@@ -1,0 +1,199 @@
+<REPC_IN150016UK05 ITSVersion="XML_1.0" 
+    xmlns="urn:hl7-org:v3">
+    <id root="BDE9311B-82A2-422F-9D7E-D0C991A57816"/>
+    <creationTime value="20120315065138"/>
+    <versionCode code="V3NPfIT4.2.00"/>
+    <interactionId root="2.16.840.1.113883.2.1.3.2.4.12" extension="REPC_IN150016UK05"/>
+    <processingCode code="P"/>
+    <processingModeCode code="T"/>
+    <acceptAckCode code="NE"/>
+    <communicationFunctionRcv typeCode="RCV">
+        <device classCode="DEV" determinerCode="INSTANCE">
+            <id root="1.2.826.0.1285.0.2.0.107" extension="655159266510"/>
+        </device>
+    </communicationFunctionRcv>
+    <communicationFunctionSnd typeCode="SND">
+        <device classCode="DEV" determinerCode="INSTANCE">
+            <id root="1.2.826.0.1285.0.2.0.107" extension="511736638012"/>
+        </device>
+    </communicationFunctionSnd>
+    <ControlActEvent classCode="CACT" moodCode="EVN">
+        <author1 typeCode="AUT">
+            <AgentSystemSDS classCode="AGNT">
+                <agentSystemSDS classCode="DEV" determinerCode="INSTANCE">
+                    <id root="1.2.826.0.1285.0.2.0.107" extension="511736638012"/>
+                </agentSystemSDS>
+            </AgentSystemSDS>
+        </author1>
+        <author typeCode="AUT">
+            <AgentPersonSDS classCode="AGNT">
+                <id root="1.2.826.0.1285.0.2.0.67" extension="055888118514"/>
+                <agentPersonSDS classCode="PSN" determinerCode="INSTANCE">
+                    <id root="1.2.826.0.1285.0.2.0.65" extension="979603625513"/>
+                </agentPersonSDS>
+                <part typeCode="PART">
+                    <partSDSRole classCode="ROL">
+                        <id extension="R0260" root="1.2.826.0.1285.0.2.1.104"/>
+                    </partSDSRole>
+                </part>
+            </AgentPersonSDS>
+        </author>
+        <subject typeCode="SUBJ" contextConductionInd="false">
+            <GPSummary classCode="COMPOSITION" moodCode="EVN">
+                <id root="938E11A2-B044-4933-AF36-123C95D6106A"/>
+                <code code="196981000000101" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="General Practice Summary"/>
+                <effectiveTime value="20120315065138"/>
+                <statusCode code="active"/>
+                <author typeCode="AUT" contextControlCode="OP">
+                    <time value="20120315065138"/>
+                    <UKCT_MT160018UK01.AgentPersonSDS classCode="AGNT" 
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                        <id root="1.2.826.0.1285.0.2.0.67" extension="055888118514"/>
+                        <agentPersonSDS classCode="PSN" determinerCode="INSTANCE">
+                            <id root="1.2.826.0.1285.0.2.0.65" extension="979603625513"/>
+                            <name>
+                                <family>NICA_Test_Automation_Healthchecks</family>
+                            </name>
+                        </agentPersonSDS>
+                    </UKCT_MT160018UK01.AgentPersonSDS>
+                </author>
+                <excerptFrom typeCode="XCRPT" inversionInd="false" contextConductionInd="true" negationInd="false">
+                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAT_RM-NPfITUK10.excerptFrom"/>
+                    <seperatableInd value="false"/>
+                    <UKCT_MT144051UK01.CareProfessionalDocumentationCRE classCode="CATEGORY" moodCode="EVN">
+                        <code code="163171000000105" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Care Professional Documentation"/>
+                        <component typeCode="COMP" inversionInd="false" negationInd="false">
+                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
+                            <seperatableInd value="false"/>
+                            <presentationText classCode="OBS" moodCode="EVN">
+                                <value mediaType="text/plain"> 
+                                <h1>header</h1>
+                                </value>
+                                <id root="EA3BCDEB-A439-4984-A519-2EE25EB3F24C"/>
+                                <code code="PresentationText" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.126" displayName="Presentation Text"/>
+                                <statusCode code="completed"/>
+                                <effectiveTime value="200804161056"/>
+                            </presentationText>
+                        </component>
+                    </UKCT_MT144051UK01.CareProfessionalDocumentationCRE>
+                </excerptFrom>
+                <pertinentInformation1 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
+                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1"/>
+                    <seperatableInd value="true"/>
+                    <pertinentRootCREType classCode="CATEGORY" moodCode="EVN">
+                        <code code="163171000000105" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Care Professional Documentation"/>
+                    </pertinentRootCREType>
+                </pertinentInformation1>
+                <pertinentInformation2 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
+                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1"/>
+                    <seperatableInd value="true"/>
+                    <pertinentCREType classCode="CATEGORY" moodCode="EVN">
+                        <code code="163221000000102" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Allergies and Adverse Reactions"/>
+                        <component typeCode="COMP" contextConductionInd="true">
+                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
+                            <seperatableInd value="false"/>
+                            <UKCT_MT144053UK02.Allergy classCode="OBS" moodCode="EVN" 
+                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <id root="F3E1EB02-A62D-4AB4-BDF5-F61405E3B6B8"/>
+                                <code code="418038007" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Propensity to adverse reaction to substance">
+                                    <originalText>Peanut allergy</originalText>
+                                    <qualifier>
+                                        <name code="246075003" displayName="causative agent"/>
+                                        <value code="91935009" displayName="Allergy to peanuts"/>
+                                    </qualifier>
+                                </code>
+                                <statusCode code="completed"/>
+                                <effectiveTime>
+                                    <low value="20080404"/>
+                                </effectiveTime>
+                            </UKCT_MT144053UK02.Allergy>
+                        </component>
+                        <component typeCode="COMP" contextConductionInd="true">
+                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
+                            <seperatableInd value="false"/>
+                            <UKCT_MT144053UK02.Allergy classCode="OBS" moodCode="EVN" 
+                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <id root="AAB6941E-40A7-404E-BC81-BA464A91F079"/>
+                                <code code="416098002" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Drug Allergy">
+                                    <originalText>Allergy - penicillamine tablets 125mg</originalText>
+                                    <qualifier>
+                                        <name code="246075003" displayName="causative agent"/>
+                                        <value code="330026007" displayName="Penicillamine 125mg tablets"/>
+                                    </qualifier>
+                                </code>
+                                <statusCode code="completed"/>
+                                <effectiveTime>
+                                    <low value="20080404"/>
+                                </effectiveTime>
+                                <pertinentInformation typeCode="PERT" contextConductionInd="true">
+                                    <seperatableInd value="false"/>
+                                    <pertinentSupportingInfo classCode="OBS" moodCode="EVN">
+                                        <value>Severity - Mild, Certainty - Possible.</value>
+                                        <code code="SupportingText" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.126" displayName="Supporting Text"/>
+                                    </pertinentSupportingInfo>
+                                </pertinentInformation>
+                            </UKCT_MT144053UK02.Allergy>
+                        </component>
+                    </pertinentCREType>
+                </pertinentInformation2>
+                <pertinentInformation2 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
+                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1"/>
+                    <seperatableInd value="true"/>
+                    <pertinentCREType classCode="CATEGORY" moodCode="EVN">
+                        <code code="185361000000102" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Medication"/>
+                        <component typeCode="COMP" contextConductionInd="true">
+                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
+                            <seperatableInd value="false"/>
+                            <UKCT_MT144040UK01.AcuteMedication classCode="SBADM" moodCode="RQO" 
+                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <id root="C967C9F4-53E4-4C87-B276-BCEFE30AC3A9"/>
+                                <code code="222671000000103" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Acute medication"/>
+                                <statusCode code="active"/>
+                                <effectiveTime value="20080404"/>
+                                <pertinentInformation1 typeCode="PERT" contextConductionInd="true">
+                                    <seperatableInd value="false"/>
+                                    <pertinentDosageInstructions classCode="OBS" moodCode="EVN">
+                                        <value>inhale 1 dose as needed</value>
+                                        <code code="DI" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.30" displayName="Dose Instructions"/>
+                                    </pertinentDosageInstructions>
+                                </pertinentInformation1>
+                                <component typeCode="COMP">
+                                    <seperatableInd value="false"/>
+                                    <medicationQuantity classCode="SPLY" moodCode="RQO">
+                                        <quantity value="1" unit="1">
+                                            <translation value="1">
+                                                <originalText>60 dose inhaler</originalText>
+                                            </translation>
+                                        </quantity>
+                                        <code code="246205007" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Quantity"/>
+                                    </medicationQuantity>
+                                </component>
+                                <consumable typeCode="CSM" contextControlCode="OP">
+                                    <manufacturedProduct classCode="MANU">
+                                        <manufacturedManufacturedMaterial classCode="MMAT" determinerCode="INSTANCE">
+                                            <code code="3382711000001107" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Ventolin 200micrograms/dose Accuhaler (GlaxoSmithKline)">
+                                                <originalText>VENTOLIN ACCUHALER 200micrograms/actuation</originalText>
+                                            </code>
+                                        </manufacturedManufacturedMaterial>
+                                    </manufacturedProduct>
+                                </consumable>
+                                <reason typeCode="RSON" inversionInd="false" negationInd="false">
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.sourceOf1"/>
+                                    <seperatableInd value="false"/>
+                                    <Diagnosis classCode="OBS" moodCode="EVN">
+                                        <id root="AAD49459-F2D8-4C1C-A08C-2B0575814A00"/>
+                                    </Diagnosis>
+                                </reason>
+                            </UKCT_MT144040UK01.AcuteMedication>
+                        </component>
+                    </pertinentCREType>
+                </pertinentInformation2>
+                <recordTarget typeCode="RCT">
+                    <patient classCode="PAT">
+                        <id root="2.16.840.1.113883.2.1.4.1" extension="9446245796"/>
+                    </patient>
+                </recordTarget>
+            </GPSummary>
+        </subject>
+    </ControlActEvent>
+</REPC_IN150016UK05>
