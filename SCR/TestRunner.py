@@ -1,6 +1,6 @@
 import unittest
-from RecordTargetTest import RecordTargetTest
-from ReplacementOfTest import ReplacementOfTest
+from Partials.RecordTargetTest import RecordTargetTest
+from Partials.ReplacementOfTest import ReplacementOfTest
 
 if __name__ == '__main__':
     #suite = unittest.TestLoader().loadTestsFromTestCase(RecordTargetTest)
