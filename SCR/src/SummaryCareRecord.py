@@ -6,7 +6,7 @@ from definitions import ROOT_DIR
 
 class SummaryCareRecord:
 
-    summaryCareRecordPath = Path(ROOT_DIR) / "src"
+    summaryCareRecordPath = Path(ROOT_DIR) / "src/MustacheTemplates"
 
     def __init__(self):
         self.builder = PystacheMessageBuilder(str(self.summaryCareRecordPath), "16UK05")

@@ -34,11 +34,20 @@ subject = {
                     'extension': '9446245796'
                 }
             }
-        }
+        },
+        'replacementOf': [
+            {
+                'priorMessageRef': {
+                    'id': {
+                        'root': "A05B9416-F700-48F1-99D8-98874D3406B9"
+                    }
+                }
+            }
+        ]
     }
 }
 
-hash = {
+replacementOf_hash = {
     'Id': 'BDE9311B-82A2-422F-9D7E-D0C991A57816',
     'creationTime': '20120315065138',
     'versionCode': 'V3NPfIT4.2.00',
@@ -95,5 +104,5 @@ hash = {
             }
         },
         'subject': subject
-    }   
+    }
 }

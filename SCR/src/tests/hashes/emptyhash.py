@@ -28,6 +28,13 @@ subject = {
                 }
             
             }
+        },
+        'recordTarget': {
+            'patient': {
+                'id': {
+                    'extension': '9446245796'
+                }
+            }
         }
     }
 }

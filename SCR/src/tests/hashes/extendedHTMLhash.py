@@ -27,6 +27,13 @@ subject = {
                     'effectiveTime': {'value': '200804161056'}
                 }
             }
+        },
+        'recordTarget': {
+            'patient': {
+                'id': {
+                    'extension': '9446245796'
+                }
+            }
         }
     }
 }

@@ -135,58 +135,6 @@
                         </component>
                     </pertinentCREType>
                 </pertinentInformation2>
-                <pertinentInformation2 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
-                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1"/>
-                    <seperatableInd value="true"/>
-                    <pertinentCREType classCode="CATEGORY" moodCode="EVN">
-                        <code code="185361000000102" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Medication"/>
-                        <component typeCode="COMP" contextConductionInd="true">
-                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
-                            <seperatableInd value="false"/>
-                            <UKCT_MT144040UK01.AcuteMedication classCode="SBADM" moodCode="RQO" 
-                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                                <id root="C967C9F4-53E4-4C87-B276-BCEFE30AC3A9"/>
-                                <code code="222671000000103" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Acute medication"/>
-                                <statusCode code="active"/>
-                                <effectiveTime value="20080404"/>
-                                <pertinentInformation1 typeCode="PERT" contextConductionInd="true">
-                                    <seperatableInd value="false"/>
-                                    <pertinentDosageInstructions classCode="OBS" moodCode="EVN">
-                                        <value>inhale 1 dose as needed</value>
-                                        <code code="DI" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.30" displayName="Dose Instructions"/>
-                                    </pertinentDosageInstructions>
-                                </pertinentInformation1>
-                                <component typeCode="COMP">
-                                    <seperatableInd value="false"/>
-                                    <medicationQuantity classCode="SPLY" moodCode="RQO">
-                                        <quantity value="1" unit="1">
-                                            <translation value="1">
-                                                <originalText>60 dose inhaler</originalText>
-                                            </translation>
-                                        </quantity>
-                                        <code code="246205007" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Quantity"/>
-                                    </medicationQuantity>
-                                </component>
-                                <consumable typeCode="CSM" contextControlCode="OP">
-                                    <manufacturedProduct classCode="MANU">
-                                        <manufacturedManufacturedMaterial classCode="MMAT" determinerCode="INSTANCE">
-                                            <code code="3382711000001107" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Ventolin 200micrograms/dose Accuhaler (GlaxoSmithKline)">
-                                                <originalText>VENTOLIN ACCUHALER 200micrograms/actuation</originalText>
-                                            </code>
-                                        </manufacturedManufacturedMaterial>
-                                    </manufacturedProduct>
-                                </consumable>
-                                <reason typeCode="RSON" inversionInd="false" negationInd="false">
-                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.sourceOf1"/>
-                                    <seperatableInd value="false"/>
-                                    <Diagnosis classCode="OBS" moodCode="EVN">
-                                        <id root="AAD49459-F2D8-4C1C-A08C-2B0575814A00"/>
-                                    </Diagnosis>
-                                </reason>
-                            </UKCT_MT144040UK01.AcuteMedication>
-                        </component>
-                    </pertinentCREType>
-                </pertinentInformation2>
                 <recordTarget typeCode="RCT">
                     <patient classCode="PAT">
                         <id root="2.16.840.1.113883.2.1.4.1" extension="9446245796"/>

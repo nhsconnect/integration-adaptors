@@ -8,6 +8,9 @@ from src.tests.hashes.emptyhash import empty_hash
 from definitions import ROOT_DIR
 from pathlib import Path
 from src.SummaryCareRecord import SummaryCareRecord
+from src.tests.hashes.replacementOfhash import replacementOf_hash
+
+from src.tests.hashes.multiReplacementOfhash import multi_replacementOf_hash
 
 
 class FullTest(unittest.TestCase):
@@ -37,4 +40,24 @@ class FullTest(unittest.TestCase):
 
         render = self.summaryCareRecord.render_hash(empty_hash)
 
+        Utilities.assert_xml_equal(expected, render)
+
+    def test_replacementOf(self):
+        root = etree.parse('./TestXmls/replacementOf.xml')
+        expected = etree.tostring(root)
+
+        render = self.summaryCareRecord.render_hash(replacementOf_hash)
+        Utilities.assert_xml_equal(expected, render)
+
+
+    def test_multipleReplacementOf(self):
+        """
+        Note: THIS IS NOT A VALID XML INSTANCE
+        This test is build purely for demonstrating having a variable number of occurrences of
+        a partial in mustache, it does not conform to the schema and will not be accepted as a valid message
+        """
+        root = etree.parse('./TestXmls/multipleReplacementOf.xml')
+        expected = etree.tostring(root)
+
+        render = self.summaryCareRecord.render_hash(multi_replacementOf_hash)
         Utilities.assert_xml_equal(expected, render)
