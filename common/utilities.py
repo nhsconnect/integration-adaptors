@@ -3,10 +3,17 @@ from lxml import etree
 from lxml import objectify
 import unittest
 
-class XmlHelper:
+
+class Utils:
 
     @staticmethod
-    def assertXmlStringsEqual(expected, actual):
+    def assert_xml_equal(expected, actual):
+        """
+        Given two strings of xml this method normalises them and asserts they are equal
+        :param expected:
+        :param actual:
+        :return:
+        """
         obj1 = objectify.fromstring(expected)
         expected = etree.tostring(obj1)
         obj2 = objectify.fromstring(actual)

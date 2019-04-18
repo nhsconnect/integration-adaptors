@@ -1,21 +1,18 @@
 import unittest
 from pystache import Renderer
 
-from lxml import etree
-from lxml import objectify
-from XmlHelper import XmlHelper
+from common.utilities import Utilities
+from pathlib import Path
+from definitions import ROOT_DIR
 
 
 class RecordTargetTest(unittest.TestCase):
-    renderer = Renderer()
-    templatePath = "./RecordTestTemplate.mustache"
 
-    # TODO: 
-    #   * Place limits on the number of occurances for typeId?
+    renderer = Renderer()
+    templatePath = Path(ROOT_DIR) / "Partials/RecordTestTemplate.mustache"
 
     def test_SimpleInput(self):
-        hash = {
-            #'recordTarget.Patient.Id': '2.16.840.1.113883.2.1.4.1'
+        input_hash = {
             'recordTarget': {
                 'Patient': {
                     'Id': {
@@ -34,11 +31,11 @@ class RecordTargetTest(unittest.TestCase):
             </recordTarget>
         """
 
-        render = self.renderer.render_path(self.templatePath, hash)
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        render = self.renderer.render_path(self.templatePath, input_hash)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_realmCode(self):
-        hash = {
+        input_hash = {
             'recordTarget': {
                 'Patient': {
                    'Id': {
@@ -47,7 +44,7 @@ class RecordTargetTest(unittest.TestCase):
                     }
                 },
                 'InfrastructureRootElements': [
-                    { 'realmCode': [
+                    {'realmCode': [
                         {'realmCode': 'qweqweqwe'}
                     ]}
                 ]
@@ -63,12 +60,12 @@ class RecordTargetTest(unittest.TestCase):
             </recordTarget>
         """
 
-        render = self.renderer.render_path(self.templatePath, hash)
+        render = self.renderer.render_path(self.templatePath, input_hash)
         
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_multiRealmCode(self):
-        hash = {
+        input_hash = {
             'recordTarget': {
                 'Patient': {
                     'Id': {
@@ -77,7 +74,7 @@ class RecordTargetTest(unittest.TestCase):
                     }
                 },
                 'InfrastructureRootElements': [
-                    { 'realmCode': [
+                    {'realmCode': [
                         {'realmCode': 'realmCode001'},
                         {'realmCode': 'realmCode002'},
                         {'realmCode': 'realmCode003'},
@@ -98,12 +95,12 @@ class RecordTargetTest(unittest.TestCase):
             </recordTarget>
         """
 
-        render = self.renderer.render_path(self.templatePath, hash)
+        render = self.renderer.render_path(self.templatePath, input_hash)
         
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_typeId(self):
-        hash = {
+        input_hash = {
             'recordTarget': {
                 'Patient': {
                     'Id': {
@@ -112,7 +109,7 @@ class RecordTargetTest(unittest.TestCase):
                     }
                 },
                 'InfrastructureRootElements': [
-                    { 'typeId': [
+                    {'typeId': [
                         {'typeId': '1.20222.2012.123'}
                     ]}
                 ]
@@ -127,12 +124,12 @@ class RecordTargetTest(unittest.TestCase):
             </recordTarget>
         """
 
-        render = self.renderer.render_path(self.templatePath, hash)
+        render = self.renderer.render_path(self.templatePath, input_hash)
         
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_templateId(self):
-        hash = {
+        input_hash = {
             'recordTarget': {
                 'Patient': {
                     'Id': {
@@ -141,7 +138,7 @@ class RecordTargetTest(unittest.TestCase):
                     }
                 },
                 'InfrastructureRootElements': [
-                    { 'templateId': [
+                    {'templateId': [
                         {'templateId': '1.20222.2012.123'}
                     ]}
                 ]
@@ -156,12 +153,12 @@ class RecordTargetTest(unittest.TestCase):
             </recordTarget>
         """
 
-        render = self.renderer.render_path(self.templatePath, hash)
+        render = self.renderer.render_path(self.templatePath, input_hash)
         
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_multiTemplateId(self):
-        hash = {
+        input_hash = {
             'recordTarget': {
                 'Patient': {
                     'Id': {
@@ -170,7 +167,7 @@ class RecordTargetTest(unittest.TestCase):
                     }
                 },
                 'InfrastructureRootElements': [
-                    { 'templateId': [
+                    {'templateId': [
                         {'templateId': 'code0001'},
                         {'templateId': 'code0002'},
                         {'templateId': 'code0003'},
@@ -191,12 +188,12 @@ class RecordTargetTest(unittest.TestCase):
             </recordTarget>
         """
 
-        render = self.renderer.render_path(self.templatePath, hash)
+        render = self.renderer.render_path(self.templatePath, input_hash)
         
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_allInfrastructureRootElements(self):
-        hash = {
+        input_hash = {
             'recordTarget': {
                 'Patient': {
                     'Id': {
@@ -205,9 +202,9 @@ class RecordTargetTest(unittest.TestCase):
                     }
                 },
                 'InfrastructureRootElements': [
-                    { 'realmCode': [{'realmCode': '1.20222.2012.123'}]},
-                    { 'typeId': [{'typeId': '1.20222.2012.123'}]},
-                    { 'templateId': [{'templateId': '1.20222.2012.123'}]}
+                    {'realmCode': [{'realmCode': '1.20222.2012.123'}]},
+                    {'typeId': [{'typeId': '1.20222.2012.123'}]},
+                    {'templateId': [{'templateId': '1.20222.2012.123'}]}
                 ]
             }
         }
@@ -222,12 +219,12 @@ class RecordTargetTest(unittest.TestCase):
             </recordTarget>
         """
 
-        render = self.renderer.render_path(self.templatePath, hash)
+        render = self.renderer.render_path(self.templatePath, input_hash)
         
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_multiAllInfrastructureRootElements(self):
-        hash = {
+        input_hash = {
             'recordTarget': {
                 'Patient': {
                     'Id': {
@@ -236,9 +233,9 @@ class RecordTargetTest(unittest.TestCase):
                     }
                 },
                 'InfrastructureRootElements': [
-                    { 'realmCode': [{'realmCode': 'realm001'}, {'realmCode': 'realm002'} ]},
-                    { 'typeId': [{'typeId': '1.20222.2012.123'}]},
-                    { 'templateId': [{'templateId': 'template001'}, {'templateId': 'template002'}]}
+                    {'realmCode': [{'realmCode': 'realm001'}, {'realmCode': 'realm002'}]},
+                    {'typeId': [{'typeId': '1.20222.2012.123'}]},
+                    {'templateId': [{'templateId': 'template001'}, {'templateId': 'template002'}]}
                 ]
             }
         }
@@ -255,10 +252,7 @@ class RecordTargetTest(unittest.TestCase):
             </recordTarget>
         """
 
-        render = self.renderer.render_path(self.templatePath, hash)
-        
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        render = self.renderer.render_path(self.templatePath, input_hash)
 
-
-if __name__ == '__main__':
-    unittest.main()
+        print(render)
+        Utilities.assert_xml_equal(expected, render)

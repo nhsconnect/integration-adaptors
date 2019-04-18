@@ -1,13 +1,16 @@
 import unittest
 from pystache import Renderer
-from XmlHelper import XmlHelper
+from common.utilities import Utilities
+from pathlib import Path
+from definitions import ROOT_DIR
 
 
 class ReplacementOfTest(unittest.TestCase):
     renderer = Renderer()
-    # TODO: 
+    # TODO:
     #   * Shift these template files to a new folder, the partial broke last time you tried this
-    templatePath = "ReplacementOfTemplate.mustache"
+    templatePath = "../Partials/ReplacementOfTemplate.mustache"
+    templatePath = Path(ROOT_DIR) / "Partials/ReplacementOfTemplate.mustache"
 
     def test_basicReplacementOf(self):
         hash = {
@@ -29,7 +32,7 @@ class ReplacementOfTest(unittest.TestCase):
         """
 
         render = self.renderer.render_path(self.templatePath, hash)
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_emptyReplacementOf(self):
         hash = {
@@ -48,7 +51,7 @@ class ReplacementOfTest(unittest.TestCase):
         """
 
         render = self.renderer.render_path(self.templatePath, hash)
-        XmlHelper.assertXmlStringsEqual(expected, render)
+        Utilities.assert_xml_equal(expected, render)
 
     def test_ReplacementOfWithInfrastructureRootElements(self):
         hash = {
@@ -79,6 +82,4 @@ class ReplacementOfTest(unittest.TestCase):
 
 
         render = self.renderer.render_path(self.templatePath, hash)
-        print(render)
-        XmlHelper.assertXmlStringsEqual(expected, render)
-    
+        Utilities.assert_xml_equal(expected, render)
