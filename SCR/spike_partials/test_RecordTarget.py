@@ -9,7 +9,7 @@ from definitions import ROOT_DIR
 class RecordTargetTest(unittest.TestCase):
 
     renderer = Renderer()
-    templatePath = Path(ROOT_DIR) / "Spike_Partials/RecordTestTemplate.mustache"
+    templatePath = Path(ROOT_DIR) / "spike_partials/RecordTestTemplate.mustache"
 
     def test_SimpleInput(self):
         input_hash = {

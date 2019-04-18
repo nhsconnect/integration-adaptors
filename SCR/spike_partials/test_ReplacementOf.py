@@ -9,8 +9,8 @@ class ReplacementOfTest(unittest.TestCase):
     renderer = Renderer()
     # TODO:
     #   * Shift these template files to a new folder, the partial broke last time you tried this
-    templatePath = "../Spike_Partials/ReplacementOfTemplate.mustache"
-    templatePath = Path(ROOT_DIR) / "Spike_Partials/ReplacementOfTemplate.mustache"
+    templatePath = "../spike_partials/ReplacementOfTemplate.mustache"
+    templatePath = Path(ROOT_DIR) / "spike_partials/ReplacementOfTemplate.mustache"
 
     def test_basicReplacementOf(self):
         hash = {

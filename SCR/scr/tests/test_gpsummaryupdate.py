@@ -2,20 +2,20 @@ import unittest
 
 from common.utilities import Utilities
 from lxml import etree
-from src.tests.hashes.hash16UK05 import hash
-from src.tests.hashes.extendedHTMLhash import extended_hash
-from src.tests.hashes.emptyhash import empty_hash
+from scr.tests.hashes.hash16UK05 import hash
+from scr.tests.hashes.extendedHTMLhash import extended_hash
+from scr.tests.hashes.emptyhash import empty_hash
 from definitions import ROOT_DIR
 from pathlib import Path
-from src.SummaryCareRecord import SummaryCareRecord
-from src.tests.hashes.replacementOfhash import replacementOf_hash
+from scr.gpsummaryupdate import SummaryCareRecord
+from scr.tests.hashes.replacementOfhash import replacementOf_hash
 
-from src.tests.hashes.multiReplacementOfhash import multi_replacementOf_hash
+from scr.tests.hashes.multiReplacementOfhash import multi_replacementOf_hash
 
 
 class FullTest(unittest.TestCase):
 
-    templatePath = Path(ROOT_DIR) / "src/16UK05.mustache"
+    templatePath = Path(ROOT_DIR) / "scr/16UK05.mustache"
     summaryCareRecord = SummaryCareRecord()
 
     def test_basic(self):
