@@ -2,27 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c847cb35-9615-4043-b2d2-9056669ab6e8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/SCR/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/TestRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/TestRunner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/MustacheTemplates/16UK05.mustache" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/data/templates/16UK05.mustache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/MustacheTemplates/BasicInformationPartial.mustache" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/data/templates/BasicInformationPartial.mustache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/MustacheTemplates/ReplacementOfPartial.mustache" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/data/templates/ReplacementOfPartial.mustache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/MustacheTemplates/pertinentInformation2Partial.mustache" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/data/templates/pertinentInformation2Partial.mustache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/SummaryCareRecord.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/gp_summary_update.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/FullGpSummaryTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/test_GpSummaryUpdate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/TestXmls/EmptyGpSummaryUpdate.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/TestXmls/EmptyGpSummaryUpdate.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/TestXmls/SummaryUpdateExtendedContents.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/TestXmls/SummaryUpdateExtendedContents.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/TestXmls/cleanSummaryUpdate.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/TestXmls/cleanSummaryUpdate.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/TestXmls/multipleReplacementOf.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/TestXmls/multipleReplacementOf.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/TestXmls/replacementOf.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/TestXmls/replacementOf.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/hashes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/hashes/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/hashes/emptyhash.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/hashes/emptyhash.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/hashes/extendedHTMLhash.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/hashes/extendedHTMLhash.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/hashes/hash16UK05.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/hashes/hash16UK05.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/hashes/multiReplacementOfhash.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/hashes/multiReplacementOfhash.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/src/tests/hashes/replacementOfhash.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/hashes/replacementOfhash.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,22 +14,36 @@
   <component name="FileEditorManager">
     <leaf>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_GpSummaryUpdate.py">
+        <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="18" column="31" lean-forward="true" selection-start-line="18" selection-start-column="31" selection-end-line="18" selection-end-column="31" />
+            <state relative-caret-position="136">
+              <caret line="11" selection-start-line="11" selection-end-line="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SCR/scr/__init__.py">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SCR/scr/gpsummaryupdate.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="204">
+              <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
               <folding>
-                <element signature="e#0#15#0" expanded="true" />
+                <element signature="e#0#64#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SCR/Spike_Partials/test_RecordTarget.py">
+        <entry file="file://$PROJECT_DIR$/SCR/spike_partials/test_RecordTarget.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="247" column="9" selection-start-line="247" selection-start-column="9" selection-end-line="247" selection-end-column="9" />
+            <state relative-caret-position="850">
+              <caret line="50" column="13" lean-forward="true" selection-start-line="50" selection-start-column="13" selection-end-line="50" selection-end-column="13" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -57,10 +52,25 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/SCR/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="204">
+                <caret line="12" column="63" selection-start-line="12" selection-start-column="63" selection-end-line="12" selection-end-column="63" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SCR/TestRunner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="11" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="11" />
+            <state relative-caret-position="323">
+              <caret line="19" column="39" selection-start-line="19" selection-start-column="39" selection-end-line="19" selection-end-column="39" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -126,16 +136,8 @@
         <option value="$PROJECT_DIR$/SCR/Spike_Partials/test_RecordTarget.py" />
         <option value="$PROJECT_DIR$/SCR/scr/SummaryCareRecord.py" />
         <option value="$PROJECT_DIR$/SCR/TestRunner.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectConfigurationFiles">
-    <option name="files">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/integration-adaptors.iml" />
-        <option value="$PROJECT_DIR$/.idea/vcs.xml" />
-        <option value="$PROJECT_DIR$/.idea/misc.xml" />
-        <option value="$PROJECT_DIR$/.idea/modules.xml" />
+        <option value="$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py" />
+        <option value="$PROJECT_DIR$/SCR/README.md" />
       </list>
     </option>
   </component>
@@ -166,20 +168,22 @@
               <item name="integration-adaptors" type="b2602c69:ProjectViewProjectNode" />
               <item name="integration-adaptors" type="462c0819:PsiDirectoryNode" />
               <item name="SCR" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
+              <item name="scr" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="integration-adaptors" type="b2602c69:ProjectViewProjectNode" />
               <item name="integration-adaptors" type="462c0819:PsiDirectoryNode" />
               <item name="SCR" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="scr" type="462c0819:PsiDirectoryNode" />
+              <item name="tests" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="integration-adaptors" type="b2602c69:ProjectViewProjectNode" />
               <item name="integration-adaptors" type="462c0819:PsiDirectoryNode" />
               <item name="SCR" type="462c0819:PsiDirectoryNode" />
-              <item name="Spike_Partials" type="462c0819:PsiDirectoryNode" />
+              <item name="scr" type="462c0819:PsiDirectoryNode" />
+              <item name="tests" type="462c0819:PsiDirectoryNode" />
+              <item name="hashes" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -364,18 +368,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_for_FullGpSummaryTest_FullTest - 2019.04.18 at 16h 03m 01s.xml">
-      <configuration name="Unittests for FullGpSummaryTest.FullTest" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_in_Spike_Partials - 2019.04.18 at 16h 06m 44s.xml">
-      <configuration name="Unittests in Spike_Partials" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_in_Spike_Partials - 2019.04.18 at 16h 07m 07s.xml">
-      <configuration name="Unittests in Spike_Partials" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_in_tests - 2019.04.18 at 16h 22m 51s.xml">
-      <configuration name="Unittests in tests" configurationId="tests" />
-    </history-entry>
     <history-entry file="Unittests_for_FullGpSummaryTest_FullTest - 2019.04.18 at 16h 23m 01s.xml">
       <configuration name="Unittests for FullGpSummaryTest.FullTest" configurationId="tests" />
     </history-entry>
@@ -394,13 +386,25 @@
     <history-entry file="Unittests_in_Spike_Partials - 2019.04.18 at 16h 28m 49s.xml">
       <configuration name="Unittests in Spike_Partials" configurationId="tests" />
     </history-entry>
+    <history-entry file="Unittests_in_test_gpsummaryupdate_py - 2019.04.18 at 16h 30m 37s.xml">
+      <configuration name="Unittests in test_gpsummaryupdate.py" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_in_tests - 2019.04.18 at 16h 30m 45s.xml">
+      <configuration name="Unittests in tests" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_in_test_gpsummaryupdate_py - 2019.04.18 at 16h 32m 29s.xml">
+      <configuration name="Unittests in test_gpsummaryupdate.py" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_in_spike_partials - 2019.04.18 at 16h 32m 41s.xml">
+      <configuration name="Unittests in spike_partials" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="6" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19652265" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15173867" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -408,7 +412,7 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.42795232" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.42795232" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -422,7 +426,7 @@
     <entry file="file://$PROJECT_DIR$/common/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/Spike_Partials/test_ReplacementOf.py">
+    <entry file="file://$PROJECT_DIR$/SCR/spike_partials/test_ReplacementOf.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="354">
           <caret line="84" column="17" selection-start-line="84" selection-start-column="17" selection-end-line="84" selection-end-column="17" />
@@ -493,7 +497,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/Spike_Partials/ReplacementOfTemplate.mustache">
+    <entry file="file://$PROJECT_DIR$/SCR/spike_partials/ReplacementOfTemplate.mustache">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret selection-end-line="7" selection-end-column="16" />
@@ -588,16 +592,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/Spike_Partials/test_RecordTarget.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="247" column="9" selection-start-line="247" selection-start-column="9" selection-end-line="247" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/site-packages/pystache/locator.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
@@ -605,27 +599,53 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_GpSummaryUpdate.py">
+    <entry file="file://$PROJECT_DIR$/SCR/TestRunner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="18" column="31" lean-forward="true" selection-start-line="18" selection-start-column="31" selection-end-line="18" selection-end-column="31" />
+        <state relative-caret-position="323">
+          <caret line="19" column="39" selection-start-line="19" selection-start-column="39" selection-end-line="19" selection-end-column="39" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/scr/gp_summary_update.py">
+    <entry file="file://$PROJECT_DIR$/SCR/scr/__init__.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="64" selection-start-column="64" selection-end-column="64" />
+        <state relative-caret-position="136">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/TestRunner.py">
+    <entry file="file://$PROJECT_DIR$/SCR/scr/gpsummaryupdate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="11" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="11" />
+        <state relative-caret-position="204">
+          <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
+          <folding>
+            <element signature="e#0#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SCR/spike_partials/test_RecordTarget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="850">
+          <caret line="50" column="13" lean-forward="true" selection-start-line="50" selection-start-column="13" selection-end-line="50" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SCR/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="204">
+            <caret line="12" column="63" selection-start-line="12" selection-start-column="63" selection-end-line="12" selection-end-column="63" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
