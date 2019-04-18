@@ -43,6 +43,12 @@ class FullTest(unittest.TestCase):
         Utilities.assert_xml_equal(expected, render)
 
     def test_replacementOf(self):
+        """
+        Note: this is not a valid xml instance
+        This is to demonstrate the condition aspect of the replacementOf partial,
+        this partial doesnt appear in the previous tests but here a list with a single
+        element is used to show how conditionals are used in mustache
+        """
         root = etree.parse('./test_xmls/replacementOf.xml')
         expected = etree.tostring(root)
 
