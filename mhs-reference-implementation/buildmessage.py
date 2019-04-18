@@ -1,8 +1,6 @@
-"""A simple script to test the use of a PystacheMessageBuilder."""
-
 from mhs.builder.pystachemessagebuilder import PystacheMessageBuilder
 
-builder = PystacheMessageBuilder("templates", "ebxml")
+builder = PystacheMessageBuilder("data/templates", "ebxml")
 message = builder.build_message({
     "from_party_id": "TESTGEN-201324",
     "to_party_id": "YEA-0000806",
