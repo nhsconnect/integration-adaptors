@@ -1,4 +1,4 @@
-"""A module that defines a Pystache-based MessageBuilder."""
+"""A module that defines a Pystache-based message builder."""
 import pystache
 from pystache import Renderer
 

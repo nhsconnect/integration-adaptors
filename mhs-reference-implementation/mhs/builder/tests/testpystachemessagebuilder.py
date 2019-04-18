@@ -1,24 +1,22 @@
+import os
+
 from unittest import TestCase
-from unittest.mock import patch, sentinel
 
-from mhs.builder.pystachemessagebuilder import PystacheMessageBuilder, Renderer
+from mhs.builder.pystachemessagebuilder import PystacheMessageBuilder
 
-TEMPLATE_DIR = "TEMPLATE_DIR"
-
-TEMPLATE_FILENAME = "template_file"
+TEMPLATES_DIR = "templates"
+TEMPLATE_FILENAME = "test"
 
 
-class PystacheMessageBuilderTest(TestCase):
-    @patch("pystache.parse")
-    @patch("mhs.builder.pystachemessagebuilder.Renderer")
-    def test_build_message(self, mock_renderer, mock_parse):
-        renderer_instance = mock_renderer.return_value
-        renderer_instance.render.return_value = sentinel.rendered_string
-        mock_parse.return_value = sentinel.parsed_template
+class TestPystacheMessageBuilder(TestCase):
+    def setUp(self):
+        current_dir = os.path.dirname(__file__)
+        templates_dir = os.path.join(current_dir, TEMPLATES_DIR)
 
-        builder = PystacheMessageBuilder(TEMPLATE_DIR, TEMPLATE_FILENAME)
-        message = builder.build_message(sentinel.message_dictionary)
+        self.builder = PystacheMessageBuilder(templates_dir, TEMPLATE_FILENAME)
 
-        renderer_instance.render.assert_called_with(sentinel.parsed_template, sentinel.message_dictionary)
-        self.assertIs(sentinel.rendered_string, message,
-                      "Message returned should be the rendered string returned by pystache")
+    def test_build_message(self):
+        message = self.builder.build_message(dict(to="world"))
+
+        self.assertEqual("Hello, world!\r\n", message,
+                         "Message returned should be the rendered string returned by Pystache")
