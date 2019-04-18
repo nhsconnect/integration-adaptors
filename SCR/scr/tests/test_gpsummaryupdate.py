@@ -19,7 +19,7 @@ class FullTest(unittest.TestCase):
     summaryCareRecord = SummaryCareRecord()
 
     def test_basic(self):
-        root = etree.parse('./TestXmls/cleanSummaryUpdate.xml')
+        root = etree.parse('./test_xmls/cleanSummaryUpdate.xml')
         expected = etree.tostring(root)
 
         render = self.summaryCareRecord.render_hash(hash)
@@ -27,7 +27,7 @@ class FullTest(unittest.TestCase):
         Utilities.assert_xml_equal(expected, render)
 
     def test_extended_html(self):
-        root = etree.parse('./TestXmls/SummaryUpdateExtendedContents.xml')
+        root = etree.parse('./test_xmls/SummaryUpdateExtendedContents.xml')
         expected = etree.tostring(root)
 
         render = self.summaryCareRecord.render_hash(extended_hash)
@@ -35,7 +35,7 @@ class FullTest(unittest.TestCase):
         Utilities.assert_xml_equal(expected, render)
 
     def test_empty_html(self):
-        root = etree.parse('./TestXmls/EmptyGpSummaryUpdate.xml')
+        root = etree.parse('./test_xmls/EmptyGpSummaryUpdate.xml')
         expected = etree.tostring(root)
 
         render = self.summaryCareRecord.render_hash(empty_hash)
@@ -43,7 +43,7 @@ class FullTest(unittest.TestCase):
         Utilities.assert_xml_equal(expected, render)
 
     def test_replacementOf(self):
-        root = etree.parse('./TestXmls/replacementOf.xml')
+        root = etree.parse('./test_xmls/replacementOf.xml')
         expected = etree.tostring(root)
 
         render = self.summaryCareRecord.render_hash(replacementOf_hash)
@@ -56,7 +56,7 @@ class FullTest(unittest.TestCase):
         This test is build purely for demonstrating having a variable number of occurrences of
         a partial in mustache, it does not conform to the schema and will not be accepted as a valid message
         """
-        root = etree.parse('./TestXmls/multipleReplacementOf.xml')
+        root = etree.parse('./test_xmls/multipleReplacementOf.xml')
         expected = etree.tostring(root)
 
         render = self.summaryCareRecord.render_hash(multi_replacementOf_hash)
