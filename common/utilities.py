@@ -4,7 +4,7 @@ from lxml import objectify
 import unittest
 
 
-class Utils:
+class Utilities:
 
     @staticmethod
     def assert_xml_equal(expected, actual):
