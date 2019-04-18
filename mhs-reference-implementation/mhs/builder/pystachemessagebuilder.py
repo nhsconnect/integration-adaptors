@@ -2,11 +2,9 @@
 import pystache
 from pystache import Renderer
 
-from mhs.builder.messagebuilder import MessageBuilder
 
-
-class PystacheMessageBuilder(MessageBuilder):
-    """A MessageBuilder that uses Pystache to populate a Mustache template in order to build a message."""
+class PystacheMessageBuilder:
+    """A component that uses Pystache to populate a Mustache template in order to build a message."""
 
     def __init__(self, template_dir, template_file):
         """Create a new PystacheMessageBuilder that uses the specified template file.
