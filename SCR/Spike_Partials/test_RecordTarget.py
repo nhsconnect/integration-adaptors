@@ -9,7 +9,7 @@ from definitions import ROOT_DIR
 class RecordTargetTest(unittest.TestCase):
 
     renderer = Renderer()
-    templatePath = Path(ROOT_DIR) / "Partials/RecordTestTemplate.mustache"
+    templatePath = Path(ROOT_DIR) / "Spike_Partials/RecordTestTemplate.mustache"
 
     def test_SimpleInput(self):
         input_hash = {
@@ -253,6 +253,4 @@ class RecordTargetTest(unittest.TestCase):
         """
 
         render = self.renderer.render_path(self.templatePath, input_hash)
-
-        print(render)
         Utilities.assert_xml_equal(expected, render)
