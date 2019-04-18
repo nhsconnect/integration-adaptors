@@ -1,0 +1,197 @@
+----=_MIME-Boundary
+Content-Id: <ebXMLHeader@spine.nhs.uk>
+Content-Type: text/xml; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP:Envelope xmlns:xsi="http://www.w3c.org/2001/XML-Schema-Instance" xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:hl7ebxml="urn:hl7-org:transport/ebXML/DSTUv1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+<SOAP:Header>
+	<eb:MessageHeader SOAP:mustUnderstand="1" eb:version="2.0">
+		<eb:From>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">TESTGEN-201324</eb:PartyId>
+		</eb:From>
+		<eb:To>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YEA-0000806</eb:PartyId>
+		</eb:To>
+		<eb:CPAId>S1001A1630</eb:CPAId>
+		<eb:ConversationId>54DE3828-6062-11E9-A444-0050562EB96B</eb:ConversationId>
+		<eb:Service>urn:nhs:names:services:psis</eb:Service>
+		<eb:Action>REPC_IN150015UK05</eb:Action>
+		<eb:MessageData>
+			<eb:MessageId>54DE3828-6062-11E9-A444-0050562EB96B</eb:MessageId>
+			<eb:Timestamp>2012-03-15T06:51:08Z</eb:Timestamp>
+		</eb:MessageData>
+		<eb:DuplicateElimination/>
+	</eb:MessageHeader>
+	<eb:AckRequested SOAP:mustUnderstand="1" eb:version="2.0" eb:signed="false" SOAP:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH"/>
+	<eb:SyncReply SOAP:mustUnderstand="1" eb:version="2.0" SOAP:actor="http://schemas.xmlsoap.org/soap/actor/next"/>
+</SOAP:Header>
+<SOAP:Body>
+	<eb:Manifest SOAP:mustUnderstand="1" eb:version="2.0">
+		<eb:Reference xlink:href="cid:54DE3828-6062-11E9-A444-0050562EB96B@spine.nhs.uk">
+			<eb:Schema eb:location="http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd" eb:version="1.0"/>
+			<eb:Description xml:lang="en">HL7 payload</eb:Description>
+			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
+		</eb:Reference>
+
+	</eb:Manifest>
+</SOAP:Body>
+</SOAP:Envelope>
+
+----=_MIME-Boundary
+Content-Id: <54DE3828-6062-11E9-A444-0050562EB96B@spine.nhs.uk>
+Content-Type: text/xml; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<REPC_IN150015UK05 xsi:schemaLocation="urn:hl7-org:v3 REPC_IN150015UK05.xsd" xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ITSVersion="XML_1.0">
+	<id root="54DE3828-6062-11E9-A444-0050562EB96B"/>
+	<creationTime value="20190416161145"/>
+	<versionCode code="V3NPfIT4.2.00"/>
+	<interactionId root="2.16.840.1.113883.2.1.3.2.4.12" extension="REPC_IN150015UK05"/>
+	<processingCode code="P"/>
+	<processingModeCode code="T"/>
+	<acceptAckCode code="NE"/>
+	<communicationFunctionRcv typeCode="RCV">
+		<device classCode="DEV" determinerCode="INSTANCE">
+			<id root="1.2.826.0.1285.0.2.0.107" extension="990101234567"/>
+		</device>
+	</communicationFunctionRcv>
+	<communicationFunctionSnd typeCode="SND">
+		<device classCode="DEV" determinerCode="INSTANCE">
+			<id root="1.2.826.0.1285.0.2.0.107" extension="230811201324"/>
+		</device>
+	</communicationFunctionSnd>
+	<ControlActEvent classCode="CACT" moodCode="EVN">
+		<author1 typeCode="AUT">
+			<AgentSystemSDS classCode="AGNT">
+				<agentSystemSDS classCode="DEV" determinerCode="INSTANCE">
+					<id root="1.2.826.0.1285.0.2.0.107" extension="230811201324"/>
+				</agentSystemSDS>
+			</AgentSystemSDS>
+		</author1>
+		<subject typeCode="SUBJ" contextConductionInd="false">
+			<GPSummary classCode="COMPOSITION" moodCode="EVN">
+				<id root="54D4228E-6062-11E9-A444-0050562EB96B"/>
+				<code code="196971000000103" displayName="General Practice Initial Summary" codeSystem="2.16.840.1.113883.2.1.3.2.4.15"/>
+				<statusCode code="active"/>
+				<effectiveTime value="20190416161145"/>
+				<author typeCode="AUT" contextControlCode="OP">
+					<time value="20120315065107"/>
+					<UKCT_MT160017UK01.AgentOrgSDS classCode="AGNT">
+						<agentOrganizationSDS classCode="ORG" determinerCode="INSTANCE">
+							<id extension="B81077" root="1.2.826.0.1285.0.1.10"/>
+							<name>WOODFORD MEDICAL CENTRE</name>
+						</agentOrganizationSDS>
+					</UKCT_MT160017UK01.AgentOrgSDS>
+				</author>
+				<excerptFrom typeCode="XCRPT" inversionInd="false" contextConductionInd="true" negationInd="false">
+					<templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAT_RM-NPfITUK10.excerptFrom"/>
+					<seperatableInd value="false"/>
+					<UKCT_MT144051UK01.CareProfessionalDocumentationCRE classCode="CATEGORY" moodCode="EVN">
+						<code code="163171000000105" displayName="Care Professional Documentation" codeSystem="2.16.840.1.113883.2.1.3.2.4.15"/>
+						<component typeCode="COMP" inversionInd="false" negationInd="false">
+							<templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
+							<seperatableInd value="false"/>
+							<presentationText classCode="OBS" moodCode="EVN">
+								<value mediaType="text/plain" xsi:type="ED.NPfIT.Text.XHTML">
+									<html xmlns="xhtml:NPfIT:PresentationText">
+										<head/>
+										<body>
+											<h2 id="Title">General Practice Initial Summary</h2>
+											<h3 id="Disclaimer">This is a GP Initial Summary sourced from the patient's General Practice record. This information has not been verified by the practice prior to sending. This summary will not include all the information pertinent to this patient.</h3>
+											<h3 id="CreateTime">Time of summary creation 05/11/2008 10:51:04</h3>
+											<h3 id="SendTime">Time of sending 05/11/2008 10:51:08</h3>
+											<h3 id="Author">Author WOODFORD MEDICAL CENTRE</h3>
+											<h2 id="Allergies" class="CreType">Allergies and Adverse reactions</h2>
+											<table id="AllergiesTable">
+												<thead>
+													<tr>
+														<th>Date</th>
+														<th>Description</th>
+														<th>Severity</th>
+														<th>Certainty</th>
+														<th>Reaction</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td id="Date">14/03/2007</td>
+														<td>H/O: penicillin allergy to PENICILLIN V elixir 250mg/5ml</td>
+														<td>Moderate</td>
+														<td>Likely</td>
+														<td>Allergy</td>
+													</tr>
+												</tbody>
+											</table>
+											<h2 id="RepeatMeds" class="CreType">Repeat Medication</h2>
+											<table id="RepeatMedsTable">
+												<thead>
+													<tr>
+														<th>Date first added</th>
+														<th>Medication Item</th>
+														<th>Dosage instructions</th>
+														<th>Quantity or duration</th>
+														<th>Reason for medication</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td id="Date">22/08/2008</td>
+														<td>ROACCUTANE caps 5mg</td>
+														<td>AS DIRECTED</td>
+														<td>6 capsule(s)</td>
+														<td/>
+													</tr>
+												</tbody>
+											</table>
+											<h2 id="DiscRepeatMeds" class="CreType">Discontinued Repeat Medication</h2>
+											<p>The practice system holds no record of Repeat Medication that has been recently discontinued</p>
+											<h2 id="AcuteMeds" class="CreType">Acute Medication</h2>
+											<table id="AcuteMedsTable">
+												<thead>
+													<tr>
+														<th>Date prescribed</th>
+														<th>Medication Item</th>
+														<th>Dosage instructions</th>
+														<th>Quantity or duration</th>
+														<th>Reason for medication</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td id="Date">14/09/2008</td>
+														<td>GABAPENTIN caps 100mg</td>
+														<td>TAKE ONE 3 TIMES/DAY</td>
+														<td>100 capsule(s)</td>
+														<td/>
+													</tr>
+												</tbody>
+											</table>
+										</body>
+									</html>
+								</value>
+								<id root="D74EF2CA-3730-4E4F-A13F-8189D7D9241E"/>
+								<code code="PresentationText" displayName="Presentation Text" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.126"/>
+								<statusCode code="completed"/>
+								<effectiveTime value="20081105105108"/>
+							</presentationText>
+						</component>
+					</UKCT_MT144051UK01.CareProfessionalDocumentationCRE>
+				</excerptFrom>
+				<pertinentInformation1 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
+					<templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1"/>
+					<seperatableInd value="true"/>
+					<pertinentRootCREType classCode="CATEGORY" moodCode="EVN">
+						<code code="163171000000105" displayName="Care Professional Documentation" codeSystem="2.16.840.1.113883.2.1.3.2.4.15"/>
+					</pertinentRootCREType>
+				</pertinentInformation1>
+				<recordTarget typeCode="RCT">
+					<patient classCode="PAT">
+						<id extension="9995000261" root="2.16.840.1.113883.2.1.4.1"/>
+					</patient>
+				</recordTarget>
+			</GPSummary>
+		</subject>
+	</ControlActEvent>
+</REPC_IN150015UK05>
+----=_MIME-Boundary
