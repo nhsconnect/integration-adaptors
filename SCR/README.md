@@ -1,7 +1,7 @@
 #### **Proof of Concept: Summary Care Record**
 
 The objective of this PoC was to provide a set of assets that would assist a new supplier in the 
-implementation of the Gp Summary Update action[1] of the `spine` system. 
+implementation of the Gp Summary Update action[1] of the spine system. 
 
 Within the `data/templates` directory there exists a `mustache` [2] 
 template of the message to be sent to the spine system, and in the `scr/gpsummaryupdate` module there is a simple interface designed to be fed a 
