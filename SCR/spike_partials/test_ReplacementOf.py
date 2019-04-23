@@ -80,6 +80,5 @@ class ReplacementOfTest(unittest.TestCase):
             </replacementOf>
         """
 
-
         render = self.renderer.render_path(self.templatePath, hash)
         Utilities.assert_xml_equal(expected, render)

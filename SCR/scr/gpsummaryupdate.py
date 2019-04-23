@@ -10,7 +10,7 @@ class SummaryCareRecord:
     def __init__(self):
         self.builder = PystacheMessageBuilder(str(self.summaryCareRecordPath), "16UK05")
 
-    def render_hash(self, input_hash):
+    def populate_template(self, input_hash):
         """
         Given a python dictionary this method returns a xml string containing the populated template of the
         GP Summary Update template

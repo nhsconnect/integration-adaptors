@@ -15,30 +15,29 @@ from scr.tests.hashes.multiReplacementOfhash import multi_replacementOf_hash
 
 class FullTest(unittest.TestCase):
 
-    templatePath = Path(ROOT_DIR) / "scr/16UK05.mustache"
     summaryCareRecord = SummaryCareRecord()
 
     def test_basic(self):
-        root = etree.parse('./test_xmls/cleanSummaryUpdate.xml')
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.render_hash(hash)
+        render = self.summaryCareRecord.populate_template(hash)
 
         Utilities.assert_xml_equal(expected, render)
 
     def test_extended_html(self):
-        root = etree.parse('./test_xmls/SummaryUpdateExtendedContents.xml')
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/SummaryUpdateExtendedContents.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.render_hash(extended_hash)
+        render = self.summaryCareRecord.populate_template(extended_hash)
 
         Utilities.assert_xml_equal(expected, render)
 
     def test_empty_html(self):
-        root = etree.parse('./test_xmls/EmptyGpSummaryUpdate.xml')
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/EmptyGpSummaryUpdate.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.render_hash(empty_hash)
+        render = self.summaryCareRecord.populate_template(empty_hash)
 
         Utilities.assert_xml_equal(expected, render)
 
@@ -49,12 +48,11 @@ class FullTest(unittest.TestCase):
         this partial doesnt appear in the previous tests but here a list with a single
         element is used to show how conditionals are used in mustache
         """
-        root = etree.parse('./test_xmls/replacementOf.xml')
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/replacementOf.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.render_hash(replacementOf_hash)
+        render = self.summaryCareRecord.populate_template(replacementOf_hash)
         Utilities.assert_xml_equal(expected, render)
-
 
     def test_multipleReplacementOf(self):
         """
@@ -62,8 +60,9 @@ class FullTest(unittest.TestCase):
         This test is build purely for demonstrating having a variable number of occurrences of
         a partial in mustache, it does not conform to the schema and will not be accepted as a valid message
         """
-        root = etree.parse('./test_xmls/multipleReplacementOf.xml')
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/multipleReplacementOf.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.render_hash(multi_replacementOf_hash)
+        render = self.summaryCareRecord.populate_template(multi_replacementOf_hash)
         Utilities.assert_xml_equal(expected, render)
+
