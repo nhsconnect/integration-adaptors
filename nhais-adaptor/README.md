@@ -6,4 +6,4 @@ An adaptor for interfacing with NHAIS
 Will take a FHIR payload and convert to an EDIFACT message to be consumed by NHAIS
 
 ## Incoming
-Will take an EDIFACT message and convert to a FHIR reponse to be consumed by the GP system
+Will take an EDIFACT message and convert to a FHIR response to be consumed by the GP system
