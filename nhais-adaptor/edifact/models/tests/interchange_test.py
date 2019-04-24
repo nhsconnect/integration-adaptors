@@ -18,8 +18,8 @@ class InterchangeTrailerTest(unittest.TestCase):
     """
 
     def test_interchange_trailer_to_edifact(self):
-        int_hdr = InterchangeTrailer(number_of_messages=1, sequence_number="00001").to_edifact()
-        self.assertEqual(int_hdr, "UNZ+1+00001'")
+        int_trl = InterchangeTrailer(number_of_messages=1, sequence_number="00001").to_edifact()
+        self.assertEqual(int_trl, "UNZ+1+00001'")
 
 
 class InterchangeTest(unittest.TestCase):

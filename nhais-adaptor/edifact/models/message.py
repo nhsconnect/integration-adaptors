@@ -35,3 +35,21 @@ class MessageTrailer(Segment):
         segment_value = f"{number_of_segments}+{sequence_number}"
         super().__init__(key=self.SEGMENT_KEY, value=segment_value)
 
+
+class Message(object):
+    """
+    An edifact Message that is contained within an interchange
+    a collection of Segments
+    """
+
+    def __init__(self, header, trailer):
+        """
+        :param header: the header of the message
+        :param trailer: the trailer of the message
+        """
+        self.segments = [header, trailer]
+
+    def to_edifact(self):
+        edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
+        return edifact_message
+
