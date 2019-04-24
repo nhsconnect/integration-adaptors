@@ -8,8 +8,8 @@ class InterchangeHeaderTest(unittest.TestCase):
     """
 
     def test_interchange_header_to_edifact(self):
-        int_hdr = InterchangeHeader(sender="SNDR", recipient="RECP", date_time="920113:1317", sequence_number="00001").to_edifact()
-        self.assertEqual(int_hdr, "UNB+UNOA:2+SNDR+RECP+920113:1317+00001'")
+        int_hdr = InterchangeHeader(sender="SNDR", recipient="RECP", date_time="2019-04-23 09:00:04.159338", sequence_number="00001").to_edifact()
+        self.assertEqual(int_hdr, "UNB+UNOA:2+SNDR+RECP+190423:0900+00001'")
 
 
 class InterchangeTest(unittest.TestCase):

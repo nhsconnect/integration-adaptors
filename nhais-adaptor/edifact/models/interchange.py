@@ -1,3 +1,4 @@
+from datetime import datetime
 from edifact.models.segment import Segment
 
 
@@ -17,7 +18,8 @@ class InterchangeHeader(Segment):
         :param date_time: the date time stamp of the interchange header
         :param sequence_number: a unique reference of the interchange
         """
-        segment_value = f"UNOA:2+{sender}+{recipient}+{date_time}+{sequence_number}"
+        formatted_date_time = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S.%f').strftime('%y%m%d:%H%M')
+        segment_value = f"UNOA:2+{sender}+{recipient}+{formatted_date_time}+{sequence_number}"
         super().__init__(key=InterchangeHeader.SEGMENT_KEY, value=segment_value)
 
 
