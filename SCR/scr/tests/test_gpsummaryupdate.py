@@ -83,3 +83,15 @@ class FullTest(unittest.TestCase):
         render = self.summaryCareRecord.populate_template_with_file(file_path)
         Utilities.assert_xml_equal(expected, render)
 
+    def test_python_dictionary_example(self):
+        """
+        Basic test to demonstrate passing a python dict to the interface instead of a json file
+        :return:
+        """
+
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
+        expected = etree.tostring(root)
+        from scr.tests.hashes.basic_dict import input_hash
+
+        render = self.summaryCareRecord.populate_template(input_hash)
+        Utilities.assert_xml_equal(expected, render)
