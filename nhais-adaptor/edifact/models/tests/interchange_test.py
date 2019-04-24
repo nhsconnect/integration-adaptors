@@ -1,7 +1,8 @@
 import unittest
 from edifact.models.interchange import Interchange, InterchangeHeader, InterchangeTrailer
-from edifact.models.message import MessageHeader, MessageBeginning, MessageSegmentTrigger1, MessageTrailer, Message
-
+from edifact.models.message import MessageHeader, MessageBeginning, MessageSegmentTrigger1, MessageSegmentTrigger2, MessageTrailer, Message
+from edifact.models.name import Name
+from edifact.models.address import Address
 
 class InterchangeHeaderTest(unittest.TestCase):
     """
@@ -41,6 +42,11 @@ class InterchangeTest(unittest.TestCase):
             "HEA+ATP+1:ZZZ'"
             "DTM+956:20190423:102'"
             "LOC+950+BURY'"
+            "S02+2'"
+            "PNA+PAT+N/10/10:OPI+++SU:STEVENS+FO:CHARLES+TI:MR+MI:ANTHONY+FS:JOHN'"
+            "DTM+329:20190420:102'"
+            "PDI+1'"
+            "NAD+PAT++MOORSIDE FARM:OLD LANE:ST PAULS CRAY:ORPINGTON:KENT+++++BR6 7EW'"
             "UNT+5+00001'"
             "UNZ+1+00001'")
 
@@ -54,8 +60,13 @@ class InterchangeTest(unittest.TestCase):
                                            acceptance_type="1",
                                            date_time="2019-04-23 09:00:04.159338",
                                            location="Bury")
+        patient_name = Name(family_name="Stevens", first_given_forename="Charles", title="Mr", middle_name="Anthony", third_given_forename="John")
+        patient_address = Address(house_name="MOORSIDE FARM", address_line_1="OLD LANE",
+                                  address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
+
+        msg_trg_2 = MessageSegmentTrigger2(id_number="N/10/10", name=patient_name, date_of_birth="2019-04-20", gender="1", address=patient_address)
         msg_trl = MessageTrailer(number_of_segments=5, sequence_number="00001")
-        msg = Message(header=msg_hdr, message_beginning=msg_bgn, message_segment_trigger_1=msg_trg_1, trailer=msg_trl)
+        msg = Message(header=msg_hdr, message_beginning=msg_bgn, message_segment_trigger_1=msg_trg_1, message_segment_trigger_2=msg_trg_2, trailer=msg_trl)
         int_trl = InterchangeTrailer(number_of_messages=1, sequence_number="00001")
         interchange = Interchange(header=int_hdr, message=msg, trailer=int_trl).to_edifact()
         self.assertEqual(interchange, expected_edifact_interchange)
