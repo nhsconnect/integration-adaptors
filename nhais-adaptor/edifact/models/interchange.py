@@ -47,11 +47,16 @@ class Interchange(SegmentCollection):
     It is constructed using a list of Segments
     """
 
-    def __init__(self, header, message, trailer):
+    def __init__(self, sender, recipient, sequence_number, date_time, message):
         """
-        :param header: The header of the interchange
+        :param sender: the sender of the interchange
+        :param recipient: the intended recipient of the interchange
+        :param date_time: the date time stamp of the interchange header
+        :param sequence_number: a unique reference of the interchange
         :param message: The message of the interchange
-        :param trailer: the trailer of the interchange
         """
-        segments = [header, message, trailer]
+        int_hdr = InterchangeHeader(sender=sender, recipient=recipient, date_time=date_time, sequence_number=sequence_number)
+        message_size = 1
+        int_trl = InterchangeTrailer(number_of_messages=message_size, sequence_number=sequence_number)
+        segments = [int_hdr, message, int_trl]
         super().__init__(segments)

@@ -1,8 +1,9 @@
 import unittest
 from edifact.models.interchange import Interchange, InterchangeHeader, InterchangeTrailer
-from edifact.models.message import MessageHeader, MessageBeginning, MessageSegmentTrigger1, MessageSegmentTrigger2, MessageTrailer, Message
+from edifact.models.message import MessageBeginning, MessageSegmentTrigger1, MessageSegmentTrigger2, Message
 from edifact.models.name import Name
 from edifact.models.address import Address
+
 
 class InterchangeHeaderTest(unittest.TestCase):
     """
@@ -51,7 +52,6 @@ class InterchangeTest(unittest.TestCase):
             "UNZ+1+00001'")
 
         date_time = "2019-04-23 09:00:04.159338"
-        int_hdr = InterchangeHeader(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001")
 
         msg_bgn = MessageBeginning(party_id="XX1", date_time=date_time, ref_number="G1")
         msg_trg_1 = MessageSegmentTrigger1(transaction_number=17,
@@ -67,8 +67,8 @@ class InterchangeTest(unittest.TestCase):
         msg_trg_2 = MessageSegmentTrigger2(id_number="N/10/10", name=patient_name, date_of_birth="2019-04-20", gender="1", address=patient_address)
 
         msg = Message(sequence_number="00001", message_beginning=msg_bgn, message_segment_trigger_1=msg_trg_1, message_segment_trigger_2=msg_trg_2)
-        int_trl = InterchangeTrailer(number_of_messages=1, sequence_number="00001")
-        interchange = Interchange(header=int_hdr, message=msg, trailer=int_trl).to_edifact()
+
+        interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001", message=msg).to_edifact()
         self.assertEqual(interchange, expected_edifact_interchange)
 
 
