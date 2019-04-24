@@ -21,6 +21,15 @@ class SummaryCareRecord:
             data = json.load(file)
             return self.populate_template(data)
 
+    def populate_template_with_json_string(self, json_string):
+        """
+        Parses a json string to a python dictionary and renders the template
+        :param json_string:
+        :return: populated template xml string
+        """
+        data = json.loads(json_string)
+        return self.populate_template(data)
+
     def populate_template(self, input_hash):
         """
         Given a python dictionary this method returns a xml string containing the populated template of the
@@ -29,3 +38,4 @@ class SummaryCareRecord:
         :return: xml string containing populated template
         """
         return self.builder.build_message(input_hash)
+

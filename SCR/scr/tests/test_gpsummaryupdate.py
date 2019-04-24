@@ -17,7 +17,8 @@ class FullTest(unittest.TestCase):
         """
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         expected = etree.tostring(root)
-        render = self.summaryCareRecord.populate_template_with_file(str(Path(ROOT_DIR) / 'scr/tests/hashes/hash16UK05.json'))
+        render = self.summaryCareRecord.populate_template_with_file(
+            str(Path(ROOT_DIR) / 'scr/tests/hashes/hash16UK05.json'))
         Utilities.assert_xml_equal(expected, render)
 
     def test_extended_html(self):
@@ -88,10 +89,22 @@ class FullTest(unittest.TestCase):
         Basic test to demonstrate passing a python dict to the interface instead of a json file
         :return:
         """
-
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         expected = etree.tostring(root)
         from scr.tests.hashes.basic_dict import input_hash
 
         render = self.summaryCareRecord.populate_template(input_hash)
         Utilities.assert_xml_equal(expected, render)
+
+    def test_json_string_example(self):
+        """
+        Basic example showing how a json string can be passed to the interface
+        :return:
+        """
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
+        expected = etree.tostring(root)
+        json_file = str(Path(ROOT_DIR) / 'scr/tests/hashes/hash16UK05.json')
+        with open(json_file) as file:
+            data = file.read()  # Reads file contents into a string
+            render = self.summaryCareRecord.populate_template_with_json_string(data)
+            Utilities.assert_xml_equal(expected, render)
