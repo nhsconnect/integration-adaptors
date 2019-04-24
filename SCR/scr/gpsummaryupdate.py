@@ -3,6 +3,7 @@ from pathlib import Path
 from definitions import ROOT_DIR
 import json
 
+
 class SummaryCareRecord:
 
     summaryCareRecordPath = Path(ROOT_DIR) / "data/templates"

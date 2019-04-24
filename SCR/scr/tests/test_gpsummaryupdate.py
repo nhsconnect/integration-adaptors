@@ -36,14 +36,24 @@ class FullTest(unittest.TestCase):
     def test_empty_html(self):
         """
         A test for an empty human readable content value
-        :return:
         """
-        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/EmptyGpSummaryUpdate.xml'))
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/EmptyHtmlGpSummaryUpdate.xml'))
         expected = etree.tostring(root)
 
-        file_path = str(Path(ROOT_DIR) / 'scr/tests/hashes/emptyhash.json')
+        file_path = str(Path(ROOT_DIR) / 'scr/tests/hashes/emptyHtmlHash.json')
         render = self.summaryCareRecord.populate_template_with_file(file_path)
 
+        Utilities.assert_xml_equal(expected, render)
+
+    def test_empty_hash(self):
+        """
+        Tests the contents are empty when a completely blank hash is provided
+        """
+        root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/EmptyHash.xml'))
+        expected = etree.tostring(root)
+
+        file_path = str(Path(ROOT_DIR) / 'scr/tests/hashes/EmptyHash.json')
+        render = self.summaryCareRecord.populate_template_with_file(file_path)
         Utilities.assert_xml_equal(expected, render)
 
     def test_replacementOf(self):
