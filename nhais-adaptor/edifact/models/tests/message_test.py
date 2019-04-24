@@ -39,10 +39,17 @@ class MessageTest(unittest.TestCase):
     """
 
     def test_message_to_edifact(self):
+        expected_edifact_message = ("UNH+00001+FHSREG:0:1:FH:FHS001'"
+            "BGM+++507'"
+            "NAD+FHS+XX1:954'"
+            "DTM+137:201904230900:203'"
+            "RFF+950:G1'"
+            "UNT+5+00001'")
         msg_hdr = MessageHeader(sequence_number="00001")
+        msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
         msg_trl = MessageTrailer(number_of_segments=5, sequence_number="00001")
-        msg = Message(header=msg_hdr, trailer=msg_trl).to_edifact()
-        self.assertEqual(msg, "UNH+00001+FHSREG:0:1:FH:FHS001'UNT+5+00001'")
+        msg = Message(header=msg_hdr, message_beginning=msg_bgn, trailer=msg_trl).to_edifact()
+        self.assertEqual(msg, expected_edifact_message)
 
 
 if __name__ == '__main__':

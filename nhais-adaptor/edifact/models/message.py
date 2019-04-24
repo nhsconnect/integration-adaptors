@@ -69,12 +69,13 @@ class Message(object):
     a collection of Segments
     """
 
-    def __init__(self, header, trailer):
+    def __init__(self, header, message_beginning, trailer):
         """
         :param header: the header of the message
+        :param message_beginning: the beginning of the message
         :param trailer: the trailer of the message
         """
-        self.segments = [header, trailer]
+        self.segments = [header, message_beginning, trailer]
 
     def to_edifact(self):
         edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
