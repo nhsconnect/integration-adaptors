@@ -1,3 +1,4 @@
+from datetime import datetime
 from edifact.models.segment import Segment
 
 
@@ -34,6 +35,32 @@ class MessageTrailer(Segment):
         """
         segment_value = f"{number_of_segments}+{sequence_number}"
         super().__init__(key=self.SEGMENT_KEY, value=segment_value)
+
+
+class MessageBeginning(object):
+    """
+    A collection of segments that represent the start of a message
+    Provides details regarding the purpose of the message
+    """
+
+    def __init__(self, party_id, date_time, ref_number):
+        """
+        Create the collection of segments represent the beginning of a message
+        :param party_id: Cipher of the NHAIS system, can be 2 or 3 characters
+        :param date_time: the date time stamp of the message
+        :param ref_number: a reference number for registration transaction type
+        """
+        formatted_date_time = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y%m%d%H%M')
+        self.segments = [
+            Segment(key="BGM", value="++507"),
+            Segment(key="NAD", value=f"FHS+{party_id}:954"),
+            Segment(key="DTM", value=f"137:{formatted_date_time}:203"),
+            Segment(key="RFF", value=f"950:{ref_number}"),
+        ]
+
+    def to_edifact(self):
+        edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
+        return edifact_message
 
 
 class Message(object):

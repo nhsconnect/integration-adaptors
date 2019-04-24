@@ -1,5 +1,5 @@
 import unittest
-from edifact.models.message import MessageHeader, MessageTrailer, Message
+from edifact.models.message import MessageHeader, MessageBeginning, MessageTrailer, Message
 
 
 class MessageHeaderTest(unittest.TestCase):
@@ -20,6 +20,17 @@ class MessageTrailerTest(unittest.TestCase):
     def test_message_trailer_to_edifact(self):
         msg_trl = MessageTrailer(number_of_segments=5, sequence_number="00001").to_edifact()
         self.assertEqual(msg_trl, "UNT+5+00001'")
+
+
+class MessageBeginningTest(unittest.TestCase):
+    """
+    Test the generating of a message beginning
+    """
+
+    def test_message_beginning_to_edifact(self):
+        expected_edifact_msg_beginning = """BGM+++507'NAD+FHS+XX1:954'DTM+137:201904230900:203'RFF+950:G1'"""
+        msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1").to_edifact()
+        self.assertEqual(msg_bgn, expected_edifact_msg_beginning)
 
 
 class MessageTest(unittest.TestCase):
