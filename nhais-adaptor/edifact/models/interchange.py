@@ -1,5 +1,5 @@
 from datetime import datetime
-from edifact.models.segment import Segment
+from edifact.models.segment import Segment, SegmentCollection
 
 
 class InterchangeHeader(Segment):
@@ -41,7 +41,7 @@ class InterchangeTrailer(Segment):
         super().__init__(key=self.SEGMENT_KEY, value=segment_value)
 
 
-class Interchange(object):
+class Interchange(SegmentCollection):
     """
     The edifact interchange that is used to interface with NHAIS
     It is constructed using a list of Segments
@@ -53,8 +53,5 @@ class Interchange(object):
         :param message: The message of the interchange
         :param trailer: the trailer of the interchange
         """
-        self.segments = [header, message, trailer]
-
-    def to_edifact(self):
-        edifact_interchange = ''.join([segment.to_edifact() for segment in self.segments])
-        return edifact_interchange
+        segments = [header, message, trailer]
+        super().__init__(segments)

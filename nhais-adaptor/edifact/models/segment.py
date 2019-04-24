@@ -24,3 +24,19 @@ class Segment(object):
         edifact_segment = f"{self.key}+{self.value}{Segment.TERMINATOR}"
         return edifact_segment
 
+
+class SegmentCollection(object):
+    """
+    A collection of segments base class
+    """
+
+    def __init__(self, segments):
+        """
+        :param segments: the collection of segments
+        """
+        self.segments = segments
+
+    def to_edifact(self):
+        edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
+        return edifact_message
+

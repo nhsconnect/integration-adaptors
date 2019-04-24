@@ -1,5 +1,5 @@
 from datetime import datetime
-from edifact.models.segment import Segment
+from edifact.models.segment import Segment, SegmentCollection
 
 
 class MessageHeader(Segment):
@@ -37,7 +37,7 @@ class MessageTrailer(Segment):
         super().__init__(key=self.SEGMENT_KEY, value=segment_value)
 
 
-class MessageBeginning(object):
+class MessageBeginning(SegmentCollection):
     """
     A collection of segments that represent the start of a message
     Provides details regarding the purpose of the message
@@ -51,19 +51,16 @@ class MessageBeginning(object):
         :param ref_number: a reference number for registration transaction type
         """
         formatted_date_time = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y%m%d%H%M')
-        self.segments = [
+        segments = [
             Segment(key="BGM", value="++507"),
             Segment(key="NAD", value=f"FHS+{party_id}:954"),
             Segment(key="DTM", value=f"137:{formatted_date_time}:203"),
             Segment(key="RFF", value=f"950:{ref_number}"),
         ]
-
-    def to_edifact(self):
-        edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
-        return edifact_message
+        super().__init__(segments=segments)
 
 
-class Message(object):
+class Message(SegmentCollection):
     """
     An edifact Message that is contained within an interchange
     a collection of Segments
@@ -75,9 +72,6 @@ class Message(object):
         :param message_beginning: the beginning of the message
         :param trailer: the trailer of the message
         """
-        self.segments = [header, message_beginning, trailer]
-
-    def to_edifact(self):
-        edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
-        return edifact_message
+        segments = [header, message_beginning, trailer]
+        super().__init__(segments=segments)
 
