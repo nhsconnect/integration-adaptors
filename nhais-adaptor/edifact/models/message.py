@@ -60,6 +60,33 @@ class MessageBeginning(SegmentCollection):
         super().__init__(segments=segments)
 
 
+class MessageSegmentTrigger1(SegmentCollection):
+    """
+    A collection of segments to provide registration information for GP patients.
+    """
+
+    def __init__(self, transaction_number, party_id, acceptance_code, acceptance_type, date_time, location):
+        """
+        :param transaction_number: a unique transaction number. NHAIS will reference this in its response
+        :param party_id: GMC National code and the Local GP Code of the patient's GP (separated by “,”).
+        :param acceptance_code: The acceptance code "A" for Acceptance
+        :param acceptance_type: The acceptance type "1" for a Birth
+        :param date_time: date of the registration
+        :param location: the patients place of birth
+        """
+        formatted_date_time = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y%m%d')
+        segments = [
+            Segment(key="S01", value="1"),
+            Segment(key="RFF", value=f"TN:{transaction_number}"),
+            Segment(key="NAD", value=f"GP+{party_id}:900"),
+            Segment(key="HEA", value=f"ACD+{acceptance_code}:ZZZ"),
+            Segment(key="HEA", value=f"ATP+{acceptance_type}:ZZZ"),
+            Segment(key="DTM", value=f"956:{formatted_date_time}:102"),
+            Segment(key="LOC", value=f"950+{location}"),
+        ]
+        super().__init__(segments=segments)
+
+
 class Message(SegmentCollection):
     """
     An edifact Message that is contained within an interchange
