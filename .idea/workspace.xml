@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c847cb35-9615-4043-b2d2-9056669ab6e8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/scr/gpsummaryupdate.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/gpsummaryupdate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/scr/tests/hashes/emptyhash.json" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/hashes/emptyHtmlHash.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SCR/scr/tests/test_xmls/EmptyGpSummaryUpdate.xml" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/scr/tests/test_xmls/EmptyHtmlGpSummaryUpdate.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SCR/data/templates/pertinentInformation2Partial.mustache" beforeDir="false" afterPath="$PROJECT_DIR$/SCR/data/templates/pertinentInformation2Partial.mustache" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,8 +15,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="53" column="78" lean-forward="true" selection-start-line="53" selection-start-column="78" selection-end-line="53" selection-end-column="78" />
+            <state relative-caret-position="443">
+              <caret line="83" column="29" selection-start-line="83" selection-start-column="29" selection-end-line="83" selection-end-column="29" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -28,29 +24,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SCR/scr/tests/hashes/EmptyHash.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="2" selection-start-column="2" selection-end-column="2" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_xmls/EmptyHash.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="135" column="40" selection-start-line="135" selection-start-column="40" selection-end-line="135" selection-end-column="40" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SCR/data/templates/pertinentInformation2Partial.mustache">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="392">
-              <caret line="46" column="62" lean-forward="true" selection-end-line="51" selection-end-column="40" />
+            <state relative-caret-position="136">
+              <caret line="8" column="79" selection-start-line="8" selection-start-column="79" selection-end-line="8" selection-end-column="79" />
             </state>
           </provider>
         </entry>
@@ -161,8 +139,9 @@
         <option value="$PROJECT_DIR$/SCR/scr/tests/hashes/extendedHTMLhash.json" />
         <option value="$PROJECT_DIR$/SCR/scr/gpsummaryupdate.py" />
         <option value="$PROJECT_DIR$/SCR/scr/tests/hashes/EmptyHash.json" />
-        <option value="$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py" />
         <option value="$PROJECT_DIR$/SCR/scr/tests/test_xmls/EmptyHash.xml" />
+        <option value="$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py" />
+        <option value="$PROJECT_DIR$/SCR/data/templates/pertinentInformation2Partial.mustache" />
       </list>
     </option>
   </component>
@@ -444,12 +423,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_for_test_gpsummaryupdate_FullTest_test_extended_html - 2019.04.24 at 10h 09m 58s.xml">
-      <configuration name="Unittests for test_gpsummaryupdate.FullTest.test_extended_html" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Unittests_for_test_gpsummaryupdate_FullTest - 2019.04.24 at 10h 10m 06s.xml">
-      <configuration name="Unittests for test_gpsummaryupdate.FullTest" configurationId="tests" />
-    </history-entry>
     <history-entry file="Unittests_for_test_gpsummaryupdate_FullTest - 2019.04.24 at 10h 15m 38s.xml">
       <configuration name="Unittests for test_gpsummaryupdate.FullTest" configurationId="tests" />
     </history-entry>
@@ -474,13 +447,19 @@
     <history-entry file="Unittests_for_test_gpsummaryupdate_FullTest_test_empty_hash - 2019.04.24 at 10h 35m 11s.xml">
       <configuration name="Unittests for test_gpsummaryupdate.FullTest.test_empty_hash" configurationId="tests" />
     </history-entry>
+    <history-entry file="Unittests_for_test_gpsummaryupdate_FullTest_test_empty_hash - 2019.04.24 at 10h 35m 36s.xml">
+      <configuration name="Unittests for test_gpsummaryupdate.FullTest.test_empty_hash" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_test_gpsummaryupdate_FullTest - 2019.04.24 at 10h 37m 33s.xml">
+      <configuration name="Unittests for test_gpsummaryupdate.FullTest" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="6" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19336143" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19336143" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
@@ -488,7 +467,7 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3206934" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3206934" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -593,16 +572,6 @@
         <state split_layout="SPLIT">
           <first_editor />
           <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/common/utilities.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-          <folding>
-            <element signature="e#1#23#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -725,20 +694,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="53" column="78" lean-forward="true" selection-start-line="53" selection-start-column="78" selection-end-line="53" selection-end-column="78" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SCR/data/templates/BasicInformationPartial.mustache">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret selection-end-line="6" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="8" selection-start-line="9" selection-start-column="8" selection-end-line="9" selection-end-column="8" />
+          <folding>
+            <element signature="e#1#23#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -749,17 +718,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/data/templates/pertinentInformation2Partial.mustache">
+    <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_xmls/EmptyHash.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="46" column="62" lean-forward="true" selection-end-line="51" selection-end-column="40" />
+        <state relative-caret-position="528">
+          <caret line="135" column="40" selection-start-line="135" selection-start-column="40" selection-end-line="135" selection-end-column="40" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_xmls/EmptyHash.xml">
+    <entry file="file://$PROJECT_DIR$/SCR/scr/tests/test_gpsummaryupdate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="135" column="40" selection-start-line="135" selection-start-column="40" selection-end-line="135" selection-end-column="40" />
+        <state relative-caret-position="443">
+          <caret line="83" column="29" selection-start-line="83" selection-start-column="29" selection-end-line="83" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SCR/data/templates/pertinentInformation2Partial.mustache">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="79" selection-start-line="8" selection-start-column="79" selection-end-line="8" selection-end-column="79" />
         </state>
       </provider>
     </entry>
