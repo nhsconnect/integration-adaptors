@@ -1,16 +1,9 @@
 import unittest
-
 from common.utilities import Utilities
 from lxml import etree
-from scr.tests.hashes.hash16UK05 import hash
-from scr.tests.hashes.extendedHTMLhash import extended_hash
-from scr.tests.hashes.emptyhash import empty_hash
 from definitions import ROOT_DIR
 from pathlib import Path
 from scr.gpsummaryupdate import SummaryCareRecord
-from scr.tests.hashes.replacementOfhash import replacementOf_hash
-
-from scr.tests.hashes.multiReplacementOfhash import multi_replacementOf_hash
 
 
 class FullTest(unittest.TestCase):
@@ -18,26 +11,38 @@ class FullTest(unittest.TestCase):
     summaryCareRecord = SummaryCareRecord()
 
     def test_basic(self):
+        """
+        A basic test using the clean summary update from the spine tests
+        :return:
+        """
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         expected = etree.tostring(root)
-
-        render = self.summaryCareRecord.populate_template(hash)
-
+        render = self.summaryCareRecord.populate_template_with_file(str(Path(ROOT_DIR) / 'scr/tests/hashes/hash16UK05.json'))
         Utilities.assert_xml_equal(expected, render)
 
     def test_extended_html(self):
+        """
+        Uses a larger set of Html for the human readable contents
+        :return:
+        """
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/SummaryUpdateExtendedContents.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.populate_template(extended_hash)
+        file_path = str(Path(ROOT_DIR) / 'scr/tests/hashes/extendedHTMLhash.json')
+        render = self.summaryCareRecord.populate_template_with_file(file_path)
 
         Utilities.assert_xml_equal(expected, render)
 
     def test_empty_html(self):
+        """
+        A test for an empty human readable content value
+        :return:
+        """
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/EmptyGpSummaryUpdate.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.populate_template(empty_hash)
+        file_path = str(Path(ROOT_DIR) / 'scr/tests/hashes/emptyhash.json')
+        render = self.summaryCareRecord.populate_template_with_file(file_path)
 
         Utilities.assert_xml_equal(expected, render)
 
@@ -51,7 +56,8 @@ class FullTest(unittest.TestCase):
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/replacementOf.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.populate_template(replacementOf_hash)
+        file_path = str(Path(ROOT_DIR) / 'scr/tests/hashes/replacementOfhash.json')
+        render = self.summaryCareRecord.populate_template_with_file(file_path)
         Utilities.assert_xml_equal(expected, render)
 
     def test_multipleReplacementOf(self):
@@ -63,6 +69,7 @@ class FullTest(unittest.TestCase):
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/multipleReplacementOf.xml'))
         expected = etree.tostring(root)
 
-        render = self.summaryCareRecord.populate_template(multi_replacementOf_hash)
+        file_path = str(Path(ROOT_DIR) / 'scr/tests/hashes/multiReplacementOfhash.json')
+        render = self.summaryCareRecord.populate_template_with_file(file_path)
         Utilities.assert_xml_equal(expected, render)
 

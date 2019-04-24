@@ -1,7 +1,7 @@
 from common.pystachemessagebuilder import PystacheMessageBuilder
 from pathlib import Path
 from definitions import ROOT_DIR
-
+import json
 
 class SummaryCareRecord:
 
@@ -9,6 +9,16 @@ class SummaryCareRecord:
 
     def __init__(self):
         self.builder = PystacheMessageBuilder(str(self.summaryCareRecordPath), "16UK05")
+
+    def populate_template_with_file(self, json_file):
+        """
+        Given a file path to a Json file, this method will parse the json and populate the template
+        :param json_file:
+        :return: populated template xml string
+        """
+        with open(json_file) as file:
+            data = json.load(file)
+            return self.populate_template(data)
 
     def populate_template(self, input_hash):
         """
