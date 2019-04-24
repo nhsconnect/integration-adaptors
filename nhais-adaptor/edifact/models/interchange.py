@@ -44,14 +44,16 @@ class InterchangeTrailer(Segment):
 class Interchange(object):
     """
     The edifact interchange that is used to interface with NHAIS
+    It is constructed using a list of Segments
     """
 
-    def __init__(self, header):
+    def __init__(self, header, trailer):
         """
         :param header: The header of the interchange
+        :param trailer: the trailer of the interchange
         """
-        self.header = header
+        self.segments = [header, trailer]
 
     def to_edifact(self):
-        edifact_interchange = f"AAA-{self.header}"
+        edifact_interchange = ''.join([segment.to_edifact() for segment in self.segments])
         return edifact_interchange
