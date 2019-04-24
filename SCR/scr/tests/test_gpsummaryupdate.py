@@ -13,7 +13,6 @@ class FullTest(unittest.TestCase):
     def test_basic(self):
         """
         A basic test using the clean summary update from the spine tests
-        :return:
         """
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         expected = etree.tostring(root)
@@ -24,7 +23,6 @@ class FullTest(unittest.TestCase):
     def test_extended_html(self):
         """
         Uses a larger set of Html for the human readable contents
-        :return:
         """
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/SummaryUpdateExtendedContents.xml'))
         expected = etree.tostring(root)
@@ -87,7 +85,6 @@ class FullTest(unittest.TestCase):
     def test_python_dictionary_example(self):
         """
         Basic test to demonstrate passing a python dict to the interface instead of a json file
-        :return:
         """
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         expected = etree.tostring(root)
@@ -99,7 +96,6 @@ class FullTest(unittest.TestCase):
     def test_json_string_example(self):
         """
         Basic example showing how a json string can be passed to the interface
-        :return:
         """
         root = etree.parse(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         expected = etree.tostring(root)
