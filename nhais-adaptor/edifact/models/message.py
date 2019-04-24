@@ -93,12 +93,13 @@ class Message(SegmentCollection):
     a collection of Segments
     """
 
-    def __init__(self, header, message_beginning, trailer):
+    def __init__(self, header, message_beginning, message_segment_trigger_1, trailer):
         """
         :param header: the header of the message
         :param message_beginning: the beginning of the message
+        :param message_segment_trigger_1: Segment trigger 1 registration information
         :param trailer: the trailer of the message
         """
-        segments = [header, message_beginning, trailer]
+        segments = [header, message_beginning, message_segment_trigger_1, trailer]
         super().__init__(segments=segments)
 

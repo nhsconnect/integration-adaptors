@@ -67,11 +67,24 @@ class MessageTest(unittest.TestCase):
             "NAD+FHS+XX1:954'"
             "DTM+137:201904230900:203'"
             "RFF+950:G1'"
+            "S01+1'"
+            "RFF+TN:17'"
+            "NAD+GP+4826940,281:900'"
+            "HEA+ACD+A:ZZZ'"
+            "HEA+ATP+1:ZZZ'"
+            "DTM+956:20190423:102'"
+            "LOC+950+BURY'"
             "UNT+5+00001'")
         msg_hdr = MessageHeader(sequence_number="00001")
         msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
+        msg_trg_1 = MessageSegmentTrigger1(transaction_number=17,
+                                           party_id="4826940,281",
+                                           acceptance_code="A",
+                                           acceptance_type="1",
+                                           date_time="2019-04-23 09:00:04.159338",
+                                           location="Bury")
         msg_trl = MessageTrailer(number_of_segments=5, sequence_number="00001")
-        msg = Message(header=msg_hdr, message_beginning=msg_bgn, trailer=msg_trl).to_edifact()
+        msg = Message(header=msg_hdr, message_beginning=msg_bgn, message_segment_trigger_1=msg_trg_1, trailer=msg_trl).to_edifact()
         self.assertEqual(msg, expected_edifact_message)
 
 
