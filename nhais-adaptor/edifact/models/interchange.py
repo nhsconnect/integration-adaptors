@@ -47,12 +47,13 @@ class Interchange(object):
     It is constructed using a list of Segments
     """
 
-    def __init__(self, header, trailer):
+    def __init__(self, header, message, trailer):
         """
         :param header: The header of the interchange
+        :param message: The message of the interchange
         :param trailer: the trailer of the interchange
         """
-        self.segments = [header, trailer]
+        self.segments = [header, message, trailer]
 
     def to_edifact(self):
         edifact_interchange = ''.join([segment.to_edifact() for segment in self.segments])
