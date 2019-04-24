@@ -3,6 +3,7 @@ from edifact.models.message import MessageHeader, MessageBeginning, MessageSegme
 from edifact.models.name import Name
 from edifact.models.address import Address
 
+
 class MessageHeaderTest(unittest.TestCase):
     """
     Test the generating of a message header
@@ -100,8 +101,7 @@ class MessageTest(unittest.TestCase):
             "DTM+329:20190420:102'"
             "PDI+1'"
             "NAD+PAT++MOORSIDE FARM:OLD LANE:ST PAULS CRAY:ORPINGTON:KENT+++++BR6 7EW'"
-            "UNT+5+00001'")
-        msg_hdr = MessageHeader(sequence_number="00001")
+            "UNT+18+00001'")
         msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
         msg_trg_1 = MessageSegmentTrigger1(transaction_number=17,
                                            party_id="4826940,281",
@@ -114,8 +114,8 @@ class MessageTest(unittest.TestCase):
                                   address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
 
         msg_trg_2 = MessageSegmentTrigger2(id_number="N/10/10", name=patient_name, date_of_birth="2019-04-20", gender="1", address=patient_address)
-        msg_trl = MessageTrailer(number_of_segments=5, sequence_number="00001")
-        msg = Message(header=msg_hdr, message_beginning=msg_bgn, message_segment_trigger_1=msg_trg_1, message_segment_trigger_2=msg_trg_2, trailer=msg_trl).to_edifact()
+
+        msg = Message(sequence_number="00001", message_beginning=msg_bgn, message_segment_trigger_1=msg_trg_1, message_segment_trigger_2=msg_trg_2).to_edifact()
         self.assertEqual(msg, expected_edifact_message)
 
 

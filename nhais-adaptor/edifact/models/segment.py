@@ -40,3 +40,5 @@ class SegmentCollection(object):
         edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
         return edifact_message
 
+    def size(self):
+        return len(self.segments)
