@@ -55,8 +55,9 @@ class Interchange(SegmentCollection):
         :param sequence_number: a unique reference of the interchange
         :param message: The message of the interchange
         """
-        int_hdr = InterchangeHeader(sender=sender, recipient=recipient, date_time=date_time, sequence_number=sequence_number)
-        message_size = 1
+        int_hdr = InterchangeHeader(sender=sender, recipient=recipient, date_time=date_time,
+                                    sequence_number=sequence_number)
+        message_size = 1  # TODO: generate this value
         int_trl = InterchangeTrailer(number_of_messages=message_size, sequence_number=sequence_number)
         segments = [int_hdr, message, int_trl]
         super().__init__(segments)

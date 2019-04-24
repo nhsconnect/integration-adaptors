@@ -103,10 +103,12 @@ class MessageSegmentTrigger2(SegmentCollection):
         formatted_date = datetime.strptime(date_of_birth, '%Y-%m-%d').strftime('%Y%m%d')
         segments = [
             Segment(key="S02", value="2"),
-            Segment(key="PNA", value=f"PAT+{id_number}:OPI+++SU:{name.family_name}+FO:{name.first_given_forename}+TI:{name.title}+MI:{name.middle_name}+FS:{name.third_given_forename}"),
+            Segment(key="PNA",
+                    value=f"PAT+{id_number}:OPI+++SU:{name.family_name}+FO:{name.first_given_forename}+TI:{name.title}+MI:{name.middle_name}+FS:{name.third_given_forename}"),
             Segment(key="DTM", value=f"329:{formatted_date}:102"),
             Segment(key="PDI", value=f"{gender}"),
-            Segment(key="NAD", value=f"PAT++{address.house_name}:{address.address_line_1}:{address.address_line_2}:{address.town}:{address.county}+++++{address.post_code}")
+            Segment(key="NAD",
+                    value=f"PAT++{address.house_name}:{address.address_line_1}:{address.address_line_2}:{address.town}:{address.county}+++++{address.post_code}")
         ]
         super().__init__(segments=segments)
 
@@ -129,4 +131,3 @@ class Message(SegmentCollection):
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_trigger_1, message_segment_trigger_2, msg_trailer]
         super().__init__(segments=segments)
-
