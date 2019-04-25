@@ -1,7 +1,6 @@
 class Address:
     """
     A class to encapsulate the address attributes required for an edifact message
-    party qualifier - PAT for current address use PER for previous address
     """
 
     def __init__(self, house_name, address_line_1, address_line_2, town, county, post_code):

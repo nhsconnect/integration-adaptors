@@ -37,8 +37,15 @@ class SegmentCollection(object):
         self.segments = segments
 
     def to_edifact(self):
+        """
+        Generated the edifact message of the collection
+        :return: an edifact string representation of the Segment collection
+        """
         edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
         return edifact_message
 
     def size(self):
+        """
+        :return: The number of segments in the collection
+        """
         return len(self.segments)

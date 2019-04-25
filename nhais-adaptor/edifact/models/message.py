@@ -145,9 +145,17 @@ class Messages(object):
         self.messages = messages
 
     def to_edifact(self):
+        """
+        Generate the edifact messages
+        :return: A string representation of all the edifact messages
+        """
         edifact_message = ''.join([message.to_edifact() for message in self.messages])
         return edifact_message
 
     def size(self):
+        """
+        The number of messages in the collection. This number is use in the interchange trailer.
+        :return: The number of messages in the collection
+        """
         return len(self.messages)
 
