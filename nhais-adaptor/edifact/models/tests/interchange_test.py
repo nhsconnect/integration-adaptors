@@ -1,6 +1,6 @@
 import unittest
 from edifact.models.interchange import Interchange, InterchangeHeader, InterchangeTrailer
-from edifact.models.message import MessageBeginning, MessageSegmentTrigger1, MessageSegmentTrigger2, Message
+from edifact.models.message import MessageBeginning, MessageSegmentTrigger1, MessageSegmentTrigger2, Message, Messages
 from edifact.models.name import Name
 from edifact.models.address import Address
 
@@ -72,9 +72,10 @@ class InterchangeTest(unittest.TestCase):
 
         msg = Message(sequence_number="00001", message_beginning=msg_bgn, message_segment_trigger_1=msg_trg_1,
                       message_segment_trigger_2=msg_trg_2)
+        msgs = Messages([msg])
 
         interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",
-                                  message=msg).to_edifact()
+                                  messages=msgs).to_edifact()
         self.assertEqual(interchange, expected_edifact_interchange)
 
 

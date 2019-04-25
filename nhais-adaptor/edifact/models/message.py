@@ -131,3 +131,23 @@ class Message(SegmentCollection):
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_trigger_1, message_segment_trigger_2, msg_trailer]
         super().__init__(segments=segments)
+
+
+class Messages(object):
+    """
+    A collection of edifact messages
+    """
+
+    def __init__(self, messages):
+        """
+        :param messages: a collections of messages
+        """
+        self.messages = messages
+
+    def to_edifact(self):
+        edifact_message = ''.join([message.to_edifact() for message in self.messages])
+        return edifact_message
+
+    def size(self):
+        return len(self.messages)
+
