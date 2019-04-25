@@ -60,9 +60,10 @@ class MessageBeginning(SegmentCollection):
         super().__init__(segments=segments)
 
 
-class MessageSegmentTrigger1(SegmentCollection):
+class MessageSegmentRegistrationDetails(SegmentCollection):
     """
     A collection of segments to provide registration information for GP patients.
+    This is referred to in edifact as segment trigger 1
     """
 
     def __init__(self, transaction_number, party_id, acceptance_code, acceptance_type, date_time, location):
@@ -87,7 +88,7 @@ class MessageSegmentTrigger1(SegmentCollection):
         super().__init__(segments=segments)
 
 
-class MessageSegmentTrigger2(SegmentCollection):
+class MessageSegmentPatientDetails(SegmentCollection):
     """
     A collection of segments that represent personal information about a patient.
     """
@@ -100,7 +101,8 @@ class MessageSegmentTrigger2(SegmentCollection):
         :param gender: sex of the patient. For an acceptance transaction, reference "G1", this segment is required
         :param address: the patients address
         """
-        formatted_date = DateFormatter.format_date(date_time=date_of_birth, format_qualifier="102", current_format="%Y-%m-%d")
+        formatted_date = DateFormatter.format_date(date_time=date_of_birth, format_qualifier="102",
+                                                   current_format="%Y-%m-%d")
         segments = [
             Segment(key="S02", value="2"),
             Segment(key="PNA",
@@ -119,17 +121,20 @@ class Message(SegmentCollection):
     a collection of Segments
     """
 
-    def __init__(self, sequence_number, message_beginning, message_segment_trigger_1, message_segment_trigger_2):
+    def __init__(self, sequence_number, message_beginning, message_segment_registration_details,
+                 message_segment_patient_details):
         """
         :param sequence_number: the unique sequence number of the message
         :param message_beginning: the beginning of the message
-        :param message_segment_trigger_1: Segment trigger 1 registration information
-        :param message_segment_trigger_2: Segment trigger 2 personal information about patient
+        :param message_segment_registration_details: Segment trigger 1 registration information
+        :param message_segment_patient_details: Segment trigger 2 personal information about patient
         """
         msg_header = MessageHeader(sequence_number=sequence_number)
-        number_of_segments = len(message_beginning) + len(message_segment_trigger_1) + len(message_segment_trigger_2) + 2
+        number_of_segments = len(message_beginning) + len(message_segment_registration_details) + \
+                             len(message_segment_patient_details) + 2
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
-        segments = [msg_header, message_beginning, message_segment_trigger_1, message_segment_trigger_2, msg_trailer]
+        segments = [msg_header, message_beginning, message_segment_registration_details,
+                    message_segment_patient_details, msg_trailer]
         super().__init__(segments=segments)
 
 
@@ -152,4 +157,3 @@ class Messages(list):
         """
         edifact_message = ''.join([message.to_edifact() for message in self.messages])
         return edifact_message
-

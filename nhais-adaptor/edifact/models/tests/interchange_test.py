@@ -1,6 +1,7 @@
 import unittest
 from edifact.models.interchange import Interchange, InterchangeHeader, InterchangeTrailer
-from edifact.models.message import MessageBeginning, MessageSegmentTrigger1, MessageSegmentTrigger2, Message, Messages
+from edifact.models.message import MessageBeginning, MessageSegmentRegistrationDetails, MessageSegmentPatientDetails, \
+    Message, Messages
 from edifact.models.name import Name
 from edifact.models.address import Address
 
@@ -28,7 +29,7 @@ class InterchangeTrailerTest(unittest.TestCase):
 
 class InterchangeTest(unittest.TestCase):
     """
-    Test the generating of edifact message
+    Test the generating of edifact interchange
     """
 
     def test_interchange_to_edifact(self):
@@ -56,22 +57,24 @@ class InterchangeTest(unittest.TestCase):
         date_time = "2019-04-23 09:00:04.159338"
 
         msg_bgn = MessageBeginning(party_id="XX1", date_time=date_time, ref_number="G1")
-        msg_trg_1 = MessageSegmentTrigger1(transaction_number=17,
-                                           party_id="4826940,281",
-                                           acceptance_code="A",
-                                           acceptance_type="1",
-                                           date_time="2019-04-23 09:00:04.159338",
-                                           location="Bury")
+        msg_seg_reg_details = MessageSegmentRegistrationDetails(transaction_number=17,
+                                                                party_id="4826940,281",
+                                                                acceptance_code="A",
+                                                                acceptance_type="1",
+                                                                date_time="2019-04-23 09:00:04.159338",
+                                                                location="Bury")
         patient_name = Name(family_name="Stevens", first_given_forename="Charles", title="Mr", middle_name="Anthony",
                             third_given_forename="John")
         patient_address = Address(house_name="MOORSIDE FARM", address_line_1="OLD LANE",
                                   address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
 
-        msg_trg_2 = MessageSegmentTrigger2(id_number="N/10/10", name=patient_name, date_of_birth="2019-04-20",
-                                           gender="1", address=patient_address)
+        msg_seg_pat_details = MessageSegmentPatientDetails(id_number="N/10/10", name=patient_name,
+                                                           date_of_birth="2019-04-20",
+                                                           gender="1", address=patient_address)
 
-        msg = Message(sequence_number="00001", message_beginning=msg_bgn, message_segment_trigger_1=msg_trg_1,
-                      message_segment_trigger_2=msg_trg_2)
+        msg = Message(sequence_number="00001", message_beginning=msg_bgn,
+                      message_segment_registration_details=msg_seg_reg_details,
+                      message_segment_patient_details=msg_seg_pat_details)
         msgs = Messages([msg])
 
         interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",
