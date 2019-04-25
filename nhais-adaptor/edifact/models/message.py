@@ -1,5 +1,5 @@
-from datetime import datetime
 from edifact.models.segment import Segment, SegmentCollection
+from edifact.helpers.date_formatter import DateFormatter
 
 
 class MessageHeader(Segment):
@@ -50,7 +50,7 @@ class MessageBeginning(SegmentCollection):
         :param date_time: the date time stamp of the message
         :param ref_number: a reference number for registration transaction type
         """
-        formatted_date_time = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y%m%d%H%M')
+        formatted_date_time = DateFormatter.format_date(date_time=date_time, format_qualifier="203")
         segments = [
             Segment(key="BGM", value="++507"),
             Segment(key="NAD", value=f"FHS+{party_id}:954"),
@@ -74,7 +74,7 @@ class MessageSegmentTrigger1(SegmentCollection):
         :param date_time: date of the registration
         :param location: the patients place of birth
         """
-        formatted_date_time = datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y%m%d')
+        formatted_date_time = DateFormatter.format_date(date_time=date_time, format_qualifier="102")
         segments = [
             Segment(key="S01", value="1"),
             Segment(key="RFF", value=f"TN:{transaction_number}"),
@@ -100,7 +100,7 @@ class MessageSegmentTrigger2(SegmentCollection):
         :param gender: sex of the patient. For an acceptance transaction, reference "G1", this segment is required
         :param address: the patients address
         """
-        formatted_date = datetime.strptime(date_of_birth, '%Y-%m-%d').strftime('%Y%m%d')
+        formatted_date = DateFormatter.format_date(date_time=date_of_birth, format_qualifier="102", current_format="%Y-%m-%d")
         segments = [
             Segment(key="S02", value="2"),
             Segment(key="PNA",
