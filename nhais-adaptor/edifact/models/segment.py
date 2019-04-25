@@ -25,7 +25,7 @@ class Segment(object):
         return edifact_segment
 
 
-class SegmentCollection(object):
+class SegmentCollection(list):
     """
     A collection of segments base class
     """
@@ -35,6 +35,7 @@ class SegmentCollection(object):
         :param segments: the collection of segments
         """
         self.segments = segments
+        super().__init__(segments)
 
     def to_edifact(self):
         """
@@ -44,8 +45,3 @@ class SegmentCollection(object):
         edifact_message = ''.join([segment.to_edifact() for segment in self.segments])
         return edifact_message
 
-    def size(self):
-        """
-        :return: The number of segments in the collection
-        """
-        return len(self.segments)

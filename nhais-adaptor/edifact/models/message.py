@@ -127,7 +127,7 @@ class Message(SegmentCollection):
         :param message_segment_trigger_2: Segment trigger 2 personal information about patient
         """
         msg_header = MessageHeader(sequence_number=sequence_number)
-        number_of_segments = message_beginning.size() + message_segment_trigger_1.size() + message_segment_trigger_2.size() + 2
+        number_of_segments = len(message_beginning) + len(message_segment_trigger_1) + len(message_segment_trigger_2) + 2
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_trigger_1, message_segment_trigger_2, msg_trailer]
         super().__init__(segments=segments)
