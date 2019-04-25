@@ -57,6 +57,6 @@ class Interchange(SegmentCollection):
         """
         int_hdr = InterchangeHeader(sender=sender, recipient=recipient, date_time=date_time,
                                     sequence_number=sequence_number)
-        int_trl = InterchangeTrailer(number_of_messages=messages.size(), sequence_number=sequence_number)
+        int_trl = InterchangeTrailer(number_of_messages=len(messages), sequence_number=sequence_number)
         segments = [int_hdr, messages, int_trl]
         super().__init__(segments)

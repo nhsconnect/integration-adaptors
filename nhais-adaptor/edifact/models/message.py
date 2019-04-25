@@ -133,7 +133,7 @@ class Message(SegmentCollection):
         super().__init__(segments=segments)
 
 
-class Messages(object):
+class Messages(list):
     """
     A collection of edifact messages
     """
@@ -143,6 +143,7 @@ class Messages(object):
         :param messages: a collections of messages
         """
         self.messages = messages
+        super().__init__(messages)
 
     def to_edifact(self):
         """
@@ -151,11 +152,4 @@ class Messages(object):
         """
         edifact_message = ''.join([message.to_edifact() for message in self.messages])
         return edifact_message
-
-    def size(self):
-        """
-        The number of messages in the collection. This number is use in the interchange trailer.
-        :return: The number of messages in the collection
-        """
-        return len(self.messages)
 
