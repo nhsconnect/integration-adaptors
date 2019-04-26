@@ -7,6 +7,7 @@ from fhirclient.models.identifier import Identifier
 from fhirclient.models.address import Address
 from edifact.models.name import Name
 from edifact.models.address import Address as EdifactAddress
+from edifact.models.message import MessageSegmentPatientDetails
 
 
 class MessageAdaptorTest(unittest.TestCase):
@@ -34,35 +35,35 @@ class MessageAdaptorTest(unittest.TestCase):
 
         with self.subTest("Patient will all address attributes"):
             pat_address = Address(
-                {'line': ['Spidey House', 'Spidey Way', 'Spiderville'], 'city': 'Spider Town',
+                {'line': ['Spidey House', 'Spidey Way', 'Spiderville'], 'city': 'Spidey Town',
                  'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
             expected = EdifactAddress(house_name="Spidey House", address_line_1="Spidey Way",
-                                      address_line_2="Spiderville", town="Spider Town", county="Spideyshire",
+                                      address_line_2="Spiderville", town="Spidey Town", county="Spideyshire",
                                       post_code="SP1 1AA")
             edi_address = MessageAdaptor.create_patient_address(pat_address)
             compare(edi_address, expected)
 
         with self.subTest("Patient address without house name"):
             pat_address = Address(
-                {'line': ['1 Spidey Way', 'Spiderville'], 'city': 'Spider Town',
+                {'line': ['1 Spidey Way', 'Spiderville'], 'city': 'Spidey Town',
                  'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
-            expected = EdifactAddress(address_line_1="1 Spidey Way", address_line_2="Spiderville", town="Spider Town",
+            expected = EdifactAddress(address_line_1="1 Spidey Way", address_line_2="Spiderville", town="Spidey Town",
                                       county="Spideyshire", post_code="SP1 1AA")
             edi_address = MessageAdaptor.create_patient_address(pat_address)
             compare(edi_address, expected)
 
         with self.subTest("Patient with only 1 address line"):
             pat_address = Address(
-                {'line': ['1 Spidey Way'], 'city': 'Spider Town', 'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
-            expected = EdifactAddress(address_line_1="1 Spidey Way", town="Spider Town", county="Spideyshire",
+                {'line': ['1 Spidey Way'], 'city': 'Spidey Town', 'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
+            expected = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", county="Spideyshire",
                                       post_code="SP1 1AA")
             edi_address = MessageAdaptor.create_patient_address(pat_address)
             compare(edi_address, expected)
 
         with self.subTest("Patient with only 1 address line and no county details"):
             pat_address = Address(
-                {'line': ['1 Spidey Way'], 'city': 'Spider Town', 'postalCode': 'SP1 1AA'})
-            expected = EdifactAddress(address_line_1="1 Spidey Way", town="Spider Town", post_code="SP1 1AA")
+                {'line': ['1 Spidey Way'], 'city': 'Spidey Town', 'postalCode': 'SP1 1AA'})
+            expected = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", post_code="SP1 1AA")
             edi_address = MessageAdaptor.create_patient_address(pat_address)
             compare(edi_address, expected)
 
@@ -72,15 +73,18 @@ class MessageAdaptorTest(unittest.TestCase):
         """
 
         with self.subTest("Patient with no previous names or addresses"):
-            pat_address = Address(
-                {'line': ['1 Spidey Way', 'Spiderville'], 'city': 'Spider Town', 'district': 'Spideyshire',
-                 'postalCode': 'SP1 1AA'})
+            pat_address = Address({'line': ['1 Spidey Way'], 'city': 'Spidey Town', 'postalCode': 'SP1 1AA'})
             nhs_number = Identifier({'value': 'NHSNO11111'})
             name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter']})
             patient = Patient({'identifier': [nhs_number.as_json()], 'gender': 'male', 'name': [name.as_json()],
-                               'birthDate': '2019-04-23',
-                               'address': [pat_address.as_json()]})
+                               'birthDate': '2019-04-23', 'address': [pat_address.as_json()]})
+
+            edifact_pat_name = Name(family_name="Parker", first_given_forename="Peter", title="Mr")
+            edifact_pat_address = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", post_code="SP1 1AA")
+            expected = MessageSegmentPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
+                                                    date_of_birth="2019-04-23",
+                                                    gender="1", address=edifact_pat_address)
 
             msg_seg_pat_details = MessageAdaptor.create_message_segment_patient_detail(patient)
-            msg_seg_pat_details.to_edifact()
-            print(msg_seg_pat_details.to_edifact())
+
+            compare(msg_seg_pat_details, expected)

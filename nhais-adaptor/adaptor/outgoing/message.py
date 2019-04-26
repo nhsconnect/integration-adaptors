@@ -7,7 +7,6 @@ class MessageAdaptor:
     """
     An adaptor to take in fhir model and generate and populate the edifact models
     """
-
     @staticmethod
     def create_patient_name(fhir_patient_name):
         given_names = [None, None, None]
@@ -45,8 +44,7 @@ class MessageAdaptor:
         :param fhir_patient: the fhir representation of the patient details
         :return: MessageSegmentPatientDetails
         """
-
-        print(fhir_patient.as_json())
+        gender_map = {'unknown': 0, 'male': 1, 'female': 2, 'other': 9}
 
         edi_name = MessageAdaptor.create_patient_name(fhir_patient.name[0])
 
@@ -55,7 +53,7 @@ class MessageAdaptor:
         # get nhs number, date or birth and gender
         msg_seg_patient_details = MessageSegmentPatientDetails(id_number=fhir_patient.identifier[0].value,
                                                                name=edi_name,
-                                                               date_of_birth="2019-04-23",
-                                                               gender=fhir_patient.gender,
+                                                               date_of_birth=fhir_patient.birthDate.as_json(),
+                                                               gender=gender_map[fhir_patient.gender],
                                                                address=edi_address)
         return msg_seg_patient_details
