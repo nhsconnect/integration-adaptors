@@ -23,11 +23,19 @@ class MessageAdaptor:
 
     @staticmethod
     def create_patient_address(fhir_patient_address):
-        edi_address = Address(house_name="",
-                              address_line_1=fhir_patient_address.line[0],
-                              address_line_2=fhir_patient_address.line[1],
+
+        address_lines = ["", "", ""]
+        counter = 0 if len(fhir_patient_address.line) == 3 else 1
+
+        for line in fhir_patient_address.line:
+            address_lines[counter] = line
+            counter += 1
+
+        edi_address = Address(house_name=address_lines[0],
+                              address_line_1=address_lines[1],
+                              address_line_2=address_lines[2],
                               town=fhir_patient_address.city,
-                              county=fhir_patient_address.district,
+                              county=fhir_patient_address.district if fhir_patient_address.district else "",
                               post_code=fhir_patient_address.postalCode)
         return edi_address
 
