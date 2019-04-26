@@ -10,11 +10,15 @@ class MessageAdaptor:
 
     @staticmethod
     def create_patient_name(fhir_patient_name):
+        given_names = [None, None, None]
+        for index, given_name in enumerate(fhir_patient_name.given):
+            given_names[index] = given_name
+
         edi_name = Name(title=fhir_patient_name.prefix[0],
                         family_name=fhir_patient_name.family,
                         first_given_forename=fhir_patient_name.given[0],
-                        middle_name=None,
-                        third_given_forename=None)
+                        middle_name=given_names[1],
+                        third_given_forename=given_names[2])
         return edi_name
 
     @staticmethod

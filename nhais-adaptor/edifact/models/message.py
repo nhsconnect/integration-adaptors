@@ -1,6 +1,7 @@
 from edifact.models.segment import Segment, SegmentCollection
 from edifact.helpers.date_formatter import DateFormatter
 from edifact.models.name import PatientName
+from edifact.models.address import PatientAddress
 
 
 class MessageHeader(Segment):
@@ -109,8 +110,7 @@ class MessageSegmentPatientDetails(SegmentCollection):
             PatientName(id_number=id_number, name=name),
             Segment(key="DTM", value=f"329:{formatted_date}:102"),
             Segment(key="PDI", value=f"{gender}"),
-            Segment(key="NAD",
-                    value=f"PAT++{address.house_name}:{address.address_line_1}:{address.address_line_2}:{address.town}:{address.county}+++++{address.post_code}")
+            PatientAddress(address=address)
         ]
         super().__init__(segments=segments)
 

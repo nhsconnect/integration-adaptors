@@ -15,28 +15,35 @@ class MessageAdaptorTest(unittest.TestCase):
 
     def test_create_patient_name(self):
         """ Test the creation edifact patient name object"""
-        name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter']})
 
         with self.subTest("Patient with just title, first name and surname"):
+            name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter']})
             expected = Name(title="Mr", family_name="Parker", first_given_forename="Peter")
             edi_name = MessageAdaptor.create_patient_name(name)
             compare(edi_name, expected)
 
-    def test_create_message_segment_patient_details_simple(self):
+        with self.subTest("Patient with all the name details"):
+            name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter', 'Spidey', 'Senses']})
+            expected = Name(title="Mr", family_name="Parker", first_given_forename="Peter", middle_name="Spidey",
+                            third_given_forename="Senses")
+            edi_name = MessageAdaptor.create_patient_name(name)
+            compare(edi_name, expected)
+
+    def test_create_message_segment_patient_details(self):
         """
         Test the function to create an edifact message segment for patient details
-        the fhir patient will have no previous names or addresses
         """
-        # create fhir patient details
 
-        pat_address = Address({'line': ['1 Spidey Way', 'Spiderville'], 'city': 'Spider Town', 'district': 'Spideyshire',
-                               'postalCode': 'SP1 1AA'})
-        nhs_number = Identifier({'value': 'NHSNO11111'})
-        name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter']})
-        patient = Patient({'identifier': [nhs_number.as_json()], 'gender': 'male', 'name': [name.as_json()],
-                           'birthDate': '2019-04-23',
-                           'address': [pat_address.as_json()]})
+        with self.subTest("Patient with no previous names or addresses"):
+            pat_address = Address(
+                {'line': ['1 Spidey Way', 'Spiderville'], 'city': 'Spider Town', 'district': 'Spideyshire',
+                 'postalCode': 'SP1 1AA'})
+            nhs_number = Identifier({'value': 'NHSNO11111'})
+            name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter']})
+            patient = Patient({'identifier': [nhs_number.as_json()], 'gender': 'male', 'name': [name.as_json()],
+                               'birthDate': '2019-04-23',
+                               'address': [pat_address.as_json()]})
 
-        msg_seg_pat_details = MessageAdaptor.create_message_segment_patient_detail(patient)
-        msg_seg_pat_details.to_edifact()
-        print(msg_seg_pat_details.to_edifact())
+            msg_seg_pat_details = MessageAdaptor.create_message_segment_patient_detail(patient)
+            msg_seg_pat_details.to_edifact()
+            print(msg_seg_pat_details.to_edifact())
