@@ -49,28 +49,27 @@ class InterchangeAdaptorTest(unittest.TestCase):
                                                                 op_param_nhais_cypher,
                                                                 op_param_practitioner, op_param_patient])
 
-            msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
-            edifact_pat_name = Name(family_name="Parker", first_given_forename="Peter", title="Mr")
-            edifact_pat_address = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", post_code="SP1 1AA")
-            msg_seg_pat_details = MessageSegmentPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
-                                                               date_of_birth="2019-04-23",
-                                                               gender="1", address=edifact_pat_address)
-            msg_seg_reg_details = MessageSegmentRegistrationDetails(transaction_number=17,
-                                                                    party_id="4826940,281",
-                                                                    acceptance_code="A",
-                                                                    acceptance_type=1,
-                                                                    date_time="2019-04-23 09:00:04.159338",
-                                                                    location="Spidey Town")
-            msg = Message(sequence_number="000001", message_beginning=msg_bgn,
-                          message_segment_registration_details=msg_seg_reg_details,
-                          message_segment_patient_details=msg_seg_pat_details)
-
-            msgs = Messages([msg])
-
-            expected = Interchange(sender="TES5", recipient="XX11", date_time="2019-04-23 09:00:04.159338",
-                                   sequence_number="000001",
-                                   messages=msgs)
+            expected_edifact_interchange = ("UNB+UNOA:2+TES5+XX11+190423:0900+000001++FHSREG'"
+                                            "UNH+000001+FHSREG:0:1:FH:FHS001'"
+                                            "BGM+++507'"
+                                            "NAD+FHS+XX1:954'"
+                                            "DTM+137:201904230900:203'"
+                                            "RFF+950:G1'"
+                                            "S01+1'"
+                                            "RFF+TN:17'"
+                                            "NAD+GP+4826940,281:900'"
+                                            "HEA+ACD+A:ZZZ'"
+                                            "HEA+ATP+1:ZZZ'"
+                                            "DTM+956:20190423:102'"
+                                            "LOC+950+SPIDEY TOWN'"
+                                            "S02+2'"
+                                            "PNA+PAT+NHSNO11111:OPI+++SU:PARKER+FO:PETER+TI:MR'"
+                                            "DTM+329:20190420:102'"
+                                            "PDI+1'"
+                                            "NAD+PAT++:1 SPIDEY WAY::SPIDEY TOWN:+++++SP1 1AA'"
+                                            "UNT+18+000001'"
+                                            "UNZ+1+000001'")
 
             interchange = InterchangeAdaptor.create_interchange(fhir_operation=op_def)
 
-            compare(interchange, expected)
+            compare(interchange, expected_edifact_interchange)
