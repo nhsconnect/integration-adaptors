@@ -134,7 +134,7 @@ class OperationDefinitionHelper:
     @staticmethod
     def get_parameter_value(fhir_operation, parameter_name):
         """
-        Find the transaction number provided in the parameters
+        Find the parameter value provided in the parameters
         :param fhir_operation: the fhir operation definition
         :param parameter_name: the name of the parameter to get the value of
         :return: a string representation of th value
@@ -148,7 +148,7 @@ class OperationDefinitionHelper:
     @staticmethod
     def find_resource(fhir_operation, resource_type):
         """
-        From the parameter get the practitioner resource in the contained list
+        From the parameter get the resource in the contained list
         :param fhir_operation:
         :param resource_type: the resource type to find
         :return: Practitioner

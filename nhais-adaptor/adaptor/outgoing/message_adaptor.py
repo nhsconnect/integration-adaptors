@@ -1,4 +1,5 @@
-from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning
+from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning, \
+    Message
 from edifact.models.name import Name
 from edifact.models.address import Address
 from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
@@ -8,6 +9,7 @@ class MessageAdaptor:
     """
     An adaptor to take in fhir model and generate and populate the edifact models
     """
+
     @staticmethod
     def create_patient_name(fhir_patient_name):
         given_names = [None, None, None]
@@ -40,22 +42,24 @@ class MessageAdaptor:
         return edi_address
 
     @staticmethod
-    def create_message_segment_patient_detail(fhir_patient):
+    def create_message_segment_patient_detail(fhir_operation):
         """
-        :param fhir_patient: the fhir representation of the patient details
+        :param fhir_operation: the fhir operation
         :return: MessageSegmentPatientDetails
         """
         gender_map = {'unknown': 0, 'male': 1, 'female': 2, 'other': 9}
 
-        edi_name = MessageAdaptor.create_patient_name(fhir_patient.name[0])
+        patient = odh.find_resource(fhir_operation, resource_type="Patient")
 
-        edi_address = MessageAdaptor.create_patient_address(fhir_patient.address[0])
+        edi_name = MessageAdaptor.create_patient_name(patient.name[0])
+
+        edi_address = MessageAdaptor.create_patient_address(patient.address[0])
 
         # get nhs number, date or birth and gender
-        msg_seg_patient_details = MessageSegmentPatientDetails(id_number=fhir_patient.identifier[0].value,
+        msg_seg_patient_details = MessageSegmentPatientDetails(id_number=patient.identifier[0].value,
                                                                name=edi_name,
-                                                               date_of_birth=fhir_patient.birthDate.as_json(),
-                                                               gender=gender_map[fhir_patient.gender],
+                                                               date_of_birth=patient.birthDate.as_json(),
+                                                               gender=gender_map[patient.gender],
                                                                address=edi_address)
         return msg_seg_patient_details
 
@@ -106,4 +110,20 @@ class MessageAdaptor:
 
         return msg_bgn
 
+    @staticmethod
+    def create_message(fhir_operation):
+        """
+        Create the edifact Message
+        :param fhir_operation:
+        :return: Message
+        """
+        message_sequence_number = odh.get_parameter_value(fhir_operation=fhir_operation,
+                                                          parameter_name="messageSequenceNumber")
+        message = Message(sequence_number=message_sequence_number,
+                          message_beginning=MessageAdaptor.create_message_beginning(fhir_operation),
+                          message_segment_registration_details=MessageAdaptor.create_message_segment_registration_details(
+                              fhir_operation),
+                          message_segment_patient_details=MessageAdaptor.create_message_segment_patient_detail(
+                              fhir_operation))
 
+        return message
