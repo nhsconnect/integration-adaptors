@@ -1,4 +1,4 @@
-from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails
+from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning
 from edifact.models.name import Name
 from edifact.models.address import Address
 from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
@@ -88,4 +88,22 @@ class MessageAdaptor:
                                                                          date_time=fhir_operation.date.as_json(),
                                                                          location=birth_location)
         return msg_seg_registration_details
+
+    @staticmethod
+    def create_message_beginning(fhir_operation):
+        """
+        Create the beginning of the message
+        :param fhir_operation:
+        :return: MessageBeginning
+        """
+        nhais_id = odh.find_nhais_id(fhir_operation=fhir_operation)
+
+        ref_number = ''
+        if fhir_operation.name == 'RegisterPatient-Birth':
+            ref_number = "G1"
+
+        msg_bgn = MessageBeginning(party_id=nhais_id, date_time=fhir_operation.date.as_json(), ref_number=ref_number)
+
+        return msg_bgn
+
 

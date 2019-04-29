@@ -3,14 +3,11 @@ from testfixtures import compare
 from adaptor.outgoing.message_adaptor import MessageAdaptor
 from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
 from adaptor.outgoing.fhir_helpers.tests.fixtures import Fixtures
-from fhirclient.models.patient import Patient
 from fhirclient.models.humanname import HumanName
-from fhirclient.models.identifier import Identifier
 from fhirclient.models.address import Address
 from edifact.models.name import Name
 from edifact.models.address import Address as EdifactAddress
-from edifact.models.message import MessageSegmentPatientDetails
-from edifact.models.message import MessageSegmentRegistrationDetails
+from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning
 
 
 class MessageAdaptorPatientDetailsTest(unittest.TestCase):
@@ -125,3 +122,23 @@ class MessageAdaptorPatientDetailsTest(unittest.TestCase):
             msg_seg_reg_details = MessageAdaptor.create_message_segment_registration_details(op_def)
 
             compare(msg_seg_reg_details, expected)
+
+    def test_create_message_beginning(self):
+        """
+        Test the function to create an edifact section representing the beginning of a message
+        """
+        with self.subTest("Message beginning for a birth registration"):
+            op_param_nhais_id = odh.create_parameter_with_binding(name="nhaisCypher", value="XX1")
+
+            op_def = odh.create_operation_definition(name="RegisterPatient-Birth",
+                                                     code="gpc.registerpatient",
+                                                     date_time="2019-04-23 09:00:04.159338",
+                                                     contained=[],
+                                                     parameter=[op_param_nhais_id])
+            expected = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
+
+            msg_bgn = MessageAdaptor.create_message_beginning(fhir_operation=op_def)
+
+            compare(msg_bgn, expected)
+
+

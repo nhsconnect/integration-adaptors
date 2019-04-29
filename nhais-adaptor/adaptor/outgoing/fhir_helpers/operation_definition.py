@@ -145,6 +145,19 @@ class OperationDefinitionHelper:
         return transaction_number
 
     @staticmethod
+    def find_nhais_id(fhir_operation):
+        """
+        Find the nhais id in the parameters
+        :param fhir_operation: the fhir operation definition
+        :return: a string of the nhais number
+        """
+        nhais_id = ''
+        for param in fhir_operation.parameter:
+            if param.name == 'nhaisCypher':
+                nhais_id = param.binding.valueSetReference.identifier.value
+        return nhais_id
+
+    @staticmethod
     def find_resource(fhir_operation, resource_type):
         """
         From the parameter get the practitioner resource in the contained list
