@@ -11,7 +11,7 @@ from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentR
     Message
 
 
-class MessageAdaptorPatientDetailsTest(unittest.TestCase):
+class MessageAdaptorTest(unittest.TestCase):
     """
     Tests the conversion of fhir to edifact
     """
@@ -101,9 +101,7 @@ class MessageAdaptorPatientDetailsTest(unittest.TestCase):
         with self.subTest("Patient registration details for type birth"):
             op_param_transaction_number = odh.create_parameter_with_binding(name="transactionNumber", value="17")
 
-            practitioner = odh.create_practitioner_resource(resource_id="practitioner-1", national_identifier="4826940",
-                                                            local_identifier="281")
-
+            practitioner = Fixtures.create_simple_practitioner()
             patient = Fixtures.create_simple_patient()
 
             op_param_practitioner = odh.create_parameter_with_resource_ref(name="registerPractitioner",
@@ -158,9 +156,7 @@ class MessageAdaptorPatientDetailsTest(unittest.TestCase):
             op_param_nhais_id = odh.create_parameter_with_binding(name="nhaisCypher", value="XX1")
             op_param_transaction_number = odh.create_parameter_with_binding(name="transactionNumber", value="17")
 
-            practitioner = odh.create_practitioner_resource(resource_id="practitioner-1", national_identifier="4826940",
-                                                            local_identifier="281")
-
+            practitioner = Fixtures.create_simple_practitioner()
             patient = Fixtures.create_simple_patient()
 
             op_param_practitioner = odh.create_parameter_with_resource_ref(name="registerPractitioner",
@@ -198,3 +194,4 @@ class MessageAdaptorPatientDetailsTest(unittest.TestCase):
             message = MessageAdaptor.create_message(fhir_operation=op_def)
 
             compare(message, expected)
+

@@ -19,3 +19,12 @@ class Fixtures:
                                               address_line_1="1 Spidey Way", city="Spidey Town", postcode="SP1 1AA")
         return patient
 
+    @staticmethod
+    def create_simple_practitioner():
+        """
+        create a simple fhir practitioner
+        :return: Practitioner
+        """
+        practitioner = odh.create_practitioner_resource(resource_id="practitioner-1", national_identifier="4826940",
+                                                            local_identifier="281")
+        return practitioner
