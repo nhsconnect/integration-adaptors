@@ -132,30 +132,18 @@ class OperationDefinitionHelper:
         return patient
 
     @staticmethod
-    def find_transaction_number(fhir_operation):
+    def get_parameter_value(fhir_operation, parameter_name):
         """
         Find the transaction number provided in the parameters
         :param fhir_operation: the fhir operation definition
-        :return: a string of the transaction number
+        :param parameter_name: the name of the parameter to get the value of
+        :return: a string representation of th value
         """
-        transaction_number = ''
+        parameter_value = ''
         for param in fhir_operation.parameter:
-            if param.name == 'transactionNumber':
-                transaction_number = param.binding.valueSetReference.identifier.value
-        return transaction_number
-
-    @staticmethod
-    def find_nhais_id(fhir_operation):
-        """
-        Find the nhais id in the parameters
-        :param fhir_operation: the fhir operation definition
-        :return: a string of the nhais number
-        """
-        nhais_id = ''
-        for param in fhir_operation.parameter:
-            if param.name == 'nhaisCypher':
-                nhais_id = param.binding.valueSetReference.identifier.value
-        return nhais_id
+            if param.name == parameter_name:
+                parameter_value = param.binding.valueSetReference.identifier.value
+        return parameter_value
 
     @staticmethod
     def find_resource(fhir_operation, resource_type):

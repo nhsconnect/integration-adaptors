@@ -75,8 +75,8 @@ class OperationDefinitionHelperTest(unittest.TestCase):
                                               address_line_1="1 Spidey Way", city="Spidey Town", postcode="SP1 1AA")
         self.assertIsInstance(patient, Patient)
 
-    def test_find_transaction_number(self):
-        op_param_transaction_number = odh.create_parameter_with_binding(name="transactionNumber", value="17")
+    def test_get_parameter_value(self):
+        op_param_transaction_number = odh.create_parameter_with_binding(name="some_param_name", value="17")
 
         op = odh.create_operation_definition(name="some.name",
                                              code="some.code",
@@ -84,7 +84,7 @@ class OperationDefinitionHelperTest(unittest.TestCase):
                                              contained=[],
                                              parameter=[op_param_transaction_number])
 
-        self.assertEqual(odh.find_transaction_number(op), "17")
+        self.assertEqual(odh.get_parameter_value(op, "some_param_name"), "17")
 
     def test_find_resource(self):
         with self.subTest("When practitioner details are found in the operation definition"):

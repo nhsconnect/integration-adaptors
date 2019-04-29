@@ -67,7 +67,7 @@ class MessageAdaptor:
         :return: MessageSegmentRegistrationDetails
         """
 
-        transaction_number = odh.find_transaction_number(fhir_operation=fhir_operation)
+        transaction_number = odh.get_parameter_value(fhir_operation=fhir_operation, parameter_name="transactionNumber")
 
         acceptance_code = ''
         acceptance_type = ''
@@ -96,7 +96,7 @@ class MessageAdaptor:
         :param fhir_operation:
         :return: MessageBeginning
         """
-        nhais_id = odh.find_nhais_id(fhir_operation=fhir_operation)
+        nhais_id = odh.get_parameter_value(fhir_operation=fhir_operation, parameter_name="nhaisCypher")
 
         ref_number = ''
         if fhir_operation.name == 'RegisterPatient-Birth':
