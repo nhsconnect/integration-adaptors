@@ -1,7 +1,8 @@
-from common.pystachemessagebuilder import PystacheMessageBuilder
-from pathlib import Path
-from definitions import ROOT_DIR
 import json
+from pathlib import Path
+
+from builder.pystachemessagebuilder import PystacheMessageBuilder
+from definitions import ROOT_DIR
 
 
 class SummaryCareRecord:

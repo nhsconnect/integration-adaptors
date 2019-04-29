@@ -1,9 +1,9 @@
 import unittest
-from common.utilities import Utilities
-from lxml import etree
-from definitions import ROOT_DIR
 from pathlib import Path
+
+from definitions import ROOT_DIR
 from scr.gpsummaryupdate import SummaryCareRecord
+from utilities.xmlutilities import XmlUtilities
 
 
 def get_file_string(file_path):
@@ -32,7 +32,7 @@ class FullTest(unittest.TestCase):
 
         expected_string = get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        Utilities.assert_xml_equal(expected_string, render)
+        XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_extended_html(self):
         """
@@ -43,7 +43,7 @@ class FullTest(unittest.TestCase):
 
         expected_string = get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        Utilities.assert_xml_equal(expected_string, render)
+        XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_empty_html(self):
         """
@@ -54,7 +54,7 @@ class FullTest(unittest.TestCase):
 
         expected_string = get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        Utilities.assert_xml_equal(expected_string, render)
+        XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_empty_hash(self):
         """
@@ -65,7 +65,7 @@ class FullTest(unittest.TestCase):
 
         expected_string = get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        Utilities.assert_xml_equal(expected_string, render)
+        XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_replacementOf(self):
         """
@@ -79,7 +79,7 @@ class FullTest(unittest.TestCase):
 
         expected_string = get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        Utilities.assert_xml_equal(expected_string, render)
+        XmlUtilities.assert_xml_equal(expected_string, render)
 
 
     def test_multipleReplacementOf(self):
@@ -93,7 +93,7 @@ class FullTest(unittest.TestCase):
 
         expected_string = get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        Utilities.assert_xml_equal(expected_string, render)
+        XmlUtilities.assert_xml_equal(expected_string, render)
 
 
     def test_python_dictionary_example(self):
@@ -104,7 +104,7 @@ class FullTest(unittest.TestCase):
         from scr.tests.hashes.basic_dict import input_hash
 
         render = self.summaryCareRecord.populate_template(input_hash)
-        Utilities.assert_xml_equal(expected_string, render)
+        XmlUtilities.assert_xml_equal(expected_string, render)
 
 
     def test_json_string_example(self):
@@ -116,4 +116,4 @@ class FullTest(unittest.TestCase):
         with open(json_file) as file:
             data = file.read()  # Reads file contents into a string
             render = self.summaryCareRecord.populate_template_with_json_string(data)
-            Utilities.assert_xml_equal(expected_string, render)
+            XmlUtilities.assert_xml_equal(expected_string, render)
