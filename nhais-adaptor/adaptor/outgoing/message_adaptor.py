@@ -1,6 +1,7 @@
-from edifact.models.message import MessageSegmentPatientDetails
+from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails
 from edifact.models.name import Name
 from edifact.models.address import Address
+from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
 
 
 class MessageAdaptor:
@@ -57,3 +58,34 @@ class MessageAdaptor:
                                                                gender=gender_map[fhir_patient.gender],
                                                                address=edi_address)
         return msg_seg_patient_details
+
+    @staticmethod
+    def create_message_segment_registration_details(fhir_operation):
+        """
+        Create the message segment registration details from the fhir operation
+        :param fhir_operation:
+        :return: MessageSegmentRegistrationDetails
+        """
+
+        transaction_number = odh.find_transaction_number(fhir_operation=fhir_operation)
+
+        acceptance_code = ''
+        acceptance_type = ''
+        if fhir_operation.name == 'RegisterPatient-Birth':
+            acceptance_code = "A"
+            acceptance_type = "1"
+
+        practitioner_details = odh.find_resource(fhir_operation=fhir_operation, resource_type="Practitioner")
+        party_id = f"{practitioner_details.identifier[0].value},{practitioner_details.identifier[1].value}"
+
+        patient_details = odh.find_resource(fhir_operation=fhir_operation, resource_type="Patient")
+        birth_location = patient_details.extension[0].valueAddress.city
+
+        msg_seg_registration_details = MessageSegmentRegistrationDetails(transaction_number=transaction_number,
+                                                                         party_id=party_id,
+                                                                         acceptance_code=acceptance_code,
+                                                                         acceptance_type=acceptance_type,
+                                                                         date_time=fhir_operation.date.as_json(),
+                                                                         location=birth_location)
+        return msg_seg_registration_details
+
