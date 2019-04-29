@@ -3,17 +3,8 @@ from pathlib import Path
 
 from definitions import ROOT_DIR
 from scr.gpsummaryupdate import SummaryCareRecord
+from utilities.fileutilities import FileUtilities
 from utilities.xmlutilities import XmlUtilities
-
-
-def get_file_string(file_path):
-    """
-    Gets the contents of a string from a file
-    :param file_path:
-    :return: string containing the file data
-    """
-    with open(file_path) as file:
-        return file.read()
 
 
 class FullTest(unittest.TestCase):
@@ -30,7 +21,7 @@ class FullTest(unittest.TestCase):
         expected_xml_file_path = str(self.xmlFileDir / 'cleanSummaryUpdate.xml')
         hash_file_path = str(self.hashFileDir / 'hash16UK05.json')
 
-        expected_string = get_file_string(expected_xml_file_path)
+        expected_string = FileUtilities.get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
@@ -41,7 +32,7 @@ class FullTest(unittest.TestCase):
         expected_xml_file_path = str(self.xmlFileDir / 'SummaryUpdateExtendedContents.xml')
         hash_file_path = str(self.hashFileDir / 'extendedHTMLhash.json')
 
-        expected_string = get_file_string(expected_xml_file_path)
+        expected_string = FileUtilities.get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
@@ -52,7 +43,7 @@ class FullTest(unittest.TestCase):
         expected_xml_file_path = str(self.xmlFileDir / 'EmptyHtmlGpSummaryUpdate.xml')
         hash_file_path = str(self.hashFileDir / 'emptyHtmlHash.json')
 
-        expected_string = get_file_string(expected_xml_file_path)
+        expected_string = FileUtilities.get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
@@ -63,7 +54,7 @@ class FullTest(unittest.TestCase):
         expected_xml_file_path = str(self.xmlFileDir / 'EmptyHash.xml')
         hash_file_path = str(self.hashFileDir / 'EmptyHash.json')
 
-        expected_string = get_file_string(expected_xml_file_path)
+        expected_string = FileUtilities.get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
@@ -77,7 +68,7 @@ class FullTest(unittest.TestCase):
         expected_xml_file_path = str(self.xmlFileDir / 'replacementOf.xml')
         hash_file_path = str(self.hashFileDir / 'replacementOfhash.json')
 
-        expected_string = get_file_string(expected_xml_file_path)
+        expected_string = FileUtilities.get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
@@ -91,7 +82,7 @@ class FullTest(unittest.TestCase):
         expected_xml_file_path = str(self.xmlFileDir / 'multipleReplacementOf.xml')
         hash_file_path = str(self.hashFileDir / 'multiReplacementOfhash.json')
 
-        expected_string = get_file_string(expected_xml_file_path)
+        expected_string = FileUtilities.get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
@@ -100,7 +91,7 @@ class FullTest(unittest.TestCase):
         """
         Basic test to demonstrate passing a python dict to the interface instead of a json file
         """
-        expected_string = get_file_string(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
+        expected_string = FileUtilities.get_file_string(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         from scr.tests.hashes.basic_dict import input_hash
 
         render = self.summaryCareRecord.populate_template(input_hash)
@@ -111,7 +102,7 @@ class FullTest(unittest.TestCase):
         """
         Basic example showing how a json string can be passed to the interface
         """
-        expected_string = get_file_string(str(self.xmlFileDir / 'cleanSummaryUpdate.xml'))
+        expected_string = FileUtilities.get_file_string(str(self.xmlFileDir / 'cleanSummaryUpdate.xml'))
         json_file = str(self.hashFileDir / 'hash16UK05.json')
         with open(json_file) as file:
             data = file.read()  # Reads file contents into a string
