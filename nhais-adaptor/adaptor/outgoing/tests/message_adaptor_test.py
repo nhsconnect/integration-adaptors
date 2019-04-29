@@ -134,13 +134,13 @@ class MessageAdaptorTest(unittest.TestCase):
         Test the function to create an edifact section representing the beginning of a message
         """
         with self.subTest("Message beginning for a birth registration"):
-            op_param_nhais_id = odh.create_parameter_with_binding(name="nhaisCypher", value="XX1")
+            op_param_nhais_cypher = odh.create_parameter_with_binding(name="nhaisCypher", value="XX1")
 
             op_def = odh.create_operation_definition(name="RegisterPatient-Birth",
                                                      code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[],
-                                                     parameter=[op_param_nhais_id])
+                                                     parameter=[op_param_nhais_cypher])
             expected = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
 
             msg_bgn = MessageAdaptor.create_message_beginning(fhir_operation=op_def)
@@ -153,7 +153,7 @@ class MessageAdaptorTest(unittest.TestCase):
         """
         with self.subTest("Birth Registration"):
             op_param_message_sequence = odh.create_parameter_with_binding(name="messageSequenceNumber", value="000001")
-            op_param_nhais_id = odh.create_parameter_with_binding(name="nhaisCypher", value="XX1")
+            op_param_nhais_cypher = odh.create_parameter_with_binding(name="nhaisCypher", value="XX1")
             op_param_transaction_number = odh.create_parameter_with_binding(name="transactionNumber", value="17")
 
             practitioner = Fixtures.create_simple_practitioner()
@@ -172,7 +172,7 @@ class MessageAdaptorTest(unittest.TestCase):
                                                      contained=[practitioner, patient],
                                                      parameter=[op_param_message_sequence,
                                                                 op_param_transaction_number,
-                                                                op_param_nhais_id,
+                                                                op_param_nhais_cypher,
                                                                 op_param_practitioner, op_param_patient])
 
             msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
