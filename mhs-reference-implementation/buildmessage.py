@@ -1,4 +1,4 @@
-from mhs.builder.pystachemessagebuilder import PystacheMessageBuilder
+from builder.pystachemessagebuilder import PystacheMessageBuilder
 
 builder = PystacheMessageBuilder("data/templates", "ebxml")
 message = builder.build_message({
