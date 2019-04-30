@@ -42,5 +42,8 @@ class InterchangeAdaptor:
 
         interchange = Interchange(sender=sender_cypher, recipient=recipient,
                                   sequence_number=interchange_sequence_number,
-                                  date_time=fhir_operation.date.as_json(), messages=messages).to_edifact()
-        return interchange
+                                  date_time=fhir_operation.date.as_json(), messages=messages)
+
+        edifact_interchange = interchange.to_edifact()
+
+        return edifact_interchange
