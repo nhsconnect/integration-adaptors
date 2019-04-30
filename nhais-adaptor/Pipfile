@@ -13,5 +13,5 @@ fhirclient = "*"
 python_version = "3.7"
 
 [scripts]
-tests = "python -m unittest discover -p 'test_*.py' -v"
+tests = "python -m unittest -v"
 transfer = "python transfer.py"
