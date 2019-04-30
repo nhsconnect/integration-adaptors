@@ -77,11 +77,11 @@
     "develop": {
         "testfixtures": {
             "hashes": [
-                "sha256:6b79324f35852eaacd4f5f440b20ee1b98df23001ff88db8b8bde3746f753f0a",
-                "sha256:c0028d2acd45e6604d359b806132af05815d64e882cf995fa45e6814ddaade13"
+                "sha256:015f8220088c40772b48a210f6bcdf328664f66faf83432c4f7aa8e55a7cfdc5",
+                "sha256:d7558f09801ee53e0ea40eabe8d7d79cbe5b0f8a72871f1d5ae8162004011913"
             ],
             "index": "pypi",
-            "version": "==6.7.0"
+            "version": "==6.7.1"
         }
     }
 }
