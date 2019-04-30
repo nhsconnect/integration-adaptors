@@ -100,5 +100,3 @@ class TestFhirCreators(unittest.TestCase):
         self.assertEqual(patient.address[0].line[0], "1 Spidey Way")
         self.assertEqual(patient.address[0].city, "Spidey Town")
         self.assertEqual(patient.address[0].postalCode, "SP1 1AA")
-
-

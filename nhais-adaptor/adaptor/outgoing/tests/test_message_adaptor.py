@@ -12,7 +12,7 @@ from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentR
     Message
 
 
-class MessageAdaptorTest(unittest.TestCase):
+class TestMessageAdaptor(unittest.TestCase):
     """
     Tests the conversion of fhir to edifact
     """

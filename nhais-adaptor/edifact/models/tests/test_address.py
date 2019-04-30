@@ -2,7 +2,7 @@ import unittest
 from edifact.models.address import PatientAddress, Address
 
 
-class PatientAddressTest(unittest.TestCase):
+class TestPatientAddress(unittest.TestCase):
     """
     Test the generating of the patient address segment
     """
@@ -27,4 +27,3 @@ class PatientAddressTest(unittest.TestCase):
             address = Address(address_line_1="5 OLD LANE", town="ORPINGTON", post_code="BR6 7EW")
             pat_address_segment = PatientAddress(address=address).to_edifact()
             self.assertEqual(expected_edifact_message, pat_address_segment)
-

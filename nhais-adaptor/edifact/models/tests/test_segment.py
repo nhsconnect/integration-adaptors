@@ -2,7 +2,7 @@ import unittest
 from edifact.models.segment import Segment
 
 
-class SegmentTest(unittest.TestCase):
+class TestSegment(unittest.TestCase):
     """
     Tests the generating of edifact segment
     """
@@ -14,8 +14,4 @@ class SegmentTest(unittest.TestCase):
     def test_values_are_converted_to_upper_case(self):
         segment = Segment(key="AAA", value="some_value").to_edifact()
         self.assertEqual(segment, "AAA+SOME_VALUE'")
-
-
-if __name__ == '__main__':
-    unittest.main()
 

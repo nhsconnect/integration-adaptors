@@ -4,7 +4,7 @@ from fhirclient.models.operationdefinition import OperationDefinition
 from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 
 
-class FhirToEdifactIntegrationTest(unittest.TestCase):
+class TestFhirToEdifactIntegration(unittest.TestCase):
     """
     Test that when fhir json payload is loaded the correct edifact message is created
     """
@@ -20,7 +20,6 @@ class FhirToEdifactIntegrationTest(unittest.TestCase):
             patient_register_json = json.load(patient_register)
         op_def = OperationDefinition(patient_register_json)
         edifact_interchange = InterchangeAdaptor.create_interchange(fhir_operation=op_def)
-        pretty_edifact_interchange  = "'\n".join(edifact_interchange.split("'"))
+        pretty_edifact_interchange = "'\n".join(edifact_interchange.split("'"))
 
-        self.assertEqual(pretty_edifact_interchange , expected_edifact_interchange)
-
+        self.assertEqual(pretty_edifact_interchange, expected_edifact_interchange)

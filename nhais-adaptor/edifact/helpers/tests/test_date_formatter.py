@@ -2,7 +2,7 @@ import unittest
 from edifact.helpers.date_formatter import DateFormatter
 
 
-class DateFormatterTest(unittest.TestCase):
+class TestDateFormatter(unittest.TestCase):
     """
     Tests the formatting of date time to an edifact date time stamp
     """
@@ -26,7 +26,3 @@ class DateFormatterTest(unittest.TestCase):
         date_time = "2019-04-23"
         formatted_date = DateFormatter.format_date(date_time=date_time, format_qualifier="102", current_format="%Y-%m-%d")
         self.assertEqual(formatted_date, "20190423")
-
-
-if __name__ == '__main__':
-    unittest.main()

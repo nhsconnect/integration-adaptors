@@ -6,7 +6,7 @@ import adaptor.outgoing.fhir_helpers.fhir_creators as creators
 from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
 
 
-class InterchangeAdaptorTest(unittest.TestCase):
+class TestInterchangeAdaptor(unittest.TestCase):
     """
     Test the conversation of fhir to an edifact interchange
     """
