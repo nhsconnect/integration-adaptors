@@ -13,6 +13,11 @@ class MessageAdaptor:
 
     @staticmethod
     def create_patient_name(fhir_patient_name):
+        """
+        Function to generate the edifact representation of the patient name
+        :param fhir_patient_name:
+        :return: edifact name
+        """
         given_names = [None, None, None]
         for index, given_name in enumerate(fhir_patient_name.given):
             given_names[index] = given_name
@@ -26,7 +31,11 @@ class MessageAdaptor:
 
     @staticmethod
     def create_patient_address(fhir_patient_address):
-
+        """
+        Function to generate the edifact representation of the patient address
+        :param fhir_patient_address:
+        :return: edifact address
+        """
         address_lines = ["", "", ""]
         counter = 0 if len(fhir_patient_address.line) == 3 else 1
 
@@ -56,7 +65,6 @@ class MessageAdaptor:
 
         edi_address = MessageAdaptor.create_patient_address(patient.address[0])
 
-        # get nhs number, date or birth and gender
         msg_seg_patient_details = MessageSegmentPatientDetails(id_number=patient.identifier[0].value,
                                                                name=edi_name,
                                                                date_of_birth=patient.birthDate.as_json(),
@@ -75,8 +83,6 @@ class MessageAdaptor:
         transaction_number = odh.get_parameter_value(fhir_operation=fhir_operation,
                                                      parameter_name=ParameterName.TRANSACTION_NO)
 
-        acceptance_code = ''
-        acceptance_type = ''
         if fhir_operation.name == OperationName.REGISTER_BIRTH:
             acceptance_code = "A"
             acceptance_type = "1"
@@ -104,7 +110,6 @@ class MessageAdaptor:
         """
         nhais_id = odh.get_parameter_value(fhir_operation=fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
 
-        ref_number = ''
         if fhir_operation.name == OperationName.REGISTER_BIRTH:
             ref_number = "G1"
 

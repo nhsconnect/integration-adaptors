@@ -7,7 +7,7 @@ from adaptor.outgoing.fhir_helpers.constants import ParameterName
 
 class InterchangeAdaptor:
     """
-    An adaptor to take in fhir models and generate an edifact interchange model
+    An adaptor to take in fhir models and generate an edifact interchange
     """
 
     @staticmethod

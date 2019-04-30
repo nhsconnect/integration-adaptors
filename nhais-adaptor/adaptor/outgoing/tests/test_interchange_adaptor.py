@@ -16,37 +16,6 @@ class InterchangeAdaptorTest(unittest.TestCase):
         Test the function to create an edifact interchange
         """
         with self.subTest("When the operation is for a Birth Registration"):
-            op_param_interchange_sequence = odh.create_parameter_with_binding(name=ParameterName.INTERCHANGE_SEQ_NO,
-                                                                              value="000001")
-            op_param_sender_cypher = odh.create_parameter_with_binding(name=ParameterName.SENDER_CYPHER, value="TES5")
-            op_param_message_sequence = odh.create_parameter_with_binding(name=ParameterName.MESSAGE_SEQ_NO,
-                                                                          value="000001")
-            op_param_nhais_cypher = odh.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
-            op_param_transaction_number = odh.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
-                                                                            value="17")
-
-            practitioner = Fixtures.create_simple_practitioner()
-            patient = Fixtures.create_simple_patient()
-
-            op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
-                                                                           resource_type=ResourceType.PRACTITIONER,
-                                                                           reference="practitioner-1")
-
-            op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
-                                                                      resource_type=ResourceType.PATIENT,
-                                                                      reference="patient-1")
-
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH,
-                                                     code="gpc.registerpatient",
-                                                     date_time="2019-04-23 09:00:04.159338",
-                                                     contained=[practitioner, patient],
-                                                     parameter=[op_param_interchange_sequence,
-                                                                op_param_sender_cypher,
-                                                                op_param_message_sequence,
-                                                                op_param_transaction_number,
-                                                                op_param_nhais_cypher,
-                                                                op_param_practitioner, op_param_patient])
-
             expected_edifact_interchange = ("UNB+UNOA:2+TES5+XX11+190423:0900+000001++FHSREG'"
                                             "UNH+000001+FHSREG:0:1:FH:FHS001'"
                                             "BGM+++507'"
@@ -67,6 +36,33 @@ class InterchangeAdaptorTest(unittest.TestCase):
                                             "NAD+PAT++:1 SPIDEY WAY::SPIDEY TOWN:+++++SP1 1AA'"
                                             "UNT+18+000001'"
                                             "UNZ+1+000001'")
+
+            op_param_interchange_sequence = odh.create_parameter_with_binding(name=ParameterName.INTERCHANGE_SEQ_NO,
+                                                                              value="000001")
+            op_param_sender_cypher = odh.create_parameter_with_binding(name=ParameterName.SENDER_CYPHER, value="TES5")
+            op_param_message_sequence = odh.create_parameter_with_binding(name=ParameterName.MESSAGE_SEQ_NO,
+                                                                          value="000001")
+            op_param_nhais_cypher = odh.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
+            op_param_transaction_number = odh.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
+                                                                            value="17")
+            practitioner = Fixtures.create_simple_practitioner()
+            patient = Fixtures.create_simple_patient()
+            op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
+                                                                           resource_type=ResourceType.PRACTITIONER,
+                                                                           reference="practitioner-1")
+            op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
+                                                                      resource_type=ResourceType.PATIENT,
+                                                                      reference="patient-1")
+            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH,
+                                                     code="gpc.registerpatient",
+                                                     date_time="2019-04-23 09:00:04.159338",
+                                                     contained=[practitioner, patient],
+                                                     parameter=[op_param_interchange_sequence,
+                                                                op_param_sender_cypher,
+                                                                op_param_message_sequence,
+                                                                op_param_transaction_number,
+                                                                op_param_nhais_cypher,
+                                                                op_param_practitioner, op_param_patient])
 
             interchange = InterchangeAdaptor.create_interchange(fhir_operation=op_def)
 

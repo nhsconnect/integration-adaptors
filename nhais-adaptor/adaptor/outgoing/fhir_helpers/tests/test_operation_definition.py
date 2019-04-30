@@ -19,6 +19,7 @@ class OperationDefinitionHelperTest(unittest.TestCase):
         Test the helper function to create an operation parameter with a binding value
         """
         op_param = odh.create_parameter_with_binding(name="SOME_NAME", value="SOME_VALUE")
+
         self.assertIsInstance(op_param, OperationDefinitionParameter)
         self.assertEqual(op_param.name, "SOME_NAME")
         self.assertEqual(op_param.binding.valueSetReference.identifier.value, "SOME_VALUE")
@@ -29,6 +30,7 @@ class OperationDefinitionHelperTest(unittest.TestCase):
         """
         op_param = odh.create_parameter_with_resource_ref(name="SOME_NAME", resource_type=ResourceType.PRACTITIONER,
                                                           reference="practitioner-1")
+
         self.assertIsInstance(op_param, OperationDefinitionParameter)
         self.assertEqual(op_param.name, "SOME_NAME")
         self.assertEqual(op_param.type, ResourceType.PRACTITIONER)
@@ -45,6 +47,7 @@ class OperationDefinitionHelperTest(unittest.TestCase):
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[],
                                                      parameter=[])
+
             self.assertIsInstance(op_def, OperationDefinition)
             self.assertEqual(op_def.name, "name.of.operation")
             self.assertEqual(op_def.code, "code.of.operation")
@@ -54,16 +57,19 @@ class OperationDefinitionHelperTest(unittest.TestCase):
 
         with self.subTest("with one parameter"):
             some_param = odh.create_parameter_with_binding(name="SOME_NAME", value="SOME_VALUE")
+
             op_def = odh.create_operation_definition(name="name.of.operation", code="code.of.operation",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[],
                                                      parameter=[some_param])
+
             self.assertEqual(len(op_def.parameter), 1)
             self.assertIsInstance(op_def.parameter[0], OperationDefinitionParameter)
 
     def test_create_practitioner(self):
         practitioner = odh.create_practitioner_resource(resource_id="practitioner-1", national_identifier="1234567",
                                                         local_identifier="111")
+
         self.assertIsInstance(practitioner, Practitioner)
         self.assertEqual(practitioner.id, "practitioner-1")
         self.assertEqual(practitioner.identifier[0].value, "1234567")
@@ -74,6 +80,7 @@ class OperationDefinitionHelperTest(unittest.TestCase):
                                               title="Mr", first_name="Peter", last_name="Parker",
                                               gender="male", date_of_birth="2019-04-23", place_of_birth="Spidey Town",
                                               address_line_1="1 Spidey Way", city="Spidey Town", postcode="SP1 1AA")
+
         self.assertIsInstance(patient, Patient)
 
     def test_get_parameter_value(self):
