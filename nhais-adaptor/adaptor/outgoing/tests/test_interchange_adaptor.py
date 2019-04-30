@@ -2,7 +2,7 @@ import unittest
 from testfixtures import compare
 from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
-from adaptor.outgoing.fhir_helpers.tests.fixtures import Fixtures
+from adaptor.outgoing.fhir_helpers.tests.fixtures import create_simple_patient, create_simple_practitioner
 from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
 
 
@@ -45,8 +45,8 @@ class InterchangeAdaptorTest(unittest.TestCase):
             op_param_nhais_cypher = odh.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
             op_param_transaction_number = odh.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
                                                                             value="17")
-            practitioner = Fixtures.create_simple_practitioner()
-            patient = Fixtures.create_simple_patient()
+            practitioner = create_simple_practitioner()
+            patient = create_simple_patient()
             op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
                                                                            resource_type=ResourceType.PRACTITIONER,
                                                                            reference="practitioner-1")
