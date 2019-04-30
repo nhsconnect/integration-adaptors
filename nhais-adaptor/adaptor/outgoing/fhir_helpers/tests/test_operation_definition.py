@@ -90,6 +90,17 @@ class OperationDefinitionHelperTest(unittest.TestCase):
                                               address_line_1="1 Spidey Way", city="Spidey Town", postcode="SP1 1AA")
 
         self.assertIsInstance(patient, Patient)
+        self.assertEqual(patient.id, "patient-1")
+        self.assertEqual(patient.identifier[0].value, "NHSNO11111")
+        self.assertEqual(patient.name[0].prefix[0], "Mr")
+        self.assertEqual(patient.name[0].given[0], "Peter")
+        self.assertEqual(patient.name[0].family, "Parker")
+        self.assertEqual(patient.gender, "male")
+        self.assertEqual(patient.birthDate.as_json(), "2019-04-23")
+        self.assertEqual(patient.extension[0].valueAddress.city, "Spidey Town")
+        self.assertEqual(patient.address[0].line[0], "1 Spidey Way")
+        self.assertEqual(patient.address[0].city, "Spidey Town")
+        self.assertEqual(patient.address[0].postalCode, "SP1 1AA")
 
     def test_get_parameter_value(self):
         op_param_transaction_number = odh.create_parameter_with_binding(name="some_param_name", value="17")
