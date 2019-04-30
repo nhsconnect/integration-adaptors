@@ -63,6 +63,17 @@ class OperationDefinitionHelperTest(unittest.TestCase):
             self.assertEqual(len(op_def.parameter), 1)
             self.assertIsInstance(op_def.parameter[0], OperationDefinitionParameter)
 
+        with self.subTest("with one contained resource"):
+            some_resource = odh.create_practitioner_resource(resource_id="some_id", national_identifier="some_nat_id",
+                                                             local_identifier="some_local_id")
+
+            op_def = odh.create_operation_definition(name="name.of.operation", code="code.of.operation",
+                                                     date_time="2019-04-23 09:00:04.159338", contained=[some_resource],
+                                                     parameters=[])
+
+            self.assertEqual(len(op_def.contained), 1)
+            self.assertIsInstance(op_def.contained[0], Practitioner)
+
     def test_create_practitioner(self):
         practitioner = odh.create_practitioner_resource(resource_id="practitioner-1", national_identifier="1234567",
                                                         local_identifier="111")
