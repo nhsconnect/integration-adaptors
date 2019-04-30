@@ -42,11 +42,9 @@ class OperationDefinitionHelperTest(unittest.TestCase):
         """
 
         with self.subTest("with no contained resources or parameters"):
-            op_def = odh.create_operation_definition(name="name.of.operation",
-                                                     code="code.of.operation",
-                                                     date_time="2019-04-23 09:00:04.159338",
-                                                     contained=[],
-                                                     parameter=[])
+            op_def = odh.create_operation_definition(name="name.of.operation", code="code.of.operation",
+                                                     date_time="2019-04-23 09:00:04.159338", contained=[],
+                                                     parameters=[])
 
             self.assertIsInstance(op_def, OperationDefinition)
             self.assertEqual(op_def.name, "name.of.operation")
@@ -59,9 +57,8 @@ class OperationDefinitionHelperTest(unittest.TestCase):
             some_param = odh.create_parameter_with_binding(name="SOME_NAME", value="SOME_VALUE")
 
             op_def = odh.create_operation_definition(name="name.of.operation", code="code.of.operation",
-                                                     date_time="2019-04-23 09:00:04.159338",
-                                                     contained=[],
-                                                     parameter=[some_param])
+                                                     date_time="2019-04-23 09:00:04.159338", contained=[],
+                                                     parameters=[some_param])
 
             self.assertEqual(len(op_def.parameter), 1)
             self.assertIsInstance(op_def.parameter[0], OperationDefinitionParameter)
@@ -86,11 +83,8 @@ class OperationDefinitionHelperTest(unittest.TestCase):
     def test_get_parameter_value(self):
         op_param_transaction_number = odh.create_parameter_with_binding(name="some_param_name", value="17")
 
-        op = odh.create_operation_definition(name="some.name",
-                                             code="some.code",
-                                             date_time="2019-04-23 09:00:04.159338",
-                                             contained=[],
-                                             parameter=[op_param_transaction_number])
+        op = odh.create_operation_definition(name="some.name", code="some.code", date_time="2019-04-23 09:00:04.159338",
+                                             contained=[], parameters=[op_param_transaction_number])
 
         self.assertEqual(odh.get_parameter_value(op, "some_param_name"), "17")
 
@@ -102,9 +96,8 @@ class OperationDefinitionHelperTest(unittest.TestCase):
                                                                            resource_type=ResourceType.PRACTITIONER,
                                                                            reference="practitioner-1")
             op_def = odh.create_operation_definition(name="name.of.operation", code="code.of.operation",
-                                                     date_time="2019-04-23 09:00:04.159338",
-                                                     contained=[practitioner],
-                                                     parameter=[op_param_practitioner])
+                                                     date_time="2019-04-23 09:00:04.159338", contained=[practitioner],
+                                                     parameters=[op_param_practitioner])
 
             found_practitioner = odh.find_resource(fhir_operation=op_def, resource_type=ResourceType.PRACTITIONER)
 

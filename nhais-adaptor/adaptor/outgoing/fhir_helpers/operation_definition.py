@@ -43,14 +43,14 @@ class OperationDefinitionHelper:
         return op_param
 
     @staticmethod
-    def create_operation_definition(name, code, date_time, contained, parameter):
+    def create_operation_definition(name, code, date_time, contained, parameters):
         """
         Helper function to create a fhir operation definition
         :param name: The name of the operation
         :param code: The code of the operation
         :param date_time: the time stamp of the operation
         :param contained: list of contained resources
-        :param parameter: list of parameters
+        :param parameters: list of parameters
         :return: OperationDefinition
         """
         op = OperationDefinition(
@@ -64,8 +64,8 @@ class OperationDefinitionHelper:
              'code': code})
         if len(contained) > 0:
             op.contained = contained
-        if len(parameter) > 0:
-            op.parameter = parameter
+        if len(parameters) > 0:
+            op.parameter = parameters
         return op
 
     @staticmethod

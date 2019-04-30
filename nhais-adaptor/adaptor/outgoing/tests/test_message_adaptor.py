@@ -96,11 +96,9 @@ class MessageAdaptorTest(unittest.TestCase):
             op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH,
-                                                     code="gpc.registerpatient",
-                                                     date_time="2019-04-23 09:00:04.159338",
-                                                     contained=[patient],
-                                                     parameter=[op_param_patient])
+            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+                                                     date_time="2019-04-23 09:00:04.159338", contained=[patient],
+                                                     parameters=[op_param_patient])
             msg_seg_pat_details = MessageAdaptor.create_message_segment_patient_detail(op_def)
 
             compare(msg_seg_pat_details, expected)
@@ -128,12 +126,11 @@ class MessageAdaptorTest(unittest.TestCase):
             op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH,
-                                                     code="gpc.registerpatient",
+            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner, patient],
-                                                     parameter=[op_param_transaction_number,
-                                                                op_param_practitioner, op_param_patient])
+                                                     parameters=[op_param_transaction_number,
+                                                                 op_param_practitioner, op_param_patient])
 
             msg_seg_reg_details = MessageAdaptor.create_message_segment_registration_details(op_def)
 
@@ -147,11 +144,9 @@ class MessageAdaptorTest(unittest.TestCase):
             expected = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
 
             op_param_nhais_cypher = odh.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH,
-                                                     code="gpc.registerpatient",
-                                                     date_time="2019-04-23 09:00:04.159338",
-                                                     contained=[],
-                                                     parameter=[op_param_nhais_cypher])
+            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+                                                     date_time="2019-04-23 09:00:04.159338", contained=[],
+                                                     parameters=[op_param_nhais_cypher])
 
             msg_bgn = MessageAdaptor.create_message_beginning(fhir_operation=op_def)
 
@@ -191,14 +186,13 @@ class MessageAdaptorTest(unittest.TestCase):
             op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH,
-                                                     code="gpc.registerpatient",
+            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner, patient],
-                                                     parameter=[op_param_message_sequence,
-                                                                op_param_transaction_number,
-                                                                op_param_nhais_cypher,
-                                                                op_param_practitioner, op_param_patient])
+                                                     parameters=[op_param_message_sequence,
+                                                                 op_param_transaction_number,
+                                                                 op_param_nhais_cypher,
+                                                                 op_param_practitioner, op_param_patient])
 
             message = MessageAdaptor.create_message(fhir_operation=op_def)
 

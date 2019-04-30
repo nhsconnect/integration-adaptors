@@ -53,16 +53,15 @@ class InterchangeAdaptorTest(unittest.TestCase):
             op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH,
-                                                     code="gpc.registerpatient",
+            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner, patient],
-                                                     parameter=[op_param_interchange_sequence,
-                                                                op_param_sender_cypher,
-                                                                op_param_message_sequence,
-                                                                op_param_transaction_number,
-                                                                op_param_nhais_cypher,
-                                                                op_param_practitioner, op_param_patient])
+                                                     parameters=[op_param_interchange_sequence,
+                                                                 op_param_sender_cypher,
+                                                                 op_param_message_sequence,
+                                                                 op_param_transaction_number,
+                                                                 op_param_nhais_cypher,
+                                                                 op_param_practitioner, op_param_patient])
 
             interchange = InterchangeAdaptor.create_interchange(fhir_operation=op_def)
 
