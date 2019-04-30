@@ -6,6 +6,7 @@ from fhirclient.models.operationdefinition import OperationDefinitionParameter, 
 from fhirclient.models.practitioner import Practitioner
 
 from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
+from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType
 
 
 class OperationDefinitionHelperTest(unittest.TestCase):
@@ -26,11 +27,11 @@ class OperationDefinitionHelperTest(unittest.TestCase):
         """
         Test the helper function to create an operation parameter with a resource reference
         """
-        op_param = odh.create_parameter_with_resource_ref(name="SOME_NAME", resource_type="Practitioner",
+        op_param = odh.create_parameter_with_resource_ref(name="SOME_NAME", resource_type=ResourceType.PRACTITIONER,
                                                           reference="practitioner-1")
         self.assertIsInstance(op_param, OperationDefinitionParameter)
         self.assertEqual(op_param.name, "SOME_NAME")
-        self.assertEqual(op_param.type, "Practitioner")
+        self.assertEqual(op_param.type, ResourceType.PRACTITIONER)
         self.assertEqual(op_param.profile.reference, "#practitioner-1")
 
     def test_create_operation_definition(self):
@@ -90,14 +91,14 @@ class OperationDefinitionHelperTest(unittest.TestCase):
         with self.subTest("When practitioner details are found in the operation definition"):
             practitioner = odh.create_practitioner_resource(resource_id="practitioner-1", national_identifier="1234567",
                                                             local_identifier="111")
-            op_param_practitioner = odh.create_parameter_with_resource_ref(name="registerPractitioner",
-                                                                           resource_type="Practitioner",
+            op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
+                                                                           resource_type=ResourceType.PRACTITIONER,
                                                                            reference="practitioner-1")
             op_def = odh.create_operation_definition(name="name.of.operation", code="code.of.operation",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner],
                                                      parameter=[op_param_practitioner])
 
-            found_practitioner = odh.find_resource(fhir_operation=op_def, resource_type="Practitioner")
+            found_practitioner = odh.find_resource(fhir_operation=op_def, resource_type=ResourceType.PRACTITIONER)
 
             compare(found_practitioner, practitioner)

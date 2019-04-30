@@ -1,14 +1,9 @@
 import unittest
 from testfixtures import compare
 from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
-from adaptor.outgoing.message_adaptor import MessageAdaptor
 from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
 from adaptor.outgoing.fhir_helpers.tests.fixtures import Fixtures
-from edifact.models.interchange import Interchange
-from edifact.models.name import Name
-from edifact.models.address import Address as EdifactAddress
-from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning, \
-    Message, Messages
+from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
 
 
 class InterchangeAdaptorTest(unittest.TestCase):
@@ -21,24 +16,27 @@ class InterchangeAdaptorTest(unittest.TestCase):
         Test the function to create an edifact interchange
         """
         with self.subTest("When the operation is for a Birth Registration"):
-            op_param_interchange_sequence = odh.create_parameter_with_binding(name="interchangeSequenceNumber",
+            op_param_interchange_sequence = odh.create_parameter_with_binding(name=ParameterName.INTERCHANGE_SEQ_NO,
                                                                               value="000001")
-            op_param_sender_cypher = odh.create_parameter_with_binding(name="senderCypher", value="TES5")
-            op_param_message_sequence = odh.create_parameter_with_binding(name="messageSequenceNumber", value="000001")
-            op_param_nhais_cypher = odh.create_parameter_with_binding(name="nhaisCypher", value="XX1")
-            op_param_transaction_number = odh.create_parameter_with_binding(name="transactionNumber", value="17")
+            op_param_sender_cypher = odh.create_parameter_with_binding(name=ParameterName.SENDER_CYPHER, value="TES5")
+            op_param_message_sequence = odh.create_parameter_with_binding(name=ParameterName.MESSAGE_SEQ_NO,
+                                                                          value="000001")
+            op_param_nhais_cypher = odh.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
+            op_param_transaction_number = odh.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
+                                                                            value="17")
 
             practitioner = Fixtures.create_simple_practitioner()
             patient = Fixtures.create_simple_patient()
 
-            op_param_practitioner = odh.create_parameter_with_resource_ref(name="registerPractitioner",
-                                                                           resource_type="Practitioner",
+            op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
+                                                                           resource_type=ResourceType.PRACTITIONER,
                                                                            reference="practitioner-1")
 
-            op_param_patient = odh.create_parameter_with_resource_ref(name="registerPatient", resource_type="Patient",
+            op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
+                                                                      resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
 
-            op_def = odh.create_operation_definition(name="RegisterPatient-Birth",
+            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH,
                                                      code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner, patient],

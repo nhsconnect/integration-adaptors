@@ -164,5 +164,3 @@ class OperationDefinitionHelper:
                 found_resource = resource
 
         return found_resource
-
-

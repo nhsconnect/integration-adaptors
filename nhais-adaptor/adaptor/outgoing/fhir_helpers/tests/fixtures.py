@@ -26,5 +26,5 @@ class Fixtures:
         :return: Practitioner
         """
         practitioner = odh.create_practitioner_resource(resource_id="practitioner-1", national_identifier="4826940",
-                                                            local_identifier="281")
+                                                        local_identifier="281")
         return practitioner
