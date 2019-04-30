@@ -1,14 +1,14 @@
 import unittest
 from pathlib import Path
 
+from utilities.file_utilities import FileUtilities
+from utilities.xml_utilities import XmlUtilities
+
 from definitions import ROOT_DIR
-from scr.gpsummaryupdate import SummaryCareRecord
-from utilities.fileutilities import FileUtilities
-from utilities.xmlutilities import XmlUtilities
+from scr.gp_summary_update import SummaryCareRecord
 
 
 class FullTest(unittest.TestCase):
-
     summaryCareRecord = SummaryCareRecord()
 
     xmlFileDir = Path(ROOT_DIR + '/scr/tests/test_xmls/')
@@ -72,7 +72,6 @@ class FullTest(unittest.TestCase):
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
-
     def test_multipleReplacementOf(self):
         """
         Note: THIS IS NOT A VALID XML INSTANCE
@@ -86,17 +85,16 @@ class FullTest(unittest.TestCase):
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
-
     def test_python_dictionary_example(self):
         """
         Basic test to demonstrate passing a python dict to the interface instead of a json file
         """
-        expected_string = FileUtilities.get_file_string(str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
+        expected_string = FileUtilities.get_file_string(
+            str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         from scr.tests.hashes.basic_dict import input_hash
 
         render = self.summaryCareRecord.populate_template(input_hash)
         XmlUtilities.assert_xml_equal(expected_string, render)
-
 
     def test_json_string_example(self):
         """

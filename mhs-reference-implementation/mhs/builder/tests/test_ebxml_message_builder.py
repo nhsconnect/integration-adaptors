@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
-from utilities.fileutilities import FileUtilities
+from utilities.file_utilities import FileUtilities
 
 from mhs.builder.ebxml_message_builder import EbXmlMessageBuilder
 

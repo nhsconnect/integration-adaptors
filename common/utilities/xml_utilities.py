@@ -1,7 +1,7 @@
+import unittest
 
 from lxml import etree
 from lxml import objectify
-import unittest
 
 
 class XmlUtilities:
