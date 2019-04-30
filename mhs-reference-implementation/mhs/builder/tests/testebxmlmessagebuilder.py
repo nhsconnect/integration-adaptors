@@ -36,4 +36,9 @@ class TestEbXmlMessageBuilder(TestCase):
             "hl7_message": '<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>'
         })
 
-        self.assertEqual(expected_message, message)
+        # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
+        # file, so normalize the line endings of both strings
+        normalized_expected_message = FileUtilities.normalize_line_endings(expected_message)
+        normalized_message = FileUtilities.normalize_line_endings(message)
+
+        self.assertEqual(normalized_expected_message, normalized_message)
