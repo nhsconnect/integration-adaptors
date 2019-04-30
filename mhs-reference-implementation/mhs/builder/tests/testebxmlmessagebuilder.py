@@ -2,23 +2,20 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
-from builder.pystachemessagebuilder import PystacheMessageBuilder
 from utilities.fileutilities import FileUtilities
 
-from definitions import ROOT_DIR
+from mhs.builder.ebxmlmessagebuilder import EbXmlMessageBuilder
 
-TEMPLATES_DIR = "data/templates"
-EBXML_TEMPLATE = "ebxml"
+EXPECTED_MESSAGES_DIR = "expected_messages"
 EXPECTED_EBXML = "ebxml.xml"
 
 
 class TestEbXmlMessageBuilder(TestCase):
-    ebxml_template_dir = Path(ROOT_DIR) / TEMPLATES_DIR
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    expected_message_dir = Path(current_dir) / "expected_messages"
+    expected_message_dir = Path(current_dir) / EXPECTED_MESSAGES_DIR
 
     def setUp(self):
-        self.builder = PystacheMessageBuilder(str(self.ebxml_template_dir), EBXML_TEMPLATE)
+        self.builder = EbXmlMessageBuilder()
 
     def test_build_message(self):
         expected_message = FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
