@@ -1,8 +1,8 @@
 import unittest
+import adaptor.outgoing.fhir_helpers.tests.fixtures as fixtures
 from testfixtures import compare
 from adaptor.outgoing.message_adaptor import MessageAdaptor
 from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
-from adaptor.outgoing.fhir_helpers.tests.fixtures import create_simple_practitioner, create_simple_patient
 from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
@@ -92,7 +92,7 @@ class MessageAdaptorTest(unittest.TestCase):
                                                     date_of_birth="2019-04-20",
                                                     gender="1", address=edifact_pat_address)
 
-            patient = create_simple_patient()
+            patient = fixtures.create_simple_patient()
             op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
@@ -120,8 +120,8 @@ class MessageAdaptorTest(unittest.TestCase):
 
             op_param_transaction_number = odh.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
                                                                             value="17")
-            practitioner = create_simple_practitioner()
-            patient = create_simple_patient()
+            practitioner = fixtures.create_simple_practitioner()
+            patient = fixtures.create_simple_patient()
             op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
                                                                            resource_type=ResourceType.PRACTITIONER,
                                                                            reference="practitioner-1")
@@ -183,8 +183,8 @@ class MessageAdaptorTest(unittest.TestCase):
             op_param_nhais_cypher = odh.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
             op_param_transaction_number = odh.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
                                                                             value="17")
-            practitioner = create_simple_practitioner()
-            patient = create_simple_patient()
+            practitioner = fixtures.create_simple_practitioner()
+            patient = fixtures.create_simple_patient()
             op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
                                                                            resource_type=ResourceType.PRACTITIONER,
                                                                            reference="practitioner-1")
