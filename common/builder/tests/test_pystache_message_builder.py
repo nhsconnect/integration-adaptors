@@ -1,8 +1,7 @@
 import os
-
 from unittest import TestCase
 
-from builder.pystachemessagebuilder import PystacheMessageBuilder
+from builder.pystache_message_builder import PystacheMessageBuilder
 
 TEMPLATES_DIR = "templates"
 TEMPLATE_FILENAME = "test"

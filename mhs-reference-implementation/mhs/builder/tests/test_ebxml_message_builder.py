@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from utilities.fileutilities import FileUtilities
 
-from mhs.builder.ebxmlmessagebuilder import EbXmlMessageBuilder
+from mhs.builder.ebxml_message_builder import EbXmlMessageBuilder
 
 EXPECTED_MESSAGES_DIR = "expected_messages"
 EXPECTED_EBXML = "ebxml.xml"

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from builder.pystachemessagebuilder import PystacheMessageBuilder
+from builder.pystache_message_builder import PystacheMessageBuilder
 from definitions import ROOT_DIR
 
 

@@ -1,7 +1,7 @@
 """A module that defines an EBXML-specific extension of PystacheMessageBuilder."""
 from pathlib import Path
 
-from builder.pystachemessagebuilder import PystacheMessageBuilder
+from builder.pystache_message_builder import PystacheMessageBuilder
 
 from definitions import ROOT_DIR
 
