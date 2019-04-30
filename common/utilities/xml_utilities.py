@@ -1,10 +1,10 @@
+import unittest
 
 from lxml import etree
 from lxml import objectify
-import unittest
 
 
-class Utilities:
+class XmlUtilities:
 
     @staticmethod
     def assert_xml_equal(expected, actual):

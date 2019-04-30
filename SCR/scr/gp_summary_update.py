@@ -1,11 +1,12 @@
-from common.pystachemessagebuilder import PystacheMessageBuilder
-from pathlib import Path
-from definitions import ROOT_DIR
 import json
+from pathlib import Path
+
+from builder.pystache_message_builder import PystacheMessageBuilder
+
+from definitions import ROOT_DIR
 
 
 class SummaryCareRecord:
-
     summaryCareRecordPath = Path(ROOT_DIR) / "data/templates"
 
     def __init__(self):
@@ -38,4 +39,3 @@ class SummaryCareRecord:
         :return: xml string containing populated template
         """
         return self.builder.build_message(input_hash)
-
