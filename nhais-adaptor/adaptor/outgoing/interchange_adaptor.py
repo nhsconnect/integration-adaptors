@@ -1,5 +1,5 @@
 from adaptor.outgoing.message_adaptor import MessageAdaptor
-from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
+import adaptor.outgoing.fhir_helpers.fhir_finders as finders
 from edifact.models.interchange import Interchange
 from edifact.models.message import Messages
 from adaptor.outgoing.fhir_helpers.constants import ParameterName
@@ -32,10 +32,10 @@ class InterchangeAdaptor:
         :param fhir_operation:
         :return: Interchange
         """
-        interchange_sequence_number = odh.get_parameter_value(fhir_operation,
-                                                              parameter_name=ParameterName.INTERCHANGE_SEQ_NO)
-        sender_cypher = odh.get_parameter_value(fhir_operation, parameter_name=ParameterName.SENDER_CYPHER)
-        nhais_cypher = odh.get_parameter_value(fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
+        interchange_sequence_number = finders.get_parameter_value(fhir_operation,
+                                                                  parameter_name=ParameterName.INTERCHANGE_SEQ_NO)
+        sender_cypher = finders.get_parameter_value(fhir_operation, parameter_name=ParameterName.SENDER_CYPHER)
+        nhais_cypher = finders.get_parameter_value(fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
         recipient = InterchangeAdaptor.generate_recipient_from(nhais_cypher)
 
         messages = Messages(messages=[MessageAdaptor.create_message(fhir_operation)])

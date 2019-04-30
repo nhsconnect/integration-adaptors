@@ -2,7 +2,7 @@ from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentR
     Message
 from edifact.models.name import Name
 from edifact.models.address import Address
-from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
+import adaptor.outgoing.fhir_helpers.fhir_finders as finders
 from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
 
 
@@ -59,7 +59,7 @@ class MessageAdaptor:
         """
         gender_map = {'unknown': 0, 'male': 1, 'female': 2, 'other': 9}
 
-        patient = odh.find_resource(fhir_operation, resource_type=ResourceType.PATIENT)
+        patient = finders.find_resource(fhir_operation, resource_type=ResourceType.PATIENT)
 
         edi_name = MessageAdaptor.create_patient_name(patient.name[0])
 
@@ -80,17 +80,17 @@ class MessageAdaptor:
         :return: MessageSegmentRegistrationDetails
         """
 
-        transaction_number = odh.get_parameter_value(fhir_operation=fhir_operation,
+        transaction_number = finders.get_parameter_value(fhir_operation=fhir_operation,
                                                      parameter_name=ParameterName.TRANSACTION_NO)
 
         if fhir_operation.name == OperationName.REGISTER_BIRTH:
             acceptance_code = "A"
             acceptance_type = "1"
 
-        practitioner_details = odh.find_resource(fhir_operation=fhir_operation, resource_type=ResourceType.PRACTITIONER)
+        practitioner_details = finders.find_resource(fhir_operation=fhir_operation, resource_type=ResourceType.PRACTITIONER)
         party_id = f"{practitioner_details.identifier[0].value},{practitioner_details.identifier[1].value}"
 
-        patient_details = odh.find_resource(fhir_operation=fhir_operation, resource_type=ResourceType.PATIENT)
+        patient_details = finders.find_resource(fhir_operation=fhir_operation, resource_type=ResourceType.PATIENT)
         birth_location = patient_details.extension[0].valueAddress.city
 
         msg_seg_registration_details = MessageSegmentRegistrationDetails(transaction_number=transaction_number,
@@ -108,7 +108,7 @@ class MessageAdaptor:
         :param fhir_operation:
         :return: MessageBeginning
         """
-        nhais_id = odh.get_parameter_value(fhir_operation=fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
+        nhais_id = finders.get_parameter_value(fhir_operation=fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
 
         if fhir_operation.name == OperationName.REGISTER_BIRTH:
             ref_number = "G1"
@@ -124,7 +124,7 @@ class MessageAdaptor:
         :param fhir_operation:
         :return: Message
         """
-        message_sequence_number = odh.get_parameter_value(fhir_operation=fhir_operation,
+        message_sequence_number = finders.get_parameter_value(fhir_operation=fhir_operation,
                                                           parameter_name=ParameterName.MESSAGE_SEQ_NO)
         message = Message(sequence_number=message_sequence_number,
                           message_beginning=MessageAdaptor.create_message_beginning(fhir_operation),

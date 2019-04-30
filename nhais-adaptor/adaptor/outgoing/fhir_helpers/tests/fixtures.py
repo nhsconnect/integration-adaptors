@@ -1,4 +1,4 @@
-from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
+import adaptor.outgoing.fhir_helpers.fhir_creators as creators
 
 
 def create_simple_patient():
@@ -6,7 +6,7 @@ def create_simple_patient():
     creates a simple fhir patient with no previous names or addresses
     :return: Patient
     """
-    patient = odh.create_patient_resource(resource_id="patient-1", nhs_number="NHSNO11111",
+    patient = creators.create_patient_resource(resource_id="patient-1", nhs_number="NHSNO11111",
                                           title="Mr", first_name="Peter", last_name="Parker",
                                           gender="male", date_of_birth="2019-04-20",
                                           place_of_birth="Spidey Town",
@@ -19,6 +19,6 @@ def create_simple_practitioner():
     create a simple fhir practitioner
     :return: Practitioner
     """
-    practitioner = odh.create_practitioner_resource(resource_id="practitioner-1", national_identifier="4826940",
+    practitioner = creators.create_practitioner_resource(resource_id="practitioner-1", national_identifier="4826940",
                                                     local_identifier="281")
     return practitioner

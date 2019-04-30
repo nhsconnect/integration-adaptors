@@ -2,7 +2,7 @@ import unittest
 import adaptor.outgoing.fhir_helpers.tests.fixtures as fixtures
 from testfixtures import compare
 from adaptor.outgoing.message_adaptor import MessageAdaptor
-from adaptor.outgoing.fhir_helpers.operation_definition import OperationDefinitionHelper as odh
+import adaptor.outgoing.fhir_helpers.fhir_creators as creators
 from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
@@ -93,10 +93,10 @@ class MessageAdaptorTest(unittest.TestCase):
                                                     gender="1", address=edifact_pat_address)
 
             patient = fixtures.create_simple_patient()
-            op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
+            op_param_patient = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+            op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338", contained=[patient],
                                                      parameters=[op_param_patient])
             msg_seg_pat_details = MessageAdaptor.create_message_segment_patient_detail(op_def)
@@ -116,17 +116,17 @@ class MessageAdaptorTest(unittest.TestCase):
                                                          date_time="2019-04-23 09:00:04.159338",
                                                          location="Spidey Town")
 
-            op_param_transaction_number = odh.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
+            op_param_transaction_number = creators.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
                                                                             value="17")
             practitioner = fixtures.create_simple_practitioner()
             patient = fixtures.create_simple_patient()
-            op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
+            op_param_practitioner = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
                                                                            resource_type=ResourceType.PRACTITIONER,
                                                                            reference="practitioner-1")
-            op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
+            op_param_patient = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+            op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner, patient],
                                                      parameters=[op_param_transaction_number,
@@ -143,8 +143,8 @@ class MessageAdaptorTest(unittest.TestCase):
         with self.subTest("Message beginning for a birth registration"):
             expected = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
 
-            op_param_nhais_cypher = odh.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+            op_param_nhais_cypher = creators.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
+            op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338", contained=[],
                                                      parameters=[op_param_nhais_cypher])
 
@@ -173,20 +173,20 @@ class MessageAdaptorTest(unittest.TestCase):
                                message_segment_registration_details=msg_seg_reg_details,
                                message_segment_patient_details=msg_seg_pat_details)
 
-            op_param_message_sequence = odh.create_parameter_with_binding(name=ParameterName.MESSAGE_SEQ_NO,
+            op_param_message_sequence = creators.create_parameter_with_binding(name=ParameterName.MESSAGE_SEQ_NO,
                                                                           value="000001")
-            op_param_nhais_cypher = odh.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
-            op_param_transaction_number = odh.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
+            op_param_nhais_cypher = creators.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
+            op_param_transaction_number = creators.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
                                                                             value="17")
             practitioner = fixtures.create_simple_practitioner()
             patient = fixtures.create_simple_patient()
-            op_param_practitioner = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
+            op_param_practitioner = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
                                                                            resource_type=ResourceType.PRACTITIONER,
                                                                            reference="practitioner-1")
-            op_param_patient = odh.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
+            op_param_patient = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = odh.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+            op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner, patient],
                                                      parameters=[op_param_message_sequence,
