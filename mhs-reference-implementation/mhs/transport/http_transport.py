@@ -4,6 +4,7 @@ import requests
 
 
 class HttpTransport:
+    """A transport that supports the sending of messages via HTTP."""
 
     def __init__(self, certs_dir):
         """Create a new HttpTransport that loads certificates from the specified directory.
