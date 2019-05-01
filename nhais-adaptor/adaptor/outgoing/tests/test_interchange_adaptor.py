@@ -1,9 +1,10 @@
 import unittest
 import adaptor.outgoing.tests.fixtures as fixtures
 from testfixtures import compare
-from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
+import adaptor.outgoing.interchange_adaptor as adaptor
 import adaptor.outgoing.fhir_helpers.fhir_creators as creators
-from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
+from adaptor.outgoing.fhir_helpers.fhir_creators import OperationName
+from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName, ResourceType
 
 
 class TestInterchangeAdaptor(unittest.TestCase):
@@ -16,12 +17,12 @@ class TestInterchangeAdaptor(unittest.TestCase):
         Test the generation of a recipient cypher from the nhais cypher
         """
         with self.subTest("When the nhais cypher is 3 characters"):
-            recipient_cypher = InterchangeAdaptor.generate_recipient_from('XX1')
+            recipient_cypher = adaptor.generate_recipient_from('XX1')
 
             self.assertEqual(recipient_cypher, "XX11")
 
         with self.subTest("When the nhais cypher is 2 characters"):
-            recipient_cypher = InterchangeAdaptor.generate_recipient_from('XX')
+            recipient_cypher = adaptor.generate_recipient_from('XX')
 
             self.assertEqual(recipient_cypher, "XX01")
 
@@ -51,32 +52,35 @@ class TestInterchangeAdaptor(unittest.TestCase):
                                             "UNT+18+000001'"
                                             "UNZ+1+000001'")
 
-            op_param_interchange_sequence = creators.create_parameter_with_binding(name=ParameterName.INTERCHANGE_SEQ_NO,
-                                                                              value="000001")
-            op_param_sender_cypher = creators.create_parameter_with_binding(name=ParameterName.SENDER_CYPHER, value="TES5")
+            op_param_interchange_sequence = creators.create_parameter_with_binding(
+                name=ParameterName.INTERCHANGE_SEQ_NO,
+                value="000001")
+            op_param_sender_cypher = creators.create_parameter_with_binding(name=ParameterName.SENDER_CYPHER,
+                                                                            value="TES5")
             op_param_message_sequence = creators.create_parameter_with_binding(name=ParameterName.MESSAGE_SEQ_NO,
-                                                                          value="000001")
+                                                                               value="000001")
             op_param_nhais_cypher = creators.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
             op_param_transaction_number = creators.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
-                                                                            value="17")
+                                                                                 value="17")
             practitioner = fixtures.create_simple_practitioner()
             patient = fixtures.create_simple_patient()
-            op_param_practitioner = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PRACTITIONER,
-                                                                           resource_type=ResourceType.PRACTITIONER,
-                                                                           reference="practitioner-1")
+            op_param_practitioner = creators.create_parameter_with_resource_ref(
+                name=ParameterName.REGISTER_PRACTITIONER,
+                resource_type=ResourceType.PRACTITIONER,
+                reference="practitioner-1")
             op_param_patient = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
-                                                                      resource_type=ResourceType.PATIENT,
-                                                                      reference="patient-1")
+                                                                           resource_type=ResourceType.PATIENT,
+                                                                           reference="patient-1")
             op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
-                                                     date_time="2019-04-23 09:00:04.159338",
-                                                     contained=[practitioner, patient],
-                                                     parameters=[op_param_interchange_sequence,
-                                                                 op_param_sender_cypher,
-                                                                 op_param_message_sequence,
-                                                                 op_param_transaction_number,
-                                                                 op_param_nhais_cypher,
-                                                                 op_param_practitioner, op_param_patient])
+                                                          date_time="2019-04-23 09:00:04.159338",
+                                                          contained=[practitioner, patient],
+                                                          parameters=[op_param_interchange_sequence,
+                                                                      op_param_sender_cypher,
+                                                                      op_param_message_sequence,
+                                                                      op_param_transaction_number,
+                                                                      op_param_nhais_cypher,
+                                                                      op_param_practitioner, op_param_patient])
 
-            interchange = InterchangeAdaptor.create_interchange(fhir_operation=op_def)
+            interchange = adaptor.create_interchange(fhir_operation=op_def)
 
             compare(interchange, expected_edifact_interchange)

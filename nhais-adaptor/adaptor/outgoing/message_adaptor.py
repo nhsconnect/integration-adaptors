@@ -3,12 +3,10 @@ from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentR
 from edifact.models.name import Name
 from edifact.models.address import Address
 import adaptor.outgoing.fhir_helpers.fhir_finders as finders
-from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
-
-REGISTER_BIRTH = "RegisterPatient-Birth"
+from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
 
 operation_dict = {
-    REGISTER_BIRTH: {
+    OperationName.REGISTER_BIRTH: {
         "acceptanceCode": "A",
         "acceptanceType": "1",
         "refNumber": "G1"
@@ -85,8 +83,8 @@ def create_message_segment_registration_details(fhir_operation):
     transaction_number = finders.get_parameter_value(fhir_operation=fhir_operation,
                                                      parameter_name=ParameterName.TRANSACTION_NO)
 
-    acceptance_code = operation_dict[REGISTER_BIRTH]["acceptanceCode"]
-    acceptance_type = operation_dict[REGISTER_BIRTH]["acceptanceType"]
+    acceptance_code = operation_dict[OperationName.REGISTER_BIRTH]["acceptanceCode"]
+    acceptance_type = operation_dict[OperationName.REGISTER_BIRTH]["acceptanceType"]
 
     practitioner_details = finders.find_resource(fhir_operation=fhir_operation,
                                                  resource_type=ResourceType.PRACTITIONER)
@@ -111,7 +109,7 @@ def create_message_beginning(fhir_operation):
     """
     nhais_id = finders.get_parameter_value(fhir_operation=fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
 
-    ref_number = operation_dict[REGISTER_BIRTH]["refNumber"]
+    ref_number = operation_dict[OperationName.REGISTER_BIRTH]["refNumber"]
 
     msg_bgn = MessageBeginning(party_id=nhais_id, date_time=fhir_operation.date.as_json(), ref_number=ref_number)
 

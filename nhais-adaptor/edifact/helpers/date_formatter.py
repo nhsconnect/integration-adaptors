@@ -16,4 +16,3 @@ def format_date(date_time, format_qualifier="DEFAULT", current_format="%Y-%m-%d 
     date_formatter = format_qualifier_dict[format_qualifier]
     formatted_date = datetime.strptime(date_time, current_format).strftime(date_formatter)
     return formatted_date
-

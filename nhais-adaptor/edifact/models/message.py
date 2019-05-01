@@ -1,5 +1,5 @@
 from edifact.models.segment import Segment, SegmentCollection
-import edifact.helpers.date_formatter as dateFormatter
+import edifact.helpers.date_formatter as date_formatter
 from edifact.models.name import PatientName
 from edifact.models.address import PatientAddress
 
@@ -52,7 +52,7 @@ class MessageBeginning(SegmentCollection):
         :param date_time: the date time stamp of the message
         :param ref_number: a reference number for registration transaction type
         """
-        formatted_date_time = dateFormatter.format_date(date_time=date_time, format_qualifier="203")
+        formatted_date_time = date_formatter.format_date(date_time=date_time, format_qualifier="203")
         segments = [
             Segment(key="BGM", value="++507"),
             Segment(key="NAD", value=f"FHS+{party_id}:954"),
@@ -77,7 +77,7 @@ class MessageSegmentRegistrationDetails(SegmentCollection):
         :param date_time: date of the registration
         :param location: the patients place of birth
         """
-        formatted_date_time = dateFormatter.format_date(date_time=date_time, format_qualifier="102")
+        formatted_date_time = date_formatter.format_date(date_time=date_time, format_qualifier="102")
         segments = [
             Segment(key="S01", value="1"),
             Segment(key="RFF", value=f"TN:{transaction_number}"),
@@ -103,8 +103,8 @@ class MessageSegmentPatientDetails(SegmentCollection):
         :param gender: sex of the patient. For an acceptance transaction, reference "G1", this segment is required
         :param address: the patients address
         """
-        formatted_date = dateFormatter.format_date(date_time=date_of_birth, format_qualifier="102",
-                                                   current_format="%Y-%m-%d")
+        formatted_date = date_formatter.format_date(date_time=date_of_birth, format_qualifier="102",
+                                                    current_format="%Y-%m-%d")
         segments = [
             Segment(key="S02", value="2"),
             PatientName(id_number=id_number, name=name),

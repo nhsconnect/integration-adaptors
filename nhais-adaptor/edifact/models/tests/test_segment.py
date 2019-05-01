@@ -14,4 +14,3 @@ class TestSegment(unittest.TestCase):
     def test_values_are_converted_to_upper_case(self):
         segment = Segment(key="AAA", value="some_value").to_edifact()
         self.assertEqual(segment, "AAA+SOME_VALUE'")
-

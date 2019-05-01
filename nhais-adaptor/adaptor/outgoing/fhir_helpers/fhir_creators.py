@@ -8,6 +8,34 @@ from fhirclient.models.address import Address
 from fhirclient.models.extension import Extension
 
 
+class OperationName:
+    """
+    Constants for the type of operations the adaptor can
+    """
+    REGISTER_BIRTH = "RegisterPatient-Birth"
+
+
+class ParameterName:
+    """
+    Constants for parameter names used in the adaptor
+    """
+    INTERCHANGE_SEQ_NO = "interchangeSequenceNumber"
+    SENDER_CYPHER = "senderCypher"
+    MESSAGE_SEQ_NO = "messageSequenceNumber"
+    NHAIS_CYPHER = "nhaisCypher"
+    TRANSACTION_NO = "transactionNumber"
+    REGISTER_PATIENT = "registerPatient"
+    REGISTER_PRACTITIONER = "registerPractitioner"
+
+
+class ResourceType:
+    """
+    Constants for the resource types used in the adaptor
+    """
+    PATIENT = "Patient"
+    PRACTITIONER = "Practitioner"
+
+
 def create_parameter_with_binding(name, value):
     """
     Helper function to create a fhir parameter with binding value
@@ -113,4 +141,3 @@ def create_patient_resource(resource_id, nhs_number, title, first_name, last_nam
                        'address': [pat_address.as_json()],
                        'extension': [place_of_birth.as_json()]})
     return patient
-

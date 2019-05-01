@@ -5,7 +5,7 @@ from fhirclient.models.operationdefinition import OperationDefinitionParameter, 
 from fhirclient.models.practitioner import Practitioner
 
 import adaptor.outgoing.fhir_helpers.fhir_creators as creators
-from adaptor.outgoing.fhir_helpers.constants import ResourceType
+from adaptor.outgoing.fhir_helpers.fhir_creators import ResourceType
 
 
 class TestFhirCreators(unittest.TestCase):
