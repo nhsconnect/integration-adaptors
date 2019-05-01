@@ -11,6 +11,14 @@ class MessageAdaptor:
     An adaptor to take in fhir model and generate and populate the edifact models
     """
 
+    operation_dict = {
+        OperationName.REGISTER_BIRTH: {
+            "acceptanceCode": "A",
+            "acceptanceType": "1",
+            "refNumber": "G1"
+        }
+    }
+
     @staticmethod
     def create_patient_name(fhir_patient_name):
         """
@@ -79,13 +87,13 @@ class MessageAdaptor:
         """
 
         transaction_number = finders.get_parameter_value(fhir_operation=fhir_operation,
-                                                     parameter_name=ParameterName.TRANSACTION_NO)
+                                                         parameter_name=ParameterName.TRANSACTION_NO)
 
-        if fhir_operation.name == OperationName.REGISTER_BIRTH:
-            acceptance_code = "A"
-            acceptance_type = "1"
+        acceptance_code = MessageAdaptor.operation_dict[OperationName.REGISTER_BIRTH]["acceptanceCode"]
+        acceptance_type = MessageAdaptor.operation_dict[OperationName.REGISTER_BIRTH]["acceptanceType"]
 
-        practitioner_details = finders.find_resource(fhir_operation=fhir_operation, resource_type=ResourceType.PRACTITIONER)
+        practitioner_details = finders.find_resource(fhir_operation=fhir_operation,
+                                                     resource_type=ResourceType.PRACTITIONER)
         party_id = f"{practitioner_details.identifier[0].value},{practitioner_details.identifier[1].value}"
 
         patient_details = finders.find_resource(fhir_operation=fhir_operation, resource_type=ResourceType.PATIENT)
@@ -107,8 +115,7 @@ class MessageAdaptor:
         """
         nhais_id = finders.get_parameter_value(fhir_operation=fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
 
-        if fhir_operation.name == OperationName.REGISTER_BIRTH:
-            ref_number = "G1"
+        ref_number = MessageAdaptor.operation_dict[OperationName.REGISTER_BIRTH]["refNumber"]
 
         msg_bgn = MessageBeginning(party_id=nhais_id, date_time=fhir_operation.date.as_json(), ref_number=ref_number)
 
@@ -121,7 +128,7 @@ class MessageAdaptor:
         :return: Message
         """
         message_sequence_number = finders.get_parameter_value(fhir_operation=fhir_operation,
-                                                          parameter_name=ParameterName.MESSAGE_SEQ_NO)
+                                                              parameter_name=ParameterName.MESSAGE_SEQ_NO)
         message = Message(sequence_number=message_sequence_number,
                           message_beginning=MessageAdaptor.create_message_beginning(fhir_operation),
                           message_segment_registration_details=MessageAdaptor.create_message_segment_registration_details(
