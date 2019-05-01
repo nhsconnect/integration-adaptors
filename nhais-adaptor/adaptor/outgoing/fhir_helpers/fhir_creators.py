@@ -10,7 +10,7 @@ from fhirclient.models.extension import Extension
 
 class OperationName:
     """
-    Constants for the type of operations the adaptor can
+    Constants for the type of fhir operations the adaptor can use
     """
     REGISTER_BIRTH = "RegisterPatient-Birth"
 
