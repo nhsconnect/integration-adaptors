@@ -27,8 +27,9 @@ class TestFhirCreators(unittest.TestCase):
         """
         Test the helper function to create an operation parameter with a resource reference
         """
-        op_param = creators.create_parameter_with_resource_ref(name="SOME_NAME", resource_type=ResourceType.PRACTITIONER,
-                                                          reference="practitioner-1")
+        op_param = creators.create_parameter_with_resource_ref(name="SOME_NAME",
+                                                               resource_type=ResourceType.PRACTITIONER,
+                                                               reference="practitioner-1")
 
         self.assertIsInstance(op_param, OperationDefinitionParameter)
         self.assertEqual(op_param.name, "SOME_NAME")
@@ -42,8 +43,8 @@ class TestFhirCreators(unittest.TestCase):
 
         with self.subTest("with no contained resources or parameters"):
             op_def = creators.create_operation_definition(name="name.of.operation", code="code.of.operation",
-                                                     date_time="2019-04-23 09:00:04.159338", contained=[],
-                                                     parameters=[])
+                                                          date_time="2019-04-23 09:00:04.159338", contained=[],
+                                                          parameters=[])
 
             self.assertIsInstance(op_def, OperationDefinition)
             self.assertEqual(op_def.name, "name.of.operation")
@@ -56,26 +57,29 @@ class TestFhirCreators(unittest.TestCase):
             some_param = creators.create_parameter_with_binding(name="SOME_NAME", value="SOME_VALUE")
 
             op_def = creators.create_operation_definition(name="name.of.operation", code="code.of.operation",
-                                                     date_time="2019-04-23 09:00:04.159338", contained=[],
-                                                     parameters=[some_param])
+                                                          date_time="2019-04-23 09:00:04.159338", contained=[],
+                                                          parameters=[some_param])
 
             self.assertEqual(len(op_def.parameter), 1)
             self.assertIsInstance(op_def.parameter[0], OperationDefinitionParameter)
 
         with self.subTest("with one contained resource"):
-            some_resource = creators.create_practitioner_resource(resource_id="some_id", national_identifier="some_nat_id",
-                                                             local_identifier="some_local_id")
+            some_resource = creators.create_practitioner_resource(resource_id="some_id",
+                                                                  national_identifier="some_nat_id",
+                                                                  local_identifier="some_local_id")
 
             op_def = creators.create_operation_definition(name="name.of.operation", code="code.of.operation",
-                                                     date_time="2019-04-23 09:00:04.159338", contained=[some_resource],
-                                                     parameters=[])
+                                                          date_time="2019-04-23 09:00:04.159338",
+                                                          contained=[some_resource],
+                                                          parameters=[])
 
             self.assertEqual(len(op_def.contained), 1)
             self.assertIsInstance(op_def.contained[0], Practitioner)
 
     def test_create_practitioner(self):
-        practitioner = creators.create_practitioner_resource(resource_id="practitioner-1", national_identifier="1234567",
-                                                        local_identifier="111")
+        practitioner = creators.create_practitioner_resource(resource_id="practitioner-1",
+                                                             national_identifier="1234567",
+                                                             local_identifier="111")
 
         self.assertIsInstance(practitioner, Practitioner)
         self.assertEqual(practitioner.id, "practitioner-1")
@@ -84,9 +88,11 @@ class TestFhirCreators(unittest.TestCase):
 
     def test_create_patient(self):
         patient = creators.create_patient_resource(resource_id="patient-1", nhs_number="NHSNO11111",
-                                              title="Mr", first_name="Peter", last_name="Parker",
-                                              gender="male", date_of_birth="2019-04-23", place_of_birth="Spidey Town",
-                                              address_line_1="1 Spidey Way", city="Spidey Town", postcode="SP1 1AA")
+                                                   title="Mr", first_name="Peter", last_name="Parker",
+                                                   gender="male", date_of_birth="2019-04-23",
+                                                   place_of_birth="Spidey Town",
+                                                   address_line_1="1 Spidey Way", city="Spidey Town",
+                                                   postcode="SP1 1AA")
 
         self.assertIsInstance(patient, Patient)
         self.assertEqual(patient.id, "patient-1")
