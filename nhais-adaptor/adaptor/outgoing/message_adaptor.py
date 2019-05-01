@@ -15,7 +15,7 @@ class MessageAdaptor:
     def create_patient_name(fhir_patient_name):
         """
         Function to generate the edifact representation of the patient name
-        :param fhir_patient_name:
+        :param fhir_patient_name: fhir representation of the patient name
         :return: edifact name
         """
         given_names = [None, None, None]
@@ -33,7 +33,7 @@ class MessageAdaptor:
     def create_patient_address(fhir_patient_address):
         """
         Function to generate the edifact representation of the patient address
-        :param fhir_patient_address:
+        :param fhir_patient_address: The fhir representation of the patient address
         :return: edifact address
         """
         address_lines = ["", "", ""]
@@ -54,7 +54,6 @@ class MessageAdaptor:
     @staticmethod
     def create_message_segment_patient_detail(fhir_operation):
         """
-        :param fhir_operation: the fhir operation
         :return: MessageSegmentPatientDetails
         """
         gender_map = {'unknown': 0, 'male': 1, 'female': 2, 'other': 9}
@@ -76,7 +75,6 @@ class MessageAdaptor:
     def create_message_segment_registration_details(fhir_operation):
         """
         Create the message segment registration details from the fhir operation
-        :param fhir_operation:
         :return: MessageSegmentRegistrationDetails
         """
 
@@ -105,7 +103,6 @@ class MessageAdaptor:
     def create_message_beginning(fhir_operation):
         """
         Create the beginning of the message
-        :param fhir_operation:
         :return: MessageBeginning
         """
         nhais_id = finders.get_parameter_value(fhir_operation=fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
@@ -121,7 +118,6 @@ class MessageAdaptor:
     def create_message(fhir_operation):
         """
         Create the edifact Message
-        :param fhir_operation:
         :return: Message
         """
         message_sequence_number = finders.get_parameter_value(fhir_operation=fhir_operation,

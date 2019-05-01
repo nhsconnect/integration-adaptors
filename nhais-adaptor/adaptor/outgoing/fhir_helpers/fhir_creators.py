@@ -69,9 +69,6 @@ def create_operation_definition(name, code, date_time, contained, parameters):
 def create_practitioner_resource(resource_id, national_identifier, local_identifier):
     """
     Helper function to create a fhir Practitioner resource
-    :param resource_id: the id of the resource
-    :param national_identifier: the national identifier
-    :param local_identifier: the local identifier
     :return: Practitioner
     """
     practitioner = Practitioner({
@@ -100,17 +97,6 @@ def create_patient_resource(resource_id, nhs_number, title, first_name, last_nam
                             address_line_1, city, postcode, place_of_birth):
     """
     Helper function to create a basic fhir patient
-    :param resource_id: the id of the resource
-    :param nhs_number: the nhs number of the patient
-    :param title: title of the patient
-    :param first_name: first name of the patient
-    :param last_name: last name of the patient
-    :param gender: patient gender
-    :param date_of_birth: date of birth of patient
-    :param address_line_1: first line of address
-    :param city: city of patient
-    :param postcode: post code of patient
-    :param place_of_birth: place of birth of patient
     :return: Patient
     """
     pat_address = Address({'line': [address_line_1], 'city': city, 'postalCode': postcode})

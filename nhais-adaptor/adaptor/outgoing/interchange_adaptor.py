@@ -29,8 +29,8 @@ class InterchangeAdaptor:
     def create_interchange(fhir_operation):
         """
         Create the edifact interchange from the fhir operation definition
-        :param fhir_operation:
-        :return: Interchange
+        :param fhir_operation: The operation definition payload
+        :return: the edifact interchange
         """
         interchange_sequence_number = finders.get_parameter_value(fhir_operation,
                                                                   parameter_name=ParameterName.INTERCHANGE_SEQ_NO)
