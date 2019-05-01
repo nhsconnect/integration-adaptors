@@ -7,6 +7,7 @@ verify_ssl = true
 
 [packages]
 integration-adaptors-common = {editable = true,path = "./../common"}
+requests = "*"
 
 [requires]
 python_version = "3.7"
