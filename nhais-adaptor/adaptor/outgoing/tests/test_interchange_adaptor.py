@@ -1,5 +1,5 @@
 import unittest
-import adaptor.outgoing.fhir_helpers.tests.fixtures as fixtures
+import adaptor.outgoing.tests.fixtures as fixtures
 from testfixtures import compare
 from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 import adaptor.outgoing.fhir_helpers.fhir_creators as creators
