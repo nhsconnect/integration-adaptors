@@ -1,9 +1,9 @@
 import unittest
 import adaptor.outgoing.tests.fixtures as fixtures
 from testfixtures import compare
-from adaptor.outgoing.message_adaptor import MessageAdaptor
+import adaptor.outgoing.message_adaptor as message_adaptor
 import adaptor.outgoing.fhir_helpers.fhir_creators as creators
-from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType, OperationName
+from adaptor.outgoing.fhir_helpers.constants import ParameterName, ResourceType
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
 from edifact.models.name import Name
@@ -24,7 +24,7 @@ class TestMessageAdaptor(unittest.TestCase):
                             third_given_forename="Senses")
 
             name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter', 'Spidey', 'Senses']})
-            edi_name = MessageAdaptor.create_patient_name(name)
+            edi_name = message_adaptor.create_patient_name(name)
 
             compare(edi_name, expected)
 
@@ -32,7 +32,7 @@ class TestMessageAdaptor(unittest.TestCase):
             expected = Name(title="Mr", family_name="Parker", first_given_forename="Peter")
 
             name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter']})
-            edi_name = MessageAdaptor.create_patient_name(name)
+            edi_name = message_adaptor.create_patient_name(name)
 
             compare(edi_name, expected)
 
@@ -47,7 +47,7 @@ class TestMessageAdaptor(unittest.TestCase):
             pat_address = Address(
                 {'line': ['Spidey House', 'Spidey Way', 'Spiderville'], 'city': 'Spidey Town',
                  'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
-            edi_address = MessageAdaptor.create_patient_address(pat_address)
+            edi_address = message_adaptor.create_patient_address(pat_address)
 
             compare(edi_address, expected)
 
@@ -58,7 +58,7 @@ class TestMessageAdaptor(unittest.TestCase):
             pat_address = Address(
                 {'line': ['1 Spidey Way', 'Spiderville'], 'city': 'Spidey Town',
                  'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
-            edi_address = MessageAdaptor.create_patient_address(pat_address)
+            edi_address = message_adaptor.create_patient_address(pat_address)
 
             compare(edi_address, expected)
 
@@ -67,7 +67,7 @@ class TestMessageAdaptor(unittest.TestCase):
                                       post_code="SP1 1AA")
             pat_address = Address(
                 {'line': ['1 Spidey Way'], 'city': 'Spidey Town', 'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
-            edi_address = MessageAdaptor.create_patient_address(pat_address)
+            edi_address = message_adaptor.create_patient_address(pat_address)
 
             compare(edi_address, expected)
 
@@ -76,7 +76,7 @@ class TestMessageAdaptor(unittest.TestCase):
 
             pat_address = Address(
                 {'line': ['1 Spidey Way'], 'city': 'Spidey Town', 'postalCode': 'SP1 1AA'})
-            edi_address = MessageAdaptor.create_patient_address(pat_address)
+            edi_address = message_adaptor.create_patient_address(pat_address)
 
             compare(edi_address, expected)
 
@@ -96,10 +96,10 @@ class TestMessageAdaptor(unittest.TestCase):
             op_param_patient = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+            op_def = creators.create_operation_definition(name=message_adaptor.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338", contained=[patient],
                                                      parameters=[op_param_patient])
-            msg_seg_pat_details = MessageAdaptor.create_message_segment_patient_detail(op_def)
+            msg_seg_pat_details = message_adaptor.create_message_segment_patient_detail(op_def)
 
             compare(msg_seg_pat_details, expected)
 
@@ -126,13 +126,13 @@ class TestMessageAdaptor(unittest.TestCase):
             op_param_patient = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+            op_def = creators.create_operation_definition(name=message_adaptor.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner, patient],
                                                      parameters=[op_param_transaction_number,
                                                                  op_param_practitioner, op_param_patient])
 
-            msg_seg_reg_details = MessageAdaptor.create_message_segment_registration_details(op_def)
+            msg_seg_reg_details = message_adaptor.create_message_segment_registration_details(op_def)
 
             compare(msg_seg_reg_details, expected)
 
@@ -144,11 +144,11 @@ class TestMessageAdaptor(unittest.TestCase):
             expected = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
 
             op_param_nhais_cypher = creators.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
-            op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+            op_def = creators.create_operation_definition(name=message_adaptor.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338", contained=[],
                                                      parameters=[op_param_nhais_cypher])
 
-            msg_bgn = MessageAdaptor.create_message_beginning(fhir_operation=op_def)
+            msg_bgn = message_adaptor.create_message_beginning(fhir_operation=op_def)
 
             compare(msg_bgn, expected)
 
@@ -186,7 +186,7 @@ class TestMessageAdaptor(unittest.TestCase):
             op_param_patient = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
                                                                       resource_type=ResourceType.PATIENT,
                                                                       reference="patient-1")
-            op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
+            op_def = creators.create_operation_definition(name=message_adaptor.REGISTER_BIRTH, code="gpc.registerpatient",
                                                      date_time="2019-04-23 09:00:04.159338",
                                                      contained=[practitioner, patient],
                                                      parameters=[op_param_message_sequence,
@@ -194,6 +194,6 @@ class TestMessageAdaptor(unittest.TestCase):
                                                                  op_param_nhais_cypher,
                                                                  op_param_practitioner, op_param_patient])
 
-            message = MessageAdaptor.create_message(fhir_operation=op_def)
+            message = message_adaptor.create_message(fhir_operation=op_def)
 
             compare(message, expected)

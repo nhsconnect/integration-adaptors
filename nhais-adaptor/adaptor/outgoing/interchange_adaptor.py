@@ -1,4 +1,4 @@
-from adaptor.outgoing.message_adaptor import MessageAdaptor
+import adaptor.outgoing.message_adaptor as message_adaptor
 import adaptor.outgoing.fhir_helpers.fhir_finders as finders
 from edifact.models.interchange import Interchange
 from edifact.models.message import Messages
@@ -38,7 +38,7 @@ class InterchangeAdaptor:
         nhais_cypher = finders.get_parameter_value(fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
         recipient = InterchangeAdaptor.generate_recipient_from(nhais_cypher)
 
-        messages = Messages(messages=[MessageAdaptor.create_message(fhir_operation)])
+        messages = Messages(messages=[message_adaptor.create_message(fhir_operation)])
 
         interchange = Interchange(sender=sender_cypher, recipient=recipient,
                                   sequence_number=interchange_sequence_number,
