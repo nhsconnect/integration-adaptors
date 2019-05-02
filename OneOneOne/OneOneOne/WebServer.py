@@ -5,7 +5,7 @@ from lxml import etree
 import xml.etree.ElementTree as ET
 from utilities.file_utilities import FileUtilities
 from OneOneOne.definitions import XML_PATH
-from MessageHandler import MessageHandler
+from OneOneOne.OneOneOne.MessageHandler import MessageHandler
 
 response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
@@ -14,14 +14,15 @@ class MessageReceiver(tornado.web.RequestHandler):
         pass
 
     def post(self):
+        mh = MessageHandler(self.request.body)
         # parser = etree.XMLParser(remove_blank_text=True)
         # root = etree.fromstring(self.request.body, parser)
         # print(etree.tostring(root, pretty_print=True).decode())
 
-        # status_code, message_response = MessageHandler.evaluate_message(self.request.body)
-        # self.set_status(status_code)
-        self.write(response)
-        ##self.finish()
+        status_code, message_response = mh.evaluate_message()
+        self.set_status(status_code)
+        self.write(message_response)
+        # self.finish()
         # self.flush(True)
         # self.finish(message_response)
         print("Responded")
