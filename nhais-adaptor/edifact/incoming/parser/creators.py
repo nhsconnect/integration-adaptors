@@ -1,24 +1,6 @@
 from edifact.incoming.models.interchange import InterchangeHeader
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails
 
-terminating_config = {
-    "UNB": ["UNH"],
-    "BGM": ["S01"],
-    "S01": ["S02", "UNT"]
-}
-
-
-def determine_sgm_size(bigger_dict, starting_pos, trigger_key):
-    new_dict = []
-
-    for (k, v) in bigger_dict[starting_pos:]:
-        if k not in terminating_config[trigger_key]:
-            new_dict.append((k, v))
-        else:
-            break
-
-    return new_dict
-
 
 def create_interchange_header(interchange_header_dict):
     """
