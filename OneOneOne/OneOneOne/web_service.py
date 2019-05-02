@@ -4,8 +4,8 @@ import tornado.web
 from lxml import etree
 import xml.etree.ElementTree as ET
 from utilities.file_utilities import FileUtilities
-from OneOneOne.definitions import XML_PATH
-from OneOneOne.OneOneOne.MessageHandler import MessageHandler
+from definitions import XML_PATH
+from OneOneOne.OneOneOne.message_handler import MessageHandler
 
 response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 

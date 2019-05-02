@@ -2,7 +2,7 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsa="http://www.w3.org/2005/08/addressing"
                xmlns:itk="urn:nhs-itk:ns:201005">
     <soap:Header>
-        <wsa:MessageID>6F05D84C-6CC2-11E9-ADC3-1BDB2480F370</wsa:MessageID>
+        <wsa:MessageID>01A71C76-6CDA-11E9-A395-2BEC16A39614</wsa:MessageID>
         <wsa:Action>urn:nhs-itk:services:201005:SendNHS111Report-v2-0</wsa:Action>
         <wsa:To>http://127.0.0.1:4848/syncsoap</wsa:To>
         <wsa:From>
@@ -12,8 +12,8 @@
             <wsu:Timestamp
                     xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
                     wsu:Id="D6CD5232-14CF-11DF-9423-1F9A910D4703">
-                <wsu:Created>2019-05-02T10:09:55Z</wsu:Created>
-                <wsu:Expires>2019-05-02T10:19:55Z</wsu:Expires>
+                <wsu:Created>2019-05-02T12:58:39Z</wsu:Created>
+                <wsu:Expires>2019-05-02T13:08:39Z</wsu:Expires>
             </wsu:Timestamp>
             <wsse:UsernameToken>
                 <wsse:Username>TKS Server test</wsse:Username>
@@ -22,16 +22,14 @@
     </soap:Header>
     <soap:Body>
         <itk:DistributionEnvelope
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">    <!-- the header of the distribution envelope contains a service name - ALWAYS "SendNHS111Report-v1-0" for NHS 111 CDA documents and a generated DCE UUID trackingId-->
-            <itk:header service="urn:nhs-itk:services:201005:SendNHS111Report-v2-0"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">    <!-- the header of the distribution envelope contains a service name - ALWAYS "SendNHS111Report-v1-0" for NHS 111 CDA documents and a generated DCE UUID trackingId-->    <!--service attribute modified by TKW AutotestManager-->
+            <itk:header service="urn:nhs-itk:services:201005:SendNHS111Report-v2-0_Bad_Service"
                         trackingid="7D6F23E0-AE1A-11DB-9808-B18E1E0994CD">        <!-- the address list is not needed, as the end point has been looked up and is in the SOAP header 		<itk:addresslist>			<itk:address uri="urn:nhs-uk:addressing:ods:EM396"/>		</itk:addresslist> -->        <!-- an audit identification of the sending organisation - use the send organisation's ODS site code -->
                 <itk:auditIdentity>
                     <itk:id uri="urn:nhs-uk:identity:ods:5L399"/>
-                </itk:auditIdentity>                  <!-- for 111 CDA documents (to A&E; GP; OOH etc.) there should only be 1 CDA document per transmission, so manifest should only have 1 item -->                  <!--Manifest count attribute incremented by 1 by TKW AutotestManager-->
+                </itk:auditIdentity>                  <!-- for 111 CDA documents (to A&E; GP; OOH etc.) there should only be 1 CDA document per transmission, so manifest should only have 1 item -->
                 <itk:manifest
-                        count="2">            <!-- CDA documents have a mimetype of application/cda+xml. id is the id of the CDA payload (<payload@id>) -->            <!-- for more details of manifest attributes see the ITK Core pack -->
-                    <itk:manifestitem mimetype="text/xml" id="uuid_7D6F23E0-AE1A-11DB-9808-B18E1E0994EE"
-                                      profileid="urn:nhs-en:profile:nhs111CDADocument-v2-0"/>                     <!--Manifest item duplicated so that item count matches no of items by TKW AutotestManager-->                        <!-- CDA documents have a mimetype of application/cda+xml. id is the id of the CDA payload (<payload@id>) -->                        <!-- for more details of manifest attributes see the ITK Core pack -->
+                        count="1">            <!-- CDA documents have a mimetype of application/cda+xml. id is the id of the CDA payload (<payload@id>) -->            <!-- for more details of manifest attributes see the ITK Core pack -->
                     <itk:manifestitem mimetype="text/xml" id="uuid_7D6F23E0-AE1A-11DB-9808-B18E1E0994EE"
                                       profileid="urn:nhs-en:profile:nhs111CDADocument-v2-0"/>
                 </itk:manifest>                  <!-- the sender address - use the ODS org site code of the sender, with a SDS idenifier of the sending person if available -->

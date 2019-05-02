@@ -4,7 +4,7 @@ from pathlib import Path
 from utilities.file_utilities import FileUtilities
 from utilities.xml_utilities import XmlUtilities
 
-from definitions import ROOT_DIR
+from SCR.definitions import ROOT_DIR
 from scr.gp_summary_update import SummaryCareRecord
 
 
