@@ -6,7 +6,7 @@ from edifact.incoming.models.message import MessageSegmentRegistrationDetails, M
 from edifact.incoming.models.interchange import InterchangeHeader, Interchange
 
 
-class TestBreakerNew(unittest.TestCase):
+class TestDeserialiser(unittest.TestCase):
 
     def test_extract_relevant_lines(self):
         original_dict = [

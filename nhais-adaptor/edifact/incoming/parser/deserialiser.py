@@ -10,13 +10,6 @@ MESSAGE_PATIENT_KEY = "S02"
 MESSAGE_TRAILER_KEY = "UNT"
 INTERCHANGE_TRAILER_KEY = "UNZ"
 
-terminating_config = {
-    INTERCHANGE_HEADER_KEY: [MESSAGE_HEADER_KEY],
-    MESSAGE_BEGINNING_KEY: [MESSAGE_REGISTRATION_KEY],
-    MESSAGE_REGISTRATION_KEY: [MESSAGE_PATIENT_KEY, MESSAGE_TRAILER_KEY],
-    MESSAGE_PATIENT_KEY: [MESSAGE_TRAILER_KEY]
-}
-
 
 def extract_relevant_lines(original_dict, starting_pos, trigger_key):
     """
@@ -29,8 +22,14 @@ def extract_relevant_lines(original_dict, starting_pos, trigger_key):
     terminating key for the section is
     :return: A smaller dictionary with just the relevant lines for the section
     """
-    new_dict = []
+    terminating_config = {
+        INTERCHANGE_HEADER_KEY: [MESSAGE_HEADER_KEY],
+        MESSAGE_BEGINNING_KEY: [MESSAGE_REGISTRATION_KEY],
+        MESSAGE_REGISTRATION_KEY: [MESSAGE_PATIENT_KEY, MESSAGE_TRAILER_KEY],
+        MESSAGE_PATIENT_KEY: [MESSAGE_TRAILER_KEY]
+    }
 
+    new_dict = []
     for (key, value) in original_dict[starting_pos:]:
         if key not in terminating_config[trigger_key]:
             new_dict.append((key, value))
@@ -64,7 +63,7 @@ def convert(lines):
     :return: Interchange: The incoming representation of the edifact interchange
     """
     original_dict = convert_to_dict(lines)
-    msgs = []
+    messages = []
     interchange = None
     interchange_header = None
     msg_bgn_details = None
@@ -92,10 +91,10 @@ def convert(lines):
 
         elif key == MESSAGE_TRAILER_KEY:
             msg = MessageSegment(msg_bgn_details, msg_reg_details, msg_pat_details)
-            msgs.append(msg)
+            messages.append(msg)
 
         elif key == INTERCHANGE_TRAILER_KEY:
-            interchange = Interchange(interchange_header, msgs)
+            interchange = Interchange(interchange_header, messages)
 
     return interchange
 
