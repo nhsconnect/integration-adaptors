@@ -49,26 +49,32 @@ def convert_to_dict(lines):
 
 
 def convert(lines):
-    lines_two = convert_to_dict(lines)
+    """
+    Takes the original list of edifact lines and converts to a deserialised representation.
+    Only relevant information from the edifact message is extracted and populated in the models
+    :param lines: A list of string of the edifact lines
+    :return: Interchange: The incoming representation of the edifact interchange
+    """
+    original_dict = convert_to_dict(lines)
     msgs = []
     interchange = None
     interchange_header = None
     msg_bgn_details = None
     msg_reg_details = None
 
-    for index, line in enumerate(lines_two):
+    for index, line in enumerate(original_dict):
         key = line[0]
 
         if key == "UNB":
-            interchange_header_line = extract_relevant_lines(lines_two, index, key)
+            interchange_header_line = extract_relevant_lines(original_dict, index, key)
             interchange_header = parser.create_interchange_header(interchange_header_line)
 
         elif key == "BGM":
-            msg_bgn_lines = extract_relevant_lines(lines_two, index, key)
+            msg_bgn_lines = extract_relevant_lines(original_dict, index, key)
             msg_bgn_details = parser.create_message_segment_beginning(msg_bgn_lines)
 
         elif key == "S01":
-            msg_reg_lines = extract_relevant_lines(lines_two, index, key)
+            msg_reg_lines = extract_relevant_lines(original_dict, index, key)
             msg_reg_details = parser.create_message_segment_registration(msg_reg_lines)
 
         elif key == "UNT":

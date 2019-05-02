@@ -69,7 +69,7 @@ class TestBreakerNew(unittest.TestCase):
 
         compare(converted_dict, expected)
 
-    def test_breaker_new(self):
+    def test_convert(self):
         expected = Interchange(InterchangeHeader("SO01", "ROO5", "190429:1756"), Messages([
             MessageSegment(MessageSegmentBeginningDetails("F4"), MessageSegmentRegistrationDetails("211102"))
         ]))
