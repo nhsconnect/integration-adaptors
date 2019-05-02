@@ -1,4 +1,4 @@
-import edifact.incoming.message as parser
+import edifact.incoming.parser.message as parser
 from edifact.incoming.models.message import MessageSegment
 from edifact.incoming.models.interchange import Interchange
 

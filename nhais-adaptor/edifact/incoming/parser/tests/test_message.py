@@ -1,6 +1,6 @@
 import unittest
 from testfixtures import compare
-import edifact.incoming.message as message_parser
+import edifact.incoming.parser.message as message_parser
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails
 
 
