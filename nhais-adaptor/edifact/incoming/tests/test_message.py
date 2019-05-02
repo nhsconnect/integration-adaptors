@@ -1,12 +1,12 @@
 import unittest
 from testfixtures import compare
-import edifact.parser.message as message_parser
-from edifact.parser.message import MessageSegmentRegistrationDetails
+import edifact.incoming.message as message_parser
+from edifact.incoming.message import MessageSegmentRegistrationDetails
 
 
 class TestMessage(unittest.TestCase):
 
-    def test_determine_message_segment_registration_lines(self):
+    def test_determine_sgm_size(self):
         expected = [
             ("S01", "+1"),
             ("RFF", "SOMETHING"),
@@ -23,7 +23,7 @@ class TestMessage(unittest.TestCase):
             ("AAA", "AAAAAAAAAAAA")
         ]
 
-        result = message_parser.determine_message_segment_registration_lines(bigger_dict, 2)
+        result = message_parser.determine_sgm_size(bigger_dict, 2, "S01")
 
         compare(result, expected)
 

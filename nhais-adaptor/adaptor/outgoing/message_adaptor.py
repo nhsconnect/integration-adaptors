@@ -39,7 +39,7 @@ def determine_address_lines(fhir_patient_address_lines):
     Since the fhir patient address does not have anything specifically for house name in its definition.
     This function assumes that if 3 address lines are provided then the first line is the house name
     if it is less than 3 then always default the first line as "".
-    :param fhir_patient_address: the fhir representation for the patient address
+    :param fhir_patient_address_lines: the fhir representation for the patient address
     :return: a uniform list of address lines to populate the edifact address model
     """
     address_lines = ["", "", ""]

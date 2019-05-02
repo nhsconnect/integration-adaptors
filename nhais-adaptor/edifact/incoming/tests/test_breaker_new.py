@@ -1,7 +1,7 @@
 import unittest
-import edifact.parser.breaker_new as breaker_new
+import edifact.incoming.breaker_new as breaker_new
 from testfixtures import compare
-from edifact.parser.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, MessageSegment, \
+from edifact.incoming.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, MessageSegment, \
     Interchange, InterchangeHeader, Messages
 
 
