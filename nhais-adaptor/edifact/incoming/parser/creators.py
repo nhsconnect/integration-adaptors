@@ -1,5 +1,6 @@
 from edifact.incoming.models.interchange import InterchangeHeader
-from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails
+from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
+    MessageSegmentPatientDetails
 
 
 def create_interchange_header(interchange_header_dict):
@@ -23,7 +24,8 @@ def create_interchange_header(interchange_header_dict):
 def create_message_segment_beginning(message_beginning_dict):
     """
     Creates an incoming message beginning from the message beginning dictionary
-    :param message_beginning_dict: The dictionary will contain a list of lines relevant to the message beginning section
+    :param message_beginning_dict: The dictionary will contain a list of lines relevant to the
+    message beginning section BGM
     :return: MessageSegmentBeginningDetails: The incoming representation of the edifact message beginning details
     """
     reference_segment = [value for key, value in message_beginning_dict if key == "RFF"][0]
@@ -36,7 +38,7 @@ def create_message_segment_registration(message_registration_dict):
     """
     Creates an incoming message registration from the message registration dictionary
     :param message_registration_dict: The dictionary will contain a list of lines relevant to the
-    message registration section
+    message registration section S01
     :return: MessageSegmentRegistrationDetails: The incoming representation of the edifact message registration details
     """
     transaction_segment = [value for key, value in message_registration_dict if key == "RFF"][0]
@@ -44,3 +46,15 @@ def create_message_segment_registration(message_registration_dict):
     transaction_number = transaction_values[1]
     return MessageSegmentRegistrationDetails(transaction_number)
 
+
+def create_message_segment_patient(message_patient_dict):
+    """
+    Creates an incoming message patient from the message message patient dictionary
+    :param message_patient_dict: The dictionary will contain a list of lines relevant to the
+    message patient section S02
+    :return: MessageSegmentRegistrationDetails: The incoming representation of the edifact message registration details
+    """
+    patient_details_segment = [value for key, value in message_patient_dict if key == "PNA"][0]
+    patient_details_segment_values = patient_details_segment.replace(":", "+").split("+")
+    nhs_number = patient_details_segment_values[1]
+    return MessageSegmentPatientDetails(nhs_number)

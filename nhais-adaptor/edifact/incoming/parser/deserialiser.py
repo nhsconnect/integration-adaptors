@@ -1,4 +1,4 @@
-import edifact.incoming.parser.creators as parser
+import edifact.incoming.parser.creators as creators
 from edifact.incoming.models.message import MessageSegment
 from edifact.incoming.models.interchange import Interchange
 
@@ -6,7 +6,8 @@ from edifact.incoming.models.interchange import Interchange
 terminating_config = {
     "UNB": ["UNH"],
     "BGM": ["S01"],
-    "S01": ["S02", "UNT"]
+    "S01": ["S02", "UNT"],
+    "S02": ["UNT"]
 }
 
 
@@ -61,24 +62,29 @@ def convert(lines):
     interchange_header = None
     msg_bgn_details = None
     msg_reg_details = None
+    msg_pat_details = None
 
     for index, line in enumerate(original_dict):
         key = line[0]
 
         if key == "UNB":
             interchange_header_line = extract_relevant_lines(original_dict, index, key)
-            interchange_header = parser.create_interchange_header(interchange_header_line)
+            interchange_header = creators.create_interchange_header(interchange_header_line)
 
         elif key == "BGM":
             msg_bgn_lines = extract_relevant_lines(original_dict, index, key)
-            msg_bgn_details = parser.create_message_segment_beginning(msg_bgn_lines)
+            msg_bgn_details = creators.create_message_segment_beginning(msg_bgn_lines)
 
         elif key == "S01":
             msg_reg_lines = extract_relevant_lines(original_dict, index, key)
-            msg_reg_details = parser.create_message_segment_registration(msg_reg_lines)
+            msg_reg_details = creators.create_message_segment_registration(msg_reg_lines)
+
+        elif key == "S02":
+            msg_pat_lines = extract_relevant_lines(original_dict, index, key)
+            msg_pat_details = creators.create_message_segment_patient(msg_pat_lines)
 
         elif key == "UNT":
-            msg = MessageSegment(msg_bgn_details, msg_reg_details)
+            msg = MessageSegment(msg_bgn_details, msg_reg_details, msg_pat_details)
             msgs.append(msg)
 
         elif key == "UNZ":

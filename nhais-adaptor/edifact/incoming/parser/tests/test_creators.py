@@ -1,7 +1,8 @@
 import unittest
 from testfixtures import compare
 import edifact.incoming.parser.creators as creators
-from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails
+from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
+    MessageSegmentPatientDetails
 from edifact.incoming.models.interchange import InterchangeHeader
 
 
@@ -41,4 +42,15 @@ class TestMessage(unittest.TestCase):
         msg_sgm_reg = creators.create_message_segment_registration(message_registration_dict)
 
         compare(msg_sgm_reg, expected)
+
+    def test_create_message_segment_patient(self):
+        expected = MessageSegmentPatientDetails("9876556789")
+
+        message_patient_dict = [
+            ("S02", "2"),
+            ("PNA", "PAT+9876556789:OPI"),
+        ]
+        msg_sgm_pat = creators.create_message_segment_patient(message_patient_dict)
+
+        compare(msg_sgm_pat, expected)
 

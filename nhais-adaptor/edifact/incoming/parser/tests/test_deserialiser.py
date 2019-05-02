@@ -2,7 +2,7 @@ import unittest
 import edifact.incoming.parser.deserialiser as deserialiser
 from testfixtures import compare
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
-    MessageSegment, Messages
+    MessageSegment, Messages, MessageSegmentPatientDetails
 from edifact.incoming.models.interchange import InterchangeHeader, Interchange
 
 
@@ -19,7 +19,9 @@ class TestBreakerNew(unittest.TestCase):
             ("S01", "1"),
             ("RFF", "TN:211102"),
             ("NAD", "GP+1231231,PLP348:900"),
-            ("UNT", "9+00024986"),
+            ("S02", "2"),
+            ("PNA", "PAT+9876556789:OPI"),
+            ("UNT", "11+00024986"),
             ("UNZ", "1+00016288"),
         ]
 
@@ -53,6 +55,16 @@ class TestBreakerNew(unittest.TestCase):
 
             compare(message_registration_dict, expected)
 
+        with self.subTest("When the trigger key is S02 (the message patient section)"):
+            expected = [
+                ("S02", "2"),
+                ("PNA", "PAT+9876556789:OPI"),
+            ]
+
+            message_registration_dict = deserialiser.extract_relevant_lines(original_dict, 9, "S02")
+
+            compare(message_registration_dict, expected)
+
     def test_convert_to_dict(self):
         expected = [
             ("UNB", "UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS"),
@@ -70,23 +82,51 @@ class TestBreakerNew(unittest.TestCase):
         compare(converted_dict, expected)
 
     def test_convert(self):
-        expected = Interchange(InterchangeHeader("SO01", "ROO5", "190429:1756"), Messages([
-            MessageSegment(MessageSegmentBeginningDetails("F4"), MessageSegmentRegistrationDetails("211102"))
-        ]))
+        with self.subTest("When the edifact incoming message does not have a patient section (S02)"):
+            expected = Interchange(InterchangeHeader("SO01", "ROO5", "190429:1756"), Messages([
+                MessageSegment(MessageSegmentBeginningDetails("F4"), MessageSegmentRegistrationDetails("211102"))
+            ]))
 
-        input_lines = [
-            "UNB+UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS",
-            "UNH+00024986+FHSREG:0:1:FH:FHS001",
-            "BGM+++507",
-            "NAD+FHS+SO:954",
-            "DTM+137:201904291755:203",
-            "RFF+950:F4",
-            "S01+1",
-            "RFF+TN:211102",
-            "NAD+GP+1231231,PLP348:900",
-            "UNT+9+00024986",
-            "UNZ+1+00016288",
-        ]
+            input_lines = [
+                "UNB+UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS",
+                "UNH+00024986+FHSREG:0:1:FH:FHS001",
+                "BGM+++507",
+                "NAD+FHS+SO:954",
+                "DTM+137:201904291755:203",
+                "RFF+950:F4",
+                "S01+1",
+                "RFF+TN:211102",
+                "NAD+GP+1231231,PLP348:900",
+                "UNT+9+00024986",
+                "UNZ+1+00016288",
+            ]
 
-        result = deserialiser.convert(input_lines)
-        compare(result, expected)
+            result = deserialiser.convert(input_lines)
+            compare(result, expected)
+
+        with self.subTest("When the edifact incoming message does have a patient section (SO2)"):
+            expected = Interchange(InterchangeHeader("SO01", "ROO5", "190429:1756"),
+                                   Messages([
+                                       MessageSegment(MessageSegmentBeginningDetails("F4"),
+                                                      MessageSegmentRegistrationDetails("211102"),
+                                                      MessageSegmentPatientDetails("9876556789"))
+                                   ]))
+
+            input_lines = [
+                "UNB+UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS",
+                "UNH+00024986+FHSREG:0:1:FH:FHS001",
+                "BGM+++507",
+                "NAD+FHS+SO:954",
+                "DTM+137:201904291755:203",
+                "RFF+950:F4",
+                "S01+1",
+                "RFF+TN:211102",
+                "NAD+GP+1231231,PLP348:900",
+                "S02+2",
+                "PNA+PAT+9876556789:OPI",
+                "UNT+9+00024986",
+                "UNZ+1+00016288",
+            ]
+
+            result = deserialiser.convert(input_lines)
+            compare(result, expected)
