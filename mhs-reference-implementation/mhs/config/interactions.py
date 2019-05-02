@@ -1,4 +1,4 @@
-import json
+from utilities.file_utilities import FileUtilities
 
 
 class InteractionsConfigFile:
@@ -7,8 +7,7 @@ class InteractionsConfigFile:
 
         :param interactions_file_name: The file to load interaction details from. This file should be in JSON format.
         """
-        with open(interactions_file_name) as interactions_file:
-            self.interactions = json.loads(interactions_file.read())
+        self.interactions = FileUtilities.get_file_dict(interactions_file_name)
 
     def get_interaction_details(self, interaction_name):
         """Get details for the specified interaction.
