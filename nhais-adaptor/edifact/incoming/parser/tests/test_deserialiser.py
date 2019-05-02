@@ -53,6 +53,22 @@ class TestBreakerNew(unittest.TestCase):
 
             compare(message_registration_dict, expected)
 
+    def test_convert_to_dict(self):
+        expected = [
+            ("UNB", "UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS"),
+            ("UNH", "00024986+FHSREG:0:1:FH:FHS001"),
+            ("BGM", "++507")
+        ]
+
+        input_lines = [
+            "UNB+UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS",
+            "UNH+00024986+FHSREG:0:1:FH:FHS001",
+            "BGM+++507"
+        ]
+        converted_dict = deserialiser.convert_to_dict(input_lines)
+
+        compare(converted_dict, expected)
+
     def test_breaker_new(self):
         expected = Interchange(InterchangeHeader("SO01", "ROO5", "190429:1756"), Messages([
             MessageSegment(MessageSegmentBeginningDetails("F4"), MessageSegmentRegistrationDetails("211102"))

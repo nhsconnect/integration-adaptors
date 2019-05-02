@@ -32,18 +32,24 @@ def extract_relevant_lines(original_dict, starting_pos, trigger_key):
     return new_dict
 
 
-def convert_to_lines_two(lines):
-    lines_two = []
+def convert_to_dict(lines):
+    """
+    Takes the list of original edifact lines and converts to a dict
+    :param lines: a list of string of the original edifact lines
+    :return: A list of Tuple with the extracted key and value. Since the keys in the edifact interchange can
+    contain duplicates a tuple is required here rather than a set
+    """
+    generated_dict = []
 
     for line in lines:
         key_value = line.split("+", 1)
-        lines_two.append((key_value[0], key_value[1]))
+        generated_dict.append((key_value[0], key_value[1]))
 
-    return lines_two
+    return generated_dict
 
 
 def convert(lines):
-    lines_two = convert_to_lines_two(lines)
+    lines_two = convert_to_dict(lines)
     msgs = []
     interchange = None
     interchange_header = None
