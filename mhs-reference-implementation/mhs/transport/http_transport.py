@@ -36,6 +36,7 @@ class HttpTransport:
                                   cert=self._cert,
                                   verify=self._verify)
 
+        # Raise an error if a 4xx or 5xx HTTP status was returned.
         response.raise_for_status()
 
         return response.content
