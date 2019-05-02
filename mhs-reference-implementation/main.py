@@ -4,7 +4,7 @@ from utilities.file_utilities import FileUtilities
 
 from definitions import ROOT_DIR
 from mhs.builder.ebxml_message_builder import EbXmlMessageBuilder
-from mhs.config.interactions import InteractionsFile
+from mhs.config.interactions import InteractionsConfigFile
 from mhs.sender.sender import Sender
 from mhs.transport.http_transport import HttpTransport
 
@@ -19,7 +19,7 @@ interactions_config_file = str(data_dir / "interactions" / "interactions.json")
 received_message = FileUtilities.get_file_string(str(data_dir / "messages" / "gp_summary_upload.xml"))
 
 # Build the application
-interactions_config = InteractionsFile(interactions_config_file)
+interactions_config = InteractionsConfigFile(interactions_config_file)
 message_builder = EbXmlMessageBuilder()
 transport = HttpTransport(certs_dir)
 sender = Sender(interactions_config, message_builder, transport)

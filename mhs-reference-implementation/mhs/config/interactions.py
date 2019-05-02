@@ -1,9 +1,9 @@
 import json
 
 
-class InteractionsFile:
+class InteractionsConfigFile:
     def __init__(self, interactions_file_name):
-        """Create a new InteractionsFile that loads the interaction details from the specified JSON file.
+        """Create a new InteractionsConfigFile that loads the interaction details from the specified JSON file.
 
         :param interactions_file_name: The file to load interaction details from. This file should be in JSON format.
         """
