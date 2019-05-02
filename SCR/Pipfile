@@ -6,10 +6,10 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-fhirclient = "*"
+integration-adaptors-common = {editable = true,path = "./../common"}
 
 [requires]
 python_version = "3.7"
 
 [scripts]
-tests = "python -m unittest discover -p '*_test.py' -v"
+tests = "python -m unittest -v"
