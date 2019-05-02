@@ -14,3 +14,4 @@ python_version = "3.7"
 
 [scripts]
 tests = "python -m unittest -v"
+sender = "python main.py"
