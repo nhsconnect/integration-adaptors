@@ -1,3 +1,5 @@
+import copy
+
 PARTY_ID = "A91424-9199121"
 
 WRAPPER_REQUIRED = 'ebxml_wrapper_required'
@@ -30,7 +32,7 @@ class Sender:
 
         requires_ebxml_wrapper = interaction_details[WRAPPER_REQUIRED]
         if requires_ebxml_wrapper:
-            context = interaction_details.copy()
+            context = copy.deepcopy(interaction_details)
             context[FROM_PARTY_ID] = PARTY_ID
             context[MESSAGE] = message_to_send
 
