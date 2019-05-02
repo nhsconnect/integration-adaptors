@@ -13,3 +13,7 @@ Ensure you have `pipenv` installed and is on your class path
 
 ### Run the tests
 `pipenv run tests` to run all the tests
+
+### Test the adaptor
+`pipenv run transfer` - Loads the fhir patient registration payload in the GP outbox. 
+Runs the adaptor and creates the edifact interchange in the NHAIS inbox
