@@ -1,5 +1,5 @@
 import unittest
-import edifact.incoming.parser.breaker_new as breaker_new
+import edifact.incoming.parser.deserialiser as breaker_new
 from testfixtures import compare
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
     MessageSegment, Messages

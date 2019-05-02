@@ -1,4 +1,4 @@
-import edifact.incoming.parser.message as parser
+import edifact.incoming.parser.creators as parser
 from edifact.incoming.models.message import MessageSegment
 from edifact.incoming.models.interchange import Interchange
 
@@ -26,15 +26,15 @@ def convert(lines):
 
         if key == "UNB":
             interchange_header_line = parser.determine_sgm_size(lines_two, index, key)
-            interchange_header = parser.parse_interchange_header(interchange_header_line)
+            interchange_header = parser.create_interchange_header(interchange_header_line)
 
         elif key == "BGM":
             msg_bgn_lines = parser.determine_sgm_size(lines_two, index, key)
-            msg_bgn_details = parser.parse_message_segment_beginning(msg_bgn_lines)
+            msg_bgn_details = parser.create_message_segment_beginning(msg_bgn_lines)
 
         elif key == "S01":
             msg_reg_lines = parser.determine_sgm_size(lines_two, index, key)
-            msg_reg_details = parser.parse_message_segment_registration(msg_reg_lines)
+            msg_reg_details = parser.create_message_segment_registration(msg_reg_lines)
 
         elif key == "UNT":
             msg = MessageSegment(msg_bgn_details, msg_reg_details)
