@@ -6,9 +6,9 @@ import adaptor.outgoing.fhir_helpers.fhir_creators as creators
 from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
-from edifact.models.name import Name
-from edifact.models.address import Address as EdifactAddress
-from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning, \
+from edifact.outgoing.models.name import Name
+from edifact.outgoing.models.address import Address as EdifactAddress
+from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning, \
     Message
 
 

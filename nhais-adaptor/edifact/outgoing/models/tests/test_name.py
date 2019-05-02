@@ -1,5 +1,5 @@
 import unittest
-from edifact.models.name import PatientName, Name
+from edifact.outgoing.models.name import PatientName, Name
 
 
 class TestPatientName(unittest.TestCase):
