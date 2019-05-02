@@ -1,19 +1,7 @@
-# TODO: Load from a config file?
 PARTY_ID = "A91424-9199121"
 
 WRAPPER_REQUIRED = 'ebxml_wrapper_required'
 FROM_PARTY_ID = "from_party_id"
-TO_PARTY_ID = "to_party_id"
-CPA_ID = "cpa_id"
-CONVERSATION_ID = "conversation_id"
-MESSAGE_GUID = "message_GUID"
-SERVICE = "service"
-ACTION = "action"
-TIMESTAMP = "timestamp"
-DUPLICATE_ELIMINATION = "duplicate_elimination"
-ACK_REQUESTED = "ack_requested"
-ACK_SOAP_ACTOR = "ack_soap_actor"
-SYNC_REPLY = "sync_reply"
 MESSAGE = "hl7_message"
 
 
