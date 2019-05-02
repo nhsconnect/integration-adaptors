@@ -19,7 +19,7 @@ class Sender:
         self.transport = transport
 
     def send_message(self, interaction_name, message_to_send):
-        """Send the specified messaage for the interaction named.
+        """Send the specified message for the interaction named.
 
         :param interaction_name: The name of the interaction the message is related to.
         :param message_to_send: A string representing the message to be sent.
