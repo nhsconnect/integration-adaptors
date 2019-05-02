@@ -80,6 +80,33 @@ class TestMessageAdaptor(unittest.TestCase):
 
             compare(edi_address, expected)
 
+    def test_determine_address_lines(self):
+        """ Test the determine address line function """
+
+        with self.subTest("When 3 address lines are provided in the fhir patient address"):
+            expected = ["house name", "address line 1", "address line 2"]
+
+            fhir_address_with_3_lines = ["house name", "address line 1", "address line 2"]
+            generated_address_lines = message_adaptor.determine_address_lines(fhir_address_with_3_lines)
+
+            compare(generated_address_lines, expected)
+
+        with self.subTest("When 2 address lines are provided in the fhir patient address"):
+            expected = ["", "address line 1", "address line 2"]
+
+            fhir_address_with_2_lines = ["address line 1", "address line 2"]
+            generated_address_lines = message_adaptor.determine_address_lines(fhir_address_with_2_lines)
+
+            compare(generated_address_lines, expected)
+
+        with self.subTest("When 1 address line is provided in the fhir patient address"):
+            expected = ["", "address line 1", ""]
+
+            fhir_address_with_1_line = ["address line 1"]
+            generated_address_lines = message_adaptor.determine_address_lines(fhir_address_with_1_line)
+
+            compare(generated_address_lines, expected)
+
     def test_create_message_segment_patient_details(self):
         """
         Test the function to create an edifact segment for patient details

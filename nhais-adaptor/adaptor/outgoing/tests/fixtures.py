@@ -27,6 +27,10 @@ def create_simple_practitioner():
 
 
 def create_operation_definition_for_birth_registration():
+    """
+    Creates an fhir operation definition for a birth registration
+    :return: OperationDefinition
+    """
     op_param_interchange_sequence = creators.create_parameter_with_binding(
         name=ParameterName.INTERCHANGE_SEQ_NO,
         value="000001")
@@ -55,5 +59,5 @@ def create_operation_definition_for_birth_registration():
                                                               op_param_transaction_number,
                                                               op_param_nhais_cypher,
                                                               op_param_practitioner, op_param_patient])
-    
+
     return op_def
