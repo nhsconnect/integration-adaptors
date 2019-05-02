@@ -1,5 +1,6 @@
 import edifact.incoming.message as parser
-from edifact.incoming.message import MessageSegment, Interchange
+from edifact.incoming.models.message import MessageSegment
+from edifact.incoming.models.interchange import Interchange
 
 
 def convert_to_lines_two(lines):

@@ -1,8 +1,9 @@
 import unittest
 import edifact.incoming.breaker_new as breaker_new
 from testfixtures import compare
-from edifact.incoming.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, MessageSegment, \
-    Interchange, InterchangeHeader, Messages
+from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
+    MessageSegment, Messages
+from edifact.incoming.models.interchange import InterchangeHeader, Interchange
 
 
 class TestBreakerNew(unittest.TestCase):

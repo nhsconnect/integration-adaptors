@@ -1,7 +1,7 @@
 import unittest
 from testfixtures import compare
 import edifact.incoming.message as message_parser
-from edifact.incoming.message import MessageSegmentRegistrationDetails
+from edifact.incoming.models.message import MessageSegmentRegistrationDetails
 
 
 class TestMessage(unittest.TestCase):

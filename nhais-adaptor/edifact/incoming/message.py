@@ -1,3 +1,6 @@
+from edifact.incoming.models.interchange import InterchangeHeader
+from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails
+
 terminating_config = {
     "UNB": ["UNH"],
     "BGM": ["S01"],
@@ -54,66 +57,4 @@ def parse_message_segment_registration(something_dict):
     transaction_values = transaction_segment.split(":")
     transaction_number = transaction_values[1]
     return MessageSegmentRegistrationDetails(transaction_number)
-
-
-class MessageSegmentRegistrationDetails(object):
-    def __init__(self, transaction_number):
-        """
-
-        :param transaction_number:
-        """
-        self.transaction_number = transaction_number
-
-
-class MessageSegmentBeginningDetails(object):
-    def __init__(self, reference_number):
-        """
-
-        :param reference_number:
-        """
-        self.reference_number = reference_number
-
-
-class MessageSegment(object):
-    def __init__(self, message_beginning, message_registration):
-        """
-
-        :param message_beginning:
-        :param message_registration
-        """
-        self.message_beginning = message_beginning
-        self.message_registration = message_registration
-
-
-class Messages(list):
-    def __init__(self, messages):
-        """
-        :param messages: a collections of messages
-        """
-        self.messages = messages
-        super().__init__(messages)
-
-
-class InterchangeHeader(object):
-    def __init__(self, sender, recipient, date_time):
-        """
-
-        :param sender:
-        :param recipient:
-        :param date_time:
-        """
-        self.sender = sender
-        self.recipient = recipient
-        self.date_time = date_time
-
-
-class Interchange(object):
-    def __init__(self, header, msgs):
-        """
-
-        :param header:
-        :param msgs:
-        """
-        self.header = header
-        self.msgs = msgs
 
