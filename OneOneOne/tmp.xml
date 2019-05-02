@@ -1,0 +1,226 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsa="http://www.w3.org/2005/08/addressing"
+               xmlns:itk="urn:nhs-itk:ns:201005">
+    <soap:Header>
+        <wsa:MessageID>6044B666-6C2B-11E9-984D-776FFC688573</wsa:MessageID>
+        <wsa:Action>urn:nhs-itk:services:201005:SendNHS111Report-v2-0</wsa:Action>
+        <wsa:To>http://127.0.0.1:4848/syncsoap</wsa:To>
+        <wsa:From>
+            <wsa:Address>http://localhost:4000</wsa:Address>
+        </wsa:From>
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+            <wsu:Timestamp
+                    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                    wsu:Id="D6CD5232-14CF-11DF-9423-1F9A910D4703">
+                <wsu:Created>2019-05-01T16:08:36Z</wsu:Created>
+                <wsu:Expires>2019-05-01T16:18:36Z</wsu:Expires>
+            </wsu:Timestamp>
+            <wsse:UsernameToken>
+                <wsse:Username>TKS Server test</wsse:Username>
+            </wsse:UsernameToken>
+        </wsse:Security>
+    </soap:Header>
+    <soap:Body>
+        <itk:DistributionEnvelope xmlns:itk="urn:nhs-itk:ns:201005"
+                                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <!-- the header of the distribution envelope contains a service name - ALWAYS "SendNHS111Report-v1-0" for NHS 111 CDA documents and a generated DCE UUID trackingId-->
+            <itk:header service="urn:nhs-itk:services:201005:SendNHS111Report-v2-0"
+                        trackingid="7D6F23E0-AE1A-11DB-9808-B18E1E0994CD">
+                <!-- the address list is not needed, as the end point has been looked up and is in the SOAP header 		<itk:addresslist>			<itk:address uri="urn:nhs-uk:addressing:ods:EM396"/>		</itk:addresslist> -->
+                <!-- an audit identification of the sending organisation - use the send organisation's ODS site code -->
+                <itk:auditIdentity>
+                    <itk:id uri="urn:nhs-uk:identity:ods:5L399"/>
+                </itk:auditIdentity>
+                <!-- for 111 CDA documents (to A&E; GP; OOH etc.) there should only be 1 CDA document per transmission, so manifest should only have 1 item -->
+                <itk:manifest count="1">
+                    <!-- CDA documents have a mimetype of application/cda+xml. id is the id of the CDA payload (<payload@id>) -->
+                    <!-- for more details of manifest attributes see the ITK Core pack -->
+                    <itk:manifestitem mimetype="text/xml" id="uuid_7D6F23E0-AE1A-11DB-9808-B18E1E0994EE"
+                                      profileid="urn:nhs-en:profile:nullificationDocument-v5-0"/>
+                </itk:manifest>
+                <!-- the sender address - use the ODS org site code of the sender, with a SDS idenifier of the sending person if available -->
+                <itk:senderAddress uri="urn:nhs-uk:addressing:ods:5L399:445510770"/>
+                <!-- handlingSpecification contains the interaction id from the 111 specification - key is always fixed; value varies depending on recipient -->
+                <itk:handlingSpecification>
+                    <itk:spec value="urn:nhs-itk:interaction:nullifyNHS111CDADocument-v1-0"
+                              key="urn:nhs-itk:ns:201005:interaction"/>
+                </itk:handlingSpecification>
+            </itk:header>
+            <itk:payloads count="1">
+                <!-- this matches the manifestitem@id for the payload being referenced by the manifest -->
+                <itk:payload id="uuid_7D6F23E0-AE1A-11DB-9808-B18E1E0994EE">
+                    <!-- the document goes here -->
+                    <ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:npfitlc="NPFIT:HL7:Localisation"
+                                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" moodCode="EVN"
+                                      classCode="DOCCLIN">
+                        <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
+                        <npfitlc:messageType root="2.16.840.1.113883.2.1.3.2.4.18.17" extension="POCD_MT130001UK05"/>
+                        <id root="7D5B4DC0-AE1A-11DB-95FB-B18E1E0994CD"/>
+                        <code code="285091000000108" codeSystem="2.16.840.1.113883.2.1.3.2.4.15"/>
+                        <title>Nullification Document</title>
+                        <effectiveTime value="20070102123459"/>
+                        <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25" displayName="normal"/>
+                        <setId root="7D5B4DC0-AE1A-11DB-95FC-B18E1E0994CD"/>
+                        <versionNumber value="2"/>
+                        <recordTarget typeCode="RCT" contextControlCode="OP">
+                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                               extension="COCD_TP145020UK03#PatientRole"/>
+                            <patientRole classCode="PAT">
+                                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                            extension="COCD_TP145020UK03#PatientRole"/>
+                                <id root="2.16.840.1.113883.2.1.4.1" extension="9900002558"/>
+                            </patientRole>
+                        </recordTarget>
+                        <author contextControlCode="OP" typeCode="AUT">
+                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                               extension="COCD_TP145001UK03#AssignedAuthorSDS"/>
+                            <functionCode codeSystem="2.16.840.1.113883.2.1.3.2.4.17.178" code="OA"
+                                          displayName="Originating Author"/>
+                            <time value="200701021234"/>
+                            <assignedAuthor classCode="ASSIGNED">
+                                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                            extension="COCD_TP145001UK03#AssignedAuthorSDS"/>
+                                <id root="1.2.826.0.1285.0.2.0.65" extension="673836492727"/>
+                                <id root="1.2.826.0.1285.0.2.0.67" extension="984181387037"/>
+                                <code code="R0050" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.196"
+                                      displayName="Consultant"/>
+                                <assignedPerson determinerCode="INSTANCE" classCode="PSN">
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145001UK03#assignedPerson"/>
+                                    <name>
+                                        <prefix>Dr</prefix>
+                                        <given>Steve</given>
+                                        <family>Fulham</family>
+                                    </name>
+                                </assignedPerson>
+                                <representedOrganization determinerCode="INSTANCE" classCode="ORG">
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145001UK03#representedOrganization"/>
+                                    <id root="2.16.840.1.113883.2.1.3.2.4.19.2" extension="RR109"/>
+                                    <name>Solihull Hospital</name>
+                                </representedOrganization>
+                            </assignedAuthor>
+                        </author>
+                        <custodian typeCode="CST">
+                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                               extension="COCD_TP145018UK03#AssignedCustodian"/>
+                            <assignedCustodian classCode="ASSIGNED">
+                                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                            extension="COCD_TP145018UK03#AssignedCustodian"/>
+                                <representedCustodianOrganization classCode="ORG" determinerCode="INSTANCE">
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145018UK03#representedCustodianOrganization"/>
+                                    <id root="2.16.840.1.113883.2.1.3.2.4.19.1" extension="RR109"/>
+                                    <name>Solihull Hospital</name>
+                                </representedCustodianOrganization>
+                            </assignedCustodian>
+                        </custodian>
+                        <informationRecipient typeCode="PRCP">
+                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                               extension="COCD_TP145017UK03#IntendedRecipient"/>
+                            <intendedRecipient classCode="ASSIGNED">
+                                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                            extension="COCD_TP145017UK03#IntendedRecipient"/>
+                                <receivedOrganization classCode="ORG" determinerCode="INSTANCE">
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145017UK03#representedOrganization"/>
+                                    <id root="2.16.840.1.113883.2.1.3.2.4.19.2" extension="YEA"/>
+                                    <name>NATIONAL CARE RECORDS SERVICE SPINE</name>
+                                </receivedOrganization>
+                            </intendedRecipient>
+                        </informationRecipient>
+                        <informationRecipient typeCode="PRCP">
+                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                               extension="COCD_TP145021UK04#AssignedEntitySDS"/>
+                            <intendedRecipient classCode="ASSIGNED">
+                                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                            extension="COCD_TP145021UK04#AssignedEntitySDS"/>
+                                <npfitlc:recipientRoleCode code="GP" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.196"
+                                                           displayName="General Practitioner"/>
+                                <id root="1.2.826.0.1285.0.2.0.65" extension="673836492727"/>
+                                <id root="1.2.826.0.1285.0.2.0.67" extension="984181387037"/>
+                                <informationRecipient determinerCode="INSTANCE" classCode="PSN">
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145021UK04#assignedPerson"/>
+                                    <name>
+                                        <prefix>Dr</prefix>
+                                        <given>Jill</given>
+                                        <family>Fulham</family>
+                                    </name>
+                                </informationRecipient>
+                            </intendedRecipient>
+                        </informationRecipient>
+                        <relatedDocument typeCode="RPLC">
+                            <parentDocument moodCode="EVN" classCode="DOCCLIN">
+                                <id root="7D5B4DC0-AE1A-11DB-9601-B18E1E0994CD"/>
+                                <code codeSystem="2.16.840.1.113883.2.1.3.2.4.15" code="185291000000100"/>
+                                <setId root="7D5B4DC0-AE1A-11DB-95FC-B18E1E0994CD"/>
+                                <versionNumber value="1"/>
+                            </parentDocument>
+                        </relatedDocument>
+                        <component typeCode="COMP" contextConductionInd="true">
+                            <structuredBody moodCode="EVN" classCode="DOCBODY">
+                                <component typeCode="COMP" contextConductionInd="true">
+                                    <section classCode="DOCSECT" moodCode="EVN">
+                                        <id root="D9303D40-EF24-11DB-A1C1-F5CA408FF127"/>
+                                        <entry typeCode="COMP" contextConductionInd="true">
+                                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                                               extension="COCD_TP146049UK05#Reason"/>
+                                            <observation classCode="OBS" moodCode="EVN">
+                                                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                            extension="COCD_TP146049UK05#Reason"/>
+                                                <id root="7D5B4DC0-AE1A-11DB-9600-B18E1E0994CD"/>
+                                                <code codeSystem="2.16.840.1.113883.2.1.3.2.4.17.176" code="02"
+                                                      displayName="Sent to wrong patient record">
+                                                    <originalText>
+                                                        <reference value="#a1"/>
+                                                    </originalText>
+                                                </code>
+                                                <effectiveTime value="200701021234"/>
+                                            </observation>
+                                        </entry>
+                                        <component typeCode="COMP" contextConductionInd="true">
+                                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                                               extension="COCD_TP146061UK01#Section1"/>
+                                            <section classCode="DOCSECT" moodCode="EVN">
+                                                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                            extension="COCD_TP146061UK01#Section1"/>
+                                                <id root="D9303D40-EF24-11DB-A1C2-F5CA408FF127"/>
+                                                <title>Document Withdrawn</title>
+                                                <text>Outpatient Clinic Attendance</text>
+                                                <component typeCode="COMP" contextConductionInd="true">
+                                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                                extension="COCD_TP146061UK01#component1"/>
+                                                    <section classCode="DOCSECT" moodCode="EVN">
+                                                        <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                                    extension="COCD_TP146061UK01#section2"/>
+                                                        <id root="D92DCC40-EF24-11DB-A1BE-F5CA408FF128"/>
+                                                        <title>Withdrawn Document Created</title>
+                                                        <text>02-Jan-2007</text>
+                                                    </section>
+                                                </component>
+                                                <component typeCode="COMP" contextConductionInd="true">
+                                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                                extension="COCD_TP146061UK01#component1"/>
+                                                    <section classCode="DOCSECT" moodCode="EVN">
+                                                        <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                                    extension="COCD_TP146061UK01#section2"/>
+                                                        <id root="D92DCC40-EF24-11DB-A1BE-F5CA408FF127"/>
+                                                        <title>Reason for Withdrawal</title>
+                                                        <text>
+                                                            <content ID="a1">Sent to wrong patient record</content>
+                                                        </text>
+                                                    </section>
+                                                </component>
+                                            </section>
+                                        </component>
+                                    </section>
+                                </component>
+                            </structuredBody>
+                        </component>
+                    </ClinicalDocument>
+                    <!-- the document ends here -->
+                </itk:payload>
+            </itk:payloads>
+        </itk:DistributionEnvelope>
+    </soap:Body>
+</soap:Envelope>
