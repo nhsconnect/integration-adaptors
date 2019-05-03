@@ -1,3 +1,5 @@
+import json
+
 LF = "\n"
 
 
@@ -11,6 +13,16 @@ class FileUtilities:
         """
         with open(file_path) as file:
             return file.read()
+
+    @staticmethod
+    def get_file_dict(file_path):
+        """Loads the contents of a JSON file as a dictionary.
+
+        :param file_path: The file to load the dictionary from.
+        :return: a dictionary representing the contents of the file.
+        """
+        with open(file_path) as json_file:
+            return json.load(json_file)
 
     @staticmethod
     def normalize_line_endings(string_to_normalize):
