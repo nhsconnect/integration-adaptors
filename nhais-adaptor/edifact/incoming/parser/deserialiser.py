@@ -14,7 +14,7 @@ INTERCHANGE_TRAILER_KEY = "UNZ"
 EdifactDict = NewType("EdifactDict", List[Tuple[str, str]])
 
 
-def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key):
+def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key) -> EdifactDict:
     """
     From the original dict generate a smaller dict just containing the relevant lines based upon the trigger key
     will keep looping till the terminating key is found in the terminating config
@@ -32,7 +32,7 @@ def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key
         MESSAGE_PATIENT_KEY: [MESSAGE_TRAILER_KEY]
     }
 
-    new_dict = []
+    new_dict = EdifactDict([])
     for (key, value) in original_dict[starting_pos:]:
         if key not in terminating_config[trigger_key]:
             new_dict.append((key, value))
