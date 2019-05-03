@@ -36,11 +36,12 @@ class ResourceType:
     PRACTITIONER = "Practitioner"
 
 
-def create_parameter_with_binding(name, value):
+def create_parameter_with_binding(name, value, direction="in"):
     """
     Helper function to create a fhir parameter with binding value
     :param name: name of the parameter
     :param value: the value of the parameter
+    :param direction: the direction of the parameter
     :return: OperationDefinitionParameter
     """
     identifier = Identifier({'value': value})
@@ -48,7 +49,7 @@ def create_parameter_with_binding(name, value):
         {'strength': 'required', 'valueSetReference': {'identifier': identifier.as_json()}}
     )
     op_param = OperationDefinitionParameter(
-        {'name': name, 'use': 'in', 'min': 1, 'max': '1',
+        {'name': name, 'use': direction, 'min': 1, 'max': '1',
          'binding': op_param_binding.as_json()})
 
     return op_param

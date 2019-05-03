@@ -16,20 +16,22 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
         """
         Tests the function to create a fhir operation definition from an incoming edifact interchange
         """
-        transaction_parameter = creators.create_parameter_with_binding(name="transactionNumber", value="17")
-        reference_number_parameter = creators.create_parameter_with_binding(name="referenceNumber", value="F4")
-        expected = creators.create_operation_definition(name="Response-RegisterPatient-Birth",
-                                                        code="gpc.registerpatient.reponse",
+        sender_parameter = creators.create_parameter_with_binding(name="senderCypher", value="XX11", direction="out")
+        recipient_parameter = creators.create_parameter_with_binding(name="recipientCypher", value="TES5", direction="out")
+        transaction_parameter = creators.create_parameter_with_binding(name="transactionNumber", value="17", direction="out")
+        expected = creators.create_operation_definition(name="Response-RegisterPatient-Approval",
+                                                        code="gpc.registerpatient.approval",
                                                         date_time="2019-04-29 17:56",
                                                         contained=[],
                                                         parameters=[
-                                                            transaction_parameter,
-                                                            reference_number_parameter
+                                                            sender_parameter,
+                                                            recipient_parameter,
+                                                            transaction_parameter
                                                         ])
 
         interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
-        messages = Messages(MessageSegment(MessageSegmentBeginningDetails(reference_number="F4"),
-                                           MessageSegmentRegistrationDetails(transaction_number="17")))
+        messages = Messages([MessageSegment(MessageSegmentBeginningDetails(reference_number="F4"),
+                                            MessageSegmentRegistrationDetails(transaction_number="17"))])
         incoming_interchange = Interchange(header=interchange_header, messages=messages)
 
         op_def = incoming_adaptor.create_operation_definition(incoming_interchange)

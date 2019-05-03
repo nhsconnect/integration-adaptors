@@ -2,7 +2,7 @@ import adaptor.outgoing.message_adaptor as message_adaptor
 import adaptor.fhir_helpers.fhir_finders as finders
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import Messages
-from adaptor.fhir_helpers import ParameterName
+from adaptor.fhir_helpers.fhir_creators import ParameterName
 
 """
 An adaptor to take in fhir models and generate an edifact interchange
