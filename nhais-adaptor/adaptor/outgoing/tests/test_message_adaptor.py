@@ -2,8 +2,8 @@ import unittest
 import adaptor.outgoing.tests.fixtures as fixtures
 from testfixtures import compare
 import adaptor.outgoing.message_adaptor as message_adaptor
-import adaptor.outgoing.fhir_helpers.fhir_creators as creators
-from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
+import adaptor.fhir_helpers.fhir_creators as creators
+from adaptor.fhir_helpers import ParameterName, ResourceType, OperationName
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
 from edifact.outgoing.models.name import Name

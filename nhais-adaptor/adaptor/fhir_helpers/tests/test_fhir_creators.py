@@ -4,8 +4,8 @@ from fhirclient.models.patient import Patient
 from fhirclient.models.operationdefinition import OperationDefinitionParameter, OperationDefinition
 from fhirclient.models.practitioner import Practitioner
 
-import adaptor.outgoing.fhir_helpers.fhir_creators as creators
-from adaptor.outgoing.fhir_helpers.fhir_creators import ResourceType
+import adaptor.fhir_helpers.fhir_creators as creators
+from adaptor.fhir_helpers import ResourceType
 
 
 class TestFhirCreators(unittest.TestCase):

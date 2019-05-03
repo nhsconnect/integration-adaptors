@@ -1,6 +1,6 @@
-import adaptor.outgoing.fhir_helpers.fhir_creators as creators
-from adaptor.outgoing.fhir_helpers.fhir_creators import OperationName
-from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName, ResourceType
+import adaptor.fhir_helpers.fhir_creators as creators
+from adaptor.fhir_helpers import OperationName
+from adaptor.fhir_helpers import ParameterName, ResourceType
 
 
 def create_simple_patient():
