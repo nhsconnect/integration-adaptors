@@ -2,20 +2,19 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
+from mhs.builder.ebxml_request_message_builder import EbXmlRequestMessageBuilder
 from utilities.file_utilities import FileUtilities
-
-from mhs.builder.ebxml_message_builder import EbXmlMessageBuilder
 
 EXPECTED_MESSAGES_DIR = "expected_messages"
 EXPECTED_EBXML = "ebxml.xml"
 
 
-class TestEbXmlMessageBuilder(TestCase):
+class TestEbXmlRequestMessageBuilder(TestCase):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     expected_message_dir = Path(current_dir) / EXPECTED_MESSAGES_DIR
 
     def setUp(self):
-        self.builder = EbXmlMessageBuilder()
+        self.builder = EbXmlRequestMessageBuilder()
 
     def test_build_message(self):
         expected_message = FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
