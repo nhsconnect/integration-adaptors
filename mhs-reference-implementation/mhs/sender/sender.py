@@ -32,14 +32,22 @@ class Sender:
 
         requires_ebxml_wrapper = interaction_details[WRAPPER_REQUIRED]
         if requires_ebxml_wrapper:
-            context = copy.deepcopy(interaction_details)
-            context[FROM_PARTY_ID] = PARTY_ID
-            context[MESSAGE] = message_to_send
-
-            message = self.message_builder.build_message(context)
+            message = self._wrap_message_in_ebxml(interaction_details, message_to_send)
         else:
             message = message_to_send
 
         response = self.transport.make_request(interaction_details, message)
 
         return response
+
+    def _wrap_message_in_ebxml(self, interaction_details, message_to_send):
+        """Wrap the specified message in an ebXML wrapper.
+
+        :param interaction_details: The interaction configuration to use when building the ebXML wrapper.
+        :param message_to_send: The message to be sent.
+        :return: A string representing the message wrapped in the generated ebXML wrapper.
+        """
+        context = copy.deepcopy(interaction_details)
+        context[FROM_PARTY_ID] = PARTY_ID
+        context[MESSAGE] = message_to_send
+        return self.message_builder.build_message(context)
