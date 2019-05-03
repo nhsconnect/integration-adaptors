@@ -1,4 +1,5 @@
-from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning, \
+from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, \
+    MessageBeginning, \
     Message
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address

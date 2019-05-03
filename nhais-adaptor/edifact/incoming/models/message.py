@@ -42,7 +42,7 @@ class MessageSegment:
     A representation of the incoming edifact message
     """
 
-    def __init__(self, message_beginning, message_registration, message_patient = None):
+    def __init__(self, message_beginning, message_registration, message_patient=None):
         """
         :param message_beginning: the incoming message beginning section
         :param message_registration: the incoming message registration details

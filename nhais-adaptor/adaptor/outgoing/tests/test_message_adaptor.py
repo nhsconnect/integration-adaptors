@@ -8,8 +8,8 @@ from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address as EdifactAddress
-from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning, \
-    Message
+from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, \
+    MessageBeginning, Message
 
 
 class TestMessageAdaptor(unittest.TestCase):

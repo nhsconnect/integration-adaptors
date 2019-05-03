@@ -1,7 +1,7 @@
 import unittest
 from edifact.outgoing.models.interchange import Interchange, InterchangeHeader, InterchangeTrailer
-from edifact.outgoing.models.message import MessageBeginning, MessageSegmentRegistrationDetails, MessageSegmentPatientDetails, \
-    Message, Messages
+from edifact.outgoing.models.message import MessageBeginning, MessageSegmentRegistrationDetails, \
+    MessageSegmentPatientDetails, Message, Messages
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address
 

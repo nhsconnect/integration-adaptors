@@ -46,7 +46,7 @@ def convert_to_dict(lines) -> EdifactDict:
     """
     Takes the list of original edifact lines and converts to a dict.
     :param lines: a list of string of the original edifact lines.
-    :return: A list of Tuple (EdifactDict) with the extracted key and value. Since the keys in the edifact interchange can
+    :return: EdifactDict - A list of Tuples. Since the keys in the edifact interchange can
     contain duplicates a tuple is required here rather than a set.
     """
     generated_dict = EdifactDict([])

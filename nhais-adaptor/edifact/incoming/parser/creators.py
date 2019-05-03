@@ -10,7 +10,8 @@ SUB_SECTION_SEPARATOR = ":"
 def get_value_in_dict(dict_to_search: EdifactDict, key_to_find):
     """
     Extract the value segment out of the dictionary provided based upon the key. Will return the first result.
-    :param dict_to_search: The dictionary of key value pairs. (This is a list of tuples so need to loop through the dict).
+    :param dict_to_search: The dictionary of key value pairs.
+    This is a list of tuples so need to loop through the dict.
     :param key_to_find: The key to find within the dict.
     :return: The Value as a string.
     """
