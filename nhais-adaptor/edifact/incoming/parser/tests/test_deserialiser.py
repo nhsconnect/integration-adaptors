@@ -4,7 +4,7 @@ from testfixtures import compare
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
     MessageSegment, Messages, MessageSegmentPatientDetails
 from edifact.incoming.models.interchange import InterchangeHeader, Interchange
-from edifact.incoming.parser.deserialiser import EdifactDict
+from edifact.incoming.parser import EdifactDict
 
 
 class TestDeserialiser(unittest.TestCase):

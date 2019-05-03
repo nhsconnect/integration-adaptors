@@ -68,20 +68,20 @@
         },
         "urllib3": {
             "hashes": [
-                "sha256:4c291ca23bbb55c76518905869ef34bdd5f0e46af7afe6861e8375643ffee1a0",
-                "sha256:9a247273df709c4fedb38c711e44292304f73f39ab01beda9f6b9fc375669ac3"
+                "sha256:2393a695cd12afedd0dcb26fe5d50d0cf248e5a66f75dbd89a3d4eb333a61af4",
+                "sha256:a637e5fae88995b256e3409dc4d52c2e2e0ba32c42a6365fee8bbd2238de3cfb"
             ],
-            "version": "==1.24.2"
+            "version": "==1.24.3"
         }
     },
     "develop": {
         "testfixtures": {
             "hashes": [
-                "sha256:015f8220088c40772b48a210f6bcdf328664f66faf83432c4f7aa8e55a7cfdc5",
-                "sha256:d7558f09801ee53e0ea40eabe8d7d79cbe5b0f8a72871f1d5ae8162004011913"
+                "sha256:2ca3a646eeea448961bce3ba32de21c0b472e156e1f16b7592d6659befc0bc70",
+                "sha256:56f5c625af5f461164a3613167daa0acf1b2d006a928e491317b131fbe9c2a98"
             ],
             "index": "pypi",
-            "version": "==6.7.1"
+            "version": "==6.8.1"
         }
     }
 }
