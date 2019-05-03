@@ -8,6 +8,35 @@ from edifact.incoming.models.interchange import InterchangeHeader
 
 class TestMessage(unittest.TestCase):
 
+    def test_get_value_in_dict(self):
+        with self.subTest("When there are no duplicate keys in the dictionary"):
+            expected = "VALUE+CCC"
+
+            dict_to_search = [
+                ("AAA", "VALUE+AAA"),
+                ("BBB", "VALUE+BBB"),
+                ("CCC", "VALUE+CCC"),
+                ("DDD", "VALUE+DDD")
+            ]
+            key_to_find = "CCC"
+            result = creators.get_value_in_dict(dict_to_search, key_to_find)
+
+            self.assertEqual(result, expected)
+
+        with self.subTest("When there are duplicate keys in the dictionary returns the value of the first find"):
+            expected = "VALUE+BBB"
+
+            dict_with_duplicate_keys = [
+                ("AAA", "VALUE+AAA"),
+                ("BBB", "VALUE+BBB"),
+                ("CCC", "VALUE+CCC"),
+                ("BBB", "VALUE+BBB+1")
+            ]
+            key_to_find = "BBB"
+            result = creators.get_value_in_dict(dict_with_duplicate_keys, key_to_find)
+
+            self.assertEqual(result, expected)
+
     def test_create_interchange_header(self):
         expected = InterchangeHeader("SO01", "ROO5", "190429:1756")
 

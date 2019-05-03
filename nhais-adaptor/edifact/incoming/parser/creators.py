@@ -3,6 +3,17 @@ from edifact.incoming.models.message import MessageSegmentRegistrationDetails, M
     MessageSegmentPatientDetails
 
 
+def get_value_in_dict(dict_to_search, key_to_find):
+    """
+    Extract the value segment out of the dictionary provided based upon the key. Will return the first result
+    :param dict_to_search: The dictionary of key value pairs. (This is a list of tuples so need to loop through the dict)
+    :param key_to_find: The key to find within the dict.
+    :return: The Value as a string
+    """
+    value = [value for key, value in dict_to_search if key == key_to_find][0]
+    return value
+
+
 def create_interchange_header(interchange_header_dict):
     """
     Creates an incoming interchange header from the interchange header dictionary
@@ -28,7 +39,7 @@ def create_message_segment_beginning(message_beginning_dict):
     message beginning section BGM
     :return: MessageSegmentBeginningDetails: The incoming representation of the edifact message beginning details
     """
-    reference_segment = [value for key, value in message_beginning_dict if key == "RFF"][0]
+    reference_segment = get_value_in_dict(dict_to_search=message_beginning_dict, key_to_find="RFF")
     reference_values = reference_segment.split(":")
     reference_number = reference_values[1]
     return MessageSegmentBeginningDetails(reference_number)
@@ -41,7 +52,7 @@ def create_message_segment_registration(message_registration_dict):
     message registration section S01
     :return: MessageSegmentRegistrationDetails: The incoming representation of the edifact message registration details
     """
-    transaction_segment = [value for key, value in message_registration_dict if key == "RFF"][0]
+    transaction_segment = get_value_in_dict(dict_to_search=message_registration_dict, key_to_find="RFF")
     transaction_values = transaction_segment.split(":")
     transaction_number = transaction_values[1]
     return MessageSegmentRegistrationDetails(transaction_number)
@@ -54,7 +65,7 @@ def create_message_segment_patient(message_patient_dict):
     message patient section S02
     :return: MessageSegmentRegistrationDetails: The incoming representation of the edifact message registration details
     """
-    patient_details_segment = [value for key, value in message_patient_dict if key == "PNA"][0]
+    patient_details_segment = get_value_in_dict(dict_to_search=message_patient_dict, key_to_find="PNA")
     patient_details_segment_values = patient_details_segment.replace(":", "+").split("+")
     nhs_number = patient_details_segment_values[1]
     return MessageSegmentPatientDetails(nhs_number)
