@@ -1,4 +1,4 @@
-class InterchangeHeader(object):
+class InterchangeHeader:
     """
     A representation of the incoming edifact interchange header
     """
@@ -14,7 +14,7 @@ class InterchangeHeader(object):
         self.date_time = date_time
 
 
-class Interchange(object):
+class Interchange:
     """
     A representation of the incoming edifact interchange
     """
