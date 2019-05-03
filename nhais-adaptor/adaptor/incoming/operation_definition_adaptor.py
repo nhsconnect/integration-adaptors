@@ -1,8 +1,8 @@
 from edifact.incoming.models.interchange import Interchange
-from edifact.incoming.models.message import MessageSegment
 from fhirclient.models.operationdefinition import OperationDefinition
 import adaptor.fhir_helpers.fhir_creators as creators
 from datetime import datetime
+from typing import List, Set
 
 
 def format_date_time(edifact_date_time):
@@ -12,23 +12,7 @@ def format_date_time(edifact_date_time):
     return formatted_date
 
 
-def extract_sender_value(interchange):
-    return interchange.header.sender
-
-
-def extract_recipient_value(interchange):
-    return interchange.header.recipient
-
-
-def extract_transaction_number(interchange):
-    return interchange.msgs[0].message_registration.transaction_number
-
-
-def extract_reference_number(message):
-    return message.message_beginning.reference_number
-
-
-def create_operation_definition(interchange: Interchange) -> OperationDefinition:
+def create_operation_definition(interchange: Interchange):
     """
     Create a fhir operation definition from the incoming interchange
     :param interchange: The incoming interchange
@@ -38,31 +22,32 @@ def create_operation_definition(interchange: Interchange) -> OperationDefinition
     response_dict = {
         "F4": {
             "name": "Response-RegisterPatient-Approval",
-            "code": "gpc.registerpatient.approval",
-            "parameters": {
-                "senderCypher": extract_sender_value,
-                "recipientCypher": extract_recipient_value,
-                "transactionNumber": extract_transaction_number
-            }
+            "code": "gpc.registerpatient.approval"
         }
     }
 
-    message: MessageSegment = interchange.msgs[0]
-
-    ref_number = extract_reference_number(message)
-
+    sender = interchange.header.sender
+    recipient = interchange.header.recipient
     formatted_date_time = format_date_time(interchange.header.date_time)
+    messages = interchange.msgs
 
-    parameters = []
-    for (key, extract_fn) in response_dict[ref_number]["parameters"].items():
-        extracted_value = extract_fn(interchange)
-        param = creators.create_parameter_with_binding(key, extracted_value, "out")
-        parameters.append(param)
+    op_defs = []
 
-    op_def = creators.create_operation_definition(name=response_dict[ref_number]["name"],
-                                                  code=response_dict[ref_number]["code"],
-                                                  date_time=formatted_date_time,
-                                                  contained=[],
-                                                  parameters=parameters)
+    for message in messages:
+        ref_number = message.message_beginning.reference_number
+        transaction_number = message.message_registration.transaction_number
 
-    return op_def
+        parameters = [
+            creators.create_parameter_with_binding("senderCypher", sender, "out"),
+            creators.create_parameter_with_binding("recipientCypher", recipient, "out"),
+            creators.create_parameter_with_binding("transactionNumber", transaction_number, "out")
+        ]
+
+        op_def = creators.create_operation_definition(name=response_dict[ref_number]["name"],
+                                                      code=response_dict[ref_number]["code"],
+                                                      date_time=formatted_date_time,
+                                                      contained=[],
+                                                      parameters=parameters)
+        op_defs.append((transaction_number, op_def))
+
+    return op_defs

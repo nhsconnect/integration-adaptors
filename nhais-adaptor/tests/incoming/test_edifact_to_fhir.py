@@ -23,7 +23,7 @@ class TestEdifactToFhirIntegration(unittest.TestCase):
         lines = incoming_interchange_raw.split("'\n")
         interchange = deserialiser.convert(lines)
 
-        op_def = adaptor.create_operation_definition(interchange)
-        pretty_op_def = op_def.as_json()
+        op_defs = adaptor.create_operation_definition(interchange)
+        pretty_op_def = op_defs[0][1].as_json()
 
         compare(pretty_op_def, patient_register_approval_json)
