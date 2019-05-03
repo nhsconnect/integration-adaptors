@@ -1,12 +1,9 @@
 from unittest import TestCase
 from unittest.mock import Mock, sentinel
 
-from mhs.sender.sender import Sender
+from mhs.sender.sender import Sender, WRAPPER_REQUIRED, FROM_PARTY_ID, MESSAGE
 
-WRAPPER_REQUIRED = "ebxml_wrapper_required"
-FROM_PARTY_ID = "from_party_id"
 EXPECTED_PARTY_ID = "A91424-9199121"
-MESSAGE = "hl7_message"
 
 
 class TestSender(TestCase):
