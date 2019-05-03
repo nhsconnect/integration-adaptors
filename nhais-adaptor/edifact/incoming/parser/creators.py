@@ -1,9 +1,10 @@
 from edifact.incoming.models.interchange import InterchangeHeader
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
     MessageSegmentPatientDetails
+from edifact.incoming.parser.deserialiser import EdifactDict
 
 
-def get_value_in_dict(dict_to_search, key_to_find):
+def get_value_in_dict(dict_to_search: EdifactDict, key_to_find):
     """
     Extract the value segment out of the dictionary provided based upon the key. Will return the first result
     :param dict_to_search: The dictionary of key value pairs. (This is a list of tuples so need to loop through the dict)
@@ -14,7 +15,7 @@ def get_value_in_dict(dict_to_search, key_to_find):
     return value
 
 
-def create_interchange_header(interchange_header_dict):
+def create_interchange_header(interchange_header_dict: EdifactDict):
     """
     Creates an incoming interchange header from the interchange header dictionary
     Since the interchange header details are all in the one line we extract the details
@@ -32,7 +33,7 @@ def create_interchange_header(interchange_header_dict):
     return InterchangeHeader(sender, recipient, date_time)
 
 
-def create_message_segment_beginning(message_beginning_dict):
+def create_message_segment_beginning(message_beginning_dict: EdifactDict):
     """
     Creates an incoming message beginning from the message beginning dictionary
     :param message_beginning_dict: The dictionary will contain a list of lines relevant to the
@@ -45,7 +46,7 @@ def create_message_segment_beginning(message_beginning_dict):
     return MessageSegmentBeginningDetails(reference_number)
 
 
-def create_message_segment_registration(message_registration_dict):
+def create_message_segment_registration(message_registration_dict: EdifactDict):
     """
     Creates an incoming message registration from the message registration dictionary
     :param message_registration_dict: The dictionary will contain a list of lines relevant to the
@@ -58,7 +59,7 @@ def create_message_segment_registration(message_registration_dict):
     return MessageSegmentRegistrationDetails(transaction_number)
 
 
-def create_message_segment_patient(message_patient_dict):
+def create_message_segment_patient(message_patient_dict: EdifactDict):
     """
     Creates an incoming message patient from the message message patient dictionary
     :param message_patient_dict: The dictionary will contain a list of lines relevant to the

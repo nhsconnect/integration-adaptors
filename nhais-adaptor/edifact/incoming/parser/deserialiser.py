@@ -1,6 +1,7 @@
 import edifact.incoming.parser.creators as creators
 from edifact.incoming.models.message import MessageSegment
 from edifact.incoming.models.interchange import Interchange
+from typing import NewType, List, Tuple
 
 INTERCHANGE_HEADER_KEY = "UNB"
 MESSAGE_HEADER_KEY = "UNH"
@@ -10,8 +11,10 @@ MESSAGE_PATIENT_KEY = "S02"
 MESSAGE_TRAILER_KEY = "UNT"
 INTERCHANGE_TRAILER_KEY = "UNZ"
 
+EdifactDict = NewType("EdifactDict", List[Tuple[str, str]])
 
-def extract_relevant_lines(original_dict, starting_pos, trigger_key):
+
+def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key):
     """
     From the original dict generate a smaller dict just containing the relevant lines based upon the trigger key
     will keep looping till the terminating key is found in the terminating config
@@ -39,14 +42,14 @@ def extract_relevant_lines(original_dict, starting_pos, trigger_key):
     return new_dict
 
 
-def convert_to_dict(lines):
+def convert_to_dict(lines) -> EdifactDict:
     """
     Takes the list of original edifact lines and converts to a dict
     :param lines: a list of string of the original edifact lines
-    :return: A list of Tuple with the extracted key and value. Since the keys in the edifact interchange can
+    :return: A list of Tuple (EdifactDict) with the extracted key and value. Since the keys in the edifact interchange can
     contain duplicates a tuple is required here rather than a set
     """
-    generated_dict = []
+    generated_dict = EdifactDict([])
 
     for line in lines:
         key_value = line.split("+", 1)
@@ -74,19 +77,19 @@ def convert(lines):
         key = line[0]
 
         if key == INTERCHANGE_HEADER_KEY:
-            interchange_header_line = extract_relevant_lines(original_dict, index, key)
+            interchange_header_line = EdifactDict(extract_relevant_lines(original_dict, index, key))
             interchange_header = creators.create_interchange_header(interchange_header_line)
 
         elif key == MESSAGE_BEGINNING_KEY:
-            msg_bgn_lines = extract_relevant_lines(original_dict, index, key)
+            msg_bgn_lines = EdifactDict(extract_relevant_lines(original_dict, index, key))
             msg_bgn_details = creators.create_message_segment_beginning(msg_bgn_lines)
 
         elif key == MESSAGE_REGISTRATION_KEY:
-            msg_reg_lines = extract_relevant_lines(original_dict, index, key)
+            msg_reg_lines = EdifactDict(extract_relevant_lines(original_dict, index, key))
             msg_reg_details = creators.create_message_segment_registration(msg_reg_lines)
 
         elif key == MESSAGE_PATIENT_KEY:
-            msg_pat_lines = extract_relevant_lines(original_dict, index, key)
+            msg_pat_lines = EdifactDict(extract_relevant_lines(original_dict, index, key))
             msg_pat_details = creators.create_message_segment_patient(msg_pat_lines)
 
         elif key == MESSAGE_TRAILER_KEY:
