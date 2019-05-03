@@ -2,10 +2,14 @@ from edifact.incoming.models.interchange import Interchange
 from edifact.incoming.models.message import MessageSegment
 from fhirclient.models.operationdefinition import OperationDefinition
 import adaptor.fhir_helpers.fhir_creators as creators
+from datetime import datetime
 
 
 def format_date_time(edifact_date_time):
-    return "2019-04-29 17:56"
+    current_format = "%y%m%d:%H%M"
+    desired_format = "%Y-%m-%d %H:%M"
+    formatted_date = datetime.strptime(edifact_date_time, current_format).strftime(desired_format)
+    return formatted_date
 
 
 def extract_sender_value(interchange):

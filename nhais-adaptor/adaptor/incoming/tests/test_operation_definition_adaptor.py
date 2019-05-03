@@ -17,8 +17,10 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
         Tests the function to create a fhir operation definition from an incoming edifact interchange
         """
         sender_parameter = creators.create_parameter_with_binding(name="senderCypher", value="XX11", direction="out")
-        recipient_parameter = creators.create_parameter_with_binding(name="recipientCypher", value="TES5", direction="out")
-        transaction_parameter = creators.create_parameter_with_binding(name="transactionNumber", value="17", direction="out")
+        recipient_parameter = creators.create_parameter_with_binding(name="recipientCypher", value="TES5",
+                                                                     direction="out")
+        transaction_parameter = creators.create_parameter_with_binding(name="transactionNumber", value="17",
+                                                                       direction="out")
         expected = creators.create_operation_definition(name="Response-RegisterPatient-Approval",
                                                         code="gpc.registerpatient.approval",
                                                         date_time="2019-04-29 17:56",
