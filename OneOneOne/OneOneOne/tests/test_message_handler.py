@@ -16,12 +16,12 @@ class MessageHandlerTest(unittest.TestCase):
     <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsa="http://www.w3.org/2005/08/addressing"
                    xmlns:itk="urn:nhs-itk:ns:201005">
         <soap:Header>
-            <wsa:Action>urn:nhs-itk:services:201005:SendNHS111Report-v2-0</wsa:Action>
+            <wsa:Action>urn:nhs-itk:services:201005:SendNHS111Report-v2-0-ThisDoesNotMatchBelow</wsa:Action>
         </soap:Header>
         <soap:Body>
             <itk:DistributionEnvelope
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                <itk:header service="urn:nhs-itk:services:201005:SendNHS111Report-v2-0_Bad_Service"
+                <itk:header service="urn:nhs-itk:services:201005:SendNHS111Report-v2-0_Bad_Service-ThisDoesNotMatchAbove"
                             trackingid="7D6F23E0-AE1A-11DB-9808-B18E1E0994CD">        
                 </itk:header>
             </itk:DistributionEnvelope>
@@ -38,3 +38,7 @@ class MessageHandlerTest(unittest.TestCase):
         expected = FileUtilities.get_file_string(str(self.xmlFileDir / 'invalid_action_service_values_response.xml'))
 
         XmlUtilities.assert_xml_equal_utf_8(expected, response)
+
+    def test_action_does_match_service(self):
+        pass
+
