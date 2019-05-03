@@ -1,4 +1,4 @@
-class MessageSegmentPatientDetails(object):
+class MessageSegmentPatientDetails:
     """
     A representation of the incoming edifact patient details contained in a message
     """
@@ -11,7 +11,7 @@ class MessageSegmentPatientDetails(object):
         self.nhs_number = nhs_number
 
 
-class MessageSegmentRegistrationDetails(object):
+class MessageSegmentRegistrationDetails:
     """
     A representation of the incoming edifact registration details contained in a message
     """
@@ -24,7 +24,7 @@ class MessageSegmentRegistrationDetails(object):
         self.transaction_number = transaction_number
 
 
-class MessageSegmentBeginningDetails(object):
+class MessageSegmentBeginningDetails:
     """
     A representation of the incoming edifact message beginning details contained in a message
     """
@@ -37,7 +37,7 @@ class MessageSegmentBeginningDetails(object):
         self.reference_number = reference_number
 
 
-class MessageSegment(object):
+class MessageSegment:
     """
     A representation of the incoming edifact message
     """

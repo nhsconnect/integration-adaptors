@@ -17,13 +17,13 @@ EdifactDict = NewType("EdifactDict", List[Tuple[str, str]])
 def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key) -> EdifactDict:
     """
     From the original dict generate a smaller dict just containing the relevant lines based upon the trigger key
-    will keep looping till the terminating key is found in the terminating config
-    :param original_dict: The original larger dictionary
+    will keep looping till the terminating key is found in the terminating config.
+    :param original_dict: The original larger dictionary.
     :param starting_pos: The starting position to start the loop from.
-    This is to prevent starting the loop from the start each time and be slightly more efficient
+    This is to prevent starting the loop from the start each time and be slightly more efficient.
     :param trigger_key: The trigger key for this section that will be used to find what the
-    terminating key for the section is
-    :return: A smaller dictionary with just the relevant lines for the section
+    terminating key for the section is.
+    :return: A smaller dictionary with just the relevant lines for the section.
     """
     terminating_config = {
         INTERCHANGE_HEADER_KEY: [MESSAGE_HEADER_KEY],
@@ -44,10 +44,10 @@ def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key
 
 def convert_to_dict(lines) -> EdifactDict:
     """
-    Takes the list of original edifact lines and converts to a dict
-    :param lines: a list of string of the original edifact lines
+    Takes the list of original edifact lines and converts to a dict.
+    :param lines: a list of string of the original edifact lines.
     :return: A list of Tuple (EdifactDict) with the extracted key and value. Since the keys in the edifact interchange can
-    contain duplicates a tuple is required here rather than a set
+    contain duplicates a tuple is required here rather than a set.
     """
     generated_dict = EdifactDict([])
 
@@ -61,9 +61,9 @@ def convert_to_dict(lines) -> EdifactDict:
 def convert(lines):
     """
     Takes the original list of edifact lines and converts to a deserialised representation.
-    Only relevant information from the edifact message is extracted and populated in the models
-    :param lines: A list of string of the edifact lines
-    :return: Interchange: The incoming representation of the edifact interchange
+    Only relevant information from the edifact message is extracted and populated in the models.
+    :param lines: A list of string of the edifact lines.
+    :return: Interchange: The incoming representation of the edifact interchange.
     """
     original_dict = convert_to_dict(lines)
     messages = []
