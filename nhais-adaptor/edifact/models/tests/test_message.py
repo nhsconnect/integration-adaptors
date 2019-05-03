@@ -6,7 +6,7 @@ from edifact.models.name import Name
 from edifact.models.address import Address
 
 
-class MessageHeaderTest(unittest.TestCase):
+class TestMessageHeader(unittest.TestCase):
     """
     Test the generating of a message header
     """
@@ -16,7 +16,7 @@ class MessageHeaderTest(unittest.TestCase):
         self.assertEqual(msg_hdr, "UNH+00001+FHSREG:0:1:FH:FHS001'")
 
 
-class MessageTrailerTest(unittest.TestCase):
+class TestMessageTrailer(unittest.TestCase):
     """
     Test the generating of a message trailer
     """
@@ -26,7 +26,7 @@ class MessageTrailerTest(unittest.TestCase):
         self.assertEqual(msg_trl, "UNT+5+00001'")
 
 
-class MessageBeginningTest(unittest.TestCase):
+class TestMessageBeginning(unittest.TestCase):
     """
     Test the generating of a message beginning
     """
@@ -37,7 +37,7 @@ class MessageBeginningTest(unittest.TestCase):
         self.assertEqual(msg_bgn, expected_edifact_message)
 
 
-class MessageSegmentRegistrationDetailsTest(unittest.TestCase):
+class TestMessageSegmentRegistrationDetails(unittest.TestCase):
     """
     Test the generating of a message segment of registration information
     """
@@ -60,7 +60,7 @@ class MessageSegmentRegistrationDetailsTest(unittest.TestCase):
         self.assertEqual(msg_seg_reg_details, expected_edifact_message)
 
 
-class MessageSegmentPatientDetailsTest(unittest.TestCase):
+class TestMessageSegmentPatientDetails(unittest.TestCase):
     """
     Test the generating of a message segment trigger 2
     """
@@ -83,7 +83,7 @@ class MessageSegmentPatientDetailsTest(unittest.TestCase):
         self.assertEqual(msg_seg_pat_details, expected_edifact_message)
 
 
-class MessageTest(unittest.TestCase):
+class TestMessage(unittest.TestCase):
     """
     Test the generating of a message
     """
@@ -127,7 +127,3 @@ class MessageTest(unittest.TestCase):
                       message_segment_registration_details=msg_seg_reg_details,
                       message_segment_patient_details=msg_seg_pat_details).to_edifact()
         self.assertEqual(msg, expected_edifact_message)
-
-
-if __name__ == '__main__':
-    unittest.main()

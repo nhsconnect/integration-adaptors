@@ -6,7 +6,7 @@ from edifact.models.name import Name
 from edifact.models.address import Address
 
 
-class InterchangeHeaderTest(unittest.TestCase):
+class TestInterchangeHeader(unittest.TestCase):
     """
     Test the generating of an interchange header
     """
@@ -17,7 +17,7 @@ class InterchangeHeaderTest(unittest.TestCase):
         self.assertEqual(int_hdr, "UNB+UNOA:2+SNDR+RECP+190423:0900+00001++FHSREG'")
 
 
-class InterchangeTrailerTest(unittest.TestCase):
+class TestInterchangeTrailer(unittest.TestCase):
     """
     Test the generating of an interchange trailer
     """
@@ -27,7 +27,7 @@ class InterchangeTrailerTest(unittest.TestCase):
         self.assertEqual(int_trl, "UNZ+1+00001'")
 
 
-class InterchangeTest(unittest.TestCase):
+class TestInterchange(unittest.TestCase):
     """
     Test the generating of edifact interchange
     """
@@ -80,7 +80,3 @@ class InterchangeTest(unittest.TestCase):
         interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",
                                   messages=msgs).to_edifact()
         self.assertEqual(interchange, expected_edifact_interchange)
-
-
-if __name__ == '__main__':
-    unittest.main()
