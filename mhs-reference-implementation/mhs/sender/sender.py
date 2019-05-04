@@ -1,10 +1,11 @@
 import copy
 
+from mhs.builder.ebxml_message_builder import FROM_PARTY_ID
+from mhs.builder.ebxml_request_message_builder import MESSAGE
+
 PARTY_ID = "A91424-9199121"
 
 WRAPPER_REQUIRED = 'ebxml_wrapper_required'
-FROM_PARTY_ID = "from_party_id"
-MESSAGE = "hl7_message"
 
 
 class Sender:

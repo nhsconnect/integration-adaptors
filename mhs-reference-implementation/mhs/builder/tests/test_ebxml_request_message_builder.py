@@ -3,7 +3,9 @@ from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch
 
-from mhs.builder.ebxml_request_message_builder import EbXmlRequestMessageBuilder
+from mhs.builder.ebxml_message_builder import FROM_PARTY_ID, TO_PARTY_ID, CPA_ID, CONVERSATION_ID
+from mhs.builder.ebxml_request_message_builder import EbXmlRequestMessageBuilder, MESSAGE, SERVICE, ACTION, \
+    DUPLICATE_ELIMINATION, ACK_REQUESTED, ACK_SOAP_ACTOR, SYNC_REPLY
 from utilities.file_utilities import FileUtilities
 from utilities.message_utilities import MessageUtilities
 
@@ -26,16 +28,17 @@ class TestEbXmlRequestMessageBuilder(TestCase):
         expected_message = FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
 
         message = self.builder.build_message({
-            "from_party_id": "TESTGEN-201324",
-            "to_party_id": "YEA-0000806",
-            "cpa_id": "S1001A1630",
-            "service": "urn:nhs:names:services:pdsquery",
-            "action": "QUPA_IN000006UK02",
-            "duplicate_elimination": True,
-            "ack_requested": True,
-            "ack_soap_actor": "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-            "sync_reply": True,
-            "hl7_message": '<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>'
+            FROM_PARTY_ID: "TESTGEN-201324",
+            TO_PARTY_ID: "YEA-0000806",
+            CPA_ID: "S1001A1630",
+            CONVERSATION_ID: "79F49A34-9798-404C-AEC4-FD38DD81C138",
+            SERVICE: "urn:nhs:names:services:pdsquery",
+            ACTION: "QUPA_IN000006UK02",
+            DUPLICATE_ELIMINATION: True,
+            ACK_REQUESTED: True,
+            ACK_SOAP_ACTOR: "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
+            SYNC_REPLY: True,
+            MESSAGE: '<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>'
         })
 
         # Pystache does not convert line endings to LF in the same way as Python does when loading the example from

@@ -7,6 +7,9 @@ from utilities.message_utilities import MessageUtilities
 
 TEMPLATES_DIR = "data/templates"
 
+FROM_PARTY_ID = "from_party_id"
+TO_PARTY_ID = "to_party_id"
+CPA_ID = "cpa_id"
 CONVERSATION_ID = 'conversation_id'
 MESSAGE_ID = 'message_id'
 TIMESTAMP = 'timestamp'

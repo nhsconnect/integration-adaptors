@@ -3,7 +3,9 @@ from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch
 
-from mhs.builder.ebxml_ack_message_builder import EbXmlAckMessageBuilder
+from mhs.builder.ebxml_ack_message_builder import EbXmlAckMessageBuilder, RECEIVED_MESSAGE_TIMESTAMP, \
+    RECEIVED_MESSAGE_ID
+from mhs.builder.ebxml_message_builder import FROM_PARTY_ID, TO_PARTY_ID, CPA_ID, CONVERSATION_ID
 from utilities.file_utilities import FileUtilities
 from utilities.message_utilities import MessageUtilities
 
@@ -26,11 +28,12 @@ class TestEbXmlAckMessageBuilder(TestCase):
         expected_message = FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
 
         message = self.builder.build_message({
-            "from_party_id": "TESTGEN-201324",
-            "to_party_id": "YEA-0000806",
-            "cpa_id": "S1001A1630",
-            "received_message_timestamp": "2013-04-16T07:52:09Z",
-            "received_message_id": "0CDBA95F-74DA-47E9-8383-7B8E9167D146",
+            FROM_PARTY_ID: "TESTGEN-201324",
+            TO_PARTY_ID: "YEA-0000806",
+            CPA_ID: "S1001A1630",
+            CONVERSATION_ID: "79F49A34-9798-404C-AEC4-FD38DD81C138",
+            RECEIVED_MESSAGE_TIMESTAMP: "2013-04-16T07:52:09Z",
+            RECEIVED_MESSAGE_ID: "0CDBA95F-74DA-47E9-8383-7B8E9167D146",
         })
 
         # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
