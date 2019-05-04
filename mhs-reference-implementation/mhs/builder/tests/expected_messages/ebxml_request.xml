@@ -14,11 +14,11 @@ Content-Transfer-Encoding: 8bit
 			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YEA-0000806</eb:PartyId>
 		</eb:To>
 		<eb:CPAId>S1001A1630</eb:CPAId>
-		<eb:ConversationId>54DE3828-6062-11E9-A444-0050562EB96B</eb:ConversationId>
+		<eb:ConversationId>5BB171D4-53B2-4986-90CF-428BE6D157F5</eb:ConversationId>
 		<eb:Service>urn:nhs:names:services:pdsquery</eb:Service>
 		<eb:Action>QUPA_IN000006UK02</eb:Action>
 		<eb:MessageData>
-			<eb:MessageId>54DE3828-6062-11E9-A444-0050562EB96B</eb:MessageId>
+			<eb:MessageId>5BB171D4-53B2-4986-90CF-428BE6D157F5</eb:MessageId>
 			<eb:Timestamp>2012-03-15T06:51:08Z</eb:Timestamp>
 		</eb:MessageData>
         <eb:DuplicateElimination/>
@@ -28,7 +28,7 @@ Content-Transfer-Encoding: 8bit
 </SOAP:Header>
 <SOAP:Body>
 	<eb:Manifest SOAP:mustUnderstand="1" eb:version="2.0">
-		<eb:Reference xlink:href="cid:54DE3828-6062-11E9-A444-0050562EB96B@spine.nhs.uk">
+		<eb:Reference xlink:href="cid:5BB171D4-53B2-4986-90CF-428BE6D157F5@spine.nhs.uk">
 			<eb:Schema eb:location="http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd" eb:version="1.0"/>
 			<eb:Description xml:lang="en">HL7 payload</eb:Description>
 			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
@@ -38,7 +38,7 @@ Content-Transfer-Encoding: 8bit
 </SOAP:Envelope>
 
 ----=_MIME-Boundary
-Content-Id: <54DE3828-6062-11E9-A444-0050562EB96B@spine.nhs.uk>
+Content-Id: <5BB171D4-53B2-4986-90CF-428BE6D157F5@spine.nhs.uk>
 Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 

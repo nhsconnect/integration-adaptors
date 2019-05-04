@@ -18,7 +18,7 @@ Content-Transfer-Encoding: 8bit
 		<eb:Service>{{service}}</eb:Service>
 		<eb:Action>{{action}}</eb:Action>
 		<eb:MessageData>
-			<eb:MessageId>{{message_GUID}}</eb:MessageId>
+			<eb:MessageId>{{message_id}}</eb:MessageId>
 			<eb:Timestamp>{{timestamp}}</eb:Timestamp>
 		</eb:MessageData>
         {{#duplicate_elimination}}
@@ -34,7 +34,7 @@ Content-Transfer-Encoding: 8bit
 </SOAP:Header>
 <SOAP:Body>
 	<eb:Manifest SOAP:mustUnderstand="1" eb:version="2.0">
-		<eb:Reference xlink:href="cid:{{message_GUID}}@spine.nhs.uk">
+		<eb:Reference xlink:href="cid:{{message_id}}@spine.nhs.uk">
 			<eb:Schema eb:location="http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd" eb:version="1.0"/>
 			<eb:Description xml:lang="en">HL7 payload</eb:Description>
 			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
@@ -44,7 +44,7 @@ Content-Transfer-Encoding: 8bit
 </SOAP:Envelope>
 
 ----=_MIME-Boundary
-Content-Id: <{{message_GUID}}@spine.nhs.uk>
+Content-Id: <{{message_id}}@spine.nhs.uk>
 Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
