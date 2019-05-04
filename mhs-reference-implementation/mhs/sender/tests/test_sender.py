@@ -1,7 +1,10 @@
 from unittest import TestCase
-from unittest.mock import Mock, sentinel
+from unittest.mock import Mock, sentinel, patch
 
-from mhs.sender.sender import Sender, WRAPPER_REQUIRED, FROM_PARTY_ID, MESSAGE
+from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
+from mhs.builder.ebxml_request_message_builder import MESSAGE
+from mhs.sender.sender import Sender, WRAPPER_REQUIRED
+from utilities.message_utilities import MessageUtilities
 
 EXPECTED_PARTY_ID = "A91424-9199121"
 
@@ -14,11 +17,15 @@ class TestSender(TestCase):
 
         self.sender = Sender(self.mock_interactions_config, self.mock_message_builder, self.mock_transport)
 
-    def test_send_message_with_ebxml_wrapper(self):
+    @patch.object(MessageUtilities, "get_uuid")
+    def test_send_message_with_ebxml_wrapper(self, mock_get_uuid):
+        fixed_uuid = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+        mock_get_uuid.return_value = fixed_uuid
         interaction_details = {WRAPPER_REQUIRED: True}
         expected_context = {
             WRAPPER_REQUIRED: True,
             FROM_PARTY_ID: EXPECTED_PARTY_ID,
+            CONVERSATION_ID: fixed_uuid,
             MESSAGE: sentinel.message
         }
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details

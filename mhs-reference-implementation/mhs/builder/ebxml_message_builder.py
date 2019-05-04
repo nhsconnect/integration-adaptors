@@ -35,7 +35,6 @@ class EbXmlMessageBuilder(PystacheMessageBuilder):
         """
         ebxml_message_dictionary = copy.deepcopy(message_dictionary)
 
-        ebxml_message_dictionary[CONVERSATION_ID] = MessageUtilities.get_uuid()
         ebxml_message_dictionary[MESSAGE_ID] = MessageUtilities.get_uuid()
         ebxml_message_dictionary[TIMESTAMP] = MessageUtilities.get_timestamp()
 
