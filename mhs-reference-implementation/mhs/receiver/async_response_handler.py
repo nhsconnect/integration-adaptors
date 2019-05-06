@@ -5,24 +5,23 @@ import mhs.builder.ebxml_message_builder as builder
 import mhs.parser.ebxml_message_parser as parser
 from mhs.sender.sender import PARTY_ID
 
-MESSAGE_PARSER = "message_parser"
-ACK_BUILDER = "ack_builder"
-CALLBACKS = "callbacks"
 
-
-class AsyncResponseReceiver(RequestHandler):
+class AsyncResponseHandler(RequestHandler):
     """A RequestHandler for asynchronous responses from a remote MHS."""
 
-    def initialize(self, initialisation_dict):
-        """Initialise this request handler with the provided dictionary of initialisation arguments.
+    def initialize(self, ack_builder, message_parser):
+        """Initialise this request handler with the provided dependencies.
 
-        :param initialisation_dict: A dictionary of initialisation arguments.
+        :param ack_builder: The message builder to use when building ebXML acknowledgement messages.
+        :param message_parser: The message parser to use to parse ebXML asynchronous responses.
+        :return:
         """
-        self.ack_builder = initialisation_dict[ACK_BUILDER]
-        self.message_parser = initialisation_dict[MESSAGE_PARSER]
+        self.ack_builder = ack_builder
+        self.message_parser = message_parser
 
     def post(self):
         print(f"POST received: {self.request}")
+        print(f"Body: {self.request.body}")
 
         parsed_message = self.message_parser.parse_message(self.request.body)
 
