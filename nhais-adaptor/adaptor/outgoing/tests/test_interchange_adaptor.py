@@ -51,6 +51,6 @@ class TestInterchangeAdaptor(unittest.TestCase):
 
             op_def = fixtures.create_operation_definition_for_birth_registration()
 
-            interchange = adaptor.create_interchange(fhir_operation=op_def)
+            (sender, recipient, interchange_seq_no, interchange) = adaptor.create_interchange(fhir_operation=op_def)
 
             compare(interchange, expected_edifact_interchange)

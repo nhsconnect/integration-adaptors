@@ -19,7 +19,7 @@ class TestFhirToEdifactIntegration(unittest.TestCase):
         with open("./tests/outgoing/patient-register-birth.json", "r") as patient_register:
             patient_register_json = json.load(patient_register)
         op_def = OperationDefinition(patient_register_json)
-        edifact_interchange = adaptor.create_interchange(fhir_operation=op_def)
+        (sender, recipient, interchange_seq_no, edifact_interchange) = adaptor.create_interchange(fhir_operation=op_def)
         pretty_edifact_interchange = "'\n".join(edifact_interchange.split("'"))
 
         self.assertEqual(pretty_edifact_interchange, expected_edifact_interchange)

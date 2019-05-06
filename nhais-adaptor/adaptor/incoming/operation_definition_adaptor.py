@@ -1,8 +1,6 @@
 from edifact.incoming.models.interchange import Interchange
-from fhirclient.models.operationdefinition import OperationDefinition
 import adaptor.fhir_helpers.fhir_creators as creators
 from datetime import datetime
-from typing import List, Set
 
 
 def format_date_time(edifact_date_time):

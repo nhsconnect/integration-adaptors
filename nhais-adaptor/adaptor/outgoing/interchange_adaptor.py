@@ -44,6 +44,6 @@ def create_interchange(fhir_operation):
                               sequence_number=interchange_sequence_number,
                               date_time=fhir_operation.date.as_json(), messages=messages)
 
-    edifact_interchange = interchange.to_edifact()
+    edifact_interchange = (sender_cypher, recipient, interchange_sequence_number, interchange.to_edifact())
 
     return edifact_interchange

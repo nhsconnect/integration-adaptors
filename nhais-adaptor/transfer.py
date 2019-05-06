@@ -7,9 +7,9 @@ with open("./mailbox/GP/TES5/outbox/patient-register-birth.json", "r") as patien
 
 op_def = OperationDefinition(patient_register_json)
 
-edifact_interchange = adaptor.create_interchange(fhir_operation=op_def)
+(sender, recipient, interchange_seq_no, edifact_interchange) = adaptor.create_interchange(fhir_operation=op_def)
 
-edifact_file = open("./mailbox/NHAIS/XX11/inbox/edifact.txt", "w")
+edifact_file = open(f"./mailbox/NHAIS/{recipient}/inbox/{sender}-{interchange_seq_no}.txt", "w")
 
 pretty_edifact_interchange = "'\n".join(edifact_interchange.split("'"))
 
