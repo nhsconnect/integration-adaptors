@@ -1,7 +1,6 @@
 import unittest
-from edifact.outgoing.models.message import MessageHeader, MessageBeginning, MessageSegmentRegistrationDetails, \
-    MessageSegmentPatientDetails, \
-    MessageTrailer, Message
+from edifact.outgoing.models.message import MessageHeader, MessageBeginning, MessageSegmentBirthRegistrationDetails, \
+    MessageSegmentPatientDetails, MessageSegmentDeathRegistrationDetails, MessageTrailer, Message
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address
 
@@ -43,21 +42,36 @@ class TestMessageSegmentRegistrationDetails(unittest.TestCase):
     """
 
     def test_message_segment_registration_details_to_edifact(self):
-        expected_edifact_message = ("S01+1'"
-                                    "RFF+TN:17'"
-                                    "NAD+GP+4826940,281:900'"
-                                    "HEA+ACD+A:ZZZ'"
-                                    "HEA+ATP+1:ZZZ'"
-                                    "DTM+956:20190423:102'"
-                                    "LOC+950+BURY'")
+        with self.subTest("For birth registrations"):
+            expected_edifact_message = ("S01+1'"
+                                        "RFF+TN:17'"
+                                        "NAD+GP+4826940,281:900'"
+                                        "HEA+ACD+A:ZZZ'"
+                                        "HEA+ATP+1:ZZZ'"
+                                        "DTM+956:20190423:102'"
+                                        "LOC+950+BURY'")
 
-        msg_seg_reg_details = MessageSegmentRegistrationDetails(transaction_number=17,
-                                                                party_id="4826940,281",
-                                                                acceptance_code="A",
-                                                                acceptance_type="1",
-                                                                date_time="2019-04-23 09:00:04.159338",
-                                                                location="Bury").to_edifact()
-        self.assertEqual(msg_seg_reg_details, expected_edifact_message)
+            msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17,
+                                                                         party_id="4826940,281",
+                                                                         acceptance_code="A",
+                                                                         acceptance_type="1",
+                                                                         date_time="2019-04-23 09:00:04.159338",
+                                                                         location="Bury").to_edifact()
+            self.assertEqual(msg_seg_reg_details, expected_edifact_message)
+
+        with self.subTest("For death registrations"):
+            expected_edifact_message = ("S01+1'"
+                                        "RFF+TN:17'"
+                                        "NAD+GP+4826940,281:900'"
+                                        "GIS+1:ZZZ'"
+                                        "DTM+961:20190423:102'"
+                                        "FTX+RGI+++DIED IN INFINITY WARS'")
+
+            msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
+                                                                         party_id="4826940,281",
+                                                                         date_time="2019-04-23 09:00:04.159338",
+                                                                         free_text="Died in Infinity Wars").to_edifact()
+            self.assertEqual(msg_seg_reg_details, expected_edifact_message)
 
 
 class TestMessageSegmentPatientDetails(unittest.TestCase):
@@ -108,12 +122,12 @@ class TestMessage(unittest.TestCase):
                                     "NAD+PAT++MOORSIDE FARM:OLD LANE:ST PAULS CRAY:ORPINGTON:KENT+++++BR6 7EW'"
                                     "UNT+18+00001'")
         msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
-        msg_seg_reg_details = MessageSegmentRegistrationDetails(transaction_number=17,
-                                                                party_id="4826940,281",
-                                                                acceptance_code="A",
-                                                                acceptance_type="1",
-                                                                date_time="2019-04-23 09:00:04.159338",
-                                                                location="Bury")
+        msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17,
+                                                                     party_id="4826940,281",
+                                                                     acceptance_code="A",
+                                                                     acceptance_type="1",
+                                                                     date_time="2019-04-23 09:00:04.159338",
+                                                                     location="Bury")
         patient_name = Name(family_name="Stevens", first_given_forename="Charles", title="Mr", middle_name="Anthony",
                             third_given_forename="John")
         patient_address = Address(house_name="MOORSIDE FARM", address_line_1="OLD LANE",

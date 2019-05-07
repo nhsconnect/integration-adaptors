@@ -8,7 +8,7 @@ from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address as EdifactAddress
-from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, \
+from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentBirthRegistrationDetails, \
     MessageBeginning, Message
 
 
@@ -136,12 +136,12 @@ class TestMessageAdaptor(unittest.TestCase):
         """
 
         with self.subTest("Patient registration details for type birth"):
-            expected = MessageSegmentRegistrationDetails(transaction_number=17,
-                                                         party_id="4826940,281",
-                                                         acceptance_code="A",
-                                                         acceptance_type=1,
-                                                         date_time="2019-04-23 09:00:04.159338",
-                                                         location="Spidey Town")
+            expected = MessageSegmentBirthRegistrationDetails(transaction_number=17,
+                                                              party_id="4826940,281",
+                                                              acceptance_code="A",
+                                                              acceptance_type=1,
+                                                              date_time="2019-04-23 09:00:04.159338",
+                                                              location="Spidey Town")
 
             op_param_transaction_number = creators.create_parameter_with_binding(name=ParameterName.TRANSACTION_NO,
                                                                                  value="17")
@@ -191,12 +191,12 @@ class TestMessageAdaptor(unittest.TestCase):
             msg_seg_pat_details = MessageSegmentPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
                                                                date_of_birth="2019-04-20",
                                                                gender="1", address=edifact_pat_address)
-            msg_seg_reg_details = MessageSegmentRegistrationDetails(transaction_number=17,
-                                                                    party_id="4826940,281",
-                                                                    acceptance_code="A",
-                                                                    acceptance_type=1,
-                                                                    date_time="2019-04-23 09:00:04.159338",
-                                                                    location="Spidey Town")
+            msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17,
+                                                                         party_id="4826940,281",
+                                                                         acceptance_code="A",
+                                                                         acceptance_type=1,
+                                                                         date_time="2019-04-23 09:00:04.159338",
+                                                                         location="Spidey Town")
             expected = Message(sequence_number="000001", message_beginning=msg_bgn,
                                message_segment_registration_details=msg_seg_reg_details,
                                message_segment_patient_details=msg_seg_pat_details)

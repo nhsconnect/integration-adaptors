@@ -1,4 +1,4 @@
-from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, \
+from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentBirthRegistrationDetails, \
     MessageBeginning, \
     Message
 from edifact.outgoing.models.name import Name
@@ -93,7 +93,7 @@ def create_message_segment_patient_detail(fhir_operation):
 def create_message_segment_registration_details(fhir_operation):
     """
     Create the message segment registration details from the fhir operation
-    :return: MessageSegmentRegistrationDetails
+    :return: MessageSegmentBirthRegistrationDetails
     """
 
     transaction_number = finders.get_parameter_value(fhir_operation=fhir_operation,
@@ -109,12 +109,12 @@ def create_message_segment_registration_details(fhir_operation):
     patient_details = finders.find_resource(fhir_operation=fhir_operation, resource_type=ResourceType.PATIENT)
     birth_location = patient_details.extension[0].valueAddress.city
 
-    msg_seg_registration_details = MessageSegmentRegistrationDetails(transaction_number=transaction_number,
-                                                                     party_id=party_id,
-                                                                     acceptance_code=acceptance_code,
-                                                                     acceptance_type=acceptance_type,
-                                                                     date_time=fhir_operation.date.as_json(),
-                                                                     location=birth_location)
+    msg_seg_registration_details = MessageSegmentBirthRegistrationDetails(transaction_number=transaction_number,
+                                                                          party_id=party_id,
+                                                                          acceptance_code=acceptance_code,
+                                                                          acceptance_type=acceptance_type,
+                                                                          date_time=fhir_operation.date.as_json(),
+                                                                          location=birth_location)
     return msg_seg_registration_details
 
 
