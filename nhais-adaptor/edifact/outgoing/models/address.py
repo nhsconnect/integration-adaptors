@@ -1,4 +1,4 @@
-from edifact.models.segment import Segment
+from edifact.outgoing.models.segment import Segment
 
 
 class Address:
@@ -34,5 +34,6 @@ class PatientAddress(Segment):
         """
         :param address: The address details
         """
-        segment_value = f"PAT++{address.house_name}:{address.address_line_1}:{address.address_line_2}:{address.town}:{address.county}+++++{address.post_code}"
+        segment_value = f"PAT++{address.house_name}:{address.address_line_1}:{address.address_line_2}:" \
+            f"{address.town}:{address.county}+++++{address.post_code}"
         super().__init__(key=self.SEGMENT_KEY, value=segment_value)

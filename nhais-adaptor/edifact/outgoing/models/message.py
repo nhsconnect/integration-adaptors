@@ -1,7 +1,7 @@
-from edifact.models.segment import Segment, SegmentCollection
+from edifact.outgoing.models.segment import Segment, SegmentCollection
 import edifact.helpers.date_formatter as date_formatter
-from edifact.models.name import PatientName
-from edifact.models.address import PatientAddress
+from edifact.outgoing.models.name import PatientName
+from edifact.outgoing.models.address import PatientAddress
 
 
 class MessageHeader(Segment):
@@ -131,7 +131,7 @@ class Message(SegmentCollection):
         """
         msg_header = MessageHeader(sequence_number=sequence_number)
         number_of_segments = len(message_beginning) + len(message_segment_registration_details) + \
-                             len(message_segment_patient_details) + 2
+            len(message_segment_patient_details) + 2
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_registration_details,
                     message_segment_patient_details, msg_trailer]

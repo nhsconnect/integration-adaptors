@@ -1,9 +1,9 @@
 import unittest
-from edifact.models.message import MessageHeader, MessageBeginning, MessageSegmentRegistrationDetails, \
+from edifact.outgoing.models.message import MessageHeader, MessageBeginning, MessageSegmentRegistrationDetails, \
     MessageSegmentPatientDetails, \
     MessageTrailer, Message
-from edifact.models.name import Name
-from edifact.models.address import Address
+from edifact.outgoing.models.name import Name
+from edifact.outgoing.models.address import Address
 
 
 class TestMessageHeader(unittest.TestCase):

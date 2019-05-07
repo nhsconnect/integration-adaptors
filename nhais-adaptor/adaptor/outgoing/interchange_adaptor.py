@@ -1,7 +1,7 @@
 import adaptor.outgoing.message_adaptor as message_adaptor
 import adaptor.outgoing.fhir_helpers.fhir_finders as finders
-from edifact.models.interchange import Interchange
-from edifact.models.message import Messages
+from edifact.outgoing.models.interchange import Interchange
+from edifact.outgoing.models.message import Messages
 from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName
 
 """

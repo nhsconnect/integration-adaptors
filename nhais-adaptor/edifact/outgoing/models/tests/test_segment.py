@@ -1,5 +1,5 @@
 import unittest
-from edifact.models.segment import Segment
+from edifact.outgoing.models.segment import Segment
 
 
 class TestSegment(unittest.TestCase):
