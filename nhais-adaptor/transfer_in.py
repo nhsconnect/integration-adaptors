@@ -1,8 +1,24 @@
+import os
 import json
 import adaptor.incoming.operation_definition_adaptor as adaptor
 import edifact.incoming.parser.deserialiser as deserialiser
+from PyInquirer import prompt
 
-with open("./mailbox/NHAIS/XX11/outbox/edifact.txt", "r") as incoming_edifact_file:
+dirs = os.listdir("./mailbox/NHAIS")
+
+nhais_outbox_choices = [
+    {
+        'type': 'list',
+        'name': 'nhais',
+        'message': 'Select a NHAIS outbox to read from: ',
+        'choices': dirs
+    }
+]
+
+answers = prompt(nhais_outbox_choices)
+nhais_cypher = answers["nhais"]
+
+with open(f"./mailbox/NHAIS/{nhais_cypher}/outbox/edifact.txt", "r") as incoming_edifact_file:
     incoming_interchange_raw = incoming_edifact_file.read()
 
 lines = incoming_interchange_raw.split("'\n")

@@ -22,8 +22,10 @@ def create_operation_definition(interchange: Interchange):
     :return: OperationDefinition:
     """
 
+    APPROVAL_REFERENCE = "F4"
+
     response_dict = {
-        "F4": {
+        APPROVAL_REFERENCE: {
             "name": "Response-RegisterPatient-Approval",
             "code": "gpc.registerpatient.approval"
         }
