@@ -3,7 +3,7 @@ import unittest
 from edifact.outgoing.models.message import MessageBeginning
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address
-from edifact.outgoing.models.Birth.message_birth import MessageSegmentBirthRegistrationDetails, \
+from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthRegistrationDetails, \
     MessageSegmentBirthPatientDetails, MessageTypeBirth
 
 

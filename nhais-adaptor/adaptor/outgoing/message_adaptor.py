@@ -1,6 +1,6 @@
 import adaptor.outgoing.birth.message_birth_adaptor as message_birth_adaptor
 from edifact.outgoing.models.message import MessageBeginning
-from edifact.outgoing.models.Birth.message_birth import Message
+from edifact.outgoing.models.birth.message_birth import Message
 import adaptor.fhir_helpers.fhir_finders as finders
 from adaptor.fhir_helpers.fhir_creators import ParameterName, OperationName
 
@@ -20,7 +20,7 @@ def create_message_beginning(fhir_operation):
     """
     nhais_id = finders.get_parameter_value(fhir_operation=fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
 
-    ref_number = operation_dict[OperationName.REGISTER_BIRTH]["refNumber"]
+    ref_number = operation_dict[fhir_operation.name]["refNumber"]
 
     msg_bgn = MessageBeginning(party_id=nhais_id, date_time=fhir_operation.date.as_json(), ref_number=ref_number)
 

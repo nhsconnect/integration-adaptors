@@ -1,6 +1,6 @@
 import unittest
 
-from edifact.outgoing.models.Birth.message_birth import MessageSegmentBirthRegistrationDetails, \
+from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthRegistrationDetails, \
     MessageSegmentBirthPatientDetails, MessageTypeBirth
 from edifact.outgoing.models.address import Address
 from edifact.outgoing.models.interchange import Interchange

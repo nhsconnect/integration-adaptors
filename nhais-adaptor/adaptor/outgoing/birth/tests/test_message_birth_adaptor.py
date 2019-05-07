@@ -6,13 +6,13 @@ import adaptor.fhir_helpers.fhir_creators as creators
 from adaptor.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
 import adaptor.outgoing.birth.message_birth_adaptor as message_adaptor
 import adaptor.outgoing.tests.fixtures as fixtures
-from edifact.outgoing.models.Birth.message_birth import MessageSegmentBirthPatientDetails, \
+from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthPatientDetails, \
     MessageSegmentBirthRegistrationDetails
 from edifact.outgoing.models.address import Address as EdifactAddress
 from edifact.outgoing.models.name import Name
 
 
-class TestMessageAdaptor(unittest.TestCase):
+class TestMessageBirthAdaptor(unittest.TestCase):
     """
     Tests the conversion of fhir to edifact
     """

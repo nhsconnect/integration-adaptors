@@ -1,6 +1,6 @@
 import unittest
 
-from edifact.outgoing.models.Death.message_death import MessageSegmentDeathRegistrationDetails, \
+from edifact.outgoing.models.death.message_death import MessageSegmentDeathRegistrationDetails, \
     MessageSegmentDeathPatientDetails, MessageTypeDeath
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import MessageBeginning, Messages

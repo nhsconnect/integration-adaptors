@@ -55,7 +55,7 @@ def create_message_segment_registration(message_registration_dict: EdifactDict):
     Creates an incoming message registration from the message registration dictionary.
     :param message_registration_dict: The dictionary will contain a list of lines relevant to the
     message registration section S01.
-    :return: MessageSegmentBirthRegistrationDetails: The incoming representation of the edifact message registration details.
+    :return: MessageSegmentBirthRegistrationDetails: The incoming representation of the edifact message registration.
     """
     transaction_segment = get_value_in_dict(dict_to_search=message_registration_dict, key_to_find="RFF")
     transaction_values = transaction_segment.split(SUB_SECTION_SEPARATOR)
@@ -68,7 +68,7 @@ def create_message_segment_patient(message_patient_dict: EdifactDict):
     Creates an incoming message patient from the message message patient dictionary.
     :param message_patient_dict: The dictionary will contain a list of lines relevant to the
     message patient section S02.
-    :return: MessageSegmentBirthRegistrationDetails: The incoming representation of the edifact message registration details.
+    :return: MessageSegmentBirthRegistrationDetails: The incoming representation of the edifact message registration.
     """
     patient_details_segment = get_value_in_dict(dict_to_search=message_patient_dict, key_to_find="PNA")
     patient_details_segment_values = patient_details_segment.replace(SUB_SECTION_SEPARATOR, SECTION_SEPARATOR).split(

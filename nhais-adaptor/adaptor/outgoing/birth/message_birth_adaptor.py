@@ -1,7 +1,7 @@
 import adaptor.fhir_helpers.fhir_finders as finders
 from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName, OperationName
 from adaptor.outgoing.common.common_adaptor import create_patient_name, create_patient_address
-from edifact.outgoing.models.Birth.message_birth import MessageSegmentBirthPatientDetails, \
+from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthPatientDetails, \
     MessageSegmentBirthRegistrationDetails
 
 operation_dict = {

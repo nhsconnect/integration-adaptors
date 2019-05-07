@@ -6,7 +6,7 @@ from adaptor.fhir_helpers import fhir_creators as creators
 from adaptor.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
 import adaptor.outgoing.message_adaptor as message_adaptor
 from adaptor.outgoing.tests import fixtures as fixtures
-from edifact.outgoing.models.Birth.message_birth import MessageSegmentBirthPatientDetails, \
+from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthPatientDetails, \
     MessageSegmentBirthRegistrationDetails, MessageTypeBirth
 from edifact.outgoing.models.address import Address as EdifactAddress
 from edifact.outgoing.models.message import MessageBeginning
@@ -80,3 +80,4 @@ class TestMessageAdaptor(unittest.TestCase):
             message = message_adaptor.create_message(fhir_operation=op_def)
 
             compare(message, expected)
+

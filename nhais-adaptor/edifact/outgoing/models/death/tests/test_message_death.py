@@ -1,6 +1,6 @@
 import unittest
 
-from edifact.outgoing.models.Death.message_death import MessageSegmentDeathRegistrationDetails, \
+from edifact.outgoing.models.death.message_death import MessageSegmentDeathRegistrationDetails, \
     MessageSegmentDeathPatientDetails, MessageTypeDeath
 from edifact.outgoing.models.message import MessageBeginning
 
@@ -34,7 +34,8 @@ class TestMessageDeath(unittest.TestCase):
 
             msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",
-                                                                         date_time="2019-04-23 09:00:04.159338").to_edifact()
+                                                                         date_time="2019-04-23 09:00:04.159338"
+                                                                         ).to_edifact()
             self.assertEqual(msg_seg_reg_details, expected_edifact_message)
 
     def test_message_segment_patient_details_to_edifact(self):
@@ -72,4 +73,3 @@ class TestMessageDeath(unittest.TestCase):
                                message_segment_registration_details=msg_seg_reg_details,
                                message_segment_patient_details=msg_seg_pat_details).to_edifact()
         self.assertEqual(msg, expected_edifact_message)
-
