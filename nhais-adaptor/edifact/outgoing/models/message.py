@@ -80,9 +80,6 @@ class MessageSegmentRegistrationDetails(SegmentCollection):
         ]
         super().__init__(segments=segments)
 
-    def add_segments(self, segments):
-        self.segments.extend(segments)
-
 
 class MessageSegmentBirthRegistrationDetails(MessageSegmentRegistrationDetails):
     """
@@ -134,9 +131,21 @@ class MessageSegmentDeathRegistrationDetails(MessageSegmentRegistrationDetails):
         super().add_segments(segments)
 
 
-class MessageSegmentBirthPatientDetails(SegmentCollection):
+class MessageSegmentPatientDetails(SegmentCollection):
     """
     A collection of segments that represent personal information about a patient.
+    """
+
+    def __init__(self):
+        segments = [
+            Segment(key="S02", value="2"),
+        ]
+        super().__init__(segments=segments)
+
+
+class MessageSegmentBirthPatientDetails(MessageSegmentPatientDetails):
+    """
+    A specialisation of the MessageSegmentPatientDetails class for the purpose of a Birth
     """
 
     def __init__(self, id_number, name, date_of_birth, gender, address):
@@ -150,13 +159,13 @@ class MessageSegmentBirthPatientDetails(SegmentCollection):
         formatted_date = date_formatter.format_date(date_time=date_of_birth, format_qualifier="102",
                                                     current_format="%Y-%m-%d")
         segments = [
-            Segment(key="S02", value="2"),
             PatientName(id_number=id_number, name=name),
             Segment(key="DTM", value=f"329:{formatted_date}:102"),
             Segment(key="PDI", value=f"{gender}"),
             PatientAddress(address=address)
         ]
-        super().__init__(segments=segments)
+        super().__init__()
+        super().add_segments(segments)
 
 
 class Message(SegmentCollection):
@@ -175,7 +184,7 @@ class Message(SegmentCollection):
         """
         msg_header = MessageHeader(sequence_number=sequence_number)
         number_of_segments = len(message_beginning) + len(message_segment_registration_details.segments) + \
-            len(message_segment_patient_details) + 2
+            len(message_segment_patient_details.segments) + 2
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_registration_details,
                     message_segment_patient_details, msg_trailer]
