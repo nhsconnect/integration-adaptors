@@ -1,4 +1,4 @@
-<?xml version=\'1.0\' encoding=\'UTF-8\'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3c.org/2001/XML-Schema-Instance"
                xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
                xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"

@@ -1,8 +1,8 @@
 from tornado.web import RequestHandler
 
-# The ID of the interaction we're making a request for - ultimately this should come from the client's request
 from utilities.file_utilities import FileUtilities
 
+# The ID of the interaction we're making a request for - ultimately this should come from the client's request
 INTERACTION_NAME = 'gp_summary_upload'
 
 
