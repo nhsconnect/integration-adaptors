@@ -12,6 +12,13 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
     Test the conversion of an incoming edifact interchange to a fhir operation definition response
     """
 
+    def test_format_date_time(self):
+        """
+        Tests the function that formats the edifact date time stamp to a fhir format
+        """
+        formatted_date = incoming_adaptor.format_date_time("190501:0902")
+        self.assertEqual(formatted_date, "2019-05-01 09:02")
+
     def test_create_operation_definition(self):
         """
         Tests the function to create a fhir operation definition from an incoming edifact interchange
