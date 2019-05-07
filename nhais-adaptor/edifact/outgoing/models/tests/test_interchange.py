@@ -1,7 +1,8 @@
 import unittest
 from edifact.outgoing.models.interchange import Interchange, InterchangeHeader, InterchangeTrailer
-from edifact.outgoing.models.message import MessageBeginning, MessageSegmentBirthRegistrationDetails, \
-    MessageSegmentBirthPatientDetails, Message, Messages
+from edifact.outgoing.models.message import MessageBeginning, Message, Messages
+from edifact.outgoing.models.message_segment_patient_details import MessageSegmentBirthPatientDetails
+from edifact.outgoing.models.message_segment_registration_details import MessageSegmentBirthRegistrationDetails
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address
 
