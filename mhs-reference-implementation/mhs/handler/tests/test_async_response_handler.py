@@ -7,7 +7,7 @@ from tornado.web import Application
 
 from mhs.builder.ebxml_ack_message_builder import EbXmlAckMessageBuilder
 from mhs.parser.ebxml_message_parser import EbXmlRequestMessageParser
-from mhs.receiver.async_response_handler import AsyncResponseHandler
+from mhs.handler.async_response_handler import AsyncResponseHandler
 from utilities.file_utilities import FileUtilities
 from utilities.message_utilities import MessageUtilities
 from utilities.xml_utilities import XmlUtilities
@@ -16,7 +16,7 @@ EXPECTED_MESSAGES_DIR = "expected_messages"
 EXPECTED_RESPONSE_FILE = "ebxml_ack.xml"
 
 
-class TestAsyncResponseReceiver(AsyncHTTPTestCase):
+class TestAsyncResponseHandler(AsyncHTTPTestCase):
     """A simple integration test for the async response endpoint."""
 
     current_dir = os.path.dirname(os.path.abspath(__file__))

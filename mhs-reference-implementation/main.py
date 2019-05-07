@@ -9,8 +9,8 @@ from mhs.builder.ebxml_ack_message_builder import EbXmlAckMessageBuilder
 from mhs.builder.ebxml_request_message_builder import EbXmlRequestMessageBuilder
 from mhs.config.interactions import InteractionsConfigFile
 from mhs.parser.ebxml_message_parser import EbXmlRequestMessageParser
-from mhs.receiver.async_response_handler import AsyncResponseHandler
-from mhs.receiver.client_request_handler import ClientRequestHandler
+from mhs.handler.async_response_handler import AsyncResponseHandler
+from mhs.handler.client_request_handler import ClientRequestHandler
 from mhs.sender.sender import Sender
 from mhs.transport.http_transport import HttpTransport
 
