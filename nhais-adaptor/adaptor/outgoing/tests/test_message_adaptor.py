@@ -8,7 +8,7 @@ from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address as EdifactAddress
-from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentBirthRegistrationDetails, \
+from edifact.outgoing.models.message import MessageSegmentBirthPatientDetails, MessageSegmentBirthRegistrationDetails, \
     MessageBeginning, Message
 
 
@@ -115,9 +115,9 @@ class TestMessageAdaptor(unittest.TestCase):
         with self.subTest("Patient with no previous names or addresses"):
             edifact_pat_name = Name(family_name="Parker", first_given_forename="Peter", title="Mr")
             edifact_pat_address = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", post_code="SP1 1AA")
-            expected = MessageSegmentPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
-                                                    date_of_birth="2019-04-20",
-                                                    gender="1", address=edifact_pat_address)
+            expected = MessageSegmentBirthPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
+                                                         date_of_birth="2019-04-20",
+                                                         gender="1", address=edifact_pat_address)
 
             patient = fixtures.create_simple_patient()
             op_param_patient = creators.create_parameter_with_resource_ref(name=ParameterName.REGISTER_PATIENT,
@@ -188,9 +188,9 @@ class TestMessageAdaptor(unittest.TestCase):
             msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
             edifact_pat_name = Name(family_name="Parker", first_given_forename="Peter", title="Mr")
             edifact_pat_address = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", post_code="SP1 1AA")
-            msg_seg_pat_details = MessageSegmentPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
-                                                               date_of_birth="2019-04-20",
-                                                               gender="1", address=edifact_pat_address)
+            msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
+                                                                    date_of_birth="2019-04-20",
+                                                                    gender="1", address=edifact_pat_address)
             msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",
                                                                          acceptance_code="A",

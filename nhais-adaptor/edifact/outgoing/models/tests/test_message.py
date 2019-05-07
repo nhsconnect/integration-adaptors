@@ -1,6 +1,6 @@
 import unittest
 from edifact.outgoing.models.message import MessageHeader, MessageBeginning, MessageSegmentBirthRegistrationDetails, \
-    MessageSegmentPatientDetails, MessageSegmentDeathRegistrationDetails, MessageTrailer, Message
+    MessageSegmentBirthPatientDetails, MessageSegmentDeathRegistrationDetails, MessageTrailer, Message
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address
 
@@ -103,9 +103,9 @@ class TestMessageSegmentPatientDetails(unittest.TestCase):
         patient_address = Address(house_name="MOORSIDE FARM", address_line_1="OLD LANE",
                                   address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
 
-        msg_seg_pat_details = MessageSegmentPatientDetails(id_number="N/10/10", name=patient_name,
-                                                           date_of_birth="2019-04-20",
-                                                           gender="1", address=patient_address).to_edifact()
+        msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="N/10/10", name=patient_name,
+                                                                date_of_birth="2019-04-20",
+                                                                gender="1", address=patient_address).to_edifact()
         self.assertEqual(msg_seg_pat_details, expected_edifact_message)
 
 
@@ -145,9 +145,9 @@ class TestMessage(unittest.TestCase):
         patient_address = Address(house_name="MOORSIDE FARM", address_line_1="OLD LANE",
                                   address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
 
-        msg_seg_pat_details = MessageSegmentPatientDetails(id_number="N/10/10", name=patient_name,
-                                                           date_of_birth="2019-04-20",
-                                                           gender="1", address=patient_address)
+        msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="N/10/10", name=patient_name,
+                                                                date_of_birth="2019-04-20",
+                                                                gender="1", address=patient_address)
 
         msg = Message(sequence_number="00001", message_beginning=msg_bgn,
                       message_segment_registration_details=msg_seg_reg_details,

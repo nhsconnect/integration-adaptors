@@ -1,4 +1,4 @@
-from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentBirthRegistrationDetails, \
+from edifact.outgoing.models.message import MessageSegmentBirthPatientDetails, MessageSegmentBirthRegistrationDetails, \
     MessageBeginning, \
     Message
 from edifact.outgoing.models.name import Name
@@ -72,7 +72,7 @@ def create_patient_address(fhir_patient_address):
 
 def create_message_segment_patient_detail(fhir_operation):
     """
-    :return: MessageSegmentPatientDetails
+    :return: MessageSegmentBirthPatientDetails
     """
     gender_map = {'unknown': 0, 'male': 1, 'female': 2, 'other': 9}
 
@@ -82,11 +82,11 @@ def create_message_segment_patient_detail(fhir_operation):
 
     edi_address = create_patient_address(patient.address[0])
 
-    msg_seg_patient_details = MessageSegmentPatientDetails(id_number=patient.identifier[0].value,
-                                                           name=edi_name,
-                                                           date_of_birth=patient.birthDate.as_json(),
-                                                           gender=gender_map[patient.gender],
-                                                           address=edi_address)
+    msg_seg_patient_details = MessageSegmentBirthPatientDetails(id_number=patient.identifier[0].value,
+                                                                name=edi_name,
+                                                                date_of_birth=patient.birthDate.as_json(),
+                                                                gender=gender_map[patient.gender],
+                                                                address=edi_address)
     return msg_seg_patient_details
 
 

@@ -1,7 +1,7 @@
 import unittest
 from edifact.outgoing.models.interchange import Interchange, InterchangeHeader, InterchangeTrailer
 from edifact.outgoing.models.message import MessageBeginning, MessageSegmentBirthRegistrationDetails, \
-    MessageSegmentPatientDetails, Message, Messages
+    MessageSegmentBirthPatientDetails, Message, Messages
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address
 
@@ -70,9 +70,9 @@ class TestInterchange(unittest.TestCase):
             patient_address = Address(house_name="MOORSIDE FARM", address_line_1="OLD LANE",
                                       address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
 
-            msg_seg_pat_details = MessageSegmentPatientDetails(id_number="N/10/10", name=patient_name,
-                                                               date_of_birth="2019-04-20",
-                                                               gender="1", address=patient_address)
+            msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="N/10/10", name=patient_name,
+                                                                    date_of_birth="2019-04-20",
+                                                                    gender="1", address=patient_address)
 
             msg = Message(sequence_number="00001", message_beginning=msg_bgn,
                           message_segment_registration_details=msg_seg_reg_details,
@@ -115,7 +115,7 @@ class TestInterchange(unittest.TestCase):
         #     patient_address = Address(house_name="MOORSIDE FARM", address_line_1="OLD LANE",
         #                               address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
         #
-        #     msg_seg_pat_details = MessageSegmentPatientDetails(id_number="N/10/10", name=patient_name,
+        #     msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="N/10/10", name=patient_name,
         #                                                        date_of_birth="2019-04-20",
         #                                                        gender="1", address=patient_address)
         #

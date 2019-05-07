@@ -134,7 +134,7 @@ class MessageSegmentDeathRegistrationDetails(MessageSegmentRegistrationDetails):
         super().add_segments(segments)
 
 
-class MessageSegmentPatientDetails(SegmentCollection):
+class MessageSegmentBirthPatientDetails(SegmentCollection):
     """
     A collection of segments that represent personal information about a patient.
     """
