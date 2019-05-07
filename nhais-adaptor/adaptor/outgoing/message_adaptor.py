@@ -1,7 +1,6 @@
-from edifact.outgoing.models.message import MessageBeginning, \
-    MessageTypeBirth
-from edifact.outgoing.models.message_segment_patient_details import MessageSegmentBirthPatientDetails
-from edifact.outgoing.models.message_segment_registration_details import MessageSegmentBirthRegistrationDetails
+from edifact.outgoing.models.message import MessageBeginning
+from edifact.outgoing.models.Birth.message_birth import MessageSegmentBirthPatientDetails, \
+    MessageSegmentBirthRegistrationDetails, MessageTypeBirth
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address
 import adaptor.fhir_helpers.fhir_finders as finders

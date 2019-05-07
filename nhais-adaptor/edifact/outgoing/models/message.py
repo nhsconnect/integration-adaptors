@@ -1,7 +1,3 @@
-from edifact.outgoing.models.message_segment_patient_details import MessageSegmentPatientDetails, \
-    MessageSegmentBirthPatientDetails
-from edifact.outgoing.models.message_segment_registration_details import MessageSegmentRegistrationDetails, \
-    MessageSegmentBirthRegistrationDetails
 from edifact.outgoing.models.segment import Segment, SegmentCollection
 import edifact.helpers.date_formatter as date_formatter
 
@@ -64,6 +60,37 @@ class MessageBeginning(SegmentCollection):
         super().__init__(segments=segments)
 
 
+class MessageSegmentRegistrationDetails(SegmentCollection):
+    """
+    A collection of segments to provide registration information for GP patients.
+    This is referred to in edifact as segment trigger 1
+    """
+
+    def __init__(self, transaction_number, party_id):
+        """
+        :param transaction_number: a unique transaction number. NHAIS will reference this in its response
+        :param party_id: GMC National code and the Local GP Code of the patient's GP (separated by “,”).
+        """
+        segments = [
+            Segment(key="S01", value="1"),
+            Segment(key="RFF", value=f"TN:{transaction_number}"),
+            Segment(key="NAD", value=f"GP+{party_id}:900"),
+        ]
+        super().__init__(segments=segments)
+
+
+class MessageSegmentPatientDetails(SegmentCollection):
+    """
+    A collection of segments that represent personal information about a patient.
+    """
+
+    def __init__(self):
+        segments = [
+            Segment(key="S02", value="2"),
+        ]
+        super().__init__(segments=segments)
+
+
 class Message(SegmentCollection):
     """
     An edifact Message that is contained within an interchange
@@ -88,20 +115,6 @@ class Message(SegmentCollection):
         super().__init__(segments=segments)
 
 
-class MessageTypeBirth(Message):
-    def __init__(self, sequence_number, message_beginning,
-                 message_segment_registration_details: MessageSegmentBirthRegistrationDetails,
-                 message_segment_patient_details: MessageSegmentBirthPatientDetails):
-        """
-        :param sequence_number: the unique sequence number of the message
-        :param message_beginning: the beginning of the message
-        :param message_segment_registration_details: Segment trigger 1 registration information
-        :param message_segment_patient_details: Segment trigger 2 personal information about patient
-        """
-        super().__init__(sequence_number, message_beginning, message_segment_registration_details,
-                         message_segment_patient_details)
-
-
 class Messages(list):
     """
     A collection of edifact messages
@@ -121,3 +134,7 @@ class Messages(list):
         """
         edifact_message = ''.join([message.to_edifact() for message in self.messages])
         return edifact_message
+
+
+
+
