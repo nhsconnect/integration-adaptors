@@ -1,7 +1,8 @@
-from edifact.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, MessageBeginning, \
+from edifact.outgoing.models.message import MessageSegmentPatientDetails, MessageSegmentRegistrationDetails, \
+    MessageBeginning, \
     Message
-from edifact.models.name import Name
-from edifact.models.address import Address
+from edifact.outgoing.models.name import Name
+from edifact.outgoing.models.address import Address
 import adaptor.outgoing.fhir_helpers.fhir_finders as finders
 from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
 
@@ -39,7 +40,7 @@ def determine_address_lines(fhir_patient_address_lines):
     Since the fhir patient address does not have anything specifically for house name in its definition.
     This function assumes that if 3 address lines are provided then the first line is the house name
     if it is less than 3 then always default the first line as "".
-    :param fhir_patient_address: the fhir representation for the patient address
+    :param fhir_patient_address_lines: the fhir representation for the patient address
     :return: a uniform list of address lines to populate the edifact address model
     """
     address_lines = ["", "", ""]
