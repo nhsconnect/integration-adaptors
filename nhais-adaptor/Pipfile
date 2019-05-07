@@ -15,5 +15,5 @@ python_version = "3.7"
 
 [scripts]
 tests = "python -m unittest -v"
-transfer = "python transfer.py"
-transfer-in = "python transfer_in.py"
+outgoing = "python outgoing.py"
+incoming = "python incoming.py"
