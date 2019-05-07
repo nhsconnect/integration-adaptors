@@ -1,3 +1,4 @@
+import logging
 import copy
 from pathlib import Path
 
@@ -35,7 +36,10 @@ class EbXmlMessageBuilder(PystacheMessageBuilder):
         """
         ebxml_message_dictionary = copy.deepcopy(message_dictionary)
 
-        ebxml_message_dictionary[MESSAGE_ID] = MessageUtilities.get_uuid()
-        ebxml_message_dictionary[TIMESTAMP] = MessageUtilities.get_timestamp()
+        message_id = MessageUtilities.get_uuid()
+        ebxml_message_dictionary[MESSAGE_ID] = message_id
+        timestamp = MessageUtilities.get_timestamp()
+        ebxml_message_dictionary[TIMESTAMP] = timestamp
+        logging.debug("Creating ebXML message with message ID '%s' and timestamp '%s'", message_id, timestamp)
 
         return super().build_message(ebxml_message_dictionary)

@@ -1,3 +1,5 @@
+import logging
+
 from tornado.web import RequestHandler
 
 from utilities.file_utilities import FileUtilities
@@ -21,9 +23,9 @@ class ClientRequestHandler(RequestHandler):
         self.sender = sender
 
     def post(self):
-        print(f"Client POST received: {self.request}")
+        logging.debug("Client POST received: %s", self.request)
 
         response = self.sender.send_message(INTERACTION_NAME, self.message)
-        print(f"Message sent. Received response: {response}")
+        logging.debug("Message sent. Received response: %s", response)
 
         self.write("Message sent.")

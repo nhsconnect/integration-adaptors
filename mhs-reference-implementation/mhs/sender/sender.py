@@ -1,4 +1,5 @@
 import copy
+import logging
 
 from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
 from mhs.builder.ebxml_request_message_builder import MESSAGE
@@ -51,6 +52,10 @@ class Sender:
         """
         context = copy.deepcopy(interaction_details)
         context[FROM_PARTY_ID] = PARTY_ID
-        context[CONVERSATION_ID] = MessageUtilities.get_uuid()
+
+        conversation_id = MessageUtilities.get_uuid()
+        context[CONVERSATION_ID] = conversation_id
+        logging.debug("Generated ebXML wrapper with conversation ID: %s", conversation_id)
+
         context[MESSAGE] = message_to_send
         return self.message_builder.build_message(context)

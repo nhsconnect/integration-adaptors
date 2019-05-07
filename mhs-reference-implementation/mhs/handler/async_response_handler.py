@@ -1,3 +1,5 @@
+import logging
+
 from tornado.web import RequestHandler
 
 import mhs.builder.ebxml_ack_message_builder as ack_builder
@@ -20,8 +22,10 @@ class AsyncResponseHandler(RequestHandler):
         self.message_parser = message_parser
 
     def post(self):
-        print(f"POST received: {self.request}")
-        print(f"Body: {self.request.body}")
+        # TODO: Configure headers correctly?
+
+        logging.debug("POST received: %s", self.request)
+        logging.debug("Body: %s", self.request.body)
 
         parsed_message = self.message_parser.parse_message(self.request.body)
 

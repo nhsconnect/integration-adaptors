@@ -1,7 +1,7 @@
 <REPC_IN150016UK05 ITSVersion="XML_1.0"
     xmlns="urn:hl7-org:v3">
-    <id root="BDE9311B-82A2-422F-9D7E-D0C991A57816"/>
-    <creationTime value="20120315065138"/>
+    <id root="236AA1EA-EF9D-45E0-99AB-4CD0A0488CFB"/>
+    <creationTime value="20190507142338"/>
     <versionCode code="V3NPfIT4.2.00"/>
     <interactionId root="2.16.840.1.113883.2.1.3.2.4.12" extension="REPC_IN150016UK05"/>
     <processingCode code="P"/>
@@ -9,19 +9,19 @@
     <acceptAckCode code="NE"/>
     <communicationFunctionRcv typeCode="RCV">
         <device classCode="DEV" determinerCode="INSTANCE">
-            <id root="1.2.826.0.1285.0.2.0.107" extension="655159266510"/>
+            <id root="1.2.826.0.1285.0.2.0.107" extension="227319907548"/>
         </device>
     </communicationFunctionRcv>
     <communicationFunctionSnd typeCode="SND">
         <device classCode="DEV" determinerCode="INSTANCE">
-            <id root="1.2.826.0.1285.0.2.0.107" extension="511736638012"/>
+            <id root="1.2.826.0.1285.0.2.0.107" extension="918999199121"/>
         </device>
     </communicationFunctionSnd>
     <ControlActEvent classCode="CACT" moodCode="EVN">
         <author1 typeCode="AUT">
             <AgentSystemSDS classCode="AGNT">
                 <agentSystemSDS classCode="DEV" determinerCode="INSTANCE">
-                    <id root="1.2.826.0.1285.0.2.0.107" extension="511736638012"/>
+                    <id root="1.2.826.0.1285.0.2.0.107" extension="918999199121"/>
                 </agentSystemSDS>
             </AgentSystemSDS>
         </author1>
@@ -40,9 +40,9 @@
         </author>
         <subject typeCode="SUBJ" contextConductionInd="false">
             <GPSummary classCode="COMPOSITION" moodCode="EVN">
-                <id root="938E11A2-B044-4933-AF36-123C95D6106A"/>
+                <id root="8073AAFE-F5F8-4C3A-85D6-8BA9C596A5DD"/>
                 <code code="196981000000101" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="General Practice Summary"/>
-                <effectiveTime value="20120315065138"/>
+                <effectiveTime value="20190507142338"/>
                 <statusCode code="active"/>
                 <author typeCode="AUT" contextControlCode="OP">
                     <time value="20120315065138"/>
