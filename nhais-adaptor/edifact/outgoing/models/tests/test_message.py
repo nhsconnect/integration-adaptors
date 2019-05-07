@@ -59,7 +59,7 @@ class TestMessageSegmentRegistrationDetails(unittest.TestCase):
                                                                          location="Bury").to_edifact()
             self.assertEqual(msg_seg_reg_details, expected_edifact_message)
 
-        with self.subTest("For death registrations"):
+        with self.subTest("For death registrations with free texts"):
             expected_edifact_message = ("S01+1'"
                                         "RFF+TN:17'"
                                         "NAD+GP+4826940,281:900'"
@@ -71,6 +71,18 @@ class TestMessageSegmentRegistrationDetails(unittest.TestCase):
                                                                          party_id="4826940,281",
                                                                          date_time="2019-04-23 09:00:04.159338",
                                                                          free_text="Died in Infinity Wars").to_edifact()
+            self.assertEqual(msg_seg_reg_details, expected_edifact_message)
+
+        with self.subTest("For death registrations without free texts"):
+            expected_edifact_message = ("S01+1'"
+                                        "RFF+TN:17'"
+                                        "NAD+GP+4826940,281:900'"
+                                        "GIS+1:ZZZ'"
+                                        "DTM+961:20190423:102'")
+
+            msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
+                                                                         party_id="4826940,281",
+                                                                         date_time="2019-04-23 09:00:04.159338").to_edifact()
             self.assertEqual(msg_seg_reg_details, expected_edifact_message)
 
 
