@@ -1,5 +1,5 @@
 import unittest
-from edifact.outgoing.models.message import MessageHeader, MessageBeginning, MessageTrailer, Message
+from edifact.outgoing.models.message import MessageHeader, MessageBeginning, MessageTrailer, MessageTypeBirth
 from edifact.outgoing.models.message_segment_patient_details import MessageSegmentBirthPatientDetails
 from edifact.outgoing.models.message_segment_registration_details import MessageSegmentBirthRegistrationDetails
 from edifact.outgoing.models.name import Name
@@ -77,7 +77,7 @@ class TestMessage(unittest.TestCase):
                                                                 date_of_birth="2019-04-20",
                                                                 gender="1", address=patient_address)
 
-        msg = Message(sequence_number="00001", message_beginning=msg_bgn,
-                      message_segment_registration_details=msg_seg_reg_details,
-                      message_segment_patient_details=msg_seg_pat_details).to_edifact()
+        msg = MessageTypeBirth(sequence_number="00001", message_beginning=msg_bgn,
+                               message_segment_registration_details=msg_seg_reg_details,
+                               message_segment_patient_details=msg_seg_pat_details).to_edifact()
         self.assertEqual(msg, expected_edifact_message)

@@ -1,6 +1,6 @@
 import unittest
 from edifact.outgoing.models.interchange import Interchange, InterchangeHeader, InterchangeTrailer
-from edifact.outgoing.models.message import MessageBeginning, Message, Messages
+from edifact.outgoing.models.message import MessageBeginning, MessageTypeBirth, Messages
 from edifact.outgoing.models.message_segment_patient_details import MessageSegmentBirthPatientDetails
 from edifact.outgoing.models.message_segment_registration_details import MessageSegmentBirthRegistrationDetails
 from edifact.outgoing.models.name import Name
@@ -34,7 +34,6 @@ class TestInterchange(unittest.TestCase):
     """
 
     def test_interchange_to_edifact(self):
-
         with self.subTest("When the transaction is to register a patient birth"):
             expected_edifact_interchange = ("UNB+UNOA:2+SNDR+RECP+190423:0900+00001++FHSREG'"
                                             "UNH+00001+FHSREG:0:1:FH:FHS001'"
@@ -66,18 +65,20 @@ class TestInterchange(unittest.TestCase):
                                                                          acceptance_type="1",
                                                                          date_time="2019-04-23 09:00:04.159338",
                                                                          location="Bury")
-            patient_name = Name(family_name="Stevens", first_given_forename="Charles", title="Mr", middle_name="Anthony",
+            patient_name = Name(family_name="Stevens", first_given_forename="Charles", title="Mr",
+                                middle_name="Anthony",
                                 third_given_forename="John")
             patient_address = Address(house_name="MOORSIDE FARM", address_line_1="OLD LANE",
-                                      address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
+                                      address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT",
+                                      post_code="BR6 7EW")
 
             msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="N/10/10", name=patient_name,
                                                                     date_of_birth="2019-04-20",
                                                                     gender="1", address=patient_address)
 
-            msg = Message(sequence_number="00001", message_beginning=msg_bgn,
-                          message_segment_registration_details=msg_seg_reg_details,
-                          message_segment_patient_details=msg_seg_pat_details)
+            msg = MessageTypeBirth(sequence_number="00001", message_beginning=msg_bgn,
+                                   message_segment_registration_details=msg_seg_reg_details,
+                                   message_segment_patient_details=msg_seg_pat_details)
             msgs = Messages([msg])
 
             interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",

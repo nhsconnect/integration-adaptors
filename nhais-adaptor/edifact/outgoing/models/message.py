@@ -1,3 +1,7 @@
+from edifact.outgoing.models.message_segment_patient_details import MessageSegmentPatientDetails, \
+    MessageSegmentBirthPatientDetails
+from edifact.outgoing.models.message_segment_registration_details import MessageSegmentRegistrationDetails, \
+    MessageSegmentBirthRegistrationDetails
 from edifact.outgoing.models.segment import Segment, SegmentCollection
 import edifact.helpers.date_formatter as date_formatter
 
@@ -66,8 +70,9 @@ class Message(SegmentCollection):
     a collection of Segments
     """
 
-    def __init__(self, sequence_number, message_beginning, message_segment_registration_details,
-                 message_segment_patient_details):
+    def __init__(self, sequence_number, message_beginning,
+                 message_segment_registration_details: MessageSegmentRegistrationDetails,
+                 message_segment_patient_details: MessageSegmentPatientDetails):
         """
         :param sequence_number: the unique sequence number of the message
         :param message_beginning: the beginning of the message
@@ -76,11 +81,25 @@ class Message(SegmentCollection):
         """
         msg_header = MessageHeader(sequence_number=sequence_number)
         number_of_segments = len(message_beginning) + len(message_segment_registration_details.segments) + \
-            len(message_segment_patient_details.segments) + 2
+                             len(message_segment_patient_details.segments) + 2
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_registration_details,
                     message_segment_patient_details, msg_trailer]
         super().__init__(segments=segments)
+
+
+class MessageTypeBirth(Message):
+    def __init__(self, sequence_number, message_beginning,
+                 message_segment_registration_details: MessageSegmentBirthRegistrationDetails,
+                 message_segment_patient_details: MessageSegmentBirthPatientDetails):
+        """
+        :param sequence_number: the unique sequence number of the message
+        :param message_beginning: the beginning of the message
+        :param message_segment_registration_details: Segment trigger 1 registration information
+        :param message_segment_patient_details: Segment trigger 2 personal information about patient
+        """
+        super().__init__(sequence_number, message_beginning, message_segment_registration_details,
+                         message_segment_patient_details)
 
 
 class Messages(list):

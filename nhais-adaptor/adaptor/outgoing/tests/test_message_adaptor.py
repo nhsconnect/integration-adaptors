@@ -8,7 +8,7 @@ from fhirclient.models.humanname import HumanName
 from fhirclient.models.address import Address
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address as EdifactAddress
-from edifact.outgoing.models.message import MessageBeginning, Message
+from edifact.outgoing.models.message import MessageBeginning, MessageTypeBirth
 from edifact.outgoing.models.message_segment_patient_details import MessageSegmentBirthPatientDetails
 from edifact.outgoing.models.message_segment_registration_details import MessageSegmentBirthRegistrationDetails
 
@@ -198,9 +198,9 @@ class TestMessageAdaptor(unittest.TestCase):
                                                                          acceptance_type=1,
                                                                          date_time="2019-04-23 09:00:04.159338",
                                                                          location="Spidey Town")
-            expected = Message(sequence_number="000001", message_beginning=msg_bgn,
-                               message_segment_registration_details=msg_seg_reg_details,
-                               message_segment_patient_details=msg_seg_pat_details)
+            expected = MessageTypeBirth(sequence_number="000001", message_beginning=msg_bgn,
+                                        message_segment_registration_details=msg_seg_reg_details,
+                                        message_segment_patient_details=msg_seg_pat_details)
 
             op_param_message_sequence = creators.create_parameter_with_binding(name=ParameterName.MESSAGE_SEQ_NO,
                                                                                value="000001")

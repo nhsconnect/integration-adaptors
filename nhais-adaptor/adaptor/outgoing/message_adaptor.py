@@ -1,5 +1,5 @@
 from edifact.outgoing.models.message import MessageBeginning, \
-    Message
+    MessageTypeBirth
 from edifact.outgoing.models.message_segment_patient_details import MessageSegmentBirthPatientDetails
 from edifact.outgoing.models.message_segment_registration_details import MessageSegmentBirthRegistrationDetails
 from edifact.outgoing.models.name import Name
@@ -140,11 +140,11 @@ def create_message(fhir_operation):
     """
     message_sequence_number = finders.get_parameter_value(fhir_operation=fhir_operation,
                                                           parameter_name=ParameterName.MESSAGE_SEQ_NO)
-    message = Message(sequence_number=message_sequence_number,
-                      message_beginning=create_message_beginning(fhir_operation),
-                      message_segment_registration_details=create_message_segment_registration_details(
-                          fhir_operation),
-                      message_segment_patient_details=create_message_segment_patient_detail(
-                          fhir_operation))
+    message = MessageTypeBirth(sequence_number=message_sequence_number,
+                               message_beginning=create_message_beginning(fhir_operation),
+                               message_segment_registration_details=create_message_segment_registration_details(
+                                   fhir_operation),
+                               message_segment_patient_details=create_message_segment_patient_detail(
+                                   fhir_operation))
 
     return message
