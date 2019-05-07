@@ -10,7 +10,7 @@
                 "strength": "required",
                 "valueSetReference": {
                     "identifier": {
-                        "value": "SO01"
+                        "value": "XX11"
                     }
                 }
             },
@@ -24,7 +24,7 @@
                 "strength": "required",
                 "valueSetReference": {
                     "identifier": {
-                        "value": "ROO5"
+                        "value": "TES5"
                     }
                 }
             },

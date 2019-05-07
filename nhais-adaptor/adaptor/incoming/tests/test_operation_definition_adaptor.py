@@ -39,7 +39,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
                                                               recipient_parameter,
                                                               transaction_parameter
                                                           ])
-            expected = [("17", op_def)]
+            expected = [("17", "TES5", op_def)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
             messages = Messages([MessageSegment(MessageSegmentBeginningDetails(reference_number="F4"),
@@ -78,7 +78,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
                                                                 recipient_parameter,
                                                                 transaction_parameter_msg_2
                                                             ])
-            expected = [("17", op_def_1), ("18", op_def_2)]
+            expected = [("17", "TES5", op_def_1), ("18", "TES5", op_def_2)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
             messages = Messages([

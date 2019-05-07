@@ -10,9 +10,9 @@ interchange = deserialiser.convert(lines)
 
 op_defs = adaptor.create_operation_definition(interchange)
 
-for (transaction_number, op_def) in op_defs:
+for (transaction_number, recipient, op_def) in op_defs:
     pretty_op_def = op_def.as_json()
 
-    with open(f"./mailbox/GP/TES5/inbox/approval-{transaction_number}.json", "w") as outfile:
+    with open(f"./mailbox/GP/{recipient}/inbox/approval-{transaction_number}.json", "w") as outfile:
         json.dump(pretty_op_def, outfile, indent=4)
 

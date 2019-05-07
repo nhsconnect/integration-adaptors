@@ -24,6 +24,6 @@ class TestEdifactToFhirIntegration(unittest.TestCase):
         interchange = deserialiser.convert(lines)
 
         op_defs = adaptor.create_operation_definition(interchange)
-        pretty_op_def = op_defs[0][1].as_json()
+        pretty_op_def = op_defs[0][2].as_json()
 
         compare(pretty_op_def, patient_register_approval_json)
