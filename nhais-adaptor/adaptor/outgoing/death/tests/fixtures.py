@@ -2,7 +2,7 @@ from fhirclient.models.patient import Patient
 
 import adaptor.fhir_helpers.fhir_creators as creators
 from adaptor.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
-from adaptor.outgoing.tests.fixtures import create_simple_practitioner
+from adaptor.outgoing.common.tests.fixtures import create_simple_practitioner
 
 
 def create_operation_definition_for_death_registration():

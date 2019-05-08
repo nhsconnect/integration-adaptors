@@ -1,6 +1,6 @@
 import adaptor.fhir_helpers.fhir_creators as creators
 from adaptor.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
-from adaptor.outgoing.tests.fixtures import create_simple_practitioner, create_simple_patient
+from adaptor.outgoing.common.tests.fixtures import create_simple_practitioner, create_simple_patient
 
 
 def create_operation_definition_for_birth_registration():
