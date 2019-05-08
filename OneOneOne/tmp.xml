@@ -1,190 +1,567 @@
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:itk="urn:nhs-itk:ns:201005">
-  <soap:Header>
-    <wsa:MessageID>4CDAC44A-716D-11E9-86C5-8DAE40EB2545</wsa:MessageID>
-    <wsa:Action>urn:nhs-itk:services:201005:SendNHS111Report-v2-0</wsa:Action>
-    <wsa:To>http://127.0.0.1:4848/syncsoap</wsa:To>
-    <wsa:From>
-      <wsa:Address>http://localhost:4000</wsa:Address>
-    </wsa:From>
-    <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
-      <wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="D6CD5232-14CF-11DF-9423-1F9A910D4703">
-        <wsu:Created>2019-05-08T08:43:06Z</wsu:Created>
-        <wsu:Expires>2019-05-08T08:53:06Z</wsu:Expires>
-      </wsu:Timestamp>
-      <wsse:UsernameToken>
-        <wsse:Username>TKS Server test</wsse:Username>
-      </wsse:UsernameToken>
-    </wsse:Security>
-  </soap:Header>
-  <soap:Body>
-    <itk:DistributionEnvelope xmlns:itk="urn:nhs-itk:ns:201005" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <!-- the header of the distribution envelope contains a service name - ALWAYS "SendNHS111Report-v1-0" for NHS 111 CDA documents and a generated DCE UUID trackingId-->
-      <itk:header service="urn:nhs-itk:services:201005:SendNHS111Report-v2-0" trackingid="7D6F23E0-AE1A-11DB-9808-B18E1E0994CD">
-        <!-- the address list is not needed, as the end point has been looked up and is in the SOAP header 		<itk:addresslist>			<itk:address uri="urn:nhs-uk:addressing:ods:EM396"/>		</itk:addresslist> -->
-        <!-- an audit identification of the sending organisation - use the send organisation's ODS site code -->
-        <itk:auditIdentity>
-          <itk:id uri="urn:nhs-uk:identity:ods:5L399"/>
-        </itk:auditIdentity>
-        <!-- for 111 CDA documents (to A&E; GP; OOH etc.) there should only be 1 CDA document per transmission, so manifest should only have 1 item -->
-        <itk:manifest count="1">
-          <!-- CDA documents have a mimetype of application/cda+xml. id is the id of the CDA payload (<payload@id>) -->
-          <!-- for more details of manifest attributes see the ITK Core pack -->
-          <itk:manifestitem mimetype="text/xml" id="uuid_7D6F23E0-AE1A-11DB-9808-B18E1E0994EE" profileid="urn:nhs-en:profile:nullificationDocument-v5-0"/>
-        </itk:manifest>
-        <!-- the sender address - use the ODS org site code of the sender, with a SDS idenifier of the sending person if available -->
-        <itk:senderAddress uri="urn:nhs-uk:addressing:ods:5L399:445510770"/>
-        <!-- handlingSpecification contains the interaction id from the 111 specification - key is always fixed; value varies depending on recipient -->
-        <itk:handlingSpecification>
-          <itk:spec value="urn:nhs-itk:interaction:nullifyNHS111CDADocument-v1-0" key="urn:nhs-itk:ns:201005:interaction"/>
-        </itk:handlingSpecification>
-      </itk:header>
-      <itk:payloads count="1">
-        <!-- this matches the manifestitem@id for the payload being referenced by the manifest -->
-        <itk:payload id="uuid_7D6F23E0-AE1A-11DB-9808-B18E1E0994EE">
-          <!-- the document goes here -->
-          <ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:npfitlc="NPFIT:HL7:Localisation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" moodCode="EVN" classCode="DOCCLIN">
-            <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
-            <npfitlc:messageType root="2.16.840.1.113883.2.1.3.2.4.18.17" extension="POCD_MT130001UK05"/>
-            <id root="7D5B4DC0-AE1A-11DB-95FB-B18E1E0994CD"/>
-            <code code="285091000000108" codeSystem="2.16.840.1.113883.2.1.3.2.4.15"/>
-            <title>Nullification Document</title>
-            <effectiveTime value="20070102123459"/>
-            <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25" displayName="normal"/>
-            <setId root="7D5B4DC0-AE1A-11DB-95FC-B18E1E0994CD"/>
-            <versionNumber value="2"/>
-            <recordTarget typeCode="RCT" contextControlCode="OP">
-              <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP145020UK03#PatientRole"/>
-              <patientRole classCode="PAT">
-                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145020UK03#PatientRole"/>
-                <id root="2.16.840.1.113883.2.1.4.1" extension="9900002558"/>
-              </patientRole>
-            </recordTarget>
-            <author contextControlCode="OP" typeCode="AUT">
-              <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP145001UK03#AssignedAuthorSDS"/>
-              <functionCode codeSystem="2.16.840.1.113883.2.1.3.2.4.17.178" code="OA" displayName="Originating Author"/>
-              <time value="200701021234"/>
-              <assignedAuthor classCode="ASSIGNED">
-                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145001UK03#AssignedAuthorSDS"/>
-                <id root="1.2.826.0.1285.0.2.0.65" extension="673836492727"/>
-                <id root="1.2.826.0.1285.0.2.0.67" extension="984181387037"/>
-                <code code="R0050" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.196" displayName="Consultant"/>
-                <assignedPerson determinerCode="INSTANCE" classCode="PSN">
-                  <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145001UK03#assignedPerson"/>
-                  <name>
-                    <prefix>Dr</prefix>
-                    <given>Steve</given>
-                    <family>Fulham</family>
-                  </name>
-                </assignedPerson>
-                <representedOrganization determinerCode="INSTANCE" classCode="ORG">
-                  <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145001UK03#representedOrganization"/>
-                  <id root="2.16.840.1.113883.2.1.3.2.4.19.2" extension="RR109"/>
-                  <name>Solihull Hospital</name>
-                </representedOrganization>
-              </assignedAuthor>
-            </author>
-            <custodian typeCode="CST">
-              <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP145018UK03#AssignedCustodian"/>
-              <assignedCustodian classCode="ASSIGNED">
-                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145018UK03#AssignedCustodian"/>
-                <representedCustodianOrganization classCode="ORG" determinerCode="INSTANCE">
-                  <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145018UK03#representedCustodianOrganization"/>
-                  <id root="2.16.840.1.113883.2.1.3.2.4.19.1" extension="RR109"/>
-                  <name>Solihull Hospital</name>
-                </representedCustodianOrganization>
-              </assignedCustodian>
-            </custodian>
-            <informationRecipient typeCode="PRCP">
-              <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP145017UK03#IntendedRecipient"/>
-              <intendedRecipient classCode="ASSIGNED">
-                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145017UK03#IntendedRecipient"/>
-                <receivedOrganization classCode="ORG" determinerCode="INSTANCE">
-                  <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145017UK03#representedOrganization"/>
-                  <id root="2.16.840.1.113883.2.1.3.2.4.19.2" extension="YEA"/>
-                  <name>NATIONAL CARE RECORDS SERVICE SPINE</name>
-                </receivedOrganization>
-              </intendedRecipient>
-            </informationRecipient>
-            <informationRecipient typeCode="PRCP">
-              <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP145021UK04#AssignedEntitySDS"/>
-              <intendedRecipient classCode="ASSIGNED">
-                <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145021UK04#AssignedEntitySDS"/>
-                <npfitlc:recipientRoleCode code="GP" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.196" displayName="General Practitioner"/>
-                <id root="1.2.826.0.1285.0.2.0.65" extension="673836492727"/>
-                <id root="1.2.826.0.1285.0.2.0.67" extension="984181387037"/>
-                <informationRecipient determinerCode="INSTANCE" classCode="PSN">
-                  <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP145021UK04#assignedPerson"/>
-                  <name>
-                    <prefix>Dr</prefix>
-                    <given>Jill</given>
-                    <family>Fulham</family>
-                  </name>
-                </informationRecipient>
-              </intendedRecipient>
-            </informationRecipient>
-            <relatedDocument typeCode="RPLC">
-              <parentDocument moodCode="EVN" classCode="DOCCLIN">
-                <id root="7D5B4DC0-AE1A-11DB-9601-B18E1E0994CD"/>
-                <code codeSystem="2.16.840.1.113883.2.1.3.2.4.15" code="185291000000100"/>
-                <setId root="7D5B4DC0-AE1A-11DB-95FC-B18E1E0994CD"/>
-                <versionNumber value="1"/>
-              </parentDocument>
-            </relatedDocument>
-            <component typeCode="COMP" contextConductionInd="true">
-              <structuredBody moodCode="EVN" classCode="DOCBODY">
-                <component typeCode="COMP" contextConductionInd="true">
-                  <section classCode="DOCSECT" moodCode="EVN">
-                    <id root="D9303D40-EF24-11DB-A1C1-F5CA408FF127"/>
-                    <entry typeCode="COMP" contextConductionInd="true">
-                      <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP146049UK05#Reason"/>
-                      <observation classCode="OBS" moodCode="EVN">
-                        <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP146049UK05#Reason"/>
-                        <id root="7D5B4DC0-AE1A-11DB-9600-B18E1E0994CD"/>
-                        <code codeSystem="2.16.840.1.113883.2.1.3.2.4.17.176" code="02" displayName="Sent to wrong patient record">
-                          <originalText>
-                            <reference value="#a1"/>
-                          </originalText>
-                        </code>
-                        <effectiveTime value="200701021234"/>
-                      </observation>
-                    </entry>
-                    <component typeCode="COMP" contextConductionInd="true">
-                      <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP146061UK01#Section1"/>
-                      <section classCode="DOCSECT" moodCode="EVN">
-                        <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP146061UK01#Section1"/>
-                        <id root="D9303D40-EF24-11DB-A1C2-F5CA408FF127"/>
-                        <title>Document Withdrawn</title>
-                        <text>Outpatient Clinic Attendance</text>
-                        <component typeCode="COMP" contextConductionInd="true">
-                          <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP146061UK01#component1"/>
-                          <section classCode="DOCSECT" moodCode="EVN">
-                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP146061UK01#section2"/>
-                            <id root="D92DCC40-EF24-11DB-A1BE-F5CA408FF128"/>
-                            <title>Withdrawn Document Created</title>
-                            <text>02-Jan-2007</text>
-                          </section>
+b'<!--This example message is provided for illustrative purposes only. It has had no clinical validation. Whilst every effort has been taken to ensure that the examples are consistent with the message specification contained within the MiM, where there are conflicts with the written message specification or schema, the specification or schema shall be considered to take precedence-->
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsa="http://www.w3.org/2005/08/addressing"
+               xmlns:itk="urn:nhs-itk:ns:201005">\t
+    <soap:Header>\t\t    <wsa:MessageID>C608A5D8-7192-11E9-B423-49189CFE5AD0</wsa:MessageID>\t\t    <wsa:Action>
+        urn:nhs-itk:services:201005:SendNHS111Report-v2-0</wsa:Action>\t\t    <wsa:To>
+        http://127.0.0.1:4848/syncsoap</wsa:To>\t\t
+        <wsa:From>\t\t\t      <wsa:Address>http://localhost:4000</wsa:Address>\t\t
+        </wsa:From>
+        \t\t
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+            \t\t\t
+            <wsu:Timestamp
+                    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                    wsu:Id="D6CD5232-14CF-11DF-9423-1F9A910D4703">\t\t\t\t        <wsu:Created>
+                2019-05-08T13:11:21Z</wsu:Created>\t\t\t\t        <wsu:Expires>2019-05-08T13:21:21Z</wsu:Expires>\t\t\t
+            </wsu:Timestamp>
+            \t\t\t
+            <wsse:UsernameToken>\t\t\t\t        <wsse:Username>TKS Server test</wsse:Username>\t\t\t
+            </wsse:UsernameToken>
+            \t\t
+        </wsse:Security>
+        \t
+    </soap:Header>
+    \t
+    <soap:Body>
+        <itk:DistributionEnvelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            \t<!-- the header of the distribution envelope contains a service name - ALWAYS "SendNHS111Report-v1-0" for NHS 111 CDA documents and a generated DCE UUID trackingId-->
+            \t
+            <itk:header service="urn:nhs-itk:services:201005:SendNHS111Report-v2-0"
+                        trackingid="7D6F23E0-AE1A-11DB-9808-B18E1E0994CD">
+                \t\t<!-- the address list is not needed, as the end point has been looked up and is in the SOAP header \t\t<itk:addresslist>\t\t\t<itk:address uri="urn:nhs-uk:addressing:ods:EM396"/>\t\t</itk:addresslist> -->
+                \t\t<!-- an audit identification of the sending organisation - use the send organisation\'s ODS site code -->
+                \t\t
+                <itk:auditIdentity>\t\t\t<itk:id uri="urn:nhs-uk:identity:ods:5L399"/>\t\t
+                </itk:auditIdentity>
+                \t\t          <!-- for 111 CDA documents (to A&E; GP; OOH etc.) there should only be 1 CDA document per transmission, so manifest should only have 1 item -->
+                \t\t
+                <itk:manifest count="1">
+                    \t\t\t<!-- CDA documents have a mimetype of application/cda+xml. id is the id of the CDA payload (<payload@id>) -->
+                    \t\t\t<!-- for more details of manifest attributes see the ITK Core pack -->\t\t\t<itk:manifestitem
+                        mimetype="text/xml" id="uuid_7D6F23E0-AE1A-11DB-9808-B18E1E0994EE"
+                        profileid="urn:nhs-en:profile:nhs111CDADocument-v2-0"/>\t\t
+                </itk:manifest>
+                \t\t          <!-- the sender address - use the ODS org site code of the sender, with a SDS idenifier of the sending person if available -->
+                \t\t
+                <itk:senderAddress uri="urn:nhs-uk:addressing:ods:5L399:445510770"/>
+                \t\t          <!-- handlingSpecification contains the interaction id from the 111 specification - key is always fixed; value varies depending on recipient -->
+                \t\t
+                <itk:handlingSpecification>\t\t\t<itk:spec
+                        value="urn:nhs-itk:interaction:primaryOutofHourRecipientNHS111CDADocument-v2-0"
+                        key="urn:nhs-itk:ns:201005:interaction"/>\t\t
+                </itk:handlingSpecification>
+                \t
+            </itk:header>
+            \t        <!--payload item uuid altered by TKW AutotestManager-->
+            <itk:payloads count="1">
+                \t\t<!-- this matches the manifestitem@id for the payload being referenced by the manifest -->\t\t
+                <itk:payload id="uuid_9999999-9999-9999-9999-999999999999">\t\t\t<!-- the document goes here -->\t\t\t
+                    <ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:npfitlc="NPFIT:HL7:Localisation" classCode="DOCCLIN"
+                                      moodCode="EVN">\t\t\t\t<typeId root="2.16.840.1.113883.1.3"
+                                                                     extension="POCD_HD000040"/>\t\t\t\t
+                        <npfitlc:messageType root="2.16.840.1.113883.2.1.3.2.4.18.17" extension="POCD_MT200001GB02"/>
+                        \t\t\t\t<id root="A709A442-3CF4-476E-8377-376500E829C9"/>\t\t\t\t
+                        <code code="819551000000100"
+                              codeSystem="2.16.840.1.113883.2.1.3.2.4.15"/>
+                        \t\t\t\t              <title>NHS 111 Report</title>\t\t\t\t<effectiveTime
+                                value="201105192000+0100"/>\t\t\t\t
+                        <confidentialityCode code="V"
+                                             displayName="very restricted"
+                                             codeSystem="2.16.840.1.113883.1.11.16926"/>
+                        \t\t\t\t<setId root="411910CF-1A76-4330-98FE-C345DDEE5553"/>\t\t\t\t
+                        <versionNumber value="2"/>
+                        \t\t\t\t
+                        <recordTarget typeCode="RCT" contextControlCode="OP">\t\t\t\t\t
+                            <npfitlc:contentId
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP145201GB01#PatientRole"/>
+                            \t\t\t\t\t
+                            <patientRole classCode="PAT">\t\t\t\t\t\t
+                                <templateId
+                                        extension="COCD_TP145201GB01#PatientRole"
+                                        root="2.16.840.1.113883.2.1.3.2.4.18.2"/>
+                                \t\t\t\t\t\t<id extension="K12345" root="2.16.840.1.113883.2.1.3.2.4.18.24"
+                                                assigningAuthorityName="DD3:MyAssigningAuthorityName"/>\t\t\t\t\t\t<id
+                                        extension="993254128" root="2.16.840.1.113883.2.1.3.2.4.18.23"/>\t\t\t\t\t\t
+                                <addr use="H">\t\t\t\t\t\t\t                    <streetAddressLine>17, County
+                                    Avenue</streetAddressLine>\t\t\t\t\t\t\t                    <streetAddressLine>
+                                    Woodtown</streetAddressLine>\t\t\t\t\t\t\t                    <city>Medway</city>\t\t\t\t\t\t\t                    <postalCode>
+                                    ME5 FS3</postalCode>\t\t\t\t\t\t
+                                </addr>
+                                \t\t\t\t\t\t<telecom value="tel:01634775667" use="H"/>\t\t\t\t\t\t<telecom
+                                        value="tel:01634451628" use="HV"/>\t\t\t\t\t\t<telecom
+                                        value="mailto:Joe.Blogg@emailfree.co.uk" use="H"/>\t\t\t\t\t\t
+                                <patient classCode="PSN" determinerCode="INSTANCE">\t\t\t\t\t\t\t<templateId
+                                        extension="COCD_TP145201GB01#patientPatient"
+                                        root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t\t
+                                    <name>\t\t\t\t\t\t\t\t                      <prefix>Mr</prefix>\t\t\t\t\t\t\t\t                      <family>
+                                        Joe</family>\t\t\t\t\t\t\t\t                      <given>Blogg</given>\t\t\t\t\t\t\t
+                                    </name>
+                                    \t\t\t\t\t\t\t
+                                    <administrativeGenderCode
+                                            codeSystem="2.16.840.1.113883.2.1.3.2.4.16.25" displayName="Male" code="1"/>
+                                    \t\t\t\t\t\t\t<birthTime value="19890101"/>\t\t\t\t\t\t\t
+                                    <languageCommunication>\t\t\t\t\t\t\t\t<templateId
+                                            extension="COCD_TP145201GB01#languageCommunication"
+                                            root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t\t\t<languageCode
+                                            code="en"/>\t\t\t\t\t\t\t
+                                    </languageCommunication>
+                                    \t\t\t\t\t\t
+                                </patient>
+                                \t\t\t\t\t\t
+                                <providerOrganization classCode="ORG" determinerCode="INSTANCE">\t\t\t\t\t\t\t
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145201GB01#providerOrganization"/>\t\t\t\t\t\t\t<id
+                                            root="2.16.840.1.113883.2.1.3.2.4.19.1" extension="V396F"/>\t\t\t\t\t\t\t                    <name>
+                                        Medway Medical Practice</name>\t\t\t\t\t\t\t<telecom value="tel:01634111222"
+                                                                                             use="WP"/>\t\t\t\t\t\t\t
+                                    <addr use="WP">\t\t\t\t\t\t\t\t                      <streetAddressLine>Springer
+                                        Street</streetAddressLine>\t\t\t\t\t\t\t\t                      <city>
+                                        Medway</city>\t\t\t\t\t\t\t\t                      <postalCode>ME5
+                                        5TY</postalCode>\t\t\t\t\t\t\t
+                                    </addr>
+                                    \t\t\t\t\t\t\t
+                                    <standardIndustryClassCode code="001" displayName="GP Practice"
+                                                               codeSystem="2.16.840.1.113883.2.1.3.2.4.17.289"/>
+                                    \t\t\t\t\t\t
+                                </providerOrganization>
+                                \t\t\t\t\t
+                            </patientRole>
+                            \t\t\t\t
+                        </recordTarget>
+                        \t\t\t\t
+                        <author typeCode="AUT" contextControlCode="OP">\t\t\t\t\t
+                            <npfitlc:contentId
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                    extension="COCD_TP145200GB01#AssignedAuthor"/>
+                            \t\t\t\t\t<functionCode code="OA" displayName="Originating Author"
+                                                    codeSystem="2.16.840.1.113883.2.1.3.2.4.17.178"/>\t\t\t\t\t<time
+                                    value="201105192000+0100"/>\t\t\t\t\t
+                            <assignedAuthor classCode="ASSIGNED">\t\t\t\t\t\t<templateId
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                    extension="COCD_TP145200GB01#AssignedAuthor"/>\t\t\t\t\t\t<id
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.24" extension="MARY100"
+                                    assigningAuthorityName="DD3:MyAssigningAuthorityName"/>\t\t\t\t\t\t
+                                <code code="T1"
+                                      codeSystem="2.16.840.1.113883.2.1.3.2.4.17.196"
+                                      displayName="Nurse Triage Practitioner"/>
+                                \t\t\t\t\t\t
+                                <assignedPerson classCode="PSN" determinerCode="INSTANCE">\t\t\t\t\t\t\t<templateId
+                                        root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                        extension="COCD_TP145200GB01#assignedPerson"/>\t\t\t\t\t\t\t
+                                    <name>\t\t\t\t\t\t\t\t                      <given>Mary</given>\t\t\t\t\t\t\t\t                      <family>
+                                        Jones</family>\t\t\t\t\t\t\t
+                                    </name>
+                                    \t\t\t\t\t\t
+                                </assignedPerson>
+                                \t\t\t\t\t\t
+                                <representedOrganization classCode="ORG" determinerCode="INSTANCE">\t\t\t\t\t\t\t
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145200GB01#representedOrganization"/>\t\t\t\t\t\t\t<id
+                                            root="2.16.840.1.113883.2.1.3.2.4.19.1" extension="5L399"/>\t\t\t\t\t\t\t                    <name>
+                                        Medway NHS Foundation Trust</name>\t\t\t\t\t\t
+                                </representedOrganization>
+                                \t\t\t\t\t
+                            </assignedAuthor>
+                            \t\t\t\t
+                        </author>
+                        \t\t\t\t
+                        <informant typeCode="INF" contextControlCode="OP">\t\t\t\t\t
+                            <npfitlc:contentId
+                                    extension="COCD_TP145007UK03#RelatedEntity"
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.16"/>
+                            \t\t\t\t\t
+                            <relatedEntity classCode="PRS">\t\t\t\t\t\t<templateId
+                                    extension="COCD_TP145007UK03#RelatedEntity"
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t
+                                <code code="01"
+                                      codeSystem="2.16.840.1.113883.2.1.3.2.4.16.45"
+                                      displayName="Spouse"/>
+                                \t\t\t\t\t\t
+                                <addr use="HP">\t\t\t\t\t\t\t                    <streetAddressLine>43 Summers
+                                    Avenue</streetAddressLine>\t\t\t\t\t\t\t                    <streetAddressLine>
+                                    Somerset Street</streetAddressLine>\t\t\t\t\t\t\t                    <city>
+                                    Medway</city>\t\t\t\t\t\t\t                    <postalCode>ME5 7TY</postalCode>\t\t\t\t\t\t
+                                </addr>
+                                \t\t\t\t\t\t<telecom value="tel:07886554123" use="MC"/>\t\t\t\t\t\t
+                                <relatedPerson classCode="PSN" determinerCode="INSTANCE">\t\t\t\t\t\t\t<templateId
+                                        extension="COCD_TP145007UK03#relationshipHolder"
+                                        root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t\t
+                                    <name>\t\t\t\t\t\t\t\t                      <given>Helga</given>\t\t\t\t\t\t\t\t                      <family>
+                                        Bloggs</family>\t\t\t\t\t\t\t
+                                    </name>
+                                    \t\t\t\t\t\t
+                                </relatedPerson>
+                                \t\t\t\t\t
+                            </relatedEntity>
+                            \t\t\t\t
+                        </informant>
+                        \t\t\t\t
+                        <custodian typeCode="CST">\t\t\t\t\t
+                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                               extension="COCD_TP145018UK03#AssignedCustodian"/>
+                            \t\t\t\t\t
+                            <assignedCustodian classCode="ASSIGNED">\t\t\t\t\t\t<templateId
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                    extension="COCD_TP145018UK03#AssignedCustodian"/>\t\t\t\t\t\t
+                                <representedCustodianOrganization classCode="ORG" determinerCode="INSTANCE">
+                                    \t\t\t\t\t\t\t
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145018UK03#representedCustodianOrganization"/>
+                                    \t\t\t\t\t\t\t
+                                    <id root="2.16.840.1.113883.2.1.3.2.4.19.1" extension="5L3"/>
+                                    \t\t\t\t\t\t\t                    <name>Medway NHS Foundation Trust</name>\t\t\t\t\t\t
+                                </representedCustodianOrganization>
+                                \t\t\t\t\t
+                            </assignedCustodian>
+                            \t\t\t\t
+                        </custodian>
+                        \t\t\t\t
+                        <informationRecipient typeCode="PRCP">\t\t\t\t\t<npfitlc:contentId
+                                root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                extension="COCD_TP145203GB03#IntendedRecipient"/>\t\t\t\t\t
+                            <intendedRecipient classCode="ASSIGNED">\t\t\t\t\t\t<templateId
+                                    extension="COCD_TP145203GB03#IntendedRecipient"
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t
+                                <addr use="WP">\t\t\t\t\t\t\t                    <streetAddressLine>Thames Medical
+                                    Practice</streetAddressLine>\t\t\t\t\t\t\t                    <streetAddressLine>
+                                    Hill Street Branch
+                                    Surgery</streetAddressLine>\t\t\t\t\t\t\t                    <streetAddressLine>
+                                    Medway</streetAddressLine>\t\t\t\t\t\t\t                    <streetAddressLine>
+                                    Essex</streetAddressLine>\t\t\t\t\t\t\t                    <postalCode>ME4
+                                    5TT</postalCode>\t\t\t\t\t\t
+                                </addr>
+                                \t\t\t\t\t\t<telecom use="WP" value="tel:0123476895"/>\t\t\t\t\t\t
+                                <receivedOrganization classCode="ORG" determinerCode="INSTANCE">\t\t\t\t\t\t\t
+                                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                extension="COCD_TP145203GB03#representedOrganization"/>\t\t\t\t\t\t\t<id
+                                            root="2.16.840.1.113883.2.1.3.2.4.19.2" extension="PRA123"/>\t\t\t\t\t\t\t                    <name>
+                                        Thames Medical Practice</name>\t\t\t\t\t\t
+                                </receivedOrganization>
+                                \t\t\t\t\t
+                            </intendedRecipient>
+                            \t\t\t\t
+                        </informationRecipient>
+                        \t\t\t\t
+                        <informationRecipient typeCode="PRCP">\t\t\t\t\t<npfitlc:contentId
+                                root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                extension="COCD_TP145203GB03#IntendedRecipient"/>\t\t\t\t\t
+                            <intendedRecipient classCode="ASSIGNED">\t\t\t\t\t\t<templateId
+                                    extension="COCD_TP145203GB03#IntendedRecipient"
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t
+                                <receivedOrganization classCode="ORG" determinerCode="INSTANCE">\t\t\t\t\t\t\t
+                                    <templateId extension="COCD_TP145203GB03#representedOrganization"
+                                                root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t\t<id
+                                            extension="EM396" root="2.16.840.1.113883.2.1.3.2.4.19.1"/>\t\t\t\t\t\t\t                    <name>
+                                        Medway Kent Out of Hours Clinic</name>\t\t\t\t\t\t
+                                </receivedOrganization>
+                                \t\t\t\t\t
+                            </intendedRecipient>
+                            \t\t\t\t
+                        </informationRecipient>
+                        \t\t\t\t
+                        <participant typeCode="REFT" contextControlCode="OP">\t\t\t\t\t<npfitlc:contentId
+                                root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                extension="COCD_TP145214GB01#AssociatedEntity"/>\t\t\t\t\t
+                            <associatedEntity classCode="ASSIGNED">\t\t\t\t\t\t<templateId
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                    extension="COCD_TP145214GB01#AssociatedEntity"/>\t\t\t\t\t\t<id
+                                    root="2.16.840.1.113883.2.1.3.2.4.19.2" extension="R8722"/>\t\t\t\t\t\t
+                                <addr use="PHYS">\t\t\t\t\t\t\t                    <streetAddressLine>Church Street Walk
+                                    in Centre</streetAddressLine>\t\t\t\t\t\t\t                    <streetAddressLine>4
+                                    Church
+                                    Street</streetAddressLine>\t\t\t\t\t\t\t                    <streetAddressLine>
+                                    Medway</streetAddressLine>\t\t\t\t\t\t\t                    <postalCode>ME8
+                                    7TT</postalCode>\t\t\t\t\t\t
+                                </addr>
+                                \t\t\t\t\t\t<telecom use="EC" value="tel:0123456789"/>\t\t\t\t\t\t
+                                <scopingOrganization classCode="ORG" determinerCode="INSTANCE">\t\t\t\t\t\t\t<templateId
+                                        root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                        extension="COCD_TP145214GB01#scopingOrganization"/>\t\t\t\t\t\t\t<id
+                                        root="2.16.840.1.113883.2.1.3.2.4.19.1" extension="RE3"/>\t\t\t\t\t\t\t                    <name>
+                                    Medway Community Hospital</name>\t\t\t\t\t\t
+                                </scopingOrganization>
+                                \t\t\t\t\t
+                            </associatedEntity>
+                            \t\t\t\t
+                        </participant>
+                        \t\t\t\t              <!-- this is an example of a document replacing another document -->
+                        \t\t\t\t
+                        <relatedDocument typeCode="RPLC">\t\t\t\t\t
+                            <parentDocument classCode="DOCCLIN" moodCode="EVN">\t\t\t\t\t\t<id
+                                    root="A709A442-3CF4-476E-8377-376500E82AAA"/>\t\t\t\t\t\t<code
+                                    code="819551000000100" codeSystem="2.16.840.1.113883.2.1.3.2.4.15"/>\t\t\t\t\t\t
+                                <setId root="411910CF-1A76-4330-98FE-C345DDEE5553"/>\t\t\t\t\t\t<versionNumber
+                                        value="1"/>\t\t\t\t\t
+                            </parentDocument>
+                            \t\t\t\t
+                        </relatedDocument>
+                        \t\t\t\t              <!-- the Consent example here assumes the use of vocab DocumentConsentSnCT. If no consent information is available, assume Consent given, and use the code documented here-->
+                        \t\t\t\t
+                        <authorization typeCode="AUTH">\t\t\t\t\t
+                            <npfitlc:contentId
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.16" extension="COCD_TP146226GB02#Consent"/>
+                            \t\t\t\t\t
+                            <consent classCode="CONS" moodCode="EVN">\t\t\t\t\t\t
+                                <templateId
+                                        root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP146226GB02#Consent"/>
+                                \t\t\t\t\t\t<id root="A709A442-3CF4-476E-8377-377700E727C7"/>\t\t\t\t\t\t<code
+                                        code="425691002" codeSystem="2.16.840.1.113883.2.1.3.2.4.15"
+                                        displayName="Consent given for electronic record sharing"/>\t\t\t\t\t\t
+                                <statusCode code="completed"/>\t\t\t\t\t
+                            </consent>
+                            \t\t\t\t
+                        </authorization>
+                        \t\t\t\t
+                        <componentOf typeCode="COMP">\t\t\t\t\t<npfitlc:contentId
+                                root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                extension="COCD_TP146232GB01#EncompassingEncounter"/>\t\t\t\t\t
+                            <encompassingEncounter classCode="ENC" moodCode="EVN">\t\t\t\t\t\t<templateId
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                    extension="COCD_TP146232GB01#EncompassingEncounter"/>\t\t\t\t\t\t<id
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.34" extension="CASEREF1234"/>\t\t\t\t\t\t<id
+                                    root="2.16.840.1.113883.2.1.3.2.4.18.35" extension="CASEID123"/>\t\t\t\t\t\t<code
+                                    code="NHS111Encounter" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.326"
+                                    displayName="NHS111 Encounter"/>\t\t\t\t\t\t
+                                <effectiveTime>\t\t\t\t\t\t\t<low value="201105191945+0100"/>\t\t\t\t\t\t\t<high
+                                        value="201105192015+0100"/>\t\t\t\t\t\t
+                                </effectiveTime>
+                                \t\t\t\t\t\t
+                                <dischargeDispositionCode code="Dx009"
+                                                          codeSystem="2.16.840.1.113883.2.1.3.2.4.17.325"
+                                                          displayName="Go to the nearest Emergency Department within 4 hours."/>
+                                \t\t\t\t\t\t
+                                <responsibleParty typeCode="RESP">\t\t\t\t\t\t\t<templateId
+                                        root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                        extension="COCD_TP146232GB01#responsibleParty"/>\t\t\t\t\t\t\t<npfitlc:contentId
+                                        root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                        extension="COCD_TP145210GB01#AssignedEntity"/>\t\t\t\t\t\t\t
+                                    <assignedEntity classCode="ASSIGNED">\t\t\t\t\t\t\t\t<templateId
+                                            root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                            extension="COCD_TP145210GB01#AssignedEntity"/>\t\t\t\t\t\t\t\t<id
+                                            nullFlavor="NI"/>\t\t\t\t\t\t\t\t
+                                        <code code="R0010"
+                                              codeSystem="2.16.840.1.113883.2.1.3.2.4.17.196"
+                                              displayName="Medical Director"/>
+                                        \t\t\t\t\t\t\t\t
+                                        <assignedPerson classCode="PSN" determinerCode="INSTANCE">\t\t\t\t\t\t\t\t\t
+                                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                        extension="COCD_TP145210GB01#assignedPerson"/>\t\t\t\t\t\t\t\t\t
+                                            <name>\t\t\t\t\t\t\t\t\t\t                          <given>Dave</given>\t\t\t\t\t\t\t\t\t\t                          <family>
+                                                Cornwell</family>\t\t\t\t\t\t\t\t\t
+                                            </name>
+                                            \t\t\t\t\t\t\t\t
+                                        </assignedPerson>
+                                        \t\t\t\t\t\t\t\t
+                                        <representedOrganization classCode="ORG" determinerCode="INSTANCE">
+                                            \t\t\t\t\t\t\t\t\t
+                                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                        extension="COCD_TP145210GB01#representedOrganization"/>
+                                            \t\t\t\t\t\t\t\t\t<id root="2.16.840.1.113883.2.1.3.2.4.19.1"
+                                                                  extension="VDE232323"/>\t\t\t\t\t\t\t\t\t                        <name>
+                                            Medway South Out of Hours Centre</name>\t\t\t\t\t\t\t\t
+                                        </representedOrganization>
+                                        \t\t\t\t\t\t\t
+                                    </assignedEntity>
+                                    \t\t\t\t\t\t
+                                </responsibleParty>
+                                \t\t\t\t\t\t
+                                <location typeCode="LOC">\t\t\t\t\t\t\t
+                                    <templateId
+                                            root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                            extension="COCD_TP146232GB01#location"/>
+                                    \t\t\t\t\t\t\t
+                                    <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                                       extension="COCD_TP145222GB02#HealthCareFacility"/>
+                                    \t\t\t\t\t\t\t
+                                    <healthCareFacility classCode="ISDLOC">\t\t\t\t\t\t\t\t<templateId
+                                            extension="COCD_TP145222GB02#HealthCareFacility"
+                                            root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t\t\t<id
+                                            nullFlavor="NA"/>\t\t\t\t\t\t\t\t
+                                        <code code="313161000000107"
+                                              codeSystem="2.16.840.1.113883.2.1.3.2.4.15"
+                                              displayName="Example Care Setting"/>
+                                        \t\t\t\t\t\t\t\t
+                                        <location classCode="PLC" determinerCode="INSTANCE">\t\t\t\t\t\t\t\t\t
+                                            <templateId extension="COCD_TP145222GB02#location"
+                                                        root="2.16.840.1.113883.2.1.3.2.4.18.2"/>\t\t\t\t\t\t\t\t\t                        <name>
+                                                Incident Location</name>\t\t\t\t\t\t\t\t\t
+                                            <addr use="PHYS">
+                                                \t\t\t\t\t\t\t\t\t\t                          <streetAddressLine>2,
+                                                Brancaster Road</streetAddressLine>\t\t\t\t\t\t\t\t\t\t                          <city>
+                                                Medway</city>\t\t\t\t\t\t\t\t\t\t                          <postalCode>
+                                                ME5 FL5</postalCode>\t\t\t\t\t\t\t\t\t\t                          <desc>
+                                                Follow the high street and turn left by Boots</desc>\t\t\t\t\t\t\t\t\t\t                          <country>
+                                                GB</country>\t\t\t\t\t\t\t\t\t\t                          <country>Great
+                                                Britain</country>\t\t\t\t\t\t\t\t\t\t                          <additionalLocator>
+                                                +38.265789-85.623415</additionalLocator>\t\t\t\t\t\t\t\t\t
+                                            </addr>
+                                            \t\t\t\t\t\t\t\t
+                                        </location>
+                                        \t\t\t\t\t\t\t
+                                    </healthCareFacility>
+                                    \t\t\t\t\t\t
+                                </location>
+                                \t\t\t\t\t
+                            </encompassingEncounter>
+                            \t\t\t\t
+                        </componentOf>
+                        \t\t\t\t
+                        <component typeCode="COMP" contextConductionInd="true">\t\t\t\t\t
+                            <structuredBody classCode="DOCBODY" moodCode="EVN">\t\t\t\t\t\t
+                                <component typeCode="COMP" contextConductionInd="true">\t\t\t\t\t\t\t
+                                    <section classCode="DOCSECT" moodCode="EVN">\t\t\t\t\t\t\t\t<id
+                                            root="7AFDCAD6-1CE3-45A6-A176-DDAC27F46C87"/>\t\t\t\t\t\t\t\t
+                                        <entry typeCode="COMP" contextConductionInd="true">\t\t\t\t\t\t\t\t\t
+                                            <npfitlc:contentId extension="COCD_TP146002GB01#ObservationMedia"
+                                                               root="2.16.840.1.113883.2.1.3.2.4.18.16"/>
+                                            \t\t\t\t\t\t\t\t\t
+                                            <observationMedia classCode="OBS" moodCode="EVN">\t\t\t\t\t\t\t\t\t\t
+                                                <templateId extension="COCD_TP146002GB01#ObservationMedia"
+                                                            root="2.16.840.1.113883.2.1.3.2.4.18.2"/>
+                                                \t\t\t\t\t\t\t\t\t\t
+                                                <id root="7DAC2CE0-AE1A-11DB-98EE-B18E1E0994CD"/>
+                                                \t\t\t\t\t\t\t\t\t\t                          <value
+                                                        representation="B64" mediaType="text/xml">
+                                                    \t\t\t\t\t\tPFBhdGh3YXlzQ2FzZSB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIiB4c2k6c2NoZW1hTG9jYXRpb249Imh0dHA6Ly9uaHNwYXRod2F5cy5vcmcvd2Vic2VydmljZXMvcGF0aHdheXMvcGF0aHdheXNDYXNlIGZpbGU6Ly8vRDovQ29ubmVjdGluZ2ZvckhlYWx0aC9Qcm9qZWN0cy9OSFMxMTEvUGF0aHdheXNDYXNlX1YyLjQueHNkIiB4bWxucz0iaHR0cDovL25oc3BhdGh3YXlzLm9yZy93ZWJzZXJ2aWNlcy9wYXRod2F5cy9wYXRod2F5c0Nhc2UiPg0KCTxzZXJ2aWNlRGVzdGluYXRpb24+DQoJCTxuYW1lPkVNQVM8L25hbWU+DQoJCTxjb2RlLz4NCgk8L3NlcnZpY2VEZXN0aW5hdGlvbj4NCgk8bWVzc2FnZVN0YXR1cz5QYXJ0aWFsRXhwZWN0aW5nVXBkYXRlPC9tZXNzYWdlU3RhdHVzPg0KCTxjYXNlUmVjZWl2ZVN0YXJ0PjIwMTEtMDItMTdUMTc6Mjc6MzMuNzhaPC9jYXNlUmVjZWl2ZVN0YXJ0Pg0KCTxjYXNlUmVjZWl2ZUVuZD4yMDExLTAyLTE3VDE3OjMxOjE0LjMxM1o8L2Nhc2VSZWNlaXZlRW5kPg0KCTxvdXRjb21lPg0KCQk8dGl0bGU+RGlzcGF0Y2ggMTkgbWludXRlIGFtYnVsYW5jZTwvdGl0bGU+DQoJCTxjb2RlPkR4MDEyPC9jb2RlPg0KCTwvb3V0Y29tZT4NCgk8Y2FzZURldGFpbHM+DQoJCTxjYXNlUmVmPjMyODI5NjQzPC9jYXNlUmVmPg0KCQk8Y2FzZUlkPjgwNjdiOWIyLWU2MDQtNDQxNC1iNTZmLThlM2NjNGRlNGIxYjwvY2FzZUlkPg0KCQk8YWRkcmVzcz4NCgkJCTxidWlsZGluZy8+DQoJCQk8c3RyZWV0PnJlZGFjdGVkPC9zdHJlZXQ+DQoJCQk8bG9jYWxpdHkvPg0KCQkJPHRvd24+cmVkYWN0ZWQ8L3Rvd24+DQoJCQk8Y291bnR5PnJlZGFjdGVkPC9jb3VudHk+DQoJCQk8cG9zdGNvZGU+cmVkYWN0ZWQ8L3Bvc3Rjb2RlPg0KCQkJPG1hcFJlZj4NCgkJCQk8bG9uZ2l0dWRlLz4NCgkJCQk8bGF0aXR1ZGUvPg0KCQkJPC9tYXBSZWY+DQoJCQk8Y291bnRyeT4NCgkJCQk8bmFtZT5FbmdsYW5kPC9uYW1lPg0KCQkJCTxpc29BbHBoYTI+R0I8L2lzb0FscGhhMj4NCgkJCTwvY291bnRyeT4NCgkJCTxkaXJlY3Rpb25zLz4NCgkJPC9hZGRyZXNzPg0KCQk8Y29uZGl0aW9uLz4NCgkJPGNvbnRhY3REZXRhaWxzPg0KCQkJPGNhbGxlcj4NCgkJCQk8bmFtZS8+DQoJCQkJPHBob25lPg0KCQkJCQk8bnVtYmVyPnJlZGFjdGVkPC9udW1iZXI+DQoJCQkJCTxleHRlbnNpb24vPg0KCQkJCTwvcGhvbmU+DQoJCQk8L2NhbGxlcj4NCgkJPC9jb250YWN0RGV0YWlscz4NCgk8L2Nhc2VEZXRhaWxzPg0KCTxwYXRpZW50Pg0KCQk8Zm9yZW5hbWU+cmVkYWN0ZWQ8L2ZvcmVuYW1lPg0KCQk8c3VybmFtZT5yZWRhY3RlZDwvc3VybmFtZT4NCgkJPGFkZHJlc3M+DQoJCQk8YnVpbGRpbmcvPg0KCQkJPHN0cmVldD5yZWRhY3RlZDwvc3RyZWV0Pg0KCQkJPGxvY2FsaXR5Lz4NCgkJCTx0b3duPnJlZGFjdGVkPC90b3duPg0KCQkJPGNvdW50eT5yZWRhY3RlZDwvY291bnR5Pg0KCQkJPHBvc3Rjb2RlPnJlZGFjdGVkPC9wb3N0Y29kZT4NCgkJCTxtYXBSZWY+DQoJCQkJPGxvbmdpdHVkZS8+DQoJCQkJPGxhdGl0dWRlLz4NCgkJCTwvbWFwUmVmPg0KCQkJPGNvdW50cnk+DQoJCQkJPG5hbWU+RW5nbGFuZDwvbmFtZT4NCgkJCQk8aXNvQWxwaGEyPkdCPC9pc29BbHBoYTI+DQoJCQk8L2NvdW50cnk+DQoJCQk8ZGlyZWN0aW9ucy8+DQoJCTwvYWRkcmVzcz4NCgkJPHBob25lPg0KCQkJPG51bWJlcj5yZWRhY3RlZDwvbnVtYmVyPg0KCQkJPGV4dGVuc2lvbi8+DQoJCTwvcGhvbmU+DQoJCTxnZW5kZXI+TWFsZTwvZ2VuZGVyPg0KCQk8bmF0aW9uYWxOdW1iZXIvPg0KCQk8cHJvdmlkZXJEZXRhaWxzIHR5cGU9IkRPQ1RPUiI+DQoJCQk8cHJvdmlkZXI+DQoJCQkJPG5hbWUvPg0KCQkJCTxpZC8+DQoJCQk8L3Byb3ZpZGVyPg0KCQkJPHByb3ZpZGVyR3JvdXA+DQoJCQkJPG5hbWUvPg0KCQkJCTxpZC8+DQoJCQk8L3Byb3ZpZGVyR3JvdXA+DQoJCTwvcHJvdmlkZXJEZXRhaWxzPg0KCQk8ZGF0ZU9mQmlydGg+DQoJCQk8ZG9iPjIwMTAtMDYtMjM8L2RvYj4NCgkJPC9kYXRlT2ZCaXJ0aD4NCgkJPG1vYmlsZVBob25lLz4NCgk8L3BhdGllbnQ+DQoJPHJldHVyblBob25lPg0KCQk8bnVtYmVyPnJlZGFjdGVkPC9udW1iZXI+DQoJCTxleHRlbnNpb24vPg0KCTwvcmV0dXJuUGhvbmU+DQoJPGJpbGxpbmdBZGRyZXNzPg0KCQk8YnVpbGRpbmcvPg0KCQk8c3RyZWV0Lz4NCgkJPGxvY2FsaXR5Lz4NCgkJPHRvd24vPg0KCQk8Y291bnR5Lz4NCgkJPHBvc3Rjb2RlLz4NCgkJPG1hcFJlZj4NCgkJCTxsb25naXR1ZGUvPg0KCQkJPGxhdGl0dWRlLz4NCgkJPC9tYXBSZWY+DQoJCTxjb3VudHJ5Pg0KCQkJPG5hbWUvPg0KCQkJPGlzb0FscGhhMj5aWjwvaXNvQWxwaGEyPg0KCQk8L2NvdW50cnk+DQoJCTxkaXJlY3Rpb25zLz4NCgk8L2JpbGxpbmdBZGRyZXNzPg0KCTxwYXRod2F5RGV0YWlscz4NCgkJPHBhdGh3YXlUcmlhZ2VEZXRhaWxzPg0KCQkJPHBhdGh3YXlUcmlhZ2U+DQoJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6Mjc6MzMuNzhaPC9zdGFydD4NCgkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6MzE6MTQuMzEzWjwvZmluaXNoPg0KCQkJCTx0cmlhZ2VEaXNwb3NpdGlvbj4NCgkJCQkJPGluaXRpYWxEaXNwQ29kZT5EeDAxMjwvaW5pdGlhbERpc3BDb2RlPg0KCQkJCQk8aW5pdGlhbERpc3BUZXh0PkRpc3BhdGNoIDE5IG1pbnV0ZSBhbWJ1bGFuY2U8L2luaXRpYWxEaXNwVGV4dD4NCgkJCQkJPHRpbWVSZWFjaGVkPjIwMTEtMDItMTdUMTc6Mzk6MzYuNzQzWjwvdGltZVJlYWNoZWQ+DQoJCQkJPC90cmlhZ2VEaXNwb3NpdGlvbj4NCgkJCQk8ZmluYWxEaXNwb3NpdGlvbj4NCgkJCQkJPGZpbmFsRGlzcENvZGU+RHgwMTI8L2ZpbmFsRGlzcENvZGU+DQoJCQkJCTxmaW5hbERpc3B0ZXh0PkRpc3BhdGNoIDE5IG1pbnV0ZSBhbWJ1bGFuY2U8L2ZpbmFsRGlzcHRleHQ+DQoJCQkJPC9maW5hbERpc3Bvc2l0aW9uPg0KCQkJCTx0cmFuc2ZlckNvZGVEZXRhaWxzPg0KCQkJCQk8dHJhbnNmZXJDb2RlIHR5cGU9IlQxIi8+DQoJ\t\t\tC\t\tQ\tkJPC90cmFuc2ZlckNvZGVEZXRhaWxzPg0KCQkJCTx1c2VyPg0KCQkJCQk8aWQ+MzEzNzwvaWQ+DQoJCQkJCTxuYW1lPnJlZGFjdGVkPC9uYW1lPg0KCQkJCQk8c2tpbGxTZXQ+VDE8L3NraWxsU2V0Pg0KCQkJCTwvdXNlcj4NCgkJCQk8dHJpYWdlTGluZURldGFpbHM+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KCQkJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6Mjc6MzMuNzk3Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6Mjc6MzMuNzk3WjwvZmluaXNoPg0KCQkJCQkJPHF1ZXN0aW9uVHlwZT5TZXRWYXJpYWJsZTwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQvPg0KCQkJCQkJCQk8cGF0aHdheU9yZGVyTm8+MDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkLz4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0Lz4NCgkJCQkJCQk8cXVlc3Rpb25SYXRpb25hbGUvPg0KCQkJCQkJCTxhbnN3ZXJzPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dC8+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCQkJPHRlcm0vPg0KCQkJCQkJCQk8Y29kZS8+DQoJCQkJCQkJPC9kaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCTwvcXVlc3Rpb24+DQoJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZC8+DQoJCQkJCQk8L2NhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCTxjbGluaWNhbEFyZWEvPg0KCQkJCQkJPHJlcG9ydFRleHQ+DQoJCQkJCQkJPHRleHQ+UGF0aWVudDogIHJlZGFjdGVkICByZWRhY3RlZCwgQWdlIEdlbmRlciBTZWxlY3RlZDogcmVkYWN0ZWQgLCByZWRhY3RlZCAsIHJlZGFjdGVkPC90ZXh0Pg0KCQkJCQkJCTxwb3NpdGl2ZT5mYWxzZTwvcG9zaXRpdmU+DQoJCQkJCQk8L3JlcG9ydFRleHQ+DQoJCQkJCQk8dXNlckNvbW1lbnQvPg0KCQkJCQkJPGFjdGlvbj5CYWNrPC9hY3Rpb24+DQoJCQkJCQk8aW5jbHVkZUluUmVwb3J0PmZhbHNlPC9pbmNsdWRlSW5SZXBvcnQ+DQoJCQkJCTwvdHJpYWdlTGluZT4NCgkJCQkJPHRyaWFnZUxpbmU+DQoJCQkJCQk8c3RhcnQ+MjAxMS0wMi0xN1QxNzoyNzozMy43OTdaPC9zdGFydD4NCgkJCQkJCTxmaW5pc2g+MjAxMS0wMi0xN1QxNzoyNzozMy43OTdaPC9maW5pc2g+DQoJCQkJCQk8cXVlc3Rpb25UeXBlPlBhdGh3YXlzU2VsZWN0aW9uPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJCTxtYWpvcj42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjA8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZC8+DQoJCQkJCQkJPHF1ZXN0aW9uVGV4dC8+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQvPg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtLz4NCgkJCQkJCQkJPGNvZGUvPg0KCQkJCQkJCTwvZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQk8L3F1ZXN0aW9uPg0KCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmQvPg0KCQkJCQkJPC9jYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQk8Y2xpbmljYWxBcmVhLz4NCgkJCQkJCTxyZXBvcnRUZXh0Pg0KCQkJCQkJCTx0ZXh0PlBhdGh3YXkgU2VsZWN0ZWQ6IFBNSSwgQ2FsbGluZyBBYm91dCBTb21lb25lIGVsc2U8L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPmZhbHNlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPkJhY2s8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+ZmFsc2U8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJCTxzeXN0ZW1GbGFncz4NCgkJCQkJCQk8c3lzdGVtRmxhZz5UcmFwcGVkPC9zeXN0ZW1GbGFnPg0KCQkJCQkJPC9zeXN0ZW1GbGFncz4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjI3OjMzLjg2Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6Mjg6MDEuNVo8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2luZ2xlQW5zd2VyPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJCTxtYWpvcj42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjU8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZD5\tUe\tD\t\tIy\tMD\tEwOTwvcXVlc3Rpb25JZD4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0PldoYXQgaXMgdGhlIHJlYXNvbiBmb3IgdGhlIGNhbGw/PC9xdWVzdGlvblRleHQ+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0idHJ1ZSI+DQoJCQkJCQkJCQk8dGV4dD5hbiBpbmp1cnkgb3Igb3RoZXIgaGVhbHRoIHByb2JsZW08L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PmEgbmVlZCB0byBhY2Nlc3MgYW5vdGhlciBoZWFsdGhjYXJlIHByb3ZpZGVyPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5hIGhlYWx0aGNhcmUgcHJvZmVzc2lvbmFsIHJlcXVlc3RpbmcgY29udGFjdCB3aXRoIGFub3RoZXIgY2xpbmljaWFuPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5hIHJlcG9ydCBvZiByZXN1bHRzIG9yIHRlc3RzPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5tb3JlPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtPklsbG5lc3Mgb3IgaW5qdXJ5PC90ZXJtPg0KCQkJCQkJCQk8Y29kZS8+DQoJCQkJCQkJPC9kaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCTwvcXVlc3Rpb24+DQoJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZC8+DQoJCQkJCQk8L2NhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCTxjbGluaWNhbEFyZWEvPg0KCQkJCQkJPHJlcG9ydFRleHQ+DQoJCQkJCQkJPHRleHQ+QW4gaW5qdXJ5IG9yIG90aGVyIGhlYWx0aCBwcm9ibGVtIHdhcyBkZXNjcmliZWQuPC90ZXh0Pg0KCQkJCQkJCTxwb3NpdGl2ZT50cnVlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPkJhY2s8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+ZmFsc2U8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjI4OjAxLjU2M1o8L3N0YXJ0Pg0KCQkJCQkJPGZpbmlzaD4yMDExLTAyLTE3VDE3OjI4OjA2LjMxM1o8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2luZ2xlQW5zd2VyPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJCTxtYWpvcj42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjM1PC9wYXRod2F5T3JkZXJObz4NCgkJCQkJCQk8L3RyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uSWQ+VHgxNDAxMTg8L3F1ZXN0aW9uSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uVGV4dD5IYXMgdGhlIGJhYnkganVzdCBiZWVuIGJvcm4/PC9xdWVzdGlvblRleHQ+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+eWVzPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5ub3Qgc3VyZTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0idHJ1ZSI+DQoJCQkJCQkJCQk8dGV4dD5ubzwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQk8L2Fuc3dlcnM+DQoJCQkJCQkJPGRpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJCQk8dGVybS8+DQoJCQkJCQkJCTxjb2RlLz4NCgkJCQkJCQk8L2Rpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJPC9xdWVzdGlvbj4NCgkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkLz4NCgkJCQkJCTwvY2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJPGNsaW5pY2FsQXJlYS8+DQoJCQkJCQk8cmVwb3J0VGV4dD4NCgkJCQkJCQk8dGV4dD5UaGUgYmFieSB3YXMgbW9yZSB0aGFuIG9uZSBob3VyIG9sZC48L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPnRydWU8L3Bvc2l0aXZlPg0KCQkJCQkJPC9yZXBvcnRUZXh0Pg0KCQkJCQkJPHVzZXJDb21tZW50Lz4NCgkJCQkJCTxhY3Rpb24+QmFjazwvYWN0aW9uPg0KCQkJCQkJPGluY2x1ZGVJblJlcG9ydD5mYWxzZTwvaW5jbHVkZUluUmVwb3J0Pg0KCQkJCQk8L3RyaWFnZUxpbmU+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KCQkJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6Mjg6MDYuMzczWjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6Mjg6MDcuODZaPC9maW5pc2g+DQoJCQkJCQk8cXVlc3Rpb25UeXBlPlNpbmdsZUFuc3dlcjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bW\tlub\t3I+\t\tMjw\tvbW\tlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UE1JPC9wYXRod2F5SWQ+DQoJCQkJCQkJCTxwYXRod2F5T3JkZXJObz40MDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkPlR4MjIwMTEwPC9xdWVzdGlvbklkPg0KCQkJCQkJCTxxdWVzdGlvblRleHQ+SXMgaGUgYnJlYXRoaW5nIGFuZCBjb25zY2lvdXM/PC9xdWVzdGlvblRleHQ+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0idHJ1ZSI+DQoJCQkJCQkJCQk8dGV4dD5icmVhdGhpbmcgQU5EIGNvbnNjaW91czwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+YnJlYXRoaW5nIGJ1dCBOT1QgY29uc2Npb3VzIChpbmNsdWRlcyBjdXJyZW50IGZpdHRpbmcpPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5OT1QgYnJlYXRoaW5nPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5jaG9raW5nIG5vdzwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQk8L2Fuc3dlcnM+DQoJCQkJCQkJPGRpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJCQk8dGVybT5CcmVhdGhpbmcgYW5kIGNvbnNjaW91czwvdGVybT4NCgkJCQkJCQkJPGNvZGUvPg0KCQkJCQkJCTwvZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQk8L3F1ZXN0aW9uPg0KCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmQvPg0KCQkJCQkJPC9jYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQk8Y2xpbmljYWxBcmVhLz4NCgkJCQkJCTxyZXBvcnRUZXh0Pg0KCQkJCQkJCTx0ZXh0PlRoZSBpbmRpdmlkdWFsIHdhcyBkZXNjcmliZWQgYXMgYnJlYXRoaW5nIGFuZCBjb25zY2lvdXMuPC90ZXh0Pg0KCQkJCQkJCTxwb3NpdGl2ZT50cnVlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPkJhY2s8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+ZmFsc2U8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjI4OjA3LjkyM1o8L3N0YXJ0Pg0KCQkJCQkJPGZpbmlzaD4yMDExLTAyLTE3VDE3OjI4OjIyLjA2M1o8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2luZ2xlQW5zd2VyPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJCTxtYWpvcj42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjYwPC9wYXRod2F5T3JkZXJObz4NCgkJCQkJCQk8L3RyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uSWQ+VHgyMjAyODU8L3F1ZXN0aW9uSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uVGV4dD5IYXMgaGUgYmVlbiBibGVlZGluZyB2ZXJ5IGhlYXZpbHkgSU4gVEhFIExBU1QgSE9VUj88L3F1ZXN0aW9uVGV4dD4NCgkJCQkJCQk8cXVlc3Rpb25SYXRpb25hbGUvPg0KCQkJCQkJCTxhbnN3ZXJzPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5ibG9vZCBzcHVydGluZyBmcm9tIGEgd291bmQ8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PmFuIGVnZyBjdXBmdWwgb3IgbW9yZSBvZiByZWQgYmxvb2QgZnJvbSBhIGJvZHkgb3BlbmluZzwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+YW4gZWdnIGN1cGZ1bCBvciBtb3JlIGZyb20gYSB3b3VuZDwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+bm90IHN1cmU8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9InRydWUiPg0KCQkJCQkJCQkJPHRleHQ+bm88L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCQkJPHRlcm0vPg0KCQkJCQkJCQk8Y29kZS8+DQoJCQkJCQkJPC9kaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCTwvcXVlc3Rpb24+DQoJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZC8+DQoJCQkJCQk8L2NhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCTxjbGluaWNhbEFyZWEvPg0KCQkJCQkJPHJlcG9ydFRleHQ+DQoJCQkJCQkJPHRleHQ+TWFqb3IgYmxvb2QgbG9zcyB3YXMgbm90IGRlc2NyaWJlZC48L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPmZhbHNlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c\t2VyQ\t29tb\tW\tVudC\t8+DQ\toJCQkJCQk8YWN0aW9uPkNoYW5nZTwvYWN0aW9uPg0KCQkJCQkJPGluY2x1ZGVJblJlcG9ydD5mYWxzZTwvaW5jbHVkZUluUmVwb3J0Pg0KCQkJCQk8L3RyaWFnZUxpbmU+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KCQkJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6Mjg6MjIuNDdaPC9zdGFydD4NCgkJCQkJCTxmaW5pc2g+MjAxMS0wMi0xN1QxNzoyODoyMi40N1o8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2luZ2xlQW5zd2VyPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJCTxtYWpvcj42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjIwNTA8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZC8+DQoJCQkJCQkJPHF1ZXN0aW9uVGV4dD5Tb2NpYWxDb25jZXJuc0V4Y2x1ZGVkPC9xdWVzdGlvblRleHQ+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+PT0icHJlc2VudCI8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9InRydWUiPg0KCQkJCQkJCQkJPHRleHQ+KjwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQk8L2Fuc3dlcnM+DQoJCQkJCQkJPGRpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJCQk8dGVybS8+DQoJCQkJCQkJCTxjb2RlLz4NCgkJCQkJCQk8L2Rpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJPC9xdWVzdGlvbj4NCgkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkLz4NCgkJCQkJCTwvY2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJPGNsaW5pY2FsQXJlYS8+DQoJCQkJCQk8cmVwb3J0VGV4dD4NCgkJCQkJCQk8dGV4dC8+DQoJCQkJCQkJPHBvc2l0aXZlPnRydWU8L3Bvc2l0aXZlPg0KCQkJCQkJPC9yZXBvcnRUZXh0Pg0KCQkJCQkJPHVzZXJDb21tZW50Lz4NCgkJCQkJCTxhY3Rpb24+Q2hhbmdlPC9hY3Rpb24+DQoJCQkJCQk8aW5jbHVkZUluUmVwb3J0PmZhbHNlPC9pbmNsdWRlSW5SZXBvcnQ+DQoJCQkJCTwvdHJpYWdlTGluZT4NCgkJCQkJPHRyaWFnZUxpbmU+DQoJCQkJCQk8c3RhcnQ+MjAxMS0wMi0xN1QxNzozMDo0MS40ODNaPC9zdGFydD4NCgkJCQkJCTxmaW5pc2g+MjAxMS0wMi0xN1QxNzozMDo0Ni41WjwvZmluaXNoPg0KCQkJCQkJPHF1ZXN0aW9uVHlwZT5TaW5nbGVBbnN3ZXI8L3F1ZXN0aW9uVHlwZT4NCgkJCQkJCTxxdWVzdGlvbj4NCgkJCQkJCQk8dHJpYWdlTG9naWNJZD4NCgkJCQkJCQkJPHBhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQkJPG1ham9yPjY8L21ham9yPg0KCQkJCQkJCQkJPG1pbm9yPjI8L21pbm9yPg0KCQkJCQkJCQkJPHN1YlJldmlzaW9uPjE8L3N1YlJldmlzaW9uPg0KCQkJCQkJCQk8L3BhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQk8cGF0aHdheUlkPlBFRTM8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjA8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZD5UeDE0MDE1OTwvcXVlc3Rpb25JZD4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0PldoYXQgaXMgdGhlIHJlYXNvbiBmb3IgZW5kaW5nIHRoZSBhc3Nlc3NtZW50PzwvcXVlc3Rpb25UZXh0Pg0KCQkJCQkJCTxxdWVzdGlvblJhdGlvbmFsZS8+DQoJCQkJCQkJPGFuc3dlcnM+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PnRoZSBwaG9uZSBsaW5lIHdlbnQgZGVhZDwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+dGhlIGNhbGxlciB0ZXJtaW5hdGVkIHRoZSBjYWxsIChzcGVjaWZ5KTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+SSB0ZXJtaW5hdGVkIHRoZSBjYWxsIChzcGVjaWZ5KTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+dHJpYWdlIG5vdCBwb3NzaWJsZTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0idHJ1ZSI+DQoJCQkJCQkJCQk8dGV4dD50cmFuc2ZlciB0byBhIGNsaW5pY2lhbjwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQk8L2Fuc3dlcnM+DQoJCQkJCQkJPGRpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJCQk8dGVybT5DYWxsIHRyYW5zZmVycmVkIGZvciBjbGluaWNpYW4gYXNzZXNzbWVudDwvdGVybT4NCgkJCQkJCQkJPGNvZGUvPg0KCQkJCQkJCTwvZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQk8L3F1ZXN0aW9uPg0KCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmQvPg0KCQkJCQkJPC9jYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQk8Y2xpbmljYWxBcmVhLz4NCgkJCQkJCTxyZXBvcnRUZXh0Pg0KCQkJCQkJCTx0ZXh0PkFzc2Vzc21lbnQgZW5kZWQgYmVjYXVzZSB0aGUgY2FsbCByZXF1aXJlZCB0cmFuc2ZlciB0byBhIGNsaW5pY2lhbi48L3RleHQ+DQoJCQkJCQkJ\tPHBvc\t2l0aX\tZl\tPmZhb\tHNlPC\t9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPkVhcmx5RXhpdDwvYWN0aW9uPg0KCQkJCQkJPGluY2x1ZGVJblJlcG9ydD5mYWxzZTwvaW5jbHVkZUluUmVwb3J0Pg0KCQkJCQk8L3RyaWFnZUxpbmU+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KCQkJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6MzA6NDYuNTc3Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6MzE6MDkuMTRaPC9maW5pc2g+DQoJCQkJCQk8cXVlc3Rpb25UeXBlPlNpbmdsZUFuc3dlcjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UEVFMzwvcGF0aHdheUlkPg0KCQkJCQkJCQk8cGF0aHdheU9yZGVyTm8+NTA8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZD5UeDIyMDQwODwvcXVlc3Rpb25JZD4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0PldIQVQgSVMgVEhFIFJFQVNPTiBGT1IgVFJBTlNGRVIgVE8gQSBDTElOSUNJQU4/PC9xdWVzdGlvblRleHQ+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+Y2FsbGVyIHJlZnVzZXMgZGlzcG9zaXRpb248L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0Pm11bHRpcGxlIHVucmVsYXRlZCBzeW1wdG9tczwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+ZGlmZmljdWx0eSBvYnRhaW5pbmcgYWRlcXVhdGUgaW5mb3JtYXRpb248L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0Pm1lZGljYXRpb24gb3IgbWVkaWNhbCBwcm9jZWR1cmUgZW5xdWlyeTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+ZGVjbGFyZWQgbWVkaWNhbCBoaXN0b3J5IChkZXRhaWxzIG5vdCByZXF1aXJlZCk8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9InRydWUiPg0KCQkJCQkJCQkJPHRleHQ+b3RoZXIgY29tcGxleCBjYWxsIChzcGVjaWZ5KTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQk8L2Fuc3dlcnM+DQoJCQkJCQkJPGRpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJCQk8dGVybS8+DQoJCQkJCQkJCTxjb2RlLz4NCgkJCQkJCQk8L2Rpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJPC9xdWVzdGlvbj4NCgkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkLz4NCgkJCQkJCTwvY2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJPGNsaW5pY2FsQXJlYS8+DQoJCQkJCQk8cmVwb3J0VGV4dD4NCgkJCQkJCQk8dGV4dD5UaGUgcmVhc29uIGZvciB0cmFuc2ZlciB0byBhIGNsaW5pY2lhbiB3YXM6IG90aGVyIGNvbXBsZXggY2FsbC48L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPnRydWU8L3Bvc2l0aXZlPg0KCQkJCQkJPC9yZXBvcnRUZXh0Pg0KCQkJCQkJPHVzZXJDb21tZW50Pk5FRURTIEZVUlRIRVIgQVNTRVNTTUVOVDwvdXNlckNvbW1lbnQ+DQoJCQkJCQk8YWN0aW9uPkJhY2s8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+ZmFsc2U8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjMxOjA5LjIzM1o8L3N0YXJ0Pg0KCQkJCQkJPGZpbmlzaD4yMDExLTAyLTE3VDE3OjMxOjExLjg5WjwvZmluaXNoPg0KCQkJCQkJPHF1ZXN0aW9uVHlwZT5EaXNwb3NpdGlvbjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UEVFMzwvcGF0aHdheUlkPg0KCQkJCQkJCQk8cGF0aHdheU9yZGVyTm8+MDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkLz4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0PlNwZWFrIHRvIENsaW5pY2lhbiBmcm9tIG91ciBTZXJ2aWNlIGltbWVkaWF0ZWx5PC9xdWVzdGlvblRleHQ+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQvPg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtLz4NCgkJCQkJCQkJPGNvZGU+RHgzMjwvY29kZT4NCgkJCQkJCQk8L2Rpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJPC9xdWVzdGlvbj4NCgkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZERldGF\tpbHM+D\tQoJCQk\tJCQ\tkJPGNh\tcmVBZH\tZpY2VLZXl3b3JkLz4NCgkJCQkJCTwvY2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJPGNsaW5pY2FsQXJlYS8+DQoJCQkJCQk8cmVwb3J0VGV4dD4NCgkJCQkJCQk8dGV4dD5BIGNsaW5pY2lhbiBmcm9tIG91ciBzZXJ2aWNlIHdpbGwgY2FsbCB0aGUgaW5kaXZpZHVhbCBiYWNrIGltbWVkaWF0ZWx5IHRvIGFzc2VzcyB0aGUgcHJvYmxlbS48L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPmZhbHNlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPlJlc3RhcnQ8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+ZmFsc2U8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjM1OjAzLjExN1o8L3N0YXJ0Pg0KCQkJCQkJPGZpbmlzaD4yMDExLTAyLTE3VDE3OjM1OjA4LjM2N1o8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2V0VmFyaWFibGU8L3F1ZXN0aW9uVHlwZT4NCgkJCQkJCTxxdWVzdGlvbj4NCgkJCQkJCQk8dHJpYWdlTG9naWNJZD4NCgkJCQkJCQkJPHBhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQkJPG1ham9yPjY8L21ham9yPg0KCQkJCQkJCQkJPG1pbm9yPjI8L21pbm9yPg0KCQkJCQkJCQkJPHN1YlJldmlzaW9uPjE8L3N1YlJldmlzaW9uPg0KCQkJCQkJCQk8L3BhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQk8cGF0aHdheUlkLz4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjA8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZC8+DQoJCQkJCQkJPHF1ZXN0aW9uVGV4dC8+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQvPg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtLz4NCgkJCQkJCQkJPGNvZGUvPg0KCQkJCQkJCTwvZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQk8L3F1ZXN0aW9uPg0KCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmQvPg0KCQkJCQkJPC9jYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQk8Y2xpbmljYWxBcmVhLz4NCgkJCQkJCTxyZXBvcnRUZXh0Pg0KCQkJCQkJCTx0ZXh0PlBhdGllbnQ6ICByZWRhY3RlZCByZWRhY3RlZCwgQWdlIEdlbmRlciBTZWxlY3RlZDogcmVkYWN0ZWQgLCByZWRhY3RlZCAsIHJlZGFjdGVkPC90ZXh0Pg0KCQkJCQkJCTxwb3NpdGl2ZT5mYWxzZTwvcG9zaXRpdmU+DQoJCQkJCQk8L3JlcG9ydFRleHQ+DQoJCQkJCQk8dXNlckNvbW1lbnQvPg0KCQkJCQkJPGFjdGlvbj5OZXh0PC9hY3Rpb24+DQoJCQkJCQk8aW5jbHVkZUluUmVwb3J0PnRydWU8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjM1OjAzLjExN1o8L3N0YXJ0Pg0KCQkJCQkJPGZpbmlzaD4yMDExLTAyLTE3VDE3OjM1OjA4LjM2N1o8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+UGF0aHdheXNTZWxlY3Rpb248L3F1ZXN0aW9uVHlwZT4NCgkJCQkJCTxxdWVzdGlvbj4NCgkJCQkJCQk8dHJpYWdlTG9naWNJZD4NCgkJCQkJCQkJPHBhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQkJPG1ham9yPjY8L21ham9yPg0KCQkJCQkJCQkJPG1pbm9yPjI8L21pbm9yPg0KCQkJCQkJCQkJPHN1YlJldmlzaW9uPjE8L3N1YlJldmlzaW9uPg0KCQkJCQkJCQk8L3BhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQk8cGF0aHdheUlkPlBNSTwvcGF0aHdheUlkPg0KCQkJCQkJCQk8cGF0aHdheU9yZGVyTm8+MDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkLz4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0Lz4NCgkJCQkJCQk8cXVlc3Rpb25SYXRpb25hbGUvPg0KCQkJCQkJCTxhbnN3ZXJzPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dC8+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCQkJPHRlcm0vPg0KCQkJCQkJCQk8Y29kZS8+DQoJCQkJCQkJPC9kaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCTwvcXVlc3Rpb24+DQoJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZC8+DQoJCQkJCQk8L2NhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCTxjbGluaWNhbEFyZWEvPg0KCQkJCQkJPHJlcG9ydFRleHQ+DQoJCQkJCQkJPHRleHQ+UGF0aHdheSBTZWxlY3RlZDogUE1JLCBDYWxsaW5nIEFib3V0IFNvbWVvbmUgZWxzZTwvdGV4dD4NCgkJCQkJCQk8cG9zaXRpdmU+ZmFsc2U8L3Bvc2l0aXZlPg0KCQkJCQkJPC9yZXBvcnRUZXh0Pg0KCQkJCQkJPHVzZXJDb21tZW50Lz4NCgkJCQkJCTxhY3Rpb24+TmV4dDwvYWN0aW9uPg0KCQkJCQkJPGluY2x1ZGVJblJlcG9ydD50cnVlPC9pbmNsdWRlSW5SZXBvcnQ+DQoJCQkJCQk8c3lzdGVtRmxhZ3M+DQoJCQkJCQkJPHN5c3RlbUZsYWc+Q0FUQkxldmVsMzwvc3lzdGVtRmxhZz4NCgkJCQkJCTwvc3lzdGVtRmxhZ3M+DQoJCQkJCTwvdHJpYWdlTGluZT4NCgkJCQkJPHRyaWFnZUxpbmU+DQoJCQkJCQk8c3RhcnQ+MjAxMS0wMi0xN1QxNzozNTowOC40NDdaPC9zdGFydD4NCgkJCQkJCTxmaW5pc2g+MjAxMS0wMi0xN1QxNzozNToxMC42OFo8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2luZ2xlQW5zd2VyPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5Vm\tVyc2lvb\tj4NCgkJ\tCQkJ\tCQkJCTx\ttYWpvcj\t42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjU8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZD5UeDIyMDEwOTwvcXVlc3Rpb25JZD4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0PldoYXQgaXMgdGhlIHJlYXNvbiBmb3IgdGhlIGNhbGw/PC9xdWVzdGlvblRleHQ+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0idHJ1ZSI+DQoJCQkJCQkJCQk8dGV4dD5hbiBpbmp1cnkgb3Igb3RoZXIgaGVhbHRoIHByb2JsZW08L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PmEgbmVlZCB0byBhY2Nlc3MgYW5vdGhlciBoZWFsdGhjYXJlIHByb3ZpZGVyPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5hIGhlYWx0aGNhcmUgcHJvZmVzc2lvbmFsIHJlcXVlc3RpbmcgY29udGFjdCB3aXRoIGFub3RoZXIgY2xpbmljaWFuPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5hIHJlcG9ydCBvZiByZXN1bHRzIG9yIHRlc3RzPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5tb3JlPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtPklsbG5lc3Mgb3IgaW5qdXJ5PC90ZXJtPg0KCQkJCQkJCQk8Y29kZS8+DQoJCQkJCQkJPC9kaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCTwvcXVlc3Rpb24+DQoJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZC8+DQoJCQkJCQk8L2NhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCTxjbGluaWNhbEFyZWEvPg0KCQkJCQkJPHJlcG9ydFRleHQ+DQoJCQkJCQkJPHRleHQ+QW4gaW5qdXJ5IG9yIG90aGVyIGhlYWx0aCBwcm9ibGVtIHdhcyBkZXNjcmliZWQuPC90ZXh0Pg0KCQkJCQkJCTxwb3NpdGl2ZT50cnVlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPk5leHQ8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+dHJ1ZTwvaW5jbHVkZUluUmVwb3J0Pg0KCQkJCQk8L3RyaWFnZUxpbmU+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KCQkJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6MzU6MTAuNzI3Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6MzU6MTIuODJaPC9maW5pc2g+DQoJCQkJCQk8cXVlc3Rpb25UeXBlPlNpbmdsZUFuc3dlcjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UE1JPC9wYXRod2F5SWQ+DQoJCQkJCQkJCTxwYXRod2F5T3JkZXJObz4zNTwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkPlR4MTQwMTE4PC9xdWVzdGlvbklkPg0KCQkJCQkJCTxxdWVzdGlvblRleHQ+SGFzIHRoZSBiYWJ5IGp1c3QgYmVlbiBib3JuPzwvcXVlc3Rpb25UZXh0Pg0KCQkJCQkJCTxxdWVzdGlvblJhdGlvbmFsZS8+DQoJCQkJCQkJPGFuc3dlcnM+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PnllczwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+bm90IHN1cmU8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9InRydWUiPg0KCQkJCQkJCQkJPHRleHQ+bm88L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCQkJPHRlcm0vPg0KCQkJCQkJCQk8Y29kZS8+DQoJCQkJCQkJPC9kaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCTwvcXVlc3Rpb24+DQoJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZC8+DQoJCQkJCQk8L2NhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCTxjbGluaWNhbEFyZWEvPg0KCQkJCQkJPHJlcG9ydFRleHQ+DQoJCQkJCQkJPHRleHQ+VGhlIGJhYnkgd2FzIG1vcmUgdGhhbiBvbmUgaG91ciBvbGQuPC90ZXh0Pg0KCQkJCQkJCTxwb3NpdGl2ZT50cnVlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPk5leHQ8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+dHJ1ZTwvaW5jbHVkZUluUmVwb3J0Pg0KCQkJCQk8L3RyaWFnZUxpbmU+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KC\tQkJCQkJP\tHN0YXJ0P\tjIwMT\tEtMDItMT\tdUMTc6Mz\tU6MTIuODY3Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6MzU6MTQuNzI3WjwvZmluaXNoPg0KCQkJCQkJPHF1ZXN0aW9uVHlwZT5TaW5nbGVBbnN3ZXI8L3F1ZXN0aW9uVHlwZT4NCgkJCQkJCTxxdWVzdGlvbj4NCgkJCQkJCQk8dHJpYWdlTG9naWNJZD4NCgkJCQkJCQkJPHBhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQkJPG1ham9yPjY8L21ham9yPg0KCQkJCQkJCQkJPG1pbm9yPjI8L21pbm9yPg0KCQkJCQkJCQkJPHN1YlJldmlzaW9uPjE8L3N1YlJldmlzaW9uPg0KCQkJCQkJCQk8L3BhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQk8cGF0aHdheUlkPlBNSTwvcGF0aHdheUlkPg0KCQkJCQkJCQk8cGF0aHdheU9yZGVyTm8+NDA8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZD5UeDIyMDExMDwvcXVlc3Rpb25JZD4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0PklzIGhlIGJyZWF0aGluZyBhbmQgY29uc2Npb3VzPzwvcXVlc3Rpb25UZXh0Pg0KCQkJCQkJCTxxdWVzdGlvblJhdGlvbmFsZS8+DQoJCQkJCQkJPGFuc3dlcnM+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9InRydWUiPg0KCQkJCQkJCQkJPHRleHQ+YnJlYXRoaW5nIEFORCBjb25zY2lvdXM8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PmJyZWF0aGluZyBidXQgTk9UIGNvbnNjaW91cyAoaW5jbHVkZXMgY3VycmVudCBmaXR0aW5nKTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+Tk9UIGJyZWF0aGluZzwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+Y2hva2luZyBub3c8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCQkJPHRlcm0+QnJlYXRoaW5nIGFuZCBjb25zY2lvdXM8L3Rlcm0+DQoJCQkJCQkJCTxjb2RlLz4NCgkJCQkJCQk8L2Rpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJPC9xdWVzdGlvbj4NCgkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkLz4NCgkJCQkJCTwvY2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJPGNsaW5pY2FsQXJlYS8+DQoJCQkJCQk8cmVwb3J0VGV4dD4NCgkJCQkJCQk8dGV4dD5UaGUgaW5kaXZpZHVhbCB3YXMgZGVzY3JpYmVkIGFzIGJyZWF0aGluZyBhbmQgY29uc2Npb3VzLjwvdGV4dD4NCgkJCQkJCQk8cG9zaXRpdmU+dHJ1ZTwvcG9zaXRpdmU+DQoJCQkJCQk8L3JlcG9ydFRleHQ+DQoJCQkJCQk8dXNlckNvbW1lbnQvPg0KCQkJCQkJPGFjdGlvbj5OZXh0PC9hY3Rpb24+DQoJCQkJCQk8aW5jbHVkZUluUmVwb3J0PnRydWU8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjM1OjE0Ljc3M1o8L3N0YXJ0Pg0KCQkJCQkJPGZpbmlzaD4yMDExLTAyLTE3VDE3OjM1OjU2Ljk3N1o8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2luZ2xlQW5zd2VyPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJCTxtYWpvcj42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjYwPC9wYXRod2F5T3JkZXJObz4NCgkJCQkJCQk8L3RyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uSWQ+VHgyMjAyODU8L3F1ZXN0aW9uSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uVGV4dD5IYXMgaGUgYmVlbiBibGVlZGluZyB2ZXJ5IGhlYXZpbHkgSU4gVEhFIExBU1QgSE9VUj88L3F1ZXN0aW9uVGV4dD4NCgkJCQkJCQk8cXVlc3Rpb25SYXRpb25hbGUvPg0KCQkJCQkJCTxhbnN3ZXJzPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5ibG9vZCBzcHVydGluZyBmcm9tIGEgd291bmQ8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PmFuIGVnZyBjdXBmdWwgb3IgbW9yZSBvZiByZWQgYmxvb2QgZnJvbSBhIGJvZHkgb3BlbmluZzwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0idHJ1ZSI+DQoJCQkJCQkJCQk8dGV4dD5hbiBlZ2cgY3VwZnVsIG9yIG1vcmUgZnJvbSBhIHdvdW5kPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5ub3Qgc3VyZTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+bm88L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCQkJPHRlcm0+TWFqb3IgYmxvb2QgbG9zcywgd291bmQ8L3Rlcm0+DQoJCQkJCQkJCTxjb2RlLz4NCgkJCQkJCQk8L2Rpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJ\tCQkJPC9xd\tWVzdGlvbj\t4NCgkJ\tCQkJCTxjY\tXJlQWR2aW\tNlS2V5d29yZERldGFpbHM+DQoJCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkLz4NCgkJCQkJCTwvY2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJPGNsaW5pY2FsQXJlYS8+DQoJCQkJCQk8cmVwb3J0VGV4dD4NCgkJCQkJCQk8dGV4dD5NYWpvciBibG9vZCBsb3NzIGZyb20gYSB3b3VuZCB3YXMgZGVzY3JpYmVkLjwvdGV4dD4NCgkJCQkJCQk8cG9zaXRpdmU+dHJ1ZTwvcG9zaXRpdmU+DQoJCQkJCQk8L3JlcG9ydFRleHQ+DQoJCQkJCQk8dXNlckNvbW1lbnQvPg0KCQkJCQkJPGFjdGlvbj5OZXh0PC9hY3Rpb24+DQoJCQkJCQk8aW5jbHVkZUluUmVwb3J0PnRydWU8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjM1OjU3LjA0Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6MzU6NTkuMDFaPC9maW5pc2g+DQoJCQkJCQk8cXVlc3Rpb25UeXBlPlNpbmdsZUFuc3dlcjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UE1JPC9wYXRod2F5SWQ+DQoJCQkJCQkJCTxwYXRod2F5T3JkZXJObz4yMDAwMDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkPlR4MTQwMTA5PC9xdWVzdGlvbklkPg0KCQkJCQkJCTxxdWVzdGlvblRleHQ+SXMgaGUgZmlnaHRpbmcgZGVzcGVyYXRlbHkgZm9yIGV2ZXJ5IGJyZWF0aD88L3F1ZXN0aW9uVGV4dD4NCgkJCQkJCQk8cXVlc3Rpb25SYXRpb25hbGUvPg0KCQkJCQkJCTxhbnN3ZXJzPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD55ZXM8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0Pm5vdCBzdXJlPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJ0cnVlIj4NCgkJCQkJCQkJCTx0ZXh0Pm5vPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtLz4NCgkJCQkJCQkJPGNvZGUvPg0KCQkJCQkJCTwvZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQk8L3F1ZXN0aW9uPg0KCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmQvPg0KCQkJCQkJPC9jYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQk8Y2xpbmljYWxBcmVhLz4NCgkJCQkJCTxyZXBvcnRUZXh0Pg0KCQkJCQkJCTx0ZXh0PkZpZ2h0aW5nIGZvciBicmVhdGggd2FzIG5vdCBkZXNjcmliZWQuPC90ZXh0Pg0KCQkJCQkJCTxwb3NpdGl2ZT5mYWxzZTwvcG9zaXRpdmU+DQoJCQkJCQk8L3JlcG9ydFRleHQ+DQoJCQkJCQk8dXNlckNvbW1lbnQvPg0KCQkJCQkJPGFjdGlvbj5OZXh0PC9hY3Rpb24+DQoJCQkJCQk8aW5jbHVkZUluUmVwb3J0PnRydWU8L2luY2x1ZGVJblJlcG9ydD4NCgkJCQkJPC90cmlhZ2VMaW5lPg0KCQkJCQk8dHJpYWdlTGluZT4NCgkJCQkJCTxzdGFydD4yMDExLTAyLTE3VDE3OjM1OjU5LjA1N1o8L3N0YXJ0Pg0KCQkJCQkJPGZpbmlzaD4yMDExLTAyLTE3VDE3OjM2OjE2LjUyM1o8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2luZ2xlQW5zd2VyPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJCTxtYWpvcj42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjIwNDAwPC9wYXRod2F5T3JkZXJObz4NCgkJCQkJCQk8L3RyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uSWQ+VHgyMjA1NjM8L3F1ZXN0aW9uSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uVGV4dD5JcyBoZSBsaW1wLCBmbG9wcHkgYW5kL29yIHVucmVzcG9uc2l2ZT88L3F1ZXN0aW9uVGV4dD4NCgkJCQkJCQk8cXVlc3Rpb25SYXRpb25hbGUvPg0KCQkJCQkJCTxhbnN3ZXJzPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD55ZXM8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0Pm5vdCBzdXJlPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJ0cnVlIj4NCgkJCQkJCQkJCTx0ZXh0Pm5vPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtLz4NCgkJCQkJCQkJPGNvZGUvPg0KCQkJCQkJCTwvZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQk8L3F1ZXN0aW9uPg0KCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmQvPg0KCQkJCQkJPC9jYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQk8Y2xpbmljYWxBcmVhLz4NCgkJCQkJCTxyZXBvcnRUZXh0Pg0\tKCQkJCQkJC\tTx0ZXh0PlR\toZSBjaG\tlsZCB3YXMg\tbm90IGRlc2\tNyaWJlZCBhcyBsaW1wLCBmbG9wcHkgYW5kL29yIHVucmVzcG9uc2l2ZS48L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPmZhbHNlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPk5leHQ8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+dHJ1ZTwvaW5jbHVkZUluUmVwb3J0Pg0KCQkJCQk8L3RyaWFnZUxpbmU+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KCQkJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6MzY6MTYuNTg3Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6MzY6MTkuMzgzWjwvZmluaXNoPg0KCQkJCQkJPHF1ZXN0aW9uVHlwZT5TaW5nbGVBbnN3ZXI8L3F1ZXN0aW9uVHlwZT4NCgkJCQkJCTxxdWVzdGlvbj4NCgkJCQkJCQk8dHJpYWdlTG9naWNJZD4NCgkJCQkJCQkJPHBhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQkJPG1ham9yPjY8L21ham9yPg0KCQkJCQkJCQkJPG1pbm9yPjI8L21pbm9yPg0KCQkJCQkJCQkJPHN1YlJldmlzaW9uPjE8L3N1YlJldmlzaW9uPg0KCQkJCQkJCQk8L3BhdGh3YXlWZXJzaW9uPg0KCQkJCQkJCQk8cGF0aHdheUlkPlBNSTwvcGF0aHdheUlkPg0KCQkJCQkJCQk8cGF0aHdheU9yZGVyTm8+MjA0NTA8L3BhdGh3YXlPcmRlck5vPg0KCQkJCQkJCTwvdHJpYWdlTG9naWNJZD4NCgkJCQkJCQk8cXVlc3Rpb25JZD5UeDIyMDU2MTwvcXVlc3Rpb25JZD4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0PklzIGhlIHdhcm0gdG8gdG91Y2g/PC9xdWVzdGlvblRleHQ+DQoJCQkJCQkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0idHJ1ZSI+DQoJCQkJCQkJCQk8dGV4dD55ZXM8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0Pm5vdCBzdXJlPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5ubzwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+bm90IHNhZmUgdG8gdG91Y2g8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCQkJPHRlcm0+V2FybSB0byB0b3VjaDwvdGVybT4NCgkJCQkJCQkJPGNvZGUvPg0KCQkJCQkJCTwvZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQk8L3F1ZXN0aW9uPg0KCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmQvPg0KCQkJCQkJPC9jYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQk8Y2xpbmljYWxBcmVhLz4NCgkJCQkJCTxyZXBvcnRUZXh0Pg0KCQkJCQkJCTx0ZXh0PlRoZSBpbmRpdmlkdWFsIHdhcyBkZXNjcmliZWQgYXMgYmVpbmcgd2FybSB0byB0b3VjaC48L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPnRydWU8L3Bvc2l0aXZlPg0KCQkJCQkJPC9yZXBvcnRUZXh0Pg0KCQkJCQkJPHVzZXJDb21tZW50Lz4NCgkJCQkJCTxhY3Rpb24+TmV4dDwvYWN0aW9uPg0KCQkJCQkJPGluY2x1ZGVJblJlcG9ydD50cnVlPC9pbmNsdWRlSW5SZXBvcnQ+DQoJCQkJCTwvdHJpYWdlTGluZT4NCgkJCQkJPHRyaWFnZUxpbmU+DQoJCQkJCQk8c3RhcnQ+MjAxMS0wMi0xN1QxNzozNjoxOS40NzdaPC9zdGFydD4NCgkJCQkJCTxmaW5pc2g+MjAxMS0wMi0xN1QxNzozNjoyMi40NjNaPC9maW5pc2g+DQoJCQkJCQk8cXVlc3Rpb25UeXBlPlNpbmdsZUFuc3dlcjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UE1JPC9wYXRod2F5SWQ+DQoJCQkJCQkJCTxwYXRod2F5T3JkZXJObz4yMDgwMDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkPlR4MTIwMDE5PC9xdWVzdGlvbklkPg0KCQkJCQkJCTxxdWVzdGlvblRleHQ+V2FzIHRoZSBpbmp1cnkgY2F1c2VkIGJ5IGFueSBvZiB0aGUgZm9sbG93aW5nPzwvcXVlc3Rpb25UZXh0Pg0KCQkJCQkJCTxxdWVzdGlvblJhdGlvbmFsZS8+DQoJCQkJCQkJPGFuc3dlcnM+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PmEgZ3Vuc2hvdDwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+YSBzdGFiYmluZzwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+YmVpbmcgZWplY3RlZCBmcm9tIGEgdmVoaWNsZTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+bm90IHN1cmU8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9InRydWUiPg0KCQkJCQkJCQkJPHRleHQ+bm88L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaX\tNwb3NpdGlvb\tlJhdGlvbmFs\tZT4NCgkJ\tCQkJCQkJPHR\tlcm0vPg0KCQ\tkJCQkJCQk8Y29kZS8+DQoJCQkJCQkJPC9kaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCTwvcXVlc3Rpb24+DQoJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZC8+DQoJCQkJCQk8L2NhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCTxjbGluaWNhbEFyZWEvPg0KCQkJCQkJPHJlcG9ydFRleHQ+DQoJCQkJCQkJPHRleHQ+QSBndW5zaG90IG9yIHN0YWJiaW5nIGluanVyeSBvciBlamVjdGlvbiBmcm9tIGEgdmVoaWNsZSB3YXMgbm90IGRlc2NyaWJlZC48L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPmZhbHNlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPk5leHQ8L2FjdGlvbj4NCgkJCQkJCTxpbmNsdWRlSW5SZXBvcnQ+dHJ1ZTwvaW5jbHVkZUluUmVwb3J0Pg0KCQkJCQk8L3RyaWFnZUxpbmU+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KCQkJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6MzY6MjIuNTRaPC9zdGFydD4NCgkJCQkJCTxmaW5pc2g+MjAxMS0wMi0xN1QxNzozNjoyNS42NjdaPC9maW5pc2g+DQoJCQkJCQk8cXVlc3Rpb25UeXBlPlNpbmdsZUFuc3dlcjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UE1JPC9wYXRod2F5SWQ+DQoJCQkJCQkJCTxwYXRod2F5T3JkZXJObz4yMzEwMDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkPlR4MjIwMjg2PC9xdWVzdGlvbklkPg0KCQkJCQkJCTxxdWVzdGlvblRleHQ+RElEIFRIRSBJTkpVUlkgSU5WT0xWRSBBTlkgT0YgVEhFIEZPTExPV0lORz88L3F1ZXN0aW9uVGV4dD4NCgkJCQkJCQk8cXVlc3Rpb25SYXRpb25hbGUvPg0KCQkJCQkJCTxhbnN3ZXJzPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5hIGZhbGwgb2YgNSBtZXRyZXMgb3IgbW9yZSAoc3BlY2lmeSk8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0Pm11bHRpcGxlIG1ham9yIGluanVyaWVzIChzcGVjaWZ5KTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+bWFqb3Igd291bmQgb3IgYW1wdXRhdGlvbiAtIG5vdCBqdXN0IGludm9sdmluZyBhIHNpbmdsZSBmaW5nZXIgb3IgdG9lIChzcGVjaWZ5KTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+YmVpbmcga25vY2tlZCBvdmVyIGJ5IGEgYmxhc3QgKHNwZWNpZnkpPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5ub3Qgc3VyZTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0idHJ1ZSI+DQoJCQkJCQkJCQk8dGV4dD5ubzwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQk8L2Fuc3dlcnM+DQoJCQkJCQkJPGRpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJCQk8dGVybS8+DQoJCQkJCQkJCTxjb2RlLz4NCgkJCQkJCQk8L2Rpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJPC9xdWVzdGlvbj4NCgkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkLz4NCgkJCQkJCTwvY2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJPGNsaW5pY2FsQXJlYS8+DQoJCQkJCQk8cmVwb3J0VGV4dD4NCgkJCQkJCQk8dGV4dD5BIG1ham9yIGZhbGwsIG11bHRpcGxlIG1ham9yIGluanVyaWVzLCBhIG1ham9yIHdvdW5kL2FtcHV0YXRpb24gb3IgYmxhc3QgaW5qdXJ5IHdlcmUgbm90IGRlc2NyaWJlZC48L3RleHQ+DQoJCQkJCQkJPHBvc2l0aXZlPmZhbHNlPC9wb3NpdGl2ZT4NCgkJCQkJCTwvcmVwb3J0VGV4dD4NCgkJCQkJCTx1c2VyQ29tbWVudC8+DQoJCQkJCQk8YWN0aW9uPkNoYW5nZTwvYWN0aW9uPg0KCQkJCQkJPGluY2x1ZGVJblJlcG9ydD5mYWxzZTwvaW5jbHVkZUluUmVwb3J0Pg0KCQkJCQk8L3RyaWFnZUxpbmU+DQoJCQkJCTx0cmlhZ2VMaW5lPg0KCQkJCQkJPHN0YXJ0PjIwMTEtMDItMTdUMTc6MzY6NTMuMDU3Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6Mzc6MDUuMThaPC9maW5pc2g+DQoJCQkJCQk8cXVlc3Rpb25UeXBlPlNpbmdsZUFuc3dlcjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UEVFMzwvcGF0aHdheUlkPg0KCQkJCQkJCQk8cGF0aHdheU9yZGVyTm8+MDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkPlR4MTQwMTU5PC9xdWVzdGlvbklkPg0KCQkJCQkJCTxxdWVzdGlvblRleHQ+V2hhdCBpcyB0aGUgcmVhc29uIGZvciBlb\tmRpbmcgdGhlI\tGFzc2Vzc21lb\tnQ/PC9xdW\tVzdGlvblRleH\tQ+DQoJCQkJCQ\tkJPHF1ZXN0aW9uUmF0aW9uYWxlLz4NCgkJCQkJCQk8YW5zd2Vycz4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+dGhlIHBob25lIGxpbmUgd2VudCBkZWFkPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD50aGUgY2FsbGVyIHRlcm1pbmF0ZWQgdGhlIGNhbGwgKHNwZWNpZnkpPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5JIHRlcm1pbmF0ZWQgdGhlIGNhbGwgKHNwZWNpZnkpPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD50cmlhZ2Ugbm90IHBvc3NpYmxlPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJ0cnVlIj4NCgkJCQkJCQkJCTx0ZXh0PnRyYW5zZmVyIHRvIGEgY2xpbmljaWFuPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtPkNhbGwgdHJhbnNmZXJyZWQgZm9yIGNsaW5pY2lhbiBhc3Nlc3NtZW50PC90ZXJtPg0KCQkJCQkJCQk8Y29kZS8+DQoJCQkJCQkJPC9kaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCTwvcXVlc3Rpb24+DQoJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZC8+DQoJCQkJCQk8L2NhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCTxjbGluaWNhbEFyZWEvPg0KCQkJCQkJPHJlcG9ydFRleHQ+DQoJCQkJCQkJPHRleHQ+QXNzZXNzbWVudCBlbmRlZCBiZWNhdXNlIHRoZSBjYWxsIHJlcXVpcmVkIHRyYW5zZmVyIHRvIGEgY2xpbmljaWFuLjwvdGV4dD4NCgkJCQkJCQk8cG9zaXRpdmU+ZmFsc2U8L3Bvc2l0aXZlPg0KCQkJCQkJPC9yZXBvcnRUZXh0Pg0KCQkJCQkJPHVzZXJDb21tZW50Lz4NCgkJCQkJCTxhY3Rpb24+RWFybHlFeGl0PC9hY3Rpb24+DQoJCQkJCQk8aW5jbHVkZUluUmVwb3J0PmZhbHNlPC9pbmNsdWRlSW5SZXBvcnQ+DQoJCQkJCTwvdHJpYWdlTGluZT4NCgkJCQkJPHRyaWFnZUxpbmU+DQoJCQkJCQk8c3RhcnQ+MjAxMS0wMi0xN1QxNzozODo1MS45NjNaPC9zdGFydD4NCgkJCQkJCTxmaW5pc2g+MjAxMS0wMi0xN1QxNzozODo1My44Mlo8L2ZpbmlzaD4NCgkJCQkJCTxxdWVzdGlvblR5cGU+U2luZ2xlQW5zd2VyPC9xdWVzdGlvblR5cGU+DQoJCQkJCQk8cXVlc3Rpb24+DQoJCQkJCQkJPHRyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJCTxwYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJCTxtYWpvcj42PC9tYWpvcj4NCgkJCQkJCQkJCTxtaW5vcj4yPC9taW5vcj4NCgkJCQkJCQkJCTxzdWJSZXZpc2lvbj4xPC9zdWJSZXZpc2lvbj4NCgkJCQkJCQkJPC9wYXRod2F5VmVyc2lvbj4NCgkJCQkJCQkJPHBhdGh3YXlJZD5QTUk8L3BhdGh3YXlJZD4NCgkJCQkJCQkJPHBhdGh3YXlPcmRlck5vPjIzMTAwPC9wYXRod2F5T3JkZXJObz4NCgkJCQkJCQk8L3RyaWFnZUxvZ2ljSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uSWQ+VHgyMjAyODY8L3F1ZXN0aW9uSWQ+DQoJCQkJCQkJPHF1ZXN0aW9uVGV4dD5ESUQgVEhFIElOSlVSWSBJTlZPTFZFIEFOWSBPRiBUSEUgRk9MTE9XSU5HPzwvcXVlc3Rpb25UZXh0Pg0KCQkJCQkJCTxxdWVzdGlvblJhdGlvbmFsZS8+DQoJCQkJCQkJPGFuc3dlcnM+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0PmEgZmFsbCBvZiA1IG1ldHJlcyBvciBtb3JlIChzcGVjaWZ5KTwvdGV4dD4NCgkJCQkJCQkJCTxyYXRpb25hbGUvPg0KCQkJCQkJCQk8L2Fuc3dlcj4NCgkJCQkJCQkJPGFuc3dlciBzZWxlY3RlZD0iZmFsc2UiPg0KCQkJCQkJCQkJPHRleHQ+bXVsdGlwbGUgbWFqb3IgaW5qdXJpZXMgKHNwZWNpZnkpPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5tYWpvciB3b3VuZCBvciBhbXB1dGF0aW9uIC0gbm90IGp1c3QgaW52b2x2aW5nIGEgc2luZ2xlIGZpbmdlciBvciB0b2UgKHNwZWNpZnkpPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dD5iZWluZyBrbm9ja2VkIG92ZXIgYnkgYSBibGFzdCAoc3BlY2lmeSk8L3RleHQ+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJCTxhbnN3ZXIgc2VsZWN0ZWQ9ImZhbHNlIj4NCgkJCQkJCQkJCTx0ZXh0Pm5vdCBzdXJlPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJ0cnVlIj4NCgkJCQkJCQkJCTx0ZXh0Pm5vPC90ZXh0Pg0KCQkJCQkJCQkJPHJhdGlvbmFsZS8+DQoJCQkJCQkJCTwvYW5zd2VyPg0KCQkJCQkJCTwvYW5zd2Vycz4NCgkJCQkJCQk8ZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQkJCTx0ZXJtLz4NCgkJCQkJCQkJPGNvZGUvPg0KCQkJCQkJCTwvZGlzcG9zaXRpb25SYXRpb25hbGU+DQoJCQkJCQk8L3F1ZXN0aW9uPg0KCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkRGV0YWlscz4NCgkJCQkJCQk8Y2FyZUFkdmljZUtleXdvcmQvPg0KCQkJCQkJPC9jYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQk8Y2xpbmljYWxBcmVhLz4NCgkJCQkJCTxyZXBvcnRUZXh0Pg0KCQkJCQkJCTx0ZXh0PkEgbWFqb3IgZmFsbCwgbXVsdGlwbGUgbWFqb3Ig\taW5qdXJpZXMsI\tGEgbWFqb3Igd2\t91bmQvYW1w\tdXRhdGlvbiBvc\tiBibGFzdCBpbm\tp1cnkgd2VyZSBub3QgZGVzY3JpYmVkLjwvdGV4dD4NCgkJCQkJCQk8cG9zaXRpdmU+ZmFsc2U8L3Bvc2l0aXZlPg0KCQkJCQkJPC9yZXBvcnRUZXh0Pg0KCQkJCQkJPHVzZXJDb21tZW50Lz4NCgkJCQkJCTxhY3Rpb24+TmV4dDwvYWN0aW9uPg0KCQkJCQkJPGluY2x1ZGVJblJlcG9ydD50cnVlPC9pbmNsdWRlSW5SZXBvcnQ+DQoJCQkJCTwvdHJpYWdlTGluZT4NCgkJCQkJPHRyaWFnZUxpbmU+DQoJCQkJCQk8c3RhcnQ+MjAxMS0wMi0xN1QxNzozODo1My45Wjwvc3RhcnQ+DQoJCQkJCQk8ZmluaXNoPjIwMTEtMDItMTdUMTc6Mzk6MzYuNzQzWjwvZmluaXNoPg0KCQkJCQkJPHF1ZXN0aW9uVHlwZT5EaXNwb3NpdGlvbjwvcXVlc3Rpb25UeXBlPg0KCQkJCQkJPHF1ZXN0aW9uPg0KCQkJCQkJCTx0cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCQk8cGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCQk8bWFqb3I+NjwvbWFqb3I+DQoJCQkJCQkJCQk8bWlub3I+MjwvbWlub3I+DQoJCQkJCQkJCQk8c3ViUmV2aXNpb24+MTwvc3ViUmV2aXNpb24+DQoJCQkJCQkJCTwvcGF0aHdheVZlcnNpb24+DQoJCQkJCQkJCTxwYXRod2F5SWQ+UE1JPC9wYXRod2F5SWQ+DQoJCQkJCQkJCTxwYXRod2F5T3JkZXJObz4yNDEwMDwvcGF0aHdheU9yZGVyTm8+DQoJCQkJCQkJPC90cmlhZ2VMb2dpY0lkPg0KCQkJCQkJCTxxdWVzdGlvbklkLz4NCgkJCQkJCQk8cXVlc3Rpb25UZXh0PkRpc3BhdGNoIDE5IG1pbnV0ZSBhbWJ1bGFuY2U8L3F1ZXN0aW9uVGV4dD4NCgkJCQkJCQk8cXVlc3Rpb25SYXRpb25hbGUvPg0KCQkJCQkJCTxhbnN3ZXJzPg0KCQkJCQkJCQk8YW5zd2VyIHNlbGVjdGVkPSJmYWxzZSI+DQoJCQkJCQkJCQk8dGV4dC8+DQoJCQkJCQkJCQk8cmF0aW9uYWxlLz4NCgkJCQkJCQkJPC9hbnN3ZXI+DQoJCQkJCQkJPC9hbnN3ZXJzPg0KCQkJCQkJCTxkaXNwb3NpdGlvblJhdGlvbmFsZT4NCgkJCQkJCQkJPHRlcm0vPg0KCQkJCQkJCQk8Y29kZT5EeDAxMjwvY29kZT4NCgkJCQkJCQk8L2Rpc3Bvc2l0aW9uUmF0aW9uYWxlPg0KCQkJCQkJPC9xdWVzdGlvbj4NCgkJCQkJCTxjYXJlQWR2aWNlS2V5d29yZERldGFpbHM+DQoJCQkJCQkJPGNhcmVBZHZpY2VLZXl3b3JkLz4NCgkJCQkJCTwvY2FyZUFkdmljZUtleXdvcmREZXRhaWxzPg0KCQkJCQkJPGNsaW5pY2FsQXJlYS8+DQoJCQkJCQk8cmVwb3J0VGV4dD4NCgkJCQkJCQk8dGV4dD5BbiBlbWVyZ2VuY3kgYW1idWxhbmNlIGlzIGJlaW5nIGFycmFuZ2VkLjwvdGV4dD4NCgkJCQkJCQk8cG9zaXRpdmU+ZmFsc2U8L3Bvc2l0aXZlPg0KCQkJCQkJPC9yZXBvcnRUZXh0Pg0KCQkJCQkJPHVzZXJDb21tZW50Lz4NCgkJCQkJCTxhY3Rpb24+TmV4dDwvYWN0aW9uPg0KCQkJCQkJPGluY2x1ZGVJblJlcG9ydD50cnVlPC9pbmNsdWRlSW5SZXBvcnQ+DQoJCQkJCTwvdHJpYWdlTGluZT4NCgkJCQk8L3RyaWFnZUxpbmVEZXRhaWxzPg0KCQkJCTxvcmlnU2l0ZT4NCgkJCQkJPHNpdGVJZD40PC9zaXRlSWQ+DQoJCQkJCTxzaXRlTmFtZT5EdWRsZXk8L3NpdGVOYW1lPg0KCQkJCQk8Y2FzZUlkPjgwNjdiOWIyLWU2MDQtNDQxNC1iNTZmLThlM2NjNGRlNGIxYjwvY2FzZUlkPg0KCQkJCQk8cGF0aHdheXNDb250ZW50VmVyc2lvbj42LjIuMWhOSFNEPC9wYXRod2F5c0NvbnRlbnRWZXJzaW9uPg0KCQkJCQk8c29mdHdhcmU+DQoJCQkJCQk8cHJvZHVjdE5hbWU+Q0FTIEZyYW1ld29yazwvcHJvZHVjdE5hbWU+DQoJCQkJCQk8dmVyc2lvbj5WMTIuMjwvdmVyc2lvbj4NCgkJCQkJPC9zb2Z0d2FyZT4NCgkJCQk8L29yaWdTaXRlPg0KCQkJCTxjYWxsZXJJc1BhdGllbnQ+ZmFsc2U8L2NhbGxlcklzUGF0aWVudD4NCgkJCTwvcGF0aHdheVRyaWFnZT4NCgkJPC9wYXRod2F5VHJpYWdlRGV0YWlscz4NCgkJPGRlbW9ncmFwaGljcz4NCgkJCTxnZW5kZXI+TWFsZTwvZ2VuZGVyPg0KCQkJPGFnZUdyb3VwPkFkdWx0PC9hZ2VHcm91cD4NCgkJPC9kZW1vZ3JhcGhpY3M+DQoJCTxzaGFyZWRDYXNlSWQvPg0KCTwvcGF0aHdheURldGFpbHM+DQoJPHNpdGU+DQoJCTxpZD40PC9pZD4NCgkJPG5hbWU+RHVkbGV5PC9uYW1lPg0KCTwvc2l0ZT4NCjwvUGF0aHdheXNDYXNlPg0K\t\t\t\t\t\t\t\t\t\t\t\t\t</value>\t\t\t\t\t\t\t\t\t\t                          <!-- this section is the change for version 2 of this message - it is the software and version that produced the triage data above -->
+                                                \t\t\t\t\t\t\t\t\t\t
+                                                <participant typeCode="DEV" contextControlCode="OP">
+                                                    \t\t\t\t\t\t\t\t\t\t\t
+                                                    <templateId
+                                                            root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                            extension="COCD_TP146002GB01#participant"/>
+                                                    \t\t\t\t\t\t\t\t\t\t\t
+                                                    <npfitlc:contentId
+                                                            root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                                            extension="COCD_TP145000GB01#ParticipantRole"/>
+                                                    \t\t\t\t\t\t\t\t\t\t\t
+                                                    <participantRole classCode="ROL">\t\t\t\t\t\t\t\t\t\t\t\t
+                                                        <templateId
+                                                                root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                                extension="COCD_TP145000GB01#ParticipantRole"/>
+                                                        \t\t\t\t\t\t\t\t\t\t\t\t
+                                                        <code code="TS"
+                                                              codeSystem="2.16.840.1.113883.2.1.3.2.4.17.418"/>
+                                                        \t\t\t\t\t\t\t\t\t\t\t\t
+                                                        <playingDevice classCode="DEV" determinerCode="INSTANCE">
+                                                            \t\t\t\t\t\t\t\t\t\t\t\t\t
+                                                            <templateId
+                                                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                                    extension="COCD_TP145000GB01#playingDevice"/>
+                                                            \t\t\t\t\t\t\t\t\t\t\t\t\t                                <manufacturerModelName>
+                                                            Pathways</manufacturerModelName>\t\t\t\t\t\t\t\t\t\t\t\t\t                                <softwareName>
+                                                            2.4</softwareName>\t\t\t\t\t\t\t\t\t\t\t\t
+                                                        </playingDevice>
+                                                        \t\t\t\t\t\t\t\t\t\t\t
+                                                    </participantRole>
+                                                    \t\t\t\t\t\t\t\t\t\t
+                                                </participant>
+                                                \t\t\t\t\t\t\t\t\t
+                                            </observationMedia>
+                                            \t\t\t\t\t\t\t\t
+                                        </entry>
+                                        \t\t\t\t\t\t\t\t
+                                        <component typeCode="COMP" contextConductionInd="true">\t\t\t\t\t\t\t\t\t
+                                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                                               extension="COCD_TP146246GB01#Section1"/>
+                                            \t\t\t\t\t\t\t\t\t
+                                            <section classCode="DOCSECT" moodCode="EVN">\t\t\t\t\t\t\t\t\t\t<templateId
+                                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                    extension="COCD_TP146246GB01#Section1"/>\t\t\t\t\t\t\t\t\t\t<id
+                                                    root="773110DB-288F-4B32-8DE1-362646A65E9A"/>\t\t\t\t\t\t\t\t\t\t                          <title>
+                                                Patient\'s Reported Condition</title>\t\t\t\t\t\t\t\t\t\t
+                                                <text>\t\t\t\t\t\t\t\t\t\t\t                            <content>Patient
+                                                    has a insect bite.</content>\t\t\t\t\t\t\t\t\t\t
+                                                </text>
+                                                \t\t\t\t\t\t\t\t\t
+                                            </section>
+                                            \t\t\t\t\t\t\t\t
+                                        </component>
+                                        \t\t\t\t\t\t\t\t
+                                        <component typeCode="COMP" contextConductionInd="true">\t\t\t\t\t\t\t\t\t
+                                            <npfitlc:contentId root="2.16.840.1.113883.2.1.3.2.4.18.16"
+                                                               extension="COCD_TP146246GB01#Section1"/>
+                                            \t\t\t\t\t\t\t\t\t
+                                            <section classCode="DOCSECT" moodCode="EVN">\t\t\t\t\t\t\t\t\t\t<templateId
+                                                    root="2.16.840.1.113883.2.1.3.2.4.18.2"
+                                                    extension="COCD_TP146246GB01#Section1"/>\t\t\t\t\t\t\t\t\t\t<id
+                                                    root="8271D2F1-126F-4A14-A1AC-C6C8023243CF"/>\t\t\t\t\t\t\t\t\t\t                          <title>
+                                                Case Summary</title>\t\t\t\t\t\t\t\t\t\t
+                                                <text>\t\t\t\t\t\t\t\t\t\t\t                            <content
+                                                        styleCode="bold">Disposition:</content>\t\t\t\t\t\t\t\t\t\t\t
+                                                    <br/>\t\t\t\t\t\t\t\t\t\t\t                            <content>Go
+                                                        to the nearest Emergency Department within 4 hours.</content>\t\t\t\t\t\t\t\t\t\t\t
+                                                    <br/>\t\t\t\t\t\t\t\t\t\t\t                            <content
+                                                            styleCode="bold">Selected care service:</content>\t\t\t\t\t\t\t\t\t\t\t
+                                                    <br/>\t\t\t\t\t\t\t\t\t\t\t                            <content>
+                                                        Dx009</content>\t\t\t\t\t\t\t\t\t\t\t<br/>\t\t\t\t\t\t\t\t\t\t\t                            <content
+                                                            styleCode="bold">Pathways Assessment:</content>\t\t\t\t\t\t\t\t\t\t\t
+                                                    <br/>\t\t\t\t\t\t\t\t\t\t\t
+                                                    <content>An injury or other health problem was
+                                                        described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>The individual was
+                                                        described as breathing and
+                                                        conscious.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>Loss of at least a
+                                                        mugful of blood in the last 30 minutes was not
+                                                        described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>An illness or other
+                                                        health problem was described. - Insect
+                                                        Bite\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>Fighting for breath was
+                                                        not described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>A heart attack,
+                                                        chest/upper back pain, recent probable stroke, recent
+                                                        fit/seizure or suicide attempt was not described as the main
+                                                        call reason.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>New confusion, a
+                                                        diabetic hypo, a probable allergic reaction or successful
+                                                        resuscitation was not described as being the main call
+                                                        reason.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>The individual was
+                                                        described as being warm to touch.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t
+                                                        <br/>An insect or spider bite or sting was described. - Tick
+                                                        Bite\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>A sting/bite occurring
+                                                        within the last hour was not
+                                                        described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>10 or more stings
+                                                        were not described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>Nausea or
+                                                        vomiting since the sting was not
+                                                        described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>A sting involving
+                                                        the eyes or mouth was not
+                                                        described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>A fever was not
+                                                        described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>An insect still
+                                                        attached to the skin was
+                                                        described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>A tick bite was
+                                                        described.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t
+                                                        <br/>
+                                                        \t\t\t\t\t\t\t\t\t\t\t
+                                                    </content>
+                                                    \t\t\t\t\t\t\t\t\t\t\t                            <content
+                                                            styleCode="bold">Advice given:</content>\t\t\t\t\t\t\t\t\t\t\t
+                                                    <br/>\t\t\t\t\t\t\t\t\t\t\t
+                                                    <content>Remove any jewellery or tight clothing from the
+                                                        area.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<br/>Antihistamine medication
+                                                        and creams help reduce swelling and itching. They can be bought
+                                                        from pharmacies. Talk to the pharmacist for advice. Follow the
+                                                        instructions in the pack.\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t
+                                                        <br/>
+                                                        Unless advised not to, or they have already been given,
+                                                        paracetamol or ibuprofen can be used to relieve pain. Follow the
+                                                        instructions in the pack. If in doubt ask a
+                                                        pharmacist.\t\t\t\t\t\t\t\t\t\t\t\t\t\t
+                                                    </content>
+                                                    \t\t\t\t\t\t\t\t\t\t
+                                                </text>
+                                                \t\t\t\t\t\t\t\t\t
+                                            </section>
+                                            \t\t\t\t\t\t\t\t
+                                        </component>
+                                        \t\t\t\t\t\t\t
+                                    </section>
+                                    \t\t\t\t\t\t
+                                </component>
+                                \t\t\t\t\t
+                            </structuredBody>
+                            \t\t\t\t
                         </component>
-                        <component typeCode="COMP" contextConductionInd="true">
-                          <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP146061UK01#component1"/>
-                          <section classCode="DOCSECT" moodCode="EVN">
-                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="COCD_TP146061UK01#section2"/>
-                            <id root="D92DCC40-EF24-11DB-A1BE-F5CA408FF127"/>
-                            <title>Reason for Withdrawal</title>
-                            <text>
-                              <content ID="a1">Sent to wrong patient record</content>
-                            </text>
-                          </section>
-                        </component>
-                      </section>
-                    </component>
-                  </section>
-                </component>
-              </structuredBody>
-            </component>
-          </ClinicalDocument>
-          <!-- the document ends here -->
-        </itk:payload>
-      </itk:payloads>
-    </itk:DistributionEnvelope>
-  </soap:Body>
-</soap:Envelope>
+                        \t\t\t
+                    </ClinicalDocument>               <!-- the document ends here -->\t\t
+                </itk:payload>
+                \t
+            </itk:payloads>
+        </itk:DistributionEnvelope>
+        \t
+    </soap:Body>
+</soap:Envelope>'

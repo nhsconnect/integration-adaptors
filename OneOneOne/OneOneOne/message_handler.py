@@ -27,10 +27,10 @@ class MessageHandler:
         self.message_tree = ET.fromstring(self.message)
         self.check_list = [
             self.check_action_types,
-            #self.check_manifest_and_payload_count,
-            #self.check_manifest_count_against_actual,
-            #self.check_payload_count_against_actual,
-            #self.check_payload_id_matches_manifest_id
+            self.check_manifest_and_payload_count,
+            self.check_manifest_count_against_actual,
+            self.check_payload_count_against_actual,
+            self.check_payload_id_matches_manifest_id
         ]
 
     def evaluate_message(self):
@@ -165,11 +165,12 @@ class MessageHandler:
                                                  self.namespaces):
             payload_ids.add(payload.attrib['id'])
 
-        for manifest in self.message_tree.findall("./soap:body"
+        for manifest in self.message_tree.findall("./soap:Body"
                                                   "/itk:DistributionEnvelope"
                                                   "/itk:header"
-                                                  "itk:manifest"
-                                                  "/itk:manifestitem"):
+                                                  "/itk:manifest"
+                                                  "/itk:manifestitem",
+                                                  self.namespaces):
             manifest_ids.add(manifest.attrib['id'])
 
         if len(payload_ids.difference(manifest_ids)) != 0:
