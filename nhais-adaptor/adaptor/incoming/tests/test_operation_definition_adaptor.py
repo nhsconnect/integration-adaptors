@@ -24,7 +24,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
         Tests the function to create a fhir operation definition from an incoming edifact interchange
         """
         with self.subTest("adapt an interchange with one message to a single fhir operation definition"):
-            op_def = fixtures.create_operation_definition_for_birth_approval(recipient="TES5", transaction_number="17")
+            op_def = fixtures.create_operation_definition_for_approval(recipient="TES5", transaction_number="17")
             expected = [("17", "TES5", op_def)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
@@ -37,10 +37,10 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
             compare(op_defs, expected)
 
         with self.subTest("adapt an interchange with two messages to two separate fhir operation definition"):
-            op_def_1 = fixtures.create_operation_definition_for_birth_approval(recipient="TES5",
-                                                                               transaction_number="17")
-            op_def_2 = fixtures.create_operation_definition_for_birth_approval(recipient="TES5",
-                                                                               transaction_number="18")
+            op_def_1 = fixtures.create_operation_definition_for_approval(recipient="TES5",
+                                                                         transaction_number="17")
+            op_def_2 = fixtures.create_operation_definition_for_approval(recipient="TES5",
+                                                                         transaction_number="18")
             expected = [("17", "TES5", op_def_1), ("18", "TES5", op_def_2)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
@@ -50,6 +50,19 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
                 MessageSegment(MessageSegmentBeginningDetails(reference_number="F4"),
                                MessageSegmentRegistrationDetails(transaction_number="18"))])
 
+            incoming_interchange = Interchange(header=interchange_header, messages=messages)
+
+            op_defs = incoming_adaptor.create_operation_definition(incoming_interchange)
+
+            compare(op_defs, expected)
+
+        with self.subTest("adapt an interchange for a deduction"):
+            op_def = fixtures.create_operation_definition_for_deduction(recipient="TES5", transaction_number="17")
+            expected = [("17", "TES5", op_def)]
+
+            interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
+            messages = Messages([MessageSegment(MessageSegmentBeginningDetails(reference_number="F2"),
+                                                MessageSegmentRegistrationDetails(transaction_number="17"))])
             incoming_interchange = Interchange(header=interchange_header, messages=messages)
 
             op_defs = incoming_adaptor.create_operation_definition(incoming_interchange)
