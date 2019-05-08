@@ -44,10 +44,10 @@ class TestFileUtilities(TestCase):
             "Mixed": MIXED_STRING
         }
 
-        for line_break_type in strings_to_test:
+        for line_break_type, test_string in strings_to_test.items():
             message = line_break_type + " line endings should be normalized."
 
             with self.subTest(message):
-                normalized_string = FileUtilities.normalize_line_endings(strings_to_test[line_break_type])
+                normalized_string = FileUtilities.normalize_line_endings(test_string)
 
                 self.assertEqual(EXPECTED_NORMALIZED_STRING, normalized_string)
