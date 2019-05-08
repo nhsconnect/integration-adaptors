@@ -8,7 +8,9 @@ basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success
 
 wrong_service_body = FileUtilities.get_file_string(XML_PATH / 'mismatched_action_services.xml')
 
-wrong_manifest_count = FileUtilities.get_file_string(XML_PATH / 'manifest_not_equal_to_payload_count.xml')
+wrong_manifest_payload_count = FileUtilities.get_file_string(XML_PATH / 'manifest_not_equal_to_payload_count.xml')
+
+wrong_manifest_instances = FileUtilities.get_file_string(XML_PATH / 'invalid_manifest_instances.xml')
 
 base_fault_response = FileUtilities.get_file_string(XML_PATH / 'basic_fault_response.xml')
 
@@ -34,6 +36,12 @@ class MessageHandler:
         ]
 
     def evaluate_message(self):
+        """
+        This iterates over the message check methods searching for errors in the message, if no errors are found
+        a success response is returned
+
+        :return:
+        """
         for check in self.check_list:
             status, response = check()
             # logging.warning("Status:" + str(response))
@@ -92,7 +100,7 @@ class MessageHandler:
         if payload_count != manifest_count:
             logging.warning("Error in manifest count: (ManifestCount, PayloadCount) (%s, %s)", manifest_count,
                             payload_count)
-            return 500, wrong_manifest_count
+            return 500, wrong_manifest_payload_count
 
         return 200, basic_success_response
 
@@ -120,7 +128,7 @@ class MessageHandler:
             logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
                             manifest_count, manifest_actual_count)
 
-            return 500, base_fault_response
+            return 500, wrong_manifest_instances
 
         return 200, basic_success_response
 

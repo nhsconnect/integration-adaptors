@@ -29,11 +29,7 @@
                     <itk:id uri="urn:nhs-uk:identity:ods:5L399"/>
                 </itk:auditIdentity>
                 <itk:manifest
-                        count="{{manifestCount}}">
-                    {{#manifest}}
-                    <itk:manifestitem mimetype="text/xml" id="{{id}}"
-                                      profileid="urn:nhs-en:profile:nhs111CDADocument-v2-0"/>
-                    {{/manifest}}
+                        count="{{payloadCount}}">
                 </itk:manifest>
                 <itk:senderAddress
                         uri="urn:nhs-uk:addressing:ods:5L399:445510770"/>
@@ -42,8 +38,10 @@
                               key="urn:nhs-itk:ns:201005:interaction"/>
                 </itk:handlingSpecification>
             </itk:header>
-            <itk:payloads
-                    count="{{manifestCount}}">
+            <itk:payloads count="{{payloadCount}}">
+                {{#payloads}}
+                    <itk:payload id="{{id}}"/>
+                {{/payloads}}
             </itk:payloads>
         </itk:DistributionEnvelope>
     </soap:Body>
