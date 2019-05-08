@@ -1,4 +1,5 @@
 import adaptor.outgoing.birth.message_birth_adaptor as message_birth_adaptor
+import adaptor.outgoing.death.message_death_adaptor as message_death_adaptor
 from edifact.outgoing.models.message import MessageBeginning
 from edifact.outgoing.models.birth.message_birth import Message
 import adaptor.fhir_helpers.fhir_finders as finders
@@ -9,6 +10,11 @@ operation_dict = {
         "refNumber": "G1",
         "registrationDetails": message_birth_adaptor.create_message_segment_registration_details,
         "patientDetails": message_birth_adaptor.create_message_segment_patient_detail
+    },
+    OperationName.REGISTER_DEATH: {
+        "refNumber": "G5",
+        "registrationDetails": message_death_adaptor.create_message_segment_registration_details,
+        "patientDetails": message_death_adaptor.create_message_segment_patient_detail
     }
 }
 
