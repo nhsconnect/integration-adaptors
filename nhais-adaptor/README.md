@@ -15,5 +15,12 @@ Ensure you have `pipenv` installed and is on your class path
 `pipenv run tests` to run all the tests
 
 ### Test the adaptor
-`pipenv run transfer` - Loads the fhir patient registration payload in the GP outbox. 
-Runs the adaptor and creates the edifact interchange in the NHAIS inbox
+#### To test outgoing transfer. Takes a fhir payload and generates an edifact message.
+
+- `pipenv run outgoing`
+Select the GP outbox and fhir payload file. An edifact interchange file will be
+generated in the NHAIS inbox. 
+
+- `pipenv run incoming`
+Select the NHAIS outbox and edifact file. Depending on the edifact interchange multiple fhir payloads will be generated
+in the GP's inbox. 

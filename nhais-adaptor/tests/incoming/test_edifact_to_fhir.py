@@ -1,8 +1,10 @@
-import unittest
 import json
+import unittest
+
+from testfixtures import compare
+
 import adaptor.incoming.operation_definition_adaptor as adaptor
 import edifact.incoming.parser.deserialiser as deserialiser
-from testfixtures import compare
 
 
 class TestEdifactToFhirIntegration(unittest.TestCase):

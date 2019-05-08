@@ -1,9 +1,11 @@
 import os
 from pathlib import Path
-from fhirclient.models.operationdefinition import OperationDefinition
-import adaptor.outgoing.interchange_adaptor as adaptor
-from utilities.file_utilities import FileUtilities
+
 from PyInquirer import prompt
+from fhirclient.models.operationdefinition import OperationDefinition
+from utilities.file_utilities import FileUtilities
+
+import adaptor.outgoing.interchange_adaptor as adaptor
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"

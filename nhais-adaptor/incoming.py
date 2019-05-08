@@ -1,10 +1,12 @@
-import os
 import json
+import os
 from pathlib import Path
+
+from PyInquirer import prompt
+from utilities.file_utilities import FileUtilities
+
 import adaptor.incoming.operation_definition_adaptor as adaptor
 import edifact.incoming.parser.deserialiser as deserialiser
-from utilities.file_utilities import FileUtilities
-from PyInquirer import prompt
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"

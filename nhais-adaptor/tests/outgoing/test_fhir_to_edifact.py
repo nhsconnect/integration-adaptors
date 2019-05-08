@@ -1,6 +1,8 @@
-import unittest
 import json
+import unittest
+
 from fhirclient.models.operationdefinition import OperationDefinition
+
 import adaptor.outgoing.interchange_adaptor as adaptor
 
 
