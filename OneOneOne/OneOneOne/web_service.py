@@ -36,6 +36,8 @@ class MessageReceiver(tornado.web.RequestHandler):
     def get(self):
         print("Test get method")
 
+    def on_finish(self) -> None:
+        self.flush()
 
 if __name__ == "__main__":
     servicesDict = {'debug': True }

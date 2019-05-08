@@ -1,7 +1,9 @@
 from lxml import etree
 import xml.etree.ElementTree as ET
+
+from builder.pystache_message_builder import PystacheMessageBuilder
 from utilities.file_utilities import FileUtilities
-from definitions import XML_PATH
+from definitions import XML_PATH, TEMPLATE_PATH
 import logging
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
@@ -72,7 +74,7 @@ class MessageHandler:
         if header_action != body_service:
             logging.warning("Action type does not match service type: (Action, Service) (%s, %s)", header_action,
                             body_service)
-            return 500, wrong_service_body
+            return 500, self.build_error_message("Manifest action does not match service action")
 
         return 200, basic_success_response
 
@@ -100,7 +102,7 @@ class MessageHandler:
         if payload_count != manifest_count:
             logging.warning("Error in manifest count: (ManifestCount, PayloadCount) (%s, %s)", manifest_count,
                             payload_count)
-            return 500, wrong_manifest_payload_count
+            return 500, self.build_error_message("Manifest count does not match payload count")
 
         return 200, basic_success_response
 
@@ -186,3 +188,7 @@ class MessageHandler:
             return 500, base_fault_response
 
         return 200, basic_success_response
+
+    def build_error_message(self, error):
+        builder = PystacheMessageBuilder(str(TEMPLATE_PATH), 'base_error_template')
+        return builder.build_message({"errorMessage": error})

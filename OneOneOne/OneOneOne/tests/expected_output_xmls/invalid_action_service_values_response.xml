@@ -15,7 +15,7 @@
                 <toolkit:ToolkitErrorInfo xmlns:toolkit="urn:nhs-itk:ns:201005">
                     <toolkit:ErrorID>79E952D7-6BFE-11E9-B1E7-EB711959C3B2</toolkit:ErrorID>
                     <toolkit:ErrorCode>1000</toolkit:ErrorCode>
-                    <toolkit:ErrorText>Invalid message</toolkit:ErrorText>
+                    <toolkit:ErrorText>Manifest action does not match service action</toolkit:ErrorText>
                     <toolkit:ErrorDiagnosticText>Test message rejection.
                         TEST_HARNESS_ID:7D6F23E0-AE1A-11DB-9808-B18E1E0994CD
                     </toolkit:ErrorDiagnosticText>
