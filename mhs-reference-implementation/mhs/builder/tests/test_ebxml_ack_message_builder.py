@@ -8,6 +8,7 @@ from mhs.builder.ebxml_ack_message_builder import EbXmlAckMessageBuilder, RECEIV
 from mhs.builder.ebxml_message_builder import FROM_PARTY_ID, TO_PARTY_ID, CPA_ID, CONVERSATION_ID
 from utilities.file_utilities import FileUtilities
 from utilities.message_utilities import MessageUtilities
+from utilities.xml_utilities import XmlUtilities
 
 EXPECTED_MESSAGES_DIR = "expected_messages"
 EXPECTED_EBXML = "ebxml_ack.xml"
@@ -36,9 +37,6 @@ class TestEbXmlAckMessageBuilder(TestCase):
             RECEIVED_MESSAGE_ID: "0CDBA95F-74DA-47E9-8383-7B8E9167D146",
         })
 
-        # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
-        # file, so normalize the line endings of both strings
-        normalized_expected_message = FileUtilities.normalize_line_endings(expected_message)
-        normalized_message = FileUtilities.normalize_line_endings(message)
-
-        self.assertEqual(normalized_expected_message, normalized_message)
+        expected_message_bytes = expected_message.encode()
+        message_bytes = message.encode()
+        XmlUtilities.assert_xml_equal(expected_message_bytes, message_bytes)
