@@ -23,8 +23,22 @@ nhais_outbox_choices = [
 answers = prompt(nhais_outbox_choices)
 nhais_cypher = answers["nhais"]
 
+# Determine the fhir payload to read
+nhais_outbox_path = str(nhais_mailbox_dir / nhais_cypher / "outbox")
+files = os.listdir(nhais_outbox_path)
+file_choices = [
+    {
+        'type': 'list',
+        'name': 'file',
+        'message': 'Select a file: ',
+        'choices': files
+    }
+]
+file_answer = prompt(file_choices)
+file_name = file_answer["file"]
+
 # read the incoming file
-incoming_file_path = str(nhais_mailbox_dir / nhais_cypher / "outbox" / "edifact.txt")
+incoming_file_path = f"{nhais_outbox_path}/{file_name}"
 incoming_interchange_raw = FileUtilities.get_file_string(incoming_file_path)
 
 # deserialise the incoming edifact interchange
