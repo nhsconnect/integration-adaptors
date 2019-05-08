@@ -27,15 +27,16 @@ class MessageHandler:
         self.message_tree = ET.fromstring(self.message)
         self.check_list = [
             self.check_action_types,
-            self.check_manifest_and_payload_count,
-            self.check_manifest_count_against_actual,
-            self.check_payload_count_against_actual,
-            self.check_payload_id_matches_manifest_id
+            #self.check_manifest_and_payload_count,
+            #self.check_manifest_count_against_actual,
+            #self.check_payload_count_against_actual,
+            #self.check_payload_id_matches_manifest_id
         ]
 
     def evaluate_message(self):
         for check in self.check_list:
             status, response = check()
+            # logging.warning("Status:" + str(response))
             if status != 200:
                 return status, response
 
@@ -113,10 +114,15 @@ class MessageHandler:
                                                               "/itk:DistributionEnvelope"
                                                               "/itk:header"
                                                               "/itk:manifest"
-                                                              "itk:manifestitem",
+                                                              "/itk:manifestitem",
                                                               self.namespaces))
         if manifest_count != manifest_actual_count:
+            logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
+                            manifest_count, manifest_actual_count)
+
             return 500, base_fault_response
+
+        return 200, basic_success_response
 
     def check_payload_count_against_actual(self):
         """
