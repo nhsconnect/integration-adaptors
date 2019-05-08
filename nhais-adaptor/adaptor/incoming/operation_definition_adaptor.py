@@ -1,6 +1,9 @@
+from fhirclient.models.operationdefinition import OperationDefinition
+
 from edifact.incoming.models.interchange import Interchange
 import adaptor.fhir_helpers.fhir_creators as creators
 from datetime import datetime
+from typing import List, Tuple
 
 
 def format_date_time(edifact_date_time):
@@ -15,11 +18,11 @@ def format_date_time(edifact_date_time):
     return formatted_date
 
 
-def create_operation_definition(interchange: Interchange):
+def create_operation_definition(interchange: Interchange) -> List[Tuple[str, str, OperationDefinition]]:
     """
     Create a fhir operation definition from the incoming interchange
     :param interchange: The incoming interchange
-    :return: OperationDefinition:
+    :return: a List of transaction_numbers, recipients and generated fhir operation definitions
     """
 
     APPROVAL_REFERENCE = "F4"
@@ -50,9 +53,7 @@ def create_operation_definition(interchange: Interchange):
 
         op_def = creators.create_operation_definition(name=response_dict[ref_number]["name"],
                                                       code=response_dict[ref_number]["code"],
-                                                      date_time=formatted_date_time,
-                                                      contained=[],
-                                                      parameters=parameters)
+                                                      date_time=formatted_date_time, parameters=parameters)
         op_defs.append((transaction_number, recipient, op_def))
 
     return op_defs

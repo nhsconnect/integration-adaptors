@@ -51,12 +51,12 @@ def create_operation_definition_for_birth_registration():
                                                                    reference="patient-1")
     op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                   date_time="2019-04-23 09:00:04.159338",
-                                                  contained=[practitioner, patient],
                                                   parameters=[op_param_interchange_sequence,
                                                               op_param_sender_cypher,
                                                               op_param_message_sequence,
                                                               op_param_transaction_number,
                                                               op_param_nhais_cypher,
-                                                              op_param_practitioner, op_param_patient])
+                                                              op_param_practitioner, op_param_patient],
+                                                  contained=[practitioner, patient])
 
     return op_def

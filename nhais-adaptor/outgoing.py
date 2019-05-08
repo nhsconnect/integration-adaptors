@@ -1,11 +1,16 @@
 import os
-import json
+from pathlib import Path
 from fhirclient.models.operationdefinition import OperationDefinition
 import adaptor.outgoing.interchange_adaptor as adaptor
+from utilities.file_utilities import FileUtilities
 from PyInquirer import prompt
 
-dirs = os.listdir("./mailbox/GP")
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"
+gp_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "GP"
 
+# Determine the GP mailbox to read from
+dirs = os.listdir(gp_mailbox_dir)
 gp_outbox_choices = [
     {
         'type': 'list',
@@ -14,12 +19,12 @@ gp_outbox_choices = [
         'choices': dirs
     }
 ]
-
 answers = prompt(gp_outbox_choices)
 gp_cypher = answers["gp"]
 
-files = os.listdir(f"./mailbox/GP/{gp_cypher}/outbox")
-
+# Determine the fhir payload to read
+gp_outbox_path = str(gp_mailbox_dir / gp_cypher / "outbox")
+files = os.listdir(gp_outbox_path)
 file_choices = [
     {
         'type': 'list',
@@ -28,21 +33,22 @@ file_choices = [
         'choices': files
     }
 ]
-
 file_answer = prompt(file_choices)
 file_name = file_answer["file"]
-print(file_name)
 
-with open(f"./mailbox/GP/{gp_cypher}/outbox/{file_name}", "r") as patient_register:
-    patient_register_json = json.load(patient_register)
+# Read the incoming file
+incoming_file_path = f"{gp_outbox_path}/{file_name}"
+patient_register_json = FileUtilities.get_file_dict(incoming_file_path)
 
+# deserialise the incoming fhir payload
 op_def = OperationDefinition(patient_register_json)
 
+# run the adaptor
 (sender, recipient, interchange_seq_no, edifact_interchange) = adaptor.create_interchange(fhir_operation=op_def)
 
-edifact_file = open(f"./mailbox/NHAIS/{recipient}/inbox/{sender}-{interchange_seq_no}.txt", "w")
-
+# create the generated edifact interchange
+file_path_to_write = str(nhais_mailbox_dir / recipient / "inbox" / f"{sender}-{interchange_seq_no}.txt")
+edifact_file = open(file_path_to_write, "w")
 pretty_edifact_interchange = "'\n".join(edifact_interchange.split("'"))
-
 edifact_file.write(pretty_edifact_interchange)
 edifact_file.close()

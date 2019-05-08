@@ -7,6 +7,7 @@ verify_ssl = true
 testfixtures = "*"
 
 [packages]
+integration-adaptors-common = {editable = true,path = "./../common"}
 fhirclient = "*"
 PyInquirer = "*"
 

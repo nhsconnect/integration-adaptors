@@ -4,7 +4,7 @@ import adaptor.incoming.operation_definition_adaptor as incoming_adaptor
 from edifact.incoming.models.interchange import Interchange, InterchangeHeader
 from edifact.incoming.models.message import Messages, MessageSegment, MessageSegmentBeginningDetails, \
     MessageSegmentRegistrationDetails
-import adaptor.fhir_helpers.fhir_creators as creators
+import adaptor.incoming.tests.fixtures as fixtures
 
 
 class TestOperationDefinitionAdaptor(unittest.TestCase):
@@ -24,21 +24,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
         Tests the function to create a fhir operation definition from an incoming edifact interchange
         """
         with self.subTest("adapt an interchange with one message to a single fhir operation definition"):
-            sender_parameter = creators.create_parameter_with_binding(name="senderCypher", value="XX11",
-                                                                      direction="out")
-            recipient_parameter = creators.create_parameter_with_binding(name="recipientCypher", value="TES5",
-                                                                         direction="out")
-            transaction_parameter = creators.create_parameter_with_binding(name="transactionNumber", value="17",
-                                                                           direction="out")
-            op_def = creators.create_operation_definition(name="Response-RegisterPatient-Approval",
-                                                          code="gpc.registerpatient.approval",
-                                                          date_time="2019-04-29 17:56",
-                                                          contained=[],
-                                                          parameters=[
-                                                              sender_parameter,
-                                                              recipient_parameter,
-                                                              transaction_parameter
-                                                          ])
+            op_def = fixtures.create_operation_definition_for_birth_approval(recipient="TES5", transaction_number="17")
             expected = [("17", "TES5", op_def)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
@@ -51,33 +37,10 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
             compare(op_defs, expected)
 
         with self.subTest("adapt an interchange with two messages to two separate fhir operation definition"):
-            sender_parameter = creators.create_parameter_with_binding(name="senderCypher", value="XX11",
-                                                                      direction="out")
-            recipient_parameter = creators.create_parameter_with_binding(name="recipientCypher", value="TES5",
-                                                                         direction="out")
-            transaction_parameter = creators.create_parameter_with_binding(name="transactionNumber", value="17",
-                                                                           direction="out")
-            op_def_1 = creators.create_operation_definition(name="Response-RegisterPatient-Approval",
-                                                            code="gpc.registerpatient.approval",
-                                                            date_time="2019-04-29 17:56",
-                                                            contained=[],
-                                                            parameters=[
-                                                                sender_parameter,
-                                                                recipient_parameter,
-                                                                transaction_parameter
-                                                            ])
-
-            transaction_parameter_msg_2 = creators.create_parameter_with_binding(name="transactionNumber", value="18",
-                                                                                 direction="out")
-            op_def_2 = creators.create_operation_definition(name="Response-RegisterPatient-Approval",
-                                                            code="gpc.registerpatient.approval",
-                                                            date_time="2019-04-29 17:56",
-                                                            contained=[],
-                                                            parameters=[
-                                                                sender_parameter,
-                                                                recipient_parameter,
-                                                                transaction_parameter_msg_2
-                                                            ])
+            op_def_1 = fixtures.create_operation_definition_for_birth_approval(recipient="TES5",
+                                                                               transaction_number="17")
+            op_def_2 = fixtures.create_operation_definition_for_birth_approval(recipient="TES5",
+                                                                               transaction_number="18")
             expected = [("17", "TES5", op_def_1), ("18", "TES5", op_def_2)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
