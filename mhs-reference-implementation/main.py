@@ -35,7 +35,7 @@ message_parser = EbXmlRequestMessageParser()
 logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
 
 # Run the Tornado server
-supplier_application = Application([(r"/send", ClientRequestHandler, dict(data_dir=data_dir, sender=sender))])
+supplier_application = Application([(r"/.*", ClientRequestHandler, dict(sender=sender))])
 supplier_server = HTTPServer(supplier_application)
 supplier_server.listen(80)
 
