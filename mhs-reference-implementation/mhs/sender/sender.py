@@ -1,10 +1,12 @@
 import copy
 
+from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
+from mhs.builder.ebxml_request_message_builder import MESSAGE
+from utilities.message_utilities import MessageUtilities
+
 PARTY_ID = "A91424-9199121"
 
 WRAPPER_REQUIRED = 'ebxml_wrapper_required'
-FROM_PARTY_ID = "from_party_id"
-MESSAGE = "hl7_message"
 
 
 class Sender:
@@ -49,5 +51,6 @@ class Sender:
         """
         context = copy.deepcopy(interaction_details)
         context[FROM_PARTY_ID] = PARTY_ID
+        context[CONVERSATION_ID] = MessageUtilities.get_uuid()
         context[MESSAGE] = message_to_send
         return self.message_builder.build_message(context)
