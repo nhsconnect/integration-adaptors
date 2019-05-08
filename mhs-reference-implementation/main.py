@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+import ssl
 
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
@@ -34,11 +35,17 @@ message_parser = EbXmlRequestMessageParser()
 logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
 
 # Run the Tornado server
-logging.info("Starting server")
-application = Application([
-    (r"/send", ClientRequestHandler, dict(data_dir=data_dir, sender=sender)),
+supplier_application = Application([(r"/send", ClientRequestHandler, dict(data_dir=data_dir, sender=sender))])
+supplier_server = HTTPServer(supplier_application)
+supplier_server.listen(80)
+
+mhs_application = Application([
     (r".*", AsyncResponseHandler, dict(ack_builder=ack_builder, message_parser=message_parser))
 ])
-httpsServer = HTTPServer(application, ssl_options=dict(certfile=certs_file, keyfile=key_file))
-httpsServer.listen(443)
+mhs_server = HTTPServer(mhs_application,
+                        ssl_options=dict(certfile=certs_file, keyfile=key_file, cert_reqs=ssl.CERT_REQUIRED,
+                                         ca_certs=certs_file))
+mhs_server.listen(443)
+
+logging.info("Starting servers")
 IOLoop.current().start()
