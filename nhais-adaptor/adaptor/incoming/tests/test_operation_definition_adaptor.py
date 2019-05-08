@@ -3,7 +3,7 @@ from testfixtures import compare
 import adaptor.incoming.operation_definition_adaptor as incoming_adaptor
 from edifact.incoming.models.interchange import Interchange, InterchangeHeader
 from edifact.incoming.models.message import Messages, MessageSegment, MessageSegmentBeginningDetails, \
-    MessageSegmentRegistrationDetails
+    MessageSegmentRegistrationDetails, MessageSegmentPatientDetails
 import adaptor.incoming.tests.fixtures as fixtures
 
 
@@ -57,12 +57,14 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
             compare(op_defs, expected)
 
         with self.subTest("adapt an interchange for a deduction"):
-            op_def = fixtures.create_operation_definition_for_deduction(recipient="TES5", transaction_number="17")
+            op_def = fixtures.create_operation_definition_for_deduction(recipient="TES5", transaction_number="17",
+                                                                        nhsNumber="NHSNO22222")
             expected = [("17", "TES5", op_def)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
             messages = Messages([MessageSegment(MessageSegmentBeginningDetails(reference_number="F2"),
-                                                MessageSegmentRegistrationDetails(transaction_number="17"))])
+                                                MessageSegmentRegistrationDetails(transaction_number="17"),
+                                                MessageSegmentPatientDetails(nhs_number="NHSNO22222"))])
             incoming_interchange = Interchange(header=interchange_header, messages=messages)
 
             op_defs = incoming_adaptor.create_operation_definition(incoming_interchange)

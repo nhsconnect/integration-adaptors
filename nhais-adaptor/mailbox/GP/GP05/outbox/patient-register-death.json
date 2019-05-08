@@ -103,7 +103,7 @@
         "strength": "required",
         "valueSetReference": {
           "identifier": {
-            "value": "GP01"
+            "value": "GP05"
           }
         }
       }
@@ -145,7 +145,7 @@
         "strength": "required",
         "valueSetReference": {
           "identifier": {
-            "value": "18"
+            "value": "19"
           }
         }
       }

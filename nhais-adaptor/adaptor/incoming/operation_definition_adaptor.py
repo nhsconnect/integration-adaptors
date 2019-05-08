@@ -45,16 +45,24 @@ def create_operation_definition(interchange: Interchange) -> List[Tuple[str, str
     messages = interchange.msgs
 
     op_defs = []
+    nhs_number = None
 
     for message in messages:
         ref_number = message.message_beginning.reference_number
         transaction_number = message.message_registration.transaction_number
+        if message.message_patient:
+            nhs_number = message.message_patient.nhs_number
 
         parameters = [
             creators.create_parameter_with_binding("senderCypher", sender, "out"),
             creators.create_parameter_with_binding("recipientCypher", recipient, "out"),
             creators.create_parameter_with_binding("transactionNumber", transaction_number, "out")
         ]
+
+        if nhs_number:
+            parameters.append(
+                creators.create_parameter_with_binding("nhsNumber", nhs_number, "out")
+            )
 
         op_def = creators.create_operation_definition(name=response_dict[ref_number]["name"],
                                                       code=response_dict[ref_number]["code"],
