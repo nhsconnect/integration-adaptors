@@ -31,6 +31,7 @@ class AsyncResponseHandler(RequestHandler):
 
         ack_message = self._build_ack(parsed_message)
 
+        self.set_header("Content-Type", "text/xml")
         self.write(ack_message)
 
     def _build_ack(self, parsed_message):
