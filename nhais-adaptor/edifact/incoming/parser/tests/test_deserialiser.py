@@ -1,9 +1,11 @@
 import unittest
-import edifact.incoming.parser.deserialiser as deserialiser
+
 from testfixtures import compare
+
+import edifact.incoming.parser.deserialiser as deserialiser
+from edifact.incoming.models.interchange import InterchangeHeader, Interchange
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
     MessageSegment, Messages, MessageSegmentPatientDetails
-from edifact.incoming.models.interchange import InterchangeHeader, Interchange
 from edifact.incoming.parser import EdifactDict
 
 
