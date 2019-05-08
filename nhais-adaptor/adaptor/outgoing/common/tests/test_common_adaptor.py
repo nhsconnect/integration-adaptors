@@ -1,28 +1,30 @@
 import unittest
-from fhirclient.models.humanname import HumanName
-from fhirclient.models.address import Address
-from edifact.outgoing.models.name import Name
-from edifact.outgoing.models.address import Address as EdifactAddress
+
+from fhirclient.models.address import Address as FhirAddress
+from fhirclient.models.humanname import HumanName as FhirName
 from testfixtures import compare
+
 import adaptor.outgoing.common.common_adaptor as adaptor
+from edifact.outgoing.models.address import Address as EdifactAddress
+from edifact.outgoing.models.name import Name as EdifactName
 
 
 class TestCommonAdaptor(unittest.TestCase):
     def test_create_patient_name(self):
         """ Test the creation of af edifact patient name object from fhir """
         with self.subTest("Patient with all the name details"):
-            expected = Name(title="Mr", family_name="Parker", first_given_forename="Peter", middle_name="Spidey",
-                            third_given_forename="Senses")
+            expected = EdifactName(title="Mr", family_name="Parker", first_given_forename="Peter", middle_name="Spidey",
+                                   third_given_forename="Senses")
 
-            name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter', 'Spidey', 'Senses']})
+            name = FhirName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter', 'Spidey', 'Senses']})
             edi_name = adaptor.create_patient_name(name)
 
             compare(edi_name, expected)
 
         with self.subTest("Patient with just title, first name and surname"):
-            expected = Name(title="Mr", family_name="Parker", first_given_forename="Peter")
+            expected = EdifactName(title="Mr", family_name="Parker", first_given_forename="Peter")
 
-            name = HumanName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter']})
+            name = FhirName({'prefix': ['Mr'], 'family': 'Parker', 'given': ['Peter']})
             edi_name = adaptor.create_patient_name(name)
 
             compare(edi_name, expected)
@@ -35,7 +37,7 @@ class TestCommonAdaptor(unittest.TestCase):
                                       address_line_2="Spiderville", town="Spidey Town", county="Spideyshire",
                                       post_code="SP1 1AA")
 
-            pat_address = Address(
+            pat_address = FhirAddress(
                 {'line': ['Spidey House', 'Spidey Way', 'Spiderville'], 'city': 'Spidey Town',
                  'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
             edi_address = adaptor.create_patient_address(pat_address)
@@ -46,7 +48,7 @@ class TestCommonAdaptor(unittest.TestCase):
             expected = EdifactAddress(address_line_1="1 Spidey Way", address_line_2="Spiderville", town="Spidey Town",
                                       county="Spideyshire", post_code="SP1 1AA")
 
-            pat_address = Address(
+            pat_address = FhirAddress(
                 {'line': ['1 Spidey Way', 'Spiderville'], 'city': 'Spidey Town',
                  'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
             edi_address = adaptor.create_patient_address(pat_address)
@@ -56,7 +58,7 @@ class TestCommonAdaptor(unittest.TestCase):
         with self.subTest("Patient with only 1 address line"):
             expected = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", county="Spideyshire",
                                       post_code="SP1 1AA")
-            pat_address = Address(
+            pat_address = FhirAddress(
                 {'line': ['1 Spidey Way'], 'city': 'Spidey Town', 'district': 'Spideyshire', 'postalCode': 'SP1 1AA'})
             edi_address = adaptor.create_patient_address(pat_address)
 
@@ -65,7 +67,7 @@ class TestCommonAdaptor(unittest.TestCase):
         with self.subTest("Patient with only 1 address line and no county details"):
             expected = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", post_code="SP1 1AA")
 
-            pat_address = Address(
+            pat_address = FhirAddress(
                 {'line': ['1 Spidey Way'], 'city': 'Spidey Town', 'postalCode': 'SP1 1AA'})
             edi_address = adaptor.create_patient_address(pat_address)
 
@@ -97,4 +99,3 @@ class TestCommonAdaptor(unittest.TestCase):
             generated_address_lines = adaptor.determine_address_lines(fhir_address_with_1_line)
 
             compare(generated_address_lines, expected)
-
