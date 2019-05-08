@@ -32,13 +32,11 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
                                                                            direction="out")
             op_def = creators.create_operation_definition(name="Response-RegisterPatient-Approval",
                                                           code="gpc.registerpatient.approval",
-                                                          date_time="2019-04-29 17:56",
-                                                          contained=[],
-                                                          parameters=[
-                                                              sender_parameter,
-                                                              recipient_parameter,
-                                                              transaction_parameter
-                                                          ])
+                                                          date_time="2019-04-29 17:56", parameters=[
+                    sender_parameter,
+                    recipient_parameter,
+                    transaction_parameter
+                ], contained=[])
             expected = [("17", "TES5", op_def)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")
@@ -59,25 +57,21 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
                                                                            direction="out")
             op_def_1 = creators.create_operation_definition(name="Response-RegisterPatient-Approval",
                                                             code="gpc.registerpatient.approval",
-                                                            date_time="2019-04-29 17:56",
-                                                            contained=[],
-                                                            parameters=[
-                                                                sender_parameter,
-                                                                recipient_parameter,
-                                                                transaction_parameter
-                                                            ])
+                                                            date_time="2019-04-29 17:56", parameters=[
+                    sender_parameter,
+                    recipient_parameter,
+                    transaction_parameter
+                ], contained=[])
 
             transaction_parameter_msg_2 = creators.create_parameter_with_binding(name="transactionNumber", value="18",
                                                                                  direction="out")
             op_def_2 = creators.create_operation_definition(name="Response-RegisterPatient-Approval",
                                                             code="gpc.registerpatient.approval",
-                                                            date_time="2019-04-29 17:56",
-                                                            contained=[],
-                                                            parameters=[
-                                                                sender_parameter,
-                                                                recipient_parameter,
-                                                                transaction_parameter_msg_2
-                                                            ])
+                                                            date_time="2019-04-29 17:56", parameters=[
+                    sender_parameter,
+                    recipient_parameter,
+                    transaction_parameter_msg_2
+                ], contained=[])
             expected = [("17", "TES5", op_def_1), ("18", "TES5", op_def_2)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")

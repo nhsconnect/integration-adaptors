@@ -69,7 +69,7 @@ def create_parameter_with_resource_ref(name, resource_type, reference):
     return op_param
 
 
-def create_operation_definition(name, code, date_time, contained, parameters):
+def create_operation_definition(name, code, date_time, parameters, contained=None):
     """
     Helper function to create a fhir operation definition
     :param name: The name of the operation
@@ -88,7 +88,7 @@ def create_operation_definition(name, code, date_time, contained, parameters):
          'date': date_time,
          'status': 'active',
          'code': code})
-    if len(contained) > 0:
+    if contained and len(contained) > 0:
         op.contained = contained
     if len(parameters) > 0:
         op.parameter = parameters

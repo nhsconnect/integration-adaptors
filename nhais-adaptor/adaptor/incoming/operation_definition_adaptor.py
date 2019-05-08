@@ -53,9 +53,7 @@ def create_operation_definition(interchange: Interchange) -> List[Tuple[str, str
 
         op_def = creators.create_operation_definition(name=response_dict[ref_number]["name"],
                                                       code=response_dict[ref_number]["code"],
-                                                      date_time=formatted_date_time,
-                                                      contained=[],
-                                                      parameters=parameters)
+                                                      date_time=formatted_date_time, parameters=parameters)
         op_defs.append((transaction_number, recipient, op_def))
 
     return op_defs

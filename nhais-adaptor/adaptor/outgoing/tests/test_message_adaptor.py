@@ -124,8 +124,8 @@ class TestMessageAdaptor(unittest.TestCase):
                                                                            resource_type=ResourceType.PATIENT,
                                                                            reference="patient-1")
             op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
-                                                          date_time="2019-04-23 09:00:04.159338", contained=[patient],
-                                                          parameters=[op_param_patient])
+                                                          date_time="2019-04-23 09:00:04.159338",
+                                                          parameters=[op_param_patient], contained=[patient])
             msg_seg_pat_details = message_adaptor.create_message_segment_patient_detail(op_def)
 
             compare(msg_seg_pat_details, expected)
@@ -156,9 +156,9 @@ class TestMessageAdaptor(unittest.TestCase):
                                                                            reference="patient-1")
             op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                           date_time="2019-04-23 09:00:04.159338",
-                                                          contained=[practitioner, patient],
                                                           parameters=[op_param_transaction_number,
-                                                                      op_param_practitioner, op_param_patient])
+                                                                      op_param_practitioner, op_param_patient],
+                                                          contained=[practitioner, patient])
 
             msg_seg_reg_details = message_adaptor.create_message_segment_registration_details(op_def)
 
@@ -173,8 +173,8 @@ class TestMessageAdaptor(unittest.TestCase):
 
             op_param_nhais_cypher = creators.create_parameter_with_binding(name=ParameterName.NHAIS_CYPHER, value="XX1")
             op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
-                                                          date_time="2019-04-23 09:00:04.159338", contained=[],
-                                                          parameters=[op_param_nhais_cypher])
+                                                          date_time="2019-04-23 09:00:04.159338",
+                                                          parameters=[op_param_nhais_cypher], contained=[])
 
             msg_bgn = message_adaptor.create_message_beginning(fhir_operation=op_def)
 
@@ -217,11 +217,11 @@ class TestMessageAdaptor(unittest.TestCase):
                                                                            reference="patient-1")
             op_def = creators.create_operation_definition(name=OperationName.REGISTER_BIRTH, code="gpc.registerpatient",
                                                           date_time="2019-04-23 09:00:04.159338",
-                                                          contained=[practitioner, patient],
                                                           parameters=[op_param_message_sequence,
                                                                       op_param_transaction_number,
                                                                       op_param_nhais_cypher,
-                                                                      op_param_practitioner, op_param_patient])
+                                                                      op_param_practitioner, op_param_patient],
+                                                          contained=[practitioner, patient])
 
             message = message_adaptor.create_message(fhir_operation=op_def)
 
