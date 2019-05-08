@@ -1,7 +1,7 @@
 from edifact.incoming.models.interchange import InterchangeHeader
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
     MessageSegmentPatientDetails
-from edifact.incoming.parser.deserialiser import EdifactDict
+from edifact.incoming.parser import EdifactDict
 
 SECTION_SEPARATOR = "+"
 SUB_SECTION_SEPARATOR = ":"
