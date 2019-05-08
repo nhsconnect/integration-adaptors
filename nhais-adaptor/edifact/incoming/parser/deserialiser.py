@@ -1,7 +1,7 @@
 import edifact.incoming.parser.creators as creators
 from edifact.incoming.models.message import MessageSegment
 from edifact.incoming.models.interchange import Interchange
-from typing import NewType, List, Tuple
+from edifact.incoming.parser import EdifactDict
 
 INTERCHANGE_HEADER_KEY = "UNB"
 MESSAGE_HEADER_KEY = "UNH"
@@ -10,8 +10,6 @@ MESSAGE_REGISTRATION_KEY = "S01"
 MESSAGE_PATIENT_KEY = "S02"
 MESSAGE_TRAILER_KEY = "UNT"
 INTERCHANGE_TRAILER_KEY = "UNZ"
-
-EdifactDict = NewType("EdifactDict", List[Tuple[str, str]])
 
 
 def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key) -> EdifactDict:

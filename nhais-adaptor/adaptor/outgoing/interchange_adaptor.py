@@ -1,8 +1,8 @@
 import adaptor.outgoing.message_adaptor as message_adaptor
-import adaptor.outgoing.fhir_helpers.fhir_finders as finders
+import adaptor.fhir_helpers.fhir_finders as finders
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import Messages
-from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName
+from adaptor.fhir_helpers.fhir_creators import ParameterName
 
 """
 An adaptor to take in fhir models and generate an edifact interchange
@@ -44,6 +44,6 @@ def create_interchange(fhir_operation):
                               sequence_number=interchange_sequence_number,
                               date_time=fhir_operation.date.as_json(), messages=messages)
 
-    edifact_interchange = interchange.to_edifact()
+    edifact_interchange = (sender_cypher, recipient, interchange_sequence_number, interchange.to_edifact())
 
     return edifact_interchange

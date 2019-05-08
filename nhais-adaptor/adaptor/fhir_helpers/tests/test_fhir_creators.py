@@ -4,8 +4,8 @@ from fhirclient.models.patient import Patient
 from fhirclient.models.operationdefinition import OperationDefinitionParameter, OperationDefinition
 from fhirclient.models.practitioner import Practitioner
 
-import adaptor.outgoing.fhir_helpers.fhir_creators as creators
-from adaptor.outgoing.fhir_helpers.fhir_creators import ResourceType
+import adaptor.fhir_helpers.fhir_creators as creators
+from adaptor.fhir_helpers.fhir_creators import ResourceType
 
 
 class TestFhirCreators(unittest.TestCase):
@@ -43,8 +43,8 @@ class TestFhirCreators(unittest.TestCase):
 
         with self.subTest("with no contained resources or parameters"):
             op_def = creators.create_operation_definition(name="name.of.operation", code="code.of.operation",
-                                                          date_time="2019-04-23 09:00:04.159338", contained=[],
-                                                          parameters=[])
+                                                          date_time="2019-04-23 09:00:04.159338", parameters=[],
+                                                          contained=[])
 
             self.assertIsInstance(op_def, OperationDefinition)
             self.assertEqual(op_def.name, "name.of.operation")
@@ -57,8 +57,8 @@ class TestFhirCreators(unittest.TestCase):
             some_param = creators.create_parameter_with_binding(name="SOME_NAME", value="SOME_VALUE")
 
             op_def = creators.create_operation_definition(name="name.of.operation", code="code.of.operation",
-                                                          date_time="2019-04-23 09:00:04.159338", contained=[],
-                                                          parameters=[some_param])
+                                                          date_time="2019-04-23 09:00:04.159338",
+                                                          parameters=[some_param], contained=[])
 
             self.assertEqual(len(op_def.parameter), 1)
             self.assertIsInstance(op_def.parameter[0], OperationDefinitionParameter)
@@ -69,9 +69,8 @@ class TestFhirCreators(unittest.TestCase):
                                                                   local_identifier="some_local_id")
 
             op_def = creators.create_operation_definition(name="name.of.operation", code="code.of.operation",
-                                                          date_time="2019-04-23 09:00:04.159338",
-                                                          contained=[some_resource],
-                                                          parameters=[])
+                                                          date_time="2019-04-23 09:00:04.159338", parameters=[],
+                                                          contained=[some_resource])
 
             self.assertEqual(len(op_def.contained), 1)
             self.assertIsInstance(op_def.contained[0], Practitioner)

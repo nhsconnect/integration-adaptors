@@ -13,13 +13,13 @@ class TestFhirToEdifactIntegration(unittest.TestCase):
         """
         Test when the operation is for a birth registration
         """
-        with open("./tests/edifact.txt", "r") as expected_file:
+        with open("./tests/outgoing/edifact.txt", "r") as expected_file:
             expected_edifact_interchange = expected_file.read()
 
-        with open("./tests/patient-register-birth.json", "r") as patient_register:
+        with open("./tests/outgoing/patient-register-birth.json", "r") as patient_register:
             patient_register_json = json.load(patient_register)
         op_def = OperationDefinition(patient_register_json)
-        edifact_interchange = adaptor.create_interchange(fhir_operation=op_def)
+        (sender, recipient, interchange_seq_no, edifact_interchange) = adaptor.create_interchange(fhir_operation=op_def)
         pretty_edifact_interchange = "'\n".join(edifact_interchange.split("'"))
 
         self.assertEqual(pretty_edifact_interchange, expected_edifact_interchange)
