@@ -1,5 +1,6 @@
 import unittest
-import adaptor.outgoing.tests.fixtures as fixtures
+
+import adaptor.outgoing.birth.tests.fixtures as fixtures
 from testfixtures import compare
 import adaptor.outgoing.interchange_adaptor as adaptor
 

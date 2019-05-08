@@ -9,8 +9,6 @@ import adaptor.outgoing.death.message_death_adaptor as message_adaptor
 import adaptor.outgoing.tests.fixtures as fixtures
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails
-from edifact.outgoing.models.address import Address as EdifactAddress
-from edifact.outgoing.models.name import Name
 
 
 class TestMessageDeathAdaptor(unittest.TestCase):

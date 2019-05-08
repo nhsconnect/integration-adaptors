@@ -1,3 +1,5 @@
+from fhirclient.models.operationdefinition import OperationDefinition
+
 import adaptor.fhir_helpers.fhir_finders as finders
 from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName, OperationName
 from adaptor.outgoing.common.common_adaptor import create_patient_name, create_patient_address
@@ -12,8 +14,9 @@ operation_dict = {
 }
 
 
-def create_message_segment_patient_detail(fhir_operation):
+def create_message_segment_patient_detail(fhir_operation: OperationDefinition) -> MessageSegmentBirthPatientDetails:
     """
+    Create the message segment patient details for a birth registration from the fhir operation
     :return: MessageSegmentBirthPatientDetails
     """
     gender_map = {'unknown': 0, 'male': 1, 'female': 2, 'other': 9}
@@ -32,9 +35,10 @@ def create_message_segment_patient_detail(fhir_operation):
     return msg_seg_patient_details
 
 
-def create_message_segment_registration_details(fhir_operation):
+def create_message_segment_registration_details(
+        fhir_operation: OperationDefinition) -> MessageSegmentBirthRegistrationDetails:
     """
-    Create the message segment registration details from the fhir operation
+    Create the message segment registration details for a birth registration from the fhir operation
     :return: MessageSegmentBirthRegistrationDetails
     """
 
@@ -58,4 +62,3 @@ def create_message_segment_registration_details(fhir_operation):
                                                                           date_time=fhir_operation.date.as_json(),
                                                                           location=birth_location)
     return msg_seg_registration_details
-

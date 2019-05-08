@@ -1,5 +1,5 @@
 import adaptor.fhir_helpers.fhir_finders as finders
-from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName, OperationName
+from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails
 
