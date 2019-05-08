@@ -10,6 +10,17 @@ PARTY_ID = "A91424-9199121"
 WRAPPER_REQUIRED = 'ebxml_wrapper_required'
 
 
+class UnknownInteractionError(Exception):
+    """Raised when an unknown interaction has been specified"""
+
+    def __init__(self, interaction_name):
+        """Create a new UnknownInteractionError for the specified interaction name.
+
+        :param interaction_name: The interaction name requested but not found.
+        """
+        self.interaction_name = interaction_name
+
+
 class Sender:
     def __init__(self, interactions_config, message_builder, transport):
         """Create a new Sender that uses the specified dependencies to load config, build a message and send it.
@@ -29,9 +40,12 @@ class Sender:
         :param interaction_name: The name of the interaction the message is related to.
         :param message_to_send: A string representing the message to be sent.
         :return: The content of the response received when the message was sent.
+        :raises: An UnknownInteractionError if the interaction_name specified was not found.
         """
 
         interaction_details = self.interactions_config.get_interaction_details(interaction_name)
+        if not interaction_details:
+            raise UnknownInteractionError(interaction_name)
 
         requires_ebxml_wrapper = interaction_details[WRAPPER_REQUIRED]
         if requires_ebxml_wrapper:

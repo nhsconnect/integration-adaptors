@@ -13,11 +13,6 @@ class InteractionsConfigFile:
         """Get details for the specified interaction.
 
         :param interaction_name: The name of the interaction to retrieve details for.
-        :return: A dictionary of interaction-specific details.
+        :return: A dictionary of interaction-specific details, or None if an entry for the specified name was not found.
         """
-        interaction_details = self.interactions.get(interaction_name)
-
-        if not interaction_details:
-            raise Exception('Unknown interaction: {}'.format(interaction_name))
-
-        return interaction_details
+        return self.interactions.get(interaction_name)
