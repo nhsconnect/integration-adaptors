@@ -1,9 +1,11 @@
+from fhirclient.models.operationdefinition import OperationDefinition
+
+import adaptor.fhir_helpers.fhir_finders as finders
 import adaptor.outgoing.birth.message_birth_adaptor as message_birth_adaptor
 import adaptor.outgoing.death.message_death_adaptor as message_death_adaptor
-from edifact.outgoing.models.message import MessageBeginning
-from edifact.outgoing.models.birth.message_birth import Message
-import adaptor.fhir_helpers.fhir_finders as finders
 from adaptor.fhir_helpers.fhir_creators import ParameterName, OperationName
+from edifact.outgoing.models.birth.message_birth import Message
+from edifact.outgoing.models.message import MessageBeginning
 
 operation_dict = {
     OperationName.REGISTER_BIRTH: {
@@ -19,7 +21,7 @@ operation_dict = {
 }
 
 
-def create_message_beginning(fhir_operation):
+def create_message_beginning(fhir_operation: OperationDefinition) -> MessageBeginning:
     """
     Create the beginning of the message
     :return: MessageBeginning
@@ -33,7 +35,7 @@ def create_message_beginning(fhir_operation):
     return msg_bgn
 
 
-def create_message(fhir_operation):
+def create_message(fhir_operation: OperationDefinition) -> Message:
     """
     Create the edifact Message
     :return: Message

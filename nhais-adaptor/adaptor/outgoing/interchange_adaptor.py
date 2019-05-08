@@ -1,8 +1,12 @@
-import adaptor.outgoing.message_adaptor as message_adaptor
+from typing import Tuple
+
+from fhirclient.models.operationdefinition import OperationDefinition
+
 import adaptor.fhir_helpers.fhir_finders as finders
+import adaptor.outgoing.message_adaptor as message_adaptor
+from adaptor.fhir_helpers.fhir_creators import ParameterName
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import Messages
-from adaptor.fhir_helpers.fhir_creators import ParameterName
 
 """
 An adaptor to take in fhir models and generate an edifact interchange
@@ -26,11 +30,12 @@ def generate_recipient_from(nhais_cypher):
     return recipient
 
 
-def create_interchange(fhir_operation):
+def create_interchange(fhir_operation: OperationDefinition) -> Tuple[str, str, str, str]:
     """
     Create the edifact interchange from the fhir operation definition
     :param fhir_operation: The operation definition payload
-    :return: the edifact interchange
+    :return: a tuple consisting of the sender cypher, recipient cypher, interchange sequence number
+    and the generated edifact interchange.
     """
     interchange_sequence_number = finders.get_parameter_value(fhir_operation,
                                                               parameter_name=ParameterName.INTERCHANGE_SEQ_NO)
