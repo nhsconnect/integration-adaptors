@@ -58,7 +58,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
 
         with self.subTest("adapt an interchange for a deduction"):
             op_def = fixtures.create_operation_definition_for_deduction(recipient="TES5", transaction_number="17",
-                                                                        nhsNumber="NHSNO22222")
+                                                                        nhs_number="NHSNO22222")
             expected = [("17", "TES5", op_def)]
 
             interchange_header = InterchangeHeader(sender="XX11", recipient="TES5", date_time="190429:1756")

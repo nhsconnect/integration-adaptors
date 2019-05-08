@@ -3,13 +3,6 @@ from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName, Oper
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails
 
-operation_dict = {
-    OperationName.REGISTER_BIRTH: {
-        "acceptanceCode": "A",
-        "acceptanceType": "1",
-    }
-}
-
 
 def create_message_segment_patient_detail(fhir_operation):
     """
