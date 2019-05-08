@@ -1,11 +1,14 @@
+from fhirclient.models.operationdefinition import OperationDefinition
+
 import adaptor.fhir_helpers.fhir_finders as finders
 from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails
 
 
-def create_message_segment_patient_detail(fhir_operation):
+def create_message_segment_patient_detail(fhir_operation: OperationDefinition) -> MessageSegmentDeathPatientDetails:
     """
+    Create the message segment patient details for a death from the fhir operation
     :return: MessageSegmentDeathPatientDetails
     """
     patient = finders.find_resource(fhir_operation, resource_type=ResourceType.PATIENT)
@@ -14,9 +17,10 @@ def create_message_segment_patient_detail(fhir_operation):
     return msg_seg_patient_details
 
 
-def create_message_segment_registration_details(fhir_operation):
+def create_message_segment_registration_details(
+        fhir_operation: OperationDefinition) -> MessageSegmentDeathRegistrationDetails:
     """
-    Create the message segment registration details from the fhir operation
+    Create the message segment registration details for a death from the fhir operation
     :return: MessageSegmentDeathRegistrationDetails
     """
 
@@ -35,4 +39,3 @@ def create_message_segment_registration_details(fhir_operation):
                                                                           party_id=party_id,
                                                                           date_time=deceased_date_time)
     return msg_seg_registration_details
-
