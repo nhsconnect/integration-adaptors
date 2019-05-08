@@ -1,0 +1,172 @@
+{
+  "resourceType": "OperationDefinition",
+  "id": "GPConnect-RegisterPatient-Operation-1",
+  "url": "https://fhir.nhs.uk/STU3/OperationDefinition/GPConnect-RegisterPatient-Operation-1",
+  "name": "RegisterPatient-Birth",
+  "status": "active",
+  "kind": "operation",
+  "date": "2019-04-23 09:00:04.159338",
+  "description": "Request to register a patient at a healthcare organisation",
+  "code": "gpc.registerpatient",
+  "system": false,
+  "type": true,
+  "instance": false,
+  "contained": [
+    {
+      "resourceType": "Patient",
+      "id": "patient-1",
+      "identifier": [{
+        "value": "NHSNO11111"
+      }],
+      "name": [
+        {
+          "use": "official",
+          "prefix": [
+            "Mr"
+          ],
+          "family": "Parker",
+          "given": [
+            "Peter"
+          ]
+        }
+      ],
+      "gender": "male",
+      "birthDate": "2019-04-20",
+      "address": [
+        {
+          "line": [
+            "1 Spider Way"
+          ],
+          "city": "Spidey Town",
+          "postalCode": "SP1 1AA"
+        }
+      ],
+      "extension": [{
+        "url": "http://hl7.org/fhir/StructureDefinition/birthPlace",
+        "valueAddress": {
+          "city": "Spidey Town"
+        }
+      }]
+    },
+    {
+      "resourceType": "Practitioner",
+      "id": "practitioner-1",
+      "identifier": [
+          {
+              "type": {
+                  "coding": [
+                    {
+                      "code": "national"
+                    }
+                  ],
+                  "text": "GMC National code"
+              },
+              "value": "4826940"
+          },
+          {
+              "type": {
+                  "coding": [
+                    {
+                      "code": "local"
+                    }
+                  ],
+                  "text": "Local GP code"
+              },
+              "value": "281"
+          }
+      ]
+    }
+  ],
+  "parameter": [
+    {
+      "name": "interchangeSequenceNumber",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "binding": {
+        "strength": "required",
+        "valueSetReference": {
+          "identifier": {
+            "value": "000001"
+          }
+        }
+      }
+    },
+    {
+      "name": "senderCypher",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "binding": {
+        "strength": "required",
+        "valueSetReference": {
+          "identifier": {
+            "value": "TES5"
+          }
+        }
+      }
+    },
+    {
+      "name": "messageSequenceNumber",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "binding": {
+        "strength": "required",
+        "valueSetReference": {
+          "identifier": {
+            "value": "000001"
+          }
+        }
+      }
+    },
+    {
+      "name": "nhaisCypher",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "binding": {
+        "strength": "required",
+        "valueSetReference": {
+          "identifier": {
+            "value": "XX1"
+          }
+        }
+      }
+    },
+    {
+      "name": "transactionNumber",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "binding": {
+        "strength": "required",
+        "valueSetReference": {
+          "identifier": {
+            "value": "17"
+          }
+        }
+      }
+    },
+    {
+      "name": "registerPatient",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "type": "Patient",
+      "profile": {
+        "reference": "#patient-1"
+      }
+    },
+    {
+      "name": "registerPractitioner",
+      "use": "in",
+      "min": 1,
+      "max": "1",
+      "type": "Practitioner",
+      "profile": {
+        "reference": "#practitioner-1"
+      }
+    }
+  ]
+}

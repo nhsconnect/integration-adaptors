@@ -4,12 +4,17 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+testfixtures = "*"
 
 [packages]
+integration-adaptors-common = {editable = true,path = "./../common"}
 fhirclient = "*"
+PyInquirer = "*"
 
 [requires]
 python_version = "3.7"
 
 [scripts]
-tests = "python -m unittest discover -p '*_test.py' -v"
+tests = "python -m unittest -v"
+outgoing = "python outgoing.py"
+incoming = "python incoming.py"
