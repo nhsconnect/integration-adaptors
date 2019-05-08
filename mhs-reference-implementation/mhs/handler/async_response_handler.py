@@ -22,8 +22,6 @@ class AsyncResponseHandler(RequestHandler):
         self.message_parser = message_parser
 
     def post(self):
-        # TODO: Configure headers correctly?
-
         logging.debug("POST received: %s", self.request)
         logging.debug("Body: %s", self.request.body)
 
