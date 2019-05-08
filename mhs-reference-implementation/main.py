@@ -1,6 +1,6 @@
 import logging
-from pathlib import Path
 import ssl
+from pathlib import Path
 
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop

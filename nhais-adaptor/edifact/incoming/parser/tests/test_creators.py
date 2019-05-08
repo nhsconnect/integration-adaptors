@@ -4,7 +4,7 @@ import edifact.incoming.parser.creators as creators
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
     MessageSegmentPatientDetails
 from edifact.incoming.models.interchange import InterchangeHeader
-from edifact.incoming.parser.deserialiser import EdifactDict
+from edifact.incoming.parser import EdifactDict
 
 
 class TestCreators(unittest.TestCase):

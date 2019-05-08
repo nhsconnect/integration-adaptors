@@ -1,8 +1,8 @@
 import unittest
 from testfixtures import compare
-import adaptor.outgoing.fhir_helpers.fhir_finders as finders
-import adaptor.outgoing.fhir_helpers.fhir_creators as creators
-from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName, ResourceType
+import adaptor.fhir_helpers.fhir_finders as finders
+import adaptor.fhir_helpers.fhir_creators as creators
+from adaptor.fhir_helpers.fhir_creators import ParameterName, ResourceType
 
 
 class TestFhirFinders(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestFhirFinders(unittest.TestCase):
 
         op = creators.create_operation_definition(name="some.name", code="some.code",
                                                   date_time="2019-04-23 09:00:04.159338",
-                                                  contained=[], parameters=[op_param_transaction_number])
+                                                  parameters=[op_param_transaction_number], contained=[])
 
         self.assertEqual(finders.get_parameter_value(op, "some_param_name"), "17")
 
@@ -30,8 +30,7 @@ class TestFhirFinders(unittest.TestCase):
                 reference="practitioner-1")
             op_def = creators.create_operation_definition(name="name.of.operation", code="code.of.operation",
                                                           date_time="2019-04-23 09:00:04.159338",
-                                                          contained=[practitioner],
-                                                          parameters=[op_param_practitioner])
+                                                          parameters=[op_param_practitioner], contained=[practitioner])
 
             found_practitioner = finders.find_resource(fhir_operation=op_def, resource_type=ResourceType.PRACTITIONER)
 

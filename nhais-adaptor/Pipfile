@@ -7,11 +7,14 @@ verify_ssl = true
 testfixtures = "*"
 
 [packages]
+integration-adaptors-common = {editable = true,path = "./../common"}
 fhirclient = "*"
+PyInquirer = "*"
 
 [requires]
 python_version = "3.7"
 
 [scripts]
 tests = "python -m unittest -v"
-transfer = "python transfer.py"
+outgoing = "python outgoing.py"
+incoming = "python incoming.py"

@@ -1,5 +1,5 @@
-import logging
 import copy
+import logging
 from pathlib import Path
 
 from builder.pystache_message_builder import PystacheMessageBuilder

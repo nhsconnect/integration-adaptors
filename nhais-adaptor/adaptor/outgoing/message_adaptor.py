@@ -3,8 +3,8 @@ from edifact.outgoing.models.message import MessageSegmentPatientDetails, Messag
     Message
 from edifact.outgoing.models.name import Name
 from edifact.outgoing.models.address import Address
-import adaptor.outgoing.fhir_helpers.fhir_finders as finders
-from adaptor.outgoing.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
+import adaptor.fhir_helpers.fhir_finders as finders
+from adaptor.fhir_helpers.fhir_creators import ParameterName, ResourceType, OperationName
 
 operation_dict = {
     OperationName.REGISTER_BIRTH: {
