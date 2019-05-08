@@ -48,4 +48,3 @@ class TestInterchange(unittest.TestCase):
             interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",
                                       messages=msgs).to_edifact()
             self.assertEqual(interchange, expected_edifact_interchange)
-

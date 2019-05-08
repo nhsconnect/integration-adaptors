@@ -59,6 +59,7 @@ class MessageTypeBirth(Message):
     """
     A specialisation of the Message for the purpose of a Birth registration
     """
+
     def __init__(self, sequence_number, message_beginning,
                  message_segment_registration_details: MessageSegmentBirthRegistrationDetails,
                  message_segment_patient_details: MessageSegmentBirthPatientDetails):
@@ -70,4 +71,3 @@ class MessageTypeBirth(Message):
         """
         super().__init__(sequence_number, message_beginning, message_segment_registration_details,
                          message_segment_patient_details)
-

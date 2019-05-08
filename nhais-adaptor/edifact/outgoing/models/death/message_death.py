@@ -48,6 +48,7 @@ class MessageTypeDeath(Message):
     """
     A specialisation of the Message for the purpose of a Death registration
     """
+
     def __init__(self, sequence_number, message_beginning,
                  message_segment_registration_details: MessageSegmentDeathRegistrationDetails,
                  message_segment_patient_details: MessageSegmentDeathPatientDetails):

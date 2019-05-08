@@ -1,4 +1,5 @@
 import unittest
+
 from edifact.outgoing.models.interchange import InterchangeHeader, InterchangeTrailer
 
 
@@ -21,4 +22,3 @@ class TestInterchangeTrailer(unittest.TestCase):
     def test_interchange_trailer_to_edifact(self):
         int_trl = InterchangeTrailer(number_of_messages=1, sequence_number="00001").to_edifact()
         self.assertEqual(int_trl, "UNZ+1+00001'")
-
