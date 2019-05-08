@@ -16,7 +16,7 @@
       "resourceType": "Patient",
       "id": "patient-1",
       "identifier": [{
-        "value": "NHSNO11111"
+        "value": "NHSNO222222"
       }],
       "name": [
         {
@@ -24,27 +24,29 @@
           "prefix": [
             "Mr"
           ],
-          "family": "Parker",
+          "family": "Stark",
           "given": [
-            "Peter"
+            "Tony"
           ]
         }
       ],
       "gender": "male",
-      "birthDate": "2019-04-20",
+      "birthDate": "1970-04-20",
+      "deceasedBoolean": true,
+      "deceasedDateTime": "2019-04-20 09:00:04.159338",
       "address": [
         {
           "line": [
-            "1 Spider Way"
+            "1 Iron Way"
           ],
-          "city": "Spidey Town",
-          "postalCode": "SP1 1AA"
+          "city": "Stark Town",
+          "postalCode": "IM1 1AA"
         }
       ],
       "extension": [{
         "url": "http://hl7.org/fhir/StructureDefinition/birthPlace",
         "valueAddress": {
-          "city": "Spidey Town"
+          "city": "Stark Town"
         }
       }]
     },
@@ -87,7 +89,7 @@
         "strength": "required",
         "valueSetReference": {
           "identifier": {
-            "value": "000001"
+            "value": "000002"
           }
         }
       }
@@ -101,7 +103,7 @@
         "strength": "required",
         "valueSetReference": {
           "identifier": {
-            "value": "TES5"
+            "value": "GP01"
           }
         }
       }
@@ -115,7 +117,7 @@
         "strength": "required",
         "valueSetReference": {
           "identifier": {
-            "value": "000001"
+            "value": "000003"
           }
         }
       }
@@ -129,7 +131,7 @@
         "strength": "required",
         "valueSetReference": {
           "identifier": {
-            "value": "XX1"
+            "value": "HA"
           }
         }
       }
@@ -143,7 +145,7 @@
         "strength": "required",
         "valueSetReference": {
           "identifier": {
-            "value": "17"
+            "value": "18"
           }
         }
       }
