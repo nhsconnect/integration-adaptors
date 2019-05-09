@@ -3,52 +3,54 @@ from typing import Tuple
 from fhirclient.models.operationdefinition import OperationDefinition
 
 import adaptor.fhir_helpers.fhir_finders as finders
-import adaptor.outgoing.message_adaptor as message_adaptor
-from adaptor.fhir_helpers.fhir_creators import ParameterName
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import Messages
-
-"""
-An adaptor to take in fhir models and generate an edifact interchange
-"""
+from adaptor.fhir_helpers.fhir_creators import ParameterName
 
 
-def generate_recipient_from(nhais_cypher):
-    """
-    Generates the recipient cypher. This value can be deduced from the nhais_cypher provided.
-    The nhais cypher can be 2 to 3 characters is length.
-    If it is 2 characters in length it will append "01" to generate the recipient cypher
-    If it is 3 characters in length it will append "1" to generate the recipient cypher
-    :param nhais_cypher: The nhais cypher provided. Should be 2-3 characters in length
-    :return: The recipient cypher
-    """
-    recipient = ''
-    if len(nhais_cypher) == 3:
-        recipient = nhais_cypher + '1'
-    elif len(nhais_cypher) == 2:
-        recipient = nhais_cypher + "01"
-    return recipient
+class InterchangeAdaptor:
 
+    def __init__(self, operation_dict):
+        self.operation_dict = operation_dict
 
-def create_interchange(fhir_operation: OperationDefinition) -> Tuple[str, str, str, str]:
-    """
-    Create the edifact interchange from the fhir operation definition
-    :param fhir_operation: The operation definition payload
-    :return: a tuple consisting of the sender cypher, recipient cypher, interchange sequence number
-    and the generated edifact interchange.
-    """
-    interchange_sequence_number = finders.get_parameter_value(fhir_operation,
-                                                              parameter_name=ParameterName.INTERCHANGE_SEQ_NO)
-    sender_cypher = finders.get_parameter_value(fhir_operation, parameter_name=ParameterName.SENDER_CYPHER)
-    nhais_cypher = finders.get_parameter_value(fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
-    recipient = generate_recipient_from(nhais_cypher)
+    @staticmethod
+    def generate_recipient_from(nhais_cypher):
+        """
+        Generates the recipient cypher. This value can be deduced from the nhais_cypher provided.
+        The nhais cypher can be 2 to 3 characters is length.
+        If it is 2 characters in length it will append "01" to generate the recipient cypher
+        If it is 3 characters in length it will append "1" to generate the recipient cypher
+        :param nhais_cypher: The nhais cypher provided. Should be 2-3 characters in length
+        :return: The recipient cypher
+        """
+        recipient = ''
+        if len(nhais_cypher) == 3:
+            recipient = nhais_cypher + '1'
+        elif len(nhais_cypher) == 2:
+            recipient = nhais_cypher + "01"
+        return recipient
 
-    messages = Messages(messages=[message_adaptor.create_message(fhir_operation)])
+    def create_interchange(self, fhir_operation: OperationDefinition) -> Tuple[str, str, str, str]:
+        """
+        Create the edifact interchange from the fhir operation definition
+        :param fhir_operation: The operation definition payload
+        :return: a tuple consisting of the sender cypher, recipient cypher, interchange sequence number
+        and the generated edifact interchange.
+        """
+        interchange_sequence_number = finders.get_parameter_value(fhir_operation,
+                                                                  parameter_name=ParameterName.INTERCHANGE_SEQ_NO)
+        sender_cypher = finders.get_parameter_value(fhir_operation, parameter_name=ParameterName.SENDER_CYPHER)
+        nhais_cypher = finders.get_parameter_value(fhir_operation, parameter_name=ParameterName.NHAIS_CYPHER)
+        recipient = self.generate_recipient_from(nhais_cypher)
 
-    interchange = Interchange(sender=sender_cypher, recipient=recipient,
-                              sequence_number=interchange_sequence_number,
-                              date_time=fhir_operation.date.as_json(), messages=messages)
+        message_adaptor = self.operation_dict[fhir_operation.name]["messageAdaptor"](fhir_operation)
 
-    edifact_interchange = (sender_cypher, recipient, interchange_sequence_number, interchange.to_edifact())
+        messages = Messages(messages=[message_adaptor.create_message()])
 
-    return edifact_interchange
+        interchange = Interchange(sender=sender_cypher, recipient=recipient,
+                                  sequence_number=interchange_sequence_number,
+                                  date_time=fhir_operation.date.as_json(), messages=messages)
+
+        edifact_interchange = (sender_cypher, recipient, interchange_sequence_number, interchange.to_edifact())
+
+        return edifact_interchange

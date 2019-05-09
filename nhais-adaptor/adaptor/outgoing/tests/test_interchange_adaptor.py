@@ -1,6 +1,6 @@
 import unittest
 
-import adaptor.outgoing.interchange_adaptor as adaptor
+from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 
 
 class TestInterchangeAdaptor(unittest.TestCase):
@@ -10,11 +10,11 @@ class TestInterchangeAdaptor(unittest.TestCase):
         Test the generation of a recipient cypher from the nhais cypher
         """
         with self.subTest("When the nhais cypher is 3 characters"):
-            recipient_cypher = adaptor.generate_recipient_from('XX1')
+            recipient_cypher = InterchangeAdaptor.generate_recipient_from('XX1')
 
             self.assertEqual(recipient_cypher, "XX11")
 
         with self.subTest("When the nhais cypher is 2 characters"):
-            recipient_cypher = adaptor.generate_recipient_from('XX')
+            recipient_cypher = InterchangeAdaptor.generate_recipient_from('XX')
 
             self.assertEqual(recipient_cypher, "XX01")

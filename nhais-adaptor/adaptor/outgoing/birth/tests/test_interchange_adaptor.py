@@ -2,13 +2,23 @@ import unittest
 
 import adaptor.outgoing.birth.tests.fixtures as fixtures
 from testfixtures import compare
-import adaptor.outgoing.interchange_adaptor as adaptor
+
+from adaptor.fhir_helpers.fhir_creators import OperationName
+from adaptor.outgoing.birth.message_birth_adaptor import MessageBirthAdaptor
+from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 
 
 class TestInterchangeAdaptor(unittest.TestCase):
     """
     Test the conversation of fhir to an edifact interchange for a birth registration
     """
+
+    operation_dict = {
+        OperationName.REGISTER_BIRTH: {
+            "refNumber": "G1",
+            "messageAdaptor": MessageBirthAdaptor
+        }
+    }
 
     def test_create_interchange(self):
         """
@@ -38,6 +48,9 @@ class TestInterchangeAdaptor(unittest.TestCase):
 
             op_def = fixtures.create_operation_definition_for_birth_registration()
 
-            (sender, recipient, interchange_seq_no, interchange) = adaptor.create_interchange(fhir_operation=op_def)
+            adaptor = InterchangeAdaptor(self.operation_dict)
+
+            (sender, recipient, interchange_seq_no, interchange) = adaptor.create_interchange(
+                fhir_operation=op_def)
 
             compare(interchange, expected_edifact_interchange)
