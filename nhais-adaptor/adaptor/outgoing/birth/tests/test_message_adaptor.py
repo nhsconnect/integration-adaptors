@@ -4,8 +4,6 @@ from testfixtures import compare
 
 import adaptor.outgoing.birth.tests.fixtures as fixtures
 import adaptor.outgoing.message_adaptor as message_adaptor
-from adaptor.fhir_helpers import fhir_creators as creators
-from adaptor.fhir_helpers.fhir_creators import ParameterName, OperationName
 from edifact.outgoing.models.address import Address as EdifactAddress
 from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthPatientDetails, \
     MessageSegmentBirthRegistrationDetails, MessageTypeBirth
