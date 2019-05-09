@@ -11,6 +11,11 @@ basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success
 base_fault_response = FileUtilities.get_file_string(XML_PATH / 'basic_fault_response.xml')
 
 
+def build_error_message(error):
+    builder = PystacheMessageBuilder(str(TEMPLATE_PATH), 'base_error_template')
+    return builder.build_message({"errorMessage": error})
+
+
 class MessageHandler:
     namespaces = {
         'soap': 'http://schemas.xmlsoap.org/soap/envelope/',
@@ -23,8 +28,6 @@ class MessageHandler:
         logging.basicConfig(level=logging.DEBUG)
         self.message = message_string
         self.message_tree = ET.fromstring(self.message)
-
-        obj1 = objectify.fromstring(message_string)
 
         self.check_list = [
             self.check_action_types,
@@ -43,7 +46,6 @@ class MessageHandler:
         """
         for check in self.check_list:
             status, response = check()
-            # logging.warning("Status:" + str(response))
             if status != 200:
                 return status, response
 
@@ -55,23 +57,23 @@ class MessageHandler:
         body as per the 'DE_INVSER' requirement specified in the requirements spreadsheet
         :return: status code, response content
         """
-        header_action = ""
+        action = ""
         for type_tag in self.message_tree.findall("./soap:Header"
                                                   "/wsa:Action",
                                                   self.namespaces):
-            header_action = type_tag.text
+            action = type_tag.text
 
-        body_service = ""
+        service = ""
         for type_tag in self.message_tree.findall('./soap:Body'
                                                   '/itk:DistributionEnvelope'
                                                   '/itk:header',
                                                   self.namespaces):
-            body_service = type_tag.attrib['service']
+            service = type_tag.attrib['service']
 
-        if header_action != body_service:
-            logging.warning("Action type does not match service type: (Action, Service) (%s, %s)", header_action,
-                            body_service)
-            return 500, self.build_error_message("Manifest action does not match service action")
+        if action != service:
+            logging.warning("Action type does not match service type: (Action, Service) (%s, %s)", action,
+                            service)
+            return 500, build_error_message("Manifest action does not match service action")
 
         return 200, basic_success_response
 
@@ -81,25 +83,14 @@ class MessageHandler:
         :return:
         """
 
-        manifest_count = "-"
-        for type_tag in self.message_tree.findall("./soap:Body"
-                                                  "/itk:DistributionEnvelope"
-                                                  "/itk:header"
-                                                  "/itk:manifest",
-                                                  self.namespaces):
-            manifest_count = type_tag.attrib['count']
+        manifest_count = self.get_manifest_count()
 
-        payload_count = "+"
-        for type_tag in self.message_tree.findall("./soap:Body"
-                                                  "/itk:DistributionEnvelope"
-                                                  "/itk:payloads",
-                                                  self.namespaces):
-            payload_count = type_tag.attrib['count']
+        payload_count = self.get_payload_count()
 
         if payload_count != manifest_count:
             logging.warning("Error in manifest count: (ManifestCount, PayloadCount) (%s, %s)", manifest_count,
                             payload_count)
-            return 500, self.build_error_message("Manifest count does not match payload count")
+            return 500, build_error_message("Manifest count does not match payload count")
 
         return 200, basic_success_response
 
@@ -109,13 +100,7 @@ class MessageHandler:
         spec
         :return:
         """
-        manifest_count = None
-        for type_tag in self.message_tree.findall("./soap:Body"
-                                                  "/itk:DistributionEnvelope"
-                                                  "/itk:header"
-                                                  "/itk:manifest",
-                                                  self.namespaces):
-            manifest_count = int(type_tag.attrib['count'])
+        manifest_count = int(self.get_manifest_count())
 
         manifest_actual_count = len(self.message_tree.findall("./soap:Body"
                                                               "/itk:DistributionEnvelope"
@@ -127,8 +112,8 @@ class MessageHandler:
             logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
                             manifest_count, manifest_actual_count)
 
-            return 500, self.build_error_message("The number of manifest instances does"
-                                                 " not match the manifest count specified")
+            return 500, build_error_message("The number of manifest instances does"
+                                            " not match the manifest count specified")
 
         return 200, basic_success_response
 
@@ -138,12 +123,7 @@ class MessageHandler:
         as per 'DE_INVPCT' in the spec
         :return:
         """
-        payload_count = "+"
-        for type_tag in self.message_tree.findall("./soap:Body"
-                                                  "/itk:DistributionEnvelope"
-                                                  "/itk:payloads",
-                                                  self.namespaces):
-            payload_count = int(type_tag.attrib['count'])
+        payload_count = int(self.get_payload_count())
 
         payload_actual_count = len(self.message_tree.findall("./soap:Body"
                                                              "/itk:DistributionEnvelope"
@@ -183,10 +163,28 @@ class MessageHandler:
 
         if len(payload_ids.difference(manifest_ids)) != 0:
             logging.warning("Payload IDs do not match Manifest IDs")
-            return 500, self.build_error_message("Payload IDs do not map to Manifest IDs")
+            return 500, build_error_message("Payload IDs do not map to Manifest IDs")
 
         return 200, basic_success_response
 
-    def build_error_message(self, error):
-        builder = PystacheMessageBuilder(str(TEMPLATE_PATH), 'base_error_template')
-        return builder.build_message({"errorMessage": error})
+    def get_manifest_count(self):
+        manifests = self.message_tree.findall("./soap:Body"
+                                              "/itk:DistributionEnvelope"
+                                              "/itk:header"
+                                              "/itk:manifest",
+                                              self.namespaces)
+
+        if len(manifests) > 1:
+            logging.warning("More than one manifest tag")
+
+        return manifests[0].attrib['count']
+
+    def get_payload_count(self):
+        payloads = self.message_tree.findall("./soap:Body"
+                                            "/itk:DistributionEnvelope"
+                                            "/itk:payloads",
+                                            self.namespaces)
+        if len(payloads) > 1:
+            logging.warning("Number of payloads tags greater than 1")
+        payload_count = payloads[0].attrib['count']
+        return payload_count
