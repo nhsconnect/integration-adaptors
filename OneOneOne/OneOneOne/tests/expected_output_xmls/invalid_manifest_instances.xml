@@ -13,7 +13,7 @@
             </faultstring>
             <detail>
                 <toolkit:ToolkitErrorInfo xmlns:toolkit="urn:nhs-itk:ns:201005">
-                    <toolkit:ErrorID>79E952D7-6BFE-11E9-B1E7-EB711959C3B2</toolkit:ErrorID>
+                    <toolkit:ErrorID>07F6FEF7-6C28-11E9-A8F6-091223E365E0</toolkit:ErrorID>
                     <toolkit:ErrorCode>1000</toolkit:ErrorCode>
                     <toolkit:ErrorText>The number of manifest instances does not match the manifest count specified</toolkit:ErrorText>
                     <toolkit:ErrorDiagnosticText>Test message rejection.

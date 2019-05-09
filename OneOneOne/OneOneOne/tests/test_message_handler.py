@@ -136,6 +136,10 @@ class MessageHandlerTest(unittest.TestCase):
             status_code, response = mh.check_payload_id_matches_manifest_id()
             assert (status_code == 500)
 
+            expected = FileUtilities.get_file_string(
+                str(self.expectedXmlFileDir / 'payloadID_does_not_match_manifestID.xml'))
+            XmlUtilities.assert_xml_equal_utf_8(expected, response)
+
             with self.subTest("Incorrect manifest occurrences returns 500 error"):
                 dictionary = {'payloadCount': "2",
                               'payloads': [{"id": 'one'}],

@@ -1,4 +1,4 @@
-from lxml import etree
+from lxml import etree, objectify
 import xml.etree.ElementTree as ET
 
 from builder.pystache_message_builder import PystacheMessageBuilder
@@ -29,6 +29,10 @@ class MessageHandler:
         logging.basicConfig(level=logging.DEBUG)
         self.message = message_string
         self.message_tree = ET.fromstring(self.message)
+
+        obj1 = objectify.fromstring(message_string)
+        print(etree.tostring(obj1))
+
         self.check_list = [
             self.check_action_types,
             self.check_manifest_and_payload_count,
@@ -130,7 +134,8 @@ class MessageHandler:
             logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
                             manifest_count, manifest_actual_count)
 
-            return 500, wrong_manifest_instances
+            return 500, self.build_error_message("The number of manifest instances does"
+                                                 " not match the manifest count specified")
 
         return 200, basic_success_response
 
@@ -185,7 +190,7 @@ class MessageHandler:
 
         if len(payload_ids.difference(manifest_ids)) != 0:
             logging.warning("Payload IDs do not match Manifest IDs")
-            return 500, base_fault_response
+            return 500, self.build_error_message("Payload IDs do not map to Manifest IDs")
 
         return 200, basic_success_response
 

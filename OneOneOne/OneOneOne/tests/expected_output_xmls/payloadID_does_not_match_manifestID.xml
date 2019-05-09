@@ -15,7 +15,7 @@
                 <toolkit:ToolkitErrorInfo xmlns:toolkit="urn:nhs-itk:ns:201005">
                     <toolkit:ErrorID>07F6FEF7-6C28-11E9-A8F6-091223E365E0</toolkit:ErrorID>
                     <toolkit:ErrorCode>1000</toolkit:ErrorCode>
-                    <toolkit:ErrorText>Manifest action does not match service action</toolkit:ErrorText>
+                    <toolkit:ErrorText>Payload IDs do not map to Manifest IDs</toolkit:ErrorText>
                     <toolkit:ErrorDiagnosticText>Test message rejection.
                         TEST_HARNESS_ID:7D6F23E0-AE1A-11DB-9808-B18E1E0994CD
                     </toolkit:ErrorDiagnosticText>
