@@ -9,6 +9,7 @@ from adaptor.fhir_helpers.fhir_creators import OperationName
 from adaptor.outgoing.birth.message_birth_adaptor import MessageBirthAdaptor
 from adaptor.outgoing.death.message_death_adaptor import MessageDeathAdaptor
 from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
+from adaptor.outgoing.config import operation_dict
 from definitions import ROOT_DIR
 
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"
@@ -49,17 +50,6 @@ patient_register_json = FileUtilities.get_file_dict(incoming_file_path)
 op_def = OperationDefinition(patient_register_json)
 
 # run the adaptor
-operation_dict = {
-    OperationName.REGISTER_BIRTH: {
-        "refNumber": "G1",
-        "messageAdaptor": MessageBirthAdaptor
-    },
-    OperationName.REGISTER_DEATH: {
-        "refNumber": "G1",
-        "messageAdaptor": MessageDeathAdaptor
-    }
-}
-
 adaptor = InterchangeAdaptor(operation_dict=operation_dict)
 (sender, recipient, interchange_seq_no, edifact_interchange) = adaptor.create_interchange(fhir_operation=op_def)
 

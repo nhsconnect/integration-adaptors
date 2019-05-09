@@ -10,6 +10,20 @@ from edifact.outgoing.models.name import Name as EdifactName
 
 
 class TestCommonAdaptor(unittest.TestCase):
+    def test_generate_recipient_from(self):
+        """
+        Test the generation of a recipient cypher from the nhais cypher
+        """
+        with self.subTest("When the nhais cypher is 3 characters"):
+            recipient_cypher = adaptor.generate_recipient_from('XX1')
+
+            self.assertEqual(recipient_cypher, "XX11")
+
+        with self.subTest("When the nhais cypher is 2 characters"):
+            recipient_cypher = adaptor.generate_recipient_from('XX')
+
+            self.assertEqual(recipient_cypher, "XX01")
+
     def test_create_patient_name(self):
         """ Test the creation of af edifact patient name object from fhir """
         with self.subTest("Patient with all the name details"):

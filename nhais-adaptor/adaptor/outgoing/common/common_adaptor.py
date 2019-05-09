@@ -7,6 +7,23 @@ from edifact.outgoing.models.address import Address as EdifactAddress
 from edifact.outgoing.models.name import Name as EdifactName
 
 
+def generate_recipient_from(nhais_cypher):
+    """
+    Generates the recipient cypher. This value can be deduced from the nhais_cypher provided.
+    The nhais cypher can be 2 to 3 characters is length.
+    If it is 2 characters in length it will append "01" to generate the recipient cypher
+    If it is 3 characters in length it will append "1" to generate the recipient cypher
+    :param nhais_cypher: The nhais cypher provided. Should be 2-3 characters in length
+    :return: The recipient cypher
+    """
+    recipient = ''
+    if len(nhais_cypher) == 3:
+        recipient = nhais_cypher + '1'
+    elif len(nhais_cypher) == 2:
+        recipient = nhais_cypher + "01"
+    return recipient
+
+
 def create_patient_name(fhir_patient_name: FhirName) -> EdifactName:
     """
     Function to generate the edifact representation of the patient name
