@@ -12,7 +12,7 @@ class MessageSegmentBirthPatientDetails(MessageSegmentPatientDetails):
 
     def __init__(self, id_number, name, date_of_birth, gender, address):
         """
-        :param id_number: OPI official Payment Id (existing NHS Number)
+        :param id_number: OPI official Patient Id (existing NHS Number)
         :param name: the name of the patient
         :param date_of_birth: Patients date of birth
         :param gender: sex of the patient. For an acceptance transaction, reference "G1", this segment is required

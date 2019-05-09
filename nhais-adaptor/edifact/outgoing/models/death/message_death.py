@@ -10,7 +10,7 @@ class MessageSegmentDeathPatientDetails(MessageSegmentPatientDetails):
 
     def __init__(self, id_number):
         """
-        :param id_number: OPI official Payment Id (existing NHS Number)
+        :param id_number: OPI official Patient Id (existing NHS Number)
         """
         segments = [
             Segment(key="PNA", value=f"PAT+{id_number}:OPI"),
