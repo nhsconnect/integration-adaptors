@@ -1,7 +1,9 @@
-import json
+import os
 import unittest
+from pathlib import Path
 
 from testfixtures import compare
+from utilities.file_utilities import FileUtilities
 
 import adaptor.incoming.operation_definition_adaptor as adaptor
 import edifact.incoming.parser.deserialiser as deserialiser
@@ -16,11 +18,13 @@ class TestEdifactToFhirIntegration(unittest.TestCase):
         """
         Test when the operation is for a birth registration
         """
-        with open("./tests/incoming/edifact.txt", "r") as incoming_edifact_file:
-            incoming_interchange_raw = incoming_edifact_file.read()
+        TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
-        with open("./tests/incoming/patient-register-birth-approval.json", "r") as patient_register_approval:
-            patient_register_approval_json = json.load(patient_register_approval)
+        expected_file_path = Path(TEST_DIR) / "patient-register-birth-approval.json"
+        patient_register_approval_json = FileUtilities.get_file_dict(expected_file_path)
+
+        incoming_file_path = Path(TEST_DIR) / "edifact.txt"
+        incoming_interchange_raw = FileUtilities.get_file_string(incoming_file_path)
 
         lines = incoming_interchange_raw.split("'\n")
         interchange = deserialiser.convert(lines)

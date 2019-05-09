@@ -6,8 +6,8 @@ from fhirclient.models.operationdefinition import OperationDefinition
 from utilities.file_utilities import FileUtilities
 
 import adaptor.outgoing.interchange_adaptor as adaptor
+from definitions import ROOT_DIR
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"
 gp_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "GP"
 

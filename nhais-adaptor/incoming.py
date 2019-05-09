@@ -7,8 +7,8 @@ from utilities.file_utilities import FileUtilities
 
 import adaptor.incoming.operation_definition_adaptor as adaptor
 import edifact.incoming.parser.deserialiser as deserialiser
+from definitions import ROOT_DIR
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"
 gp_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "GP"
 
@@ -57,4 +57,3 @@ for (transaction_number, recipient, op_def) in op_defs:
     file_path_to_write = str(gp_mailbox_dir / recipient / "inbox" / f"approval-{transaction_number}.json")
     with open(file_path_to_write, "w") as outfile:
         json.dump(pretty_op_def, outfile, indent=4)
-

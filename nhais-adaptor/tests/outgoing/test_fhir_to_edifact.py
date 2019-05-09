@@ -1,7 +1,9 @@
-import json
+import os
 import unittest
+from pathlib import Path
 
 from fhirclient.models.operationdefinition import OperationDefinition
+from utilities.file_utilities import FileUtilities
 
 import adaptor.outgoing.interchange_adaptor as adaptor
 
@@ -15,11 +17,14 @@ class TestFhirToEdifactIntegration(unittest.TestCase):
         """
         Test when the operation is for a birth registration
         """
-        with open("./tests/outgoing/edifact.txt", "r") as expected_file:
-            expected_edifact_interchange = expected_file.read()
+        TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
-        with open("./tests/outgoing/patient-register-birth.json", "r") as patient_register:
-            patient_register_json = json.load(patient_register)
+        expected_file_path = Path(TEST_DIR) / "edifact.txt"
+        expected_edifact_interchange = FileUtilities.get_file_string(expected_file_path)
+
+        incoming_file_path = Path(TEST_DIR) / "patient-register-birth.json"
+        patient_register_json = FileUtilities.get_file_dict(incoming_file_path)
+
         op_def = OperationDefinition(patient_register_json)
         (sender, recipient, interchange_seq_no, edifact_interchange) = adaptor.create_interchange(fhir_operation=op_def)
         pretty_edifact_interchange = "'\n".join(edifact_interchange.split("'"))
