@@ -8,8 +8,6 @@ import logging
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
-basic_fault_response = FileUtilities.get_file_string(XML_PATH / 'basic_fault_response.xml')
-
 
 def build_error_message(error):
     builder = PystacheMessageBuilder(str(TEMPLATE_PATH), 'base_error_template')
@@ -26,8 +24,7 @@ class MessageHandler:
 
     def __init__(self, message_string):
         logging.basicConfig(level=logging.DEBUG)
-        self.message = message_string
-        self.message_tree = ET.fromstring(self.message)
+        self.message_tree = ET.fromstring(message_string)
 
         self.check_list = [
             self.check_action_types,
@@ -42,7 +39,7 @@ class MessageHandler:
         This iterates over the message check methods searching for errors in the message, if no errors are found
         a success response is returned
 
-        :return:
+        :return: status code, response content
         """
         for check in self.check_list:
             status, response = check()
@@ -57,22 +54,22 @@ class MessageHandler:
         body as per the 'DE_INVSER' requirement specified in the requirements spreadsheet
         :return: status code, response content
         """
-        action = ""
+        action_tag_value = "-"
         for type_tag in self.message_tree.findall("./soap:Header"
                                                   "/wsa:Action",
                                                   self.namespaces):
-            action = type_tag.text
+            action_tag_value = type_tag.text
 
-        service = ""
+        service_tag_value = "+"
         for type_tag in self.message_tree.findall('./soap:Body'
                                                   '/itk:DistributionEnvelope'
                                                   '/itk:header',
                                                   self.namespaces):
-            service = type_tag.attrib['service']
+            service_tag_value = type_tag.attrib['service']
 
-        if action != service:
-            logging.warning("Action type does not match service type: (Action, Service) (%s, %s)", action,
-                            service)
+        if action_tag_value != service_tag_value:
+            logging.warning("Action type does not match service type: (Action Tag, Service Tag) (%s, %s)", action_tag_value,
+                            service_tag_value)
             return 500, build_error_message("Manifest action does not match service action")
 
         return 200, basic_success_response
@@ -80,7 +77,7 @@ class MessageHandler:
     def check_manifest_and_payload_count(self):
         """
         This verifies the manifest count is equal to the payload count as per 'DE_INVMPC' requirement
-        :return:
+        :return: status code, response content
         """
 
         manifest_count = self.get_manifest_count()
@@ -98,7 +95,7 @@ class MessageHandler:
         """
         Checks if the manifest.count attribute matches the number of manifest items as per the 'DE_INVMCT'
         spec
-        :return:
+        :return: status code, response content
         """
         manifest_count = int(self.get_manifest_count())
 
@@ -121,7 +118,7 @@ class MessageHandler:
         """
         Checks if the specified payload count matches the actual occurrences of payload elements
         as per 'DE_INVPCT' in the spec
-        :return:
+        :return: status code, response content
         """
         payload_count = int(self.get_payload_count())
 
@@ -131,10 +128,10 @@ class MessageHandler:
                                                              "/itk:payload",
                                                              self.namespaces))
         if payload_count != payload_actual_count:
-            logging.warning("Payload count does not match number of instaces - Expected: %i Found: %i",
+            logging.warning("Payload count does not match number of instances - Expected: %i Found: %i",
                             payload_count,
                             payload_actual_count)
-            return 500, basic_fault_response
+            return 500, build_error_message("Invalid message")
 
         return 200, basic_success_response
 
@@ -142,7 +139,7 @@ class MessageHandler:
         """
         Checks that for each id of each manifest item has a corrosponding
         payload with the same Id as per  'DE_INVMPI'
-        :return: status code, xml response
+        :return: status code, response content
         """
         payload_ids = set()
         manifest_ids = set()
@@ -168,6 +165,10 @@ class MessageHandler:
         return 200, basic_success_response
 
     def get_manifest_count(self):
+        """
+        Extracts the count on the manifest tag in the message
+        :return: manifest count as a string
+        """
         manifests = self.message_tree.findall("./soap:Body"
                                               "/itk:DistributionEnvelope"
                                               "/itk:header"
@@ -180,10 +181,14 @@ class MessageHandler:
         return manifests[0].attrib['count']
 
     def get_payload_count(self):
+        """
+        Extracts the count on the payloads tag in the message
+        :return: payloads count as a string
+        """
         payloads = self.message_tree.findall("./soap:Body"
-                                            "/itk:DistributionEnvelope"
-                                            "/itk:payloads",
-                                            self.namespaces)
+                                             "/itk:DistributionEnvelope"
+                                             "/itk:payloads",
+                                             self.namespaces)
         if len(payloads) > 1:
             logging.warning("Number of payloads tags greater than 1")
         payload_count = payloads[0].attrib['count']
