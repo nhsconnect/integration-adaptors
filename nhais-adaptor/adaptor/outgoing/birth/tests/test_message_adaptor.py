@@ -15,11 +15,12 @@ class TestMessageAdaptor(unittest.TestCase):
 
     def test_create_message_beginning(self):
         with self.subTest("Message beginning for a birth registration"):
-            expected = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
+            expected = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338",
+                                        ref_number="G1").segments
 
             op_def = fixtures.create_operation_definition_for_birth_registration()
 
-            msg_bgn = message_adaptor.create_message_beginning(fhir_operation=op_def)
+            msg_bgn = message_adaptor.create_message_beginning(fhir_operation=op_def).segments
 
             compare(msg_bgn, expected)
 
@@ -39,10 +40,10 @@ class TestMessageAdaptor(unittest.TestCase):
                                                                          location="Spidey Town")
             expected = MessageTypeBirth(sequence_number="000001", message_beginning=msg_bgn,
                                         message_segment_registration_details=msg_seg_reg_details,
-                                        message_segment_patient_details=msg_seg_pat_details)
+                                        message_segment_patient_details=msg_seg_pat_details).segments
 
             op_def = fixtures.create_operation_definition_for_birth_registration()
 
-            message = message_adaptor.create_message(fhir_operation=op_def)
+            message = message_adaptor.create_message(fhir_operation=op_def).segments
 
             compare(message, expected)

@@ -35,7 +35,10 @@ def create_message_segment_registration_details(
 
     deceased_date_time = patient_details.deceasedDateTime.as_json()
 
+    free_text = finders.get_parameter_value(fhir_operation=fhir_operation, parameter_name=ParameterName.FREE_TEXT)
+
     msg_seg_registration_details = MessageSegmentDeathRegistrationDetails(transaction_number=transaction_number,
                                                                           party_id=party_id,
-                                                                          date_time=deceased_date_time)
+                                                                          date_time=deceased_date_time,
+                                                                          free_text=free_text)
     return msg_seg_registration_details

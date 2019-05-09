@@ -18,11 +18,11 @@ class TestMessageBirthAdaptor(unittest.TestCase):
             edifact_pat_address = EdifactAddress(address_line_1="1 Spidey Way", town="Spidey Town", post_code="SP1 1AA")
             expected = MessageSegmentBirthPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
                                                          date_of_birth="2019-04-20",
-                                                         gender="1", address=edifact_pat_address)
+                                                         gender="1", address=edifact_pat_address).segments
 
             op_def = fixtures.create_operation_definition_for_birth_registration()
 
-            msg_seg_pat_details = message_adaptor.create_message_segment_patient_detail(op_def)
+            msg_seg_pat_details = message_adaptor.create_message_segment_patient_detail(op_def).segments
 
             compare(msg_seg_pat_details, expected)
 
@@ -33,10 +33,10 @@ class TestMessageBirthAdaptor(unittest.TestCase):
                                                               acceptance_code="A",
                                                               acceptance_type=1,
                                                               date_time="2019-04-23 09:00:04.159338",
-                                                              location="Spidey Town")
+                                                              location="Spidey Town").segments
 
             op_def = fixtures.create_operation_definition_for_birth_registration()
 
-            msg_seg_reg_details = message_adaptor.create_message_segment_registration_details(op_def)
+            msg_seg_reg_details = message_adaptor.create_message_segment_registration_details(op_def).segments
 
             compare(msg_seg_reg_details, expected)

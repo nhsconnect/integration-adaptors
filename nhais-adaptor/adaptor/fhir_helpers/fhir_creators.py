@@ -27,6 +27,7 @@ class ParameterName:
     TRANSACTION_NO = "transactionNumber"
     REGISTER_PATIENT = "registerPatient"
     REGISTER_PRACTITIONER = "registerPractitioner"
+    FREE_TEXT = "freeText"
 
 
 class ResourceType:
