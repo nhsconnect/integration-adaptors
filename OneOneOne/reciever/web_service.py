@@ -1,18 +1,12 @@
 import logging
-from time import sleep
 
 from tornado.httpserver import HTTPServer
 import tornado.ioloop
 import tornado.web
-from lxml import etree
-import xml.etree.ElementTree as ET
-import requests
-
-from tornado.iostream import StreamClosedError
 
 from utilities.file_utilities import FileUtilities
 from definitions import XML_PATH
-from OneOneOne.OneOneOne.message_handler import MessageHandler
+from OneOneOne.reciever.message_handler import MessageHandler
 
 response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
