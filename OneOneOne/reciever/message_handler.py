@@ -1,4 +1,3 @@
-from lxml import etree, objectify
 import xml.etree.ElementTree as ET
 
 from builder.pystache_message_builder import PystacheMessageBuilder

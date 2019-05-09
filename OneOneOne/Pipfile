@@ -10,6 +10,7 @@ integration-adaptors-common = {editable = true,path = "./../common"}
 
 [requires]
 python_version = "3.7"
+tornado = "*"
 
 [scripts]
 tests = "python -m unittest -v"

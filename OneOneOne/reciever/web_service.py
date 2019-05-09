@@ -13,8 +13,8 @@ response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml'
 
 class MessageReceiver(tornado.web.RequestHandler):
 
-    def initialize(self, servicesdict):
-        logging.basicConfig(level=logging.DEBUG)
+    def initialize(self, servicesdict=None):
+        pass
 
     def post(self):
         logging.debug("Post message received ")
@@ -22,22 +22,15 @@ class MessageReceiver(tornado.web.RequestHandler):
         status_code, message_response = mh.evaluate_message()
 
         self.set_status(status_code)
-        logging.warning("Status code %i", status_code)
+        logging.debug("Status code %i", status_code)
 
-        logging.warning("Sending reply")
+        logging.debug("Sending reply")
         self.write(message_response)
-
-    def get(self):
-        print("Test get method")
-
-    def on_finish(self) -> None:
-        self.flush()
 
 
 if __name__ == "__main__":
-    servicesDict = {'debug': True }
-    application = tornado.web.Application([(r"/syncsoap", MessageReceiver, dict(servicesdict=servicesDict))],
-                                          debug=True)
+    logging.basicConfig(level=logging.DEBUG)
+    application = tornado.web.Application([(r"/syncsoap", MessageReceiver)])
 
     httpsServer = HTTPServer(application)
     httpsServer.listen(4545)
