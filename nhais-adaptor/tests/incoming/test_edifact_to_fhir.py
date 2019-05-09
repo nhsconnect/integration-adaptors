@@ -5,8 +5,9 @@ from pathlib import Path
 from testfixtures import compare
 from utilities.file_utilities import FileUtilities
 
-import adaptor.incoming.operation_definition_adaptor as adaptor
+from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
 import edifact.incoming.parser.deserialiser as deserialiser
+from adaptor.incoming.config import reference_dict
 
 
 class TestEdifactToFhirIntegration(unittest.TestCase):
@@ -29,7 +30,8 @@ class TestEdifactToFhirIntegration(unittest.TestCase):
         lines = incoming_interchange_raw.split("'\n")
         interchange = deserialiser.convert(lines)
 
-        op_defs = adaptor.create_operation_definition(interchange)
+        adaptor = OperationDefinitionAdaptor(reference_dict)
+        op_defs = adaptor.create_operation_definition(interchange=interchange)
         pretty_op_def = op_defs[0][2].as_json()
 
         compare(pretty_op_def, patient_register_approval_json)

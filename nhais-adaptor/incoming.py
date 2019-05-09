@@ -5,9 +5,10 @@ from pathlib import Path
 from PyInquirer import prompt
 from utilities.file_utilities import FileUtilities
 
-import adaptor.incoming.operation_definition_adaptor as adaptor
+from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
 import edifact.incoming.parser.deserialiser as deserialiser
 from definitions import ROOT_DIR
+from adaptor.incoming.config import reference_dict
 
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"
 gp_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "GP"
@@ -48,6 +49,7 @@ lines = incoming_interchange_raw.split("'\n")
 interchange = deserialiser.convert(lines)
 
 # Run the adaptor
+adaptor = OperationDefinitionAdaptor(reference_dict)
 op_defs = adaptor.create_operation_definition(interchange)
 
 # create the generated fhir operation definitions files

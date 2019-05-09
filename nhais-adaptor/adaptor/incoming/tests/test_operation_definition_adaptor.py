@@ -1,22 +1,22 @@
 import unittest
 from testfixtures import compare
-import adaptor.incoming.operation_definition_adaptor as incoming_adaptor
+from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
 from edifact.incoming.models.interchange import Interchange, InterchangeHeader
 from edifact.incoming.models.message import Messages, MessageSegment, MessageSegmentBeginningDetails, \
     MessageSegmentRegistrationDetails, MessageSegmentPatientDetails
 import adaptor.incoming.tests.fixtures as fixtures
+from adaptor.incoming.config import reference_dict
 
 
 class TestOperationDefinitionAdaptor(unittest.TestCase):
     """
     Test the conversion of an incoming edifact interchange to a fhir operation definition response
     """
-
     def test_format_date_time(self):
         """
         Tests the function that formats the edifact date time stamp to a fhir format
         """
-        formatted_date = incoming_adaptor.format_date_time("190501:0902")
+        formatted_date = OperationDefinitionAdaptor.format_date_time("190501:0902")
         self.assertEqual(formatted_date, "2019-05-01 09:02")
 
     def test_create_operation_definition(self):
@@ -32,7 +32,8 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
                                                 MessageSegmentRegistrationDetails(transaction_number="17"))])
             incoming_interchange = Interchange(header=interchange_header, messages=messages)
 
-            op_defs = incoming_adaptor.create_operation_definition(incoming_interchange)
+            adaptor = OperationDefinitionAdaptor(reference_dict=reference_dict)
+            op_defs = adaptor.create_operation_definition(interchange=incoming_interchange)
 
             compare(op_defs, expected)
 
@@ -52,7 +53,8 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
 
             incoming_interchange = Interchange(header=interchange_header, messages=messages)
 
-            op_defs = incoming_adaptor.create_operation_definition(incoming_interchange)
+            adaptor = OperationDefinitionAdaptor(reference_dict=reference_dict)
+            op_defs = adaptor.create_operation_definition(interchange=incoming_interchange)
 
             compare(op_defs, expected)
 
@@ -67,6 +69,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
                                                 MessageSegmentPatientDetails(nhs_number="NHSNO22222"))])
             incoming_interchange = Interchange(header=interchange_header, messages=messages)
 
-            op_defs = incoming_adaptor.create_operation_definition(incoming_interchange)
+            adaptor = OperationDefinitionAdaptor(reference_dict=reference_dict)
+            op_defs = adaptor.create_operation_definition(interchange=incoming_interchange)
 
             compare(op_defs, expected)
