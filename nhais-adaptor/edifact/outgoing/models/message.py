@@ -108,7 +108,7 @@ class Message(SegmentCollection):
         """
         msg_header = MessageHeader(sequence_number=sequence_number)
         number_of_segments = len(message_beginning) + len(message_segment_registration_details.segments) + \
-                             len(message_segment_patient_details.segments) + 2
+            len(message_segment_patient_details.segments) + 2
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_registration_details,
                     message_segment_patient_details, msg_trailer]

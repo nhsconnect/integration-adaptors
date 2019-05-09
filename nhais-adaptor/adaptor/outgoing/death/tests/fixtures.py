@@ -33,7 +33,7 @@ def create_operation_definition_for_death_registration(free_text=None):
                   op_param_sender_cypher, op_param_transaction_number, op_param_practitioner, op_param_patient]
     if free_text:
         parameters.append(creators.create_parameter_with_binding(name=ParameterName.FREE_TEXT,
-                                                                value=free_text))
+                                                                 value=free_text))
 
     op_def = creators.create_operation_definition(name=OperationName.REGISTER_DEATH, code="gpc.registerpatient",
                                                   date_time="2019-04-23 09:00:04.159338",

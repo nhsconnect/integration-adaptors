@@ -5,11 +5,8 @@ from PyInquirer import prompt
 from fhirclient.models.operationdefinition import OperationDefinition
 from utilities.file_utilities import FileUtilities
 
-from adaptor.fhir_helpers.fhir_creators import OperationName
-from adaptor.outgoing.birth.message_birth_adaptor import MessageBirthAdaptor
-from adaptor.outgoing.death.message_death_adaptor import MessageDeathAdaptor
-from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 from adaptor.outgoing.config import operation_dict
+from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 from definitions import ROOT_DIR
 
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"

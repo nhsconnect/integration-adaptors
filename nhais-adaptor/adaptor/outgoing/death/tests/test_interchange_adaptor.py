@@ -1,7 +1,8 @@
 import unittest
 
-import adaptor.outgoing.death.tests.fixtures as fixtures
 from testfixtures import compare
+
+import adaptor.outgoing.death.tests.fixtures as fixtures
 from adaptor.fhir_helpers.fhir_creators import OperationName
 from adaptor.outgoing.death.message_death_adaptor import MessageDeathAdaptor
 from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
@@ -43,7 +44,8 @@ class TestInterchangeAdaptor(unittest.TestCase):
 
             op_def = fixtures.create_operation_definition_for_death_registration()
 
-            (sender, recipient, interchange_seq_no, interchange) = self.adaptor.create_interchange(fhir_operation=op_def)
+            (sender, recipient, interchange_seq_no, interchange) = self.adaptor.create_interchange(
+                fhir_operation=op_def)
 
             compare(interchange, expected_edifact_interchange)
 
@@ -67,6 +69,7 @@ class TestInterchangeAdaptor(unittest.TestCase):
 
             op_def = fixtures.create_operation_definition_for_death_registration(free_text="Died in Infinity Wars")
 
-            (sender, recipient, interchange_seq_no, interchange) = self.adaptor.create_interchange(fhir_operation=op_def)
+            (sender, recipient, interchange_seq_no, interchange) = self.adaptor.create_interchange(
+                fhir_operation=op_def)
 
             compare(interchange, expected_edifact_interchange)
