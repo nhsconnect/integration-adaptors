@@ -39,10 +39,7 @@ class TestInterchange(unittest.TestCase):
             date_time = "2019-04-23 09:00:04.159338"
 
             msg_bgn = MessageBeginning(party_id="XX1", date_time=date_time, ref_number="G1")
-            msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17,
-                                                                         party_id="4826940,281",
-                                                                         acceptance_code="A",
-                                                                         acceptance_type="1",
+            msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
                                                                          date_time="2019-04-23 09:00:04.159338",
                                                                          location="Bury")
             patient_name = Name(family_name="Stevens", first_given_forename="Charles", title="Mr",

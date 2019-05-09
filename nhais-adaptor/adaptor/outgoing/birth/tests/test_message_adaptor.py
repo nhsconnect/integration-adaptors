@@ -32,10 +32,7 @@ class TestMessageAdaptor(unittest.TestCase):
             msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="NHSNO11111", name=edifact_pat_name,
                                                                     date_of_birth="2019-04-20",
                                                                     gender="1", address=edifact_pat_address)
-            msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17,
-                                                                         party_id="4826940,281",
-                                                                         acceptance_code="A",
-                                                                         acceptance_type=1,
+            msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
                                                                          date_time="2019-04-23 09:00:04.159338",
                                                                          location="Spidey Town")
             expected = MessageTypeBirth(sequence_number="000001", message_beginning=msg_bgn,

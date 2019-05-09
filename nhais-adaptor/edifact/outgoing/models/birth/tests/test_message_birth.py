@@ -22,10 +22,7 @@ class TestMessageBirth(unittest.TestCase):
                                         "DTM+956:20190423:102'"
                                         "LOC+950+BURY'")
 
-            msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17,
-                                                                         party_id="4826940,281",
-                                                                         acceptance_code="A",
-                                                                         acceptance_type="1",
+            msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
                                                                          date_time="2019-04-23 09:00:04.159338",
                                                                          location="Bury").to_edifact()
             self.assertEqual(msg_seg_reg_details, expected_edifact_message)
@@ -70,10 +67,7 @@ class TestMessageBirth(unittest.TestCase):
                                     "NAD+PAT++MOORSIDE FARM:OLD LANE:ST PAULS CRAY:ORPINGTON:KENT+++++BR6 7EW'"
                                     "UNT+18+00001'")
         msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
-        msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17,
-                                                                     party_id="4826940,281",
-                                                                     acceptance_code="A",
-                                                                     acceptance_type="1",
+        msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
                                                                      date_time="2019-04-23 09:00:04.159338",
                                                                      location="Bury")
         patient_name = Name(family_name="Stevens", first_given_forename="Charles", title="Mr", middle_name="Anthony",

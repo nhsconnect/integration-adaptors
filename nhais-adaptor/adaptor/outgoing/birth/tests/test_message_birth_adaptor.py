@@ -28,10 +28,7 @@ class TestMessageBirthAdaptor(unittest.TestCase):
 
     def test_create_message_segment_registration_details(self):
         with self.subTest("Patient registration details for type birth"):
-            expected = MessageSegmentBirthRegistrationDetails(transaction_number=17,
-                                                              party_id="4826940,281",
-                                                              acceptance_code="A",
-                                                              acceptance_type=1,
+            expected = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
                                                               date_time="2019-04-23 09:00:04.159338",
                                                               location="Spidey Town").segments
 
