@@ -39,6 +39,7 @@ class MessageReceiver(tornado.web.RequestHandler):
     def on_finish(self) -> None:
         self.flush()
 
+
 if __name__ == "__main__":
     servicesDict = {'debug': True }
     application = tornado.web.Application([(r"/syncsoap", MessageReceiver, dict(servicesdict=servicesDict))],

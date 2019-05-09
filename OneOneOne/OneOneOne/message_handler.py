@@ -8,12 +8,6 @@ import logging
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
-wrong_service_body = FileUtilities.get_file_string(XML_PATH / 'mismatched_action_services.xml')
-
-wrong_manifest_payload_count = FileUtilities.get_file_string(XML_PATH / 'manifest_not_equal_to_payload_count.xml')
-
-wrong_manifest_instances = FileUtilities.get_file_string(XML_PATH / 'invalid_manifest_instances.xml')
-
 base_fault_response = FileUtilities.get_file_string(XML_PATH / 'basic_fault_response.xml')
 
 
@@ -31,7 +25,6 @@ class MessageHandler:
         self.message_tree = ET.fromstring(self.message)
 
         obj1 = objectify.fromstring(message_string)
-        print(etree.tostring(obj1))
 
         self.check_list = [
             self.check_action_types,
