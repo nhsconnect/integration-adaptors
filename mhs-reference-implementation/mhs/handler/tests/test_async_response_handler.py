@@ -42,4 +42,5 @@ class TestAsyncResponseHandler(AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", body=request_body)
 
         self.assertEqual(response.code, 200)
+        self.assertEqual(response.headers["Content-Type"], "text/xml")
         XmlUtilities.assert_xml_equal(expected_response, response.body)

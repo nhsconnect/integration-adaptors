@@ -3,7 +3,7 @@ from unittest.mock import Mock, sentinel, patch
 
 from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
 from mhs.builder.ebxml_request_message_builder import MESSAGE
-from mhs.sender.sender import Sender, WRAPPER_REQUIRED
+from mhs.sender.sender import Sender, WRAPPER_REQUIRED, UnknownInteractionError
 from utilities.message_utilities import MessageUtilities
 
 EXPECTED_PARTY_ID = "A91424-9199121"
@@ -49,3 +49,9 @@ class TestSender(TestCase):
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
         self.mock_transport.make_request.assert_called_with(interaction_details, sentinel.message)
         self.assertIs(sentinel.response, actual_response)
+
+    def test_send_message_incorrect_interaction_name(self):
+        self.mock_interactions_config.get_interaction_details.return_value = None
+
+        with (self.assertRaises(UnknownInteractionError)):
+            self.sender.send_message("unknown_interaction", "message")
