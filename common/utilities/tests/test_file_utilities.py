@@ -4,8 +4,12 @@ from unittest import TestCase
 from utilities.file_utilities import FileUtilities
 
 TEST_FILE_DIR = "test_files"
+
 TEST_FILE = "test.txt"
-TEST_STRING = "Test String.\n"
+EXPECTED_STRING = "Test String.\n"
+
+TEST_JSON_FILE = "test.json"
+EXPECTED_JSON = {"one": "foo", "two": "bar"}
 
 CR_LF_STRING = "foo\r\nbar\r\nbaz"
 CR_STRING = "foo\rbar\rbaz"
@@ -15,24 +19,35 @@ EXPECTED_NORMALIZED_STRING = "foo\nbar\nbaz"
 
 
 class TestFileUtilities(TestCase):
+    current_dir = os.path.dirname(__file__)
+    test_files_dir = os.path.join(current_dir, TEST_FILE_DIR)
 
     def test_get_file_string(self):
-        current_dir = os.path.dirname(__file__)
-        test_files_dir = os.path.join(current_dir, TEST_FILE_DIR)
-        test_file = os.path.join(test_files_dir, TEST_FILE)
+        test_file = os.path.join(self.test_files_dir, TEST_FILE)
 
         loaded_string = FileUtilities.get_file_string(test_file)
 
-        self.assertEqual(TEST_STRING, loaded_string, "The string loaded should match the one expected.")
+        self.assertEqual(EXPECTED_STRING, loaded_string, "The string loaded should match the one expected.")
+
+    def test_get_file_dict(self):
+        test_json_file = os.path.join(self.test_files_dir, TEST_JSON_FILE)
+
+        loaded_dict = FileUtilities.get_file_dict(test_json_file)
+
+        self.assertEqual(EXPECTED_JSON, loaded_dict, "The dictionary loaded should match the one expected.")
 
     def test_normalize_line_endings(self):
-        normalized_crlf_string = FileUtilities.normalize_line_endings(CR_LF_STRING)
-        normalized_cr_string = FileUtilities.normalize_line_endings(CR_STRING)
-        normalized_lf_string = FileUtilities.normalize_line_endings(LF_STRING)
-        normalized_mixed_string = FileUtilities.normalize_line_endings(MIXED_STRING)
+        strings_to_test = {
+            "CRLF": CR_LF_STRING,
+            "CR": CR_STRING,
+            "LF": LF_STRING,
+            "Mixed": MIXED_STRING
+        }
 
-        self.assertEqual(EXPECTED_NORMALIZED_STRING, normalized_crlf_string, "CRLF line endings should be normalized.")
-        self.assertEqual(EXPECTED_NORMALIZED_STRING, normalized_cr_string, "LF line endings should be normalized.")
-        self.assertEqual(EXPECTED_NORMALIZED_STRING, normalized_lf_string, "LF line endings should be normalized.")
-        self.assertEqual(EXPECTED_NORMALIZED_STRING, normalized_mixed_string,
-                         "Mixed line endings should be normalized.")
+        for line_break_type, test_string in strings_to_test.items():
+            message = line_break_type + " line endings should be normalized."
+
+            with self.subTest(message):
+                normalized_string = FileUtilities.normalize_line_endings(test_string)
+
+                self.assertEqual(EXPECTED_NORMALIZED_STRING, normalized_string)
