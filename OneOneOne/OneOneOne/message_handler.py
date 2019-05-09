@@ -8,7 +8,7 @@ import logging
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
-base_fault_response = FileUtilities.get_file_string(XML_PATH / 'basic_fault_response.xml')
+basic_fault_response = FileUtilities.get_file_string(XML_PATH / 'basic_fault_response.xml')
 
 
 def build_error_message(error):
@@ -134,7 +134,7 @@ class MessageHandler:
             logging.warning("Payload count does not match number of instaces - Expected: %i Found: %i",
                             payload_count,
                             payload_actual_count)
-            return 500, base_fault_response
+            return 500, basic_fault_response
 
         return 200, basic_success_response
 
