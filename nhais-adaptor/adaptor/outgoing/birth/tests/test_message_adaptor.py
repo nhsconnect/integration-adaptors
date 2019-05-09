@@ -6,7 +6,7 @@ import adaptor.outgoing.birth.tests.fixtures as fixtures
 import adaptor.outgoing.message_adaptor as message_adaptor
 from edifact.outgoing.models.address import Address as EdifactAddress
 from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthPatientDetails, \
-    MessageSegmentBirthRegistrationDetails, MessageTypeBirth
+    MessageSegmentBirthRegistrationDetails, BirthRegistrationMessage
 from edifact.outgoing.models.message import MessageBeginning
 from edifact.outgoing.models.name import Name
 
@@ -35,9 +35,9 @@ class TestMessageAdaptor(unittest.TestCase):
             msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
                                                                          date_time="2019-04-23 09:00:04.159338",
                                                                          location="Spidey Town")
-            expected = MessageTypeBirth(sequence_number="000001", message_beginning=msg_bgn,
-                                        message_segment_registration_details=msg_seg_reg_details,
-                                        message_segment_patient_details=msg_seg_pat_details).segments
+            expected = BirthRegistrationMessage(sequence_number="000001", message_beginning=msg_bgn,
+                                                message_segment_registration_details=msg_seg_reg_details,
+                                                message_segment_patient_details=msg_seg_pat_details).segments
 
             op_def = fixtures.create_operation_definition_for_birth_registration()
 

@@ -1,7 +1,7 @@
 import unittest
 
 from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthRegistrationDetails, \
-    MessageSegmentBirthPatientDetails, MessageTypeBirth
+    MessageSegmentBirthPatientDetails, BirthRegistrationMessage
 from edifact.outgoing.models.address import Address
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import MessageBeginning, Messages
@@ -53,9 +53,9 @@ class TestInterchange(unittest.TestCase):
                                                                     date_of_birth="2019-04-20",
                                                                     gender="1", address=patient_address)
 
-            msg = MessageTypeBirth(sequence_number="00001", message_beginning=msg_bgn,
-                                   message_segment_registration_details=msg_seg_reg_details,
-                                   message_segment_patient_details=msg_seg_pat_details)
+            msg = BirthRegistrationMessage(sequence_number="00001", message_beginning=msg_bgn,
+                                           message_segment_registration_details=msg_seg_reg_details,
+                                           message_segment_patient_details=msg_seg_pat_details)
             msgs = Messages([msg])
 
             interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",

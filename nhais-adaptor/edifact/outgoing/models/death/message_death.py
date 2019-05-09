@@ -44,7 +44,7 @@ class MessageSegmentDeathRegistrationDetails(MessageSegmentRegistrationDetails):
         super().add_segments(segments)
 
 
-class MessageTypeDeath(Message):
+class DeathRegistrationMessage(Message):
     """
     A specialisation of the Message for the purpose of a Death registration
     """

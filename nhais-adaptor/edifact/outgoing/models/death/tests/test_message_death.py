@@ -1,7 +1,7 @@
 import unittest
 
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathRegistrationDetails, \
-    MessageSegmentDeathPatientDetails, MessageTypeDeath
+    MessageSegmentDeathPatientDetails, DeathRegistrationMessage
 from edifact.outgoing.models.message import MessageBeginning
 
 
@@ -69,7 +69,7 @@ class TestMessageDeath(unittest.TestCase):
 
         msg_seg_pat_details = MessageSegmentDeathPatientDetails(id_number="N/10/10")
 
-        msg = MessageTypeDeath(sequence_number="00001", message_beginning=msg_bgn,
-                               message_segment_registration_details=msg_seg_reg_details,
-                               message_segment_patient_details=msg_seg_pat_details).to_edifact()
+        msg = DeathRegistrationMessage(sequence_number="00001", message_beginning=msg_bgn,
+                                       message_segment_registration_details=msg_seg_reg_details,
+                                       message_segment_patient_details=msg_seg_pat_details).to_edifact()
         self.assertEqual(msg, expected_edifact_message)

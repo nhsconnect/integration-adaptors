@@ -53,7 +53,7 @@ class MessageSegmentBirthRegistrationDetails(MessageSegmentRegistrationDetails):
         super().add_segments(segments)
 
 
-class MessageTypeBirth(Message):
+class BirthRegistrationMessage(Message):
     """
     A specialisation of the Message for the purpose of a Birth registration
     """

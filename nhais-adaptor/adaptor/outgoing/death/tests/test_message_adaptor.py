@@ -5,7 +5,7 @@ from testfixtures import compare
 import adaptor.outgoing.death.tests.fixtures as fixtures
 import adaptor.outgoing.message_adaptor as message_adaptor
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
-    MessageSegmentDeathRegistrationDetails, MessageTypeDeath
+    MessageSegmentDeathRegistrationDetails, DeathRegistrationMessage
 from edifact.outgoing.models.message import MessageBeginning
 
 
@@ -35,9 +35,9 @@ class TestMessageAdaptor(unittest.TestCase):
             msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",
                                                                          date_time="2019-04-20 09:00:04.159338")
-            expected = MessageTypeDeath(sequence_number="000001", message_beginning=msg_bgn,
-                                        message_segment_registration_details=msg_seg_reg_details,
-                                        message_segment_patient_details=msg_seg_pat_details).segments
+            expected = DeathRegistrationMessage(sequence_number="000001", message_beginning=msg_bgn,
+                                                message_segment_registration_details=msg_seg_reg_details,
+                                                message_segment_patient_details=msg_seg_pat_details).segments
 
             op_def = fixtures.create_operation_definition_for_death_registration()
 

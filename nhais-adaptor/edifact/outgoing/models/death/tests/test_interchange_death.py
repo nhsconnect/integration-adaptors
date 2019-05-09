@@ -1,7 +1,7 @@
 import unittest
 
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathRegistrationDetails, \
-    MessageSegmentDeathPatientDetails, MessageTypeDeath
+    MessageSegmentDeathPatientDetails, DeathRegistrationMessage
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import MessageBeginning, Messages
 
@@ -40,9 +40,9 @@ class TestInterchange(unittest.TestCase):
 
             msg_seg_pat_details = MessageSegmentDeathPatientDetails(id_number="N/10/10")
 
-            msg = MessageTypeDeath(sequence_number="00001", message_beginning=msg_bgn,
-                                   message_segment_registration_details=msg_seg_reg_details,
-                                   message_segment_patient_details=msg_seg_pat_details)
+            msg = DeathRegistrationMessage(sequence_number="00001", message_beginning=msg_bgn,
+                                           message_segment_registration_details=msg_seg_reg_details,
+                                           message_segment_patient_details=msg_seg_pat_details)
             msgs = Messages([msg])
 
             interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",
