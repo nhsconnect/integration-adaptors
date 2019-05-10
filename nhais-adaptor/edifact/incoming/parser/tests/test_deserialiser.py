@@ -7,43 +7,9 @@ from edifact.incoming.models.interchange import InterchangeHeader, Interchange
 from edifact.incoming.models.message import MessageSegmentBeginningDetails, MessageSegment, Messages
 from edifact.incoming.models.transaction import Transactions, Transaction, TransactionRegistrationDetails, \
     TransactionPatientDetails
-from edifact.incoming.parser import EdifactDict
 
 
 class TestDeserialiser(unittest.TestCase):
-    def test_convert_to_dict(self):
-        with self.subTest("Without duplicate keys"):
-            expected = EdifactDict([
-                ("UNB", "UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS"),
-                ("UNH", "00024986+FHSREG:0:1:FH:FHS001"),
-                ("BGM", "++507")
-            ])
-
-            input_lines = [
-                "UNB+UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS",
-                "UNH+00024986+FHSREG:0:1:FH:FHS001",
-                "BGM+++507"
-            ]
-            converted_dict = deserialiser.convert_to_dict(input_lines)
-
-            compare(converted_dict, expected)
-
-        with self.subTest("With duplicate keys"):
-            expected = EdifactDict([
-                ("NAD", "FHS+SO:954"),
-                ("DTM", "137:201904291755:203"),
-                ("NAD", "GP+1231231,PLP348:900")
-            ])
-
-            input_lines = [
-                "NAD+FHS+SO:954",
-                "DTM+137:201904291755:203",
-                "NAD+GP+1231231,PLP348:900",
-            ]
-            converted_dict = deserialiser.convert_to_dict(input_lines)
-
-            compare(converted_dict, expected)
-
     def test_convert(self):
         with self.subTest("When the edifact incoming message does not have a patient section (S02)"):
             expected = Interchange(InterchangeHeader("SO01", "ROO5", "190429:1756"),
