@@ -30,14 +30,6 @@ class MessageHandler:
         logging.basicConfig(level=logging.DEBUG)
         self.message_tree = ET.fromstring(message)
         self.check_list = check_list
-        #
-        # self.check_list = [
-        #     self.check_action_types,
-        #     self.check_manifest_and_payload_count,
-        #     self.check_manifest_count_against_actual,
-        #     self.check_payload_count_against_actual,
-        #     self.check_payload_id_matches_manifest_id
-        # ]
 
     def evaluate_message(self):
         """
@@ -46,7 +38,6 @@ class MessageHandler:
 
         :return: status code, response content
         """
-        print()
         for check in self.check_list:
             c = check(self.message_tree)
             status, response = c.check()

@@ -9,10 +9,10 @@ class CheckManifestCountInstances(Check):
 
     def check(self):
         """
-               Checks if the manifest.count attribute matches the number of manifest items as per the 'DE_INVMCT'
-               spec
-               :return: status code, response content
-               """
+       Checks if the manifest.count attribute matches the number of manifest items as per the 'DE_INVMCT'
+       spec, returns a failure flag where True indicates a failure has occurred
+       :return: failure flag, response content
+       """
         manifest_count = int(self.get_manifest_count())
 
         manifest_actual_count = len(self.message_tree.findall("./soap:Body"
@@ -25,23 +25,24 @@ class CheckManifestCountInstances(Check):
             logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
                             manifest_count, manifest_actual_count)
 
-            return 500, self.build_error_message("The number of manifest instances does"
-                                                 " not match the manifest count specified")
+            return True, self.build_error_message("The number of manifest instances "
+                                                  "does not match the manifest count specified")
 
-        return 200, "qweqwe"
+        return False, None
 
 
 class CheckActionTypes(Check):
 
     def __int__(self, message):
-        super(CheckActionTypes, self).__int__(message)
+        super(CheckActionTypes, self).__init__(message)
 
     def check(self):
         """
-               This method checks for equality between the action type in the header, and the service value in the message
-               body as per the 'DE_INVSER' requirement specified in the requirements spreadsheet
-               :return: status code, response content
-               """
+       This method checks for equality between the action type in the header, and the service value in the message
+       body as per the 'DE_INVSER' requirement specified in the requirements spreadsheet
+       Returns a failure flag where True indicates a failure has occurred
+       :return: failure flag, response content
+       """
         action_tag_value = "-"
         for type_tag in self.message_tree.findall("./soap:Header"
                                                   "/wsa:Action",
@@ -59,9 +60,9 @@ class CheckActionTypes(Check):
             logging.warning("Action type does not match service type: (Action Tag, Service Tag) (%s, %s)",
                             action_tag_value,
                             service_tag_value)
-            return 500, self.build_error_message("Manifest action does not match service action")
+            return True,  self.build_error_message("Manifest action does not match service action")
 
-        return 200, ""
+        return False, None
 
 
 class CheckManifestPayloadCounts(Check):
@@ -82,9 +83,9 @@ class CheckManifestPayloadCounts(Check):
         if payload_count != manifest_count:
             logging.warning("Error in manifest count: (ManifestCount, PayloadCount) (%s, %s)", manifest_count,
                             payload_count)
-            return 500, self.build_error_message("Manifest count does not match payload count")
+            return True, self.build_error_message("Manifest count does not match payload count")
 
-        return 200, ""
+        return False, None
 
 
 class CheckPayloadCountAgainstActual(Check):
@@ -109,9 +110,9 @@ class CheckPayloadCountAgainstActual(Check):
             logging.warning("Payload count does not match number of instances - Expected: %i Found: %i",
                             payload_count,
                             payload_actual_count)
-            return 500, self.build_error_message("Invalid message")
+            return True, self.build_error_message("Invalid message")
 
-        return 200, None
+        return False, None
 
 
 class CheckPayloadIdAgainstManifestId(Check):
@@ -144,6 +145,6 @@ class CheckPayloadIdAgainstManifestId(Check):
 
         if len(payload_ids.difference(manifest_ids)) != 0:
             logging.warning("Payload IDs do not match Manifest IDs")
-            return 500, self.build_error_message("Payload IDs do not map to Manifest IDs")
+            return True, self.build_error_message("Payload IDs do not map to Manifest IDs")
 
-        return 200, None
+        return False, None

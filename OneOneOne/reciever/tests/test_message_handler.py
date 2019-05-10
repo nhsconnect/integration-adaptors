@@ -4,8 +4,9 @@ from builder.pystache_message_builder import PystacheMessageBuilder
 from utilities.file_utilities import FileUtilities
 from utilities.xml_utilities import XmlUtilities
 from reciever.message_handler import MessageHandler
-
+import xml.etree.ElementTree as ET
 from definitions import ROOT_DIR
+from reciever.message_checks.checks import *
 
 
 class MessageHandlerTest(unittest.TestCase):
@@ -23,10 +24,12 @@ class MessageHandlerTest(unittest.TestCase):
                 str(self.expectedXmlFileDir / 'invalid_action_service_values_response.xml'))
 
             msg = builder.build_message(service_dict)
-            mh = MessageHandler(msg)
-            status_code, response = mh.check_action_types()
+            message_tree = ET.fromstring(msg)
+            mh = CheckActionTypes(message_tree)
 
-            assert (status_code == 500)
+            fail_flag, response = mh.check()
+
+            self.assertTrue(fail_flag)
             XmlUtilities.assert_xml_equal_utf_8(expected, response)
 
         with self.subTest("Two services which are the same should return 200 code"):
@@ -34,10 +37,12 @@ class MessageHandlerTest(unittest.TestCase):
                             'service': "urn:nhs-itk:services:201005:SendNHS111Report"}
 
             msg = builder.build_message(service_dict)
-            mh = MessageHandler(msg)
-            status_code, response = mh.check_action_types()
+            message_tree = ET.fromstring(msg)
+            mh = CheckActionTypes(message_tree)
 
-            assert (status_code == 200)
+            fail_flag, response = mh.check()
+
+            self.assertFalse(fail_flag)
 
     def test_manifest_payload_count(self):
         builder = PystacheMessageBuilder(str(self.inputXmlFileDir), 'manifest_payload_count')
@@ -50,10 +55,11 @@ class MessageHandlerTest(unittest.TestCase):
                 str(self.expectedXmlFileDir / 'manifest_not_equal_to_payload_count.xml'))
 
             msg = builder.build_message(counts)
-            mh = MessageHandler(msg)
-            status_code, response = mh.check_manifest_and_payload_count()
+            message_tree = ET.fromstring(msg)
+            mh = CheckManifestPayloadCounts(message_tree)
+            fail_flag, response = mh.check()
 
-            assert (status_code == 500)
+            self.assertTrue(fail_flag)
             XmlUtilities.assert_xml_equal_utf_8(expected, response)
 
         with self.subTest("Equal counts: 200 response"):
@@ -61,10 +67,11 @@ class MessageHandlerTest(unittest.TestCase):
                       'payloadCount': "2"}
 
             msg = builder.build_message(counts)
-            mh = MessageHandler(msg)
+            message_tree = ET.fromstring(msg)
+            mh = CheckManifestPayloadCounts(message_tree)
 
-            status_code, response = mh.check_manifest_and_payload_count()
-            assert (status_code == 200)
+            fail_flag, response = mh.check()
+            self.assertFalse(fail_flag)
 
     def test_manifest_count_matches_manifest_instances(self):
         builder = PystacheMessageBuilder(str(self.inputXmlFileDir), 'manifest_count_manifest_instances')
@@ -76,10 +83,11 @@ class MessageHandlerTest(unittest.TestCase):
                 str(self.expectedXmlFileDir / 'invalid_manifest_instances.xml'))
 
             msg = builder.build_message(manifests)
-            mh = MessageHandler(msg)
-            status_code, response = mh.check_manifest_count_against_actual()
+            message_tree = ET.fromstring(msg)
+            mh = CheckManifestCountInstances(message_tree)
+            fail_flag, response = mh.check()
 
-            assert (status_code == 500)
+            self.assertTrue(fail_flag)
             XmlUtilities.assert_xml_equal_utf_8(expected, response)
 
         with self.subTest("Correct manifest occurrences returns 500 error"):
@@ -87,10 +95,11 @@ class MessageHandlerTest(unittest.TestCase):
                          'manifest': [{"id": 'one'}]}
 
             msg = builder.build_message(manifests)
-            mh = MessageHandler(msg)
-            status_code, response = mh.check_manifest_count_against_actual()
+            message_tree = ET.fromstring(msg)
+            mh = CheckManifestCountInstances(message_tree)
+            fail_flag, response = mh.check()
 
-            assert (status_code == 200)
+            self.assertFalse(fail_flag)
 
     def test_payload_count_against_instances(self):
         builder = PystacheMessageBuilder(str(self.inputXmlFileDir), 'payload_count')
@@ -102,10 +111,11 @@ class MessageHandlerTest(unittest.TestCase):
                 str(self.expectedXmlFileDir / 'basic_fault_response.xml'))
 
             msg = builder.build_message(manifests)
-            mh = MessageHandler(msg)
-            status_code, response = mh.check_payload_count_against_actual()
+            message_tree = ET.fromstring(msg)
+            mh = CheckPayloadCountAgainstActual(message_tree)
+            fail_flag, response = mh.check()
 
-            assert (status_code == 500)
+            self.assertTrue(fail_flag)
             XmlUtilities.assert_xml_equal_utf_8(expected, response)
 
         with self.subTest("Incorrect manifest occurrences returns 500 error"):
@@ -113,10 +123,11 @@ class MessageHandlerTest(unittest.TestCase):
                          'payloads': [{"id": 'one'}]}
 
             msg = builder.build_message(manifests)
-            mh = MessageHandler(msg)
-            status_code, response = mh.check_payload_count_against_actual()
+            message_tree = ET.fromstring(msg)
+            mh = CheckPayloadCountAgainstActual(message_tree)
+            fail_flag, response = mh.check()
 
-            assert (status_code == 200)
+            self.assertFalse(fail_flag)
 
     def test_payload_id_matches_manifest_id(self):
         builder = PystacheMessageBuilder(str(self.inputXmlFileDir), 'payload_manifest_ids')
@@ -131,10 +142,11 @@ class MessageHandlerTest(unittest.TestCase):
                 str(self.expectedXmlFileDir / 'payloadID_does_not_match_manifestID.xml'))
 
             msg = builder.build_message(dictionary)
-            mh = MessageHandler(msg)
+            message_tree = ET.fromstring(msg)
+            mh = CheckPayloadIdAgainstManifestId(message_tree)
+            fail_flag, response = mh.check()
 
-            status_code, response = mh.check_payload_id_matches_manifest_id()
-            assert (status_code == 500)
+            self.assertTrue(fail_flag)
             XmlUtilities.assert_xml_equal_utf_8(expected, response)
 
             with self.subTest("Incorrect manifest occurrences returns 500 error"):
@@ -145,7 +157,8 @@ class MessageHandlerTest(unittest.TestCase):
                               }
 
                 msg = builder.build_message(dictionary)
-                mh = MessageHandler(msg)
+                message_tree = ET.fromstring(msg)
+                mh = CheckPayloadIdAgainstManifestId(message_tree)
+                fail_flag, response = mh.check()
 
-                status_code, response = mh.check_payload_id_matches_manifest_id()
-                assert (status_code == 200)
+                self.assertFalse(fail_flag)
