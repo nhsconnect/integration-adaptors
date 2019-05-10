@@ -36,8 +36,6 @@ class MessageHandlerTest(unittest.TestCase):
         with self.subTest("Two services which are the same should return 200 code"):
             service_dict = {'action': "urn:nhs-itk:services:201005:SendNHS111Report",
                             'service': "urn:nhs-itk:services:201005:SendNHS111Report"}
-            expected = FileUtilities.get_file_string(
-                str(self.expectedXmlFileDir / 'basic_success_response.xml'))
 
             msg = self.builder.build_message(service_dict)
             message_tree = ET.fromstring(msg)
