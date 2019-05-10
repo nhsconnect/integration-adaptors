@@ -11,66 +11,6 @@ from edifact.incoming.parser import EdifactDict
 
 
 class TestDeserialiser(unittest.TestCase):
-
-    def test_extract_relevant_lines(self):
-        original_dict = EdifactDict([
-            ("UNB", "UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS"),
-            ("UNH", "00024986+FHSREG:0:1:FH:FHS001"),
-            ("BGM", "++507"),
-            ("NAD", "FHS+SO:954"),
-            ("DTM", "137:201904291755:203"),
-            ("RFF", "950:F4"),
-            ("S01", "1"),
-            ("RFF", "TN:211102"),
-            ("NAD", "GP+1231231,PLP348:900"),
-            ("S02", "2"),
-            ("PNA", "PAT+9876556789:OPI"),
-            ("UNT", "11+00024986"),
-            ("UNZ", "1+00016288"),
-        ])
-
-        with self.subTest("When the trigger key is UNB (the interchange header)"):
-            expected = EdifactDict([
-                ("UNB", "UNOA:2+SO01+ROO5+190429:1756+00016288++FHSREG+++FHSA EDI TRANSFERS")
-            ])
-
-            interchange_header_dict = deserialiser.extract_relevant_lines(original_dict, 0, ["UNH"])
-
-            compare(interchange_header_dict, expected)
-
-        with self.subTest("When the trigger key is BGM (the message beginning section)"):
-            expected = EdifactDict([
-                ("BGM", "++507"),
-                ("NAD", "FHS+SO:954"),
-                ("DTM", "137:201904291755:203"),
-                ("RFF", "950:F4")
-            ])
-
-            message_beginning_dict = deserialiser.extract_relevant_lines(original_dict, 2, ["S01"])
-
-            compare(message_beginning_dict, expected)
-
-        with self.subTest("When the trigger key is S01 (the message registration section)"):
-            expected = EdifactDict([
-                ("S01", "1"),
-                ("RFF", "TN:211102"),
-                ("NAD", "GP+1231231,PLP348:900")
-            ])
-
-            message_registration_dict = deserialiser.extract_relevant_lines(original_dict, 6, ["S02"])
-
-            compare(message_registration_dict, expected)
-
-        with self.subTest("When the trigger key is S02 (the message patient section)"):
-            expected = EdifactDict([
-                ("S02", "2"),
-                ("PNA", "PAT+9876556789:OPI"),
-            ])
-
-            message_registration_dict = deserialiser.extract_relevant_lines(original_dict, 9, ["UNT"])
-
-            compare(message_registration_dict, expected)
-
     def test_convert_to_dict(self):
         with self.subTest("Without duplicate keys"):
             expected = EdifactDict([

@@ -17,13 +17,12 @@ INTERCHANGE_TRAILER_KEY = "UNZ"
 
 def extract_relevant_lines(original_dict: EdifactDict, starting_pos: int, terminator_keys: List[str]) -> EdifactDict:
     """
-    From the original dict generate a smaller dict just containing the relevant lines based upon the trigger key
-    will keep looping till the terminating key is found in the terminating config.
+    From the original dict generate a smaller dict just containing the relevant lines from the starting_pos
+    to when then terminator_keys is found
     :param original_dict: The original larger dictionary.
     :param starting_pos: The starting position to start the loop from.
     This is to prevent starting the loop from the start each time and be slightly more efficient.
-    :param terminator_keys: The trigger key for this section that will be used to find what the
-    terminating key for the section is.
+    :param terminator_keys: a list of terminator keys that signal when all the relevant lines have been found
     :return: A smaller dictionary with just the relevant lines for the section.
     """
     new_dict = EdifactDict([])
