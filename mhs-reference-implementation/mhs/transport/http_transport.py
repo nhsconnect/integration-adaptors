@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import requests
@@ -29,6 +30,8 @@ class HttpTransport:
         headers = HttpTransport._build_headers(interaction_details)
 
         request_method = HttpTransport._get_request_method(interaction_details)
+
+        logging.debug("About to send message with headers '%s' to URL '%s': %s", headers, url, message)
 
         response = request_method(url,
                                   data=message,

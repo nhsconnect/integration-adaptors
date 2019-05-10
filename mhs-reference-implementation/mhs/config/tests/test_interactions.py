@@ -23,7 +23,3 @@ class TestInteractionsConfigFile(TestCase):
         details = self.interactions_config_file.get_interaction_details(INTERACTION_NAME)
 
         self.assertEqual(details[PROPERTY_NAME], PROPERTY_VALUE)
-
-    def test_get_interaction_details_incorrect_name(self):
-        with (self.assertRaises(Exception)):
-            self.interactions_config_file.get_interaction_details("invalid")

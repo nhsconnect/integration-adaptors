@@ -1,10 +1,24 @@
 import copy
+import logging
+
+from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
+from mhs.builder.ebxml_request_message_builder import MESSAGE
+from utilities.message_utilities import MessageUtilities
 
 PARTY_ID = "A91424-9199121"
 
 WRAPPER_REQUIRED = 'ebxml_wrapper_required'
-FROM_PARTY_ID = "from_party_id"
-MESSAGE = "hl7_message"
+
+
+class UnknownInteractionError(Exception):
+    """Raised when an unknown interaction has been specified"""
+
+    def __init__(self, interaction_name):
+        """Create a new UnknownInteractionError for the specified interaction name.
+
+        :param interaction_name: The interaction name requested but not found.
+        """
+        self.interaction_name = interaction_name
 
 
 class Sender:
@@ -26,9 +40,12 @@ class Sender:
         :param interaction_name: The name of the interaction the message is related to.
         :param message_to_send: A string representing the message to be sent.
         :return: The content of the response received when the message was sent.
+        :raises: An UnknownInteractionError if the interaction_name specified was not found.
         """
 
         interaction_details = self.interactions_config.get_interaction_details(interaction_name)
+        if not interaction_details:
+            raise UnknownInteractionError(interaction_name)
 
         requires_ebxml_wrapper = interaction_details[WRAPPER_REQUIRED]
         if requires_ebxml_wrapper:
@@ -49,5 +66,10 @@ class Sender:
         """
         context = copy.deepcopy(interaction_details)
         context[FROM_PARTY_ID] = PARTY_ID
+
+        conversation_id = MessageUtilities.get_uuid()
+        context[CONVERSATION_ID] = conversation_id
+        logging.debug("Generated ebXML wrapper with conversation ID: %s", conversation_id)
+
         context[MESSAGE] = message_to_send
         return self.message_builder.build_message(context)
