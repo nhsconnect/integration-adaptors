@@ -2,10 +2,10 @@ import unittest
 
 from testfixtures import compare
 from edifact.incoming.parser import EdifactDict
-import edifact.incoming.parser.deserialiser as deserialiser
+import edifact.incoming.parser.helpers as helpers
 
 
-class TestExtractRelevantLines(unittest.TestCase):
+class TestParserHelpers(unittest.TestCase):
 
     def test_extract_relevant_lines(self):
         with self.subTest("When the original dict is just 1 line and terminating keys not found "
@@ -13,7 +13,7 @@ class TestExtractRelevantLines(unittest.TestCase):
             expected = EdifactDict([("AAA", "VALUE FOR AAA")])
 
             original_dict = EdifactDict([("AAA", "VALUE FOR AAA")])
-            result = deserialiser.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["BBB"])
+            result = helpers.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["BBB"])
 
             compare(result, expected)
 
@@ -22,7 +22,7 @@ class TestExtractRelevantLines(unittest.TestCase):
             expected = EdifactDict([])
 
             original_dict = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB")])
-            result = deserialiser.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["AAA"])
+            result = helpers.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["AAA"])
 
             compare(result, expected)
 
@@ -31,7 +31,7 @@ class TestExtractRelevantLines(unittest.TestCase):
             expected = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB")])
 
             original_dict = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB")])
-            result = deserialiser.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["CCC"])
+            result = helpers.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["CCC"])
 
             compare(result, expected)
 
@@ -40,7 +40,7 @@ class TestExtractRelevantLines(unittest.TestCase):
             expected = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB")])
 
             original_dict = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB"), ("CCC", "VALUE FOR CCC")])
-            result = deserialiser.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["CCC"])
+            result = helpers.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["CCC"])
 
             compare(result, expected)
 
@@ -49,7 +49,7 @@ class TestExtractRelevantLines(unittest.TestCase):
             expected = EdifactDict([("BBB", "VALUE FOR BBB")])
 
             original_dict = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB"), ("CCC", "VALUE FOR CCC")])
-            result = deserialiser.extract_relevant_lines(original_dict, starting_pos=1, terminator_keys=["CCC"])
+            result = helpers.extract_relevant_lines(original_dict, starting_pos=1, terminator_keys=["CCC"])
 
             compare(result, expected)
 
@@ -58,7 +58,7 @@ class TestExtractRelevantLines(unittest.TestCase):
             expected = EdifactDict([("BBB", "VALUE FOR BBB"), ("CCC", "VALUE FOR CCC")])
 
             original_dict = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB"), ("CCC", "VALUE FOR CCC")])
-            result = deserialiser.extract_relevant_lines(original_dict, starting_pos=1, terminator_keys=["DDD"])
+            result = helpers.extract_relevant_lines(original_dict, starting_pos=1, terminator_keys=["DDD"])
 
             compare(result, expected)
 
@@ -67,7 +67,7 @@ class TestExtractRelevantLines(unittest.TestCase):
             expected = EdifactDict([("BBB", "VALUE FOR BBB")])
 
             original_dict = EdifactDict([("CCC", "VALUE FOR CCC"), ("BBB", "VALUE FOR BBB"), ("CCC", "VALUE FOR CCC")])
-            result = deserialiser.extract_relevant_lines(original_dict, starting_pos=1, terminator_keys=["CCC"])
+            result = helpers.extract_relevant_lines(original_dict, starting_pos=1, terminator_keys=["CCC"])
 
             compare(result, expected)
 
@@ -76,6 +76,39 @@ class TestExtractRelevantLines(unittest.TestCase):
             expected = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB")])
 
             original_dict = EdifactDict([("AAA", "VALUE FOR AAA"), ("BBB", "VALUE FOR BBB"), ("CCC", "VALUE FOR CCC")])
-            result = deserialiser.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["CCC", "DDD"])
+            result = helpers.extract_relevant_lines(original_dict, starting_pos=0, terminator_keys=["CCC", "DDD"])
 
             compare(result, expected)
+
+    def test_convert_to_dict(self):
+        with self.subTest("Without duplicate keys"):
+            expected = EdifactDict([
+                ("AAA", "VALUE FOR AAA"),
+                ("BBB", "VALUE FOR BBB"),
+                ("CCC", "VALUE FOR CCC")
+            ])
+
+            input_lines = [
+                "AAA+VALUE FOR AAA",
+                "BBB+VALUE FOR BBB",
+                "CCC+VALUE FOR CCC"
+            ]
+            converted_dict = helpers.convert_to_dict(input_lines)
+
+            compare(converted_dict, expected)
+
+        with self.subTest("With duplicate keys should still return duplicate keys in EdifactDict"):
+            expected = EdifactDict([
+                ("AAA", "VALUE FOR AAA"),
+                ("BBB", "VALUE FOR BBB"),
+                ("AAA", "VALUE FOR AAA")
+            ])
+
+            input_lines = [
+                "AAA+VALUE FOR AAA",
+                "BBB+VALUE FOR BBB",
+                "AAA+VALUE FOR AAA"
+            ]
+            converted_dict = helpers.convert_to_dict(input_lines)
+
+            compare(converted_dict, expected)

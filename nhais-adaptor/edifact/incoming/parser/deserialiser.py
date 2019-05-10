@@ -5,6 +5,7 @@ from edifact.incoming.models.interchange import Interchange
 from edifact.incoming.models.message import MessageSegment, Messages
 from edifact.incoming.models.transaction import Transaction, Transactions
 from edifact.incoming.parser import EdifactDict
+import edifact.incoming.parser.helpers as helpers
 
 INTERCHANGE_HEADER_KEY = "UNB"
 MESSAGE_HEADER_KEY = "UNH"
@@ -15,50 +16,14 @@ MESSAGE_TRAILER_KEY = "UNT"
 INTERCHANGE_TRAILER_KEY = "UNZ"
 
 
-def extract_relevant_lines(original_dict: EdifactDict, starting_pos: int, terminator_keys: List[str]) -> EdifactDict:
-    """
-    From the original dict generate a smaller dict just containing the relevant lines from the starting_pos
-    to when then terminator_keys is found
-    :param original_dict: The original larger dictionary.
-    :param starting_pos: The starting position to start the loop from.
-    This is to prevent starting the loop from the start each time and be slightly more efficient.
-    :param terminator_keys: a list of terminator keys that signal when all the relevant lines have been found
-    :return: A smaller dictionary with just the relevant lines for the section.
-    """
-    new_dict = EdifactDict([])
-    for (key, value) in original_dict[starting_pos:]:
-        if key not in terminator_keys:
-            new_dict.append((key, value))
-        else:
-            break
-
-    return new_dict
-
-
-def convert_to_dict(lines: List[str]) -> EdifactDict:
-    """
-    Takes the list of original edifact lines and converts to a dict.
-    :param lines: a list of string of the original edifact lines.
-    :return: EdifactDict - A list of Tuples. Since the keys in the edifact interchange can
-    contain duplicates a tuple is required here rather than a set.
-    """
-    generated_dict = EdifactDict([])
-
-    for line in lines:
-        key_value = line.split("+", 1)
-        generated_dict.append((key_value[0], key_value[1]))
-
-    return generated_dict
-
-
 def deserialise_interchange_header(original_dict, index):
-    interchange_header_line = EdifactDict(extract_relevant_lines(original_dict, index, [MESSAGE_HEADER_KEY]))
+    interchange_header_line = EdifactDict(helpers.extract_relevant_lines(original_dict, index, [MESSAGE_HEADER_KEY]))
     interchange_header = creators.create_interchange_header(interchange_header_line)
     return interchange_header
 
 
 def deserialise_message_beginning(original_dict, index):
-    msg_bgn_lines = EdifactDict(extract_relevant_lines(original_dict, index, [MESSAGE_REGISTRATION_KEY]))
+    msg_bgn_lines = EdifactDict(helpers.extract_relevant_lines(original_dict, index, [MESSAGE_REGISTRATION_KEY]))
     msg_bgn_details = creators.create_message_segment_beginning(msg_bgn_lines)
     return msg_bgn_details
 
@@ -66,15 +31,15 @@ def deserialise_message_beginning(original_dict, index):
 def deserialise_transaction(original_dict, index):
     transaction_pat = None
     transaction_lines = EdifactDict(
-        extract_relevant_lines(original_dict, index + 1, [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
+        helpers.extract_relevant_lines(original_dict, index + 1, [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
 
-    msg_reg_lines = EdifactDict(extract_relevant_lines(transaction_lines, 0,
+    msg_reg_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, 0,
                                                        [MESSAGE_REGISTRATION_KEY, MESSAGE_PATIENT_KEY,
                                                         MESSAGE_TRAILER_KEY]))
     transaction_reg = creators.create_transaction_registration(msg_reg_lines)
 
     if len(msg_reg_lines) != len(transaction_lines):
-        msg_pat_lines = EdifactDict(extract_relevant_lines(transaction_lines, len(msg_reg_lines),
+        msg_pat_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, len(msg_reg_lines),
                                                            [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
         transaction_pat = creators.create_transaction_patient(msg_pat_lines)
 
@@ -89,7 +54,7 @@ def convert(lines: List[str]) -> Interchange:
     :param lines: A list of string of the edifact lines.
     :return: Interchange: The incoming representation of the edifact interchange.
     """
-    original_dict = convert_to_dict(lines)
+    original_dict = helpers.convert_to_dict(lines)
     messages = []
     transactions = []
     interchange = None
