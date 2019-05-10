@@ -7,7 +7,7 @@ SECTION_SEPARATOR = "+"
 SUB_SECTION_SEPARATOR = ":"
 
 
-def get_value_in_dict(dict_to_search: EdifactDict, key_to_find):
+def get_value_in_dict(dict_to_search: EdifactDict, key_to_find: str) -> str:
     """
     Extract the value segment out of the dictionary provided based upon the key. Will return the first result.
     :param dict_to_search: The dictionary of key value pairs.
@@ -19,7 +19,7 @@ def get_value_in_dict(dict_to_search: EdifactDict, key_to_find):
     return value
 
 
-def create_interchange_header(interchange_header_dict: EdifactDict):
+def create_interchange_header(interchange_header_dict: EdifactDict) -> InterchangeHeader:
     """
     Creates an incoming interchange header from the interchange header dictionary.
     Since the interchange header details are all in the one line we extract the details
@@ -37,7 +37,7 @@ def create_interchange_header(interchange_header_dict: EdifactDict):
     return InterchangeHeader(sender, recipient, date_time)
 
 
-def create_message_segment_beginning(message_beginning_dict: EdifactDict):
+def create_message_segment_beginning(message_beginning_dict: EdifactDict) -> MessageSegmentBeginningDetails:
     """
     Creates an incoming message beginning from the message beginning dictionary.
     :param message_beginning_dict: The dictionary will contain a list of lines relevant to the
@@ -50,12 +50,12 @@ def create_message_segment_beginning(message_beginning_dict: EdifactDict):
     return MessageSegmentBeginningDetails(reference_number)
 
 
-def create_message_segment_registration(message_registration_dict: EdifactDict):
+def create_message_segment_registration(message_registration_dict: EdifactDict) -> MessageSegmentRegistrationDetails:
     """
     Creates an incoming message registration from the message registration dictionary.
     :param message_registration_dict: The dictionary will contain a list of lines relevant to the
     message registration section S01.
-    :return: MessageSegmentRegistrationDetails: The incoming representation of the edifact message registration details.
+    :return: MessageSegmentRegistrationDetails: The incoming representation of the edifact message registration.
     """
     transaction_segment = get_value_in_dict(dict_to_search=message_registration_dict, key_to_find="RFF")
     transaction_values = transaction_segment.split(SUB_SECTION_SEPARATOR)
@@ -63,12 +63,12 @@ def create_message_segment_registration(message_registration_dict: EdifactDict):
     return MessageSegmentRegistrationDetails(transaction_number)
 
 
-def create_message_segment_patient(message_patient_dict: EdifactDict):
+def create_message_segment_patient(message_patient_dict: EdifactDict) -> MessageSegmentPatientDetails:
     """
     Creates an incoming message patient from the message message patient dictionary.
     :param message_patient_dict: The dictionary will contain a list of lines relevant to the
     message patient section S02.
-    :return: MessageSegmentRegistrationDetails: The incoming representation of the edifact message registration details.
+    :return: MessageSegmentPatientDetails: The incoming representation of the edifact message patient.
     """
     patient_details_segment = get_value_in_dict(dict_to_search=message_patient_dict, key_to_find="PNA")
     patient_details_segment_values = patient_details_segment.replace(SUB_SECTION_SEPARATOR, SECTION_SEPARATOR).split(

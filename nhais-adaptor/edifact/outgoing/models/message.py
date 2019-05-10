@@ -1,7 +1,5 @@
-from edifact.outgoing.models.segment import Segment, SegmentCollection
 import edifact.helpers.date_formatter as date_formatter
-from edifact.outgoing.models.name import PatientName
-from edifact.outgoing.models.address import PatientAddress
+from edifact.outgoing.models.segment import Segment, SegmentCollection
 
 
 class MessageHeader(Segment):
@@ -68,24 +66,15 @@ class MessageSegmentRegistrationDetails(SegmentCollection):
     This is referred to in edifact as segment trigger 1
     """
 
-    def __init__(self, transaction_number, party_id, acceptance_code, acceptance_type, date_time, location):
+    def __init__(self, transaction_number, party_id):
         """
         :param transaction_number: a unique transaction number. NHAIS will reference this in its response
         :param party_id: GMC National code and the Local GP Code of the patient's GP (separated by “,”).
-        :param acceptance_code: The acceptance code "A" for Acceptance
-        :param acceptance_type: The acceptance type "1" for a Birth
-        :param date_time: date of the registration
-        :param location: the patients place of birth
         """
-        formatted_date_time = date_formatter.format_date(date_time=date_time, format_qualifier="102")
         segments = [
             Segment(key="S01", value="1"),
             Segment(key="RFF", value=f"TN:{transaction_number}"),
             Segment(key="NAD", value=f"GP+{party_id}:900"),
-            Segment(key="HEA", value=f"ACD+{acceptance_code}:ZZZ"),
-            Segment(key="HEA", value=f"ATP+{acceptance_type}:ZZZ"),
-            Segment(key="DTM", value=f"956:{formatted_date_time}:102"),
-            Segment(key="LOC", value=f"950+{location}"),
         ]
         super().__init__(segments=segments)
 
@@ -95,22 +84,9 @@ class MessageSegmentPatientDetails(SegmentCollection):
     A collection of segments that represent personal information about a patient.
     """
 
-    def __init__(self, id_number, name, date_of_birth, gender, address):
-        """
-        :param id_number: OPI official Payment Id (existing NHS Number)
-        :param name: the name of the patient
-        :param date_of_birth: Patients date of birth
-        :param gender: sex of the patient. For an acceptance transaction, reference "G1", this segment is required
-        :param address: the patients address
-        """
-        formatted_date = date_formatter.format_date(date_time=date_of_birth, format_qualifier="102",
-                                                    current_format="%Y-%m-%d")
+    def __init__(self):
         segments = [
             Segment(key="S02", value="2"),
-            PatientName(id_number=id_number, name=name),
-            Segment(key="DTM", value=f"329:{formatted_date}:102"),
-            Segment(key="PDI", value=f"{gender}"),
-            PatientAddress(address=address)
         ]
         super().__init__(segments=segments)
 
@@ -121,8 +97,9 @@ class Message(SegmentCollection):
     a collection of Segments
     """
 
-    def __init__(self, sequence_number, message_beginning, message_segment_registration_details,
-                 message_segment_patient_details):
+    def __init__(self, sequence_number, message_beginning,
+                 message_segment_registration_details: MessageSegmentRegistrationDetails,
+                 message_segment_patient_details: MessageSegmentPatientDetails):
         """
         :param sequence_number: the unique sequence number of the message
         :param message_beginning: the beginning of the message
@@ -130,8 +107,8 @@ class Message(SegmentCollection):
         :param message_segment_patient_details: Segment trigger 2 personal information about patient
         """
         msg_header = MessageHeader(sequence_number=sequence_number)
-        number_of_segments = len(message_beginning) + len(message_segment_registration_details) + \
-            len(message_segment_patient_details) + 2
+        number_of_segments = len(message_beginning) + len(message_segment_registration_details.segments) + \
+            len(message_segment_patient_details.segments) + 2
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_registration_details,
                     message_segment_patient_details, msg_trailer]

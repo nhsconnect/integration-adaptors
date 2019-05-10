@@ -1,6 +1,8 @@
+from typing import List
+
 import edifact.incoming.parser.creators as creators
-from edifact.incoming.models.message import MessageSegment
 from edifact.incoming.models.interchange import Interchange
+from edifact.incoming.models.message import MessageSegment
 from edifact.incoming.parser import EdifactDict
 
 INTERCHANGE_HEADER_KEY = "UNB"
@@ -12,7 +14,7 @@ MESSAGE_TRAILER_KEY = "UNT"
 INTERCHANGE_TRAILER_KEY = "UNZ"
 
 
-def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key) -> EdifactDict:
+def extract_relevant_lines(original_dict: EdifactDict, starting_pos: int, trigger_key: str) -> EdifactDict:
     """
     From the original dict generate a smaller dict just containing the relevant lines based upon the trigger key
     will keep looping till the terminating key is found in the terminating config.
@@ -40,7 +42,7 @@ def extract_relevant_lines(original_dict: EdifactDict, starting_pos, trigger_key
     return new_dict
 
 
-def convert_to_dict(lines) -> EdifactDict:
+def convert_to_dict(lines: List[str]) -> EdifactDict:
     """
     Takes the list of original edifact lines and converts to a dict.
     :param lines: a list of string of the original edifact lines.
@@ -56,7 +58,7 @@ def convert_to_dict(lines) -> EdifactDict:
     return generated_dict
 
 
-def convert(lines):
+def convert(lines: List[str]) -> Interchange:
     """
     Takes the original list of edifact lines and converts to a deserialised representation.
     Only relevant information from the edifact message is extracted and populated in the models.
@@ -98,4 +100,3 @@ def convert(lines):
             interchange = Interchange(interchange_header, messages)
 
     return interchange
-
