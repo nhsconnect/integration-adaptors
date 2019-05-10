@@ -25,7 +25,7 @@ class AsyncResponseHandler(RequestHandler):
         logging.debug("POST received: %s", self.request)
         logging.debug("Body: %s", self.request.body)
 
-        parsed_message = self.message_parser.parse_message(self.request.body)
+        parsed_message = self.message_parser.parse_message(self.request.headers, self.request.body.decode())
 
         ack_message = self._build_ack(parsed_message)
 
