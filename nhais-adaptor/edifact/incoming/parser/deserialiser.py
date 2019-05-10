@@ -83,13 +83,6 @@ def deserialise_transaction(original_dict, index):
     return transaction
 
 
-deserialise_strategy = {
-    INTERCHANGE_HEADER_KEY: deserialise_interchange_header,
-    MESSAGE_BEGINNING_KEY: deserialise_message_beginning,
-    MESSAGE_REGISTRATION_KEY: deserialise_transaction,
-}
-
-
 def convert(lines: List[str]) -> Interchange:
     """
     Takes the original list of edifact lines and converts to a deserialised representation.
@@ -108,13 +101,13 @@ def convert(lines: List[str]) -> Interchange:
         key = line[0]
 
         if key == INTERCHANGE_HEADER_KEY:
-            interchange_header = deserialise_strategy[INTERCHANGE_HEADER_KEY](original_dict, index)
+            interchange_header = deserialise_interchange_header(original_dict, index)
 
         elif key == MESSAGE_BEGINNING_KEY:
-            msg_bgn_details = deserialise_strategy[MESSAGE_BEGINNING_KEY](original_dict, index)
+            msg_bgn_details = deserialise_message_beginning(original_dict, index)
 
         elif key == MESSAGE_REGISTRATION_KEY:
-            transaction = deserialise_strategy[MESSAGE_REGISTRATION_KEY](original_dict, index)
+            transaction = deserialise_transaction(original_dict, index)
             transactions.append(transaction)
 
         elif key == MESSAGE_TRAILER_KEY:

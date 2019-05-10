@@ -242,7 +242,7 @@ class TestDeserialiser(unittest.TestCase):
                 "S01+1",
                 "RFF+TN:211103",
                 "NAD+GP+1231231,PLP348:900",
-                "UNT+9+00024986",
+                "UNT+14+00024986",
                 "UNH+00024987+FHSREG:0:1:FH:FHS001",
                 "BGM+++507",
                 "NAD+FHS+XX1:954",
