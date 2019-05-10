@@ -1,9 +1,14 @@
 import xml.etree.ElementTree as ET
+from inspect import getmembers
 
 from builder.pystache_message_builder import PystacheMessageBuilder
+from reciever.message_checks.Check import Check
 from utilities.file_utilities import FileUtilities
 from definitions import XML_PATH, TEMPLATE_PATH
 import logging
+from typing import List
+
+CheckList = List[Check]
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
@@ -21,17 +26,18 @@ class MessageHandler:
         'itk': 'urn:nhs-itk:ns:201005'
     }
 
-    def __init__(self, message_string):
+    def __init__(self, message, check_list: CheckList):
         logging.basicConfig(level=logging.DEBUG)
-        self.message_tree = ET.fromstring(message_string)
-
-        self.check_list = [
-            self.check_action_types,
-            self.check_manifest_and_payload_count,
-            self.check_manifest_count_against_actual,
-            self.check_payload_count_against_actual,
-            self.check_payload_id_matches_manifest_id
-        ]
+        self.message_tree = ET.fromstring(message)
+        self.check_list = check_list
+        #
+        # self.check_list = [
+        #     self.check_action_types,
+        #     self.check_manifest_and_payload_count,
+        #     self.check_manifest_count_against_actual,
+        #     self.check_payload_count_against_actual,
+        #     self.check_payload_id_matches_manifest_id
+        # ]
 
     def evaluate_message(self):
         """
@@ -40,12 +46,16 @@ class MessageHandler:
 
         :return: status code, response content
         """
+        print()
         for check in self.check_list:
-            status, response = check()
+            c = check(self.message_tree)
+            status, response = c.check()
             if status != 200:
                 return status, response
 
         return 200, basic_success_response
+
+
 
     def check_action_types(self):
         """
