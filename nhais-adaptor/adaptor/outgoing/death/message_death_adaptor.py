@@ -3,25 +3,16 @@ from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName
 from adaptor.outgoing.message_adaptor import MessageAdaptor
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails
-from edifact.outgoing.models.message import MessageBeginning
 
 
 class MessageDeathAdaptor(MessageAdaptor):
 
-    def create_message_beginning(self) -> MessageBeginning:
+    def get_reference_number(self) -> str:
         """
-        Create the beginning of the message
-        :return: MessageBeginning
+        Returns the unique reference number to indicate a death registration in the edifact payload
+        :return: a string representing a death registration
         """
-        nhais_id = finders.get_parameter_value(fhir_operation=self.fhir_operation,
-                                               parameter_name=ParameterName.NHAIS_CYPHER)
-
-        ref_number = "G5"
-
-        msg_bgn = MessageBeginning(party_id=nhais_id, date_time=self.fhir_operation.date.as_json(),
-                                   ref_number=ref_number)
-
-        return msg_bgn
+        return "G5"
 
     def create_message_segment_patient_detail(self) -> MessageSegmentDeathPatientDetails:
         """

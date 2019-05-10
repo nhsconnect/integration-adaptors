@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from fhirclient.models.operationdefinition import OperationDefinition
 
 import adaptor.fhir_helpers.fhir_finders as finders
@@ -5,7 +7,6 @@ from adaptor.fhir_helpers.fhir_creators import ParameterName
 from edifact.outgoing.models.birth.message_birth import Message
 from edifact.outgoing.models.message import MessageBeginning, MessageSegmentPatientDetails, \
     MessageSegmentRegistrationDetails
-from abc import ABC, abstractmethod
 
 
 class MessageAdaptor(ABC):
@@ -14,7 +15,7 @@ class MessageAdaptor(ABC):
         self.fhir_operation = fhir_operation
 
     @abstractmethod
-    def create_message_beginning(self) -> MessageBeginning:
+    def get_reference_number(self) -> str:
         pass
 
     @abstractmethod
@@ -24,6 +25,21 @@ class MessageAdaptor(ABC):
     @abstractmethod
     def create_message_segment_registration_details(self) -> MessageSegmentRegistrationDetails:
         pass
+
+    def create_message_beginning(self) -> MessageBeginning:
+        """
+        Create the beginning of the message
+        :return: MessageBeginning
+        """
+        nhais_id = finders.get_parameter_value(fhir_operation=self.fhir_operation,
+                                               parameter_name=ParameterName.NHAIS_CYPHER)
+
+        ref_number = self.get_reference_number()
+
+        msg_bgn = MessageBeginning(party_id=nhais_id, date_time=self.fhir_operation.date.as_json(),
+                                   ref_number=ref_number)
+
+        return msg_bgn
 
     def create_message(self) -> Message:
         """

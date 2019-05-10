@@ -4,25 +4,16 @@ from adaptor.outgoing.common.common_adaptor import create_patient_name, create_p
 from adaptor.outgoing.message_adaptor import MessageAdaptor
 from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthPatientDetails, \
     MessageSegmentBirthRegistrationDetails
-from edifact.outgoing.models.message import MessageBeginning
 
 
 class MessageBirthAdaptor(MessageAdaptor):
 
-    def create_message_beginning(self) -> MessageBeginning:
+    def get_reference_number(self) -> str:
         """
-        Create the beginning of the message
-        :return: MessageBeginning
+        Returns the unique reference number to indicate a birth registration in the edifact payload
+        :return: a string representing a birth registration
         """
-        nhais_id = finders.get_parameter_value(fhir_operation=self.fhir_operation,
-                                               parameter_name=ParameterName.NHAIS_CYPHER)
-
-        ref_number = "G1"
-
-        msg_bgn = MessageBeginning(party_id=nhais_id, date_time=self.fhir_operation.date.as_json(),
-                                   ref_number=ref_number)
-
-        return msg_bgn
+        return "G1"
 
     def create_message_segment_patient_detail(self) -> MessageSegmentBirthPatientDetails:
         """
