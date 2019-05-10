@@ -1,10 +1,16 @@
 import logging
 
 from builder.pystache_message_builder import PystacheMessageBuilder
-from definitions import TEMPLATE_PATH
+from definitions import TEMPLATE_PATH, XML_PATH
+from utilities.file_utilities import FileUtilities
 
 
 class Check:
+
+    distribution_envelope = "./soap:Body/itk:DistributionEnvelope"
+    soap_body = "./soap:Body"
+    manifest_tag = distribution_envelope + "/itk:header/itk:manifest"
+    basic_success_message = FileUtilities.get_file_string(str(XML_PATH / 'basic_success_response.xml'))
 
     namespaces = {
         'soap': 'http://schemas.xmlsoap.org/soap/envelope/',
@@ -24,11 +30,7 @@ class Check:
         Extracts the count on the manifest tag in the message
         :return: manifest count as a string
         """
-        manifests = self.message_tree.findall("./soap:Body"
-                                              "/itk:DistributionEnvelope"
-                                              "/itk:header"
-                                              "/itk:manifest",
-                                              self.namespaces)
+        manifests = self.message_tree.findall(self.distribution_envelope + "/itk:header/itk:manifest", self.namespaces)
 
         if len(manifests) > 1:
             logging.warning("More than one manifest tag")
@@ -40,10 +42,8 @@ class Check:
         Extracts the count on the payloads tag in the message
         :return: payloads count as a string
         """
-        payloads = self.message_tree.findall("./soap:Body"
-                                             "/itk:DistributionEnvelope"
-                                             "/itk:payloads",
-                                             self.namespaces)
+        payloads = self.message_tree.findall(self.distribution_envelope + "/itk:payloads", self.namespaces)
+
         if len(payloads) > 1:
             logging.warning("Number of payloads tags greater than 1")
         payload_count = payloads[0].attrib['count']

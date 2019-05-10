@@ -3,7 +3,7 @@
                xmlns:itk="urn:nhs-itk:ns:201005">
     <soap:Header>
         <wsa:MessageID>01A71C76-6CDA-11E9-A395-2BEC16A39614</wsa:MessageID>
-        <wsa:Action>urn:nhs-itk:services:201005:SendNHS111Report-v2-0</wsa:Action>
+        <wsa:Action>{{action}}</wsa:Action>
         <wsa:To>http://127.0.0.1:4848/syncsoap</wsa:To>
         <wsa:From>
             <wsa:Address>http://localhost:4000</wsa:Address>
@@ -23,7 +23,7 @@
     <soap:Body>
         <itk:DistributionEnvelope
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <itk:header service="urn:nhs-itk:services:201005:SendNHS111Report-v2-0"
+            <itk:header service="{{service}}"
                         trackingid="7D6F23E0-AE1A-11DB-9808-B18E1E0994CD">
                 <itk:auditIdentity>
                     <itk:id uri="urn:nhs-uk:identity:ods:5L399"/>

@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as ET
-from inspect import getmembers
 
 from builder.pystache_message_builder import PystacheMessageBuilder
 from reciever.message_checks.Check import Check
@@ -39,10 +38,10 @@ class MessageHandler:
         :return: status code, response content
         """
         for check in self.check_list:
-            c = check(self.message_tree)
-            status, response = c.check()
-            if status != 200:
-                return status, response
+            c = check(self.message_tree)  # instantiate the check object instance
+            fail, response = c.check()  # make the check call
+            if fail:
+                return 500, response
 
         return 200, basic_success_response
 

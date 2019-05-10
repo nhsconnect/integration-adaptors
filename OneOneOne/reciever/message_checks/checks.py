@@ -15,12 +15,7 @@ class CheckManifestCountInstances(Check):
        """
         manifest_count = int(self.get_manifest_count())
 
-        manifest_actual_count = len(self.message_tree.findall("./soap:Body"
-                                                              "/itk:DistributionEnvelope"
-                                                              "/itk:header"
-                                                              "/itk:manifest"
-                                                              "/itk:manifestitem",
-                                                              self.namespaces))
+        manifest_actual_count = len(self.message_tree.findall(self.manifest_tag + "/itk:manifestitem", self.namespaces))
         if manifest_count != manifest_actual_count:
             logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
                             manifest_count, manifest_actual_count)
@@ -28,7 +23,7 @@ class CheckManifestCountInstances(Check):
             return True, self.build_error_message("The number of manifest instances "
                                                   "does not match the manifest count specified")
 
-        return False, None
+        return False, self.basic_success_message
 
 
 class CheckActionTypes(Check):
@@ -44,16 +39,11 @@ class CheckActionTypes(Check):
        :return: failure flag, response content
        """
         action_tag_value = "-"
-        for type_tag in self.message_tree.findall("./soap:Header"
-                                                  "/wsa:Action",
-                                                  self.namespaces):
+        for type_tag in self.message_tree.findall("./soap:Header/wsa:Action", self.namespaces):
             action_tag_value = type_tag.text
 
         service_tag_value = "+"
-        for type_tag in self.message_tree.findall('./soap:Body'
-                                                  '/itk:DistributionEnvelope'
-                                                  '/itk:header',
-                                                  self.namespaces):
+        for type_tag in self.message_tree.findall(self.distribution_envelope + '/itk:header', self.namespaces):
             service_tag_value = type_tag.attrib['service']
 
         if action_tag_value != service_tag_value:
@@ -62,7 +52,7 @@ class CheckActionTypes(Check):
                             service_tag_value)
             return True,  self.build_error_message("Manifest action does not match service action")
 
-        return False, None
+        return False, self.basic_success_message
 
 
 class CheckManifestPayloadCounts(Check):
@@ -85,7 +75,7 @@ class CheckManifestPayloadCounts(Check):
                             payload_count)
             return True, self.build_error_message("Manifest count does not match payload count")
 
-        return False, None
+        return False, self.basic_success_message
 
 
 class CheckPayloadCountAgainstActual(Check):
@@ -101,10 +91,7 @@ class CheckPayloadCountAgainstActual(Check):
         """
         payload_count = int(self.get_payload_count())
 
-        payload_actual_count = len(self.message_tree.findall("./soap:Body"
-                                                             "/itk:DistributionEnvelope"
-                                                             "/itk:payloads"
-                                                             "/itk:payload",
+        payload_actual_count = len(self.message_tree.findall(self.distribution_envelope + "/itk:payloads/itk:payload",
                                                              self.namespaces))
         if payload_count != payload_actual_count:
             logging.warning("Payload count does not match number of instances - Expected: %i Found: %i",
@@ -112,7 +99,7 @@ class CheckPayloadCountAgainstActual(Check):
                             payload_actual_count)
             return True, self.build_error_message("Invalid message")
 
-        return False, None
+        return False, self.basic_success_message
 
 
 class CheckPayloadIdAgainstManifestId(Check):
@@ -122,24 +109,17 @@ class CheckPayloadIdAgainstManifestId(Check):
 
     def check(self):
         """
-        Checks that for each id of each manifest item has a corrosponding
+        Checks that for each id of each manifest item has a corresponding
         payload with the same Id as per  'DE_INVMPI'
         :return: status code, response content
         """
         payload_ids = set()
         manifest_ids = set()
-        for payload in self.message_tree.findall("./soap:Body"
-                                                 "/itk:DistributionEnvelope"
-                                                 "/itk:payloads"
-                                                 "/itk:payload",
+        for payload in self.message_tree.findall(self.distribution_envelope + "/itk:payloads/itk:payload",
                                                  self.namespaces):
             payload_ids.add(payload.attrib['id'])
 
-        for manifest in self.message_tree.findall("./soap:Body"
-                                                  "/itk:DistributionEnvelope"
-                                                  "/itk:header"
-                                                  "/itk:manifest"
-                                                  "/itk:manifestitem",
+        for manifest in self.message_tree.findall(self.manifest_tag + "/itk:manifestitem",
                                                   self.namespaces):
             manifest_ids.add(manifest.attrib['id'])
 
@@ -147,4 +127,4 @@ class CheckPayloadIdAgainstManifestId(Check):
             logging.warning("Payload IDs do not match Manifest IDs")
             return True, self.build_error_message("Payload IDs do not map to Manifest IDs")
 
-        return False, None
+        return False, self.basic_success_message

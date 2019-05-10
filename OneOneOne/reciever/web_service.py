@@ -1,5 +1,3 @@
-import logging
-
 from tornado.httpserver import HTTPServer
 import tornado.ioloop
 import tornado.web
