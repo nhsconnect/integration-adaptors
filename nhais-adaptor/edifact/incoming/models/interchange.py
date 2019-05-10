@@ -1,3 +1,6 @@
+from edifact.incoming.models.message import Messages
+
+
 class InterchangeHeader:
     """
     A representation of the incoming edifact interchange header
@@ -18,7 +21,7 @@ class Interchange:
     """
     A representation of the incoming edifact interchange
     """
-    def __init__(self, header, messages):
+    def __init__(self, header: InterchangeHeader, messages: Messages):
         """
         :param header: the interchange header of the incoming interchange
         :param messages: a list of messages from the incoming interchange

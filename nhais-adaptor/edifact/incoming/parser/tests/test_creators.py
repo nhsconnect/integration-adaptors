@@ -4,8 +4,8 @@ from testfixtures import compare
 
 import edifact.incoming.parser.creators as creators
 from edifact.incoming.models.interchange import InterchangeHeader
-from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
-    MessageSegmentPatientDetails
+from edifact.incoming.models.message import MessageSegmentBeginningDetails
+from edifact.incoming.models.transaction import TransactionRegistrationDetails, TransactionPatientDetails
 from edifact.incoming.parser import EdifactDict
 
 
@@ -64,24 +64,24 @@ class TestCreators(unittest.TestCase):
         compare(msg_sgm_bgn, expected)
 
     def test_create_message_segment_registration(self):
-        expected = MessageSegmentRegistrationDetails("211102")
+        expected = TransactionRegistrationDetails("211102")
 
         message_registration_dict = EdifactDict([
             ("S01", "1"),
             ("RFF", "TN:211102"),
             ("NAD", "GP+1231231,PLP348:900")
         ])
-        msg_sgm_reg = creators.create_message_segment_registration(message_registration_dict)
+        msg_sgm_reg = creators.create_transaction_registration(message_registration_dict)
 
         compare(msg_sgm_reg, expected)
 
     def test_create_message_segment_patient(self):
-        expected = MessageSegmentPatientDetails("9876556789")
+        expected = TransactionPatientDetails("9876556789")
 
         message_patient_dict = EdifactDict([
             ("S02", "2"),
             ("PNA", "PAT+9876556789:OPI"),
         ])
-        msg_sgm_pat = creators.create_message_segment_patient(message_patient_dict)
+        msg_sgm_pat = creators.create_transaction_patient(message_patient_dict)
 
         compare(msg_sgm_pat, expected)

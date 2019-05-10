@@ -1,6 +1,6 @@
 from edifact.incoming.models.interchange import InterchangeHeader
-from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
-    MessageSegmentPatientDetails
+from edifact.incoming.models.message import MessageSegmentBeginningDetails
+from edifact.incoming.models.transaction import TransactionRegistrationDetails, TransactionPatientDetails
 from edifact.incoming.parser import EdifactDict
 
 SECTION_SEPARATOR = "+"
@@ -50,7 +50,7 @@ def create_message_segment_beginning(message_beginning_dict: EdifactDict) -> Mes
     return MessageSegmentBeginningDetails(reference_number)
 
 
-def create_message_segment_registration(message_registration_dict: EdifactDict) -> MessageSegmentRegistrationDetails:
+def create_transaction_registration(message_registration_dict: EdifactDict) -> TransactionRegistrationDetails:
     """
     Creates an incoming message registration from the message registration dictionary.
     :param message_registration_dict: The dictionary will contain a list of lines relevant to the
@@ -60,10 +60,10 @@ def create_message_segment_registration(message_registration_dict: EdifactDict) 
     transaction_segment = get_value_in_dict(dict_to_search=message_registration_dict, key_to_find="RFF")
     transaction_values = transaction_segment.split(SUB_SECTION_SEPARATOR)
     transaction_number = transaction_values[1]
-    return MessageSegmentRegistrationDetails(transaction_number)
+    return TransactionRegistrationDetails(transaction_number)
 
 
-def create_message_segment_patient(message_patient_dict: EdifactDict) -> MessageSegmentPatientDetails:
+def create_transaction_patient(message_patient_dict: EdifactDict) -> TransactionPatientDetails:
     """
     Creates an incoming message patient from the message message patient dictionary.
     :param message_patient_dict: The dictionary will contain a list of lines relevant to the
@@ -74,4 +74,4 @@ def create_message_segment_patient(message_patient_dict: EdifactDict) -> Message
     patient_details_segment_values = patient_details_segment.replace(SUB_SECTION_SEPARATOR, SECTION_SEPARATOR).split(
         SECTION_SEPARATOR)
     nhs_number = patient_details_segment_values[1]
-    return MessageSegmentPatientDetails(nhs_number)
+    return TransactionPatientDetails(nhs_number)
