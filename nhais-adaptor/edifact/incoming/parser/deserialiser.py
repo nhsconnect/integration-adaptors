@@ -1,8 +1,8 @@
 from typing import List
 
 import edifact.incoming.parser.creators as creators
-from edifact.incoming.models.interchange import Interchange
-from edifact.incoming.models.message import MessageSegment, Messages
+from edifact.incoming.models.interchange import Interchange, InterchangeHeader
+from edifact.incoming.models.message import MessageSegment, Messages, MessageSegmentBeginningDetails
 from edifact.incoming.models.transaction import Transaction, Transactions
 from edifact.incoming.parser import EdifactDict
 import edifact.incoming.parser.helpers as helpers
@@ -16,32 +16,32 @@ MESSAGE_TRAILER_KEY = "UNT"
 INTERCHANGE_TRAILER_KEY = "UNZ"
 
 
-def deserialise_interchange_header(original_dict, index):
+def deserialise_interchange_header(original_dict: EdifactDict, index: int) -> InterchangeHeader:
     interchange_header_line = EdifactDict(helpers.extract_relevant_lines(original_dict, index, [MESSAGE_HEADER_KEY]))
     interchange_header = creators.create_interchange_header(interchange_header_line)
     return interchange_header
 
 
-def deserialise_message_beginning(original_dict, index):
+def deserialise_message_beginning(original_dict: EdifactDict, index: int) -> MessageSegmentBeginningDetails:
     msg_bgn_lines = EdifactDict(helpers.extract_relevant_lines(original_dict, index, [MESSAGE_REGISTRATION_KEY]))
     msg_bgn_details = creators.create_message_segment_beginning(msg_bgn_lines)
     return msg_bgn_details
 
 
-def deserialise_transaction(original_dict, index):
+def deserialise_transaction(original_dict: EdifactDict, index: int) -> Transaction:
     transaction_pat = None
     transaction_lines = EdifactDict(
         helpers.extract_relevant_lines(original_dict, index + 1, [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
 
-    msg_reg_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, 0,
-                                                       [MESSAGE_REGISTRATION_KEY, MESSAGE_PATIENT_KEY,
-                                                        MESSAGE_TRAILER_KEY]))
-    transaction_reg = creators.create_transaction_registration(msg_reg_lines)
+    registration_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, 0,
+                                                                    [MESSAGE_REGISTRATION_KEY, MESSAGE_PATIENT_KEY,
+                                                                     MESSAGE_TRAILER_KEY]))
+    transaction_reg = creators.create_transaction_registration(registration_lines)
 
-    if len(msg_reg_lines) != len(transaction_lines):
-        msg_pat_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, len(msg_reg_lines),
-                                                           [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
-        transaction_pat = creators.create_transaction_patient(msg_pat_lines)
+    if len(registration_lines) != len(transaction_lines):
+        patient_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, len(registration_lines),
+                                                                   [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
+        transaction_pat = creators.create_transaction_patient(patient_lines)
 
     transaction = Transaction(transaction_reg, transaction_pat)
     return transaction

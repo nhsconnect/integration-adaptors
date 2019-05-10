@@ -7,7 +7,6 @@ from edifact.incoming.models.interchange import InterchangeHeader, Interchange
 from edifact.incoming.models.message import MessageSegmentBeginningDetails, MessageSegment, Messages
 from edifact.incoming.models.transaction import Transactions, Transaction, TransactionRegistrationDetails, \
     TransactionPatientDetails
-import edifact.incoming.parser.tests.fixtures as fixtures
 from edifact.incoming.parser.tests.fixtures import LineBuilder
 
 
