@@ -1,11 +1,7 @@
 {
     "_meta": {
         "hash": {
-<<<<<<< HEAD
-            "sha256": "509e2fa45a56a0975d841c0cb9041c7ccb6653e5833cd44905d5876d3e9d8a14"
-=======
             "sha256": "126c5586d076e225c819724117407baf532559c9fd1fc5850b71fc77cebb31b5"
->>>>>>> master
         },
         "pipfile-spec": 6,
         "requires": {
@@ -60,11 +56,6 @@
             ],
             "version": "==0.6.0"
         },
-<<<<<<< HEAD
-        "nhais-adaptor": {
-            "editable": true,
-            "path": "."
-=======
         "lxml": {
             "hashes": [
                 "sha256:03984196d00670b2ab14ae0ea83d5cc0cfa4f5a42558afa9ab5fa745995328f5",
@@ -137,7 +128,6 @@
                 "sha256:f9cd39066048066a4abe4c18fb213bc541339728005e72263f023742fb912585"
             ],
             "version": "==2019.4.14"
->>>>>>> master
         },
         "requests": {
             "hashes": [
@@ -159,8 +149,6 @@
                 "sha256:a637e5fae88995b256e3409dc4d52c2e2e0ba32c42a6365fee8bbd2238de3cfb"
             ],
             "version": "==1.24.3"
-<<<<<<< HEAD
-=======
         },
         "wcwidth": {
             "hashes": [
@@ -168,7 +156,6 @@
                 "sha256:f4ebe71925af7b40a864553f761ed559b43544f8f71746c2d756c7fe788ade7c"
             ],
             "version": "==0.1.7"
->>>>>>> master
         }
     },
     "develop": {
