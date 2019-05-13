@@ -1,7 +1,5 @@
-from typing import Optional, Awaitable
-
 from tornado.httpserver import HTTPServer
-import tornado.ioloop
+from tornado.ioloop import IOLoop
 import tornado.web
 
 from reciever.message_checks.checks import *
@@ -25,11 +23,18 @@ class MessageReceiver(tornado.web.RequestHandler):
         logging.debug("Post message received ")
         mh = MessageHandler(self.request.body)
 
-        self.set_status(mh.get_response_code())
-        logging.debug("Status code %i", mh.get_response_code())
+        status_code = self.get_status_code(mh.error_flag)
+        self.set_status(status_code)
+        logging.debug("Status code %i", status_code)
 
         logging.debug("Sending reply")
         self.write(mh.get_response())
+
+    def get_status_code(self, flag):
+        if flag:
+            return 500
+        else:
+            return 200
 
 
 if __name__ == "__main__":
@@ -38,4 +43,4 @@ if __name__ == "__main__":
 
     httpsServer = HTTPServer(application)
     httpsServer.listen(4848)
-    tornado.ioloop.IOLoop.current().start()
+    IOLoop.current().start()

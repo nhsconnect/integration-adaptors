@@ -1,4 +1,4 @@
-from reciever.message_checks.Check import Check
+from reciever.message_checks.check import Check
 import logging
 
 

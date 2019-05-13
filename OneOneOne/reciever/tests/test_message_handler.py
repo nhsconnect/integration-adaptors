@@ -28,7 +28,7 @@ class MessageHandlerTest(unittest.TestCase):
             msg = self.builder.build_message(service_dict)
             mh = MessageHandler(msg)
 
-            self.assertEqual(mh.get_response_code(), 500)
+            self.assertEqual(mh.error_flag, True)
             XmlUtilities.assert_xml_equal_utf_8(expected, mh.get_response())
 
         with self.subTest("Two services which are the same should return 200 code"):
@@ -41,7 +41,7 @@ class MessageHandlerTest(unittest.TestCase):
             msg = self.builder.build_message(service_dict)
             mh = MessageHandler(msg)
 
-            self.assertEqual(mh.get_response_code(), 200)
+            self.assertEqual(mh.error_flag, False)
             XmlUtilities.assert_xml_equal_utf_8(self.success_response, mh.get_response())
 
     def test_manifest_payload_count(self):
@@ -61,7 +61,7 @@ class MessageHandlerTest(unittest.TestCase):
             msg = self.builder.build_message(counts)
             mh = MessageHandler(msg)
 
-            self.assertEqual(mh.get_response_code(), 500)
+            self.assertEqual(mh.error_flag, True)
             XmlUtilities.assert_xml_equal_utf_8(expected, mh.get_response())
 
         with self.subTest("Equal counts: 200 response"):
@@ -77,7 +77,7 @@ class MessageHandlerTest(unittest.TestCase):
             msg = self.builder.build_message(counts)
             mh = MessageHandler(msg)
 
-            self.assertEqual(mh.get_response_code(), 200)
+            self.assertEqual(mh.error_flag, False)
             XmlUtilities.assert_xml_equal_utf_8(self.success_response, mh.get_response())
 
     def test_payload_id_matches_manifest_id(self):
@@ -96,7 +96,7 @@ class MessageHandlerTest(unittest.TestCase):
             msg = self.builder.build_message(dictionary)
             mh = MessageHandler(msg)
 
-            self.assertEqual(mh.get_response_code(), 500)
+            self.assertEqual(mh.error_flag, True)
             XmlUtilities.assert_xml_equal_utf_8(expected, mh.get_response())
 
         with self.subTest("Incorrect manifest occurrences returns 500 error"):
@@ -112,5 +112,5 @@ class MessageHandlerTest(unittest.TestCase):
             msg = self.builder.build_message(dictionary)
             mh = MessageHandler(msg)
 
-            self.assertEqual(mh.get_response_code(), 200)
+            self.assertEqual(mh.error_flag, False)
             XmlUtilities.assert_xml_equal_utf_8(self.success_response, mh.get_response())

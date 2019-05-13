@@ -2,19 +2,17 @@ import xml.etree.ElementTree as ET
 
 from builder.pystache_message_builder import PystacheMessageBuilder
 from reciever.message_checks.checks import *
-from reciever.message_checks.Check import Check
+from reciever.message_checks.check import Check
 from utilities.file_utilities import FileUtilities
 from definitions import XML_PATH, TEMPLATE_PATH
-import logging
 from typing import List, Type
-
-CheckList = List[Type[Check]]
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
 check_list = [CheckManifestCountInstances, CheckActionTypes, CheckManifestPayloadCounts,
               CheckPayloadCountAgainstActual, CheckPayloadIdAgainstManifestId
               ]
+
 
 def build_error_message(error):
     builder = PystacheMessageBuilder(str(TEMPLATE_PATH), 'base_error_template')
@@ -27,7 +25,7 @@ class MessageHandler:
     to be returned to the sender
     """
 
-    def __init__(self, message, checks: CheckList = check_list):
+    def __init__(self, message, checks: List[Type[Check]] = check_list):
         self.message_tree = ET.fromstring(message)
         self.check_list = checks
         self.error_flag = False
@@ -45,16 +43,6 @@ class MessageHandler:
             return build_error_message(self.response_message)
         else:
             return basic_success_response
-
-    def get_response_code(self):
-        """
-        Determines the http response code based on the failure flag set by validation
-        :return: http response code
-        """
-        if self.error_flag:
-            return 500
-        else:
-            return 200
 
     def handle(self):
         """

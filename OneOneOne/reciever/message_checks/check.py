@@ -8,8 +8,8 @@ from abc import ABC, abstractmethod
 
 class Check(ABC):
 
-    distribution_envelope = "./soap:Body/itk:DistributionEnvelope"
     soap_body = "./soap:Body"
+    distribution_envelope = soap_body + "/itk:DistributionEnvelope"
     manifest_tag = distribution_envelope + "/itk:header/itk:manifest"
     basic_success_message = FileUtilities.get_file_string(str(XML_PATH / 'basic_success_response.xml'))
 
@@ -36,7 +36,7 @@ class Check(ABC):
         Extracts the count on the manifest tag in the message
         :return: manifest count as a string
         """
-        return self.message_tree.find(self.distribution_envelope + "/itk:header/itk:manifest",
+        return self.message_tree.find(self.manifest_tag,
                                       self.namespaces).attrib['count']
 
     def get_payload_count(self):
@@ -44,7 +44,7 @@ class Check(ABC):
         Extracts the count on the payloads tag in the message
         :return: payloads count as a string
         """
-        return self.message_tree.findall(self.distribution_envelope + "/itk:payloads", self.namespaces).attrib['count']
+        return self.message_tree.find(self.distribution_envelope + "/itk:payloads", self.namespaces).attrib['count']
 
     def build_error_message(self, error):
         builder = PystacheMessageBuilder(str(TEMPLATE_PATH), 'base_error_template')
