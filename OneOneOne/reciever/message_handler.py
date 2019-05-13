@@ -2,7 +2,6 @@ import xml.etree.ElementTree as ET
 
 from builder.pystache_message_builder import PystacheMessageBuilder
 from reciever.message_checks.checks import *
-from reciever.message_checks.check import Check
 from utilities.file_utilities import FileUtilities
 from OneOneOne.definitions import XML_PATH, TEMPLATE_PATH
 from typing import List, Type
@@ -60,8 +59,8 @@ class MessageHandler:
         :return: status code, response content
         """
 
-        for check in self.check_list:
-            c = check(self.message_tree)  # instantiate the check object instance
+        for CheckInstance in self.check_list:
+            c = CheckInstance(self.message_tree)  # instantiate the check object instance
             fail, response_string = c.check()  # make the check call
             if fail:
                 self.error_flag = True

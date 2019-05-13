@@ -1,7 +1,7 @@
 import logging
 
 from builder.pystache_message_builder import PystacheMessageBuilder
-from definitions import TEMPLATE_PATH, XML_PATH
+from OneOneOne.definitions import TEMPLATE_PATH, XML_PATH
 from utilities.file_utilities import FileUtilities
 from abc import ABC, abstractmethod
 
