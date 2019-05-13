@@ -58,7 +58,7 @@ class TestInterchange(unittest.TestCase):
                                            message_segment_patient_details=msg_seg_pat_details)
             msgs = Messages([msg])
 
-            interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",
+            interchange = Interchange(sender="SNDR", recipient="RECP", date_time="190423:0900", sequence_number="00001",
                                       messages=msgs).to_edifact()
             self.assertEqual(interchange, expected_edifact_interchange)
 

@@ -1,4 +1,4 @@
-from edifact.helpers import date_formatter as date_formatter
+from adaptor.outgoing.common import date_formatter as date_formatter
 from edifact.outgoing.models.message import MessageSegmentRegistrationDetails, MessageSegmentPatientDetails, Message
 from edifact.outgoing.models.segment import Segment
 
