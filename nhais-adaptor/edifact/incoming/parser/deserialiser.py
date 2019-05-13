@@ -57,16 +57,12 @@ def find_index_of_patient_segment(transaction_lines: EdifactDict) -> int:
     return index_of_patient_segment
 
 
-def does_transaction_have_patient_segment(transaction_lines: EdifactDict) -> bool:
-    has_patient_segment = True if find_index_of_patient_segment(transaction_lines) != -1 else False
-    return has_patient_segment
-
-
 def deserialise_patient_if_applicable(transaction_lines: EdifactDict) -> TransactionPatientDetails:
     transaction_pat = None
-    if does_transaction_have_patient_segment(transaction_lines):
+    patient_segment_index = find_index_of_patient_segment(transaction_lines)
+    if patient_segment_index != -1:
         patient_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines,
-                                                                   find_index_of_patient_segment(transaction_lines),
+                                                                   patient_segment_index,
                                                                    [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
         transaction_pat = creators.create_transaction_patient(patient_lines)
 
