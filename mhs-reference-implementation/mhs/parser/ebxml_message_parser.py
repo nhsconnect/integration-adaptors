@@ -2,6 +2,8 @@ import email
 import email.policy
 import logging
 import xml.etree.ElementTree as ET
+from email.message import Message
+from typing import Dict, Tuple
 
 FROM_PARTY_ID = "from_party_id"
 TO_PARTY_ID = "to_party_id"
@@ -111,7 +113,14 @@ class EbXmlRequestMessageParser(EbXmlMessageParser):
         logging.debug("Extracted values from message: %s", extracted_values)
         return extracted_values
 
-    def _parse_mime_message(self, headers, message):
+    def _parse_mime_message(self, headers: Dict[str, str], message: str) -> Message:
+        """ Take the provided message string (and set of HTTP headers received with it) and parse it to obtain a Message
+        object.
+
+        :param headers: The HTTP headers received with the message.
+        :param message: The message (as a string) to be parsed.
+        :return: a Message that represents the message received.
+        """
         content_type = headers[CONTENT_TYPE_HEADER_NAME]
         content_type_header = CONTENT_TYPE_HEADER_NAME + ": " + content_type + "\r\n"
 
@@ -119,7 +128,12 @@ class EbXmlRequestMessageParser(EbXmlMessageParser):
 
         return msg
 
-    def _extract_message_parts(self, msg):
+    def _extract_message_parts(self, msg) -> Tuple[str, str]:
+        """Extract the ebXML and payload parts of the message and return them as a tuple.
+
+        :param msg: The message to extract parts from.
+        :return: A tuple containing the ebXML and payload (if present, otherwise None) parts of the message provided.
+        """
         # EIS section 2.5.4 defines that the first MIME part must contain the ebML SOAP message and the message payload
         # (if present) must be the first additional attachment.
 
