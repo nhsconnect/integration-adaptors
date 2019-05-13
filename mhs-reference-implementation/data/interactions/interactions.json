@@ -9,7 +9,7 @@
     "type": "text/xml",
     "charset": "UTF-8",
     "start": "<ebXMLHeader@spine.nhs.uk>",
-    "ebxml_wrapper_required": true,
+    "async_response_expected": true,
     "to_party_id": "YES-0000806",
     "cpa_id": "S20001A000182",
     "duplicate_elimination": true,
@@ -25,6 +25,6 @@
     "type": "text/xml",
     "charset": "UTF-8",
     "start": "<ebXMLHeader@spine.nhs.uk>",
-    "ebxml_wrapper_required": false
+    "async_response_expected": false
   }
 }

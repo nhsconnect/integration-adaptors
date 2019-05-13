@@ -3,7 +3,7 @@ from unittest.mock import Mock, sentinel, patch
 
 from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
 from mhs.builder.ebxml_request_message_builder import MESSAGE
-from mhs.sender.sender import Sender, WRAPPER_REQUIRED, UnknownInteractionError
+from mhs.sender.sender import Sender, ASYNC_RESPONSE_EXPECTED, UnknownInteractionError
 from utilities.message_utilities import MessageUtilities
 
 EXPECTED_PARTY_ID = "A91424-9199121"
@@ -21,9 +21,9 @@ class TestSender(TestCase):
     def test_send_message_with_ebxml_wrapper(self, mock_get_uuid):
         fixed_uuid = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_uuid.return_value = fixed_uuid
-        interaction_details = {WRAPPER_REQUIRED: True}
+        interaction_details = {ASYNC_RESPONSE_EXPECTED: True}
         expected_context = {
-            WRAPPER_REQUIRED: True,
+            ASYNC_RESPONSE_EXPECTED: True,
             FROM_PARTY_ID: EXPECTED_PARTY_ID,
             CONVERSATION_ID: fixed_uuid,
             MESSAGE: sentinel.message
@@ -41,7 +41,7 @@ class TestSender(TestCase):
         self.assertIs(sentinel.response, actual_response)
 
     def test_send_message_without_ebxml_wrapper(self):
-        interaction_details = {WRAPPER_REQUIRED: False}
+        interaction_details = {ASYNC_RESPONSE_EXPECTED: False}
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
         self.mock_transport.make_request.return_value = sentinel.response
 

@@ -8,7 +8,7 @@ from utilities.message_utilities import MessageUtilities
 
 PARTY_ID = "A91424-9199121"
 
-WRAPPER_REQUIRED = 'ebxml_wrapper_required'
+ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 
 
 class UnknownInteractionError(Exception):
@@ -40,8 +40,8 @@ class Sender:
 
         :param interaction_name: The name of the interaction the message is related to.
         :param message_to_send: A string representing the message to be sent.
-        :return: A tuple containing the ID of the message sent (if one was generated) and the content of the response
-        received
+        :return: A tuple containing the ID of the message sent (if an asynchronous response is expected) and the
+        content of the response received.
         :raises: An UnknownInteractionError if the interaction_name specified was not found.
         """
 
@@ -49,11 +49,11 @@ class Sender:
         if not interaction_details:
             raise UnknownInteractionError(interaction_name)
 
-        requires_ebxml_wrapper = interaction_details[WRAPPER_REQUIRED]
-        message_id = None
-        if requires_ebxml_wrapper:
+        async_pattern = interaction_details[ASYNC_RESPONSE_EXPECTED]
+        if async_pattern:
             message_id, message = self._wrap_message_in_ebxml(interaction_details, message_to_send)
         else:
+            message_id = None
             message = message_to_send
 
         response = self.transport.make_request(interaction_details, message)
