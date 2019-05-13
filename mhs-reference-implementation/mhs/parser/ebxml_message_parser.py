@@ -47,19 +47,25 @@ class EbXmlMessageParser:
         xml_tree = ET.fromstring(message)
         extracted_values = {}
 
-        self._extract_ebxml_text_value(xml_tree, "PartyId", extracted_values, FROM_PARTY_ID, parent="From")
-        self._extract_ebxml_text_value(xml_tree, "PartyId", extracted_values, TO_PARTY_ID, parent="To")
-        self._extract_ebxml_text_value(xml_tree, "CPAId", extracted_values, CPA_ID)
-        self._extract_ebxml_text_value(xml_tree, "ConversationId", extracted_values, CONVERSATION_ID)
-        self._extract_ebxml_text_value(xml_tree, "Service", extracted_values, SERVICE)
-        self._extract_ebxml_text_value(xml_tree, "Action", extracted_values, ACTION)
-        self._extract_ebxml_text_value(xml_tree, "MessageId", extracted_values, MESSAGE_ID, parent="MessageData")
-        self._extract_ebxml_text_value(xml_tree, "Timestamp", extracted_values, TIMESTAMP, parent="MessageData")
-        self._extract_ebxml_text_value(xml_tree, "RefToMessageId", extracted_values, REF_TO_MESSAGE_ID,
-                                       parent="MessageData")
-        self._extract_ebxml_value_is_present(xml_tree, "DuplicateElimination", extracted_values, DUPLICATE_ELIMINATION)
-        self._extract_ebxml_value_is_present(xml_tree, "SyncReply", extracted_values, SYNC_REPLY)
-        self._extract_ebxml_value_is_present(xml_tree, "AckRequested", extracted_values, ACK_REQUESTED)
+        self._add_if_present(extracted_values, FROM_PARTY_ID,
+                             self._extract_ebxml_text_value(xml_tree, "PartyId", parent="From"))
+        self._add_if_present(extracted_values, TO_PARTY_ID,
+                             self._extract_ebxml_text_value(xml_tree, "PartyId", parent="To"))
+        self._add_if_present(extracted_values, CPA_ID, self._extract_ebxml_text_value(xml_tree, "CPAId"))
+        self._add_if_present(extracted_values, CONVERSATION_ID,
+                             self._extract_ebxml_text_value(xml_tree, "ConversationId"))
+        self._add_if_present(extracted_values, SERVICE, self._extract_ebxml_text_value(xml_tree, "Service"))
+        self._add_if_present(extracted_values, ACTION, self._extract_ebxml_text_value(xml_tree, "Action"))
+        self._add_if_present(extracted_values, MESSAGE_ID,
+                             self._extract_ebxml_text_value(xml_tree, "MessageId", parent="MessageData"))
+        self._add_if_present(extracted_values, TIMESTAMP,
+                             self._extract_ebxml_text_value(xml_tree, "Timestamp", parent="MessageData"))
+        self._add_if_present(extracted_values, REF_TO_MESSAGE_ID,
+                             self._extract_ebxml_text_value(xml_tree, "RefToMessageId", parent="MessageData"))
+        self._add_flag_if_present(extracted_values, DUPLICATE_ELIMINATION,
+                                  self._extract_ebxml_value(xml_tree, "DuplicateElimination"))
+        self._add_flag_if_present(extracted_values, SYNC_REPLY, self._extract_ebxml_value(xml_tree, "SyncReply"))
+        self._add_flag_if_present(extracted_values, ACK_REQUESTED, self._extract_ebxml_value(xml_tree, "AckRequested"))
         self._extract_attribute(xml_tree, "AckRequested", SOAP_NAMESPACE, "actor", extracted_values, ACK_SOAP_ACTOR)
 
         return extracted_values
@@ -74,23 +80,32 @@ class EbXmlMessageParser:
 
         return path
 
-    def _extract_ebxml_text_value(self, xml_tree, element_name, values_dict, key, parent=None):
+    def _extract_ebxml_value(self, xml_tree, element_name, parent=None):
         xpath = self._path_to_ebxml_element(element_name, parent=parent)
-        text_value = xml_tree.findtext(xpath, namespaces=NAMESPACES)
-        if text_value is not None:
-            values_dict[key] = text_value
+        return xml_tree.find(xpath, namespaces=NAMESPACES)
 
-    def _extract_ebxml_value_is_present(self, xml_tree, element_name, values_dict, key):
-        xpath = self._path_to_ebxml_element(element_name)
-        value = xml_tree.find(xpath, NAMESPACES)
+    def _extract_ebxml_text_value(self, xml_tree, element_name, parent=None):
+        value = self._extract_ebxml_value(xml_tree, element_name, parent)
+        text = None
+
         if value is not None:
-            values_dict[key] = True
+            text = value.text
+
+        return text
 
     def _extract_attribute(self, xml_tree, element_name, attribute_namespace, attribute_name, values_dict, key):
         xpath = self._path_to_ebxml_element(element_name)
         element = xml_tree.find(xpath, NAMESPACES)
         if element is not None:
             values_dict[key] = element.attrib["{" + NAMESPACES[attribute_namespace] + "}" + attribute_name]
+
+    def _add_if_present(self, values_dict, key, value):
+        if value is not None:
+            values_dict[key] = value
+
+    def _add_flag_if_present(self, values_dict, key, value):
+        if value is not None:
+            values_dict[key] = True
 
 
 class EbXmlRequestMessageParser(EbXmlMessageParser):
