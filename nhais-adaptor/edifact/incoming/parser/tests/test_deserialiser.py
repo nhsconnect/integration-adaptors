@@ -23,7 +23,7 @@ class TestDeserialiser(unittest.TestCase):
                                                       ]))
                                    ]))
 
-            input_lines = LineBuilder().start_interchange().start_message("F4")\
+            input_lines = LineBuilder().start_interchange().start_message("F4") \
                 .add_transaction("211102").end_message().end_interchange().build()
 
             result = deserialiser.convert(input_lines)
@@ -41,7 +41,7 @@ class TestDeserialiser(unittest.TestCase):
                                                       ]))
                                    ]))
 
-            input_lines = LineBuilder().start_interchange().start_message("F4")\
+            input_lines = LineBuilder().start_interchange().start_message("F4") \
                 .add_transaction("211102", "9876556789").end_message().end_interchange().build()
 
             result = deserialiser.convert(input_lines)
@@ -62,8 +62,8 @@ class TestDeserialiser(unittest.TestCase):
                                                       ]))
                                    ]))
 
-            input_lines = LineBuilder().start_interchange().start_message("F4")\
-                .add_transaction("211102", "9876556789").add_transaction("211103")\
+            input_lines = LineBuilder().start_interchange().start_message("F4") \
+                .add_transaction("211102", "9876556789").add_transaction("211103") \
                 .end_message().end_interchange().build()
 
             result = deserialiser.convert(input_lines)
@@ -95,9 +95,9 @@ class TestDeserialiser(unittest.TestCase):
                                                       ]))
                                    ]))
 
-            input_lines = LineBuilder().start_interchange().start_message("F4")\
-                .add_transaction("211102", "9876556789").add_transaction("211103").end_message()\
-                .start_message("F2").add_transaction("211104", "111111111").add_transaction("211105", "2222222222")\
+            input_lines = LineBuilder().start_interchange().start_message("F4") \
+                .add_transaction("211102", "9876556789").add_transaction("211103").end_message() \
+                .start_message("F2").add_transaction("211104", "111111111").add_transaction("211105", "2222222222") \
                 .end_message().end_interchange().build()
 
             result = deserialiser.convert(input_lines)

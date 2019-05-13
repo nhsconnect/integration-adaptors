@@ -1,10 +1,12 @@
 import unittest
+
 from testfixtures import compare
+
+import adaptor.incoming.tests.fixtures as fixtures
+from adaptor.incoming.config import reference_dict
 from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
 from edifact.incoming.models.interchange import Interchange, InterchangeHeader
 from edifact.incoming.models.message import Messages, MessageSegment, MessageSegmentBeginningDetails
-import adaptor.incoming.tests.fixtures as fixtures
-from adaptor.incoming.config import reference_dict
 from edifact.incoming.models.transaction import Transactions, Transaction, TransactionRegistrationDetails, \
     TransactionPatientDetails
 

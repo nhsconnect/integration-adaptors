@@ -2,8 +2,8 @@ import unittest
 
 from testfixtures import compare
 
-from adaptor.outgoing.death.message_death_adaptor import MessageDeathAdaptor
 import adaptor.outgoing.death.tests.fixtures as fixtures
+from adaptor.outgoing.death.message_death_adaptor import MessageDeathAdaptor
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails, DeathRegistrationMessage
 from edifact.outgoing.models.message import MessageBeginning

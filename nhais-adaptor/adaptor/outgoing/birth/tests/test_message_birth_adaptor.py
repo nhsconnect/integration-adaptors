@@ -2,8 +2,8 @@ import unittest
 
 from testfixtures import compare
 
-from adaptor.outgoing.birth.message_birth_adaptor import MessageBirthAdaptor
 import adaptor.outgoing.birth.tests.fixtures as fixtures
+from adaptor.outgoing.birth.message_birth_adaptor import MessageBirthAdaptor
 from edifact.outgoing.models.address import Address as EdifactAddress
 from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthPatientDetails, \
     MessageSegmentBirthRegistrationDetails, BirthRegistrationMessage

@@ -1,8 +1,8 @@
 import unittest
 
+from edifact.outgoing.models.address import Address
 from edifact.outgoing.models.birth.message_birth import MessageSegmentBirthRegistrationDetails, \
     MessageSegmentBirthPatientDetails, BirthRegistrationMessage
-from edifact.outgoing.models.address import Address
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import MessageBeginning, Messages
 from edifact.outgoing.models.name import Name
@@ -59,4 +59,3 @@ class TestInterchange(unittest.TestCase):
             interchange = Interchange(sender="SNDR", recipient="RECP", date_time="190423:0900", sequence_number="00001",
                                       messages=msgs).to_edifact()
             self.assertEqual(interchange, expected_edifact_interchange)
-

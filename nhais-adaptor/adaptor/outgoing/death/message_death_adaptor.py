@@ -1,9 +1,9 @@
 import adaptor.fhir_helpers.fhir_finders as finders
+import adaptor.outgoing.common.date_formatter as date_formatter
 from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName
 from adaptor.outgoing.message_adaptor import MessageAdaptor
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails
-import adaptor.outgoing.common.date_formatter as date_formatter
 
 
 class MessageDeathAdaptor(MessageAdaptor):

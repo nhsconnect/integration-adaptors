@@ -1,4 +1,3 @@
-import adaptor.outgoing.common.date_formatter as date_formatter
 from edifact.outgoing.models.segment import Segment, SegmentCollection
 
 

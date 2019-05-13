@@ -1,8 +1,9 @@
 import unittest
 
 from testfixtures import compare
-from edifact.incoming.parser import EdifactDict
+
 import edifact.incoming.parser.helpers as helpers
+from edifact.incoming.parser import EdifactDict
 
 
 class TestParserHelpers(unittest.TestCase):

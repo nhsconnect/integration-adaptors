@@ -1,11 +1,11 @@
 from typing import List
 
 import edifact.incoming.parser.creators as creators
+import edifact.incoming.parser.helpers as helpers
 from edifact.incoming.models.interchange import Interchange, InterchangeHeader
 from edifact.incoming.models.message import MessageSegment, Messages, MessageSegmentBeginningDetails
 from edifact.incoming.models.transaction import Transaction, Transactions
 from edifact.incoming.parser import EdifactDict
-import edifact.incoming.parser.helpers as helpers
 
 INTERCHANGE_HEADER_KEY = "UNB"
 MESSAGE_HEADER_KEY = "UNH"

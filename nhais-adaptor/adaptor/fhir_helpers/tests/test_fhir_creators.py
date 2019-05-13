@@ -1,7 +1,7 @@
 import unittest
 
-from fhirclient.models.patient import Patient
 from fhirclient.models.operationdefinition import OperationDefinitionParameter, OperationDefinition
+from fhirclient.models.patient import Patient
 from fhirclient.models.practitioner import Practitioner
 
 import adaptor.fhir_helpers.fhir_creators as creators
