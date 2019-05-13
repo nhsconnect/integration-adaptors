@@ -63,7 +63,7 @@ class TestCreators(unittest.TestCase):
 
         compare(msg_sgm_bgn, expected)
 
-    def test_create_message_segment_registration(self):
+    def test_create_transaction_registration(self):
         expected = TransactionRegistrationDetails("211102")
 
         message_registration_dict = EdifactDict([
@@ -75,7 +75,7 @@ class TestCreators(unittest.TestCase):
 
         compare(msg_sgm_reg, expected)
 
-    def test_create_message_segment_patient(self):
+    def test_create_transaction_patient(self):
         expected = TransactionPatientDetails("9876556789")
 
         message_patient_dict = EdifactDict([
