@@ -12,7 +12,8 @@ from utilities.file_utilities import FileUtilities
 from utilities.message_utilities import MessageUtilities
 from utilities.xml_utilities import XmlUtilities
 
-EXPECTED_MESSAGES_DIR = "expected_messages"
+MESSAGES_DIR = "messages"
+REQUEST_FILE = "ebxml_request.msg"
 EXPECTED_RESPONSE_FILE = "ebxml_ack.xml"
 
 
@@ -20,7 +21,7 @@ class TestAsyncResponseHandler(AsyncHTTPTestCase):
     """A simple integration test for the async response endpoint."""
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    expected_message_dir = Path(current_dir) / EXPECTED_MESSAGES_DIR
+    message_dir = Path(current_dir) / MESSAGES_DIR
 
     def get_app(self):
         ack_builder = EbXmlAckMessageBuilder()
@@ -34,12 +35,11 @@ class TestAsyncResponseHandler(AsyncHTTPTestCase):
     def test_post(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        expected_response = FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_RESPONSE_FILE))
+        expected_response = FileUtilities.get_file_string(str(self.message_dir / EXPECTED_RESPONSE_FILE))
+        request_body = FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
-        # Once message parsing is implemented, this will need to contain values matching the expected response.
-        request_body = "test"
-
-        response = self.fetch("/", method="POST", body=request_body)
+        headers = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
+        response = self.fetch("/", method="POST", body=request_body, headers=headers)
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.headers["Content-Type"], "text/xml")
