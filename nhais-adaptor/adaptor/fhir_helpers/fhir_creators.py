@@ -13,6 +13,7 @@ class OperationName:
     Constants for the type of fhir operations the adaptor can use
     """
     REGISTER_BIRTH = "RegisterPatient-Birth"
+    REGISTER_DEATH = "RegisterPatient-Death"
 
 
 class ParameterName:
@@ -26,6 +27,7 @@ class ParameterName:
     TRANSACTION_NO = "transactionNumber"
     REGISTER_PATIENT = "registerPatient"
     REGISTER_PRACTITIONER = "registerPractitioner"
+    FREE_TEXT = "freeText"
 
 
 class ResourceType:

@@ -1,5 +1,5 @@
-from edifact.outgoing.models.segment import Segment, SegmentCollection
 import edifact.helpers.date_formatter as date_formatter
+from edifact.outgoing.models.segment import Segment, SegmentCollection
 
 
 class InterchangeHeader(Segment):

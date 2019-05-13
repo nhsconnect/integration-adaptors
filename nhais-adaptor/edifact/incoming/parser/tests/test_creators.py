@@ -1,9 +1,11 @@
 import unittest
+
 from testfixtures import compare
+
 import edifact.incoming.parser.creators as creators
+from edifact.incoming.models.interchange import InterchangeHeader
 from edifact.incoming.models.message import MessageSegmentRegistrationDetails, MessageSegmentBeginningDetails, \
     MessageSegmentPatientDetails
-from edifact.incoming.models.interchange import InterchangeHeader
 from edifact.incoming.parser import EdifactDict
 
 
@@ -83,4 +85,3 @@ class TestCreators(unittest.TestCase):
         msg_sgm_pat = creators.create_message_segment_patient(message_patient_dict)
 
         compare(msg_sgm_pat, expected)
-

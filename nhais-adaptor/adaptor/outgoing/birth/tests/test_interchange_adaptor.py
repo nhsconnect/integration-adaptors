@@ -1,27 +1,24 @@
 import unittest
-import adaptor.outgoing.tests.fixtures as fixtures
+
+import adaptor.outgoing.birth.tests.fixtures as fixtures
 from testfixtures import compare
-import adaptor.outgoing.interchange_adaptor as adaptor
+
+from adaptor.fhir_helpers.fhir_creators import OperationName
+from adaptor.outgoing.birth.message_birth_adaptor import MessageBirthAdaptor
+from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 
 
 class TestInterchangeAdaptor(unittest.TestCase):
     """
-    Test the conversation of fhir to an edifact interchange
+    Test the conversation of fhir to an edifact interchange for a birth registration
     """
 
-    def test_generate_recipient_from(self):
-        """
-        Test the generation of a recipient cypher from the nhais cypher
-        """
-        with self.subTest("When the nhais cypher is 3 characters"):
-            recipient_cypher = adaptor.generate_recipient_from('XX1')
-
-            self.assertEqual(recipient_cypher, "XX11")
-
-        with self.subTest("When the nhais cypher is 2 characters"):
-            recipient_cypher = adaptor.generate_recipient_from('XX')
-
-            self.assertEqual(recipient_cypher, "XX01")
+    operation_dict = {
+        OperationName.REGISTER_BIRTH: {
+            "refNumber": "G1",
+            "messageAdaptor": MessageBirthAdaptor
+        }
+    }
 
     def test_create_interchange(self):
         """
@@ -51,6 +48,9 @@ class TestInterchangeAdaptor(unittest.TestCase):
 
             op_def = fixtures.create_operation_definition_for_birth_registration()
 
-            (sender, recipient, interchange_seq_no, interchange) = adaptor.create_interchange(fhir_operation=op_def)
+            adaptor = InterchangeAdaptor(self.operation_dict)
+
+            (sender, recipient, interchange_seq_no, interchange) = adaptor.create_interchange(
+                fhir_operation=op_def)
 
             compare(interchange, expected_edifact_interchange)
