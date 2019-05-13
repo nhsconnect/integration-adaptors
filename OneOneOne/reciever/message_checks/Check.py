@@ -3,9 +3,10 @@ import logging
 from builder.pystache_message_builder import PystacheMessageBuilder
 from definitions import TEMPLATE_PATH, XML_PATH
 from utilities.file_utilities import FileUtilities
+from abc import ABC, abstractmethod
 
 
-class Check:
+class Check(ABC):
 
     distribution_envelope = "./soap:Body/itk:DistributionEnvelope"
     soap_body = "./soap:Body"
@@ -22,7 +23,12 @@ class Check:
     def __init__(self, message):
         self.message_tree = message
 
+    @abstractmethod
     def check(self):
+        """
+        An asbtract method called by the validator to run the check
+        :return: flail flag, error message
+        """
         pass
 
     def get_manifest_count(self):

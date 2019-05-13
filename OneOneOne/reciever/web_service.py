@@ -1,3 +1,5 @@
+from typing import Optional, Awaitable
+
 from tornado.httpserver import HTTPServer
 import tornado.ioloop
 import tornado.web
@@ -21,14 +23,13 @@ class MessageReceiver(tornado.web.RequestHandler):
 
     def post(self):
         logging.debug("Post message received ")
-        mh = MessageHandler(self.request.body, check_list)
-        status_code, message_response = mh.evaluate_message()
+        mh = MessageHandler(self.request.body)
 
-        self.set_status(status_code)
-        logging.debug("Status code %i", status_code)
+        self.set_status(mh.get_response_code())
+        logging.debug("Status code %i", mh.get_response_code())
 
         logging.debug("Sending reply")
-        self.write(message_response)
+        self.write(mh.get_response())
 
 
 if __name__ == "__main__":

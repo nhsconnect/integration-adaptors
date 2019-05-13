@@ -1,13 +1,15 @@
 import xml.etree.ElementTree as ET
 
 from builder.pystache_message_builder import PystacheMessageBuilder
+from reciever.message_checks.checks import *
 from reciever.message_checks.Check import Check
 from utilities.file_utilities import FileUtilities
 from definitions import XML_PATH, TEMPLATE_PATH
 import logging
-from typing import List
+from typing import List, Type
+from reciever.message_validator import MessageValidator
 
-CheckList = List[Check]
+CheckList = List[Type[Check]]
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
@@ -18,177 +20,42 @@ def build_error_message(error):
 
 
 class MessageHandler:
-    namespaces = {
-        'soap': 'http://schemas.xmlsoap.org/soap/envelope/',
-        'a': 'http://www.etis.fskab.se/v1.0/ETISws',
-        'wsa': 'http://www.w3.org/2005/08/addressing',
-        'itk': 'urn:nhs-itk:ns:201005'
-    }
+    """
+        Validates the incoming message and wraps the validation outcome in a response
+        to be returned to the sender
+    """
 
-    def __init__(self, message, check_list: CheckList):
-        logging.basicConfig(level=logging.DEBUG)
+    def __init__(self, message):
         self.message_tree = ET.fromstring(message)
-        self.check_list = check_list
+        self.validator = MessageValidator(self.message_tree)
+        self.error_flag, self.error_message = self.validator.evaluate_message()
+        if not self.error_flag:
+            self.handle()
 
-    def evaluate_message(self):
+    def get_response(self):
         """
-        This iterates over the message check methods searching for errors in the message, if no errors are found
-        a success response is returned
-
-        :return: status code, response content
+        Returns a fully wrapped error/success response for the given message
+        :return: string
         """
-        for check in self.check_list:
-            c = check(self.message_tree)  # instantiate the check object instance
-            fail, response = c.check()  # make the check call
-            if fail:
-                return 500, response
+        if self.error_flag:
+            return build_error_message(self.error_message)
+        else:
+            return basic_success_response
 
-        return 200, basic_success_response
-
-
-
-    def check_action_types(self):
+    def get_response_code(self):
         """
-        This method checks for equality between the action type in the header, and the service value in the message
-        body as per the 'DE_INVSER' requirement specified in the requirements spreadsheet
-        :return: status code, response content
+        Determines the http response code based on the failure flag set by validation
+        :return: http response code
         """
-        action_tag_value = "-"
-        for type_tag in self.message_tree.findall("./soap:Header"
-                                                  "/wsa:Action",
-                                                  self.namespaces):
-            action_tag_value = type_tag.text
+        if self.error_flag:
+            return 500
+        else:
+            return 200
 
-        service_tag_value = "+"
-        for type_tag in self.message_tree.findall('./soap:Body'
-                                                  '/itk:DistributionEnvelope'
-                                                  '/itk:header',
-                                                  self.namespaces):
-            service_tag_value = type_tag.attrib['service']
-
-        if action_tag_value != service_tag_value:
-            logging.warning("Action type does not match service type: (Action Tag, Service Tag) (%s, %s)", action_tag_value,
-                            service_tag_value)
-            return 500, build_error_message("Manifest action does not match service action")
-
-        return 200, basic_success_response
-
-    def check_manifest_and_payload_count(self):
+    def handle(self):
         """
-        This verifies the manifest count is equal to the payload count as per 'DE_INVMPC' requirement
-        :return: status code, response content
+        This is an empty method meant as a placeholder for whatever asynchronous message/parsing would occur after the
+        incoming message has been identified as valid and the sender has been notified as such
+        :return:
         """
-
-        manifest_count = self.get_manifest_count()
-
-        payload_count = self.get_payload_count()
-
-        if payload_count != manifest_count:
-            logging.warning("Error in manifest count: (ManifestCount, PayloadCount) (%s, %s)", manifest_count,
-                            payload_count)
-            return 500, build_error_message("Manifest count does not match payload count")
-
-        return 200, basic_success_response
-
-    def check_manifest_count_against_actual(self):
-        """
-        Checks if the manifest.count attribute matches the number of manifest items as per the 'DE_INVMCT'
-        spec
-        :return: status code, response content
-        """
-        manifest_count = int(self.get_manifest_count())
-
-        manifest_actual_count = len(self.message_tree.findall("./soap:Body"
-                                                              "/itk:DistributionEnvelope"
-                                                              "/itk:header"
-                                                              "/itk:manifest"
-                                                              "/itk:manifestitem",
-                                                              self.namespaces))
-        if manifest_count != manifest_actual_count:
-            logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
-                            manifest_count, manifest_actual_count)
-
-            return 500, build_error_message("The number of manifest instances does"
-                                            " not match the manifest count specified")
-
-        return 200, basic_success_response
-
-    def check_payload_count_against_actual(self):
-        """
-        Checks if the specified payload count matches the actual occurrences of payload elements
-        as per 'DE_INVPCT' in the spec
-        :return: status code, response content
-        """
-        payload_count = int(self.get_payload_count())
-
-        payload_actual_count = len(self.message_tree.findall("./soap:Body"
-                                                             "/itk:DistributionEnvelope"
-                                                             "/itk:payloads"
-                                                             "/itk:payload",
-                                                             self.namespaces))
-        if payload_count != payload_actual_count:
-            logging.warning("Payload count does not match number of instances - Expected: %i Found: %i",
-                            payload_count,
-                            payload_actual_count)
-            return 500, build_error_message("Invalid message")
-
-        return 200, basic_success_response
-
-    def check_payload_id_matches_manifest_id(self):
-        """
-        Checks that for each id of each manifest item has a corrosponding
-        payload with the same Id as per  'DE_INVMPI'
-        :return: status code, response content
-        """
-        payload_ids = set()
-        manifest_ids = set()
-        for payload in self.message_tree.findall("./soap:Body"
-                                                 "/itk:DistributionEnvelope"
-                                                 "/itk:payloads"
-                                                 "/itk:payload",
-                                                 self.namespaces):
-            payload_ids.add(payload.attrib['id'])
-
-        for manifest in self.message_tree.findall("./soap:Body"
-                                                  "/itk:DistributionEnvelope"
-                                                  "/itk:header"
-                                                  "/itk:manifest"
-                                                  "/itk:manifestitem",
-                                                  self.namespaces):
-            manifest_ids.add(manifest.attrib['id'])
-
-        if len(payload_ids.difference(manifest_ids)) != 0:
-            logging.warning("Payload IDs do not match Manifest IDs")
-            return 500, build_error_message("Payload IDs do not map to Manifest IDs")
-
-        return 200, basic_success_response
-
-    def get_manifest_count(self):
-        """
-        Extracts the count on the manifest tag in the message
-        :return: manifest count as a string
-        """
-        manifests = self.message_tree.findall("./soap:Body"
-                                              "/itk:DistributionEnvelope"
-                                              "/itk:header"
-                                              "/itk:manifest",
-                                              self.namespaces)
-
-        if len(manifests) > 1:
-            logging.warning("More than one manifest tag")
-
-        return manifests[0].attrib['count']
-
-    def get_payload_count(self):
-        """
-        Extracts the count on the payloads tag in the message
-        :return: payloads count as a string
-        """
-        payloads = self.message_tree.findall("./soap:Body"
-                                             "/itk:DistributionEnvelope"
-                                             "/itk:payloads",
-                                             self.namespaces)
-        if len(payloads) > 1:
-            logging.warning("Number of payloads tags greater than 1")
-        payload_count = payloads[0].attrib['count']
-        return payload_count
+        pass

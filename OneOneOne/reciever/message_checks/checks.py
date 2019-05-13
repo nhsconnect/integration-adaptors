@@ -20,10 +20,9 @@ class CheckManifestCountInstances(Check):
             logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
                             manifest_count, manifest_actual_count)
 
-            return True, self.build_error_message("The number of manifest instances "
-                                                  "does not match the manifest count specified")
+            return True, "The number of manifest instances does not match the manifest count specified"
 
-        return False, self.basic_success_message
+        return False, None
 
 
 class CheckActionTypes(Check):
@@ -50,9 +49,9 @@ class CheckActionTypes(Check):
             logging.warning("Action type does not match service type: (Action Tag, Service Tag) (%s, %s)",
                             action_tag_value,
                             service_tag_value)
-            return True,  self.build_error_message("Manifest action does not match service action")
+            return True,  "Manifest action does not match service action"
 
-        return False, self.basic_success_message
+        return False, None
 
 
 class CheckManifestPayloadCounts(Check):
@@ -73,9 +72,9 @@ class CheckManifestPayloadCounts(Check):
         if payload_count != manifest_count:
             logging.warning("Error in manifest count: (ManifestCount, PayloadCount) (%s, %s)", manifest_count,
                             payload_count)
-            return True, self.build_error_message("Manifest count does not match payload count")
+            return True, "Manifest count does not match payload count"
 
-        return False, self.basic_success_message
+        return False, None
 
 
 class CheckPayloadCountAgainstActual(Check):
@@ -97,9 +96,9 @@ class CheckPayloadCountAgainstActual(Check):
             logging.warning("Payload count does not match number of instances - Expected: %i Found: %i",
                             payload_count,
                             payload_actual_count)
-            return True, self.build_error_message("Invalid message")
+            return True, "Invalid message"
 
-        return False, self.basic_success_message
+        return False, None
 
 
 class CheckPayloadIdAgainstManifestId(Check):
@@ -125,6 +124,6 @@ class CheckPayloadIdAgainstManifestId(Check):
 
         if len(payload_ids.difference(manifest_ids)) != 0:
             logging.warning("Payload IDs do not match Manifest IDs")
-            return True, self.build_error_message("Payload IDs do not map to Manifest IDs")
+            return True, "Payload IDs do not map to Manifest IDs"
 
-        return False, self.basic_success_message
+        return False, None
