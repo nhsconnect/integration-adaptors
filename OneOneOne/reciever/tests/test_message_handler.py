@@ -4,9 +4,7 @@ from builder.pystache_message_builder import PystacheMessageBuilder
 from reciever.message_handler import MessageHandler
 from utilities.file_utilities import FileUtilities
 from utilities.xml_utilities import XmlUtilities
-import xml.etree.ElementTree as ET
 from definitions import ROOT_DIR
-from reciever.message_checks.checks import *
 
 
 class MessageHandlerTest(unittest.TestCase):

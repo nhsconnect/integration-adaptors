@@ -6,7 +6,7 @@ from definitions import ROOT_DIR
 from reciever.message_checks.checks import *
 
 
-class MessageHandlerTest(unittest.TestCase):
+class MessageCheckTests(unittest.TestCase):
     inputXmlFileDir = Path(ROOT_DIR) / 'reciever' / 'tests' / 'input_xmls'
     builder = PystacheMessageBuilder(str(inputXmlFileDir), 'base_input')
 

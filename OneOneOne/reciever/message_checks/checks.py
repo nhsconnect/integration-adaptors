@@ -11,15 +11,14 @@ class CheckManifestCountInstances(Check):
         """
        Checks if the manifest.count attribute matches the number of manifest items as per the 'DE_INVMCT'
        spec, returns a failure flag where True indicates a failure has occurred
-       :return: failure flag, response content
+       :return: failure flag, error string
        """
         manifest_count = int(self.get_manifest_count())
-
         manifest_actual_count = len(self.message_tree.findall(self.manifest_tag + "/itk:manifestitem", self.namespaces))
+
         if manifest_count != manifest_actual_count:
             logging.warning("Manifest count did not equal number of instances: (expected : found) - (%i : %i)",
                             manifest_count, manifest_actual_count)
-
             return True, "The number of manifest instances does not match the manifest count specified"
 
         return False, None
@@ -35,7 +34,7 @@ class CheckActionTypes(Check):
        This method checks for equality between the action type in the header, and the service value in the message
        body as per the 'DE_INVSER' requirement specified in the requirements spreadsheet
        Returns a failure flag where True indicates a failure has occurred
-       :return: failure flag, response content
+       :return: failure flag, error string
        """
         action_tag_value = "-"
         for type_tag in self.message_tree.findall("./soap:Header/wsa:Action", self.namespaces):
@@ -62,7 +61,7 @@ class CheckManifestPayloadCounts(Check):
     def check(self):
         """
         This verifies the manifest count is equal to the payload count as per 'DE_INVMPC' requirement
-        :return: status code, response content
+        :return: status code, error string
         """
 
         manifest_count = self.get_manifest_count()
@@ -86,7 +85,7 @@ class CheckPayloadCountAgainstActual(Check):
         """
         Checks if the specified payload count matches the actual occurrences of payload elements
         as per 'DE_INVPCT' in the spec
-        :return: status code, response content
+        :return: status code, error string
         """
         payload_count = int(self.get_payload_count())
 
@@ -110,7 +109,7 @@ class CheckPayloadIdAgainstManifestId(Check):
         """
         Checks that for each id of each manifest item has a corresponding
         payload with the same Id as per  'DE_INVMPI'
-        :return: status code, response content
+        :return: status code, error string
         """
         payload_ids = set()
         manifest_ids = set()

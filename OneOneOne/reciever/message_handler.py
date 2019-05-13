@@ -7,12 +7,14 @@ from utilities.file_utilities import FileUtilities
 from definitions import XML_PATH, TEMPLATE_PATH
 import logging
 from typing import List, Type
-from reciever.message_validator import MessageValidator
 
 CheckList = List[Type[Check]]
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 
+check_list = [CheckManifestCountInstances, CheckActionTypes, CheckManifestPayloadCounts,
+              CheckPayloadCountAgainstActual, CheckPayloadIdAgainstManifestId
+              ]
 
 def build_error_message(error):
     builder = PystacheMessageBuilder(str(TEMPLATE_PATH), 'base_error_template')
@@ -21,14 +23,16 @@ def build_error_message(error):
 
 class MessageHandler:
     """
-        Validates the incoming message and wraps the validation outcome in a response
-        to be returned to the sender
+    Validates the incoming message and wraps the validation outcome in a response
+    to be returned to the sender
     """
 
-    def __init__(self, message):
+    def __init__(self, message, checks: CheckList = check_list):
         self.message_tree = ET.fromstring(message)
-        self.validator = MessageValidator(self.message_tree)
-        self.error_flag, self.error_message = self.validator.evaluate_message()
+        self.check_list = checks
+        self.error_flag = False
+        self.response_message = None
+        self.evaluate_message()
         if not self.error_flag:
             self.handle()
 
@@ -38,7 +42,7 @@ class MessageHandler:
         :return: string
         """
         if self.error_flag:
-            return build_error_message(self.error_message)
+            return build_error_message(self.response_message)
         else:
             return basic_success_response
 
@@ -59,3 +63,21 @@ class MessageHandler:
         :return:
         """
         pass
+
+    def evaluate_message(self):
+        """
+        This iterates over the message check methods searching for errors in the message, if no errors are found
+        a success response is returned
+
+        :return: status code, response content
+        """
+
+        for check in self.check_list:
+            c = check(self.message_tree)  # instantiate the check object instance
+            fail, response_string = c.check()  # make the check call
+            if fail:
+                self.error_flag = True
+                self.response_message = response_string
+                return
+
+        return False, None
