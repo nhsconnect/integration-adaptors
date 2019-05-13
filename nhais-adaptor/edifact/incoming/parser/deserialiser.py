@@ -30,6 +30,8 @@ def deserialise_message_beginning(original_dict: EdifactDict, index: int) -> Mes
 
 def deserialise_transaction(original_dict: EdifactDict, index: int) -> Transaction:
     transaction_pat = None
+    # When extracting the relevant lines for a transactions we need to skip the very first REGISTRATION_KEY
+    # Therefore we start the index at +1.
     transaction_lines = EdifactDict(
         helpers.extract_relevant_lines(original_dict, index + 1, [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
 
