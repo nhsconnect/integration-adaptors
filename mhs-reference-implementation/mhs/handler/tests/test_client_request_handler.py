@@ -6,6 +6,8 @@ from tornado.web import Application
 from mhs.handler.client_request_handler import ClientRequestHandler
 from mhs.sender.sender import UnknownInteractionError
 
+MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+
 
 class TestAsyncResponseHandler(AsyncHTTPTestCase):
 
@@ -19,7 +21,7 @@ class TestAsyncResponseHandler(AsyncHTTPTestCase):
         interaction_name = "interaction"
         request_body = "A request"
         expected_response = "Hello world!"
-        self.sender.send_message.return_value = expected_response
+        self.sender.send_message.return_value = MOCK_UUID, expected_response
 
         response = self.fetch(f"/{interaction_name}", method="POST", body=request_body)
 

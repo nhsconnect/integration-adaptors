@@ -1,5 +1,6 @@
 import copy
 import logging
+from typing import Dict, Tuple
 
 from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
 from mhs.builder.ebxml_request_message_builder import MESSAGE
@@ -34,12 +35,13 @@ class Sender:
         self.message_builder = message_builder
         self.transport = transport
 
-    def send_message(self, interaction_name, message_to_send):
+    def send_message(self, interaction_name, message_to_send) -> Tuple[str, str]:
         """Send the specified message for the interaction named.
 
         :param interaction_name: The name of the interaction the message is related to.
         :param message_to_send: A string representing the message to be sent.
-        :return: The content of the response received when the message was sent.
+        :return: A tuple containing the ID of the message sent (if one was generated) and the content of the response
+        received
         :raises: An UnknownInteractionError if the interaction_name specified was not found.
         """
 
@@ -48,28 +50,33 @@ class Sender:
             raise UnknownInteractionError(interaction_name)
 
         requires_ebxml_wrapper = interaction_details[WRAPPER_REQUIRED]
+        message_id = None
         if requires_ebxml_wrapper:
-            message = self._wrap_message_in_ebxml(interaction_details, message_to_send)
+            message_id, message = self._wrap_message_in_ebxml(interaction_details, message_to_send)
         else:
             message = message_to_send
 
         response = self.transport.make_request(interaction_details, message)
 
-        return response
+        return message_id, response
 
-    def _wrap_message_in_ebxml(self, interaction_details, message_to_send):
+    def _wrap_message_in_ebxml(self, interaction_details: Dict[str, str], message_to_send: str) -> Tuple[str, str]:
         """Wrap the specified message in an ebXML wrapper.
 
         :param interaction_details: The interaction configuration to use when building the ebXML wrapper.
         :param message_to_send: The message to be sent.
-        :return: A string representing the message wrapped in the generated ebXML wrapper.
+        :return: A tuple of strings representing the ID and the content of the message wrapped in the generated ebXML
+        wrapper.
         """
         context = copy.deepcopy(interaction_details)
         context[FROM_PARTY_ID] = PARTY_ID
 
         conversation_id = MessageUtilities.get_uuid()
         context[CONVERSATION_ID] = conversation_id
-        logging.debug("Generated ebXML wrapper with conversation ID: %s", conversation_id)
 
         context[MESSAGE] = message_to_send
-        return self.message_builder.build_message(context)
+        message_id, message = self.message_builder.build_message(context)
+
+        logging.debug("Generated ebXML wrapper with conversation ID '%s' and message ID '%s'", conversation_id,
+                      message_id)
+        return message_id, message

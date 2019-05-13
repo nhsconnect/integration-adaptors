@@ -13,6 +13,8 @@ from utilities.xml_utilities import XmlUtilities
 EXPECTED_MESSAGES_DIR = "expected_messages"
 EXPECTED_EBXML = "ebxml_ack.xml"
 
+MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+
 
 class TestEbXmlAckMessageBuilder(TestCase):
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -24,11 +26,11 @@ class TestEbXmlAckMessageBuilder(TestCase):
     @patch.object(MessageUtilities, "get_timestamp")
     @patch.object(MessageUtilities, "get_uuid")
     def test_build_message(self, mock_get_uuid, mock_get_timestamp):
-        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+        mock_get_uuid.return_value = MOCK_UUID
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
         expected_message = FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
 
-        message = self.builder.build_message({
+        message_id, message = self.builder.build_message({
             FROM_PARTY_ID: "TESTGEN-201324",
             TO_PARTY_ID: "YEA-0000806",
             CPA_ID: "S1001A1630",
@@ -39,4 +41,6 @@ class TestEbXmlAckMessageBuilder(TestCase):
 
         expected_message_bytes = expected_message.encode()
         message_bytes = message.encode()
+
+        self.assertEqual(MOCK_UUID, message_id)
         XmlUtilities.assert_xml_equal(expected_message_bytes, message_bytes)

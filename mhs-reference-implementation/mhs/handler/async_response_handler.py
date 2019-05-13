@@ -42,5 +42,5 @@ class AsyncResponseHandler(RequestHandler):
             ack_builder.RECEIVED_MESSAGE_ID: parsed_message[parser.MESSAGE_ID]
         }
 
-        ack_message = self.ack_builder.build_message(ack_context)
+        _, ack_message = self.ack_builder.build_message(ack_context)
         return ack_message

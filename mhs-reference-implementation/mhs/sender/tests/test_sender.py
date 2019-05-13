@@ -29,14 +29,15 @@ class TestSender(TestCase):
             MESSAGE: sentinel.message
         }
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
-        self.mock_message_builder.build_message.return_value = sentinel.ebxml_message
+        self.mock_message_builder.build_message.return_value = sentinel.ebxml_id, sentinel.ebxml_message
         self.mock_transport.make_request.return_value = sentinel.response
 
-        actual_response = self.sender.send_message(sentinel.interaction_name, sentinel.message)
+        actual_id, actual_response = self.sender.send_message(sentinel.interaction_name, sentinel.message)
 
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
         self.mock_message_builder.build_message.assert_called_with(expected_context)
         self.mock_transport.make_request.assert_called_with(interaction_details, sentinel.ebxml_message)
+        self.assertIs(sentinel.ebxml_id, actual_id)
         self.assertIs(sentinel.response, actual_response)
 
     def test_send_message_without_ebxml_wrapper(self):
@@ -44,10 +45,11 @@ class TestSender(TestCase):
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
         self.mock_transport.make_request.return_value = sentinel.response
 
-        actual_response = self.sender.send_message(sentinel.interaction_name, sentinel.message)
+        actual_id, actual_response = self.sender.send_message(sentinel.interaction_name, sentinel.message)
 
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
         self.mock_transport.make_request.assert_called_with(interaction_details, sentinel.message)
+        self.assertIsNone(actual_id)
         self.assertIs(sentinel.response, actual_response)
 
     def test_send_message_incorrect_interaction_name(self):

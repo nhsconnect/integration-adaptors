@@ -21,9 +21,9 @@ class ClientRequestHandler(RequestHandler):
         interaction_name = self.request.uri[1:]
 
         try:
-            response = self.sender.send_message(interaction_name, self.request.body.decode())
+            message_id, response = self.sender.send_message(interaction_name, self.request.body.decode())
 
-            logging.debug("Message sent. Received response: %s", response)
+            logging.debug("Message sent with ID '%s'. Received response: %s", message_id, response)
 
             self.set_header("Content-Type", "text/xml")
             self.write(response)
