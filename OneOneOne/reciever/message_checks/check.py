@@ -26,8 +26,8 @@ class Check(ABC):
     @abstractmethod
     def check(self):
         """
-        An asbtract method called by the validator to run the check
-        :return: flail flag, error message
+        An abstract method called by the validator to run the check
+        :return: fail flag, error message
         """
         pass
 
