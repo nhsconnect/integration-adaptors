@@ -3,6 +3,7 @@ from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName
 from adaptor.outgoing.message_adaptor import MessageAdaptor
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails
+import adaptor.outgoing.common.date_formatter as date_formatter
 
 
 class MessageDeathAdaptor(MessageAdaptor):
@@ -40,12 +41,13 @@ class MessageDeathAdaptor(MessageAdaptor):
         patient_details = finders.find_resource(fhir_operation=self.fhir_operation, resource_type=ResourceType.PATIENT)
 
         deceased_date_time = patient_details.deceasedDateTime.as_json()
+        formatted_deceased_date_time = date_formatter.format_date(date_time=deceased_date_time, format_qualifier="102")
 
         free_text = finders.get_parameter_value(fhir_operation=self.fhir_operation,
                                                 parameter_name=ParameterName.FREE_TEXT)
 
         msg_seg_registration_details = MessageSegmentDeathRegistrationDetails(transaction_number=transaction_number,
                                                                               party_id=party_id,
-                                                                              date_time=deceased_date_time,
+                                                                              date_time=formatted_deceased_date_time,
                                                                               free_text=free_text)
         return msg_seg_registration_details

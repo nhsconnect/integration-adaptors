@@ -1,4 +1,3 @@
-from adaptor.outgoing.common import date_formatter as date_formatter
 from edifact.outgoing.models.message import MessageSegmentRegistrationDetails, MessageSegmentPatientDetails, Message
 from edifact.outgoing.models.segment import Segment
 
@@ -31,10 +30,9 @@ class MessageSegmentDeathRegistrationDetails(MessageSegmentRegistrationDetails):
         :param date_time: date of the patient deduction
         :param free_text: optional free text
         """
-        formatted_date_time = date_formatter.format_date(date_time=date_time, format_qualifier="102")
         segments = [
             Segment(key="GIS", value=f"1:ZZZ"),
-            Segment(key="DTM", value=f"961:{formatted_date_time}:102"),
+            Segment(key="DTM", value=f"961:{date_time}:102"),
         ]
         if free_text:
             segments.append(

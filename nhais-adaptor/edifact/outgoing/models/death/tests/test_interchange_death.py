@@ -33,7 +33,7 @@ class TestInterchange(unittest.TestCase):
             msg_bgn = MessageBeginning(party_id="XX1", date_time="201905070900", ref_number="G5")
             msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",
-                                                                         date_time="2019-05-05 09:00:04.159338",
+                                                                         date_time="20190505",
                                                                          free_text="Died in Infinity Wars")
 
             msg_seg_pat_details = MessageSegmentDeathPatientDetails(id_number="N/10/10")
