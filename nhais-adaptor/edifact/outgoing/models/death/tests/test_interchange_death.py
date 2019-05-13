@@ -30,9 +30,7 @@ class TestInterchange(unittest.TestCase):
                                             "UNT+14+00001'"
                                             "UNZ+1+00001'")
 
-            date_time = "2019-05-07 09:00:04.159338"
-
-            msg_bgn = MessageBeginning(party_id="XX1", date_time=date_time, ref_number="G5")
+            msg_bgn = MessageBeginning(party_id="XX1", date_time="201905070900", ref_number="G5")
             msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",
                                                                          date_time="2019-05-05 09:00:04.159338",

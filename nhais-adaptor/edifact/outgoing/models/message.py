@@ -50,11 +50,10 @@ class MessageBeginning(SegmentCollection):
         :param date_time: the date time stamp of the message
         :param ref_number: a reference number for registration transaction type
         """
-        formatted_date_time = date_formatter.format_date(date_time=date_time, format_qualifier="203")
         segments = [
             Segment(key="BGM", value="++507"),
             Segment(key="NAD", value=f"FHS+{party_id}:954"),
-            Segment(key="DTM", value=f"137:{formatted_date_time}:203"),
+            Segment(key="DTM", value=f"137:{date_time}:203"),
             Segment(key="RFF", value=f"950:{ref_number}"),
         ]
         super().__init__(segments=segments)

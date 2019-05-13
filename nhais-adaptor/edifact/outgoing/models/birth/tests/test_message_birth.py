@@ -66,7 +66,8 @@ class TestMessageBirth(unittest.TestCase):
                                     "PDI+1'"
                                     "NAD+PAT++MOORSIDE FARM:OLD LANE:ST PAULS CRAY:ORPINGTON:KENT+++++BR6 7EW'"
                                     "UNT+18+00001'")
-        msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
+
+        msg_bgn = MessageBeginning(party_id="XX1", date_time="201904230900", ref_number="G1")
         msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
                                                                      date_time="2019-04-23 09:00:04.159338",
                                                                      location="Bury")
