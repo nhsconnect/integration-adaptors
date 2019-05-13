@@ -47,10 +47,11 @@ class TestEbXmlMessageParser(TestCase):
 
     def test_parse_message(self):
         message = FileUtilities.get_file_string(str(message_dir / "ebxml_header.xml"))
+        expected_values_without_message = expected_values()
 
         extracted_values = self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
 
-        self.assertEqual(expected_values(), extracted_values)
+        self.assertEqual(expected_values_without_message, extracted_values)
 
     def test_parse_message_with_no_values(self):
         message = FileUtilities.get_file_string(str(message_dir / "ebxml_header_empty.xml"))
@@ -66,32 +67,36 @@ class TestEbXmlRequestMessageParser(TestCase):
         self.parser = EbXmlRequestMessageParser()
 
     def test_parse_message(self):
-        message = FileUtilities.get_file_string(str(message_dir / "ebxml_request.msg"))
+        with self.subTest("A valid request containing a payload"):
+            message = FileUtilities.get_file_string(str(message_dir / "ebxml_request.msg"))
+            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
 
-        extracted_values = self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
+            extracted_values = self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
 
-        self.assertEqual(expected_values(message=EXPECTED_MESSAGE), extracted_values)
+            self.assertEqual(expected_values_with_payload, extracted_values)
 
-    def test_parse_message_with_no_header(self):
-        message = FileUtilities.get_file_string(str(message_dir / "ebxml_request_no_header.msg"))
+        with self.subTest("An invalid multi-part MIME message"):
+            message = FileUtilities.get_file_string(str(message_dir / "ebxml_request_no_header.msg"))
 
-        with (self.assertRaises(EbXmlParsingError)):
-            self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
+            with (self.assertRaises(EbXmlParsingError)):
+                self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
 
-    def test_parse_message_with_no_payload(self):
-        message = FileUtilities.get_file_string(str(message_dir / "ebxml_request_no_payload.msg"))
+        with self.subTest("A valid request that does not contain the optional payload MIME part"):
+            message = FileUtilities.get_file_string(str(message_dir / "ebxml_request_no_payload.msg"))
+            expected_values_with_no_payload = expected_values()
 
-        extracted_values = self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
+            extracted_values = self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
 
-        self.assertEqual(expected_values(), extracted_values)
+            self.assertEqual(expected_values_with_no_payload, extracted_values)
 
-    def test_parse_message_with_additional_attachment(self):
-        message = FileUtilities.get_file_string(str(message_dir / "ebxml_request_additional_attachment.msg"))
+        with self.subTest("A valid request containing an additional MIME part"):
+            message = FileUtilities.get_file_string(str(message_dir / "ebxml_request_additional_attachment.msg"))
+            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
 
-        extracted_values = self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
+            extracted_values = self.parser.parse_message(MULTIPART_MIME_HEADERS, message)
 
-        self.assertEqual(expected_values(message=EXPECTED_MESSAGE), extracted_values)
+            self.assertEqual(expected_values_with_payload, extracted_values)
 
-    def test_parse_message_with_non_multipart_message(self):
-        with (self.assertRaises(EbXmlParsingError)):
-            self.parser.parse_message({CONTENT_TYPE_HEADER_NAME: "text/plain"}, "A message")
+        with self.subTest("An message that is not a multi-part MIME message"):
+            with (self.assertRaises(EbXmlParsingError)):
+                self.parser.parse_message({CONTENT_TYPE_HEADER_NAME: "text/plain"}, "A message")
