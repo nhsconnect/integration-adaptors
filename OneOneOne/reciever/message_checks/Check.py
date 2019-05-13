@@ -36,24 +36,15 @@ class Check(ABC):
         Extracts the count on the manifest tag in the message
         :return: manifest count as a string
         """
-        manifests = self.message_tree.findall(self.distribution_envelope + "/itk:header/itk:manifest", self.namespaces)
-
-        if len(manifests) > 1:
-            logging.warning("More than one manifest tag")
-
-        return manifests[0].attrib['count']
+        return self.message_tree.find(self.distribution_envelope + "/itk:header/itk:manifest",
+                                      self.namespaces).attrib['count']
 
     def get_payload_count(self):
         """
         Extracts the count on the payloads tag in the message
         :return: payloads count as a string
         """
-        payloads = self.message_tree.findall(self.distribution_envelope + "/itk:payloads", self.namespaces)
-
-        if len(payloads) > 1:
-            logging.warning("Number of payloads tags greater than 1")
-        payload_count = payloads[0].attrib['count']
-        return payload_count
+        return self.message_tree.findall(self.distribution_envelope + "/itk:payloads", self.namespaces).attrib['count']
 
     def build_error_message(self, error):
         builder = PystacheMessageBuilder(str(TEMPLATE_PATH), 'base_error_template')

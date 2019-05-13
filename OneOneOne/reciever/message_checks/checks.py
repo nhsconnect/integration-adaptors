@@ -36,19 +36,16 @@ class CheckActionTypes(Check):
        Returns a failure flag where True indicates a failure has occurred
        :return: failure flag, error string
        """
-        action_tag_value = "-"
-        for type_tag in self.message_tree.findall("./soap:Header/wsa:Action", self.namespaces):
-            action_tag_value = type_tag.text
+        action_tag_value = self.message_tree.find("./soap:Header/wsa:Action", self.namespaces).text
 
-        service_tag_value = "+"
-        for type_tag in self.message_tree.findall(self.distribution_envelope + '/itk:header', self.namespaces):
-            service_tag_value = type_tag.attrib['service']
+        service_tag_value = \
+            self.message_tree.find(self.distribution_envelope + '/itk:header', self.namespaces).attrib['service']
 
         if action_tag_value != service_tag_value:
             logging.warning("Action type does not match service type: (Action Tag, Service Tag) (%s, %s)",
                             action_tag_value,
                             service_tag_value)
-            return True,  "Manifest action does not match service action"
+            return True, "Manifest action does not match service action"
 
         return False, None
 
