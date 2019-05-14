@@ -28,6 +28,7 @@
     application tier)</p>
 </div>
 <form>
+    <h2>Input:</h2>
     <div class="row">
         <div class="col-md-4">
             <h3>MHS Adaptor Command</h3>
@@ -38,7 +39,8 @@
             <br/>
             <h3>NHS Number</h3>
             <input type=text size=35 name="nhs_number" value="9446245796">
-            <br>
+        </div>
+        <div class="col-md-4">
             <h3>SCR Human Readable Payload</h3>
             <textarea type=text cols="80" rows="10" id="human_readable" name="human_readable">stuff</textarea>
         </div>
@@ -49,9 +51,8 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
-            <h2><p id="result"></p></h2>
-        </div>
+        <h2>Result:</h2>
+        <pre id="result"></pre>
     </div>
 </form>
 
