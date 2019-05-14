@@ -6,8 +6,6 @@ from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
 from mhs.builder.ebxml_request_message_builder import MESSAGE
 from utilities.message_utilities import MessageUtilities
 
-PARTY_ID = "A91424-9199121"
-
 ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 
 
@@ -23,17 +21,19 @@ class UnknownInteractionError(Exception):
 
 
 class Sender:
-    def __init__(self, interactions_config, message_builder, transport):
+    def __init__(self, interactions_config, message_builder, transport, party_id):
         """Create a new Sender that uses the specified dependencies to load config, build a message and send it.
 
         :param interactions_config: The object that can be used to obtain interaction-specific configuration details.
         :param message_builder: The message builder that can be used to build a message.
         :param transport: The transport that can be used to send messages.
+        :param party_id: The party ID of this MHS. Sent in ebXML requests.
         """
 
         self.interactions_config = interactions_config
         self.message_builder = message_builder
         self.transport = transport
+        self.party_id = party_id
 
     def send_message(self, interaction_name, message_to_send) -> Tuple[str, str]:
         """Send the specified message for the interaction named.
@@ -69,7 +69,7 @@ class Sender:
         wrapper.
         """
         context = copy.deepcopy(interaction_details)
-        context[FROM_PARTY_ID] = PARTY_ID
+        context[FROM_PARTY_ID] = self.party_id
 
         conversation_id = MessageUtilities.get_uuid()
         context[CONVERSATION_ID] = conversation_id

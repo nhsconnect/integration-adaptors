@@ -9,14 +9,27 @@ project's directory run:
 pipenv install
 ```
 
-### Run Tests
+### Running Tests
 `pipenv run tests` will run all tests.
 
-### Send a Message
-`pipenv run sender` will run the `main.py` script which will send an example GP Summary Upload message to Opentest.
+### Running an MHS Instance
+`pipenv run mhs` will run the `main.py` script (you can also run this directly). This will start up an MHS
+instance listening for 'client' requests on port 80 and asynchronous responses from Spine on port 443.
 
-A /certs directory is required with the following files (containing the certificates & keys provided when you registered
-for Opentest):
-- client.cert - Should include the following in this order: endpoint certificate, Endpoint issuing subCA certificate, Root CA Certificate, as provided by the Opentest team
-- client.key - Your endpoint private key, as provided by the Opentest team
-- client.pem - A copy of client.cert
+Any content POSTed to `/path` (for example) on port 80 will result in the request configuration for the `path` entry in
+`data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
+`interactions.json` will allow you to define new supported interactions.
+
+You will need to complete the setup steps below before being able to successfully connect to a Spine instance.
+
+#### Setup
+A `data/certs` directory should be created with the following files (containing the certificates & keys required to
+perform client authentication to the Spine instance you are using. For Openttest, these will have been provided when you
+were granted access):
+- `client.cert` - Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate,
+root CA Certificate.
+- `client.key` - Your endpoint private key
+- `client.pem` - A copy of client.cert
+
+You will also need to configure your party key, by replacing the value of the `PARTY_ID` variable in `main.py` with your
+party key. If you are using Opentest, this will also have been provided when you were granted access.

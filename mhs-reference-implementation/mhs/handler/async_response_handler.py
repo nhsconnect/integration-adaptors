@@ -6,7 +6,6 @@ from tornado.web import RequestHandler, HTTPError
 import mhs.builder.ebxml_ack_message_builder as ack_builder
 import mhs.builder.ebxml_message_builder as builder
 import mhs.parser.ebxml_message_parser as parser
-from mhs.sender.sender import PARTY_ID
 
 
 class AsyncResponseHandler(RequestHandler):
@@ -14,17 +13,18 @@ class AsyncResponseHandler(RequestHandler):
     messages received and calls the callback registered against this ID."""
 
     def initialize(self, ack_builder: builder.EbXmlMessageBuilder, message_parser: parser.EbXmlMessageParser,
-                   callbacks: Dict[str, Callable[[str], None]]):
+                   callbacks: Dict[str, Callable[[str], None]], party_id: str):
         """Initialise this request handler with the provided dependencies.
 
         :param ack_builder: The message builder to use when building ebXML acknowledgement messages.
         :param message_parser: The message parser to use to parse ebXML asynchronous responses.
         :param callbacks: The dictionary of callbacks to use when a message is received.
-        :return:
+        :param party_id: The party ID of this MHS. Sent in ebXML acknowledgements.
         """
         self.ack_builder = ack_builder
         self.message_parser = message_parser
         self.callbacks = callbacks
+        self.party_id = party_id
 
     def post(self):
         logging.debug("POST received: %s", self.request)
@@ -45,7 +45,7 @@ class AsyncResponseHandler(RequestHandler):
 
     def _send_ack(self, parsed_message):
         ack_context = {
-            builder.FROM_PARTY_ID: PARTY_ID,
+            builder.FROM_PARTY_ID: self.party_id,
             builder.TO_PARTY_ID: parsed_message[parser.FROM_PARTY_ID],
             builder.CPA_ID: parsed_message[parser.CPA_ID],
             builder.CONVERSATION_ID: parsed_message[parser.CONVERSATION_ID],

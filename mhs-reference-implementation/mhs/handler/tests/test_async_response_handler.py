@@ -15,6 +15,7 @@ from utilities.xml_utilities import XmlUtilities
 MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
 EXPECTED_RESPONSE_FILE = "ebxml_ack.xml"
+FROM_PARTY_ID = "FROM-PARTY-ID"
 CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
 REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
@@ -35,7 +36,8 @@ class TestAsyncResponseHandler(AsyncHTTPTestCase):
         message_parser = EbXmlRequestMessageParser()
         return Application([
             (r".*", AsyncResponseHandler,
-             dict(ack_builder=ack_builder, message_parser=message_parser, callbacks=self.callbacks))
+             dict(ack_builder=ack_builder, message_parser=message_parser, callbacks=self.callbacks,
+                  party_id=FROM_PARTY_ID))
         ])
 
     @patch.object(MessageUtilities, "get_timestamp")

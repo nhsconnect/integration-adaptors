@@ -6,7 +6,7 @@ from mhs.builder.ebxml_request_message_builder import MESSAGE
 from mhs.sender.sender import Sender, ASYNC_RESPONSE_EXPECTED, UnknownInteractionError
 from utilities.message_utilities import MessageUtilities
 
-EXPECTED_PARTY_ID = "A91424-9199121"
+PARTY_ID = "PARTY-ID"
 
 
 class TestSender(TestCase):
@@ -15,7 +15,7 @@ class TestSender(TestCase):
         self.mock_message_builder = Mock()
         self.mock_transport = Mock()
 
-        self.sender = Sender(self.mock_interactions_config, self.mock_message_builder, self.mock_transport)
+        self.sender = Sender(self.mock_interactions_config, self.mock_message_builder, self.mock_transport, PARTY_ID)
 
     @patch.object(MessageUtilities, "get_uuid")
     def test_send_message_with_ebxml_wrapper(self, mock_get_uuid):
@@ -24,7 +24,7 @@ class TestSender(TestCase):
         interaction_details = {ASYNC_RESPONSE_EXPECTED: True}
         expected_context = {
             ASYNC_RESPONSE_EXPECTED: True,
-            FROM_PARTY_ID: EXPECTED_PARTY_ID,
+            FROM_PARTY_ID: PARTY_ID,
             CONVERSATION_ID: fixed_uuid,
             MESSAGE: sentinel.message
         }

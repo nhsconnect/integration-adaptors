@@ -17,6 +17,8 @@ from mhs.sender.sender import Sender
 from mhs.transport.http_transport import HttpTransport
 
 ASYNC_TIMEOUT = 30
+# TODO: Replace this with your party ID.
+PARTY_ID = "PARTY-ID"
 
 data_dir = Path(ROOT_DIR) / "data"
 certs_dir = data_dir / "certs"
@@ -28,7 +30,7 @@ interactions_config_file = str(data_dir / "interactions" / "interactions.json")
 interactions_config = InteractionsConfigFile(interactions_config_file)
 message_builder = EbXmlRequestMessageBuilder()
 transport = HttpTransport(str(certs_dir))
-sender = Sender(interactions_config, message_builder, transport)
+sender = Sender(interactions_config, message_builder, transport, PARTY_ID)
 
 ack_builder = EbXmlAckMessageBuilder()
 message_parser = EbXmlRequestMessageParser()
@@ -45,7 +47,8 @@ supplier_server = HTTPServer(supplier_application)
 supplier_server.listen(80)
 
 mhs_application = Application([
-    (r".*", AsyncResponseHandler, dict(ack_builder=ack_builder, message_parser=message_parser, callbacks=callbacks))])
+    (r".*", AsyncResponseHandler,
+     dict(ack_builder=ack_builder, message_parser=message_parser, callbacks=callbacks, party_id=PARTY_ID))])
 mhs_server = HTTPServer(mhs_application,
                         ssl_options=dict(certfile=certs_file, keyfile=key_file, cert_reqs=ssl.CERT_REQUIRED,
                                          ca_certs=certs_file))
