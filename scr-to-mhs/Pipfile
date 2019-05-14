@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 integration-adaptors-common = {editable = true,path = "./../common"}
 scr = {editable = true,path = "./../SCR"}
+flask = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"
