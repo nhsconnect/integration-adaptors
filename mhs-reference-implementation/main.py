@@ -16,6 +16,8 @@ from mhs.parser.ebxml_message_parser import EbXmlRequestMessageParser
 from mhs.sender.sender import Sender
 from mhs.transport.http_transport import HttpTransport
 
+ASYNC_TIMEOUT = 30
+
 data_dir = Path(ROOT_DIR) / "data"
 certs_dir = data_dir / "certs"
 certs_file = str(certs_dir / "client.pem")
@@ -37,13 +39,13 @@ logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=log
 # Run the Tornado servers
 callbacks = {}
 
-supplier_application = Application([(r"/.*", ClientRequestHandler, dict(sender=sender))])
+supplier_application = Application(
+    [(r"/.*", ClientRequestHandler, dict(sender=sender, callbacks=callbacks, async_timeout=ASYNC_TIMEOUT))])
 supplier_server = HTTPServer(supplier_application)
 supplier_server.listen(80)
 
 mhs_application = Application([
-    (r".*", AsyncResponseHandler, dict(ack_builder=ack_builder, message_parser=message_parser, callbacks=callbacks))
-])
+    (r".*", AsyncResponseHandler, dict(ack_builder=ack_builder, message_parser=message_parser, callbacks=callbacks))])
 mhs_server = HTTPServer(mhs_application,
                         ssl_options=dict(certfile=certs_file, keyfile=key_file, cert_reqs=ssl.CERT_REQUIRED,
                                          ca_certs=certs_file))

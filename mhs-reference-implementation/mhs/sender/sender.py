@@ -41,7 +41,7 @@ class Sender:
         :param interaction_name: The name of the interaction the message is related to.
         :param message_to_send: A string representing the message to be sent.
         :return: A tuple containing the ID of the message sent (if an asynchronous response is expected) and the
-        content of the response received.
+        content of the response received. The message ID will be None if no asynchronous response is expected.
         :raises: An UnknownInteractionError if the interaction_name specified was not found.
         """
 
