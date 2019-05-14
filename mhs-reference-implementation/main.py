@@ -34,13 +34,15 @@ message_parser = EbXmlRequestMessageParser()
 # Configure logging
 logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
 
-# Run the Tornado server
+# Run the Tornado servers
+callbacks = {}
+
 supplier_application = Application([(r"/.*", ClientRequestHandler, dict(sender=sender))])
 supplier_server = HTTPServer(supplier_application)
 supplier_server.listen(80)
 
 mhs_application = Application([
-    (r".*", AsyncResponseHandler, dict(ack_builder=ack_builder, message_parser=message_parser))
+    (r".*", AsyncResponseHandler, dict(ack_builder=ack_builder, message_parser=message_parser, callbacks=callbacks))
 ])
 mhs_server = HTTPServer(mhs_application,
                         ssl_options=dict(certfile=certs_file, keyfile=key_file, cert_reqs=ssl.CERT_REQUIRED,

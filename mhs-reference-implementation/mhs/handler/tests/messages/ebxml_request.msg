@@ -20,6 +20,7 @@ Content-Transfer-Encoding: 8bit
 		<eb:MessageData>
 			<eb:MessageId>C614484E-4B10-499A-9ACD-5D645CFACF61</eb:MessageId>
 			<eb:Timestamp>2019-05-04T20:55:16Z</eb:Timestamp>
+			<eb:RefToMessageId>B4D38C15-4981-4366-BDE9-8F56EDC4AB72</eb:RefToMessageId>
 		</eb:MessageData>
         <eb:DuplicateElimination/>
     </eb:MessageHeader>
@@ -42,6 +43,5 @@ Content-Id: <C614484E-4B10-499A-9ACD-5D645CFACF61@spine.nhs.uk>
 Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3">
-</hl7:MCCI_IN010000UK13>
+<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>
 ----=_MIME-Boundary--
