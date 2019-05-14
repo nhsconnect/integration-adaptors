@@ -1,8 +1,13 @@
+import os
 import unittest
-import json
-import adaptor.incoming.operation_definition_adaptor as adaptor
-import edifact.incoming.parser.deserialiser as deserialiser
+from pathlib import Path
+
 from testfixtures import compare
+from utilities.file_utilities import FileUtilities
+
+from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
+import edifact.incoming.parser.deserialiser as deserialiser
+from adaptor.incoming.config import reference_dict
 
 
 class TestEdifactToFhirIntegration(unittest.TestCase):
@@ -14,16 +19,19 @@ class TestEdifactToFhirIntegration(unittest.TestCase):
         """
         Test when the operation is for a birth registration
         """
-        with open("./tests/incoming/edifact.txt", "r") as incoming_edifact_file:
-            incoming_interchange_raw = incoming_edifact_file.read()
+        TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
-        with open("./tests/incoming/patient-register-birth-approval.json", "r") as patient_register_approval:
-            patient_register_approval_json = json.load(patient_register_approval)
+        expected_file_path = Path(TEST_DIR) / "patient-register-birth-approval.json"
+        patient_register_approval_json = FileUtilities.get_file_dict(expected_file_path)
+
+        incoming_file_path = Path(TEST_DIR) / "edifact.txt"
+        incoming_interchange_raw = FileUtilities.get_file_string(incoming_file_path)
 
         lines = incoming_interchange_raw.split("'\n")
         interchange = deserialiser.convert(lines)
 
-        op_defs = adaptor.create_operation_definition(interchange)
+        adaptor = OperationDefinitionAdaptor(reference_dict)
+        op_defs = adaptor.create_operation_definition(interchange=interchange)
         pretty_op_def = op_defs[0][2].as_json()
 
         compare(pretty_op_def, patient_register_approval_json)

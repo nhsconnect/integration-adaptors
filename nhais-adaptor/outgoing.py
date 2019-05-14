@@ -1,11 +1,14 @@
 import os
 from pathlib import Path
-from fhirclient.models.operationdefinition import OperationDefinition
-import adaptor.outgoing.interchange_adaptor as adaptor
-from utilities.file_utilities import FileUtilities
-from PyInquirer import prompt
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+from PyInquirer import prompt
+from fhirclient.models.operationdefinition import OperationDefinition
+from utilities.file_utilities import FileUtilities
+
+from adaptor.outgoing.config import operation_dict
+from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
+from definitions import ROOT_DIR
+
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"
 gp_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "GP"
 
@@ -44,6 +47,7 @@ patient_register_json = FileUtilities.get_file_dict(incoming_file_path)
 op_def = OperationDefinition(patient_register_json)
 
 # run the adaptor
+adaptor = InterchangeAdaptor(operation_dict=operation_dict)
 (sender, recipient, interchange_seq_no, edifact_interchange) = adaptor.create_interchange(fhir_operation=op_def)
 
 # create the generated edifact interchange

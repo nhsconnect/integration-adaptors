@@ -1,4 +1,5 @@
 import unittest
+
 from edifact.outgoing.models.address import PatientAddress, Address
 
 

@@ -1,4 +1,5 @@
 import unittest
+
 from edifact.outgoing.models.segment import Segment
 
 
