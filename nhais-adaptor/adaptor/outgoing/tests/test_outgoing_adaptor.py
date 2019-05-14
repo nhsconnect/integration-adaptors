@@ -14,9 +14,6 @@ class TestOutgoingAdaptor(unittest.TestCase):
     """
 
     def test_convert_to_edifact(self):
-        """
-        Test when the operation is for a birth registration
-        """
         TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
         expected_file_path = Path(TEST_DIR) / "edifact.txt"

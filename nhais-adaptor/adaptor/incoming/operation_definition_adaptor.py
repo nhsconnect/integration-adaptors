@@ -1,5 +1,5 @@
 from typing import List, Tuple
-
+import json
 from fhirclient.models.operationdefinition import OperationDefinition
 
 import adaptor.fhir_helpers.fhir_creators as creators
@@ -12,7 +12,7 @@ class OperationDefinitionAdaptor:
     def __init__(self, reference_dict):
         self.reference_dict = reference_dict
 
-    def create_operation_definition(self, interchange: Interchange) -> List[Tuple[str, str, OperationDefinition]]:
+    def create_operation_definition(self, interchange: Interchange) -> List[Tuple[str, str, str]]:
         """
         Create a fhir operation definition from the incoming interchange
         :param interchange:
@@ -46,6 +46,6 @@ class OperationDefinitionAdaptor:
                 op_def = creators.create_operation_definition(name=self.reference_dict[ref_number]["name"],
                                                               code=self.reference_dict[ref_number]["code"],
                                                               date_time=formatted_date_time, parameters=parameters)
-                op_defs.append((transaction_number, recipient, op_def))
+                op_defs.append((transaction_number, recipient, op_def.as_json()))
 
         return op_defs
