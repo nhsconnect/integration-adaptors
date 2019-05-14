@@ -39,23 +39,25 @@ class OperationDefinitionAdaptor:
 
         for message in messages:
             ref_number = message.message_beginning.reference_number
-            transaction_number = message.message_registration.transaction_number
 
-            parameters = [
-                creators.create_parameter_with_binding("senderCypher", sender, "out"),
-                creators.create_parameter_with_binding("recipientCypher", recipient, "out"),
-                creators.create_parameter_with_binding("transactionNumber", transaction_number, "out")
-            ]
+            for transaction in message.transactions:
+                transaction_number = transaction.transaction_registration.transaction_number
 
-            if message.message_patient:
-                nhs_number = message.message_patient.nhs_number
-                parameters.append(
-                    creators.create_parameter_with_binding("nhsNumber", nhs_number, "out")
-                )
+                parameters = [
+                    creators.create_parameter_with_binding("senderCypher", sender, "out"),
+                    creators.create_parameter_with_binding("recipientCypher", recipient, "out"),
+                    creators.create_parameter_with_binding("transactionNumber", transaction_number, "out")
+                ]
 
-            op_def = creators.create_operation_definition(name=self.reference_dict[ref_number]["name"],
-                                                          code=self.reference_dict[ref_number]["code"],
-                                                          date_time=formatted_date_time, parameters=parameters)
-            op_defs.append((transaction_number, recipient, op_def))
+                if transaction.transaction_patient:
+                    nhs_number = transaction.transaction_patient.nhs_number
+                    parameters.append(
+                        creators.create_parameter_with_binding("nhsNumber", nhs_number, "out")
+                    )
+
+                op_def = creators.create_operation_definition(name=self.reference_dict[ref_number]["name"],
+                                                              code=self.reference_dict[ref_number]["code"],
+                                                              date_time=formatted_date_time, parameters=parameters)
+                op_defs.append((transaction_number, recipient, op_def))
 
         return op_defs

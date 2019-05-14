@@ -1,9 +1,12 @@
 from typing import List
 
 import edifact.incoming.parser.creators as creators
-from edifact.incoming.models.interchange import Interchange
-from edifact.incoming.models.message import MessageSegment
+from edifact.incoming.models.interchange import Interchange, InterchangeHeader
+from edifact.incoming.models.message import MessageSegment, Messages, MessageSegmentBeginningDetails
+from edifact.incoming.models.transaction import Transaction, Transactions, TransactionRegistrationDetails, \
+    TransactionPatientDetails
 from edifact.incoming.parser import EdifactDict
+import edifact.incoming.parser.helpers as helpers
 
 INTERCHANGE_HEADER_KEY = "UNB"
 MESSAGE_HEADER_KEY = "UNH"
@@ -14,48 +17,68 @@ MESSAGE_TRAILER_KEY = "UNT"
 INTERCHANGE_TRAILER_KEY = "UNZ"
 
 
-def extract_relevant_lines(original_dict: EdifactDict, starting_pos: int, trigger_key: str) -> EdifactDict:
+def deserialise_interchange_header(original_dict: EdifactDict, index: int) -> InterchangeHeader:
+    interchange_header_line = EdifactDict(helpers.extract_relevant_lines(original_dict, index, [MESSAGE_HEADER_KEY]))
+    interchange_header = creators.create_interchange_header(interchange_header_line)
+    return interchange_header
+
+
+def deserialise_message_beginning(original_dict: EdifactDict, index: int) -> MessageSegmentBeginningDetails:
+    msg_bgn_lines = EdifactDict(helpers.extract_relevant_lines(original_dict, index, [MESSAGE_REGISTRATION_KEY]))
+    msg_bgn_details = creators.create_message_segment_beginning(msg_bgn_lines)
+    return msg_bgn_details
+
+
+def get_transaction_lines(original_dict: EdifactDict, index: int) -> EdifactDict:
     """
-    From the original dict generate a smaller dict just containing the relevant lines based upon the trigger key
-    will keep looping till the terminating key is found in the terminating config.
-    :param original_dict: The original larger dictionary.
-    :param starting_pos: The starting position to start the loop from.
-    This is to prevent starting the loop from the start each time and be slightly more efficient.
-    :param trigger_key: The trigger key for this section that will be used to find what the
-    terminating key for the section is.
-    :return: A smaller dictionary with just the relevant lines for the section.
+    From the original dict provided get the lines that represent a transaction within a message.
+    This can be when another MESSAGE_REGISTRATION_KEY is found representing a new transaction or
+    when the MESSAGE_TRAILER_KEY is found.
+    In order to skip the first SO1 in the original_dict provided here the index is started at +1
     """
-    terminating_config = {
-        INTERCHANGE_HEADER_KEY: [MESSAGE_HEADER_KEY],
-        MESSAGE_BEGINNING_KEY: [MESSAGE_REGISTRATION_KEY],
-        MESSAGE_REGISTRATION_KEY: [MESSAGE_PATIENT_KEY, MESSAGE_TRAILER_KEY],
-        MESSAGE_PATIENT_KEY: [MESSAGE_TRAILER_KEY]
-    }
-
-    new_dict = EdifactDict([])
-    for (key, value) in original_dict[starting_pos:]:
-        if key not in terminating_config[trigger_key]:
-            new_dict.append((key, value))
-        else:
-            break
-
-    return new_dict
+    transaction_lines = EdifactDict(
+        helpers.extract_relevant_lines(original_dict, index + 1, [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
+    return transaction_lines
 
 
-def convert_to_dict(lines: List[str]) -> EdifactDict:
-    """
-    Takes the list of original edifact lines and converts to a dict.
-    :param lines: a list of string of the original edifact lines.
-    :return: EdifactDict - A list of Tuples. Since the keys in the edifact interchange can
-    contain duplicates a tuple is required here rather than a set.
-    """
-    generated_dict = EdifactDict([])
+def deserialise_registration(transaction_lines: EdifactDict) -> TransactionRegistrationDetails:
+    registration_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, 0,
+                                                                    [MESSAGE_REGISTRATION_KEY, MESSAGE_PATIENT_KEY,
+                                                                     MESSAGE_TRAILER_KEY]))
+    transaction_reg = creators.create_transaction_registration(registration_lines)
+    return transaction_reg
 
-    for line in lines:
-        key_value = line.split("+", 1)
-        generated_dict.append((key_value[0], key_value[1]))
 
-    return generated_dict
+def find_index_of_patient_segment(transaction_lines: EdifactDict) -> int:
+    index_of_patient_segment = -1
+    for index, line in enumerate(transaction_lines):
+        if line[0] == MESSAGE_PATIENT_KEY:
+            index_of_patient_segment = index
+    return index_of_patient_segment
+
+
+def deserialise_patient_if_applicable(transaction_lines: EdifactDict) -> TransactionPatientDetails:
+    transaction_pat = None
+    patient_segment_index = find_index_of_patient_segment(transaction_lines)
+    if patient_segment_index != -1:
+        patient_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines,
+                                                                   patient_segment_index,
+                                                                   [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
+        transaction_pat = creators.create_transaction_patient(patient_lines)
+
+    return transaction_pat
+
+
+def deserialise_transaction(original_dict: EdifactDict, index: int) -> Transaction:
+
+    transaction_lines = get_transaction_lines(original_dict, index)
+
+    transaction_reg = deserialise_registration(transaction_lines)
+
+    transaction_pat = deserialise_patient_if_applicable(transaction_lines)
+
+    transaction = Transaction(transaction_reg, transaction_pat)
+    return transaction
 
 
 def convert(lines: List[str]) -> Interchange:
@@ -65,38 +88,32 @@ def convert(lines: List[str]) -> Interchange:
     :param lines: A list of string of the edifact lines.
     :return: Interchange: The incoming representation of the edifact interchange.
     """
-    original_dict = convert_to_dict(lines)
+    original_dict = helpers.convert_to_dict(lines)
     messages = []
+    transactions = []
     interchange = None
     interchange_header = None
     msg_bgn_details = None
-    msg_reg_details = None
-    msg_pat_details = None
 
     for index, line in enumerate(original_dict):
         key = line[0]
 
         if key == INTERCHANGE_HEADER_KEY:
-            interchange_header_line = EdifactDict(extract_relevant_lines(original_dict, index, key))
-            interchange_header = creators.create_interchange_header(interchange_header_line)
+            interchange_header = deserialise_interchange_header(original_dict, index)
 
         elif key == MESSAGE_BEGINNING_KEY:
-            msg_bgn_lines = EdifactDict(extract_relevant_lines(original_dict, index, key))
-            msg_bgn_details = creators.create_message_segment_beginning(msg_bgn_lines)
+            msg_bgn_details = deserialise_message_beginning(original_dict, index)
 
         elif key == MESSAGE_REGISTRATION_KEY:
-            msg_reg_lines = EdifactDict(extract_relevant_lines(original_dict, index, key))
-            msg_reg_details = creators.create_message_segment_registration(msg_reg_lines)
-
-        elif key == MESSAGE_PATIENT_KEY:
-            msg_pat_lines = EdifactDict(extract_relevant_lines(original_dict, index, key))
-            msg_pat_details = creators.create_message_segment_patient(msg_pat_lines)
+            transaction = deserialise_transaction(original_dict, index)
+            transactions.append(transaction)
 
         elif key == MESSAGE_TRAILER_KEY:
-            msg = MessageSegment(msg_bgn_details, msg_reg_details, msg_pat_details)
+            msg = MessageSegment(msg_bgn_details, Transactions(transactions))
             messages.append(msg)
+            transactions = []
 
         elif key == INTERCHANGE_TRAILER_KEY:
-            interchange = Interchange(interchange_header, messages)
+            interchange = Interchange(interchange_header, Messages(messages))
 
     return interchange
