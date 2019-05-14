@@ -2,19 +2,18 @@ import os
 import unittest
 from pathlib import Path
 
-from fhirclient.models.operationdefinition import OperationDefinition
 from utilities.file_utilities import FileUtilities
 
-from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 from adaptor.outgoing.config import operation_dict
+from adaptor.outgoing.outgoing_adaptor import OutgoingAdaptor
 
 
-class TestFhirToEdifactIntegration(unittest.TestCase):
+class TestOutgoingAdaptor(unittest.TestCase):
     """
     Test that when fhir json payload is loaded the correct edifact message is created
     """
 
-    def test_patient_registration_birth(self):
+    def test_convert_to_edifact(self):
         """
         Test when the operation is for a birth registration
         """
@@ -26,10 +25,9 @@ class TestFhirToEdifactIntegration(unittest.TestCase):
         incoming_file_path = Path(TEST_DIR) / "patient-register-birth.json"
         patient_register_json = FileUtilities.get_file_dict(incoming_file_path)
 
-        op_def = OperationDefinition(patient_register_json)
+        outgoing_adaptor = OutgoingAdaptor(operation_dict)
+        (sender, recipient, interchange_seq_no, edifact_interchange) = outgoing_adaptor.convert_to_edifact(
+            patient_register_json)
 
-        adaptor = InterchangeAdaptor(operation_dict)
-        (sender, recipient, interchange_seq_no, edifact_interchange) = adaptor.create_interchange(fhir_operation=op_def)
         pretty_edifact_interchange = "'\n".join(edifact_interchange.split("'"))
-
         self.assertEqual(pretty_edifact_interchange, expected_edifact_interchange)
