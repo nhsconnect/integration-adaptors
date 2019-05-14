@@ -27,12 +27,13 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
 
             incoming_interchange = Interchange(InterchangeHeader("XX11", "TES5", "190429:1756"),
                                                Messages([
-                                                   MessageSegment(MessageSegmentBeginningDetails("F4"),
-                                                                  Transactions([
-                                                                      Transaction(
-                                                                          TransactionRegistrationDetails("17")
-                                                                      )
-                                                                  ]))
+                                                   MessageSegment(
+                                                       MessageSegmentBeginningDetails("F4"),
+                                                       Transactions([
+                                                           Transaction(
+                                                               TransactionRegistrationDetails("17")
+                                                           )
+                                                       ]))
                                                ]))
 
             adaptor = OperationDefinitionAdaptor(reference_dict=reference_dict)
@@ -49,15 +50,16 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
 
             incoming_interchange = Interchange(InterchangeHeader("XX11", "TES5", "190429:1756"),
                                                Messages([
-                                                   MessageSegment(MessageSegmentBeginningDetails("F4"),
-                                                                  Transactions([
-                                                                      Transaction(
-                                                                          TransactionRegistrationDetails("17")
-                                                                      ),
-                                                                      Transaction(
-                                                                          TransactionRegistrationDetails("18")
-                                                                      )
-                                                                  ]))
+                                                   MessageSegment(
+                                                       MessageSegmentBeginningDetails("F4"),
+                                                       Transactions([
+                                                           Transaction(
+                                                               TransactionRegistrationDetails("17")
+                                                           ),
+                                                           Transaction(
+                                                               TransactionRegistrationDetails("18")
+                                                           )
+                                                       ]))
                                                ]))
 
             adaptor = OperationDefinitionAdaptor(reference_dict=reference_dict)
@@ -72,13 +74,14 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
 
             incoming_interchange = Interchange(InterchangeHeader("XX11", "TES5", "190429:1756"),
                                                Messages([
-                                                   MessageSegment(MessageSegmentBeginningDetails("F2"),
-                                                                  Transactions([
-                                                                      Transaction(
-                                                                          TransactionRegistrationDetails("17"),
-                                                                          TransactionPatientDetails("NHSNO22222")
-                                                                      )
-                                                                  ]))
+                                                   MessageSegment(
+                                                       MessageSegmentBeginningDetails("F2"),
+                                                       Transactions([
+                                                           Transaction(
+                                                               TransactionRegistrationDetails("17"),
+                                                               TransactionPatientDetails("NHSNO22222")
+                                                           )
+                                                       ]))
                                                ]))
 
             adaptor = OperationDefinitionAdaptor(reference_dict=reference_dict)
@@ -103,26 +106,28 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
 
             incoming_interchange = Interchange(InterchangeHeader("XX11", "TES5", "190429:1756"),
                                                Messages([
-                                                   MessageSegment(MessageSegmentBeginningDetails("F4"),
-                                                                  Transactions([
-                                                                      Transaction(
-                                                                          TransactionRegistrationDetails("17")
-                                                                      ),
-                                                                      Transaction(
-                                                                          TransactionRegistrationDetails("18")
-                                                                      )
-                                                                  ])),
-                                                   MessageSegment(MessageSegmentBeginningDetails("F2"),
-                                                                  Transactions([
-                                                                      Transaction(
-                                                                          TransactionRegistrationDetails("19"),
-                                                                          TransactionPatientDetails("NHSNO11111")
-                                                                      ),
-                                                                      Transaction(
-                                                                          TransactionRegistrationDetails("20"),
-                                                                          TransactionPatientDetails("NHSNO22222")
-                                                                      )
-                                                                  ]))
+                                                   MessageSegment(
+                                                       MessageSegmentBeginningDetails("F4"),
+                                                       Transactions([
+                                                           Transaction(
+                                                               TransactionRegistrationDetails("17")
+                                                           ),
+                                                           Transaction(
+                                                               TransactionRegistrationDetails("18")
+                                                           )
+                                                       ])),
+                                                   MessageSegment(
+                                                       MessageSegmentBeginningDetails("F2"),
+                                                       Transactions([
+                                                           Transaction(
+                                                               TransactionRegistrationDetails("19"),
+                                                               TransactionPatientDetails("NHSNO11111")
+                                                           ),
+                                                           Transaction(
+                                                               TransactionRegistrationDetails("20"),
+                                                               TransactionPatientDetails("NHSNO22222")
+                                                           )
+                                                       ]))
                                                ]))
 
             adaptor = OperationDefinitionAdaptor(reference_dict=reference_dict)

@@ -4,7 +4,8 @@ import edifact.incoming.parser.creators as creators
 import edifact.incoming.parser.helpers as helpers
 from edifact.incoming.models.interchange import Interchange, InterchangeHeader
 from edifact.incoming.models.message import MessageSegment, Messages, MessageSegmentBeginningDetails
-from edifact.incoming.models.transaction import Transaction, Transactions
+from edifact.incoming.models.transaction import Transaction, Transactions, TransactionRegistrationDetails, \
+    TransactionPatientDetails
 from edifact.incoming.parser import EdifactDict
 
 INTERCHANGE_HEADER_KEY = "UNB"
@@ -28,22 +29,53 @@ def deserialise_message_beginning(original_dict: EdifactDict, index: int) -> Mes
     return msg_bgn_details
 
 
-def deserialise_transaction(original_dict: EdifactDict, index: int) -> Transaction:
-    transaction_pat = None
-    # When extracting the relevant lines for a transactions we need to skip the very first REGISTRATION_KEY
-    # Therefore we start the index at +1.
+def get_transaction_lines(original_dict: EdifactDict, index: int) -> EdifactDict:
+    """
+    From the original dict provided get the lines that represent a transaction within a message.
+    This can be when another MESSAGE_REGISTRATION_KEY is found representing a new transaction or
+    when the MESSAGE_TRAILER_KEY is found.
+    In order to skip the first SO1 in the original_dict provided here the index is started at +1
+    """
     transaction_lines = EdifactDict(
         helpers.extract_relevant_lines(original_dict, index + 1, [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
+    return transaction_lines
 
+
+def deserialise_registration(transaction_lines: EdifactDict) -> TransactionRegistrationDetails:
     registration_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, 0,
                                                                     [MESSAGE_REGISTRATION_KEY, MESSAGE_PATIENT_KEY,
                                                                      MESSAGE_TRAILER_KEY]))
     transaction_reg = creators.create_transaction_registration(registration_lines)
+    return transaction_reg
 
-    if len(registration_lines) != len(transaction_lines):
-        patient_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines, len(registration_lines),
+
+def find_index_of_patient_segment(transaction_lines: EdifactDict) -> int:
+    index_of_patient_segment = -1
+    for index, line in enumerate(transaction_lines):
+        if line[0] == MESSAGE_PATIENT_KEY:
+            index_of_patient_segment = index
+    return index_of_patient_segment
+
+
+def deserialise_patient_if_applicable(transaction_lines: EdifactDict) -> TransactionPatientDetails:
+    transaction_pat = None
+    patient_segment_index = find_index_of_patient_segment(transaction_lines)
+    if patient_segment_index != -1:
+        patient_lines = EdifactDict(helpers.extract_relevant_lines(transaction_lines,
+                                                                   patient_segment_index,
                                                                    [MESSAGE_REGISTRATION_KEY, MESSAGE_TRAILER_KEY]))
         transaction_pat = creators.create_transaction_patient(patient_lines)
+
+    return transaction_pat
+
+
+def deserialise_transaction(original_dict: EdifactDict, index: int) -> Transaction:
+
+    transaction_lines = get_transaction_lines(original_dict, index)
+
+    transaction_reg = deserialise_registration(transaction_lines)
+
+    transaction_pat = deserialise_patient_if_applicable(transaction_lines)
 
     transaction = Transaction(transaction_reg, transaction_pat)
     return transaction
