@@ -30,7 +30,7 @@ class ClientRequestHandler(RequestHandler):
 
         async_message_id = None
         try:
-            async_message_id, message = self.sender.build_message(interaction_name, self.request.body.decode())
+            async_message_id, message = self.sender.prepare_message(interaction_name, self.request.body.decode())
 
             interaction_is_asynchronous = async_message_id is not None
             if interaction_is_asynchronous:

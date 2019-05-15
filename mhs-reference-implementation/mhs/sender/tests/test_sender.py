@@ -31,7 +31,7 @@ class TestSender(TestCase):
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
         self.mock_message_builder.build_message.return_value = sentinel.ebxml_id, sentinel.ebxml_message
 
-        actual_id, actual_response = self.sender.build_message(sentinel.interaction_name, sentinel.message)
+        actual_id, actual_response = self.sender.prepare_message(sentinel.interaction_name, sentinel.message)
 
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
         self.mock_message_builder.build_message.assert_called_with(expected_context)
@@ -42,7 +42,7 @@ class TestSender(TestCase):
         interaction_details = {ASYNC_RESPONSE_EXPECTED: False}
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
 
-        actual_id, actual_response = self.sender.build_message(sentinel.interaction_name, sentinel.message)
+        actual_id, actual_response = self.sender.prepare_message(sentinel.interaction_name, sentinel.message)
 
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
         self.assertIsNone(actual_id)
@@ -52,7 +52,7 @@ class TestSender(TestCase):
         self.mock_interactions_config.get_interaction_details.return_value = None
 
         with (self.assertRaises(UnknownInteractionError)):
-            self.sender.build_message("unknown_interaction", "message")
+            self.sender.prepare_message("unknown_interaction", "message")
 
     def test_sender(self):
         self.mock_interactions_config.get_interaction_details.return_value = sentinel.interaction_details

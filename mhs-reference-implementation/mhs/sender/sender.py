@@ -35,7 +35,7 @@ class Sender:
         self.transport = transport
         self.party_id = party_id
 
-    def build_message(self, interaction_name: str, content: str) -> Tuple[str, str]:
+    def prepare_message(self, interaction_name: str, content: str) -> Tuple[str, str]:
         """Build a message for the specified interaction. Wraps the provided content if required.
 
         :param interaction_name: The name of the interaction the message is related to.
@@ -45,8 +45,8 @@ class Sender:
         """
         interaction_details = self._get_interaction_details(interaction_name)
 
-        async_pattern = interaction_details[ASYNC_RESPONSE_EXPECTED]
-        if async_pattern:
+        is_async = interaction_details[ASYNC_RESPONSE_EXPECTED]
+        if is_async:
             message_id, message = self._wrap_message_in_ebxml(interaction_details, content)
         else:
             message_id = None
