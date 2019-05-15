@@ -15,4 +15,4 @@ requests = "*"
 python_version = "3.7"
 
 [scripts]
-generate = "python scr_to_mhs.py"
+server = "python runserver.py"
