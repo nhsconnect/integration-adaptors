@@ -30,16 +30,16 @@ class ClientRequestHandler(RequestHandler):
 
         async_message_id = None
         try:
-            async_message_id, message = self.sender.prepare_message(interaction_name, self.request.body.decode())
+            interaction_is_async, async_message_id, message = self.sender.prepare_message(interaction_name,
+                                                                                          self.request.body.decode())
 
-            interaction_is_asynchronous = async_message_id is not None
-            if interaction_is_asynchronous:
+            if interaction_is_async:
                 self.callbacks[async_message_id] = self._write_async_response
                 logging.debug("Added callback for asynchronous message with ID '%s'", async_message_id)
 
             immediate_response = self.sender.send_message(interaction_name, message)
 
-            if interaction_is_asynchronous:
+            if interaction_is_async:
                 await self._pause_request(async_message_id)
             else:
                 # No async response expected. Just return the response to our initial request.

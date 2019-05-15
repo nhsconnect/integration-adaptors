@@ -18,7 +18,7 @@ class TestSender(TestCase):
         self.sender = Sender(self.mock_interactions_config, self.mock_message_builder, self.mock_transport, PARTY_ID)
 
     @patch.object(MessageUtilities, "get_uuid")
-    def test_build_async_message(self, mock_get_uuid):
+    def test_prepare_message_async(self, mock_get_uuid):
         fixed_uuid = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_uuid.return_value = fixed_uuid
         interaction_details = {ASYNC_RESPONSE_EXPECTED: True}
@@ -31,20 +31,22 @@ class TestSender(TestCase):
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
         self.mock_message_builder.build_message.return_value = sentinel.ebxml_id, sentinel.ebxml_message
 
-        actual_id, actual_response = self.sender.prepare_message(sentinel.interaction_name, sentinel.message)
+        is_async, actual_id, actual_response = self.sender.prepare_message(sentinel.interaction_name, sentinel.message)
 
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
         self.mock_message_builder.build_message.assert_called_with(expected_context)
+        self.assertTrue(is_async)
         self.assertIs(sentinel.ebxml_id, actual_id)
         self.assertIs(sentinel.ebxml_message, actual_response)
 
-    def test_build_sync_message(self):
+    def test_prepare_message_sync(self):
         interaction_details = {ASYNC_RESPONSE_EXPECTED: False}
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
 
-        actual_id, actual_response = self.sender.prepare_message(sentinel.interaction_name, sentinel.message)
+        is_async, actual_id, actual_response = self.sender.prepare_message(sentinel.interaction_name, sentinel.message)
 
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
+        self.assertFalse(is_async)
         self.assertIsNone(actual_id)
         self.assertIs(sentinel.message, actual_response)
 

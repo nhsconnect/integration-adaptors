@@ -35,13 +35,15 @@ class Sender:
         self.transport = transport
         self.party_id = party_id
 
-    def prepare_message(self, interaction_name: str, content: str) -> Tuple[str, str]:
-        """Build a message for the specified interaction. Wraps the provided content if required.
+    def prepare_message(self, interaction_name: str, content: str) -> Tuple[bool, str, str]:
+        """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
 
         :param interaction_name: The name of the interaction the message is related to.
         :param content: The message content to be sent.
-        :return: A tuple containing the ID of the message (if an asynchronous response is expected) and the content of
-        the response received. The message ID will be None if no asynchronous response is expected.
+        :return: A tuple containing:
+        1. A flag indicating whether this message should be sent asynchronously
+        2. the ID of the message, if an asynchronous response is expected, otherwise None
+        3. The message to send
         """
         interaction_details = self._get_interaction_details(interaction_name)
 
@@ -52,7 +54,7 @@ class Sender:
             message_id = None
             message = content
 
-        return message_id, message
+        return is_async, message_id, message
 
     def send_message(self, interaction_name: str, message: str) -> str:
         """Send the provided message for the interaction named. Returns the response received immediately, but note that
