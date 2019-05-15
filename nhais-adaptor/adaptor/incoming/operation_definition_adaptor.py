@@ -1,6 +1,4 @@
 from typing import List, Tuple
-import json
-from fhirclient.models.operationdefinition import OperationDefinition
 
 import adaptor.fhir_helpers.fhir_creators as creators
 import adaptor.incoming.common.date_formatter as date_formatter
@@ -16,7 +14,7 @@ class OperationDefinitionAdaptor:
         """
         Create a fhir operation definition from the incoming interchange
         :param interchange:
-        :return: a List of transaction_numbers, recipients and generated fhir operation definitions
+        :return: a List of transaction_numbers, recipients and generated fhir operation definition json payloads
         """
         sender = interchange.header.sender
         recipient = interchange.header.recipient
