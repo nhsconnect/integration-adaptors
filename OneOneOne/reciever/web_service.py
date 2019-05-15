@@ -4,8 +4,8 @@ import tornado.web
 
 from reciever.message_checks.checks import *
 from utilities.file_utilities import FileUtilities
-from OneOneOne.definitions import XML_PATH
-from OneOneOne.reciever.message_handler import MessageHandler
+from definitions import XML_PATH
+from reciever.message_handler import MessageHandler
 
 response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')
 

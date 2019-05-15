@@ -4,7 +4,7 @@ from builder.pystache_message_builder import PystacheMessageBuilder
 from reciever.message_handler import MessageHandler
 from utilities.file_utilities import FileUtilities
 from utilities.xml_utilities import XmlUtilities
-from OneOneOne.definitions import ROOT_DIR
+from definitions import ROOT_DIR
 
 
 class MessageHandlerTest(unittest.TestCase):
