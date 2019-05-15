@@ -3,6 +3,8 @@ import datetime
 from scr.gp_summary_update import SummaryCareRecord
 from utilities.message_utilities import MessageUtilities
 
+HL7_TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"
+
 
 def build_scr(asid, patient_nhs_number, human_readable_payload):
     """Build a GP summary upload message
@@ -13,9 +15,8 @@ def build_scr(asid, patient_nhs_number, human_readable_payload):
     :return: The GP summary message.
     """
 
-    hl7_timestamp_format = "%Y%m%d%H%M%S"
     current_utc_time = datetime.datetime.utcnow()
-    hl7_timestamp = current_utc_time.strftime(hl7_timestamp_format)
+    hl7_timestamp = current_utc_time.strftime(HL7_TIMESTAMP_FORMAT)
 
     gp_summary_properties = {
         "Id": MessageUtilities.get_uuid(),
