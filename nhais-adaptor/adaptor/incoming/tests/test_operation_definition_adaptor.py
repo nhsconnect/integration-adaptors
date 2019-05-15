@@ -23,7 +23,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
         with self.subTest(
                 "adapt an interchange with one message and transaction to a single fhir operation definition"):
             op_def = fixtures.create_operation_definition_for_approval(recipient="TES5", transaction_number="17")
-            expected = [("17", "TES5", op_def)]
+            expected = [("17", "TES5", op_def.as_json())]
 
             incoming_interchange = Interchange(InterchangeHeader("XX11", "TES5", "190429:1756"),
                                                Messages([
@@ -46,7 +46,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
                                                                          transaction_number="17")
             op_def_2 = fixtures.create_operation_definition_for_approval(recipient="TES5",
                                                                          transaction_number="18")
-            expected = [("17", "TES5", op_def_1), ("18", "TES5", op_def_2)]
+            expected = [("17", "TES5", op_def_1.as_json()), ("18", "TES5", op_def_2.as_json())]
 
             incoming_interchange = Interchange(InterchangeHeader("XX11", "TES5", "190429:1756"),
                                                Messages([
@@ -70,7 +70,7 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
         with self.subTest("adapt an interchange for a deduction"):
             op_def = fixtures.create_operation_definition_for_deduction(recipient="TES5", transaction_number="17",
                                                                         nhs_number="NHSNO22222")
-            expected = [("17", "TES5", op_def)]
+            expected = [("17", "TES5", op_def.as_json())]
 
             incoming_interchange = Interchange(InterchangeHeader("XX11", "TES5", "190429:1756"),
                                                Messages([
@@ -101,8 +101,8 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
             deduction_2 = fixtures.create_operation_definition_for_deduction(recipient="TES5",
                                                                              transaction_number="20",
                                                                              nhs_number="NHSNO22222")
-            expected = [("17", "TES5", approval_1), ("18", "TES5", approval_2),
-                        ("19", "TES5", deduction_1), ("20", "TES5", deduction_2)]
+            expected = [("17", "TES5", approval_1.as_json()), ("18", "TES5", approval_2.as_json()),
+                        ("19", "TES5", deduction_1.as_json()), ("20", "TES5", deduction_2.as_json())]
 
             incoming_interchange = Interchange(InterchangeHeader("XX11", "TES5", "190429:1756"),
                                                Messages([
