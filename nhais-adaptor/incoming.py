@@ -5,11 +5,9 @@ from pathlib import Path
 from PyInquirer import prompt
 from utilities.file_utilities import FileUtilities
 
-from adaptor.incoming.incoming_adaptor import IncomingAdaptor
-from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
-import edifact.incoming.parser.deserialiser as deserialiser
-from definitions import ROOT_DIR
 from adaptor.incoming.config import reference_dict
+from adaptor.incoming.incoming_adaptor import IncomingAdaptor
+from definitions import ROOT_DIR
 
 nhais_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "NHAIS"
 gp_mailbox_dir = Path(ROOT_DIR) / "mailbox" / "GP"
@@ -51,7 +49,6 @@ op_defs = adaptor.convert_to_fhir(incoming_interchange_raw)
 
 # create the generated fhir operation definitions files
 for (transaction_number, recipient, op_def) in op_defs:
-
     file_path_to_write = str(gp_mailbox_dir / recipient / "inbox" / f"approval-{transaction_number}.json")
     with open(file_path_to_write, "w") as outfile:
         json.dump(op_def, outfile, indent=4)
