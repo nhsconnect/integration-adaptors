@@ -6,9 +6,9 @@ from datetime import datetime
 
 from flask import render_template, jsonify, request
 
-from SupplierSCR import app
-from SupplierSCR.build_scr import build_scr
-from SupplierSCR.callmhs import call_mhs
+from supplier import app
+from supplier.build_scr import build_scr
+from supplier.callmhs import call_mhs
 
 
 @app.route('/')

@@ -1,10 +1,10 @@
 """
-This script runs the SupplierSCR application using a development server.
+This script runs the supplier-example application using a development server.
 """
 
 from os import environ
 
-from SupplierSCR import app
+from supplier import app
 
 if __name__ == '__main__':
     HOST = environ.get('SERVER_HOST', 'localhost')
