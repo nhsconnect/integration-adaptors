@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from builder.pystache_message_builder import PystacheMessageBuilder
 import xml.etree.ElementTree as ET
-from OneOneOne.definitions import ROOT_DIR
+from definitions import ROOT_DIR
 from reciever.message_checks.checks import *
 
 

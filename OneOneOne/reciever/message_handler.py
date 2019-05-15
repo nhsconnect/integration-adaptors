@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from builder.pystache_message_builder import PystacheMessageBuilder
 from reciever.message_checks.checks import *
 from utilities.file_utilities import FileUtilities
-from OneOneOne.definitions import XML_PATH, TEMPLATE_PATH
+from definitions import XML_PATH, TEMPLATE_PATH
 from typing import List, Type
 
 basic_success_response = FileUtilities.get_file_string(XML_PATH / 'basic_success_response.xml')

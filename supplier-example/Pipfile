@@ -7,10 +7,12 @@ verify_ssl = true
 
 [packages]
 integration-adaptors-common = {editable = true,path = "./../common"}
-scr = {editable = true,path = "."}
+scr = {editable = true,path = "./../SCR"}
+flask = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"
 
 [scripts]
-tests = "python -m unittest -v"
+server = "python runserver.py"
