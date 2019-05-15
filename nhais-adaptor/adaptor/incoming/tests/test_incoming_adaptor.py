@@ -27,7 +27,7 @@ class TestIncomingAdaptor(unittest.TestCase):
         incoming_interchange_raw = FileUtilities.get_file_string(incoming_file_path)
 
         incoming_adaptor = IncomingAdaptor(reference_dict)
-        op_defs = incoming_adaptor.covert_to_fhir(incoming_interchange_raw)
+        op_defs = incoming_adaptor.convert_to_fhir(incoming_interchange_raw)
 
         op_def_to_compare = op_defs[0][2]
         compare(op_def_to_compare, patient_register_approval_json)

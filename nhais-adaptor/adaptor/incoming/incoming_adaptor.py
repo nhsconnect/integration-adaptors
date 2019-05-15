@@ -8,7 +8,7 @@ class IncomingAdaptor:
     def __init__(self, reference_dict):
         self.reference_dict = reference_dict
 
-    def covert_to_fhir(self, edifact_payload) -> List[Tuple[str, str, str]]:
+    def convert_to_fhir(self, edifact_payload) -> List[Tuple[str, str, str]]:
         lines = edifact_payload.split("'\n")
         interchange = deserialiser.convert(lines)
 

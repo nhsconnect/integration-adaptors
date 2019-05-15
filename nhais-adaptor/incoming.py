@@ -47,7 +47,7 @@ incoming_interchange_raw = FileUtilities.get_file_string(incoming_file_path)
 
 # Run the adaptor
 adaptor = IncomingAdaptor(reference_dict)
-op_defs = adaptor.covert_to_fhir(incoming_interchange_raw)
+op_defs = adaptor.convert_to_fhir(incoming_interchange_raw)
 
 # create the generated fhir operation definitions files
 for (transaction_number, recipient, op_def) in op_defs:
