@@ -45,16 +45,16 @@ class TestAsyncResponseHandler(AsyncHTTPTestCase):
     def test_post(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        expected_response = FileUtilities.get_file_string(str(self.message_dir / EXPECTED_RESPONSE_FILE))
+        expected_ack_response = FileUtilities.get_file_string(str(self.message_dir / EXPECTED_RESPONSE_FILE))
         request_body = FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
         mock_callback = Mock()
         self.callbacks[REF_TO_MESSAGE_ID] = mock_callback
 
-        response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
 
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response.headers["Content-Type"], "text/xml")
-        XmlUtilities.assert_xml_equal(expected_response, response.body)
+        self.assertEqual(ack_response.code, 200)
+        self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
+        XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
         mock_callback.assert_called_with(EXPECTED_MESSAGE)
 
     def test_post_no_callback(self):
