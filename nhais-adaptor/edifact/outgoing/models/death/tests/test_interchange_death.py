@@ -30,12 +30,10 @@ class TestInterchange(unittest.TestCase):
                                             "UNT+14+00001'"
                                             "UNZ+1+00001'")
 
-            date_time = "2019-05-07 09:00:04.159338"
-
-            msg_bgn = MessageBeginning(party_id="XX1", date_time=date_time, ref_number="G5")
+            msg_bgn = MessageBeginning(party_id="XX1", date_time="201905070900", ref_number="G5")
             msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",
-                                                                         date_time="2019-05-05 09:00:04.159338",
+                                                                         date_time="20190505",
                                                                          free_text="Died in Infinity Wars")
 
             msg_seg_pat_details = MessageSegmentDeathPatientDetails(id_number="N/10/10")
@@ -45,6 +43,6 @@ class TestInterchange(unittest.TestCase):
                                            message_segment_patient_details=msg_seg_pat_details)
             msgs = Messages([msg])
 
-            interchange = Interchange(sender="SNDR", recipient="RECP", date_time=date_time, sequence_number="00001",
+            interchange = Interchange(sender="SNDR", recipient="RECP", date_time="190507:0900", sequence_number="00001",
                                       messages=msgs).to_edifact()
             self.assertEqual(interchange, expected_edifact_interchange)

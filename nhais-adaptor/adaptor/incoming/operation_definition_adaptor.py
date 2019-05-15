@@ -1,9 +1,9 @@
-from datetime import datetime
 from typing import List, Tuple
 
 from fhirclient.models.operationdefinition import OperationDefinition
 
 import adaptor.fhir_helpers.fhir_creators as creators
+import adaptor.incoming.common.date_formatter as date_formatter
 from edifact.incoming.models.interchange import Interchange
 
 
@@ -11,18 +11,6 @@ class OperationDefinitionAdaptor:
 
     def __init__(self, reference_dict):
         self.reference_dict = reference_dict
-
-    @staticmethod
-    def format_date_time(edifact_date_time):
-        """
-        format the edifact date time to a fhir format
-        :param edifact_date_time: The incoming date time stamp from the interchange header
-        :return: The formatted date time stamp
-        """
-        current_format = "%y%m%d:%H%M"
-        desired_format = "%Y-%m-%d %H:%M"
-        formatted_date = datetime.strptime(edifact_date_time, current_format).strftime(desired_format)
-        return formatted_date
 
     def create_operation_definition(self, interchange: Interchange) -> List[Tuple[str, str, OperationDefinition]]:
         """
@@ -32,7 +20,7 @@ class OperationDefinitionAdaptor:
         """
         sender = interchange.header.sender
         recipient = interchange.header.recipient
-        formatted_date_time = self.format_date_time(interchange.header.date_time)
+        formatted_date_time = date_formatter.format_date_time(interchange.header.date_time)
         messages = interchange.msgs
 
         op_defs = []

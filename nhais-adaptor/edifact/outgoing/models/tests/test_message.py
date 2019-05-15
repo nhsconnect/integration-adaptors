@@ -30,5 +30,5 @@ class TestMessageBeginning(unittest.TestCase):
 
     def test_message_beginning_to_edifact(self):
         expected_edifact_message = """BGM+++507'NAD+FHS+XX1:954'DTM+137:201904230900:203'RFF+950:G1'"""
-        msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1").to_edifact()
+        msg_bgn = MessageBeginning(party_id="XX1", date_time="201904230900", ref_number="G1").to_edifact()
         self.assertEqual(msg_bgn, expected_edifact_message)

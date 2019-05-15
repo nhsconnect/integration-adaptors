@@ -1,6 +1,6 @@
 import unittest
 
-import edifact.helpers.date_formatter as formatter
+import adaptor.outgoing.common.date_formatter as formatter
 
 
 class TestDateFormatter(unittest.TestCase):

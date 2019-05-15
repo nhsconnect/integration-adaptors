@@ -1,10 +1,12 @@
 import unittest
+
 from testfixtures import compare
+
+import adaptor.incoming.tests.fixtures as fixtures
+from adaptor.incoming.config import reference_dict
 from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
 from edifact.incoming.models.interchange import Interchange, InterchangeHeader
 from edifact.incoming.models.message import Messages, MessageSegment, MessageSegmentBeginningDetails
-import adaptor.incoming.tests.fixtures as fixtures
-from adaptor.incoming.config import reference_dict
 from edifact.incoming.models.transaction import Transactions, Transaction, TransactionRegistrationDetails, \
     TransactionPatientDetails
 
@@ -13,13 +15,6 @@ class TestOperationDefinitionAdaptor(unittest.TestCase):
     """
     Test the conversion of an incoming edifact interchange to a fhir operation definition response
     """
-
-    def test_format_date_time(self):
-        """
-        Tests the function that formats the edifact date time stamp to a fhir format
-        """
-        formatted_date = OperationDefinitionAdaptor.format_date_time("190501:0902")
-        self.assertEqual(formatted_date, "2019-05-01 09:02")
 
     def test_create_operation_definition(self):
         """

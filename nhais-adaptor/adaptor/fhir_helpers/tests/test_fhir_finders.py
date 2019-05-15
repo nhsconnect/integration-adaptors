@@ -1,7 +1,9 @@
 import unittest
+
 from testfixtures import compare
-import adaptor.fhir_helpers.fhir_finders as finders
+
 import adaptor.fhir_helpers.fhir_creators as creators
+import adaptor.fhir_helpers.fhir_finders as finders
 from adaptor.fhir_helpers.fhir_creators import ParameterName, ResourceType
 
 

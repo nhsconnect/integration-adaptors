@@ -1,4 +1,3 @@
-import edifact.helpers.date_formatter as date_formatter
 from edifact.outgoing.models.segment import Segment, SegmentCollection
 
 
@@ -50,11 +49,10 @@ class MessageBeginning(SegmentCollection):
         :param date_time: the date time stamp of the message
         :param ref_number: a reference number for registration transaction type
         """
-        formatted_date_time = date_formatter.format_date(date_time=date_time, format_qualifier="203")
         segments = [
             Segment(key="BGM", value="++507"),
             Segment(key="NAD", value=f"FHS+{party_id}:954"),
-            Segment(key="DTM", value=f"137:{formatted_date_time}:203"),
+            Segment(key="DTM", value=f"137:{date_time}:203"),
             Segment(key="RFF", value=f"950:{ref_number}"),
         ]
         super().__init__(segments=segments)
@@ -108,7 +106,7 @@ class Message(SegmentCollection):
         """
         msg_header = MessageHeader(sequence_number=sequence_number)
         number_of_segments = len(message_beginning) + len(message_segment_registration_details.segments) + \
-            len(message_segment_patient_details.segments) + 2
+                             len(message_segment_patient_details.segments) + 2
         msg_trailer = MessageTrailer(number_of_segments=number_of_segments, sequence_number=sequence_number)
         segments = [msg_header, message_beginning, message_segment_registration_details,
                     message_segment_patient_details, msg_trailer]

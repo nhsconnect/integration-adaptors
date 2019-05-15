@@ -1,11 +1,11 @@
+from fhirclient.models.address import Address
+from fhirclient.models.extension import Extension
 from fhirclient.models.humanname import HumanName
 from fhirclient.models.identifier import Identifier
 from fhirclient.models.operationdefinition import OperationDefinitionParameterBinding, OperationDefinitionParameter, \
     OperationDefinition
 from fhirclient.models.patient import Patient
 from fhirclient.models.practitioner import Practitioner
-from fhirclient.models.address import Address
-from fhirclient.models.extension import Extension
 
 
 class OperationName:

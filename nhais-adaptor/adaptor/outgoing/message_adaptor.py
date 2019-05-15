@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from fhirclient.models.operationdefinition import OperationDefinition
 
 import adaptor.fhir_helpers.fhir_finders as finders
+import adaptor.outgoing.common.date_formatter as date_formatter
 from adaptor.fhir_helpers.fhir_creators import ParameterName
 from edifact.outgoing.models.birth.message_birth import Message
 from edifact.outgoing.models.message import MessageBeginning, MessageSegmentPatientDetails, \
@@ -35,8 +36,10 @@ class MessageAdaptor(ABC):
                                                parameter_name=ParameterName.NHAIS_CYPHER)
 
         ref_number = self.get_reference_number()
+        formatted_date_time = date_formatter.format_date(date_time=self.fhir_operation.date.as_json(),
+                                                         format_qualifier="203")
 
-        msg_bgn = MessageBeginning(party_id=nhais_id, date_time=self.fhir_operation.date.as_json(),
+        msg_bgn = MessageBeginning(party_id=nhais_id, date_time=formatted_date_time,
                                    ref_number=ref_number)
 
         return msg_bgn

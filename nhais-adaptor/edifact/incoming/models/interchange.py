@@ -21,6 +21,7 @@ class Interchange:
     """
     A representation of the incoming edifact interchange
     """
+
     def __init__(self, header: InterchangeHeader, messages: Messages):
         """
         :param header: the interchange header of the incoming interchange
@@ -28,4 +29,3 @@ class Interchange:
         """
         self.header = header
         self.msgs = messages
-

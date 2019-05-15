@@ -1,4 +1,5 @@
 from typing import List
+
 from edifact.incoming.parser import EdifactDict
 
 

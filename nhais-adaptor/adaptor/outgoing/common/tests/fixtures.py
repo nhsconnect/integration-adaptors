@@ -22,5 +22,3 @@ def create_simple_practitioner():
     practitioner = creators.create_practitioner_resource(resource_id="practitioner-1", national_identifier="4826940",
                                                          local_identifier="281")
     return practitioner
-
-

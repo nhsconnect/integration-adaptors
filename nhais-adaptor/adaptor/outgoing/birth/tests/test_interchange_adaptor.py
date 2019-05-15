@@ -1,8 +1,8 @@
 import unittest
 
-import adaptor.outgoing.birth.tests.fixtures as fixtures
 from testfixtures import compare
 
+import adaptor.outgoing.birth.tests.fixtures as fixtures
 from adaptor.fhir_helpers.fhir_creators import OperationName
 from adaptor.outgoing.birth.message_birth_adaptor import MessageBirthAdaptor
 from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
