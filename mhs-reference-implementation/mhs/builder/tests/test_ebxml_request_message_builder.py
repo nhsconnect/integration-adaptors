@@ -12,6 +12,8 @@ from utilities.message_utilities import MessageUtilities
 EXPECTED_MESSAGES_DIR = "expected_messages"
 EXPECTED_EBXML = "ebxml_request.xml"
 
+MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+
 
 class TestEbXmlRequestMessageBuilder(TestCase):
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -23,11 +25,11 @@ class TestEbXmlRequestMessageBuilder(TestCase):
     @patch.object(MessageUtilities, "get_timestamp")
     @patch.object(MessageUtilities, "get_uuid")
     def test_build_message(self, mock_get_uuid, mock_get_timestamp):
-        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+        mock_get_uuid.return_value = MOCK_UUID
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
         expected_message = FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
 
-        message = self.builder.build_message({
+        message_id, message = self.builder.build_message({
             FROM_PARTY_ID: "TESTGEN-201324",
             TO_PARTY_ID: "YEA-0000806",
             CPA_ID: "S1001A1630",
@@ -46,4 +48,5 @@ class TestEbXmlRequestMessageBuilder(TestCase):
         normalized_expected_message = FileUtilities.normalize_line_endings(expected_message)
         normalized_message = FileUtilities.normalize_line_endings(message)
 
+        self.assertEqual(MOCK_UUID, message_id)
         self.assertEqual(normalized_expected_message, normalized_message)
