@@ -28,19 +28,28 @@ class ClientRequestHandler(RequestHandler):
 
         interaction_name = self.request.uri[1:]
 
+        async_message_id = None
         try:
-            async_message_id, immediate_response = self.sender.send_message(interaction_name,
-                                                                            self.request.body.decode())
-            logging.debug("Message sent with ID '%s'. Received response: %s", async_message_id, immediate_response)
+            async_message_id, message = self.sender.build_message(interaction_name, self.request.body.decode())
 
-            if async_message_id is not None:
-                # Async response expected.
+            interaction_is_asynchronous = async_message_id is not None
+            if interaction_is_asynchronous:
+                self.callbacks[async_message_id] = self._write_async_response
+                logging.debug("Added callback for asynchronous message with ID '%s'", async_message_id)
+
+            immediate_response = self.sender.send_message(interaction_name, message)
+
+            if interaction_is_asynchronous:
                 await self._pause_request(async_message_id)
             else:
                 # No async response expected. Just return the response to our initial request.
                 self._write_response(immediate_response)
+
         except UnknownInteractionError:
             raise HTTPError(404, "Unknown interaction ID: %s", interaction_name)
+        finally:
+            if async_message_id in self.callbacks:
+                del self.callbacks[async_message_id]
 
     async def _pause_request(self, async_message_id):
         """Pause the incoming request until an asynchronous response is received (or a timeout is hit).
@@ -48,14 +57,11 @@ class ClientRequestHandler(RequestHandler):
         :param async_message_id: The ID of the request that expects an asynchronous response.
         :raises: An HTTPError if we timed out waiting for an asynchronous response.
         """
-        self.callbacks[async_message_id] = self._write_async_response
-
         try:
+            logging.debug("Waiting for asynchronous response to message with ID '%s'", async_message_id)
             await self.async_response_received.wait(timedelta(seconds=self.async_timeout))
         except TimeoutError:
             raise HTTPError(log_message=f"Timed out waiting for a response to message {async_message_id}")
-
-        del self.callbacks[async_message_id]
 
     def _write_response(self, message: str) -> None:
         """Write the given message to the response.
@@ -70,5 +76,6 @@ class ClientRequestHandler(RequestHandler):
 
         :param message: The message to write to the response.
         """
+        logging.debug("Received asynchronous response containing message '%s'", message)
         self._write_response(message)
         self.async_response_received.set()

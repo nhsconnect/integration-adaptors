@@ -21,7 +21,8 @@ class TestClientRequestHandler(AsyncHTTPTestCase):
 
     def test_post_synchronous_message(self):
         expected_response = "Hello world!"
-        self.sender.send_message.return_value = None, expected_response
+        self.sender.build_message.return_value = None, REQUEST_BODY
+        self.sender.send_message.return_value = expected_response
 
         response = self.fetch(f"/{INTERACTION_NAME}", method="POST", body=REQUEST_BODY)
 
@@ -31,7 +32,7 @@ class TestClientRequestHandler(AsyncHTTPTestCase):
         self.sender.send_message.assert_called_with(INTERACTION_NAME, REQUEST_BODY)
 
     def test_post_with_invalid_interaction_name(self):
-        self.sender.send_message.side_effect = UnknownInteractionError(INTERACTION_NAME)
+        self.sender.build_message.side_effect = UnknownInteractionError(INTERACTION_NAME)
 
         response = self.fetch(f"/{INTERACTION_NAME}", method="POST", body="A request")
 
@@ -39,7 +40,8 @@ class TestClientRequestHandler(AsyncHTTPTestCase):
 
     def test_post_asynchronous_message_times_out(self):
         # An request that results in an asynchronous message should time out if no asynchronous response is received.
-        self.sender.send_message.return_value = MOCK_UUID, "Hello world!"
+        self.sender.build_message.return_value = MOCK_UUID, "ebXML request"
+        self.sender.send_message.return_value = "Hello world!"
 
         response = self.fetch(f"/{INTERACTION_NAME}", method="POST", body="A request")
 

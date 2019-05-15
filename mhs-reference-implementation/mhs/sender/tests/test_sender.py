@@ -18,7 +18,7 @@ class TestSender(TestCase):
         self.sender = Sender(self.mock_interactions_config, self.mock_message_builder, self.mock_transport, PARTY_ID)
 
     @patch.object(MessageUtilities, "get_uuid")
-    def test_send_message_with_ebxml_wrapper(self, mock_get_uuid):
+    def test_build_async_message(self, mock_get_uuid):
         fixed_uuid = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_uuid.return_value = fixed_uuid
         interaction_details = {ASYNC_RESPONSE_EXPECTED: True}
@@ -30,26 +30,38 @@ class TestSender(TestCase):
         }
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
         self.mock_message_builder.build_message.return_value = sentinel.ebxml_id, sentinel.ebxml_message
-        self.mock_transport.make_request.return_value = sentinel.response
 
-        actual_id, actual_response = self.sender.send_message(sentinel.interaction_name, sentinel.message)
+        actual_id, actual_response = self.sender.build_message(sentinel.interaction_name, sentinel.message)
 
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
         self.mock_message_builder.build_message.assert_called_with(expected_context)
-        self.mock_transport.make_request.assert_called_with(interaction_details, sentinel.ebxml_message)
         self.assertIs(sentinel.ebxml_id, actual_id)
-        self.assertIs(sentinel.response, actual_response)
+        self.assertIs(sentinel.ebxml_message, actual_response)
 
-    def test_send_message_without_ebxml_wrapper(self):
+    def test_build_sync_message(self):
         interaction_details = {ASYNC_RESPONSE_EXPECTED: False}
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
-        self.mock_transport.make_request.return_value = sentinel.response
 
-        actual_id, actual_response = self.sender.send_message(sentinel.interaction_name, sentinel.message)
+        actual_id, actual_response = self.sender.build_message(sentinel.interaction_name, sentinel.message)
 
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
-        self.mock_transport.make_request.assert_called_with(interaction_details, sentinel.message)
         self.assertIsNone(actual_id)
+        self.assertIs(sentinel.message, actual_response)
+
+    def test_build_message_incorrect_interaction_name(self):
+        self.mock_interactions_config.get_interaction_details.return_value = None
+
+        with (self.assertRaises(UnknownInteractionError)):
+            self.sender.build_message("unknown_interaction", "message")
+
+    def test_sender(self):
+        self.mock_interactions_config.get_interaction_details.return_value = sentinel.interaction_details
+        self.mock_transport.make_request.return_value = sentinel.response
+
+        actual_response = self.sender.send_message(sentinel.interaction_name, sentinel.message)
+
+        self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
+        self.mock_transport.make_request.assert_called_with(sentinel.interaction_details, sentinel.message)
         self.assertIs(sentinel.response, actual_response)
 
     def test_send_message_incorrect_interaction_name(self):
