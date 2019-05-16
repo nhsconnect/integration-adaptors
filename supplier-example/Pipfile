@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+integration-adaptors-common = {editable = true,path = "./../common"}
+scr = {editable = true,path = "./../SCR"}
+flask = "*"
+requests = "*"
+
+[requires]
+python_version = "3.7"
+
+[scripts]
+server = "python runserver.py"

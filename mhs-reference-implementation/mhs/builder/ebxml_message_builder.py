@@ -1,6 +1,7 @@
 import copy
 import logging
 from pathlib import Path
+from typing import Dict, Tuple
 
 from builder.pystache_message_builder import PystacheMessageBuilder
 from definitions import ROOT_DIR
@@ -28,11 +29,11 @@ class EbXmlMessageBuilder(PystacheMessageBuilder):
 
         super().__init__(ebxml_template_dir, template_file)
 
-    def build_message(self, message_dictionary):
+    def build_message(self, message_dictionary: Dict[str, str]) -> Tuple[str, str]:
         """Build an ebXML message by populating a Mustache template with values from the provided dictionary.
 
         :param message_dictionary: The dictionary of values to use when populating the template.
-        :return: A string containing a message suitable for sending to a remote MHS.
+        :return: A tuple string containing the ID generated for message created and the message value.
         """
         ebxml_message_dictionary = copy.deepcopy(message_dictionary)
 
@@ -42,4 +43,4 @@ class EbXmlMessageBuilder(PystacheMessageBuilder):
         ebxml_message_dictionary[TIMESTAMP] = timestamp
         logging.debug("Creating ebXML message with message ID '%s' and timestamp '%s'", message_id, timestamp)
 
-        return super().build_message(ebxml_message_dictionary)
+        return message_id, super().build_message(ebxml_message_dictionary)

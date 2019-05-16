@@ -23,7 +23,7 @@ class TestMessageBirth(unittest.TestCase):
                                         "LOC+950+BURY'")
 
             msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
-                                                                         date_time="2019-04-23 09:00:04.159338",
+                                                                         date_time="20190423",
                                                                          location="Bury").to_edifact()
             self.assertEqual(msg_seg_reg_details, expected_edifact_message)
 
@@ -43,7 +43,7 @@ class TestMessageBirth(unittest.TestCase):
                                       post_code="BR6 7EW")
 
             msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="N/10/10", name=patient_name,
-                                                                    date_of_birth="2019-04-20",
+                                                                    date_of_birth="20190420",
                                                                     gender="1", address=patient_address).to_edifact()
             self.assertEqual(msg_seg_pat_details, expected_edifact_message)
 
@@ -66,9 +66,10 @@ class TestMessageBirth(unittest.TestCase):
                                     "PDI+1'"
                                     "NAD+PAT++MOORSIDE FARM:OLD LANE:ST PAULS CRAY:ORPINGTON:KENT+++++BR6 7EW'"
                                     "UNT+18+00001'")
-        msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G1")
+
+        msg_bgn = MessageBeginning(party_id="XX1", date_time="201904230900", ref_number="G1")
         msg_seg_reg_details = MessageSegmentBirthRegistrationDetails(transaction_number=17, party_id="4826940,281",
-                                                                     date_time="2019-04-23 09:00:04.159338",
+                                                                     date_time="20190423",
                                                                      location="Bury")
         patient_name = Name(family_name="Stevens", first_given_forename="Charles", title="Mr", middle_name="Anthony",
                             third_given_forename="John")
@@ -76,7 +77,7 @@ class TestMessageBirth(unittest.TestCase):
                                   address_line_2="ST PAULS CRAY", town="ORPINGTON", county="KENT", post_code="BR6 7EW")
 
         msg_seg_pat_details = MessageSegmentBirthPatientDetails(id_number="N/10/10", name=patient_name,
-                                                                date_of_birth="2019-04-20",
+                                                                date_of_birth="20190420",
                                                                 gender="1", address=patient_address)
 
         msg = BirthRegistrationMessage(sequence_number="00001", message_beginning=msg_bgn,

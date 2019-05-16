@@ -5,7 +5,7 @@
     <soap:Header>
         <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
             <eb:From>
-                <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">A91424-9199121</eb:PartyId>
+                <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">FROM-PARTY-ID</eb:PartyId>
             </eb:From>
             <eb:To>
                 <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YES-0000806</eb:PartyId>
@@ -25,7 +25,7 @@
             <eb:Timestamp>2012-03-15T06:51:08Z</eb:Timestamp>
             <eb:RefToMessageId>C614484E-4B10-499A-9ACD-5D645CFACF61</eb:RefToMessageId>
             <eb:From>
-                <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">A91424-9199121</eb:PartyId>
+                <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">FROM-PARTY-ID</eb:PartyId>
             </eb:From>
         </eb:Acknowledgment>
     </soap:Header>

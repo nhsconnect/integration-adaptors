@@ -1,4 +1,5 @@
 import adaptor.fhir_helpers.fhir_finders as finders
+import adaptor.outgoing.common.date_formatter as date_formatter
 from adaptor.fhir_helpers.fhir_creators import ResourceType, ParameterName
 from adaptor.outgoing.common.common_adaptor import create_patient_name, create_patient_address
 from adaptor.outgoing.message_adaptor import MessageAdaptor
@@ -28,9 +29,12 @@ class MessageBirthAdaptor(MessageAdaptor):
 
         edi_address = create_patient_address(patient.address[0])
 
+        formatted_date_of_birth = date_formatter.format_date(date_time=patient.birthDate.as_json(),
+                                                             format_qualifier="102", current_format="%Y-%m-%d")
+
         msg_seg_patient_details = MessageSegmentBirthPatientDetails(id_number=patient.identifier[0].value,
                                                                     name=edi_name,
-                                                                    date_of_birth=patient.birthDate.as_json(),
+                                                                    date_of_birth=formatted_date_of_birth,
                                                                     gender=gender_map[patient.gender],
                                                                     address=edi_address)
         return msg_seg_patient_details
@@ -50,9 +54,11 @@ class MessageBirthAdaptor(MessageAdaptor):
 
         patient_details = finders.find_resource(fhir_operation=self.fhir_operation, resource_type=ResourceType.PATIENT)
         birth_location = patient_details.extension[0].valueAddress.city
+        formatted_date_time = date_formatter.format_date(date_time=self.fhir_operation.date.as_json(),
+                                                         format_qualifier="102")
 
         msg_seg_registration_details = MessageSegmentBirthRegistrationDetails(transaction_number=transaction_number,
                                                                               party_id=party_id,
-                                                                              date_time=self.fhir_operation.date.as_json(),
+                                                                              date_time=formatted_date_time,
                                                                               location=birth_location)
         return msg_seg_registration_details

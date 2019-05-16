@@ -3,7 +3,7 @@ from pathlib import Path
 
 from builder.pystache_message_builder import PystacheMessageBuilder
 
-from SCR.definitions import ROOT_DIR
+from scr_definitions import ROOT_DIR
 
 
 class SummaryCareRecord:

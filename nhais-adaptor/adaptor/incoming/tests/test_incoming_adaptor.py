@@ -5,17 +5,16 @@ from pathlib import Path
 from testfixtures import compare
 from utilities.file_utilities import FileUtilities
 
-from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
-import edifact.incoming.parser.deserialiser as deserialiser
 from adaptor.incoming.config import reference_dict
+from adaptor.incoming.incoming_adaptor import IncomingAdaptor
 
 
-class TestEdifactToFhirIntegration(unittest.TestCase):
+class TestIncomingAdaptor(unittest.TestCase):
     """
     Test that when fhir json payload is loaded the correct edifact message is created
     """
 
-    def test_patient_registration_birth_approval(self):
+    def test_covert_to_fhir(self):
         """
         Test when the operation is for a birth registration
         """
@@ -27,11 +26,8 @@ class TestEdifactToFhirIntegration(unittest.TestCase):
         incoming_file_path = Path(TEST_DIR) / "edifact.txt"
         incoming_interchange_raw = FileUtilities.get_file_string(incoming_file_path)
 
-        lines = incoming_interchange_raw.split("'\n")
-        interchange = deserialiser.convert(lines)
+        incoming_adaptor = IncomingAdaptor(reference_dict)
+        op_defs = incoming_adaptor.convert_to_fhir(incoming_interchange_raw)
 
-        adaptor = OperationDefinitionAdaptor(reference_dict)
-        op_defs = adaptor.create_operation_definition(interchange=interchange)
-        pretty_op_def = op_defs[0][2].as_json()
-
-        compare(pretty_op_def, patient_register_approval_json)
+        op_def_to_compare = op_defs[0][2]
+        compare(op_def_to_compare, patient_register_approval_json)

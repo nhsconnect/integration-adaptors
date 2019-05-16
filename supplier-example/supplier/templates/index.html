@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<head>
+    <script type=text/javascript>
+        $(function () {
+            $('a#process_input').bind('click', function () {
+                $.getJSON('/call_mhs', {
+                    interaction_name: $('input[name="interaction_name"]').val(),
+                    asid: $('input[name="asid"]').val(),
+                    nhs_number: $('input[name="nhs_number"]').val(),
+                    human_readable: $('textarea#human_readable').val(),
+                }, function (data) {
+                    $("#result").text(data.result);
+                });
+                return false;
+            });
+        });
+    </script>
+
+</head>
+
+<div class="jumbotron">
+    <h1>MHS Adaptor - Supplier client</h1>
+    <p class="lead">This form will enable the sending of an SCR payload to the MHS adaptor. This provides a mocked
+    demonstration of how the MHS adaptor would be called after an event takes place in the supplier user interface (or
+    application tier)</p>
+</div>
+<form>
+    <h2>Input:</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <h3>MHS Adaptor Command</h3>
+            <input type=text size=35 name="interaction_name" value="gp_summary_upload">
+            <br/>
+            <h3>ASID</h3>
+            <input type=text size=35 name="asid" value="918999199121">
+            <br/>
+            <h3>NHS Number</h3>
+            <input type=text size=35 name="nhs_number" value="9446245796">
+        </div>
+        <div class="col-md-4">
+            <h3>SCR Human Readable Payload</h3>
+            <textarea type=text cols="80" rows="10" id="human_readable" name="human_readable">stuff</textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <a href=# id=process_input><button class='btn btn-primary'>Submit</button></a>
+        </div>
+    </div>
+    <div class="row">
+        <h2>Result:</h2>
+        <pre id="result"></pre>
+    </div>
+</form>
+
+{% endblock %}

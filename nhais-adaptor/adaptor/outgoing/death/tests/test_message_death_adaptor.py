@@ -2,8 +2,8 @@ import unittest
 
 from testfixtures import compare
 
-from adaptor.outgoing.death.message_death_adaptor import MessageDeathAdaptor
 import adaptor.outgoing.death.tests.fixtures as fixtures
+from adaptor.outgoing.death.message_death_adaptor import MessageDeathAdaptor
 from edifact.outgoing.models.death.message_death import MessageSegmentDeathPatientDetails, \
     MessageSegmentDeathRegistrationDetails, DeathRegistrationMessage
 from edifact.outgoing.models.message import MessageBeginning
@@ -16,7 +16,7 @@ class TestMessageDeathAdaptor(unittest.TestCase):
         Test the function to create an edifact section representing the beginning of a message
         """
         with self.subTest("Message beginning for a death registration"):
-            expected = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338",
+            expected = MessageBeginning(party_id="XX1", date_time="201904230900",
                                         ref_number="G5").segments
 
             op_def = fixtures.create_operation_definition_for_death_registration()
@@ -40,7 +40,7 @@ class TestMessageDeathAdaptor(unittest.TestCase):
         with self.subTest("Patient death registration details without free text"):
             expected = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                               party_id="4826940,281",
-                                                              date_time="2019-04-20 09:00:04.15933").segments
+                                                              date_time="20190420").segments
 
             op_def = fixtures.create_operation_definition_for_death_registration()
 
@@ -52,7 +52,7 @@ class TestMessageDeathAdaptor(unittest.TestCase):
         with self.subTest("Patient death registration details with free text"):
             expected = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                               party_id="4826940,281",
-                                                              date_time="2019-04-20 09:00:04.159338",
+                                                              date_time="20190420",
                                                               free_text="Died Happy").segments
 
             op_def = fixtures.create_operation_definition_for_death_registration(free_text="Died Happy")
@@ -67,7 +67,7 @@ class TestMessageDeathAdaptor(unittest.TestCase):
         Test the function to create an edifact message
         """
         with self.subTest("Death Registration"):
-            msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-04-23 09:00:04.159338", ref_number="G5")
+            msg_bgn = MessageBeginning(party_id="XX1", date_time="201904230900", ref_number="G5")
             msg_seg_pat_details = MessageSegmentDeathPatientDetails(id_number="NHSNO22222")
             msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",

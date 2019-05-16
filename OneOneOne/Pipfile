@@ -7,10 +7,10 @@ verify_ssl = true
 
 [packages]
 integration-adaptors-common = {editable = true,path = "./../common"}
+tornado = "*"
 
 [requires]
 python_version = "3.7"
-tornado = "*"
 
 [scripts]
 tests = "python -m unittest -v"

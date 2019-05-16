@@ -21,7 +21,7 @@ class TestMessageDeath(unittest.TestCase):
 
             msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",
-                                                                         date_time="2019-04-23 09:00:04.159338",
+                                                                         date_time="20190423",
                                                                          free_text="Died in Infinity Wars").to_edifact()
             self.assertEqual(msg_seg_reg_details, expected_edifact_message)
 
@@ -34,7 +34,7 @@ class TestMessageDeath(unittest.TestCase):
 
             msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                          party_id="4826940,281",
-                                                                         date_time="2019-04-23 09:00:04.159338"
+                                                                         date_time="20190423"
                                                                          ).to_edifact()
             self.assertEqual(msg_seg_reg_details, expected_edifact_message)
 
@@ -61,10 +61,11 @@ class TestMessageDeath(unittest.TestCase):
                                     "S02+2'"
                                     "PNA+PAT+N/10/10:OPI'"
                                     "UNT+14+00001'")
-        msg_bgn = MessageBeginning(party_id="XX1", date_time="2019-05-07 09:00:04.159338", ref_number="G5")
+
+        msg_bgn = MessageBeginning(party_id="XX1", date_time="201905070900", ref_number="G5")
         msg_seg_reg_details = MessageSegmentDeathRegistrationDetails(transaction_number=17,
                                                                      party_id="4826940,281",
-                                                                     date_time="2019-05-05 09:00:04.159338",
+                                                                     date_time="20190505",
                                                                      free_text="Died in Infinity Wars")
 
         msg_seg_pat_details = MessageSegmentDeathPatientDetails(id_number="N/10/10")
