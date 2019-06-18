@@ -3,7 +3,9 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'python --version'
+                dir('mhs-reference-implementation') {
+                    sh 'python --version'
+                }
             }
         }
     }
