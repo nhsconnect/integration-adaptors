@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        dockerfile { dir 'mhs-reference-implementation/docker/build' }
+        dockerfile { dir 'mhs-reference-implementation/docker/build-environment' }
     }
     stages {
         stage('build') {
