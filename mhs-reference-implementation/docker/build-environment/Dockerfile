@@ -1,2 +1,2 @@
 FROM python:3-alpine
-RUN pip install pipenv
+RUN pip install --user pipenv

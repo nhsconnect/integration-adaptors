@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'mc706/pipenv-3.7' }
+        dockerfile { dir 'mhs-reference-implementation/docker/build-environment' }
     }
     stages {
         stage('build') {
