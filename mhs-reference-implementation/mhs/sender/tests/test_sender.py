@@ -36,7 +36,7 @@ class TestSender(TestCase):
         self.mock_interactions_config.get_interaction_details.assert_called_with(sentinel.interaction_name)
         self.mock_message_builder.build_message.assert_called_with(expected_context)
         self.assertTrue(is_async)
-        self.assertIs(sentinel.ebxml_id, actual_id)
+        self.assertIs(sentinel.ebxml_id, "foo")
         self.assertIs(sentinel.ebxml_message, actual_response)
 
     def test_prepare_message_sync(self):
