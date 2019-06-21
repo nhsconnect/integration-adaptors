@@ -1,7 +1,7 @@
 pipeline {
     agent any
     stages {
-        stage('build') {
+        stage('Unit Tests') {
             steps {
                 dir('mhs-reference-implementation') {
                     sh label: 'Installing dependencies', script: 'pipenv install --deploy --ignore-pipfile'
