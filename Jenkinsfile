@@ -11,7 +11,7 @@ pipeline {
         }
         stage('Package') {
             steps {
-                sh label: 'Running Packer build', script: 'packer build packer\mhs.json'
+                sh label: 'Running Packer build', script: 'packer build packer/mhs.json'
             }
         }
     }
