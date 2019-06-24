@@ -1,9 +1,11 @@
 {
-  "_todo": "ECR upload",
   "variables": {
     "app_dir": "/usr/src/app",
     "common_dir": "common",
-    "mhs_dir": "mhs-reference-implementation"
+    "mhs_dir": "mhs-reference-implementation",
+    "repository": "{{env `DOCKER_REPOSITORY`}}",
+    "tag": "{{env `GIT_BRANCH`}}-{{env `BUILD_NUMBER`}}",
+    "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
   },
   "builders": [
     {
@@ -42,5 +44,19 @@
         "pipenv install --deploy --ignore-pipfile"
       ]
     }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "{{user `repository`}}",
+        "tag": "{{user `tag`}}"
+      },
+      {
+        "type": "docker-push",
+        "ecr_login": true,
+        "login_server": "{{user `docker_registry_url`}}"
+      }
+    ]
   ]
 }
