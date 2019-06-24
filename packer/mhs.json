@@ -1,0 +1,46 @@
+{
+  "_todo": "ECR upload",
+  "variables": {
+    "app_dir": "/usr/src/app",
+    "common_dir": "common",
+    "mhs_dir": "mhs-reference-implementation"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "python:3-slim",
+      "commit": true,
+      "changes": [
+        "EXPOSE 80 443",
+        "WORKDIR {{user `app_dir`}}/{{user `mhs_dir`}}",
+        "ENTRYPOINT pipenv run mhs"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "mkdir -p {{user `app_dir`}}"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `common_dir`}}",
+      "destination": "{{user `app_dir`}}"
+    },
+    {
+      "type": "file",
+      "source": "{{user `mhs_dir`}}",
+      "destination": "{{user `app_dir`}}"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "pip install pipenv",
+        "cd {{user `app_dir`}}/{{user `mhs_dir`}}",
+        "pipenv install --deploy --ignore-pipfile"
+      ]
+    }
+  ]
+}
