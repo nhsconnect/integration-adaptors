@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-      BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+      BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
     }
 
     stages {
