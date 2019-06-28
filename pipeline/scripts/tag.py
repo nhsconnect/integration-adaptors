@@ -34,4 +34,4 @@ def _parse_arguments():
 if __name__ == "__main__":
     args = _parse_arguments()
 
-    print(generate_tag(args.branch_name, args.build_id))
+    print(generate_tag(args.branch_name, args.build_id), end="")
