@@ -17,7 +17,7 @@ def generate_tag(branch_name: str, build_id: str) -> str:
     return tag
 
 
-def _clean_tag_element(tag_element):
+def _clean_tag_element(tag_element: str) -> str:
     clean_tag_element = tag_element.replace("/", "-")
     return clean_tag_element
 
