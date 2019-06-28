@@ -1,4 +1,5 @@
 {
+  "_description": "This template produces a Docker container that contains the MHS application and pushes it to the docker repository specified by the relevant environment variables.",
   "variables": {
     "app_dir": "/usr/src/app",
     "common_dir": "common",
