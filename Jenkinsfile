@@ -1,5 +1,10 @@
 pipeline {
     agent any
+
+    environment {
+      BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python build/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+    }
+
     stages {
         stage('Unit Tests') {
             steps {
@@ -9,9 +14,10 @@ pipeline {
                 }
             }
         }
+
         stage('Package') {
             steps {
-                sh label: 'Running Packer build', script: 'packer build packer/mhs.json'
+                sh label: 'Running Packer build', script: 'packer build build/packer/mhs.json'
             }
         }
     }

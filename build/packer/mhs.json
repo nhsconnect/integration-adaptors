@@ -4,7 +4,7 @@
     "common_dir": "common",
     "mhs_dir": "mhs-reference-implementation",
     "repository": "{{env `DOCKER_REPOSITORY`}}",
-    "tag": "{{env `GIT_BRANCH`}}-{{env `BUILD_NUMBER`}}",
+    "tag": "{{env `BUILD_TAG`}}",
     "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
   },
   "builders": [
