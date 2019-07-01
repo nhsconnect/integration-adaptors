@@ -1,0 +1,29 @@
+import os
+
+from selenium_tests.page_objects import interactions, xml_parser
+
+HUMAN_READABLE = 'Payload stuff'
+
+
+def __init__(self, driver):
+    self.driver = driver
+
+
+def get_asid():
+    ###The asid should be stored in data\local_asid file (which is excluded from GIT
+    with open(os.path.join(os.getcwd(), "selenium_tests\\data\\local_asid")) as asid_file:
+        asid = asid_file.readline()
+    asid_file.close()
+
+    return asid
+
+
+def get_interaction(interaction_name, nhs_number):
+    return interactions.process_request(interaction_name, get_asid(), nhs_number, HUMAN_READABLE)
+
+
+def check_scr_response(returned_xml):
+    returned_data = xml_parser.XmlMessageParser().parse_message(returned_xml)
+    value = xml_parser.XmlMessageParser().extract_hl7xml_value(returned_data, 'requestSuccessDetail')
+
+    return value is not None
