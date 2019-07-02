@@ -1,16 +1,13 @@
-
 import mhs.routing.sds as sds
 
 
 class MHSAttributeLookupHandler:
 
-    def __init__(self, sds_lookup_address: str = None):
-        self.cache = {}
-        self.sds_client = sds.SDSClient(sds_lookup_address)
+    def __init__(self, client: sds.SDSClient):
+        if not client:
+            raise ValueError('sds client required')
+        self.sds_client = client
 
-    async def retrieve_mhs_attributes(self, org_code, service_id):
-        # Check cache for hits, if no hit retrieve via sds client
-        endpoint_details = await self.sds_client.get_mhs_details(org_code, service_id)
-
-        # cache.add(endpoint_details)
+    async def retrieve_mhs_attributes(self, org_code, interaction_id):
+        endpoint_details = await self.sds_client.get_mhs_details(org_code, interaction_id)
         return endpoint_details
