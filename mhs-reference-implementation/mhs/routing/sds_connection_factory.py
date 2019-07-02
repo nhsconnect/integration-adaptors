@@ -19,7 +19,7 @@ def build_sds_connection_tls(ldap_address: str,
                              ca_certs_file: str
                              ) -> ldap3.Connection:
     """
-    This will return a connection object for the given ip along with loading the given certification files 
+    This will return a connection object for the given ip along with loading the given certification files
     :param ldap_address:
     :param private_key_path:
     :param local_cert_path:

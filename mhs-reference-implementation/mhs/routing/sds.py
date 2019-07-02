@@ -104,10 +104,10 @@ class SDSClient:
 
     async def _get_query_result(self, message_id: int) -> List:
         loop = asyncio.get_event_loop()
+        response = []
         try:
             response, result = await loop.run_in_executor(None, self.connection.get_response, message_id, self.timeout)
         except ldap_exceptions.LDAPResponseTimeoutError:
             logger.error(f'LDAP query timed out for message id: {message_id}')
-            return []
 
         return response
