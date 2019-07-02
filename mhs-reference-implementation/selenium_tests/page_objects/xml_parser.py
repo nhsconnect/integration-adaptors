@@ -1,7 +1,4 @@
-import xml.etree.ElementTree as ET
-
-CONTROLACTEVENT = "classCode"
-INTERACTION_ID = "root"
+import xml.etree.ElementTree as et
 
 HL7_NAMESPACE = "hl7"
 NAMESPACES = {HL7_NAMESPACE: "urn:hl7-org:v3"}
@@ -17,7 +14,7 @@ class XmlMessageParser:
         :return: the parsed message.
         """
 
-        return ET.fromstring(message)
+        return et.fromstring(message)
 
     def path_to_hl7xml_element(self, name, parent=None):
         path = ".//"

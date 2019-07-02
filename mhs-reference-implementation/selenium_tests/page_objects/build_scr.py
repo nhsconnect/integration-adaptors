@@ -1,6 +1,6 @@
 import datetime
 
-from src.gp_summary_update import SummaryCareRecord
+from scr.gp_summary_update import SummaryCareRecord
 from utilities.message_utilities import MessageUtilities
 
 HL7_TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"
@@ -11,7 +11,7 @@ def build_scr(asid, patient_nhs_number, human_readable_payload):
 
     :param asid: The ASID of this node.
     :param patient_nhs_number: The NHS number of the patient this record belongs to.
-    :param human_readable_payload: The himan readable payload to be included in the summary message.
+    :param human_readable_payload: The human readable payload to be included in the summary message.
     :return: The GP summary message.
     """
 
