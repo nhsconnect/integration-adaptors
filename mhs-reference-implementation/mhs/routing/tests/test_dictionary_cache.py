@@ -37,7 +37,7 @@ class TestDictionaryCache(TestCase):
 
     @async_test
     async def test_message_should_timeout(self):
-        half_second = 1.0 / 120
+        half_second = 0.5
         cache = Cache.DictionaryCache(half_second)
         await cache.add_cache_value("code", "int", "check123")
 
