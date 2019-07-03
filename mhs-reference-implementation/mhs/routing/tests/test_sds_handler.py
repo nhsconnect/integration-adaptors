@@ -1,8 +1,11 @@
+import asyncio
+import time
 from unittest import TestCase
+from unittest.mock import MagicMock
 import mhs.routing.sds_handler as sds
-
 import mhs.routing.tests.ldap_mocks as mocks
 from utilities.test_utilities import async_test
+from mhs.routing import dictionary_cache as dc
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 
@@ -12,7 +15,6 @@ OPENTEST_SDS_URL = "192.168.128.11"
 PARTY_KEY = " AP4RTY-K33Y"
 INTERACTION_ID = "urn:nhs:names:services:psis:MCCI_IN010000UK13"
 ODS_CODE = "ODSCODE1"
-
 
 expected_mhs_attributes = {
     'nhsEPInteractionType': 'HL7',
@@ -39,9 +41,13 @@ expected_mhs_attributes = {
 
 class TestMHSAttributeLookupHandler(TestCase):
 
+    def setUp(self) -> None:
+        self.cache = dc.DictionaryCache()
+        self.mocked_client = mocks.mocked_sds_client()
+
     @async_test
     async def test_get_endpoint(self):
-        handler = sds.MHSAttributeLookupHandler(mocks.mocked_sds_client())
+        handler = sds.MHSAttributeLookupHandler(mocks.mocked_sds_client(), self.cache)
         attributes = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
         for key, value in expected_mhs_attributes.items():
             self.assertEqual(value, attributes[key])
@@ -52,4 +58,58 @@ class TestMHSAttributeLookupHandler(TestCase):
     @async_test
     async def test_no_client(self):
         with self.assertRaises(ValueError):
-            sds.MHSAttributeLookupHandler(None)
+            sds.MHSAttributeLookupHandler(None, self.cache)
+
+    @async_test
+    async def test_no_cache(self):
+        with self.assertRaises(ValueError):
+            sds.MHSAttributeLookupHandler(mocks.mocked_sds_client(), None)
+
+    @async_test
+    async def test_value_added_to_cache(self):
+        handler = sds.MHSAttributeLookupHandler(mocks.mocked_sds_client(), self.cache)
+        handler.sds_client = mocks.mocked_sds_client()
+        future = asyncio.Future()
+        future.set_result(None)
+
+        handler.cache.add_cache_value = MagicMock()
+        handler.cache.retrieve_mhs_attributes_value = MagicMock()
+
+        handler.cache.retrieve_mhs_attributes_value.return_value = future
+        handler.cache.add_cache_value.return_value = future
+
+        result = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
+
+        handler.cache.add_cache_value.assert_called_with(ODS_CODE, INTERACTION_ID, result)
+
+    @async_test
+    async def test_sds_not_called_when_value_in_cache(self):
+        await self.cache.add_cache_value("check", "not", "added")
+        handler = sds.MHSAttributeLookupHandler(MagicMock(), self.cache)
+
+        result = await handler.retrieve_mhs_attributes("check", "not")
+
+        self.assertEqual(result, "added")
+        handler.sds_client.assert_not_called()
+
+    @async_test
+    async def test_retrieving_cache_value_doesnt_reset_ttl(self):
+
+        cache = dc.DictionaryCache(expiry_time=3)
+        client = MagicMock()
+        future = asyncio.Future()
+        future.set_result({'attributes': 'testData'})
+
+        client.get_mhs_details.return_value = future
+        handler = sds.MHSAttributeLookupHandler(client, cache)
+
+        await handler.cache.add_cache_value("check", "not", "added")  # value in cache for 3 seconds
+
+        time.sleep(2)
+        await handler.retrieve_mhs_attributes("check", "not")  # This will come from the cache
+        handler.sds_client.get_mhs_details.assert_not_called()
+
+        time.sleep(1.1)  # wait for the cache to expire
+        await handler.retrieve_mhs_attributes("check", "not")  # This should expire in the cache and call sds
+
+        handler.sds_client.get_mhs_details.assert_called_once()
