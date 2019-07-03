@@ -87,7 +87,7 @@ class SDSClient:
 
     async def _mhs_details_lookup(self, party_key: str, interaction_id: str) -> List:
         """
-        Given a party key and a service, this will return an object containing the attributes of that party key,
+        Given a party key and an interaction id, this will return an object containing the attributes of that party key,
         including the endpoint address
         :return: all the endpoint details
         """

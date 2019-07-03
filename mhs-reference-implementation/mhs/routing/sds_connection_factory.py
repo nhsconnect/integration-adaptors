@@ -4,7 +4,7 @@ import ldap3
 
 def build_sds_connection(ldap_address: str) -> ldap3.Connection:
     """
-    Given an ip address this will return a ldap3 connection object
+    Given an ldap service address this will return a ldap3 connection object
     """
     server = ldap3.Server(ldap_address)
     connection = ldap3.Connection(server, auto_bind=True, client_strategy=ldap3.REUSABLE)
