@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import mhs.routing.sds_handler as sds
 import mhs.routing.tests.ldap_mocks as mocks
 from utilities.test_utilities import async_test
-from mhs.routing import dictionary_cache as dc
+import mhs.routing.dictionary_cache as dc
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 
@@ -52,7 +52,7 @@ class TestMHSAttributeLookupHandler(TestCase):
         for key, value in expected_mhs_attributes.items():
             self.assertEqual(value, attributes[key])
 
-        # Assert exact number of attributes, minus the unique values
+        # Assert exact number of attributes
         self.assertEqual(len(attributes), len(expected_mhs_attributes))
 
     @async_test
