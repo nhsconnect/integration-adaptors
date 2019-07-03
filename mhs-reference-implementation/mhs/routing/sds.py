@@ -36,9 +36,7 @@ class SDSClient:
     async def get_mhs_details(self, ods_code: str, interaction_id: str) -> Dict:
         """
         Returns the mhs details for the given org code and interaction id
-        :param ods_code:
-        :param interaction_id:
-        :return:
+        :return: Dictionary of the attributes of the mhs associated with the given parameters
         """
 
         accredited_system_lookup = await self._accredited_system_lookup(ods_code, interaction_id)
@@ -76,16 +74,13 @@ class SDSClient:
         logger.info(f'Message id - {message_id} - for query: ods code - {ods_code} '
                     f': interaction id - {interaction_id}')
 
-        query_task = self._get_query_result(message_id)
-        response = await query_task
+        response = await self._get_query_result(message_id)
         return response
 
     async def _mhs_details_lookup(self, party_key: str, interaction_id: str) -> List:
         """
         Given a party key and a service, this will return an object containing the attributes of that party key,
         including the endpoint address
-        :param party_key:
-        :param interaction_id:
         :return: all the endpoint details
         """
         search_filter = f"(&(objectClass={MHS_OBJECT_CLASS})" \
@@ -98,8 +93,7 @@ class SDSClient:
         logger.info(f'Message id - {message_id} - for query: party key - {party_key} '
                     f': interaction id - {interaction_id}')
 
-        query_task = self._get_query_result(message_id)
-        response = await query_task
+        response = await self._get_query_result(message_id)
         return response
 
     async def _get_query_result(self, message_id: int) -> List:

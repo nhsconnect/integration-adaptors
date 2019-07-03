@@ -5,8 +5,6 @@ import ldap3
 def build_sds_connection(ldap_address: str) -> ldap3.Connection:
     """
     Given an ip address this will return a ldap3 connection object
-    :param ldap_address:
-    :return:
     """
     server = ldap3.Server(ldap_address)
     connection = ldap3.Connection(server, auto_bind=True, client_strategy=ldap3.REUSABLE)
@@ -20,11 +18,7 @@ def build_sds_connection_tls(ldap_address: str,
                              ) -> ldap3.Connection:
     """
     This will return a connection object for the given ip along with loading the given certification files
-    :param ldap_address:
-    :param private_key_path:
-    :param local_cert_path:
-    :param ca_certs_file:
-    :return:
+    :return: Connection object using the given cert files
     """
 
     load_tls = ldap3.Tls(local_private_key_file=private_key_path,
