@@ -42,6 +42,8 @@ class SDSClient:
         accredited_system_lookup = await self._accredited_system_lookup(ods_code, interaction_id)
 
         if not accredited_system_lookup:
+            logger.error(f"Failed to find accredited system details for ods code : {ods_code} and interaction id: "
+                         f"{interaction_id}")
             raise routing_exception.RoutingException('No response from accredited system lookup')
 
         if len(accredited_system_lookup) > 1:
@@ -54,6 +56,10 @@ class SDSClient:
 
         details = await self._mhs_details_lookup(party_key, interaction_id)
 
+        if not details:
+            logger.error(f'No mhs details returned for party key: {party_key} and interaction id : {interaction_id}')
+            raise routing_exception.RoutingException(f'No mhs details returned for party key: '
+                                                     f'{party_key} and interaction id : {interaction_id}')
         if len(details) > 1:
             logger.warning(f"More than one mhs details returned on inputs: "
                            f"ods: {ods_code} - interaction: {interaction_id}")
@@ -75,6 +81,8 @@ class SDSClient:
                     f': interaction id - {interaction_id}')
 
         response = await self._get_query_result(message_id)
+        logger.info(f'Found accredited supplier details for message_id: {message_id}')
+
         return response
 
     async def _mhs_details_lookup(self, party_key: str, interaction_id: str) -> List:
@@ -94,6 +102,8 @@ class SDSClient:
                     f': interaction id - {interaction_id}')
 
         response = await self._get_query_result(message_id)
+        logger.info(f'Found mhs details for message_id: {message_id}')
+
         return response
 
     async def _get_query_result(self, message_id: int) -> List:

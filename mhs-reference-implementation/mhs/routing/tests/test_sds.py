@@ -81,7 +81,7 @@ class TestSDSClient(TestCase):
             await client.get_mhs_details("fake code", "fake interaction")
 
     @async_test
-    async def test__no_connection(self):
+    async def test_no_connection(self):
         with self.assertRaises(ValueError):
             sds.SDSClient(None)
 
