@@ -20,5 +20,32 @@ pipeline {
                 sh label: 'Running Packer build', script: 'packer build pipeline/packer/mhs.json'
             }
         }
+
+        stage('Deploy') {
+            steps {
+                dir('pipeline/terraform/test-environment') {
+                    // TODO: Use tag name (and repo URL base?) to work out URL of container image & provide as a terraform input var
+                    sh label: 'Initialising Terraform', script: 'terraform init'
+                    sh label: 'Applying Terraform configuration', script: 'terraform apply --var cluster_id=${CLUSTER_ID} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            steps {
+                // TODO: Run actual integration tests.
+                sh label: 'Ping MHS', script: 'ping ${MHS_ADDRESS}'
+            }
+        }
+
+        post {
+            cleanup {
+                steps{
+                    dir('pipeline/terraform/test-environment') {
+                        sh label: 'Destroying Terraform configuration', script: 'terraform destroy --var cluster_id=${CLUSTER_ID} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
+                    }
+                }
+            }
+        }
     }
 }
