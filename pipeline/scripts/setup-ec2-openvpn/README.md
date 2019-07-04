@@ -1,6 +1,6 @@
 # EC2 OpenVPN Setup Script
 
-This is a Fabric script that can be used to setup an EC2 instance (specifically, one that has been created by ECS) with an OpenVPN connection.
+This is a [Fabric](https://www.fabfile.org/) script that can be used to setup an EC2 instance (specifically, one that has been created by ECS) with an OpenVPN connection.
 
 Usage:
 - `pipenv install`
