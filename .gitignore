@@ -108,3 +108,8 @@ venv.bak/
 
 # PyCharm settings
 .idea
+
+# Certs
+**/*.cert
+**/*.key
+**/*.pem

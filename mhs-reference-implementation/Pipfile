@@ -10,6 +10,7 @@ scr = {editable = true,path = "./../SCR"}
 integration-adaptors-common = {editable = true,path = "./../common"}
 requests = "*"
 tornado = "*"
+ldap3 = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cafd36e3507948eca701908f22efc5acc4e2513a80e7d8ae12546a72e083b53a"
+            "sha256": "55775950977e714f70bf5a8841677b4c2220225977c60eef689e479681f39484"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -41,6 +41,14 @@
             "editable": true,
             "path": "./../common"
         },
+        "ldap3": {
+            "hashes": [
+                "sha256:0533eefc18d5ce0532f07fe1ce4e1f27128e1073845a6bf39fef2c828a401bb8",
+                "sha256:a92e380a0265963dc5507580ecd51eb84677e00c3d7800517b6442ef046f6ece"
+            ],
+            "index": "pypi",
+            "version": "==2.6"
+        },
         "lxml": {
             "hashes": [
                 "sha256:06c7616601430aa140a69f97e3116308fffe0848f543b639a5ec2e8920ae72fd",
@@ -69,6 +77,13 @@
                 "sha256:f2fec194a49bfaef42a548ee657362af5c7a640da757f6f452a35da7dd9f923c"
             ],
             "version": "==4.3.4"
+        },
+        "pyasn1": {
+            "hashes": [
+                "sha256:da2420fe13a9452d8ae97a0e478adde1dee153b11ba832a95b223a2ba01c10f7",
+                "sha256:da6b43a8c9ae93bc80e2739efb38cc776ba74a886e3e9318d65fe81a8b8a2c6e"
+            ],
+            "version": "==0.4.5"
         },
         "pystache": {
             "hashes": [
