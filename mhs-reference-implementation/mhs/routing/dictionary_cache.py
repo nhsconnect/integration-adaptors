@@ -5,7 +5,7 @@ from typing import Dict, Optional
 FIFTEEN_MINUTES_IN_SECONDS = 900
 
 
-def _generate_key(ods_code: str, interaction_id: str):
+def _generate_key(ods_code: str, interaction_id: str) -> str:
     return ods_code + interaction_id
 
 
@@ -36,7 +36,7 @@ class DictionaryCache(aca.AbstractMHSCacheAdaptor):
 
     def _is_value_expired(self, key: str) -> bool:
         """
-        A private method to check if the value associated with the given key has expired
+        Checks if the value associated with the given key has expired
         """
         current_time = time.time()
         insert_time = self.cache[key]['time']

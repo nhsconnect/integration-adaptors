@@ -16,7 +16,6 @@ class TestDictionaryCache(unittest.TestCase):
     @async_test
     async def test_get_basic_value(self):
         cache = dict_cache.DictionaryCache()
-        # Check cache is empty first
         self.assertTrue(not cache.cache)
 
         await cache.add_cache_value("code", "int", "check123")
