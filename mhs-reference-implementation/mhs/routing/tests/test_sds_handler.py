@@ -66,13 +66,10 @@ class TestMHSAttributeLookupHandler(TestCase):
 
     @async_test
     async def test_value_added_to_cache(self):
-        handler = sds.MHSAttributeLookupHandler(mocks.mocked_sds_client(), self.cache)
-        handler.sds_client = mocks.mocked_sds_client()
+        handler = sds.MHSAttributeLookupHandler(mocks.mocked_sds_client(), MagicMock())
+
         future = asyncio.Future()
         future.set_result(None)
-
-        handler.cache.add_cache_value = MagicMock()
-        handler.cache.retrieve_mhs_attributes_value = MagicMock()
 
         handler.cache.retrieve_mhs_attributes_value.return_value = future
         handler.cache.add_cache_value.return_value = future
