@@ -10,7 +10,8 @@ pipenv install
 ```
 
 ### Running Tests
-`pipenv run tests` will run all tests.
+`pipenv run unittests` will run all unit tests.
+`pipenv run inttests` will run all integration tests.
 
 ### Running an MHS Instance
 `pipenv run mhs` will run the `main.py` script (you can also run this directly). This will start up an MHS

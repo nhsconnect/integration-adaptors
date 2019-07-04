@@ -5,11 +5,12 @@ from definitions import ROOT_DIR
 from selenium_tests.page_objects import interactions, xml_parser
 
 HUMAN_READABLE = 'Payload stuff'
+DATA_PATH = 'selenium_tests/data'
 
 
 def get_asid():
     # The asid should be stored in data\local_asid file (which is excluded from GIT
-    with (Path(ROOT_DIR) / "selenium_tests" / "data" / "local_asid").open() as asid_file:
+    with (Path(ROOT_DIR) / DATA_PATH / "local_asid").open() as asid_file:
         asid = asid_file.readline()
 
     return asid
