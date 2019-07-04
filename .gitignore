@@ -109,5 +109,6 @@ venv.bak/
 # PyCharm settings
 .idea
 
-# Terraform directories
+# Terraform
 .terraform
+*.tfstate*
