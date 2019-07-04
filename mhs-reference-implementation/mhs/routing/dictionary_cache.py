@@ -24,9 +24,8 @@ class DictionaryCache(aca.AbstractMHSCacheAdaptor):
         """
         key = _generate_key(ods_code, interaction_id)
 
-        if key in self.cache and not self._is_value_expired(key):
+        if key in self.cache:
             if self._is_value_expired(key):
-                self.cache[key] = None
                 del self.cache[key]
                 return None
             else:
