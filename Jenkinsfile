@@ -41,10 +41,8 @@ pipeline {
 
     post {
         cleanup {
-            steps{
-                dir('pipeline/terraform/test-environment') {
+            dir('pipeline/terraform/test-environment') {
                     sh label: 'Destroying Terraform configuration', script: 'terraform destroy --var cluster_id=${CLUSTER_ID} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
-                }
             }
         }
     }
