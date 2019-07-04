@@ -1,30 +1,36 @@
 #!/bin/sh
-# Copyright (c) 2007-2008 Roy Marples <roy@marples.name>
-# Amended by Kristian Gunstone for manjaro-openrc
-# Released under the 2-clause BSD license.
+# Copyright (c) 2007-2015 The OpenRC Authors.
+# See the Authors file at the top-level directory of this distribution and
+# https://github.com/OpenRC/openrc/blob/master/AUTHORS
+#
+# This file is part of OpenRC. It is subject to the license terms in
+# the LICENSE file found in the top-level directory of this
+# distribution and at https://github.com/OpenRC/openrc/blob/master/LICENSE
+# This file may not be copied, modified, propagated, or distributed
+#    except according to the terms contained in the LICENSE file.
 
-export RC_SERVICE=/etc/init.d/$SVCNAME
-export RC_SVCNAME=$SVCNAME
 # If we have a service specific script, run this now
 [ -x "${RC_SVCNAME}"-down.sh ] && "${RC_SVCNAME}"-down.sh
 
 # Restore resolv.conf to how it was
-if type resolvconf >/dev/null 2>&1; then
-    resolvconf -d "${dev}"
+if command -v resolvconf >/dev/null 2>&1; then
+        resolvconf -d "${dev}"
 elif [ -e /etc/resolv.conf-"${dev}".sv ]; then
-    # Important that we copy instead of move incase resolv.conf is
-    # a symlink and not an actual file
-    cp -p /etc/resolv.conf-"${dev}".sv /etc/resolv.conf
-    rm -f /etc/resolv.conf-"${dev}".sv
+        # Important that we copy instead of move incase resolv.conf is
+        # a symlink and not an actual file
+        cp -p /etc/resolv.conf-"${dev}".sv /etc/resolv.conf
+        rm -f /etc/resolv.conf-"${dev}".sv
 fi
 
 # Re-enter the init script to stop any dependant services
 if [ -x "${RC_SERVICE}" ]; then
-    if "${RC_SERVICE}" --quiet status; then
-        export IN_BACKGROUND=YES
-        "${RC_SERVICE}" --quiet stop
-    fi
+        if "${RC_SERVICE}" --quiet status; then
+                IN_BACKGROUND=YES
+                export IN_BACKGROUND
+                "${RC_SERVICE}" --quiet stop
+        fi
 fi
 
 exit 0
-# File taken from https://gist.github.com/gammy/b821ff02abfb23d0e41524f96d8a1b0a
+
+# File taken from https://github.com/OpenRC/openrc/blob/fee2ffe559bc39beec16585daf557b902a53137b/support/openvpn/down.sh

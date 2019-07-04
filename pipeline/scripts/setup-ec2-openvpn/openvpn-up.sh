@@ -1,7 +1,13 @@
 #!/bin/sh
-# Copyright (c) 2007-2008 Roy Marples <roy@marples.name>
-# Amended by Kristian Gunstone for manjaro-openrc
-# Released under the 2-clause BSD license.
+# Copyright (c) 2007-2015 The OpenRC Authors.
+# See the Authors file at the top-level directory of this distribution and
+# https://github.com/OpenRC/openrc/blob/master/AUTHORS
+#
+# This file is part of OpenRC. It is subject to the license terms in
+# the LICENSE file found in the top-level directory of this
+# distribution and at https://github.com/OpenRC/openrc/blob/master/LICENSE
+# This file may not be copied, modified, propagated, or distributed
+#    except according to the terms contained in the LICENSE file.
 
 # Setup our resolv.conf
 # Vitally important that we use the domain entry in resolv.conf so we
@@ -23,9 +29,6 @@ NS=
 DOMAIN=
 SEARCH=
 i=1
-export RC_SERVICE=/etc/init.d/$SVCNAME
-export RC_SVCNAME=$SVCNAME
-
 while true; do
         eval opt=\$foreign_option_${i}
         [ -z "${opt}" ] && break
@@ -38,7 +41,7 @@ while true; do
         elif [ "${opt}" != "${opt#dhcp-option DNS *}" ]; then
                 NS="${NS}nameserver ${opt#dhcp-option DNS *}\n"
         fi
-        i=$((${i} + 1))
+        : $(( i += 1 ))
 done
 
 if [ -n "${NS}" ]; then
@@ -49,7 +52,7 @@ if [ -n "${NS}" ]; then
                 DNS="${DNS}domain ${DOMAIN}\n"
         fi
         DNS="${DNS}${NS}"
-        if type resolvconf >/dev/null 2>&1; then
+        if command -v resolvconf >/dev/null 2>&1; then
                 printf "${DNS}" | resolvconf -a "${dev}"
         else
                 # Preserve the existing resolv.conf
@@ -68,10 +71,12 @@ fi
 # Re-enter the init script to start any dependant services
 if [ -x "${RC_SERVICE}" ]; then
         if ! "${RC_SERVICE}" --quiet status; then
-                export IN_BACKGROUND=true
+                IN_BACKGROUND=YES
+                export IN_BACKGROUND
                 "${RC_SERVICE}" --quiet start
         fi
 fi
 
 exit 0
-# File taken from https://gist.github.com/gammy/23c071e62f6f93ea8d1b42e0c110d8c9
+
+# File taken from https://github.com/OpenRC/openrc/blob/fee2ffe559bc39beec16585daf557b902a53137b/support/openvpn/up.sh
