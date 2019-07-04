@@ -1,9 +1,10 @@
 from mhs.routing import sds_handler
 
+
 class RoutingAndReliability:
 
-    def __init__(self):
-        self.lookup = sds_handler.MHSAttributeLookupHandler()
+    def __init__(self, sds: sds_handler.MHSAttributeLookupHandler, cache):
+        self.lookup = sds_handler.MHSAttributeLookupHandler(sds, cache)
 
     async def get_end_point(self, org_code, service_id):
         endpoint_details = await self.lookup.retrieve_mhs_attributes(org_code, service_id)
