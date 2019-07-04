@@ -1,7 +1,7 @@
 import asyncio
 import time
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 import mhs.routing.sds_handler as sds
 import mhs.routing.tests.ldap_mocks as mocks
 from utilities.test_utilities import async_test
@@ -43,7 +43,6 @@ class TestMHSAttributeLookupHandler(TestCase):
 
     def setUp(self) -> None:
         self.cache = dc.DictionaryCache()
-        self.mocked_client = mocks.mocked_sds_client()
 
     @async_test
     async def test_get_endpoint(self):
@@ -92,10 +91,11 @@ class TestMHSAttributeLookupHandler(TestCase):
         self.assertEqual(result, "added")
         handler.sds_client.assert_not_called()
 
+    @patch('time.time')
     @async_test
-    async def test_retrieving_cache_value_doesnt_reset_ttl(self):
-
+    async def test_retrieving_cache_value_doesnt_reset_ttl(self, patched_time):
         cache = dc.DictionaryCache(expiry_time=3)
+        patched_time.return_value = 1
         client = MagicMock()
         future = asyncio.Future()
         future.set_result({'attributes': 'testData'})
@@ -105,11 +105,11 @@ class TestMHSAttributeLookupHandler(TestCase):
 
         await handler.cache.add_cache_value("check", "not", "added")  # value in cache for 3 seconds
 
-        time.sleep(2)
+        patched_time.return_value = 2  # Set time to something before the expiry
         await handler.retrieve_mhs_attributes("check", "not")  # This will come from the cache
         handler.sds_client.get_mhs_details.assert_not_called()
 
-        time.sleep(1.1)  # wait for the cache to expire
+        patched_time.return_value = 4.1  # wait for the cache to expire
         await handler.retrieve_mhs_attributes("check", "not")  # This should expire in the cache and call sds
 
         handler.sds_client.get_mhs_details.assert_called_once()

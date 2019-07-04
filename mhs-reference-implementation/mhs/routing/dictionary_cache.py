@@ -6,7 +6,7 @@ FIFTEEN_MINUTES_IN_SECONDS = 900
 
 
 def _generate_key(ods_code: str, interaction_id: str) -> str:
-    return ods_code + interaction_id
+    return ods_code + '-' + interaction_id
 
 
 class DictionaryCache(aca.AbstractMHSCacheAdaptor):

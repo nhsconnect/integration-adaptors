@@ -23,7 +23,7 @@ class AbstractMHSCacheAdaptor(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def add_cache_value(self, ods_code: str, interaction_id: str, value) -> None:
+    async def add_cache_value(self, ods_code: str, interaction_id: str, value: Dict) -> None:
         """
         Adds a value to the cache, recording the input time used to determine when values have expired
         """
