@@ -22,7 +22,6 @@ class RoutingAndReliability:
     async def get_end_point(self, org_code, service_id):
         endpoint_details = await self.lookup.retrieve_mhs_attributes(org_code, service_id)
         routing = {item: endpoint_details[item] for item in ROUTING_KEYS}
-
         return routing
 
     async def get_reliability(self, org_code, service_id):

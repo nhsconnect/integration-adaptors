@@ -5,6 +5,7 @@ from mhs.routing import sds_handler
 import mhs.routing.routing_reliabillity as rar
 import mhs.routing.tests.ldap_mocks as mocks
 import mhs.routing.routing_exception as route_exception
+import mhs.routing.dictionary_cache as dict_cache
 
 PARTY_KEY = " AP4RTY-K33Y"
 INTERACTION_ID = "urn:nhs:names:services:psis:MCCI_IN010000UK13"
@@ -18,10 +19,10 @@ EXPECTED_ROUTING = {
 
 EXPECTED_RELIABILITY = {
     'nhsMHSSyncReplyMode': 'MSHSignalsOnly',
+    'nhsMHSRetries': '2',
+    'nhsMHSPersistDuration': 'PT5M',
     'nhsMHSAckRequested': 'always',
     'nhsMHSDuplicateElimination': 'always',
-    'nhsMHSPersistDuration': 'PT5M',
-    'nhsMHSRetries': '2',
     'nhsMHSRetryInterval': 'PT1M'
 }
 
@@ -29,7 +30,8 @@ EXPECTED_RELIABILITY = {
 class TestRoutingReliability(unittest.TestCase):
 
     def setUp(self):
-        handler = sds_handler.MHSAttributeLookupHandler(mocks.mocked_sds_client())
+        cache = dict_cache.DictionaryCache()
+        handler = sds_handler.MHSAttributeLookupHandler(mocks.mocked_sds_client(), cache)
         self.router = rar.RoutingAndReliability(handler)
 
     @async_test
@@ -66,3 +68,4 @@ class TestRoutingReliability(unittest.TestCase):
     async def test_empty_handler(self):
         with self.assertRaises(ValueError):
             rar.RoutingAndReliability(None)
+
