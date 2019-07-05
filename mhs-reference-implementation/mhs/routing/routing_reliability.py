@@ -16,7 +16,7 @@ class RoutingAndReliability:
 
     def __init__(self, lookup_handler: sds_handler.MHSAttributeLookupHandler):
         if not lookup_handler:
-            raise ValueError("MHS Attribute Lookup not found")
+            raise ValueError("MHS Attribute Lookup Handler not found")
         self.lookup = lookup_handler
 
     async def get_end_point(self, org_code, service_id):
