@@ -7,10 +7,10 @@ TEMPLATES_DIR = "selenium_tests/data/templates"
 
 
 class MustacheMessageBuilder(PystacheMessageBuilder):
-    """A component that uses Pystache to populate a Mustache template in order to build a json message."""
+    """A component that uses Pystache to populate a Mustache template in order to build a message."""
 
     def __init__(self, template_file):
-        """Create a new JSONMessageBuilder that uses a json request template file.
+        """Create a new MessageBuilder that uses a mustache request template file.
 
         :param template_file: The template file to populate with values.
         """
