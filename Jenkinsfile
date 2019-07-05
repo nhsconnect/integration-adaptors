@@ -34,7 +34,7 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 // TODO: Run actual integration tests.
-                sh label: 'Ping MHS', script: 'ping ${MHS_ADDRESS}'
+                sh label: 'Ping MHS', script: 'curl ${MHS_ADDRESS}'
             }
         }
     }
