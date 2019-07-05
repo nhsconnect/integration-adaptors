@@ -3,17 +3,17 @@ provider "aws" {
   region = var.region
 }
 
-# TODO: Certs? Done using a volume? Or get them from host instance, since it's tied to a VPN connection?
+# TODO: Load Opentest certificates. Simplest approach would be to mount a directory on the host machine.
 
-# TODO: Use our container image
 resource "aws_ecs_task_definition" "test-environment-mhs-task" {
   family = "${var.build_id}-mhs-task"
 
-  # TODO: Get from ECR repo
+  # TODO: Get from ECR repo - See https://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_on_ECS.html
   container_definitions = jsonencode(
   [
     {
       name = "mhs"
+      # TODO: Use our container image
       image = "nginx:latest"
       essential = true
       logConfiguration = {
