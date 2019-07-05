@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import ldap3
-from mhs.routing import routing_exception
+from mhs.routing import sds_exception
 import ldap3.core.exceptions as ldap_exceptions
 from typing import Dict, List
 
@@ -44,7 +44,7 @@ class SDSClient:
         if not accredited_system_lookup:
             logger.error(f"Failed to find accredited system details for ods code : {ods_code} and interaction id: "
                          f"{interaction_id}")
-            raise routing_exception.RoutingException('No response from accredited system lookup')
+            raise sds_exception.SDSException('No response from accredited system lookup')
 
         if len(accredited_system_lookup) > 1:
             logger.warning(f"More than one accredited system details returned on inputs: "
@@ -58,7 +58,7 @@ class SDSClient:
 
         if not details:
             logger.error(f'No mhs details returned for party key: {party_key} and interaction id : {interaction_id}')
-            raise routing_exception.RoutingException(f'No mhs details returned for party key: '
+            raise sds_exception.SDSException(f'No mhs details returned for party key: '
                                                      f'{party_key} and interaction id : {interaction_id}')
         if len(details) > 1:
             logger.warning(f"More than one mhs details returned on inputs: "

@@ -2,7 +2,7 @@ from unittest import TestCase
 import mhs.routing.sds as sds
 import mhs.routing.tests.ldap_mocks as mocks
 from utilities.test_utilities import async_test
-import mhs.routing.routing_exception as re
+import mhs.routing.sds_exception as re
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 
@@ -77,7 +77,7 @@ class TestSDSClient(TestCase):
     @async_test
     async def test_no_results(self):
         client = mocks.mocked_sds_client()
-        with self.assertRaises(re.RoutingException):
+        with self.assertRaises(re.SDSException):
             await client.get_mhs_details("fake code", "fake interaction")
 
     @async_test
