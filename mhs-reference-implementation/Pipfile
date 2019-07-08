@@ -15,5 +15,6 @@ ldap3 = "*"
 python_version = "3.7"
 
 [scripts]
-tests = "python -m unittest -v"
+unittests = 'python -m unittest -v'
+inttests = 'python -m unittest discover -p "int_*" -v'
 mhs = "python main.py"
