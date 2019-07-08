@@ -1,7 +1,7 @@
 import datetime
 
 from utilities import message_utilities
-from selenium_tests.page_objects.message_builder import MustacheMessageBuilder
+from selenium_tests.page_objects import message_builder
 
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"
 MESSAGE_XML = "xml_IN150016UK05"
@@ -26,7 +26,7 @@ def build_scr(asid, patient_nhs_number, payload):
     timestamp = current_utc_time.strftime(TIMESTAMP_FORMAT)
     uuid = message_utilities.MessageUtilities.get_uuid()
 
-    xml_message = MustacheMessageBuilder(MESSAGE_XML).build_message({
+    xml_message = message_builder.MustacheMessageBuilder(MESSAGE_XML).build_message({
         UUID: uuid,
         TIMESTAMP: timestamp,
         ASID: asid,

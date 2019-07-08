@@ -1,12 +1,12 @@
 
-from builder.pystache_message_builder import PystacheMessageBuilder
+from builder import pystache_message_builder
 from definitions import ROOT_DIR
 from pathlib import Path
 
 TEMPLATES_DIR = "selenium_tests/data/templates"
 
 
-class MustacheMessageBuilder(PystacheMessageBuilder):
+class MustacheMessageBuilder(pystache_message_builder.PystacheMessageBuilder):
     """A component that uses Pystache to populate a Mustache template in order to build a message."""
 
     def __init__(self, template_file):
