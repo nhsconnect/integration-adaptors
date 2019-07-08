@@ -10,7 +10,7 @@ pipeline {
             steps {
                 dir('mhs-reference-implementation') {
                     sh label: 'Installing dependencies', script: 'pipenv install --deploy --ignore-pipfile'
-                    sh label: 'Running unit tests', script: 'pipenv run tests'
+                    sh label: 'Running unit tests', script: 'pipenv run unittests'
                 }
             }
         }
