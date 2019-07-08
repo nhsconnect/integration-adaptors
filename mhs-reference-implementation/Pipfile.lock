@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "55775950977e714f70bf5a8841677b4c2220225977c60eef689e479681f39484"
+            "sha256": "55ef3ca275ab652b135d1fc45f7dab2dacb036be03f0162f4d48e297a82f7e90"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -120,10 +120,5 @@
             "version": "==1.25.3"
         }
     },
-    "develop": {
-        "scr": {
-            "editable": true,
-            "path": "./../SCR"
-        }
-    }
+    "develop": {}
 }
