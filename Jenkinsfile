@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent{
+        label 'jenkins-workers'
+    }
 
     environment {
       BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
