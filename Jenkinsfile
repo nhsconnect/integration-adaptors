@@ -28,7 +28,7 @@ pipeline {
                 dir('pipeline/terraform/test-environment') {
                     // TODO: Use tag name (and repo URL base?) to work out URL of container image & provide as a terraform input var
                     sh label: 'Initialising Terraform', script: 'terraform init -input=false'
-                    sh label: 'Applying Terraform configuration', script: 'terraform apply -auto-approve --var cluster_id=${CLUSTER_ID} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
+                    sh label: 'Applying Terraform configuration', script: 'terraform apply -auto-approve --var cluster_id=${CLUSTER_ID} -var ecs_address=${DOCKER_REGISTRY_URL} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
                 }
             }
         }
@@ -44,7 +44,7 @@ pipeline {
     post {
         cleanup {
             dir('pipeline/terraform/test-environment') {
-                    sh label: 'Destroying Terraform configuration', script: 'terraform destroy -auto-approve --var cluster_id=${CLUSTER_ID} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
+                    sh label: 'Destroying Terraform configuration', script: 'terraform destroy -auto-approve --var cluster_id=${CLUSTER_ID} -var ecs_address=${DOCKER_REGISTRY_URL} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
             }
         }
     }

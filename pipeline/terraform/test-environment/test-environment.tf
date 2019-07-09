@@ -3,6 +3,7 @@ provider "aws" {
   region = var.region
 }
 
+
 # TODO: Load Opentest certificates. Simplest approach would be to mount a directory on the host machine.
 
 resource "aws_ecs_task_definition" "test-environment-mhs-task" {
@@ -14,7 +15,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
     {
       name = "mhs"
       # TODO: Use our container image
-      image = "nginx:latest"
+      image = "${var.ecs_address}:${var.build_id}"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"

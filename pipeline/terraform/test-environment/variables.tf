@@ -5,3 +5,4 @@ variable "region" {
 variable "cluster_id" {}
 variable "task_execution_role" {}
 variable "build_id" {}
+variable "ecs_address" {}
