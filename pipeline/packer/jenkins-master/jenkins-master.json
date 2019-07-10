@@ -19,12 +19,12 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "pipeline/packer/jenkins_plugins.txt",
+      "source": "pipeline/packer/jenkins-master/plugins.txt",
       "destination": "/usr/share/jenkins/ref/plugins.txt"
     },
     {
       "type": "file",
-      "source": "pipeline/packer/jenkins.yaml",
+      "source": "pipeline/packer/jenkins-master/jenkins.yaml",
       "destination": "/usr/share/jenkins/ref/jenkins.yaml"
     },
     {
