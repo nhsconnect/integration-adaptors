@@ -37,7 +37,7 @@ pipeline {
             steps {
                 // Wait for MHS container to fully stand up
                 // TODO: Run actual integration tests.
-                sh label: 'Ping MHS', script: 'sleep 10; curl ${MHS_ADDRESS}'
+                sh label: 'Ping MHS', script: 'sleep 60; curl ${MHS_ADDRESS}'
             }
         }
     }
