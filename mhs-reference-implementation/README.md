@@ -31,6 +31,6 @@ were granted access):
 root CA Certificate.
 - `client.key` - Your endpoint private key
 - `client.pem` - A copy of client.cert
+- `party_key.txt` - The party key associated with your MHS build 
 
-You will also need to configure your party key, by replacing the value of the `PARTY_ID` variable in `main.py` with your
-party key. If you are using Opentest, this will also have been provided when you were granted access.
+If you are using Opentest, each of these credentials will have been provided when you were granted access.
