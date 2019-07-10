@@ -36,18 +36,8 @@ pipeline {
         stage('Integration Tests') {
             steps {
                 // Wait for MHS container to fully stand up
-                timeout(10) {
-                    waitUntil {
-                       script {
-                         // def r = sh returnStdout: true, script: 'curl --write-out %{http_code} --silent ${MHS_ADDRESS}'
-                         def r = sh script: 'wget -q ${MHS_ADDRESS} -O /dev/null', returnStatus: true
-                         sh script: "echo ${r}"
-                         return (r != 000);
-                       }
-                    }
-                }
                 // TODO: Run actual integration tests.
-                sh label: 'Ping MHS', script: 'curl ${MHS_ADDRESS}'
+                sh label: 'Ping MHS', script: 'sleep 10; curl ${MHS_ADDRESS}'
             }
         }
     }
