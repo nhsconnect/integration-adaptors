@@ -9,12 +9,15 @@ provider "aws" {
 resource "aws_ecs_task_definition" "test-environment-mhs-task" {
   family = "${var.build_id}-mhs-task"
 
-  # TODO: Get from ECR repo - See https://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_on_ECS.html
+  volume {
+    name = "certs-volume"
+    host_path = "/home/ec2-user/certs"
+  }
+
   container_definitions = jsonencode(
   [
     {
       name = "mhs"
-      # TODO: Use our container image
       image = "${var.ecs_address}:${var.build_id}"
       essential = true
       logConfiguration = {
@@ -25,6 +28,11 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
           awslogs-stream-prefix = var.build_id
         }
       }
+
+      mountPoints = [{
+        sourceVolume = "certs-volume"
+        containerPath = "/usr/src/app/mhs-reference-implementation/data/certs/"
+      }]
 
       portMappings = [
         {
