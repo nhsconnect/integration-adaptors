@@ -3,9 +3,6 @@ provider "aws" {
   region = var.region
 }
 
-
-# TODO: Load Opentest certificates. Simplest approach would be to mount a directory on the host machine.
-
 resource "aws_ecs_task_definition" "test-environment-mhs-task" {
   family = "${var.build_id}-mhs-task"
 
