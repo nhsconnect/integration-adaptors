@@ -39,7 +39,7 @@ pipeline {
                 timeout(10) {
                     waitUntil {
                        script {
-                         def r = sh script: 'curl -s -o /dev/null -w "%{http_code}" ${MHS_ADDRESS}', returnStatus: true
+                         def r = sh returnStdout: true, script: 'curl -s -o /dev/null -w "%{http_code}" ${MHS_ADDRESS}'
                          sh script: "echo ${r}"
                          return (r != 000);
                        }
