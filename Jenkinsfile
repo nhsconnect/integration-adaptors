@@ -27,7 +27,13 @@ pipeline {
             steps {
                 dir('pipeline/terraform/test-environment') {
                     sh label: 'Initialising Terraform', script: 'terraform init -input=false'
-                    sh label: 'Applying Terraform configuration', script: 'terraform apply -auto-approve --var cluster_id=${CLUSTER_ID} -var ecs_address=${DOCKER_REPOSITORY} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
+                    sh label: 'Applying Terraform configuration', script: """
+                            terraform apply -auto-approve
+                            --var cluster_id=${CLUSTER_ID}
+                            -var ecs_address=${DOCKER_REPOSITORY}
+                            -var task_execution_role=${TASK_EXECUTION_ROLE}
+                            -var build_id=${BUILD_TAG}
+                        """
                 }
             }
         }
@@ -44,7 +50,13 @@ pipeline {
     post {
         cleanup {
             dir('pipeline/terraform/test-environment') {
-                    sh label: 'Destroying Terraform configuration', script: 'terraform destroy -auto-approve --var cluster_id=${CLUSTER_ID} -var ecs_address=${DOCKER_REPOSITORY} -var task_execution_role=${TASK_EXECUTION_ROLE} -var build_id=${BUILD_TAG}'
+                    sh label: 'Destroying Terraform configuration', script: """
+                        terraform destroy -auto-approve
+                        --var cluster_id=${CLUSTER_ID}
+                        -var ecs_address=${DOCKER_REPOSITORY}
+                         -var task_execution_role=${TASK_EXECUTION_ROLE}
+                         -var build_id=${BUILD_TAG}
+                     """
             }
         }
     }
