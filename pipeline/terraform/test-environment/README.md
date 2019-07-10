@@ -30,6 +30,6 @@ Next, you will need to have built the Docker container image containing the MHS.
 
 Once you have configured AWS authentication, you can run the following commands in this directory:
 1. `terraform init` - Initialises local Terraform settings 
-1. `terraform apply --var cluster_id=<cluster-arn> -var task_execution_role=<role-arn> -var build_id=<build-tag>` - Applies the configuration from this directory and deploys
+1. `terraform apply --var cluster_id=<cluster-arn> -var task_execution_role=<role-arn> -var build_id=<build-tag> -var ecs_address=<ecs repository>` - Applies the configuration from this directory and deploys
 
-You can remove the resources deployed with `terraform destroy --var cluster_id=<cluster-arn> -var task_execution_role=<role-arn> -var build_id=<build-tag>` 
+You can remove the resources deployed with `terraform destroy --var cluster_id=<cluster-arn> -var ecs_address=<ecs repository> -var task_execution_role=<role-arn> -var build_id=<build-tag>` 
