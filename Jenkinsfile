@@ -40,7 +40,6 @@ pipeline {
                     waitUntil {
                        script {
                          def r = sh script: 'curl -s -o /dev/null -w "%{http_code}" ${MHS_ADDRESS}', returnStatus: true
-                         echo r
                          return (r != 000);
                        }
                     }
