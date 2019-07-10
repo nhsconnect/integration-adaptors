@@ -15,15 +15,19 @@ from mhs.handler.client_request_handler import ClientRequestHandler
 from mhs.parser.ebxml_message_parser import EbXmlRequestMessageParser
 from mhs.sender.sender import Sender
 from mhs.transport.http_transport import HttpTransport
+from utilities.file_utilities import FileUtilities
 
 ASYNC_TIMEOUT = 30
-# TODO: Replace this with your party ID.
-PARTY_ID = "PARTY-ID"
 
 data_dir = Path(ROOT_DIR) / "data"
 certs_dir = data_dir / "certs"
 certs_file = str(certs_dir / "client.pem")
 key_file = str(certs_dir / "client.key")
+
+party_key_file = str(certs_dir / "party_key.txt")
+PARTY_ID = FileUtilities.get_file_string(party_key_file)
+assert PARTY_ID
+
 interactions_config_file = str(data_dir / "interactions" / "interactions.json")
 
 # Build the application
