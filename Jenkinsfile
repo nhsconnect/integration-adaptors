@@ -11,7 +11,8 @@ pipeline {
                 dir('mhs-reference-implementation') {
                     sh label: 'Installing dependencies', script: 'pipenv install --deploy --ignore-pipfile'
                     sh label: 'Running unit tests', script: 'pipenv run unittests'
-                }
+                    sh label: 'Running unit tests', script: 'pipenv run inttests'
+               }
             }
         }
 
