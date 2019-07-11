@@ -11,19 +11,13 @@ DATA_PATH = 'selenium_tests/data'
 def get_asid():
     # The asid should be set in the 'Environment variables' section of the Run/Debug Configurations
     # ...if this is not set, it will be taken from data\local_asid file (which is excluded from GIT)
-    # with (Path(ROOT_DIR) / DATA_PATH / "local_asid").open() as asid_file:
-    #     asid = asid_file.readline()
-    return_asid = os.environ.get('ASID', 1234567890)
-    print('asid: ', return_asid)
-    return os.environ.get('ASID', return_asid)
+    return os.environ.get('ASID', os.environ.get('ASID', 1234567890))
 
 
 def get_hostname():
     # The hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
     # ...if this is not set, it will default to 'http://localhost/'
-    hostname = os.environ.get('MHS_ADDRESS', 'localhost')
-    print(hostname)
-    return "http://" + hostname + "/"
+    return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
 
 
 def get_interaction(interaction_name, nhs_number):
