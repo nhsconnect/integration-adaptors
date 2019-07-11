@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 resource "aws_ecs_task_definition" "test-environment-mhs-task" {
-  family = "${var.build_id}-mhs-task"
+  family = "mhs-task-${var.build_id}"
 
   volume {
     name = "certs-volume"
@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
   [
     {
       name = "mhs"
-      image = "${var.ecs_address}:${var.build_id}"
+      image = "${var.ecr_address}:${var.build_id}"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
@@ -54,7 +54,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
   execution_role_arn = var.task_execution_role
 }
 
-resource "aws_ecs_service" "test-environment-service" {
+resource "aws_ecs_service" "test-mhs-environment-service" {
   name = "${var.build_id}-service"
   cluster = var.cluster_id
   task_definition = aws_ecs_task_definition.test-environment-mhs-task.arn
