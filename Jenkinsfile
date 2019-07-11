@@ -40,10 +40,12 @@ pipeline {
 
         stage('Integration Tests') {
             steps {
-                // Wait for MHS container to fully stand up
-                // TODO: Run actual integration tests.
-                sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
-                sh label: 'Running unit tests', script: 'pipenv run inttests'
+                dir('mhs-reference-implementation') {
+                    // Wait for MHS container to fully stand up
+                    // TODO: Run actual integration tests.
+                    sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
+                    sh label: 'Running unit tests', script: 'pipenv run inttests'
+                }
             }
         }
     }
