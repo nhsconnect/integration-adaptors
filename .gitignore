@@ -109,10 +109,17 @@ venv.bak/
 # PyCharm settings
 .idea
 
+# Terraform
+.terraform
+*.tfstate*
+
+
 # Certs
 **/*.cert
 **/*.key
 **/*.pem
+**/certs/party_key.txt
 
 
 mhs-reference-implementation/selenium_tests/data/local_asid
+
