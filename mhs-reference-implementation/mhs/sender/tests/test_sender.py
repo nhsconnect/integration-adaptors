@@ -1,12 +1,19 @@
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import Mock, sentinel, patch
 
+from utilities.file_utilities import FileUtilities
+
+from definitions import ROOT_DIR
 from mhs.builder.ebxml_message_builder import CONVERSATION_ID, FROM_PARTY_ID
 from mhs.builder.ebxml_request_message_builder import MESSAGE
 from mhs.sender.sender import Sender, ASYNC_RESPONSE_EXPECTED, UnknownInteractionError
 from utilities.message_utilities import MessageUtilities
 
-PARTY_ID = "PARTY-ID"
+data_dir = Path(ROOT_DIR) / "data"
+certs_dir = data_dir / "certs"
+party_key_file = str(certs_dir / "party_key.txt")
+PARTY_ID = FileUtilities.get_file_string(party_key_file)
 
 
 class TestSender(TestCase):
