@@ -1,0 +1,23 @@
+jenkins:
+  systemMessage: "Auto-configured integration-adaptors Jenkins instance.\n\n"
+  agentProtocols:
+  - "JNLP4-connect"
+  - "Ping"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  markupFormatter: "plainText"
+  numExecutors: 0
+  remotingSecurity:
+    enabled: true
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+  sSHD:
+    port: -1
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"

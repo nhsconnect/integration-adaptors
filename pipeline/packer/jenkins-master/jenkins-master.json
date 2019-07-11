@@ -1,0 +1,51 @@
+{
+  "_description": "This template produces a Jenkins server.",
+  "variables": {
+    "repository": "{{env `DOCKER_REPOSITORY`}}",
+    "tag": "{{env `BUILD_TAG`}}",
+    "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "jenkins/jenkins:lts",
+      "commit": true,
+      "changes": [
+        "ENV CASC_JENKINS_CONFIG /usr/share/jenkins/ref/jenkins.yaml",
+        "ENTRYPOINT [\"/sbin/tini\", \"--\", \"/usr/local/bin/jenkins.sh\"]"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "pipeline/packer/jenkins-master/plugins.txt",
+      "destination": "/usr/share/jenkins/ref/plugins.txt"
+    },
+    {
+      "type": "file",
+      "source": "pipeline/packer/jenkins-master/jenkins.yaml",
+      "destination": "/usr/share/jenkins/ref/jenkins.yaml"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "install-plugins.sh < /usr/share/jenkins/ref/plugins.txt"
+      ]
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "{{user `repository`}}",
+        "tag": "{{user `tag`}}"
+      },
+      {
+        "type": "docker-push",
+        "ecr_login": true,
+        "login_server": "{{user `docker_registry_url`}}"
+      }
+    ]
+  ]
+}
