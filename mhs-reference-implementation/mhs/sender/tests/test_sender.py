@@ -10,10 +10,11 @@ from mhs.builder.ebxml_request_message_builder import MESSAGE
 from mhs.sender.sender import Sender, ASYNC_RESPONSE_EXPECTED, UnknownInteractionError
 from utilities.message_utilities import MessageUtilities
 
-data_dir = Path(ROOT_DIR) / "data"
-certs_dir = data_dir / "certs"
-party_key_file = str(certs_dir / "party_key.txt")
-PARTY_ID = FileUtilities.get_file_string(party_key_file)
+# data_dir = Path(ROOT_DIR) / "data"
+# certs_dir = data_dir / "certs"
+# party_key_file = str(certs_dir / "party_key.txt")
+# PARTY_ID = FileUtilities.get_file_string(party_key_file)
+PARTY_ID = "A91468-9199077"
 
 
 class TestSender(TestCase):
