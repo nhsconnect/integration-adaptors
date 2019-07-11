@@ -21,9 +21,9 @@ def get_asid():
 def get_hostname():
     # The hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
     # ...if this is not set, it will default to 'http://localhost/'
-    hostname = os.environ.get('MHS_ADDRESS', 'http://localhost')
+    hostname = os.environ.get('MHS_ADDRESS', 'localhost')
     print(hostname)
-    return hostname + "/"
+    return "http://" + hostname + "/"
 
 
 def get_interaction(interaction_name, nhs_number):
