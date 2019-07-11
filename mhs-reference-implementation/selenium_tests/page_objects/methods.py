@@ -15,7 +15,7 @@ def get_asid():
     #     asid = asid_file.readline()
     return_asid = os.environ.get('ASID', 1234567890)
     print('asid: ', return_asid)
-    return os.environ.get('ASID', return_asid)c
+    return os.environ.get('ASID', return_asid)
 
 
 def get_hostname():
