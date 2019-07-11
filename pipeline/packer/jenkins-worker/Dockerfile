@@ -1,0 +1,41 @@
+FROM jenkins/jnlp-slave:3.29-1
+
+# Need to be root to install packages
+USER root
+
+# Install Packer
+RUN wget -O packer.zip https://releases.hashicorp.com/packer/1.4.2/packer_1.4.2_linux_amd64.zip && \
+        unzip packer.zip -d /usr/bin/ && \
+        rm packer.zip
+
+# Install Terraform
+RUN wget -O terraform.zip https://releases.hashicorp.com/terraform/0.12.3/terraform_0.12.3_linux_amd64.zip && \
+        unzip terraform.zip -d /usr/bin/ && \
+        rm terraform.zip
+
+# Install Python 3.7
+RUN apt-get update && apt-get install -y build-essential checkinstall libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev libgdbm-dev libc6-dev libbz2-dev uuid-dev zlib1g-dev libffi-dev && \
+        wget -O python.tgz https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz && \
+        tar -xf python.tgz && rm python.tgz && \
+        cd Python-3.7.3 && \
+        ./configure && make && make install && \
+        cd .. && rm -rf Python-3.7.3
+
+# Install pipenv
+RUN pip3 install pipenv
+
+# Install Docker
+# These commands are based on https://docs.docker.com/install/linux/docker-ce/debian/ and https://github.com/ninech/jnlp-slave-with-docker
+# This relies on docker.sock being exposed to the Jenkins slave
+RUN apt-get update && \
+        apt-get install -qq -y --no-install-recommends \
+        apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+        apt-key fingerprint 0EBFCD88 && \
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" && \
+        apt-get update && \
+        apt-get install -qq -y --no-install-recommends docker-ce=18.06.3~ce~3-0~debian
+
+# Leave as root to allow for running docker builds
+
+ENTRYPOINT [\"jenkins-slave\"]
