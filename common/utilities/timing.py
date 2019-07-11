@@ -32,6 +32,7 @@ def time_method(method):
             return method(*args, **kwargs)
         finally:
             duration = stopwatch.stop_timer()
+            duration = round(duration, 3)
             logging.info(f"Method '{method.__name__}' called, executed in: {duration}s")
 
     return invoke_method_with_timer
