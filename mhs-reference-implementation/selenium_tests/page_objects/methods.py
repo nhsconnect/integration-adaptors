@@ -7,13 +7,13 @@ HUMAN_READABLE = 'Payload stuff'
 
 def get_asid():
     # The asid should be set in the 'Environment variables' section of the Run/Debug Configurations
-    # ...if this is not set, it will default to '1234567890', which will cause test failures!)
-    return os.environ.get('ASID', os.environ.get('ASID', 1234567890))
+    # ...if this is not set, it will default to '123456789012', which will cause test failures!)
+    return os.environ.get('ASID', os.environ.get('ASID', 123456789012))
 
 
 def get_hostname():
     # The hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
-    # ...if this is not set, it will default to 'http://localhost/'
+    # ...if this is not set, it will default to 'localhost'
     return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
 
 
