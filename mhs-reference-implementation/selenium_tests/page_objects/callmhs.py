@@ -11,9 +11,5 @@ def call_mhs(mhs_command, hl7payload):
     :return: The response returned by the MHS.
     """
 
-    mhs_url = methods.get_hostname() + mhs_command
-    print("url: ", mhs_url)
-    print("payload: ", hl7payload)
-    response = requests.post(mhs_url, data=hl7payload)
-
+    response = requests.post(methods.get_hostname() + mhs_command, data=hl7payload)
     return response.text
