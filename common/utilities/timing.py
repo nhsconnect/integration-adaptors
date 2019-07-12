@@ -18,7 +18,7 @@ class StopWatch:
 
 def time_method(method):
     """
-    A method decorator that logs the time taken to
+    A method decorator that logs the time taken to execute a given method
 
     :param method:
     :return:
@@ -43,10 +43,8 @@ def time_method(method):
 
 def time_method_async(method):
     """
-    A method decorator that logs the time taken to
-
-    :param method:
-    :return:
+    A method decorator that logs the time taken to execute a given method. This decorator should be used to wrap
+    asynchronous methods as the standard time_method decorator does not handle async methods effectively
     """
 
     @wraps(method)
@@ -99,7 +97,8 @@ def log_request(method):
 def async_log_request(method):
     """
     A method to be used with tornado end points to extract their calling details and time their execution, this
-    mainly holds as a placeholder if any extra data is required from the call
+    mainly holds as a placeholder if any extra data is required from the call. This decorator should be used for
+    asynchronous tornado calls to ensure the async methods called are handled properly
     """
     async def method_wrapper(*args, **kwargs):
 
