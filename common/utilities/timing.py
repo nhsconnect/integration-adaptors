@@ -66,3 +66,35 @@ def log_request(method):
             logging.info(f"{log_details}")
 
     return method_wrapper
+
+
+def async_log_request(method):
+    """
+    A method to be used with tornado end points to extract their calling details and time their execution, this
+    mainly holds as a placeholder if any extra data is required from the call
+    """
+    async def method_wrapper(*args, **kwargs):
+
+        # Gets the 'self' of the caller
+        handler = args[0]
+
+        log_details = {
+            'handler': handler.__class__.__name__,
+            'method': handler.request.method.lower()
+        }
+
+        if handler.request.body:
+            log_details['requestBody'] = handler.request.body
+
+        stopwatch = StopWatch()
+        stopwatch.start_timer()
+
+        try:
+            return await method(*args, **kwargs)
+        finally:
+            duration = stopwatch.stop_timer()
+            duration = round(duration, 3)
+            log_details['duration'] = duration
+            logging.info(f"{log_details}")
+
+    return method_wrapper

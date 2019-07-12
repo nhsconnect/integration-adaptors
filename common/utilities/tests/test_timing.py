@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 import time
 from unittest import TestCase
 from unittest.mock import patch, Mock
@@ -82,12 +83,26 @@ class TestTimeUtilities(TestCase):
     async def async_method(self):
         pass
 
+    @patch('logging.info')
+    @async_test
+    def test_invoke_with_time_async_method(self, log_mock):
+        self.actual_sleep()
+        log_mock.assert_called_with("Method 'async_method' called, executed in: 5s")
+
+    @timing.time_method
+    async def actual_sleep(self):
+        time.sleep(1)
+
 
 class FakeRequestHandler(RequestHandler):
 
     @timing.log_request
     def post(self):
         pass
+
+    @timing.async_log_request
+    async def get(self):
+        time.sleep(0.5)
 
 
 class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
@@ -98,9 +113,10 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
             (r"/.*", FakeRequestHandler, {})
         ])
 
+    @patch('time.sleep')
     @patch('common.utilities.timing.StopWatch.stop_timer')
     @patch('logging.info')
-    def test_post_synchronous_message(self, log_mock, time_mock):
+    def test_post_synchronous_message(self, log_mock, time_mock, sleep_mock):
         time_mock.return_value = 5
         expected_response = "Hello world!"
         self.sender.prepare_message.return_value = False, None, None
@@ -112,3 +128,21 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
         log = '{\'handler\': \'FakeRequestHandler\', \'method\': \'post\', ' \
               '\'requestBody\': b"{\'test\': \'tested\'}", \'duration\': 5}'
         log_mock.assert_called_with(log)
+
+    @patch('logging.info')
+    def test_get_asynchronous_message_whew(self, log_mock):
+        expected_response = "Hello world!"
+        self.sender.prepare_message.return_value = False, None, None
+        self.sender.send_message.return_value = expected_response
+
+        response = self.fetch(f"/", method="GET")
+
+        self.assertEqual(response.code, 200)
+        self.assertEqual(len(log_mock.call_args_list), 1)
+
+        call = log_mock.call_args_list[0]
+        args, kwargs = call
+        input_dict = json.loads(args[0].replace("\'", "\""))
+
+        print(input_dict["duration"] == 0.5)
+        self.assertTrue(math.isclose(input_dict["duration"], 0.5, rel_tol=0.15))
