@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import math
@@ -19,7 +20,7 @@ class TestTimeUtilities(TestCase):
     def test_invoke_with_time(self, log_mock, time_mock):
         time_mock.return_value = 5
         self.sleep_method()
-        log_mock.assert_called_with("Method 'sleep_method' called, executed in: 5s")
+        log_mock.assert_called_with({'method': 'sleep_method', 'duration': 5})
 
     @patch('common.utilities.timing.StopWatch.stop_timer')
     @patch('logging.info')
@@ -30,7 +31,7 @@ class TestTimeUtilities(TestCase):
         except ValueError:
             pass
 
-        log_mock.assert_called_with("Method 'throw_error_method' called, executed in: 5s")
+        log_mock.assert_called_with({'method': 'throw_error_method', 'duration': 5})
 
     @patch('time.time')
     def test_stopwatch(self, time_mock):
@@ -47,22 +48,22 @@ class TestTimeUtilities(TestCase):
     def test_invoke_with_time_rounding(self, log_mock, time_mock):
         time_mock.return_value = 5.1236
         self.sleep_method()
-        log_mock.assert_called_with("Method 'sleep_method' called, executed in: 5.124s")
+        log_mock.assert_called_with({'method': 'sleep_method', 'duration': 5.124})
 
     @patch('common.utilities.timing.StopWatch.stop_timer')
     @patch('logging.info')
     def test_invoke_with_time_parameters(self, log_mock, time_mock):
         time_mock.return_value = 5
         self.take_parameters("whew", 1, [2], {3: 3})
-        log_mock.assert_called_with("Method 'take_parameters' called, executed in: 5s")
+        log_mock.assert_called_with({'method': 'take_parameters', 'duration': 5})
 
     @patch('common.utilities.timing.StopWatch.stop_timer')
     @patch('logging.info')
     @async_test
-    async def test_invoke_with_time_async_method(self, log_mock, time_mock):
+    async def test_invoke_with_time_fake_async_method(self, log_mock, time_mock):
         time_mock.return_value = 5
         await self.async_method()
-        log_mock.assert_called_with("Method 'async_method' called, executed in: 5s")
+        log_mock.assert_called_with({'method': 'async_method', 'duration': 5})
 
     @timing.time_method
     def sleep_method(self):
@@ -79,17 +80,26 @@ class TestTimeUtilities(TestCase):
         assert two is not None
         assert three is not None
 
-    @timing.time_method
+    @timing.time_method_async
     async def async_method(self):
         pass
 
     @patch('logging.info')
     @async_test
-    def test_invoke_with_time_async_method(self, log_mock):
-        self.actual_sleep()
-        log_mock.assert_called_with("Method 'async_method' called, executed in: 5s")
+    async def test_invoke_with_time_async_method(self, log_mock):
+        task = self.actual_sleep()
 
-    @timing.time_method
+        time.sleep(2)
+        await task
+        self.assertEqual(len(log_mock.call_args_list), 1)
+
+        call = log_mock.call_args_list[0]
+        args, kwargs = call
+        input_dict = args[0]
+
+        self.assertTrue(math.isclose(input_dict["duration"], 1, rel_tol=0.15))
+
+    @timing.time_method_async
     async def actual_sleep(self):
         time.sleep(1)
 
@@ -125,8 +135,7 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
         response = self.fetch(f"/", method="POST", body="{'test': 'tested'}")
 
         self.assertEqual(response.code, 200)
-        log = '{\'handler\': \'FakeRequestHandler\', \'method\': \'post\', ' \
-              '\'requestBody\': b"{\'test\': \'tested\'}", \'duration\': 5}'
+        log = {'handler': 'FakeRequestHandler', 'method': 'post', 'requestBody': b"{'test': 'tested'}", 'duration': 5}
         log_mock.assert_called_with(log)
 
     @patch('logging.info')
@@ -146,7 +155,5 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
 
         call = log_mock.call_args_list[0]
         args, kwargs = call
-        input_dict = json.loads(args[0].replace("\'", "\""))
-
-        print(input_dict["duration"] == 0.5)
+        input_dict = args[0]
         self.assertTrue(math.isclose(input_dict["duration"], 0.5, rel_tol=0.15))

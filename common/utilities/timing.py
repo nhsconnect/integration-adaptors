@@ -33,7 +33,35 @@ def time_method(method):
         finally:
             duration = stopwatch.stop_timer()
             duration = round(duration, 3)
-            logging.info(f"Method '{method.__name__}' called, executed in: {duration}s")
+            logging.info({
+                'method': method.__name__,
+                'duration': duration
+            })
+
+    return invoke_method_with_timer
+
+
+def time_method_async(method):
+    """
+    A method decorator that logs the time taken to
+
+    :param method:
+    :return:
+    """
+
+    @wraps(method)
+    async def invoke_method_with_timer(*args, **kwargs):
+        stopwatch = StopWatch()
+        stopwatch.start_timer()
+        try:
+            return await method(*args, **kwargs)
+        finally:
+            duration = stopwatch.stop_timer()
+            duration = round(duration, 3)
+            logging.info({
+                'method': method.__name__,
+                'duration': duration
+            })
 
     return invoke_method_with_timer
 
@@ -63,7 +91,7 @@ def log_request(method):
             duration = stopwatch.stop_timer()
             duration = round(duration, 3)
             log_details['duration'] = duration
-            logging.info(f"{log_details}")
+            logging.info(log_details)
 
     return method_wrapper
 
@@ -95,6 +123,6 @@ def async_log_request(method):
             duration = stopwatch.stop_timer()
             duration = round(duration, 3)
             log_details['duration'] = duration
-            logging.info(f"{log_details}")
+            logging.info(log_details)
 
     return method_wrapper
