@@ -24,7 +24,6 @@ def get_interaction(interaction_name, nhs_number):
 def check_scr_response(returned_xml):
     parser = xml_parser.XmlMessageParser()
     returned_data = parser.parse_message(returned_xml)
-    print(returned_data)
     value = parser.extract_hl7xml_value(returned_data, 'requestSuccessDetail')
 
     return value is not None
