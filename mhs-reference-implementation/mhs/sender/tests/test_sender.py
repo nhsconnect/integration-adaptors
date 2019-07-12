@@ -9,10 +9,7 @@ from mhs.sender.sender import Sender, ASYNC_RESPONSE_EXPECTED, UnknownInteractio
 from utilities.file_utilities import FileUtilities
 from utilities.message_utilities import MessageUtilities
 
-data_dir = Path(ROOT_DIR) / "data"
-certs_dir = data_dir / "certs"
-party_key_file = str(certs_dir / "party_key.txt")
-PARTY_ID = FileUtilities.get_file_string(party_key_file)
+PARTY_ID = "PARTY_ID"
 
 
 class TestSender(TestCase):
@@ -20,7 +17,6 @@ class TestSender(TestCase):
         self.mock_interactions_config = Mock()
         self.mock_message_builder = Mock()
         self.mock_transport = Mock()
-        print("data directory: ", data_dir)
 
         self.sender = Sender(self.mock_interactions_config, self.mock_message_builder, self.mock_transport, PARTY_ID)
 
