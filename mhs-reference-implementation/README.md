@@ -9,9 +9,19 @@ project's directory run:
 pipenv install
 ```
 
-### Running Tests
+### Running Unit Tests
 `pipenv run unittests` will run all unit tests.
+
+### Running Integration Tests
 `pipenv run inttests` will run all integration tests.
+
+When running the tests locally, you will need to set the MHS_ADDRESS and ASID in the 'Environment variables' section of
+ the Run/Debug Configurations.
+- The ASID is a 12 digit number needed to access Opentest, supplied by NHS Digital
+    - eg ASID=123456789012
+- The MHS_ADDRESS is the hostname of the MHS instance being used for testing and should be supplied in it's raw state,
+ without the 'http://' prefix or '/' suffix 
+    - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
 
 ### Running an MHS Instance
 `pipenv run mhs` will run the `main.py` script (you can also run this directly). This will start up an MHS
