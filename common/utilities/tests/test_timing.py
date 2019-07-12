@@ -1,5 +1,11 @@
+import json
+import logging
+import time
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+
+from tornado.testing import AsyncHTTPTestCase
+from tornado.web import Application, RequestHandler
 
 from common.utilities import timing
 from common.utilities.test_utilities import async_test
@@ -75,3 +81,34 @@ class TestTimeUtilities(TestCase):
     @timing.time_method
     async def async_method(self):
         pass
+
+
+class FakeRequestHandler(RequestHandler):
+
+    @timing.log_request
+    def post(self):
+        pass
+
+
+class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
+
+    def get_app(self):
+        self.sender = Mock()
+        return Application([
+            (r"/.*", FakeRequestHandler, {})
+        ])
+
+    @patch('common.utilities.timing.StopWatch.stop_timer')
+    @patch('logging.info')
+    def test_post_synchronous_message(self, log_mock, time_mock):
+        time_mock.return_value = 5
+        expected_response = "Hello world!"
+        self.sender.prepare_message.return_value = False, None, None
+        self.sender.send_message.return_value = expected_response
+
+        response = self.fetch(f"/", method="POST", body="{'test': 'tested'}")
+
+        self.assertEqual(response.code, 200)
+        log = '{\'handler\': \'FakeRequestHandler\', \'method\': \'post\', ' \
+              '\'requestBody\': b"{\'test\': \'tested\'}", \'duration\': 5}'
+        log_mock.assert_called_with(log)
