@@ -130,7 +130,11 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
         log_mock.assert_called_with(log)
 
     @patch('logging.info')
-    def test_get_asynchronous_message_whew(self, log_mock):
+    def test_get_asynchronous_message(self, log_mock):
+        """
+        Had to enable a full wait here as the behaviour was different when the time
+        response was mocked
+        """
         expected_response = "Hello world!"
         self.sender.prepare_message.return_value = False, None, None
         self.sender.send_message.return_value = expected_response
