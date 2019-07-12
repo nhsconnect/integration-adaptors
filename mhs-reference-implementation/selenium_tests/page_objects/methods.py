@@ -1,19 +1,20 @@
 import os
-from pathlib import Path
 
-from definitions import ROOT_DIR
 from selenium_tests.page_objects import interactions, xml_parser
 
 HUMAN_READABLE = 'Payload stuff'
-DATA_PATH = 'selenium_tests/data'
 
 
 def get_asid():
-    # The asid should be stored in data\local_asid file (which is excluded from GIT
-    with (Path(ROOT_DIR) / DATA_PATH / "local_asid").open() as asid_file:
-        asid = asid_file.readline()
+    # The asid should be set in the 'Environment variables' section of the Run/Debug Configurations
+    # ...if this is not set, it will default to '123456789012', which will cause test failures!)
+    return os.environ.get('ASID', os.environ.get('ASID', 123456789012))
 
-    return asid
+
+def get_hostname():
+    # The hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
+    # ...if this is not set, it will default to 'localhost'
+    return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
 
 
 def get_interaction(interaction_name, nhs_number):
