@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+coverage = "~=4.5"
 
 [packages]
 integration-adaptors-common = {editable = true,path = "./../common"}
@@ -16,5 +17,8 @@ python_version = "3.7"
 
 [scripts]
 unittests = 'python -m unittest -v'
+unittests-cov = 'coverage run -m unittest -v'
+coverage-report = 'coverage report'
+coverage-report-xml = 'coverage xml'
 inttests = 'python -m unittest discover -p "int_*" -v'
 mhs = "python main.py"
