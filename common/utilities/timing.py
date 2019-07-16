@@ -4,7 +4,7 @@ import time
 from functools import wraps
 
 
-class StopWatch:
+class Stopwatch:
 
     start_time = None
 
@@ -18,7 +18,7 @@ class StopWatch:
 
 
 def _begin_stopwatch():
-    stopwatch = StopWatch()
+    stopwatch = Stopwatch()
     stopwatch.start_timer()
     return stopwatch
 
