@@ -76,3 +76,4 @@ github-api:1.95
 momentjs:1.1.1
 jdk-tool:1.2
 credentials-binding:1.19
+cobertura:1.14
