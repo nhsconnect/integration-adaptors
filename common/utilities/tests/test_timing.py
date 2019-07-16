@@ -8,6 +8,8 @@ from tornado.web import Application, RequestHandler
 from common.utilities import timing
 from common.utilities.test_utilities import async_test
 
+DEFAULT_RETURN = "default"
+
 
 class TestTimeUtilities(TestCase):
 
@@ -23,8 +25,12 @@ class TestTimeUtilities(TestCase):
 
     @patch('logging.info')
     def test_invoke_with_time_rounding(self, log_mock):
-        timing._log_time(5.1236, "yes")
-        log_mock.assert_called_with('Method name=yes took duration=5.124')
+        with self.subTest("Default"):
+            timing._log_time(5.1236, "yes")
+            log_mock.assert_called_with('func_name=yes took duration=5.124')
+        with self.subTest("Tornado"):
+            timing._log_tornado_time(5.1236, "yes", "methodName")
+            log_mock.assert_called_with("func_name=methodName from handler=yes took duration=5.124")
 
     @patch('common.utilities.timing._log_time')
     @patch('common.utilities.timing.Stopwatch.stop_timer')
@@ -34,32 +40,28 @@ class TestTimeUtilities(TestCase):
         with self.subTest("Sync version"):
             res = self.default_method()
             log_mock.assert_called_with(5, 'default_method')
-            self.assertEqual("slept", res)
+            self.assertEqual(DEFAULT_RETURN, res)
 
         with self.subTest("Async version"):
             res = await self.default_method_async()
             log_mock.assert_called_with(5, 'default_method_async')
-            self.assertEqual(5, res)
+            self.assertEqual(DEFAULT_RETURN, res)
 
     @patch('common.utilities.timing.Stopwatch.stop_timer')
     @patch('common.utilities.timing._log_time')
     @async_test
     async def test_exception_thrown_whilst_timing(self, log_mock, time_mock):
-        time_mock.return_value = 5
+        time_mock.return_value = 10
         with self.subTest("Sync"):
-            try:
+            with self.assertRaises(ValueError):
                 self.throw_error_method()
-            except ValueError:
-                pass
-            log_mock.assert_called_with(5, 'throw_error_method')
+            log_mock.assert_called_with(10, 'throw_error_method')
 
         with self.subTest("Async"):
-            try:
+            with self.assertRaises(ValueError):
                 await self.throw_error_method_async()
-            except ValueError:
-                pass
 
-            log_mock.assert_called_with(5, 'throw_error_method_async')
+            log_mock.assert_called_with(10, 'throw_error_method_async')
 
     @patch('common.utilities.timing.Stopwatch.stop_timer')
     @patch('logging.info')
@@ -68,12 +70,12 @@ class TestTimeUtilities(TestCase):
         with self.subTest("Sync"):
             time_mock.return_value = 5
             res = self.take_parameters("whew", 1, [2], {3: 3})
-            log_mock.assert_called_with('Method name=take_parameters took duration=5')
+            log_mock.assert_called_with('func_name=take_parameters took duration=5')
             self.assertEqual("whew1", res)
         with self.subTest("Async"):
             time_mock.return_value = 5
             res = await self.take_parameters_async("whew", 1, [2], {3: 3})
-            log_mock.assert_called_with('Method name=take_parameters_async took duration=5')
+            log_mock.assert_called_with('func_name=take_parameters_async took duration=5')
             self.assertEqual("whew1", res)
 
     @patch('common.utilities.timing.Stopwatch.stop_timer')
@@ -88,7 +90,7 @@ class TestTimeUtilities(TestCase):
 
         await task
 
-        log_mock.assert_called_with('Method name=default_method_async took duration=2')
+        log_mock.assert_called_with('func_name=default_method_async took duration=2')
 
     @patch('common.utilities.timing.Stopwatch.stop_timer')
     @patch('logging.info')
@@ -97,21 +99,21 @@ class TestTimeUtilities(TestCase):
         with self.subTest("Sync"):
             time_mock.return_value = 5
             res = self.var_parameters("whew", 1, 2, 3, 4, 5)
-            log_mock.assert_called_with('Method name=var_parameters took duration=5')
+            log_mock.assert_called_with('func_name=var_parameters took duration=5')
             self.assertEqual("whew12345", res)
         with self.subTest("Async"):
             time_mock.return_value = 5
             res = await self.var_parameters_async("whew", 1, "three", 4)
-            log_mock.assert_called_with('Method name=var_parameters_async took duration=5')
+            log_mock.assert_called_with('func_name=var_parameters_async took duration=5')
             self.assertEqual("whew1three4", res)
 
     @timing.time_function
     def default_method(self):
-        return "slept"
+        return DEFAULT_RETURN
 
     @timing.time_function
     async def default_method_async(self):
-        return 5
+        return DEFAULT_RETURN
 
     @timing.time_function
     def throw_error_method(self):
@@ -131,11 +133,7 @@ class TestTimeUtilities(TestCase):
 
     @timing.time_function
     async def take_parameters_async(self, check, one, two, three):
-        assert check is not None
-        assert one is not None
-        assert two is not None
-        assert three is not None
-        return check + str(one)
+        return self.take_parameters(check, one, two, three)
 
     @timing.time_function
     def var_parameters(self, *arg):
@@ -143,7 +141,7 @@ class TestTimeUtilities(TestCase):
 
     @timing.time_function
     async def var_parameters_async(self, *arg):
-        return ''.join([str(string) for string in arg])
+        return self.var_parameters(*arg)
 
 
 class FakeRequestHandler(RequestHandler):
@@ -185,7 +183,7 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
 
         response = self.fetch(f"/", method="POST", body="{'test': 'tested'}")
         self._assert_handler_data(response, 200,
-                                  "hello", 'method=post from handler=FakeRequestHandler took duration=5', log_mock)
+                                  "hello", 'func_name=post from handler=FakeRequestHandler took duration=5', log_mock)
 
     @patch('common.utilities.timing.Stopwatch.stop_timer')
     @patch('logging.info')
@@ -194,7 +192,7 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
 
         response = self.fetch(f"/", method="GET")
         self._assert_handler_data(response, 200,
-                                  "hello", 'method=get from handler=FakeRequestHandler took duration=5', log_mock)
+                                  "hello", 'func_name=get from handler=FakeRequestHandler took duration=5', log_mock)
 
     @patch('common.utilities.timing.Stopwatch.stop_timer')
     @patch('logging.info')
@@ -204,4 +202,4 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
         response = self.fetch(f"/", method="PUT", body="{'test': 'tested'}")
 
         self._assert_handler_data(response, 500,
-                                  None, 'method=put from handler=FakeRequestHandler took duration=5', log_mock)
+                                  None, 'func_name=put from handler=FakeRequestHandler took duration=5', log_mock)
