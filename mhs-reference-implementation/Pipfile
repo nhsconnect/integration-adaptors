@@ -20,5 +20,6 @@ unittests = 'python -m unittest -v'
 unittests-cov = 'coverage run -m unittest -v'
 coverage-report = 'coverage report'
 coverage-report-xml = 'coverage xml'
+coverage-report-html = 'coverage html'
 inttests = 'python -m unittest discover -p "int_*" -v'
 mhs = "python main.py"
