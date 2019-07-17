@@ -15,6 +15,19 @@ def audit(self, message, *args, **kws):
 logging.Logger.audit = audit
 
 
+def load_global_log_config():
+    logger = logging.getLogger()
+    logger.setLevel(logging.NOTSET)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.NOTSET)
+    logging.Formatter.converter = time.gmtime
+    formatter = logging.Formatter('[%(asctime)s.%(msecs)03d] '
+                                  '%(message)s pid=%(process)d LogLevel=%(levelname)s ProcessKey=%(processKey)s',
+                                  '%Y-%m-%d %H:%M:%S')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+
 def _format_values_in_map(dict_values: dict) -> dict:
     new_map = {}
     for key, value in dict_values.items():
@@ -26,15 +39,9 @@ def _format_values_in_map(dict_values: dict) -> dict:
 
 
 def _append_additional_information(
-        process_key: str = None,
-        process_id: str = None,
         request_id: str = None,
         correlation_id: str = None):
     end_message = ''
-    if process_key:
-        end_message += f' ProcessKey={process_key}'
-    if process_id:
-        end_message += f' ProcessId={process_id}'
     if request_id:
         end_message += f' RequestId={request_id}'
     if correlation_id:
@@ -50,62 +57,32 @@ def _formatted_string(message: str, dict_values: dict) -> str:
 
 class Logger:
 
-    def __init__(self, log_file: str, log_level: int = logging.INFO):
+    def __init__(self, log_ref: str = "SYS"):
+        self.process_key_tag = log_ref
         self.logger = logging.getLogger()
+        # self.logger.setLevel(logging.NOTSET)
 
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(log_level)
-        logging.Formatter.converter = time.gmtime
-        formatter = logging.Formatter('[%(asctime)s.%(msecs)03d] %(message)s LogLevel=%(levelname)s',
-                                      '%Y-%m-%d %H:%M:%S')
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-        self.logger.setLevel(log_level)
+    def _write(self, level, message, process_key_num: str):
+        if not process_key_num:
+            process_key_num = "000"
+        self.logger.log(level, message, extra={'processKey': self.process_key_tag + process_key_num})
 
-    def _write(self, level, message):
-        self.logger.log(level, message)
-
-    def info(self, message, values,
-             process_key: str = None,
-             process_id: str = None,
-             request_id: str = None,
-             correlation_id=None):
+    def _format_and_write(self, message, values, request_id, correlation_id, level, process_key_num):
         message = _formatted_string(message, values)
-        message += _append_additional_information(process_key, process_id, request_id, correlation_id)
-        self._write(logging.INFO, message)
+        message += _append_additional_information(request_id, correlation_id)
+        self._write(level, message, process_key_num)
 
-    def audit(self, message, values,
-              process_key: str = None,
-              process_id: str = None,
-              request_id: str = None,
-              correlation_id=None):
-        message = _formatted_string(message, values)
-        message += _append_additional_information(process_key, process_id, request_id, correlation_id)
-        self._write(AUDIT, message)
+    def info(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
+        self._format_and_write(message, values, request_id, correlation_id, logging.INFO, process_key_num)
 
-    def warning(self, message, values,
-                process_key: str = None,
-                process_id: str = None,
-                request_id: str = None,
-                correlation_id=None):
-        message = _formatted_string(message, values)
-        message += _append_additional_information(process_key, process_id, request_id, correlation_id)
-        self._write(logging.WARNING, message)
+    def audit(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
+        self._format_and_write(message, values, request_id, correlation_id, AUDIT, process_key_num)
 
-    def error(self, message, values,
-              process_key: str = None,
-              process_id: str = None,
-              request_id: str = None,
-              correlation_id=None):
-        message = _formatted_string(message, values)
-        message += _append_additional_information(process_key, process_id, request_id, correlation_id)
-        self._write(logging.ERROR, message)
+    def warning(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
+        self._format_and_write(message, values, request_id, correlation_id, logging.WARNING, process_key_num)
 
-    def critical(self, message, values,
-                 process_key: str = None,
-                 process_id: str = None,
-                 request_id: str = None,
-                 correlation_id=None):
-        message = _formatted_string(message, values)
-        message += _append_additional_information(process_key, process_id, request_id, correlation_id)
-        self._write(logging.CRITICAL, message)
+    def error(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
+        self._format_and_write(message, values, request_id, correlation_id, logging.ERROR, process_key_num)
+
+    def critical(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
+        self._format_and_write(message, values, request_id, correlation_id, logging.CRITICAL, process_key_num)
