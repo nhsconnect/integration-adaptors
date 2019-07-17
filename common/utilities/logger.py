@@ -60,29 +60,43 @@ class Logger:
     def __init__(self, log_ref: str = "SYS"):
         self.process_key_tag = log_ref
         self.logger = logging.getLogger()
-        # self.logger.setLevel(logging.NOTSET)
 
     def _write(self, level, message, process_key_num: str):
         if not process_key_num:
             process_key_num = "000"
         self.logger.log(level, message, extra={'processKey': self.process_key_tag + process_key_num})
 
-    def _format_and_write(self, message, values, request_id, correlation_id, level, process_key_num):
+    def _format_and_write(self, message, values, process_key_num, request_id, correlation_id, level):
         message = _formatted_string(message, values)
         message += _append_additional_information(request_id, correlation_id)
         self._write(level, message, process_key_num)
 
-    def info(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
-        self._format_and_write(message, values, request_id, correlation_id, logging.INFO, process_key_num)
+    def info(self, message: str, values: dict = None, process_key_num: str = None,
+             request_id: str = None, correlation_id=None):
+        if values is None:
+            values = {}
+        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.INFO)
 
-    def audit(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
-        self._format_and_write(message, values, request_id, correlation_id, AUDIT, process_key_num)
+    def audit(self, message: str, values: dict = None, process_key_num: str = None,
+              request_id: str = None, correlation_id=None):
+        if values is None:
+            values = {}
+        self._format_and_write(message, values, process_key_num, request_id, correlation_id, AUDIT)
 
-    def warning(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
-        self._format_and_write(message, values, request_id, correlation_id, logging.WARNING, process_key_num)
+    def warning(self, message: str, values: dict = None, process_key_num: str = None,
+                request_id: str = None, correlation_id=None):
+        if values is None:
+            values = {}
+        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.WARNING)
 
-    def error(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
-        self._format_and_write(message, values, request_id, correlation_id, logging.ERROR, process_key_num)
+    def error(self, message: str, values: dict = None, process_key_num: str = None,
+              request_id: str = None, correlation_id=None):
+        if values is None:
+            values = {}
+        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.ERROR)
 
-    def critical(self, message, values, process_key_num: str = None, request_id: str = None, correlation_id=None):
-        self._format_and_write(message, values, request_id, correlation_id, logging.CRITICAL, process_key_num)
+    def critical(self, message: str, values: dict = None, process_key_num: str = None,
+                 request_id: str = None, correlation_id=None):
+        if values is None:
+            values = {}
+        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.CRITICAL)
