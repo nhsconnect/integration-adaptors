@@ -8,6 +8,19 @@ pipeline {
     }
 
     stages {
+        stage('Common Module Unit Tests') {
+            steps {
+                dir('common') {
+                    sh label: 'Installing dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                    sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
+                    sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
+                    sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
+                    cobertura coberturaReportFile: '**/coverage.xml'
+               }
+            }
+        }
+
+
         stage('Unit Tests') {
             steps {
                 dir('mhs-reference-implementation') {
