@@ -16,6 +16,7 @@ pipeline {
                     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
                     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
                     cobertura coberturaReportFile: '**/coverage.xml'
+                    junit '**/test-reports/*.xml'
                }
             }
         }
