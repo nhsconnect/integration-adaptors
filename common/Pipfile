@@ -14,7 +14,6 @@ integration-adaptors-common = {editable = true,path = "."}
 python_version = "3.7"
 
 [scripts]
-tests = "python -m unittest -v"
 unittests = 'python -m unittest -v'
 unittests-cov = 'coverage run -m unittest -v'
 coverage-report = 'coverage report'
