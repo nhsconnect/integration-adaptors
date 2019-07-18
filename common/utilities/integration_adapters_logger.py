@@ -2,24 +2,33 @@ import logging
 import sys
 import time
 
-# Set a custom log level
 AUDIT = 25
-logging.addLevelName(AUDIT, "AUDIT")
 
 
-def audit(self, message, *args, **kws):
-    if self.isEnabledFor(AUDIT):
-        self._log(AUDIT, message, args, **kws)
+def _add_audit_level_log():
+    """
+    Adds a new log level to the standard python logging module, this level is the `audit` level and is defined as
+    a high level than INFO but lower than  WARNING
+    """
+    logging.addLevelName(AUDIT, "AUDIT")
 
+    def audit(self, message, *args, **kws):
+        if self.isEnabledFor(AUDIT):
+            self._log(AUDIT, message, args, **kws)
 
-logging.Logger.audit = audit
+    logging.Logger.audit = audit
 
 
 def load_global_log_config():
+    """
+    A general method to load the overall config of the system, specifically it modifies the root handler to output
+    to sysout and sets the default log levels and format. This is expected to be called once at the start of a
+    system.
+    """
+    _add_audit_level_log()
     logger = logging.getLogger()
     logger.setLevel(logging.NOTSET)
     handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(logging.NOTSET)
     logging.Formatter.converter = time.gmtime
     formatter = logging.Formatter('[%(asctime)s.%(msecs)03d] '
                                   '%(message)s pid=%(process)d LogLevel=%(levelname)s ProcessKey=%(processKey)s',
@@ -29,6 +38,10 @@ def load_global_log_config():
 
 
 def _format_values_in_map(dict_values: dict) -> dict:
+    """
+    Replaces the values in the map with key=value so that the key in a string can be replaced with the correct
+    log format, also surrounds the value with quotes if it contains spaces
+    """
     new_map = {}
     for key, value in dict_values.items():
         if ' ' in value:
@@ -39,11 +52,14 @@ def _format_values_in_map(dict_values: dict) -> dict:
 
 
 def _formatted_string(message: str, dict_values: dict) -> str:
+    """
+    Populates the string with the correctly formatted dictionary values
+    """
     formatted_values = _format_values_in_map(dict_values)
     return message.format(**formatted_values)
 
 
-class Logger:
+class IntegrationAdaptersLogger:
 
     def __init__(self, log_ref: str = "SYS"):
         self.process_key_tag = log_ref
@@ -55,6 +71,9 @@ class Logger:
         self.logger.log(level, message, extra={'processKey': self.process_key_tag + process_key_num})
 
     def _format_and_write(self, message, values, process_key_num, request_id, correlation_id, level):
+        """
+        Formats the string and appends the appropriate values if they are included before writing the log
+        """
         message = _formatted_string(message, values)
 
         if request_id:
@@ -66,30 +85,25 @@ class Logger:
 
     def info(self, message: str, values: dict = None, process_key_num: str = None,
              request_id: str = None, correlation_id=None):
-        if values is None:
-            values = {}
+        values = values if values is not None else {}
         self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.INFO)
 
     def audit(self, message: str, values: dict = None, process_key_num: str = None,
               request_id: str = None, correlation_id=None):
-        if values is None:
-            values = {}
+        values = values if values is not None else {}
         self._format_and_write(message, values, process_key_num, request_id, correlation_id, AUDIT)
 
     def warning(self, message: str, values: dict = None, process_key_num: str = None,
                 request_id: str = None, correlation_id=None):
-        if values is None:
-            values = {}
+        values = values if values is not None else {}
         self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.WARNING)
 
     def error(self, message: str, values: dict = None, process_key_num: str = None,
               request_id: str = None, correlation_id=None):
-        if values is None:
-            values = {}
+        values = values if values is not None else {}
         self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.ERROR)
 
     def critical(self, message: str, values: dict = None, process_key_num: str = None,
                  request_id: str = None, correlation_id=None):
-        if values is None:
-            values = {}
+        values = values if values is not None else {}
         self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.CRITICAL)

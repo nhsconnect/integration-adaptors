@@ -2,7 +2,7 @@ import io
 import logging
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from common.utilities import logger as log
+from common.utilities import integration_adapters_logger as log
 
 
 class TestLogger(TestCase):
@@ -24,7 +24,7 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_audit(self, mock_std):
         log.load_global_log_config()
-        log.Logger('TES') \
+        log.IntegrationAdaptersLogger('TES') \
             .info('{There Will Be No Spaces Today}', {'There Will Be No Spaces Today': 'wow qwe'}, correlation_id=2)
 
         output = mock_std.getvalue()
@@ -34,7 +34,7 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write(self, mock_std):
         log.load_global_log_config()
-        log.Logger()._format_and_write(
+        log.IntegrationAdaptersLogger()._format_and_write(
             message="{yes} {no} {maybe}",
             values={'yes': 'one', 'no': 'two', 'maybe': 'three'},
             request_id=10,
@@ -57,7 +57,7 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write_empty_vals(self, mock_std):
         log.load_global_log_config()
-        log.Logger()._format_and_write(
+        log.IntegrationAdaptersLogger()._format_and_write(
             message="{yes} {no} {maybe}",
             values={'yes': 'one', 'no': 'two', 'maybe': 'three'},
             request_id=None,
@@ -74,7 +74,7 @@ class TestLogger(TestCase):
         self.assertIn(' yes=one ', output)
 
     def test_log_levels(self):
-        logger = log.Logger()
+        logger = log.IntegrationAdaptersLogger()
         logger._format_and_write = MagicMock()
         with self.subTest("INFO"):
             logger.info("{yes}", {'yes': 'no'}, "100", "REQ", 313)
@@ -99,7 +99,7 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_empty_values(self, mock_stdout):
         log.load_global_log_config()
-        logger = log.Logger()
+        logger = log.IntegrationAdaptersLogger()
         with self.subTest("Empty info log"):
             logger.info("I can still log info strings without values!")
             output = mock_stdout.getvalue()
