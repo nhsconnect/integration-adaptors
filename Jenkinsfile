@@ -15,7 +15,6 @@ pipeline {
                     sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
                     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
                     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
-                    cobertura coberturaReportFile: '**/coverage.xml'
                }
             }
         }
@@ -28,8 +27,13 @@ pipeline {
                     sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
                     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
                     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
-                    cobertura coberturaReportFile: '**/coverage.xml'
                }
+            }
+        }
+
+        stage('Publish Coverage Report') {
+            steps {
+                cobertura coberturaReportFile: '**/coverage.xml'
             }
         }
 
