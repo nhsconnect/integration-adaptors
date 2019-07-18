@@ -2,12 +2,7 @@ import io
 import logging
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-import re
-
 from common.utilities import logger as log
-
-# This is the regex use to extract the key=value formatted log strings into dictionaries for testing
-KEY_PAIR_REGEX = r'(\S+)=(".*?"|\S+)'
 
 
 class TestLogger(TestCase):
@@ -15,8 +10,8 @@ class TestLogger(TestCase):
     def test_dictionary_formatting(self):
         # Tests both removing the spaces and surrounding values with quotes if needed
         input_dict = {
-            'Key With Space': 'value with space',
-            'EasyKey': 'EasyValue'
+            'Key With Space': 'value with space',  # Needs quotes
+            'EasyKey': 'EasyValue',  # Doesn't need quotes
         }
 
         expected_output = {
@@ -33,9 +28,8 @@ class TestLogger(TestCase):
             .info('{There Will Be No Spaces Today}', {'There Will Be No Spaces Today': 'wow qwe'}, correlation_id=2)
 
         output = mock_std.getvalue()
-        output_dict = dict(re.findall(KEY_PAIR_REGEX, output))
-        self.assertEqual(output_dict['CorrelationId'], "2")
-        self.assertEqual(output_dict["ThereWillBeNoSpacesToday"], '"wow qwe"')
+        self.assertIn('CorrelationId=2', output)
+        self.assertIn('ThereWillBeNoSpacesToday="wow qwe"', output)
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write(self, mock_std):
@@ -50,14 +44,15 @@ class TestLogger(TestCase):
         )
 
         output = mock_std.getvalue()
-        output_dict = dict(re.findall(KEY_PAIR_REGEX, output))
-        self.assertEqual(output_dict['CorrelationId'], '5')
-        self.assertEqual(output_dict['LogLevel'], 'INFO')
-        self.assertEqual(output_dict['ProcessKey'], 'SYS100')
-        self.assertEqual(output_dict['RequestId'], '10')
-        self.assertEqual(output_dict['maybe'], 'three')
-        self.assertIsNotNone(output_dict['pid'])
-        self.assertEqual(output_dict['yes'], 'one')
+
+        # Check that each value has spaces
+        self.assertIn(' CorrelationId=5 ', output)
+        self.assertIn(' LogLevel=INFO ', output)
+        self.assertIn(' ProcessKey=SYS100', output)
+        self.assertIn(' RequestId=10 ', output)
+        self.assertIn(' maybe=three ', output)
+        self.assertIn(' yes=one ', output)
+        self.assertIn(' pid=', output)
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write_empty_vals(self, mock_std):
@@ -72,53 +67,58 @@ class TestLogger(TestCase):
         )
 
         output = mock_std.getvalue()
-        output_dict = dict(re.findall(r'(\S+)=(".*?"|\S+)', output))
-        self.assertEqual(output_dict['LogLevel'], 'INFO')
-        self.assertEqual(output_dict['ProcessKey'], 'SYS100')
-        self.assertEqual(output_dict['maybe'], 'three')
-        self.assertIsNotNone(output_dict['pid'])
-        self.assertEqual(output_dict['yes'], 'one')
+        self.assertIn(' LogLevel=INFO ', output)
+        self.assertIn(' ProcessKey=SYS100', output)
+        self.assertIn(' maybe=three ', output)
+        self.assertIn(' pid=', output)
+        self.assertIn(' yes=one ', output)
 
     def test_log_levels(self):
         logger = log.Logger()
         logger._format_and_write = MagicMock()
         with self.subTest("INFO"):
-            logger.info("{yes}", {'yes', 'no'}, "100", "REQ", 313)
-            logger._format_and_write.assert_called_with("{yes}", {'yes', 'no'}, "100", "REQ", 313, logging.INFO)
+            logger.info("{yes}", {'yes': 'no'}, "100", "REQ", 313)
+            logger._format_and_write.assert_called_with("{yes}", {'yes': 'no'}, "100", "REQ", 313, logging.INFO)
 
         with self.subTest("AUDIT"):
-            logger.audit("{yes}", {'yes', 'no'}, "100", "REQ", 313)
-            logger._format_and_write.assert_called_with("{yes}", {'yes', 'no'}, "100", "REQ", 313, log.AUDIT)
+            logger.audit("{yes}", {'yes': 'no'}, "100", "REQ", 313)
+            logger._format_and_write.assert_called_with("{yes}", {'yes': 'no'}, "100", "REQ", 313, log.AUDIT)
 
         with self.subTest("WARNING"):
-            logger.warning("{yes}", {'yes', 'no'}, "100", "REQ", 313)
-            logger._format_and_write.assert_called_with("{yes}", {'yes', 'no'}, "100", "REQ", 313, logging.WARNING)
+            logger.warning("{yes}", {'yes': 'no'}, "100", "REQ", 313)
+            logger._format_and_write.assert_called_with("{yes}", {'yes': 'no'}, "100", "REQ", 313, logging.WARNING)
 
         with self.subTest("ERROR"):
-            logger.error("{yes}", {'yes', 'no'}, "100", "REQ", 313)
-            logger._format_and_write.assert_called_with("{yes}", {'yes', 'no'}, "100", "REQ", 313, logging.ERROR)
+            logger.error("{yes}", {'yes': 'no'}, "100", "REQ", 313)
+            logger._format_and_write.assert_called_with("{yes}", {'yes': 'no'}, "100", "REQ", 313, logging.ERROR)
 
         with self.subTest("CRITICAL"):
-            logger.critical("{yes}", {'yes', 'no'}, "100", "REQ", 313)
-            logger._format_and_write.assert_called_with("{yes}", {'yes', 'no'}, "100", "REQ", 313, logging.CRITICAL)
+            logger.critical("{yes}", {'yes': 'no'}, "100", "REQ", 313)
+            logger._format_and_write.assert_called_with("{yes}", {'yes': 'no'}, "100", "REQ", 313, logging.CRITICAL)
 
     @patch('sys.stdout', new_callable=io.StringIO)
-    def test_crit_writes_to_stdout(self, mock_stdout):
+    def test_empty_values(self, mock_stdout):
         log.load_global_log_config()
-        log.Logger('FAR') \
-            .critical(message='This is a {key}',
-                      values={'key': 'great value'},
-                      process_key_num="541",
-                      request_id="313",
-                      correlation_id=2)
+        logger = log.Logger()
+        with self.subTest("Empty info log"):
+            logger.info("I can still log info strings without values!")
+            output = mock_stdout.getvalue()
+            self.assertIn('I can still log info strings without values!', output)
+        with self.subTest("Empty audit log"):
+            logger.audit("I can still log audit strings without values!")
+            output = mock_stdout.getvalue()
+            self.assertIn('I can still log audit strings without values!', output)
+        with self.subTest("Empty warning log"):
+            logger.warning("I can still log warning strings without values!")
+            output = mock_stdout.getvalue()
+            self.assertIn('I can still log warning strings without values!', output)
+        with self.subTest("Empty error log"):
+            logger.error("I can still log error strings without values!")
+            output = mock_stdout.getvalue()
+            self.assertIn('I can still log error strings without values!', output)
+        with self.subTest("Empty Critical log"):
+            logger.critical("I can still log critical strings without values!")
+            output = mock_stdout.getvalue()
+            self.assertIn('I can still log critical strings without values!', output)
 
-        output = mock_stdout.getvalue()
-        text = output.split(']')[1]  # Get rid of the time section
-        # Asserts non key value text is written as well
-        self.assertTrue('This is a key="great value"' in text)
-
-        self.assertTrue('CorrelationId=2' in text)
-        self.assertTrue('key="great value"' in text)
-        self.assertTrue('RequestId=313' in text)
-        self.assertTrue('LogLevel=CRITICAL' in text)
 

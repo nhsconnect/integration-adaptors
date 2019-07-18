@@ -38,18 +38,6 @@ def _format_values_in_map(dict_values: dict) -> dict:
     return new_map
 
 
-def _append_additional_information(
-        request_id: str = None,
-        correlation_id: str = None):
-    end_message = ''
-    if request_id:
-        end_message += f' RequestId={request_id}'
-    if correlation_id:
-        end_message += f' CorrelationId={correlation_id}'
-
-    return end_message
-
-
 def _formatted_string(message: str, dict_values: dict) -> str:
     formatted_values = _format_values_in_map(dict_values)
     return message.format(**formatted_values)
@@ -68,7 +56,12 @@ class Logger:
 
     def _format_and_write(self, message, values, process_key_num, request_id, correlation_id, level):
         message = _formatted_string(message, values)
-        message += _append_additional_information(request_id, correlation_id)
+
+        if request_id:
+            message += f' RequestId={request_id}'
+        if correlation_id:
+            message += f' CorrelationId={correlation_id}'
+
         self._write(level, message, process_key_num)
 
     def info(self, message: str, values: dict = None, process_key_num: str = None,
