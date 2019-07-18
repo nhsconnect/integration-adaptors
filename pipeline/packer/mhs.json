@@ -11,7 +11,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "python:3-slim",
+      "image": "python:3-slim-stretch",
       "commit": true,
       "changes": [
         "EXPOSE 80 443",
@@ -40,7 +40,7 @@
     {
       "type": "shell",
       "inline": [
-        "sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
+        "# sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
       ]
     },
     {
