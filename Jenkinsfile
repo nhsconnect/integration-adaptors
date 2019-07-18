@@ -16,7 +16,6 @@ pipeline {
                     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
                     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
                     cobertura coberturaReportFile: '**/coverage.xml'
-                    junit '**/test-reports/*.xml'
                }
             }
         }
@@ -48,13 +47,15 @@ pipeline {
                     // Wait for MHS container to fully stand up
                     sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
                     sh label: 'Running integration tests', script: 'pipenv run inttests'
-                    junit '**/test-reports/*.xml'
                 }
             }
         }
     }
 
     post {
+        always {
+            junit '**/test-reports/*.xml'
+        }
         cleanup {
             dir('pipeline/terraform/test-environment') {
                     sh label: 'Destroying Terraform configuration', script: """
