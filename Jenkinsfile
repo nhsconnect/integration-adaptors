@@ -48,6 +48,7 @@ pipeline {
                     // Wait for MHS container to fully stand up
                     sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
                     sh label: 'Running unit tests', script: 'pipenv run inttests'
+                    junit '**/test-reports/*.xml'
                 }
             }
         }
