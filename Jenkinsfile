@@ -8,14 +8,18 @@ pipeline {
     }
 
     stages {
-        stage('Unit Tests') {
+        stage('Common Module Unit Tests') {
+            steps {
+                dir('common') {
+                    executeUnitTestsWithCoverage()
+               }
+            }
+        }
+
+        stage('MHS Unit Tests') {
             steps {
                 dir('mhs-reference-implementation') {
-                    sh label: 'Installing dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                    sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
-                    sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
-                    sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
-                    cobertura coberturaReportFile: '**/coverage.xml'
+                    executeUnitTestsWithCoverage()
                }
             }
         }
@@ -46,13 +50,17 @@ pipeline {
                 dir('mhs-reference-implementation') {
                     // Wait for MHS container to fully stand up
                     sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
-                    sh label: 'Running unit tests', script: 'pipenv run inttests'
+                    sh label: 'Running integration tests', script: 'pipenv run inttests'
                 }
             }
         }
     }
 
     post {
+        always {
+            cobertura coberturaReportFile: '**/coverage.xml'
+            junit '**/test-reports/*.xml'
+        }
         cleanup {
             dir('pipeline/terraform/test-environment') {
                     sh label: 'Destroying Terraform configuration', script: """
@@ -65,4 +73,11 @@ pipeline {
             }
         }
     }
+}
+
+void executeUnitTestsWithCoverage() {
+    sh label: 'Installing dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+    sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
+    sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
+    sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
 }
