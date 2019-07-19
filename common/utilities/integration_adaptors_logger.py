@@ -35,16 +35,15 @@ class IntegrationAdaptorsLogger:
             raise ValueError('Undefined log reference')
         self.process_key_tag = log_ref
         self.logger = logging.getLogger(log_ref)
-
-    def _write(self, level, message, process_key_num: str):
-        if not process_key_num:
-            raise ValueError('process_key_num not defined')
-        self.logger.log(level, message)
+        logging.getLoggerClass()
 
     def _format_and_write(self, message, values, process_key_num, request_id, correlation_id, level):
         """
         Formats the string and appends the appropriate values if they are included before writing the log
         """
+        if not process_key_num:
+            raise ValueError('process_key_num not defined')
+
         message = self._formatted_string(message, values)
 
         if request_id:
@@ -54,7 +53,7 @@ class IntegrationAdaptorsLogger:
         if process_key_num:
             message += f' ProcessKey={self.process_key_tag + process_key_num}'
 
-        self._write(level, message, process_key_num)
+        self.logger.log(level, message)
 
     def info(self, process_key_num: str, message: str, values: dict = None,
              request_id: str = None, correlation_id=None):
