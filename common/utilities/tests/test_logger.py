@@ -8,6 +8,9 @@ from utilities import integration_adaptors_logger as log
 
 class TestLogger(TestCase):
 
+    def tearDown(self) -> None:
+        logging.getLogger().handlers = []
+
     def test_dictionary_formatting(self):
         # Tests both removing the spaces and surrounding values with quotes if needed
         input_dict = {
