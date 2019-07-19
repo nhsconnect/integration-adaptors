@@ -18,7 +18,7 @@ def configure_logging():
     handler = logging.StreamHandler(sys.stdout)
     logging.Formatter.converter = time.gmtime
     formatter = logging.Formatter('[%(asctime)s.%(msecs)03dZ] '
-                                  '%(message)s pid=%(process)d LogLevel=%(levelname)s ProcessKey=%(processKey)s',
+                                  '%(message)s pid=%(process)d LogLevel=%(levelname)s ',
                                   '%Y-%m-%dT%H:%M:%S')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
@@ -39,7 +39,7 @@ class IntegrationAdaptorsLogger:
     def _write(self, level, message, process_key_num: str):
         if not process_key_num:
             raise ValueError('process_key_num not defined')
-        self.logger.log(level, message, extra={'processKey': self.process_key_tag + process_key_num})
+        self.logger.log(level, message)
 
     def _format_and_write(self, message, values, process_key_num, request_id, correlation_id, level):
         """
@@ -51,6 +51,8 @@ class IntegrationAdaptorsLogger:
             message += f' RequestId={request_id}'
         if correlation_id:
             message += f' CorrelationId={correlation_id}'
+        if process_key_num:
+            message += f' ProcessKey={self.process_key_tag + process_key_num}'
 
         self._write(level, message, process_key_num)
 
