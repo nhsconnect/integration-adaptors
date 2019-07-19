@@ -19,3 +19,14 @@ class EbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
         :param message_dictionary: The dictionary of values to use when populating the template.
         """
         super().__init__(EBXML_TEMPLATE, message_dictionary)
+
+    @classmethod
+    def from_string(cls, headers: typing.Dict[str, str], message: str):
+        """Parse the provided message string and create an instance of an EbxmlAckEnvelope.
+
+        :param headers A dictionary of headers received with the message.
+        :param message: The message to be parsed.
+        :return: An instance of an EbxmlAckEnvelope constructed from the message.
+        """
+        message_dictionary = super().parse_message(headers, message)
+        return EbxmlAckEnvelope(message_dictionary)
