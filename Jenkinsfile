@@ -24,12 +24,6 @@ pipeline {
             }
         }
 
-        stage('Publish Coverage Report') {
-            steps {
-                cobertura coberturaReportFile: '**/coverage.xml'
-            }
-        }
-
         stage('Package') {
             steps {
                 sh label: 'Running Packer build', script: 'packer build pipeline/packer/mhs.json'
@@ -56,13 +50,17 @@ pipeline {
                 dir('mhs-reference-implementation') {
                     // Wait for MHS container to fully stand up
                     sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
-                    sh label: 'Running unit tests', script: 'pipenv run inttests'
+                    sh label: 'Running integration tests', script: 'pipenv run inttests'
                 }
             }
         }
     }
 
     post {
+        always {
+            cobertura coberturaReportFile: '**/coverage.xml'
+            junit '**/test-reports/*.xml'
+        }
         cleanup {
             dir('pipeline/terraform/test-environment') {
                     sh label: 'Destroying Terraform configuration', script: """

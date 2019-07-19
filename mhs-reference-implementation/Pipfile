@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 coverage = "~=4.5"
+unittest-xml-reporting = "~=2.5"
 
 [packages]
 integration-adaptors-common = {editable = true,path = "./../common"}
@@ -16,10 +17,10 @@ ldap3 = "*"
 python_version = "3.7"
 
 [scripts]
-unittests = 'python -m unittest -v'
-unittests-cov = 'coverage run -m unittest -v'
+unittests = 'python -m xmlrunner -o test-reports -v'
+unittests-cov = 'coverage run -m xmlrunner -o test-reports -v'
 coverage-report = 'coverage report'
 coverage-report-xml = 'coverage xml'
 coverage-report-html = 'coverage html'
-inttests = 'python -m unittest discover -p "int_*" -v'
+inttests = 'python -m xmlrunner discover -o test-reports -p "int_*" -v'
 mhs = "python main.py"
