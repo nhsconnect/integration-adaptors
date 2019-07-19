@@ -35,7 +35,6 @@ class IntegrationAdaptorsLogger:
             raise ValueError('Undefined log reference')
         self.process_key_tag = log_ref
         self.logger = logging.getLogger(log_ref)
-        logging.getLoggerClass()
 
     def _format_and_write(self, message, values, process_key_num, request_id, correlation_id, level):
         """
@@ -50,8 +49,8 @@ class IntegrationAdaptorsLogger:
             message += f' RequestId={request_id}'
         if correlation_id:
             message += f' CorrelationId={correlation_id}'
-        if process_key_num:
-            message += f' ProcessKey={self.process_key_tag + process_key_num}'
+
+        message += f' ProcessKey={self.process_key_tag + process_key_num}'
 
         self.logger.log(level, message)
 

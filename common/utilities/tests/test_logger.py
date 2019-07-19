@@ -127,6 +127,13 @@ class TestLogger(TestCase):
             output = mock_stdout.getvalue()
             self.assertIn('I can still log critical strings without values!', output)
 
+    def test_write_throws_error_on_bad_params(self):
+        with self.assertRaises(ValueError):
+            log.IntegrationAdaptorsLogger('SYS')._format_and_write("message", {}, "", None, None, logging.INFO)
+
+        with self.assertRaises(ValueError):
+            log.IntegrationAdaptorsLogger('SYS')._format_and_write("message", {}, None, None, None, logging.INFO)
+
     def test_undefined_log_ref_throws_error(self):
         with self.assertRaises(ValueError):
             log.IntegrationAdaptorsLogger('')
