@@ -134,7 +134,3 @@ class TestLogger(TestCase):
     def test_undefined_log_ref_throws_error(self):
         with self.assertRaises(ValueError):
             log.IntegrationAdaptorsLogger('')
-
-    def test_2(self):
-        log.configure_logging()
-        log.IntegrationAdaptorsLogger('YES').info('100', 'qweqwe', {})
