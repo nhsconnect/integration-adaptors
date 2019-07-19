@@ -19,7 +19,7 @@ class TestLogger(TestCase):
             'Key With Space': 'KeyWithSpace="value with space"',
             'EasyKey': 'EasyKey=EasyValue'
         }
-        output = log.IntegrationAdaptorsLogger()._format_values_in_map(input_dict)
+        output = log.IntegrationAdaptorsLogger('SYS')._format_values_in_map(input_dict)
         self.assertEqual(output, expected_output)
 
     @patch('sys.stdout', new_callable=io.StringIO)
@@ -38,7 +38,7 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write(self, mock_std):
         log.configure_logging()
-        log.IntegrationAdaptorsLogger("SYS")._format_and_write(
+        log.IntegrationAdaptorsLogger('SYS')._format_and_write(
             message='{yes} {no} {maybe}',
             values={'yes': 'one', 'no': 'two', 'maybe': 'three'},
             request_id=10,
@@ -61,7 +61,7 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write_empty_vals(self, mock_std):
         log.configure_logging()
-        log.IntegrationAdaptorsLogger("SYS")._format_and_write(
+        log.IntegrationAdaptorsLogger('SYS')._format_and_write(
             message='{yes} {no} {maybe}',
             values={'yes': 'one', 'no': 'two', 'maybe': 'three'},
             request_id=None,
@@ -80,7 +80,7 @@ class TestLogger(TestCase):
         self.assertNotIn('RequestId=', output)
 
     def test_log_levels(self):
-        logger = log.IntegrationAdaptorsLogger()
+        logger = log.IntegrationAdaptorsLogger('SYS')
         logger._format_and_write = MagicMock()
         with self.subTest('INFO'):
             logger.info('100', '{yes}', {'yes': 'no'}, 'REQ', 313)
@@ -105,7 +105,7 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_empty_values(self, mock_stdout):
         log.configure_logging()
-        logger = log.IntegrationAdaptorsLogger()
+        logger = log.IntegrationAdaptorsLogger('SYS')
         with self.subTest('Empty info log'):
             logger.info('100', 'I can still log info strings without values!')
             output = mock_stdout.getvalue()
@@ -129,7 +129,7 @@ class TestLogger(TestCase):
 
     def test_write_throws_error_on_bad_params(self):
         with self.assertRaises(ValueError):
-            log.IntegrationAdaptorsLogger()._write(logging.INFO, 'no processkey', None)
+            log.IntegrationAdaptorsLogger('SYS')._write(logging.INFO, 'no processkey', None)
 
     def test_undefined_log_ref_throws_error(self):
         with self.assertRaises(ValueError):
@@ -137,4 +137,4 @@ class TestLogger(TestCase):
 
     def test_2(self):
         log.configure_logging()
-        log.IntegrationAdaptorsLogger('YES').info("100", "qweqwe", {})
+        log.IntegrationAdaptorsLogger('YES').info('100', 'qweqwe', {})
