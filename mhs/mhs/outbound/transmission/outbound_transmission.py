@@ -10,7 +10,7 @@ class OutboundTransmission:
     """A component that sends HTTP requests to a remote MHS."""
 
     def __init__(self, certs_dir):
-        """Create a new HttpTransport that loads certificates from the specified directory.
+        """Create a new OutboundTransmission that loads certificates from the specified directory.
         :param certs_dir: A string containing the path to the directory to load certificates from.
         """
         client_cert_path = str(Path(certs_dir) / "client.cert")
