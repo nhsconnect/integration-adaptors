@@ -24,12 +24,6 @@ pipeline {
             }
         }
 
-        stage('Publish Coverage Report') {
-            steps {
-                cobertura coberturaReportFile: '**/coverage.xml'
-            }
-        }
-
         stage('Package') {
             steps {
                 sh label: 'Running Packer build', script: 'packer build pipeline/packer/mhs.json'
@@ -64,6 +58,7 @@ pipeline {
 
     post {
         always {
+            cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
         }
         cleanup {
