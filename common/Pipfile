@@ -4,6 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+coverage = "~=4.5"
+tornado = "*"
 
 [packages]
 integration-adaptors-common = {editable = true,path = "."}
@@ -12,4 +14,9 @@ integration-adaptors-common = {editable = true,path = "."}
 python_version = "3.7"
 
 [scripts]
-tests = "python -m unittest -v"
+unittests = 'python -m unittest -v'
+unittests-cov = 'coverage run -m unittest -v'
+coverage-report = 'coverage report'
+coverage-report-xml = 'coverage xml'
+coverage-report-html = 'coverage html'
+

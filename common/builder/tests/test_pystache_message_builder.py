@@ -17,5 +17,5 @@ class TestPystacheMessageBuilder(TestCase):
     def test_build_message(self):
         message = self.builder.build_message(dict(to="world"))
 
-        self.assertEqual("Hello, world!\r\n", message,
+        self.assertEqual("Hello, world!", message.strip(),
                          "Message returned should be the rendered string returned by Pystache")
