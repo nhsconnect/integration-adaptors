@@ -8,15 +8,25 @@ pipeline {
     }
 
     stages {
-        stage('Unit Tests') {
+        stage('Common Module Unit Tests') {
+            steps {
+                dir('common') {
+                    executeUnitTestsWithCoverage()
+               }
+            }
+        }
+
+        stage('MHS Unit Tests') {
             steps {
                 dir('mhs-reference-implementation') {
-                    sh label: 'Installing dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                    sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
-                    sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
-                    sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
-                    cobertura coberturaReportFile: '**/coverage.xml'
+                    executeUnitTestsWithCoverage()
                }
+            }
+        }
+
+        stage('Publish Coverage Report') {
+            steps {
+                cobertura coberturaReportFile: '**/coverage.xml'
             }
         }
 
@@ -68,4 +78,11 @@ pipeline {
             }
         }
     }
+}
+
+void executeUnitTestsWithCoverage() {
+    sh label: 'Installing dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+    sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
+    sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
+    sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
 }
