@@ -3,7 +3,7 @@ import os
 import logging
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from common.utilities import integration_adaptors_logger as log
+from utilities import integration_adaptors_logger as log
 
 
 class TestLogger(TestCase):
