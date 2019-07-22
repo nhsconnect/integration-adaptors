@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
 
       mountPoints = [{
         sourceVolume = "certs-volume"
-        containerPath = "/usr/src/app/mhs-reference-implementation/data/certs/"
+        containerPath = "/usr/src/app/mhs/data/certs/"
       }]
 
       portMappings = [
