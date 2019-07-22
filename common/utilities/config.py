@@ -3,7 +3,7 @@ Config
 
 This module holds the config used by an application. To use this module, first
 call `setup_config` to populate `config`. Then, just get any required config
-using `get_config` (or directly use `config` for optional config).
+using `get_config` (or directly use `config` for more complex use cases).
 """
 import logging
 import os
