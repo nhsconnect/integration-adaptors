@@ -1,0 +1,6 @@
+[run]
+branch = True
+source = .
+omit =
+    selenium_tests/*
+    */tests/*
