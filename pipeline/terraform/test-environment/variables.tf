@@ -6,3 +6,4 @@ variable "cluster_id" {}
 variable "task_execution_role" {}
 variable "build_id" {}
 variable "ecr_address" {}
+variable "mhs_log_level" {}

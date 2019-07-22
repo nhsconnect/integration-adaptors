@@ -69,6 +69,7 @@ pipeline {
                         -var ecr_address=${DOCKER_REPOSITORY} \
                         -var task_execution_role=${TASK_EXECUTION_ROLE} \
                         -var build_id=${BUILD_TAG}
+                        -var mhs_log_level=DEBUG
                      """
             }
         }

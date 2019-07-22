@@ -6,6 +6,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application
 
+from utilities import config
 from definitions import ROOT_DIR
 from mhs.builder.ebxml_ack_message_builder import EbXmlAckMessageBuilder
 from mhs.builder.ebxml_request_message_builder import EbXmlRequestMessageBuilder
@@ -30,6 +31,8 @@ assert PARTY_ID
 
 interactions_config_file = str(data_dir / "interactions" / "interactions.json")
 
+config.setup_config("MHS")
+
 # Build the application
 interactions_config = InteractionsConfigFile(interactions_config_file)
 message_builder = EbXmlRequestMessageBuilder()
@@ -40,7 +43,7 @@ ack_builder = EbXmlAckMessageBuilder()
 message_parser = EbXmlRequestMessageParser()
 
 # Configure logging
-logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=config.config["LOG_LEVEL"])
 
 # Run the Tornado servers
 callbacks = {}
