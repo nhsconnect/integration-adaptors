@@ -19,7 +19,7 @@ REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
 
 
-class TestAsyncResponseHandler(AsyncHTTPTestCase):
+class TestInboundHandler(AsyncHTTPTestCase):
     """A simple integration test for the async response endpoint."""
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
