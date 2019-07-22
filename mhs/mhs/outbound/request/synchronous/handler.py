@@ -3,6 +3,6 @@
 import mhs.outbound.request.common as common
 
 
-class SynchronousHandler(common.CommonOutboud):
+class SynchronousHandler(common.CommonOutbound):
     """A Tornado request handler intended to handle incoming HTTP requests from a supplier system."""
     pass
