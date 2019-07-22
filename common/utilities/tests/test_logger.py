@@ -3,9 +3,11 @@ import logging
 import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from utilities import integration_adaptors_logger as log
+
+from utilities import integration_adaptors_logger as log, config
 
 
+@patch("utilities.config.config", new={'LOG_LEVEL': 'INFO'})
 class TestLogger(TestCase):
 
     def tearDown(self) -> None:
@@ -27,7 +29,7 @@ class TestLogger(TestCase):
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_custom_audit_level(self, mock_stdout):
-        log.configure_logging(log.AUDIT)
+        log.configure_logging()
         log.IntegrationAdaptorsLogger('TES') \
             .audit('100', '{There Will Be No Spaces Today}',
                    {'There Will Be No Spaces Today': 'wow qwe'}, correlation_id=2)
@@ -40,7 +42,8 @@ class TestLogger(TestCase):
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_log_threshold(self, mock_stdout):
-        log.configure_logging(log.AUDIT)
+        config.config['LOG_LEVEL'] = 'AUDIT'
+        log.configure_logging()
         log.IntegrationAdaptorsLogger('TES').info('100', 'Test message')
 
         output = mock_stdout.getvalue()
@@ -48,7 +51,7 @@ class TestLogger(TestCase):
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write(self, mock_std):
-        log.configure_logging(logging.INFO)
+        log.configure_logging()
         log.IntegrationAdaptorsLogger('SYS')._format_and_write(
             message='{yes} {no} {maybe}',
             values={'yes': 'one', 'no': 'two', 'maybe': 'three'},
@@ -71,7 +74,7 @@ class TestLogger(TestCase):
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write_empty_vals(self, mock_std):
-        log.configure_logging(logging.INFO)
+        log.configure_logging()
         log.IntegrationAdaptorsLogger('SYS')._format_and_write(
             message='{yes} {no} {maybe}',
             values={'yes': 'one', 'no': 'two', 'maybe': 'three'},
@@ -115,7 +118,7 @@ class TestLogger(TestCase):
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_empty_values(self, mock_stdout):
-        log.configure_logging(logging.INFO)
+        log.configure_logging()
         logger = log.IntegrationAdaptorsLogger('SYS')
         with self.subTest('Empty info log'):
             logger.info('100', 'I can still log info strings without values!')

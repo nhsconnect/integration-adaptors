@@ -1,23 +1,22 @@
 import logging
 import sys
 import time
-from typing import Union
+
+from utilities import config
 
 AUDIT = 25
 
 
 # Set the logging info globally, make each module get a new logger based on that log ref we provide
-def configure_logging(log_level: Union[int, str]):
+def configure_logging():
     """
     A general method to load the overall config of the system, specifically it modifies the root handler to output
     to stdout and sets the default log levels and format. This is expected to be called once at the start of a
     application.
-
-    :param log_level threshold at which to output logs
     """
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
-    logger.setLevel(log_level)
+    logger.setLevel(config.config['LOG_LEVEL'])
     handler = logging.StreamHandler(sys.stdout)
     logging.Formatter.converter = time.gmtime
     formatter = logging.Formatter('[%(asctime)s.%(msecs)03dZ] '
