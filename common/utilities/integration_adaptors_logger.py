@@ -16,7 +16,7 @@ def configure_logging():
     """
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
-    logger.setLevel(config.config['LOG_LEVEL'])
+    logger.setLevel(config.get_config('LOG_LEVEL'))
     handler = logging.StreamHandler(sys.stdout)
     logging.Formatter.converter = time.gmtime
     formatter = logging.Formatter('[%(asctime)s.%(msecs)03dZ] '

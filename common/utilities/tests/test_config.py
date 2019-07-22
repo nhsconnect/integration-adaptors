@@ -1,7 +1,10 @@
+import io
+import logging
 import unittest
 from unittest.mock import patch
 
 import utilities.config as config
+from utilities import integration_adaptors_logger
 
 
 @patch.dict(config.config)
@@ -24,3 +27,29 @@ class TestConfig(unittest.TestCase):
         config.setup_config("PREFIX")
 
         self.assertEqual({}, config.config)
+
+    def test_get_config_success(self, mock_environ):
+        mock_environ["PREFIX_TEST"] = "123"
+        mock_environ["PREFIX_LOG_LEVEL"] = "INFO"
+
+        config.setup_config("PREFIX")
+
+        self.assertEqual("123", config.get_config("TEST"))
+
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_get_config_no_config_variable_found(self, mock_stdout, mock_environ):
+        mock_environ["PREFIX_LOG_LEVEL"] = "INFO"
+        config.setup_config("PREFIX")
+
+        def rename_logging_handler():
+            logging.getLogger().handlers = []
+
+        self.addCleanup(rename_logging_handler)
+        integration_adaptors_logger.configure_logging()
+
+        with self.assertRaises(KeyError):
+            config.get_config("BLAH")
+
+        output = mock_stdout.getvalue()
+        self.assertIn('Failed to get config ConfigName:"BLAH" ProcessKey=CONFIG001', output)
+        self.assertIn("LogLevel=ERROR", output)
