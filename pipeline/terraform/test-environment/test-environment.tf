@@ -31,6 +31,13 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
         containerPath = "/usr/src/app/mhs/data/certs/"
       }]
 
+      environment = [
+        {
+          name = "MHS_LOG_LEVEL"
+          value = var.mhs_log_level
+        }
+      ]
+
       portMappings = [
         {
           containerPort = 80

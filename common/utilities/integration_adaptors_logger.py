@@ -2,6 +2,8 @@ import logging
 import sys
 import time
 
+from utilities import config
+
 AUDIT = 25
 
 
@@ -14,7 +16,7 @@ def configure_logging():
     """
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
-    logger.setLevel(logging.NOTSET)
+    logger.setLevel(config.get_config('LOG_LEVEL'))
     handler = logging.StreamHandler(sys.stdout)
     logging.Formatter.converter = time.gmtime
     formatter = logging.Formatter('[%(asctime)s.%(msecs)03dZ] '

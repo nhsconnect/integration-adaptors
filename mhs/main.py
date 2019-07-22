@@ -6,6 +6,7 @@ import typing
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+import utilities.config as config
 import utilities.file_utilities as file_utilities
 
 import definitions
@@ -64,7 +65,7 @@ def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
 
 def configure_logging() -> None:
     """Configure logging for this application."""
-    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=logging.DEBUG)
+    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=config.config["LOG_LEVEL"])
 
 
 def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_workflow.SyncAsyncWorkflow,
@@ -97,6 +98,7 @@ def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_w
 
 
 def main():
+    config.setup_config("MHS")
     configure_logging()
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"

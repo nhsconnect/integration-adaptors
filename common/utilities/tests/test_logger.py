@@ -1,11 +1,13 @@
 import io
-import os
 import logging
+import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from utilities import integration_adaptors_logger as log
+
+from utilities import integration_adaptors_logger as log, config
 
 
+@patch("utilities.config.config", new={'LOG_LEVEL': 'INFO'})
 class TestLogger(TestCase):
 
     def tearDown(self) -> None:
@@ -37,6 +39,15 @@ class TestLogger(TestCase):
         self.assertIn('ThereWillBeNoSpacesToday="wow qwe"', output)
         self.assertIn('LogLevel=AUDIT', output)
         self.assertIn('ProcessKey=TES100', output)
+
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_log_threshold(self, mock_stdout):
+        config.config['LOG_LEVEL'] = 'AUDIT'
+        log.configure_logging()
+        log.IntegrationAdaptorsLogger('TES').info('100', 'Test message')
+
+        output = mock_stdout.getvalue()
+        self.assertEqual("", output)
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write(self, mock_std):
