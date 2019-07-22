@@ -20,7 +20,7 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
 - The ASID is a 12 digit number needed to access Opentest, supplied by NHS Digital
     - eg ASID=123456789012
 - The MHS_ADDRESS is the hostname of the MHS instance being used for testing and should be supplied in it's raw state,
- without the 'http://' prefix or '/' suffix 
+ without the 'http://' prefix or '/' suffix
     - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
 
 ### Running an MHS Instance
@@ -43,6 +43,6 @@ were granted access):
 root CA Certificate.
 - `client.key` - Your endpoint private key
 - `client.pem` - A copy of client.cert
-- `party_key.txt` - The party key associated with your MHS build 
+- `party_key.txt` - The party key associated with your MHS build
 
 If you are using Opentest, each of these credentials will have been provided when you were granted access.
