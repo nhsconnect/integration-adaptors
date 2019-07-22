@@ -30,7 +30,6 @@ class TestConfig(unittest.TestCase):
 
     def test_get_config_success(self, mock_environ):
         mock_environ["PREFIX_TEST"] = "123"
-        mock_environ["PREFIX_LOG_LEVEL"] = "INFO"
 
         config.setup_config("PREFIX")
 
