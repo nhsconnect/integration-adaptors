@@ -1,12 +1,12 @@
 import os
-from pathlib import Path
-from unittest.mock import Mock, patch
+import pathlib
+import unittest.mock
 
-from tornado.testing import AsyncHTTPTestCase
-from tornado.web import Application
-from utilities.file_utilities import FileUtilities
-from utilities.message_utilities import MessageUtilities
-from utilities.xml_utilities import XmlUtilities
+import tornado.testing
+import tornado.web
+import utilities.file_utilities as file_utilities
+import utilities.message_utilities as message_utilities
+import utilities.xml_utilities as xml_utilities
 
 import mhs.inbound.request.handler as handler
 
@@ -19,42 +19,43 @@ REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
 
 
-class TestInboundHandler(AsyncHTTPTestCase):
+class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     """A simple integration test for the async response endpoint."""
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    message_dir = Path(current_dir) / MESSAGES_DIR
+    message_dir = pathlib.Path(current_dir) / MESSAGES_DIR
 
     def setUp(self):
         self.callbacks = {}
         super().setUp()
 
     def get_app(self):
-        return Application([
+        return tornado.web.Application([
             (r".*", handler.InboundHandler, dict(callbacks=self.callbacks, party_id=FROM_PARTY_ID))
         ])
 
-    @patch.object(MessageUtilities, "get_timestamp")
-    @patch.object(MessageUtilities, "get_uuid")
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_post(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        expected_ack_response = FileUtilities.get_file_string(str(self.message_dir / EXPECTED_RESPONSE_FILE))
-        request_body = FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
-        mock_callback = Mock()
+        expected_ack_response = file_utilities.FileUtilities.get_file_string(
+            str(self.message_dir / EXPECTED_RESPONSE_FILE))
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+        mock_callback = unittest.mock.Mock()
         self.callbacks[REF_TO_MESSAGE_ID] = mock_callback
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
 
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
-        XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
+        xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
         mock_callback.assert_called_with(EXPECTED_MESSAGE)
 
     def test_post_no_callback(self):
         # If there is no callback registered for the message ID the response is in reference to, an HTTP 500 should be
         # returned.
-        request_body = FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
         response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
 
