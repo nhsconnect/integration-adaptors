@@ -40,10 +40,10 @@ class TestConfig(unittest.TestCase):
         mock_environ["PREFIX_LOG_LEVEL"] = "INFO"
         config.setup_config("PREFIX")
 
-        def rename_logging_handler():
+        def remove_logging_handler():
             logging.getLogger().handlers = []
 
-        self.addCleanup(rename_logging_handler)
+        self.addCleanup(remove_logging_handler)
         integration_adaptors_logger.configure_logging()
 
         with self.assertRaises(KeyError):
