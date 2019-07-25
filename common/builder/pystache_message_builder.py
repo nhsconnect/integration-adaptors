@@ -3,6 +3,9 @@ import pystache
 from pystache import Renderer
 from pystache.common import MissingTags
 from pystache.context import KeyNotFoundError
+from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
+
+logger = IntegrationAdaptorsLogger('MSGGEN')
 
 
 class PystacheMessageBuilder:
@@ -14,6 +17,7 @@ class PystacheMessageBuilder:
         :param template_file: The template file to populate with values.
         """
         self._renderer = Renderer(search_dirs=template_dir, missing_tags=MissingTags.strict)
+        self.template_file = template_file
         raw_template = self._renderer.load_template(template_file)
         self._parsed_template = pystache.parse(raw_template)
 
@@ -25,6 +29,8 @@ class PystacheMessageBuilder:
         try:
             return self._renderer.render(self._parsed_template, message_dictionary)
         except KeyNotFoundError as e:
+            logger.error('0001', 'Failed to find key when generating message from {TemplateFile} . {ErrorMessage}',
+                         {'TemplateFile': self.template_file, 'ErrorMessage': str(e)})
             raise MessageGenerationSOAPFaultError()
 
 
