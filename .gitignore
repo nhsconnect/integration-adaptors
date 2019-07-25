@@ -124,3 +124,7 @@ venv.bak/
 mhs-reference-implementation/selenium_tests/data/local_asid
 
 **/test-reports/
+
+# Sonar-Scanner
+.scannerwork
+
