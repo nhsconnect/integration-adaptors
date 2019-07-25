@@ -1,6 +1,6 @@
 # MHS
 
-This package contains a pre-assured implementation of a Message Handling System (MHS), intended to encapsulate the
+This package contains a pre-assured implementation of a Message Handling Service (MHS), intended to encapsulate the
 details of Spine messaging and provide a simple interface to allow HL7 messages to be sent to a remote MHS.
 
 ## Setup
