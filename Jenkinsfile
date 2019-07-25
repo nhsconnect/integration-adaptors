@@ -3,6 +3,11 @@ pipeline {
         label 'jenkins-workers'
     }
 
+    parameters {
+      string(defaultValue: 'http://ec2-35-177-240-92.eu-west-2.compute.amazonaws.com/', description: 'Location of the sonarqube host', name: 'sonarhost')
+      string(defaultValue: 'd968237dc29dcea44d0802f765ef88c9c37522a3', description: 'Location of the sonarqube token', name: 'sonartoken')
+    }
+
     environment {
       BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
     }
@@ -82,4 +87,5 @@ void executeUnitTestsWithCoverage() {
     sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
+    sh label: 'Running SonarQube analysis', script: "sonar-scanner -D${params.sonarhost} -D${sonartoken}""
 }
