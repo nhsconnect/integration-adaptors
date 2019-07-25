@@ -1,15 +1,16 @@
 """This module defines the envelope used to wrap asynchronous messages to be sent to a remote MHS."""
 import copy
-import logging
 import pathlib
 import typing
 import xml.etree.ElementTree as ElementTree
 
 import builder.pystache_message_builder as pystache_message_builder
-import utilities.message_utilities as message_utilities
-
-import mhs.common.messages.envelope as envelope
 import definitions
+import mhs.common.messages.envelope as envelope
+import utilities.message_utilities as message_utilities
+from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
+
+logger = IntegrationAdaptorsLogger('MSGPACKER')
 
 TEMPLATES_DIR = "data/templates"
 
@@ -59,7 +60,7 @@ class EbxmlEnvelope(envelope.Envelope):
         ebxml_message_dictionary[MESSAGE_ID] = message_id
         timestamp = message_utilities.MessageUtilities.get_timestamp()
         ebxml_message_dictionary[TIMESTAMP] = timestamp
-        logging.debug("Creating ebXML message with message ID '%s' and timestamp '%s'", message_id, timestamp)
+        logger.info('0001', 'Creating ebXML message with {MessageId} and {Timestamp}', {'MessageId': message_id, 'Timestamp': timestamp})
 
         return message_id, self.message_builder.build_message(ebxml_message_dictionary)
 
