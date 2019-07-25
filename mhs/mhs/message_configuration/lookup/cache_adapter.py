@@ -18,6 +18,7 @@ class CacheAdapter(abc.ABC):
             raise ValueError('Expiry time must not be non-negative')
         self.expiry_time = expiry_time
 
+    @abc.abstractmethod
     async def retrieve_mhs_attributes_value(self, ods_code: str, interaction_id: str) -> Optional[Dict]:
         """
         Given a key, the cache should return either the cached value or None if the value is not found or if the value
