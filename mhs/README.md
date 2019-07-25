@@ -20,12 +20,14 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
 - The ASID is a 12 digit number needed to access Opentest, supplied by NHS Digital
     - eg ASID=123456789012
 - The MHS_ADDRESS is the hostname of the MHS instance being used for testing and should be supplied in it's raw state,
- without the 'http://' prefix or '/' suffix 
+ without the 'http://' prefix or '/' suffix
     - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
 
 ### Running an MHS Instance
 `pipenv run mhs` will run the `main.py` script (you can also run this directly). This will start up an MHS
 instance listening for 'client' requests on port 80 and asynchronous responses from Spine on port 443.
+Note that the following environment variables need to be set when running MHS:
+- `MHS_LOG_LEVEL` - log level threshold
 
 Any content POSTed to `/path` (for example) on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
@@ -41,6 +43,6 @@ were granted access):
 root CA Certificate.
 - `client.key` - Your endpoint private key
 - `client.pem` - A copy of client.cert
-- `party_key.txt` - The party key associated with your MHS build 
+- `party_key.txt` - The party key associated with your MHS build
 
 If you are using Opentest, each of these credentials will have been provided when you were granted access.
