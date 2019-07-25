@@ -15,8 +15,9 @@ minimum set of client types in their interface layer and can re-use this code ac
 This repository contains the following directories:
 - [common](common) - A Python package containing components and utilities that are common to several integration adaptors.
 - [documentation](documentation) - Documentation and assets for the integration adaptors as a whole.
-- [mhs-reference-implementation](mhs-reference-implementation) - A reference implementation of a Message Handling System (MHS), that encapsulates the
-details of Spine messaging and provides a simple interface to allow HL7 messages to be sent to a remote MHS.
+- [mhs-reference-implementation](mhs-reference-implementation) - A reference implementation of a Message Handling
+Service (MHS), that encapsulates the details of Spine messaging and provides a simple interface to allow HL7 messages to
+be sent to a remote MHS.
 - [nhais-adaptor](nhais-adaptor) - A proof-of-concept adaptor that hides the details of NHAIS' EDIFACT messaging format
 and provides a FHIR interface for requests.
 - [OneOneOne](OneOneOne) - A proof-of-concept 111 receiver, used to investigate use of the ITK testbench (the TKW).
