@@ -1,6 +1,7 @@
 # MHS
 
-This package contains a pre-assured implementation of an MHS.
+This package contains a pre-assured implementation of a Message Handling System (MHS), intended to encapsulate the
+details of Spine messaging and provide a simple interface to allow HL7 messages to be sent to a remote MHS.
 
 ## Developer Setup
 To prepare a development environment for this application, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/)
