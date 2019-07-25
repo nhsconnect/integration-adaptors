@@ -3,6 +3,6 @@ This module defines the state adapter interface, used to allow support for multi
 """
 
 
-class PersistanceAdapter:
+class PersistenceAdapter:
     """An adapter that provides a common interface to the state management database."""
     pass
