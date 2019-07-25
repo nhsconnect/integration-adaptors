@@ -47,12 +47,7 @@ class FunctionalTest(TestCase):
                 # extract the timestamp from the line...
                 time = methods.get_log_timestamp(line)
                 print('Timestamp: ', time)
-                level = methods.get_log_level(line)
-                print('Log level: ', level)
-                description = methods.get_log_description(line)
-                print('Log description: ', description)
+
                 after_start = time > start_time.strftime(TIMESTAMP_FORMAT)
                 before_end = end_time.strftime(TIMESTAMP_FORMAT) > time
                 self.assertTrue(after_start & before_end)
-                # self.assertGreater(time, start_time.strftime(TIMESTAMP_FORMAT), "Event logged before test started")
-                # self.assertGreater(end_time.strftime(TIMESTAMP_FORMAT), time, "Event logged after test ended")
