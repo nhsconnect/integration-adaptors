@@ -1,6 +1,8 @@
 """A module that defines a Pystache-based MessageBuilder."""
 import pystache
 from pystache import Renderer
+from pystache.common import MissingTags
+from pystache.context import KeyNotFoundError
 
 
 class PystacheMessageBuilder:
@@ -11,7 +13,7 @@ class PystacheMessageBuilder:
         :param template_dir: The directory to load template files from
         :param template_file: The template file to populate with values.
         """
-        self._renderer = Renderer(search_dirs=template_dir)
+        self._renderer = Renderer(search_dirs=template_dir, missing_tags=MissingTags.strict)
         raw_template = self._renderer.load_template(template_file)
         self._parsed_template = pystache.parse(raw_template)
 
@@ -20,4 +22,14 @@ class PystacheMessageBuilder:
         :param message_dictionary: The dictionary of values to use when populating the template.
         :return: A string containing a message suitable for sending to a remote MHS.
         """
-        return self._renderer.render(self._parsed_template, message_dictionary)
+        try:
+            return self._renderer.render(self._parsed_template, message_dictionary)
+        except KeyNotFoundError as e:
+            raise MessageGenerationSOAPFaultError()
+
+
+class MessageGenerationSOAPFaultError(Exception):
+    """
+    An exception generated when an error is encountered during message generation.
+    """
+    pass

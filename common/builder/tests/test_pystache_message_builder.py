@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from builder.pystache_message_builder import PystacheMessageBuilder
+from builder.pystache_message_builder import PystacheMessageBuilder, MessageGenerationSOAPFaultError
 
 TEMPLATES_DIR = "templates"
 TEMPLATE_FILENAME = "test"
@@ -19,3 +19,7 @@ class TestPystacheMessageBuilder(TestCase):
 
         self.assertEqual("Hello, world!", message.strip(),
                          "Message returned should be the rendered string returned by Pystache")
+
+    def test_build_message_errors_on_missing_tag(self):
+        with self.assertRaises(MessageGenerationSOAPFaultError):
+            self.builder.build_message({})
