@@ -1,4 +1,7 @@
 """This module defines the envelope used to wrap asynchronous request messages to be sent to a remote MHS."""
+
+from __future__ import annotations
+
 import email
 import email.message
 import email.policy
@@ -30,7 +33,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         super().__init__(EBXML_TEMPLATE, message_dictionary)
 
     @classmethod
-    def from_string(cls, headers: typing.Dict[str, str], message: str):
+    def from_string(cls, headers: typing.Dict[str, str], message: str) -> EbxmlRequestEnvelope:
         """Parse the provided message string and create an instance of an EbxmlRequestEnvelope.
 
         :param headers A dictionary of headers received with the message.
