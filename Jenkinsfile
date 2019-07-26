@@ -82,5 +82,5 @@ void executeUnitTestsWithCoverage() {
     sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
-    sh label: 'Running SonarQube analysis', script: "sonar-scanner -D${SONAR_HOST} -D${SONAR_TOKEN}""
+    sh label: 'Running SonarQube analysis', script: "sonar-scanner -D${SONAR_HOST} -D${SONAR_TOKEN}"
 }
