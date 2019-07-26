@@ -6,6 +6,10 @@ These adaptors hide the complexity of integration with the interfaces provided b
 implementing an adaptor layer. The integrating supplier sees only a simplified and standardised set of interfaces which
 the adaptor layer presents. The adaptor layer is responsible for interacting with the legacy NHSD interface estate. 
 
+In the diagram below, NHS Digital are providing the set of adaptors shown as the "Adaptor Layer". This list of adaptors shown here is only a representative sample of those planned. 
+
+A supplier is therefore required only to implement a simplified set of standard clients to the adaptor layer, integrating with a simplified and standardised set of interfaces exposed by the Adaptor layer. This set of clients is shown in the "Interface Layer".
+
 ![High Level Architecture](documentation/High%20Level%20Architecture.png)
 
 As a result, the complexity of integration work is much reduced. The integrating supplier is required to implement a
