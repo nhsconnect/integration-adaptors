@@ -19,7 +19,7 @@ def build_scr(asid, patient_nhs_number, payload):
     :param asid: The ASID of this node.
     :param patient_nhs_number: The NHS number of the patient this record belongs to.
     :param payload: The human readable payload to be included in the summary message.
-    :return: The GP summary message.
+    :return: A tuple of the GP summary message and the message id (UUID) used in it.
     """
 
     current_utc_time = datetime.datetime.utcnow()
@@ -34,4 +34,4 @@ def build_scr(asid, patient_nhs_number, payload):
         PATIENT_NHS_NUMBER: patient_nhs_number
     })
 
-    return xml_message
+    return xml_message, uuid
