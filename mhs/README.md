@@ -31,7 +31,6 @@ pipenv install --dev
 ## Running Unit Tests
 `pipenv run unittests` will run all unit tests.
 
-<<<<<<< HEAD:mhs-reference-implementation/README.md
 ## Coverage
 `pipenv run unittests-cov` will run all unit tests with coverage enabled. \
 `pipenv run coverage-report-xml` will generate an xml file which can then be submitted for coverage analysis.
@@ -44,7 +43,6 @@ Ensure sonar-scanner is on your path, and configured for the sonarqube host with
 NOTE: Coverage will not show in the analysis unless you have already generated the xml report (as per above.)
 
 ## Running Integration Tests
->>>>>>> 618e6863c4f9bdb37b91284f276c578c04cdb437:mhs/README.md
 `pipenv run inttests` will run all integration tests.
 
 When running the tests locally, you will need to set the MHS_ADDRESS and ASID in the 'Environment variables' section of
