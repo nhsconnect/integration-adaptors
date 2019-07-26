@@ -1,5 +1,8 @@
 """This module defines the envelope used to wrap the acknowledgement messages to be sent to a remote MHS in response to
 an asynchronous request."""
+
+from __future__ import annotations
+
 import typing
 
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
@@ -21,7 +24,7 @@ class EbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
         super().__init__(EBXML_TEMPLATE, message_dictionary)
 
     @classmethod
-    def from_string(cls, headers: typing.Dict[str, str], message: str):
+    def from_string(cls, headers: typing.Dict[str, str], message: str) -> EbxmlAckEnvelope:
         """Parse the provided message string and create an instance of an EbxmlAckEnvelope.
 
         :param headers A dictionary of headers received with the message.
