@@ -17,10 +17,10 @@ This repository contains the following directories:
 - [documentation](documentation) - Documentation and assets for the integration adaptors as a whole.
 - [mhs-reference-implementation](mhs-reference-implementation) - A reference implementation of a Message Handling
 Service (MHS), that encapsulates the details of Spine messaging and provides a simple interface to allow HL7 messages to
-be sent to a remote MHS.
+be sent to the NHS spine MHS.
 - [nhais-adaptor](nhais-adaptor) - A proof-of-concept adaptor that hides the details of NHAIS' EDIFACT messaging format
-and provides a FHIR interface for requests.
-- [OneOneOne](OneOneOne) - A proof-of-concept 111 receiver, used to investigate use of the ITK testbench (the TKW).
+and provides a prototype FHIR interface for sending registratio events taking place at the practice to NHAIS.
+- [OneOneOne](OneOneOne) - A proof-of-concept 111 receiver, also used to investigate use of the ITK testbench (the TKW).
 - [pipeline](pipeline) - Scripts and configuration files used to build container images for adaptors and deploy them to various
 environments. Intended for use as part of an automated build pipeline.
 - [SCR](SCR) - A package of assets that simplify the building of HL7 GP Summary Update request messages.
