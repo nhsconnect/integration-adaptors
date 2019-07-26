@@ -23,6 +23,7 @@ pipenv install -e ./../common
 ### Analysis
 To use sonarqube analysis you will need to have installed `sonar-scanner`. \
 Ensure sonar-scanner is on your path, and configured for the sonarqube host with appropriate token. \
-`sonar-scanner` will use `sonar-project.properties` to submit source to sonarqube for analysis. \
+`sonar-scanner` will use `sonar-project.properties` to submit source to sonarqube for analysis.
+ (See: [SonarQube](https://gpitbjss.atlassian.net/wiki/x/XQFfXQ))\
 NOTE: Coverage will not show in the analysis unless you have already generated the xml report (as per above.)
 
