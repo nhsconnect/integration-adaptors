@@ -22,7 +22,7 @@ This repository contains the following directories:
 - [mhs](mhs) - A pre-assured implementation of a Message Handling Service (MHS), that encapsulates the details of Spine
 messaging and provides a simple interface to allow HL7 messages to be sent to the NHS spine MHS.
 - [nhais-adaptor](nhais-adaptor) - A proof-of-concept adaptor that hides the details of NHAIS' EDIFACT messaging format
-and provides a prototype FHIR interface for sending registratio events taking place at the practice to NHAIS.
+and provides a prototype FHIR interface for sending registration events taking place at the practice to NHAIS.
 - [OneOneOne](OneOneOne) - A proof-of-concept 111 receiver, also used to investigate use of the ITK testbench (the TKW).
 - [pipeline](pipeline) - Scripts and configuration files used to build container images for adaptors and deploy them to various
 environments. Intended for use as part of an automated build pipeline.
