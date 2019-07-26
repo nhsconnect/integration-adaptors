@@ -18,7 +18,7 @@ If you are using Opentest, each of these credentials will have been provided whe
 Finally, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/) installed and on your path, then from this
 directory run:
 ```
-pipenv install --dev
+pipenv install
 ```
 
 ### Developer Setup
