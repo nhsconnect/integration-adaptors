@@ -56,8 +56,10 @@ class EbxmlEnvelope(envelope.Envelope):
         """
         ebxml_message_dictionary = copy.deepcopy(self.message_dictionary)
 
-        message_id = message_utilities.MessageUtilities.get_uuid()
-        ebxml_message_dictionary[MESSAGE_ID] = message_id
+        message_id = ebxml_message_dictionary.get(MESSAGE_ID)
+        if not message_id:
+            message_id = message_utilities.MessageUtilities.get_uuid()
+            ebxml_message_dictionary[MESSAGE_ID] = message_id
         timestamp = message_utilities.MessageUtilities.get_timestamp()
         ebxml_message_dictionary[TIMESTAMP] = timestamp
         logger.info('0001', 'Creating ebXML message with {MessageId} and {Timestamp}', {'MessageId': message_id, 'Timestamp': timestamp})

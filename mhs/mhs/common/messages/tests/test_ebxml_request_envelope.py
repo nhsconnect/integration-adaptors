@@ -65,6 +65,23 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
 
     @patch.object(MessageUtilities, "get_timestamp")
     @patch.object(MessageUtilities, "get_uuid")
+    def test_serialize_message_id_not_generated(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
+
+        message_dictionary = get_test_message_dictionary()
+        message_dictionary[ebxml_envelope.MESSAGE_ID] = test_ebxml_envelope.MOCK_UUID
+        envelope = ebxml_request_envelope.EbxmlRequestEnvelope(message_dictionary)
+
+        message_id, message = envelope.serialize()
+
+        normalized_message = FileUtilities.normalize_line_endings(message)
+
+        mock_get_uuid.assert_not_called()
+        self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
+        self.assertEqual(self.normalized_expected_serialized_message, normalized_message)
+
+    @patch.object(MessageUtilities, "get_timestamp")
+    @patch.object(MessageUtilities, "get_uuid")
     def test_serialize_required_tags(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP

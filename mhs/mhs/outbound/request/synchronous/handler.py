@@ -28,15 +28,16 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
         self.async_response_received = tornado.locks.Event()
         self.async_timeout = async_timeout
 
-    async def post(self):
+    async def post(self, interaction_name):
         logging.debug("Client POST received: %s", self.request)
 
-        interaction_name = self.request.uri[1:]
+        message_id = self.get_query_argument("messageId", default=None)
 
         async_message_id = None
         try:
             interaction_is_async, async_message_id, message = self.workflow.prepare_message(interaction_name,
-                                                                                            self.request.body.decode())
+                                                                                            self.request.body.decode(),
+                                                                                            message_id)
 
             if interaction_is_async:
                 self.callbacks[async_message_id] = self._write_async_response

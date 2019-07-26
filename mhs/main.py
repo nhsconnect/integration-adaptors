@@ -86,7 +86,7 @@ def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_w
     supplier_server.listen(80)
 
     mhs_application = tornado.web.Application(
-        [(r".*", async_request_handler.InboundHandler, dict(callbacks=callbacks, party_id=party_key))])
+        [(r"/(.*)", async_request_handler.InboundHandler, dict(callbacks=callbacks, party_id=party_key))])
     mhs_server = tornado.httpserver.HTTPServer(mhs_application,
                                                ssl_options=dict(certfile=certs_file, keyfile=key_file,
                                                                 cert_reqs=ssl.CERT_REQUIRED,

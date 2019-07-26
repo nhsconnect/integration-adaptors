@@ -33,17 +33,23 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.transmission = transmission
         self.party_id = party_id
 
-    def prepare_message(self, interaction_name: str, content: str) -> typing.Tuple[bool, str, str]:
+    def prepare_message(self, interaction_name: str, content: str, message_id: typing.Optional[str] = None) \
+            -> typing.Tuple[bool, str, str]:
         """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
 
         :param interaction_name: The name of the interaction the message is related to.
         :param content: The message content to be sent.
+        :param message_id: message id to use in the message header. If not supplied, we generate a new message id.
+        The purpose of this param is to be used for duplicate elimination when sending async messages.
         :return: A tuple containing:
         1. A flag indicating whether this message should be sent asynchronously
         2. the ID of the message, if an asynchronous response is expected, otherwise None
         3. The message to send
         """
         interaction_details = self._get_interaction_details(interaction_name)
+
+        if message_id is not None:
+            interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
 
         is_async = interaction_details[ASYNC_RESPONSE_EXPECTED]
         if is_async:
