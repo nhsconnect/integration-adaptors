@@ -60,6 +60,8 @@ Several global variables must be set within Jenkins for the scripts to work as p
 - TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it 
 - MHS_ADDRESS: The (private) ip address where the mhs build is running - this will be the private ip of the EC2 instance
     hosting the deployment ECS cluster
+- SONAR_HOST: The URL for the sonarqube server.
+- SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
 
 The Jenkins worker EC2 instance will have to have the following permission in order to publish the builds to 
 ECR and start the tasks in ECS with terraform:
