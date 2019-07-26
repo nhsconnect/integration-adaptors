@@ -18,7 +18,7 @@ pipeline {
 
         stage('MHS Unit Tests') {
             steps {
-                dir('mhs-reference-implementation') {
+                dir('mhs') {
                     executeUnitTestsWithCoverage()
                }
             }
@@ -48,7 +48,7 @@ pipeline {
 
         stage('Integration Tests') {
             steps {
-                dir('mhs-reference-implementation') {
+                dir('mhs') {
                     // Wait for MHS container to fully stand up
                     sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
                     sh label: 'Running integration tests', script: 'pipenv run inttests'

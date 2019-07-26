@@ -3,7 +3,7 @@
   "variables": {
     "app_dir": "/usr/src/app",
     "common_dir": "common",
-    "mhs_dir": "mhs-reference-implementation",
+    "mhs_dir": "mhs",
     "repository": "{{env `DOCKER_REPOSITORY`}}",
     "tag": "{{env `BUILD_TAG`}}",
     "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
