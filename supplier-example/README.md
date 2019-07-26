@@ -6,7 +6,7 @@ how the national integration adaptors can be used together to simplify integrati
 
 The example consists of a simple [Flask](https://www.fullstackpython.com/flask.html) application, which presents a web
 page containing a form that can be submitted in order to build a GP Summary Update request and send it to an MHS
-implementation listening on the local machine. 
+implementation listening on the local machine.
 
 ## Running the Example
 
@@ -24,5 +24,4 @@ pipenv run server
 This will start a webserver and print the URL that it can be accessed on. You can navigate to this in a browser to see
 the example application.
 
-You will also need to run an MHS (see the `mhs-reference-implementation` project) in order to handle the messages
-generated.
+You will also need to run an MHS (see the `mhs` project) in order to handle the messages generated.
