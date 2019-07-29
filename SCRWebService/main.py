@@ -2,8 +2,8 @@ import json
 import os
 import tornado.ioloop
 import tornado.web
-import SCR.scr.gp_summary_update as scr_update
-import common.utilities.integration_adaptors_logger as log
+import scr.gp_summary_update as scr_update
+import utilities.integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger('SCR-WEB')
 
@@ -33,3 +33,4 @@ if __name__ == "__main__":
     app = tornado.web.Application([(r"/scr", SCRReciever)])
     app.listen(9000)
     tornado.ioloop.IOLoop.current().start()
+    print("Server started")

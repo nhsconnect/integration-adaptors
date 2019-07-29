@@ -23,6 +23,6 @@ coverage-report = 'coverage report'
 coverage-report-xml = 'coverage xml'
 coverage-report-html = 'coverage html'
 inttests = 'python -m xmlrunner discover -o test-reports -p "int_*" -v'
-mhs = "python main.py"
+scr = "python main.py"
 
 

@@ -26,7 +26,8 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh label: 'Running Packer build', script: 'packer build pipeline/packer/mhs.json'
+                sh label: 'Running MHS Packer build', script: 'packer build pipeline/packer/mhs.json'
+                sh label: 'Running SCR service Packer build', script: 'packer build pipeline/packer/scr-web-service.json'
             }
         }
 
