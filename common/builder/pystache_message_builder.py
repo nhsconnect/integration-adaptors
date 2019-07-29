@@ -31,11 +31,16 @@ class PystacheMessageBuilder:
         except pystache_context.KeyNotFoundError as e:
             logger.error('0001', 'Failed to find key when generating message from {TemplateFile} . {ErrorMessage}',
                          {'TemplateFile': self.template_file, 'ErrorMessage': str(e)})
-            raise MessageGenerationSOAPFaultError()
+            raise MessageGenerationError(f'Failed to find key:{e.key} when generating message from'
+                                         f' template file:{self.template_file}')
 
 
-class MessageGenerationSOAPFaultError(Exception):
+class MessageGenerationError(Exception):
     """
     An exception generated when an error is encountered during message generation.
     """
-    pass
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg

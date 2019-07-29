@@ -21,5 +21,5 @@ class TestPystacheMessageBuilder(TestCase):
                          "Message returned should be the rendered string returned by Pystache")
 
     def test_build_message_errors_on_missing_tag(self):
-        with self.assertRaises(pystache_message_builder.MessageGenerationSOAPFaultError):
+        with self.assertRaisesRegex(pystache_message_builder.MessageGenerationError, 'Failed to find key'):
             self.builder.build_message({})

@@ -53,7 +53,7 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
                 del test_message_dict[required_tag]
                 envelope = ebxml_ack_envelope.EbxmlAckEnvelope(test_message_dict)
 
-                with self.assertRaises(pystache_message_builder.MessageGenerationSOAPFaultError):
+                with self.assertRaisesRegex(pystache_message_builder.MessageGenerationError, 'Failed to find key'):
                     envelope.serialize()
 
     def test_from_string(self):
