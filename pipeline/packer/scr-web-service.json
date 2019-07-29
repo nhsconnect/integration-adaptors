@@ -36,7 +36,7 @@
     {
       "type": "file",
       "source": "{{user `scr_dir`}}",
-      "destination": "{{user 'app_dir'}}"
+      "destination": "{{user `app_dir`}}"
     },
     {
       "type": "file",
