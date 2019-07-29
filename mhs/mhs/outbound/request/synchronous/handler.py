@@ -1,7 +1,6 @@
 """This module defines the outbound synchronous request handler component."""
 
 import datetime
-import logging
 from typing import Dict, Callable
 
 import tornado.locks
