@@ -70,6 +70,7 @@ pipeline {
                         terraform destroy -auto-approve \
                         -var cluster_id=${CLUSTER_ID} \
                         -var ecr_address=${DOCKER_REPOSITORY} \
+                        -var scr_ecr_address=${SCR_REPOSITORY} \
                         -var task_execution_role=${TASK_EXECUTION_ROLE} \
                         -var build_id=${BUILD_TAG} \
                         -var mhs_log_level=DEBUG
