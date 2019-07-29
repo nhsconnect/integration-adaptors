@@ -48,12 +48,20 @@ pipeline {
             }
         }
 
-        stage('Integration Tests') {
+        stage('MHS Integration Tests') {
             steps {
                 dir('mhs') {
                     // Wait for MHS container to fully stand up
                     sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
                     sh label: 'Running integration tests', script: 'pipenv run inttests'
+                }
+            }
+        }
+
+        stage('SCR Service Integration Tests') {
+            steps {
+                dir('SCRWebService') {
+                    sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
                 }
             }
         }

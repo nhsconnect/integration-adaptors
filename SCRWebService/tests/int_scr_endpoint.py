@@ -5,8 +5,7 @@ import requests
 
 
 def get_target_address():
-    return "http://localhost:9000"
-    # return os.environ['SCR_SERVICE_ADDRESS']
+    return os.getenv('SCR_SERVICE_ADDRESS', 'http://localhost:9000')
 
 
 class SCREndpointTest(TestCase):
