@@ -3,6 +3,7 @@
   "variables": {
     "app_dir": "/usr/src/app",
     "common_dir": "common",
+    "SCR_dir": "SCR",
     "scr_service_dir": "SCRWebService",
     "repository": "{{env `SCR_REPOSITORY`}}",
     "tag": "{{env `BUILD_TAG`}}",
@@ -31,6 +32,11 @@
       "type": "file",
       "source": "{{user `common_dir`}}",
       "destination": "{{user `app_dir`}}"
+    },
+    {
+      "type": "file",
+      "source": "{{user 'SCR_dir'}}",
+      "destination": "{{user 'app_dir'}}"
     },
     {
       "type": "file",
