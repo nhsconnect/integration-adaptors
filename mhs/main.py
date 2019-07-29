@@ -1,13 +1,11 @@
 import logging
 import pathlib
 import ssl
-import typing
+from typing import Tuple
 
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-import utilities.config as config
-import utilities.file_utilities as file_utilities
 
 import definitions
 import mhs.common.configuration.configuration_manager as configuration_manager
@@ -15,11 +13,13 @@ import mhs.common.workflow.sync_async as sync_async_workflow
 import mhs.inbound.request.handler as async_request_handler
 import mhs.outbound.request.synchronous.handler as client_request_handler
 import mhs.outbound.transmission.outbound_transmission as outbound_transmission
+import utilities.config as config
+import utilities.file_utilities as file_utilities
 
 ASYNC_TIMEOUT = 30
 
 
-def load_certs(certs_dir: pathlib.Path) -> typing.Tuple[str, str]:
+def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
     """Load the necessary TLS certificates from the specified directory.
 
     :param certs_dir: The directory to load certificates from.

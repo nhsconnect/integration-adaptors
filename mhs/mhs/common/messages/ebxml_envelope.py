@@ -1,16 +1,16 @@
 """This module defines the envelope used to wrap asynchronous messages to be sent to a remote MHS."""
 import copy
 import pathlib
-import typing
 import xml.etree.ElementTree as ElementTree
+from typing import Dict, Tuple
 
 import builder.pystache_message_builder as pystache_message_builder
 import definitions
 import mhs.common.messages.envelope as envelope
 import utilities.message_utilities as message_utilities
-from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
+from utilities import integration_adaptors_logger as log
 
-logger = IntegrationAdaptorsLogger('MSGPACKER')
+logger = log.IntegrationAdaptorsLogger('MSGPACKER')
 
 TEMPLATES_DIR = "data/templates"
 
@@ -37,7 +37,7 @@ NAMESPACES = {SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
 class EbxmlEnvelope(envelope.Envelope):
     """An envelope that contains a message to be sent asynchronously to a remote MHS."""
 
-    def __init__(self, template_file, message_dictionary: typing.Dict[str, str]):
+    def __init__(self, template_file, message_dictionary: Dict[str, str]):
         """Create a new EbxmlEnvelope that populates the specified template file with the provided dictionary.
 
         :param template_file: The template file to populate with values.
@@ -48,7 +48,7 @@ class EbxmlEnvelope(envelope.Envelope):
         ebxml_template_dir = str(pathlib.Path(definitions.ROOT_DIR) / TEMPLATES_DIR)
         self.message_builder = pystache_message_builder.PystacheMessageBuilder(ebxml_template_dir, template_file)
 
-    def serialize(self) -> typing.Tuple[str, str]:
+    def serialize(self) -> Tuple[str, str]:
         """Produce a serialised representation of this ebXML message by populating a Mustache template with this
         object's properties.
 
@@ -68,7 +68,7 @@ class EbxmlEnvelope(envelope.Envelope):
         return message_id, self.message_builder.build_message(ebxml_message_dictionary)
 
     @staticmethod
-    def parse_message(headers: typing.Dict[str, str], message: str) -> typing.Dict[str, str]:
+    def parse_message(headers: Dict[str, str], message: str) -> Dict[str, str]:
         """Parse the provided ebXML message and extract a dictionary of values from it.
 
         :param headers A dictionary of headers received with the message.

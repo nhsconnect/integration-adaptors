@@ -3,10 +3,10 @@ from unittest.mock import patch
 import mhs.common.messages.ebxml_ack_envelope as ebxml_ack_envelope
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
 import mhs.common.messages.tests.test_ebxml_envelope as test_ebxml_envelope
-from builder.pystache_message_builder import MessageGenerationSOAPFaultError
-from utilities.file_utilities import FileUtilities
-from utilities.message_utilities import MessageUtilities
-from utilities.xml_utilities import XmlUtilities
+from builder import pystache_message_builder
+from utilities import file_utilities
+from utilities import message_utilities
+from utilities import xml_utilities
 
 EXPECTED_EBXML = "ebxml_ack.xml"
 
@@ -24,12 +24,12 @@ def get_test_message_dictionary():
 
 class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
 
-    @patch.object(MessageUtilities, "get_timestamp")
-    @patch.object(MessageUtilities, "get_uuid")
+    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_serialize(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
-        expected_message = FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
+        expected_message = file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
 
         envelope = ebxml_ack_envelope.EbxmlAckEnvelope(get_test_message_dictionary())
 
@@ -39,10 +39,10 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
         message_bytes = message.encode()
 
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
-        XmlUtilities.assert_xml_equal(expected_message_bytes, message_bytes)
+        xml_utilities.XmlUtilities.assert_xml_equal(expected_message_bytes, message_bytes)
 
-    @patch.object(MessageUtilities, "get_timestamp")
-    @patch.object(MessageUtilities, "get_uuid")
+    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_serialize_required_tags(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
@@ -53,18 +53,18 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
                 del test_message_dict[required_tag]
                 envelope = ebxml_ack_envelope.EbxmlAckEnvelope(test_message_dict)
 
-                with self.assertRaises(MessageGenerationSOAPFaultError):
+                with self.assertRaises(pystache_message_builder.MessageGenerationSOAPFaultError):
                     envelope.serialize()
 
     def test_from_string(self):
-        message = FileUtilities.get_file_string(str(self.message_dir / "ebxml_header.xml"))
+        message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_header.xml"))
 
         parsed_message = ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, message)
 
         self.assertEqual(test_ebxml_envelope.EXPECTED_VALUES, parsed_message.message_dictionary)
 
     def test_from_string_with_no_values(self):
-        message = FileUtilities.get_file_string(str(self.message_dir / "ebxml_header_empty.xml"))
+        message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_header_empty.xml"))
 
         parsed_message = ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, message)
 

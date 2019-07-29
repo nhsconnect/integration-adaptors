@@ -2,7 +2,7 @@
 
 import datetime
 import logging
-import typing
+from typing import Dict, Callable
 
 import tornado.locks
 import tornado.web
@@ -16,7 +16,7 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a supplier system."""
 
     def initialize(self, workflow: sync_async_workflow.SyncAsyncWorkflow,
-                   callbacks: typing.Dict[str, typing.Callable[[str], None]], async_timeout: int):
+                   callbacks: Dict[str, Callable[[str], None]], async_timeout: int):
         """Initialise this request handler with the provided configuration values.
 
         :param workflow: The workflow to use to send messages.
