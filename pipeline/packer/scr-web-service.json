@@ -17,7 +17,7 @@
       "changes": [
         "EXPOSE 9000",
         "WORKDIR {{user `app_dir`}}/{{user `scr_service_dir`}}",
-        "ENTRYPOINT pipenv run service"
+        "ENTRYPOINT pipenv run scr-server"
       ]
     }
   ],
