@@ -7,6 +7,7 @@ import email.message
 import email.policy
 import logging
 from typing import Dict, Tuple
+from xml.etree import ElementTree
 
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
 
@@ -42,7 +43,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         """
         msg = EbxmlRequestEnvelope._parse_mime_message(headers, message)
         ebxml_part, payload_part = EbxmlRequestEnvelope._extract_message_parts(msg)
-        extracted_values = super().parse_message(headers, ebxml_part)
+        extracted_values = super().parse_message(ElementTree.fromstring(ebxml_part))
 
         if payload_part:
             extracted_values[MESSAGE] = payload_part

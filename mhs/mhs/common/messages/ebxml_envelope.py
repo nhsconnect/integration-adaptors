@@ -68,14 +68,12 @@ class EbxmlEnvelope(envelope.Envelope):
         return message_id, self.message_builder.build_message(ebxml_message_dictionary)
 
     @staticmethod
-    def parse_message(headers: Dict[str, str], message: str) -> Dict[str, str]:
-        """Parse the provided ebXML message and extract a dictionary of values from it.
+    def parse_message(xml_tree: ElementTree.Element) -> Dict[str, str]:
+        """Extract a dictionary of values from the provided xml Element tree.
 
-        :param headers A dictionary of headers received with the message.
-        :param message: The message to be parsed.
+        :param xml_tree: The xml tree to extract values from
         :return: A dictionary of values extracted from the message.
         """
-        xml_tree = ElementTree.fromstring(message)
         extracted_values = {}
 
         EbxmlEnvelope._add_if_present(extracted_values, FROM_PARTY_ID,

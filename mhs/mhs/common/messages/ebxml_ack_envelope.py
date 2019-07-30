@@ -4,6 +4,7 @@ an asynchronous request."""
 from __future__ import annotations
 
 from typing import Dict
+from xml.etree import ElementTree
 
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
 
@@ -31,5 +32,5 @@ class EbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
         :param message: The message to be parsed.
         :return: An instance of an EbxmlAckEnvelope constructed from the message.
         """
-        message_dictionary = super().parse_message(headers, message)
+        message_dictionary = super().parse_message(ElementTree.fromstring(message))
         return EbxmlAckEnvelope(message_dictionary)
