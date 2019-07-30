@@ -65,6 +65,8 @@ Several global variables must be set within Jenkins for the scripts to work as p
 - SCR_REPOSITORY_URL: Same as above with the full URL
 - SCR_SERVICE_ADDRESS: The endpoint address the SCRWebService can be reached on e.g `http://192.168.41.129:9000`
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
+- SONAR_HOST: The URL for the sonarqube server.
+- SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
 
 
 The Jenkins worker EC2 instance will have to have the following permission in order to publish the builds to 
