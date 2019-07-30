@@ -23,3 +23,11 @@ class TestConfigurationManager(TestCase):
         details = self.interactions_config_file.get_interaction_details(INTERACTION_NAME)
 
         self.assertEqual(details[PROPERTY_NAME], PROPERTY_VALUE)
+
+    def test_get_interaction_details_returns_copy(self):
+        first_details = self.interactions_config_file.get_interaction_details(INTERACTION_NAME)
+        first_details['test'] = 'blah'
+
+        second_details = self.interactions_config_file.get_interaction_details(INTERACTION_NAME)
+
+        self.assertNotIn('test', second_details)
