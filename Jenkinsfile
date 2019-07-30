@@ -23,6 +23,13 @@ pipeline {
                }
             }
         }
+        stage('SCR Web Service Unit Tests') {
+            steps {
+                dir('SCRWebService') {
+                    executeUnitTestsWithCoverage()
+               }
+            }
+        }
 
         stage('Package') {
             steps {
