@@ -1,5 +1,6 @@
 import os
 import json
+
 import tornado.web
 import tornado.ioloop
 import scr.gp_summary_update as scr_update
@@ -20,7 +21,13 @@ class GpSummaryUpload(tornado.web.RequestHandler):
         this end point currently returns the data provided  
         :return:
         """
-        scr_input_json = json.loads(self.request.body)
+        
+        try:
+            scr_input_json = json.loads(self.request.body)
+        except json.decoder.JSONDecodeError:
+            self.set_status(500)
+            return self.write("Empty body received with post request")
+            
         try:
             summary_care_record = scr_update.SummaryCareRecord()
             hl7_message = summary_care_record.populate_template(scr_input_json)
