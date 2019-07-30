@@ -28,4 +28,8 @@ variable "scr_ecr_address" {
   type = string
   description = "The address of the ECR repository conaining the scr-service containers"
 }
+variable "scr_service_port" {
+  type = number
+  description = "The port to be exposed for the scr web service"
+}
 

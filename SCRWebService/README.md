@@ -6,4 +6,5 @@ for a particular SCR function, this data will then be used to populate templates
  
  A simple integration test is provided, by default the application runs on port 9000 but this can be set 
  with the environment variable `SCR_SERVICE_PORT`, the integration test defaults to `http://localhost:9000`
- but again this can be changed with the environment variable `SCR_SERVICE_ADDRESS`
+ but again this can be changed with the environment variable `SCR_SERVICE_ADDRESS` and should be set
+ for the pipeline

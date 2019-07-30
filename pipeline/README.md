@@ -64,6 +64,7 @@ Several global variables must be set within Jenkins for the scripts to work as p
 - SCR_REPOSITORY: The docker repository used to upload and retrieve the SCRWebService images
 - SCR_REPOSITORY_URL: Same as above with the full URL
 - SCR_SERVICE_ADDRESS: The endpoint address the SCRWebService can be reached on e.g `http://192.168.41.129:9000`
+- SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 
 
 The Jenkins worker EC2 instance will have to have the following permission in order to publish the builds to 
