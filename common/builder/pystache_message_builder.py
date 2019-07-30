@@ -5,7 +5,7 @@ from pystache import context as pystache_context
 
 import utilities.integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('MSGGEN')
+logger = log.IntegrationAdaptorsLogger('COMMON_MSG_BUILDER')
 
 
 class PystacheMessageBuilder:

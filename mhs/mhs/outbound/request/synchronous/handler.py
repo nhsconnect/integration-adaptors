@@ -11,7 +11,7 @@ import mhs.common.workflow.sync_async as sync_async_workflow
 import mhs.outbound.request.common as common
 from utilities import integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('MHSOUT')
+logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
 
 class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):

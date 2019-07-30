@@ -10,7 +10,7 @@ import mhs.common.messages.envelope as envelope
 import utilities.message_utilities as message_utilities
 from utilities import integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('MSGPACKER')
+logger = log.IntegrationAdaptorsLogger('COMMON_EBXML_ENVELOPE')
 
 TEMPLATES_DIR = "data/templates"
 
