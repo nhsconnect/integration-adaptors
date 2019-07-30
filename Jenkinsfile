@@ -49,7 +49,7 @@ pipeline {
                             -var scr_ecr_address=${SCR_REPOSITORY} \
                             -var task_execution_role=${TASK_EXECUTION_ROLE} \
                             -var build_id=${BUILD_TAG} \
-                            -var mhs_log_level=DEBUG
+                            -var mhs_log_level=DEBUG \
                             -var scr_service_port=${SCR_SERVICE_PORT}
                         """
                 }
@@ -89,7 +89,7 @@ pipeline {
                         -var scr_ecr_address=${SCR_REPOSITORY} \
                         -var task_execution_role=${TASK_EXECUTION_ROLE} \
                         -var build_id=${BUILD_TAG} \
-                        -var mhs_log_level=DEBUG
+                        -var mhs_log_level=DEBUG \
                         -var scr_service_port=${SCR_SERVICE_PORT}
                      """
             }
