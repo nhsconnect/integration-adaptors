@@ -24,6 +24,10 @@ variable "mhs_log_level" {
   type = string
   description = "Log level for the MHS application."
 }
+variable "scr_log_level" {
+  type = "string"
+  description = "Log Level for the SCR Web Service"
+}
 variable "scr_ecr_address" {
   type = string
   description = "The address of the ECR repository conaining the scr-service containers"
