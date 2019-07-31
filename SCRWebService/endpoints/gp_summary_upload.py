@@ -1,6 +1,5 @@
 import os
 import json
-
 import tornado.web
 import tornado.ioloop
 import scr.gp_summary_update as scr_update
@@ -31,10 +30,10 @@ class GpSummaryUpload(tornado.web.RequestHandler):
         try:
             summary_care_record = scr_update.SummaryCareRecord()
             hl7_message = summary_care_record.populate_template(scr_input_json)
-            logger.info("0100", hl7_message)
+            logger.info("001", hl7_message)
             self.write(scr_input_json)
         except Exception as e:
-            logger.error('0200', f'Summary care message generation failed: {e}')
+            logger.error('001', f'Summary care message generation failed: {e}')
             self.set_status(500)
             self.write('Exception raised whilst populating hl7 message with json')
 
