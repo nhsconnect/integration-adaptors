@@ -1,7 +1,7 @@
 """This module defines the inbound request handler component."""
 
 import logging
-import typing
+from typing import Dict, Callable
 
 import tornado.web
 
@@ -13,7 +13,7 @@ import mhs.common.messages.ebxml_request_envelope as ebxml_request_envelope
 class InboundHandler(tornado.web.RequestHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a remote MHS."""
 
-    def initialize(self, callbacks: typing.Dict[str, typing.Callable[[str], None]], party_id: str):
+    def initialize(self, callbacks: Dict[str, Callable[[str], None]], party_id: str):
         """Initialise this request handler with the provided dependencies.
 
         :param callbacks: The dictionary of callbacks to use when a message is received.

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import abc
-import typing
+from typing import Dict
 
 
 class Envelope(abc.ABC):
@@ -19,7 +19,7 @@ class Envelope(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_string(cls, headers: typing.Dict[str, str], message: str) -> Envelope:
+    def from_string(cls, headers: Dict[str, str], message: str) -> Envelope:
         """Parse the provided message string and create an instance of an Envelope.
 
         :param headers A dictionary of headers received with the message.
