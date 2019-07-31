@@ -8,6 +8,7 @@ import tornado.ioloop
 import tornado.web
 import utilities.config as config
 import utilities.file_utilities as file_utilities
+import utilities.integration_adaptors_logger as log
 
 import definitions
 import mhs.common.configuration.configuration_manager as configuration_manager
@@ -17,6 +18,7 @@ import mhs.outbound.request.synchronous.handler as client_request_handler
 import mhs.outbound.transmission.outbound_transmission as outbound_transmission
 
 ASYNC_TIMEOUT = 30
+logger = log.IntegrationAdaptorsLogger('MHS_MAIN')
 
 
 def load_certs(certs_dir: pathlib.Path) -> typing.Tuple[str, str]:
@@ -65,7 +67,7 @@ def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
 
 def configure_logging() -> None:
     """Configure logging for this application."""
-    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=config.config["LOG_LEVEL"])
+    log.configure_logging()
 
 
 def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_workflow.SyncAsyncWorkflow,
