@@ -12,6 +12,5 @@ if __name__ == "__main__":
     log.configure_logging()
 
     app = tornado.web.Application([(r"/gpsummaryupload", gp_summary_upload.GpSummaryUpload)])
-    listening_port = os.getenv('SCR_SERVICE_PORT', 9000)
-    app.listen(listening_port)
+    app.listen(80)
     tornado.ioloop.IOLoop.current().start()

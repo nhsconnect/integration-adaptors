@@ -15,7 +15,7 @@
       "image": "python:3-slim",
       "commit": true,
       "changes": [
-        "EXPOSE 9000",
+        "EXPOSE 80",
         "WORKDIR {{user `app_dir`}}/{{user `scr_service_dir`}}",
         "ENTRYPOINT pipenv run scr-server"
       ]

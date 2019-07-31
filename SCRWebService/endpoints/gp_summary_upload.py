@@ -23,9 +23,10 @@ class GpSummaryUpload(tornado.web.RequestHandler):
         
         try:
             scr_input_json = json.loads(self.request.body)
-        except json.decoder.JSONDecodeError:
+        except json.decoder.JSONDecodeError as e:
             self.set_status(500)
-            return self.write("Empty body received with post request")
+            logger.error('001', f'Failed to parse message body: {e}')
+            return self.write(f'Failed to parse message body: {e}')
             
         try:
             summary_care_record = scr_update.SummaryCareRecord()
