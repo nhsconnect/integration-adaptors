@@ -10,7 +10,7 @@ complete_data_path = pathlib.Path(definitions.ROOT_DIR) / 'tests' / 'data' / 'co
 
 
 def get_target_address():
-    return os.getenv('SCR_SERVICE_ADDRESS', 'http://localhost:9000')
+    return os.getenv('SCR_SERVICE_ADDRESS', 'http://localhost')
 
 
 class SCREndpointTest(TestCase):
@@ -19,4 +19,4 @@ class SCREndpointTest(TestCase):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         response = requests.post(f"{get_target_address()}/gp_summary_upload",
                                  data=json.dumps(body))
-        self.assertEqual(json.loads(response.text), body)
+        self.assertEqual(json.dumps(json.loads(response.text)), json.dumps(body))

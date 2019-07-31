@@ -23,9 +23,7 @@ class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
 
     def test_handler_happy_path(self):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
-        print(body)
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=json.dumps(body))
-        print(response)
         self.assertEqual(json.dumps(json.loads(response.body)), json.dumps(body))
 
     def test_handler_missing_keys(self):
@@ -36,8 +34,6 @@ class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
         self.assertEqual(response.body, str.encode('Exception raised whilst populating hl7 message with json: '
                                                    'Failed to find key:Id when generating message '
                                                    'from template file:16UK05'))
-
-        # self.assertEqual(json.loads(response.body), json.loads(body))
 
     def test_handler_empty_body(self):
         body = ''
