@@ -1,6 +1,11 @@
 """A module that defines a Pystache-based MessageBuilder."""
 import pystache
-from pystache import Renderer
+from pystache import common as pystache_common
+from pystache import context as pystache_context
+
+import utilities.integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger('COMMON_MSG_BUILDER')
 
 
 class PystacheMessageBuilder:
@@ -11,7 +16,8 @@ class PystacheMessageBuilder:
         :param template_dir: The directory to load template files from
         :param template_file: The template file to populate with values.
         """
-        self._renderer = Renderer(search_dirs=template_dir)
+        self._renderer = pystache.Renderer(search_dirs=template_dir, missing_tags=pystache_common.MissingTags.strict)
+        self.template_file = template_file
         raw_template = self._renderer.load_template(template_file)
         self._parsed_template = pystache.parse(raw_template)
 
@@ -20,4 +26,21 @@ class PystacheMessageBuilder:
         :param message_dictionary: The dictionary of values to use when populating the template.
         :return: A string containing a message suitable for sending to a remote MHS.
         """
-        return self._renderer.render(self._parsed_template, message_dictionary)
+        try:
+            return self._renderer.render(self._parsed_template, message_dictionary)
+        except pystache_context.KeyNotFoundError as e:
+            logger.error('0001', 'Failed to find {Key} when generating message from {TemplateFile} . {ErrorMessage}',
+                         {'Key': e.key, 'TemplateFile': self.template_file, 'ErrorMessage': str(e)})
+            raise MessageGenerationError(f'Failed to find key:{e.key} when generating message from'
+                                         f' template file:{self.template_file}')
+
+
+class MessageGenerationError(Exception):
+    """
+    An exception generated when an error is encountered during message generation.
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
