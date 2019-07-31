@@ -7,9 +7,9 @@ import utilities.integration_adaptors_logger as log
 
 
 if __name__ == "__main__":
+    config.setup_config('SCR')
     log.configure_logging()
     logger = log.IntegrationAdaptorsLogger('SCR-WEB')
-    config.setup_config('SCR')
 
     app = tornado.web.Application([(r"/gp_summary_upload", gp_summary_upload.GpSummaryUpload)])
     app.listen(80)

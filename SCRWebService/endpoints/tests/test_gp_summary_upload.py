@@ -5,6 +5,7 @@ from tornado.web import Application
 from unittest.mock import Mock
 from endpoints import gp_summary_upload
 
+GP_SUMMARY_UPLOAD_URL = "/gp_summary_upload"
 
 class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
 
@@ -16,26 +17,26 @@ class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
 
     def test_handler_happy_path(self):
         body = '{"test": "tested"}'
-        response = self.fetch(f'/gp_summary_upload', method='POST', body=body)
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
 
         self.assertEqual(json.loads(response.body), json.loads(body))
 
     def test_handler_empty_dictionary(self):
         body = '{}'
-        response = self.fetch(f'/gp_summary_upload', method='POST', body=body)
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
 
         self.assertEqual(json.loads(response.body), json.loads(body))
 
     def test_handler_empty_body(self):
         body = ''
-        response = self.fetch(f'/gp_summary_upload', method='POST', body=body)
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
         self.assertEqual(response.code, 500)
         self.assertEqual(response.body, str.encode('Failed to parse message body:'
                                                    ' Expecting value: line 1 column 1 (char 0)'))
 
     def test_handler_invalid_json(self):
         body = "{'yes': 'wow'}"
-        response = self.fetch(f'/gp_summary_upload', method='POST', body=body)
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
         self.assertEqual(response.code, 500)
         self.assertEqual(response.body,
                          str.encode('Failed to parse message body: Expecting property '
