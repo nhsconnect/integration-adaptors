@@ -28,7 +28,7 @@ class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
 
     def test_handler_empty_body(self):
         body = ''
-        response = self.fetch(f'/gpsummaryupload', method='POST', body=body)
+        response = self.fetch(f'/gp_summary_upload', method='POST', body=body)
         self.assertEqual(response.code, 500)
         self.assertEqual(response.body, str.encode('Failed to parse message body:'
                                                    ' Expecting value: line 1 column 1 (char 0)'))
