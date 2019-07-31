@@ -33,6 +33,18 @@ NAMESPACES = {SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
 class EbxmlEnvelope(envelope.Envelope):
     """An envelope that contains a message to be sent asynchronously to a remote MHS."""
 
+    _elements_to_extract_when_parsing = [
+        {'name': FROM_PARTY_ID, 'element_name': 'PartyId', 'parent': 'From'},
+        {'name': TO_PARTY_ID, 'element_name': 'PartyId', 'parent': 'To'},
+        {'name': CPA_ID, 'element_name': 'CPAId', 'parent': None},
+        {'name': CONVERSATION_ID, 'element_name': 'ConversationId', 'parent': None},
+        {'name': SERVICE, 'element_name': 'Service', 'parent': None},
+        {'name': ACTION, 'element_name': 'Action', 'parent': None},
+        {'name': MESSAGE_ID, 'element_name': 'MessageId', 'parent': 'MessageData'},
+        {'name': TIMESTAMP, 'element_name': 'Timestamp', 'parent': 'MessageData'},
+        {'name': REF_TO_MESSAGE_ID, 'element_name': 'RefToMessageId', 'parent': 'MessageData'}
+    ]
+
     def __init__(self, template_file, message_dictionary: Dict[str, str]):
         """Create a new EbxmlEnvelope that populates the specified template file with the provided dictionary.
 
@@ -72,27 +84,11 @@ class EbxmlEnvelope(envelope.Envelope):
         """
         extracted_values = {}
 
-        EbxmlEnvelope._add_if_present(extracted_values, FROM_PARTY_ID,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "PartyId", parent="From"))
-        EbxmlEnvelope._add_if_present(extracted_values, TO_PARTY_ID,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "PartyId", parent="To"))
-        EbxmlEnvelope._add_if_present(extracted_values, CPA_ID,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "CPAId"))
-        EbxmlEnvelope._add_if_present(extracted_values, CONVERSATION_ID,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "ConversationId"))
-        EbxmlEnvelope._add_if_present(extracted_values, SERVICE,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "Service"))
-        EbxmlEnvelope._add_if_present(extracted_values, ACTION,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "Action"))
-        EbxmlEnvelope._add_if_present(extracted_values, MESSAGE_ID,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "MessageId",
-                                                                              parent="MessageData"))
-        EbxmlEnvelope._add_if_present(extracted_values, TIMESTAMP,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "Timestamp",
-                                                                              parent="MessageData"))
-        EbxmlEnvelope._add_if_present(extracted_values, REF_TO_MESSAGE_ID,
-                                      EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "RefToMessageId",
-                                                                              parent="MessageData"))
+        for element_to_extract in EbxmlEnvelope._elements_to_extract_when_parsing:
+            EbxmlEnvelope._add_if_present(extracted_values, element_to_extract['name'],
+                                          EbxmlEnvelope._extract_ebxml_text_value(xml_tree,
+                                                                                  element_to_extract['element_name'],
+                                                                                  parent=element_to_extract['parent']))
 
         return extracted_values
 
@@ -108,12 +104,12 @@ class EbxmlEnvelope(envelope.Envelope):
         return path
 
     @staticmethod
-    def _extract_ebxml_value(xml_tree, element_name, parent=None):
+    def _extract_ebxml_value(xml_tree: ElementTree.Element, element_name, parent=None):
         xpath = EbxmlEnvelope._path_to_ebxml_element(element_name, parent=parent)
         return xml_tree.find(xpath, namespaces=NAMESPACES)
 
     @staticmethod
-    def _extract_ebxml_text_value(xml_tree, element_name, parent=None):
+    def _extract_ebxml_text_value(xml_tree: ElementTree.Element, element_name, parent=None):
         value = EbxmlEnvelope._extract_ebxml_value(xml_tree, element_name, parent)
         text = None
 
