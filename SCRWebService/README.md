@@ -1,5 +1,5 @@
 #Summary Care Record Web Service
-The goal of this section is to produce a web service which provides a simple interface with which 
+ This is a web service which provides a simple interface with which 
 a supplier can perform Summary Care Record (SCR) based actions. A supplier will provide JSON formatted input data 
 for a particular SCR function, this data will then be used to populate templates for SCR functions producing
  a HL7 message which is forwarded to an MHS and further to spine.

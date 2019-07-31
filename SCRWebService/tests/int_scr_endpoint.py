@@ -12,6 +12,6 @@ class SCREndpointTest(TestCase):
 
     def test_scr_happy_path(self):
         body = {"yes": ["one"]}
-        response = requests.post(f"{get_target_address()}/gpsummaryupload",
+        response = requests.post(f"{get_target_address()}/gp_summary_upload",
                                  data=json.dumps(body))
         self.assertEqual(json.loads(response.text), body)

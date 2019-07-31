@@ -89,7 +89,7 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
       portMappings = [
         {
           containerPort = 80
-          hostPort = var.scr_ecr_address
+          hostPort = var.scr_service_port
           protocol = "tcp"
         }
       ]

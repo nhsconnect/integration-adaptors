@@ -5,7 +5,7 @@ import tornado.ioloop
 import scr.gp_summary_update as scr_update
 import utilities.integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('SCR_WEB')
+logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
 
 
 class GpSummaryUpload(tornado.web.RequestHandler):

@@ -11,6 +11,6 @@ if __name__ == "__main__":
     logger = log.IntegrationAdaptorsLogger('SCR-WEB')
     config.setup_config('SCR')
 
-    app = tornado.web.Application([(r"/gpsummaryupload", gp_summary_upload.GpSummaryUpload)])
+    app = tornado.web.Application([(r"/gp_summary_upload", gp_summary_upload.GpSummaryUpload)])
     app.listen(80)
     tornado.ioloop.IOLoop.current().start()

@@ -11,18 +11,18 @@ class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
     def get_app(self):
         self.sender = Mock()
         return Application([
-            (r'/gpsummaryupload', gp_summary_upload.GpSummaryUpload, {})
+            (r'/gp_summary_upload', gp_summary_upload.GpSummaryUpload, {})
         ])
 
     def test_handler_happy_path(self):
         body = '{"test": "tested"}'
-        response = self.fetch(f'/gpsummaryupload', method='POST', body=body)
+        response = self.fetch(f'/gp_summary_upload', method='POST', body=body)
 
         self.assertEqual(json.loads(response.body), json.loads(body))
 
     def test_handler_empty_dictionary(self):
         body = '{}'
-        response = self.fetch(f'/gpsummaryupload', method='POST', body=body)
+        response = self.fetch(f'/gp_summary_upload', method='POST', body=body)
 
         self.assertEqual(json.loads(response.body), json.loads(body))
 
@@ -35,7 +35,7 @@ class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
 
     def test_handler_invalid_json(self):
         body = "{'yes': 'wow'}"
-        response = self.fetch(f'/gpsummaryupload', method='POST', body=body)
+        response = self.fetch(f'/gp_summary_upload', method='POST', body=body)
         self.assertEqual(response.code, 500)
         self.assertEqual(response.body,
                          str.encode('Failed to parse message body: Expecting property '
