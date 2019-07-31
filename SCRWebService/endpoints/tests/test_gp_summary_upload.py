@@ -1,11 +1,17 @@
 import json
+import pathlib
 
+from utilities import file_utilities
+from definitions import  ROOT_DIR
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
 from unittest.mock import Mock
 from endpoints import gp_summary_upload
 
 GP_SUMMARY_UPLOAD_URL = "/gp_summary_upload"
+
+complete_data_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data' / 'complete_input.json'
+
 
 class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
 
@@ -16,16 +22,22 @@ class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
         ])
 
     def test_handler_happy_path(self):
-        body = '{"test": "tested"}'
-        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
+        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        print(body)
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=json.dumps(body))
+        print(response)
+        self.assertEqual(json.dumps(json.loads(response.body)), json.dumps(body))
 
-        self.assertEqual(json.loads(response.body), json.loads(body))
-
-    def test_handler_empty_dictionary(self):
+    def test_handler_missing_keys(self):
         body = '{}'
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
+        self.assertEqual(response.code, 500)
 
-        self.assertEqual(json.loads(response.body), json.loads(body))
+        self.assertEqual(response.body, str.encode('Exception raised whilst populating hl7 message with json: '
+                                                   'Failed to find key:Id when generating message '
+                                                   'from template file:16UK05'))
+
+        # self.assertEqual(json.loads(response.body), json.loads(body))
 
     def test_handler_empty_body(self):
         body = ''

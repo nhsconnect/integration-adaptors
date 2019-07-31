@@ -27,11 +27,14 @@ class GpSummaryUpload(tornado.web.RequestHandler):
             self.set_status(500)
             logger.error('001', f'Failed to parse message body: {e}')
             return self.write(f'Failed to parse message body: {e}')
-            
+
         try:
+            scr = scr_update.SummaryCareRecord()
+            hl7 = scr.populate_template(scr_input_json)
+            logger.info("002", hl7)
             self.write(scr_input_json)
         except Exception as e:
-            logger.error('003', f'Summary care message generation failed: {e}')
             self.set_status(500)
-            self.write('Exception raised whilst populating hl7 message with json')
+            logger.error('003', f'Summary care message generation failed: {e}')
+            return self.write(f'Exception raised whilst populating hl7 message with json: {e}')
 
