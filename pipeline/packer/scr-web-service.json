@@ -7,7 +7,7 @@
     "scr_service_dir": "SCRWebService",
     "repository": "{{env `SCR_REPOSITORY`}}",
     "tag": "{{env `BUILD_TAG`}}",
-    "docker_registry_url": "{{env `SCR_REPOSITORY_URL`}}"
+    "docker_registry_url": "{{env `SCR_REPOSITORY`}}"
   },
   "builders": [
     {
