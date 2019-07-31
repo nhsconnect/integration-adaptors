@@ -61,7 +61,16 @@ pipeline {
             steps {
                 dir('mhs') {
                     // Wait for MHS container to fully stand up
-                    sh label: 'Ping MHS', script: 'sleep 90; curl ${MHS_ADDRESS}'
+                    // sh label: 'Ping MHS', script: 'sleep 90; curl ${MHS_ADDRESS}'
+
+                    timeout(2) {
+                        waitUntil {
+                           script {
+                             def r = sh script: 'curl ${MHS_ADDRESS}', returnStatus: true
+                             return (r == 0);
+                           }
+                        }
+                    }
                     sh label: 'Running integration tests', script: 'pipenv run inttests'
                 }
             }
