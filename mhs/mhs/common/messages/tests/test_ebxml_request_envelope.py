@@ -13,6 +13,14 @@ CONTENT_TYPE_HEADER_NAME = "Content-Type"
 MULTIPART_MIME_HEADERS = {CONTENT_TYPE_HEADER_NAME: 'multipart/related; boundary="--=_MIME-Boundary"'}
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
 
+_ADDITIONAL_EXPECTED_VALUES = {
+    ebxml_request_envelope.DUPLICATE_ELIMINATION: True,
+    ebxml_request_envelope.ACK_REQUESTED: True,
+    ebxml_request_envelope.ACK_SOAP_ACTOR: "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
+    ebxml_request_envelope.SYNC_REPLY: True,
+}
+EXPECTED_VALUES = {**test_ebxml_envelope.BASE_EXPECTED_VALUES, **_ADDITIONAL_EXPECTED_VALUES}
+
 
 def get_test_message_dictionary():
     return {
@@ -22,16 +30,16 @@ def get_test_message_dictionary():
         ebxml_envelope.CONVERSATION_ID: "79F49A34-9798-404C-AEC4-FD38DD81C138",
         ebxml_envelope.SERVICE: "urn:nhs:names:services:pdsquery",
         ebxml_envelope.ACTION: "QUPA_IN000006UK02",
-        ebxml_envelope.DUPLICATE_ELIMINATION: True,
-        ebxml_envelope.ACK_REQUESTED: True,
-        ebxml_envelope.ACK_SOAP_ACTOR: "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-        ebxml_envelope.SYNC_REPLY: True,
+        ebxml_request_envelope.DUPLICATE_ELIMINATION: True,
+        ebxml_request_envelope.ACK_REQUESTED: True,
+        ebxml_request_envelope.ACK_SOAP_ACTOR: "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
+        ebxml_request_envelope.SYNC_REPLY: True,
         ebxml_request_envelope.MESSAGE: '<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>'
     }
 
 
 def expected_values(message=None):
-    values = test_ebxml_envelope.EXPECTED_VALUES.copy()
+    values = EXPECTED_VALUES.copy()
 
     if message:
         values[ebxml_request_envelope.MESSAGE] = message
@@ -103,9 +111,9 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
 
         test_cases = [
-            (ebxml_envelope.DUPLICATE_ELIMINATION, 'eb:DuplicateElimination'),
-            (ebxml_envelope.ACK_REQUESTED, 'eb:AckRequested'),
-            (ebxml_envelope.SYNC_REPLY, 'eb:SyncReply')
+            (ebxml_request_envelope.DUPLICATE_ELIMINATION, 'eb:DuplicateElimination'),
+            (ebxml_request_envelope.ACK_REQUESTED, 'eb:AckRequested'),
+            (ebxml_request_envelope.SYNC_REPLY, 'eb:SyncReply')
         ]
         for optional_tag, optional_xml_tag in test_cases:
             with self.subTest(optional_tag=optional_tag):

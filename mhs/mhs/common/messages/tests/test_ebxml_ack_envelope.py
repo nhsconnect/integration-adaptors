@@ -9,6 +9,7 @@ from utilities import message_utilities
 from utilities import xml_utilities
 
 EXPECTED_EBXML = "ebxml_ack.xml"
+EXPECTED_VALUES = test_ebxml_envelope.BASE_EXPECTED_VALUES
 
 
 def get_test_message_dictionary():
@@ -61,7 +62,7 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
 
         parsed_message = ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, message)
 
-        self.assertEqual(test_ebxml_envelope.EXPECTED_VALUES, parsed_message.message_dictionary)
+        self.assertEqual(EXPECTED_VALUES, parsed_message.message_dictionary)
 
     def test_from_string_with_no_values(self):
         message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_header_empty.xml"))

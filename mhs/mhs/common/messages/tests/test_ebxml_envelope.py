@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
-import mhs.common.messages.ebxml_envelope as ebxml_envelope
+from  mhs.common.messages import ebxml_envelope
+from mhs.common.messages import ebxml_request_envelope
 
 EXPECTED_MESSAGES_DIR = "expected_messages"
 MESSAGE_DIR = "test_messages"
@@ -10,7 +11,7 @@ MESSAGE_DIR = "test_messages"
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_TIMESTAMP = "2012-03-15T06:51:08Z"
 
-EXPECTED_VALUES = {
+BASE_EXPECTED_VALUES = {
     ebxml_envelope.FROM_PARTY_ID: "YES-0000806",
     ebxml_envelope.TO_PARTY_ID: "A91424-9199121",
     ebxml_envelope.CPA_ID: "S1001A1630",
@@ -20,10 +21,6 @@ EXPECTED_VALUES = {
     ebxml_envelope.MESSAGE_ID: "C614484E-4B10-499A-9ACD-5D645CFACF61",
     ebxml_envelope.REF_TO_MESSAGE_ID: "F106022D-758B-49A9-A80A-8FF211C32A43",
     ebxml_envelope.TIMESTAMP: "2019-05-04T20:55:16Z",
-    ebxml_envelope.DUPLICATE_ELIMINATION: True,
-    ebxml_envelope.ACK_REQUESTED: True,
-    ebxml_envelope.ACK_SOAP_ACTOR: "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-    ebxml_envelope.SYNC_REPLY: True,
 }
 
 

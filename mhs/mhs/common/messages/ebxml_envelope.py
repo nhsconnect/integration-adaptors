@@ -23,10 +23,6 @@ ACTION = "action"
 MESSAGE_ID = 'message_id'
 TIMESTAMP = 'timestamp'
 REF_TO_MESSAGE_ID = "ref_to_message_id"
-DUPLICATE_ELIMINATION = "duplicate_elimination"
-ACK_REQUESTED = "ack_requested"
-ACK_SOAP_ACTOR = "ack_soap_actor"
-SYNC_REPLY = "sync_reply"
 
 EBXML_NAMESPACE = "eb"
 SOAP_NAMESPACE = "SOAP"
@@ -97,14 +93,6 @@ class EbxmlEnvelope(envelope.Envelope):
         EbxmlEnvelope._add_if_present(extracted_values, REF_TO_MESSAGE_ID,
                                       EbxmlEnvelope._extract_ebxml_text_value(xml_tree, "RefToMessageId",
                                                                               parent="MessageData"))
-        EbxmlEnvelope._add_flag_if_present(extracted_values, DUPLICATE_ELIMINATION,
-                                           EbxmlEnvelope._extract_ebxml_value(xml_tree, "DuplicateElimination"))
-        EbxmlEnvelope._add_flag_if_present(extracted_values, SYNC_REPLY,
-                                           EbxmlEnvelope._extract_ebxml_value(xml_tree, "SyncReply"))
-        EbxmlEnvelope._add_flag_if_present(extracted_values, ACK_REQUESTED,
-                                           EbxmlEnvelope._extract_ebxml_value(xml_tree, "AckRequested"))
-        EbxmlEnvelope._extract_attribute(xml_tree, "AckRequested", SOAP_NAMESPACE, "actor", extracted_values,
-                                         ACK_SOAP_ACTOR)
 
         return extracted_values
 

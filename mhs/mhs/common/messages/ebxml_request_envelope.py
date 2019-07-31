@@ -17,6 +17,11 @@ MESSAGE = "hl7_message"
 
 CONTENT_TYPE_HEADER_NAME = "Content-Type"
 
+DUPLICATE_ELIMINATION = "duplicate_elimination"
+ACK_REQUESTED = "ack_requested"
+ACK_SOAP_ACTOR = "ack_soap_actor"
+SYNC_REPLY = "sync_reply"
+
 
 class EbXmlParsingError(Exception):
     """Raised when an error was encountered during parsing of an ebXML message."""
@@ -43,13 +48,25 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         """
         msg = EbxmlRequestEnvelope._parse_mime_message(headers, message)
         ebxml_part, payload_part = EbxmlRequestEnvelope._extract_message_parts(msg)
-        extracted_values = super().parse_message(ElementTree.fromstring(ebxml_part))
+        xml_tree = ElementTree.fromstring(ebxml_part)
+        extracted_values = super().parse_message(xml_tree)
+
+        cls._extract_more_values_from_xml_tree(xml_tree, extracted_values)
 
         if payload_part:
             extracted_values[MESSAGE] = payload_part
 
         logging.debug("Extracted values from message: %s", extracted_values)
         return EbxmlRequestEnvelope(extracted_values)
+
+    @classmethod
+    def _extract_more_values_from_xml_tree(cls, xml_tree, extracted_values):
+        cls._add_flag_if_present(extracted_values, DUPLICATE_ELIMINATION,
+                                 cls._extract_ebxml_value(xml_tree, "DuplicateElimination"))
+        cls._add_flag_if_present(extracted_values, SYNC_REPLY, cls._extract_ebxml_value(xml_tree, "SyncReply"))
+        cls._add_flag_if_present(extracted_values, ACK_REQUESTED, cls._extract_ebxml_value(xml_tree, "AckRequested"))
+        cls._extract_attribute(xml_tree, "AckRequested", ebxml_envelope.SOAP_NAMESPACE, "actor", extracted_values,
+                               ACK_SOAP_ACTOR)
 
     @staticmethod
     def _parse_mime_message(headers: Dict[str, str], message: str) -> email.message.Message:
