@@ -95,8 +95,8 @@ to the EC2 instance in a `home/ec2-user/certs` directory (this directory is a sh
 mhs docker container as specified in the docker container). 
 
 
-There must also be log groups in cloud watch under the following names:
-- `/ecs/jenkins/master`
+There must also be log groups in cloud watch under the following names - these groups need to be created manually:
+- `/ecs/jenkins-master`
 - `/ecs/jenkins-workers-jenkins-worker`
 - `/ecs/scr-service-environment`
 - `/ecs/sonarqube`
