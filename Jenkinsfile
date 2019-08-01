@@ -61,22 +61,14 @@ pipeline {
             steps {
                 dir('mhs') {
                     // Wait for MHS container to fully stand up
-                    // sh label: 'Ping MHS', script: 'sleep 90; curl ${MHS_ADDRESS}'
-
                     timeout(2) {
                         waitUntil {
                            script {
-                            try {
-                                def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
-                                return (r == '405');
-                             }
-                             catch (err){
-                                echo err
-                             }
+                               def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
+                               return (r == '405');
                            }
                         }
-                    }
-
+                     }
 
                     sh label: 'Running integration tests', script: 'pipenv run inttests'
                 }
@@ -86,6 +78,15 @@ pipeline {
         stage('SCR Service Integration Tests') {
             steps {
                 dir('SCRWebService') {
+                     timeout(2) {
+                        waitUntil {
+                           script {
+                               def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS}:${SCR_SERVICE_PORT} || echo 1', returnStdout: true
+                               return (r == '404');
+                           }
+                        }
+                     }
+
                     sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
                 }
             }
