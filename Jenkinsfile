@@ -66,8 +66,8 @@ pipeline {
                     timeout(2) {
                         waitUntil {
                            script {
-                             def r = sh script: 'wget -q ${MHS_ADDRESS} -O /dev/null', returnStatus: true
-                             return (r == 0);
+                             def r = sh script: 'curl -o /dev/null --silent --head --write-out '%{http_code}\n' localhost', returnStdout: true
+                             return (r == 405);
                            }
                         }
                     }
