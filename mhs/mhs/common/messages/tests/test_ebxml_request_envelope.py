@@ -167,3 +167,31 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
             with (self.assertRaises(ebxml_request_envelope.EbXmlParsingError)):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string({CONTENT_TYPE_HEADER_NAME: "text/plain"},
                                                                         "A message")
+
+    def test_from_string_missing_additional_values(self):
+        sub_tests = [
+            ('DuplicateElimination', 'ebxml_request_no_duplicate_elimination.msg',
+             ebxml_request_envelope.DUPLICATE_ELIMINATION),
+            ('SyncReply', 'ebxml_request_no_sync_reply.msg', ebxml_request_envelope.SYNC_REPLY)
+        ]
+        for element_name, filename, key in sub_tests:
+            with self.subTest(f'A valid request without a {element_name} element'):
+                message = file_utilities.FileUtilities.get_file_string(
+                    str(self.message_dir / filename))
+                expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+                expected_values_with_payload[key] = False
+
+                parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+                self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
+
+        with self.subTest(f'A valid request without an AckRequested element'):
+            message = file_utilities.FileUtilities.get_file_string(
+                str(self.message_dir / 'ebxml_request_no_ack_requested.msg'))
+            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            expected_values_with_payload[ebxml_request_envelope.ACK_REQUESTED] = False
+            del expected_values_with_payload[ebxml_request_envelope.ACK_SOAP_ACTOR]
+
+            parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+            self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)

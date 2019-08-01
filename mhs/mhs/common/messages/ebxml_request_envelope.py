@@ -61,10 +61,10 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
     @classmethod
     def _extract_more_values_from_xml_tree(cls, xml_tree, extracted_values):
-        cls._add_flag_if_present(extracted_values, DUPLICATE_ELIMINATION,
-                                 cls._extract_ebxml_value(xml_tree, "DuplicateElimination"))
-        cls._add_flag_if_present(extracted_values, SYNC_REPLY, cls._extract_ebxml_value(xml_tree, "SyncReply"))
-        cls._add_flag_if_present(extracted_values, ACK_REQUESTED, cls._extract_ebxml_value(xml_tree, "AckRequested"))
+        cls._add_flag(extracted_values, DUPLICATE_ELIMINATION,
+                      cls._extract_ebxml_value(xml_tree, "DuplicateElimination"))
+        cls._add_flag(extracted_values, SYNC_REPLY, cls._extract_ebxml_value(xml_tree, "SyncReply"))
+        cls._add_flag(extracted_values, ACK_REQUESTED, cls._extract_ebxml_value(xml_tree, "AckRequested"))
         cls._extract_attribute(xml_tree, "AckRequested", ebxml_envelope.SOAP_NAMESPACE, "actor", extracted_values,
                                ACK_SOAP_ACTOR)
 

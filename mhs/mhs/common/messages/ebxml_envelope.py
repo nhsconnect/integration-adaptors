@@ -131,6 +131,8 @@ class EbxmlEnvelope(envelope.Envelope):
             values_dict[key] = value
 
     @staticmethod
-    def _add_flag_if_present(values_dict, key, value):
+    def _add_flag(values_dict, key, value):
         if value is not None:
             values_dict[key] = True
+        else:
+            values_dict[key] = False
