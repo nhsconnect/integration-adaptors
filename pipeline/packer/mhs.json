@@ -12,6 +12,7 @@
     {
       "type": "docker",
       "image": "python:3-slim",
+      "container_dir": "/packer-files",
       "commit": true,
       "changes": [
         "EXPOSE 80 443",
