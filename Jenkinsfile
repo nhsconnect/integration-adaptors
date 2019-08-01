@@ -66,8 +66,13 @@ pipeline {
                     timeout(2) {
                         waitUntil {
                            script {
-                             def r = sh script: 'curl -o /dev/null --silent --head --write-out "%{http_code}\n" localhost', returnStdout: true
-                             return (r == 405);
+                            try {
+                                def r = sh script: 'curl --write-out "%{http_code}\n" localhost', returnStdout: true
+                                return (r == 405);
+                             }
+                             catch (err){
+                                echo err
+                             }
                            }
                         }
                     }
