@@ -1,6 +1,5 @@
 from unittest.mock import patch
 
-import mhs.common.messages.ebxml_envelope
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
 import mhs.common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs.common.messages.tests.test_ebxml_envelope as test_ebxml_envelope
