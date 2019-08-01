@@ -12,6 +12,7 @@ requests = "*"
 integration-adaptors-common = {editable = true,path = "./../common"}
 ldap3 = "*"
 tornado = "*"
+boto3 = "*"
 
 [requires]
 python_version = "3.7"
