@@ -67,7 +67,7 @@ pipeline {
                         waitUntil {
                            script {
                             try {
-                                def r = sh script: 'sleep 2; curl --write-out "%{http_code}\n" localhost || echo 1', returnStdout: true
+                                def r = sh script: 'sleep 2; curl --write-out "%{http_code}\n" ${MHS_ADDRESS} || echo 1', returnStdout: true
                                 return (r == 405);
                              }
                              catch (err){
