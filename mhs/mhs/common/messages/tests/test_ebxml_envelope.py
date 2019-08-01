@@ -2,8 +2,7 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
-from  mhs.common.messages import ebxml_envelope
-from mhs.common.messages import ebxml_request_envelope
+from mhs.common.messages import ebxml_envelope
 
 EXPECTED_MESSAGES_DIR = "expected_messages"
 MESSAGE_DIR = "test_messages"
