@@ -68,6 +68,7 @@ pipeline {
                            script {
                             try {
                                 def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}\n" ${MHS_ADDRESS} || echo 1', returnStdout: true
+                                echo r
                                 return (r == 405);
                              }
                              catch (err){
