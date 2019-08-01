@@ -67,6 +67,5 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
     def test_from_string_with_no_values(self):
         message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_header_empty.xml"))
 
-        parsed_message = ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, message)
-
-        self.assertEqual({}, parsed_message.message_dictionary)
+        with self.assertRaisesRegex(ebxml_envelope.EbXmlParsingError, "Weren't able to find required element"):
+            ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, message)

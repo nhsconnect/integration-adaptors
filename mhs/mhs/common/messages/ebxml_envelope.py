@@ -88,7 +88,8 @@ class EbxmlEnvelope(envelope.Envelope):
             EbxmlEnvelope._add_if_present(extracted_values, element_to_extract['name'],
                                           EbxmlEnvelope._extract_ebxml_text_value(xml_tree,
                                                                                   element_to_extract['element_name'],
-                                                                                  parent=element_to_extract['parent']))
+                                                                                  parent=element_to_extract['parent'],
+                                                                                  required=True))
 
         return extracted_values
 
@@ -104,13 +105,18 @@ class EbxmlEnvelope(envelope.Envelope):
         return path
 
     @staticmethod
-    def _extract_ebxml_value(xml_tree: ElementTree.Element, element_name, parent=None):
+    def _extract_ebxml_value(xml_tree: ElementTree.Element, element_name, parent=None, required=False):
         xpath = EbxmlEnvelope._path_to_ebxml_element(element_name, parent=parent)
-        return xml_tree.find(xpath, namespaces=NAMESPACES)
+        value = xml_tree.find(xpath, namespaces=NAMESPACES)
+        if value is None and required:
+            logger.error('0002', "Weren't able to find required element {xpath} during parsing of EbXML message.",
+                         {'xpath': xpath})
+            raise EbXmlParsingError(f"Weren't able to find required element {xpath} during parsing of EbXML message")
+        return value
 
     @staticmethod
-    def _extract_ebxml_text_value(xml_tree: ElementTree.Element, element_name, parent=None):
-        value = EbxmlEnvelope._extract_ebxml_value(xml_tree, element_name, parent)
+    def _extract_ebxml_text_value(xml_tree: ElementTree.Element, element_name, parent=None, required=False):
+        value = EbxmlEnvelope._extract_ebxml_value(xml_tree, element_name, parent, required)
         text = None
 
         if value is not None:
@@ -123,7 +129,13 @@ class EbxmlEnvelope(envelope.Envelope):
         xpath = EbxmlEnvelope._path_to_ebxml_element(element_name)
         element = xml_tree.find(xpath, NAMESPACES)
         if element is not None:
-            values_dict[key] = element.attrib["{" + NAMESPACES[attribute_namespace] + "}" + attribute_name]
+            try:
+                values_dict[key] = element.attrib["{" + NAMESPACES[attribute_namespace] + "}" + attribute_name]
+            except KeyError as e:
+                logger.error('0003', "Weren't able to find required {attribute_name} of {xpath} during parsing of "
+                                     "EbXML message.", {'attribute_name': attribute_name, 'xpath': xpath})
+                raise EbXmlParsingError(f"Weren't able to find required attribute {attribute_name} during parsing of "
+                                        f"EbXML message") from e
 
     @staticmethod
     def _add_if_present(values_dict, key, value):
@@ -136,3 +148,8 @@ class EbxmlEnvelope(envelope.Envelope):
             values_dict[key] = True
         else:
             values_dict[key] = False
+
+
+class EbXmlParsingError(Exception):
+    """Raised when an error was encountered during parsing of an ebXML message."""
+    pass

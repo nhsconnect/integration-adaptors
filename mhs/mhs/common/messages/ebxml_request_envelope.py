@@ -9,7 +9,7 @@ import logging
 from typing import Dict, Tuple
 from xml.etree import ElementTree
 
-import mhs.common.messages.ebxml_envelope as ebxml_envelope
+from mhs.common.messages import ebxml_envelope
 
 EBXML_TEMPLATE = "ebxml_request"
 
@@ -21,11 +21,6 @@ DUPLICATE_ELIMINATION = "duplicate_elimination"
 ACK_REQUESTED = "ack_requested"
 ACK_SOAP_ACTOR = "ack_soap_actor"
 SYNC_REPLY = "sync_reply"
-
-
-class EbXmlParsingError(Exception):
-    """Raised when an error was encountered during parsing of an ebXML message."""
-    pass
 
 
 class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
@@ -95,7 +90,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         # (if present) must be the first additional attachment.
 
         if not msg.is_multipart():
-            raise EbXmlParsingError("Non-multipart message received!")
+            raise ebxml_envelope.EbXmlParsingError("Non-multipart message received!")
 
         message_parts = msg.get_payload()
 
