@@ -4,8 +4,8 @@ from unittest.mock import MagicMock, patch, Mock
 
 from utilities.test_utilities import async_test
 
-from mhs.common.state import dynamo_persistence_adapter
-from mhs.common.state.dynamo_persistence_adapter import DynamoPersistenceAdapter, RecordCreationError, \
+from mhs.common.state import dynamo_persistence_adaptor
+from mhs.common.state.dynamo_persistence_adaptor import DynamoPersistenceAdaptor, RecordCreationError, \
     InvalidTableError, RecordRetrievalError, RecordDeletionError
 
 TEST_STATE_ARN = "TEST STATE ARN"
@@ -27,9 +27,9 @@ TEST_EXCEPTION = Exception()
 TEST_SIDE_EFFECT = Mock(side_effect=TEST_EXCEPTION)
 
 
-class TestDynamoPersistenceAdapter(unittest.TestCase):
+class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
-    @patch.object(dynamo_persistence_adapter.aioboto3, "resource")
+    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
     def setUp(self, mock_boto3_resource):
         self.mock_dynamodb = MagicMock()
         mock_boto3_resource.return_value = self.mock_dynamodb
@@ -37,7 +37,7 @@ class TestDynamoPersistenceAdapter(unittest.TestCase):
         self.mock_table = MagicMock()
         self.mock_dynamodb.Table.return_value = self.mock_table
 
-        self.service = DynamoPersistenceAdapter(
+        self.service = DynamoPersistenceAdaptor(
             state_table=TEST_STATE_TABLE,
             state_arn=TEST_STATE_ARN,
             sync_async_table=TEST_ASYNC_TABLE,

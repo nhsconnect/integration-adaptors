@@ -4,7 +4,7 @@ import traceback
 import aioboto3
 import utilities.integration_adaptors_logger as log
 
-import mhs.common.state.persistence_adapter
+import mhs.common.state.persistence_adaptor
 
 logger = log.IntegrationAdaptorsLogger('DYNAMO_PERSISTENCE')
 
@@ -29,7 +29,7 @@ class InvalidTableError(RuntimeError):
         pass
 
 
-class DynamoPersistenceAdapter(mhs.common.state.persistence_adapter.PersistenceAdapter):
+class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceAdaptor):
     """
     Class responsible for persisting items into DynamoDB.
     """
@@ -37,7 +37,7 @@ class DynamoPersistenceAdapter(mhs.common.state.persistence_adapter.PersistenceA
     def __init__(self, **kwargs):
         """
         Constructs a DynamoDB version of a
-        :class:`PersistenceAdapter <mhs.common.state.persistence_adapter.PersistenceAdapter>`.
+        :class:`PersistenceAdaptor <mhs.common.state.persistence_adaptor.PersistenceAdaptor>`.
         The kwargs provided should contain the following information:
           * state_table: The name used to refer to the table containing state items.
           * state_arn: The Amazon Resource Name used to identify the dynamo table containing state items.

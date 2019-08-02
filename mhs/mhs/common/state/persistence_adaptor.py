@@ -1,11 +1,11 @@
 """
-This module defines the state adapter interface, used to allow support for multiple state database implementations.
+This module defines the state adaptor interface, used to allow support for multiple state database implementations.
 """
 import typing
 
 
-class PersistenceAdapter:
-    """An adapter that provides a common interface to the state management database."""
+class PersistenceAdaptor:
+    """An adaptor that provides a common interface to the state management database."""
 
     async def add(self, table_name: str, key: str, item: dict) -> typing.Optional[dict]:
         """Add an item to a specified table, using a provided key.
