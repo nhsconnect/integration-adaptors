@@ -8,7 +8,7 @@ class PersistenceAdapter:
     """An adapter that provides a common interface to the state management database."""
     pass
 
-    def add(self, table_name, key, item: dict) -> Optional[dict]:
+    async def add(self, table_name, key, item: dict) -> Optional[dict]:
         """Add an item to a specified table, using a provided key.
 
         :param table_name: The name of the table to add the item to.
@@ -18,7 +18,7 @@ class PersistenceAdapter:
         """
         pass
 
-    def get(self, table_name, key) -> Optional[dict]:
+    async def get(self, table_name, key) -> Optional[dict]:
         """
         Retrieves an item from a specified table with a given key.
         :param table_name: The table to use when finding the item.
@@ -27,7 +27,7 @@ class PersistenceAdapter:
         """
         pass
 
-    def delete(self, table_name, key) -> Optional[dict]:
+    async def delete(self, table_name, key) -> Optional[dict]:
         """
         Removes an item from a table given it's key.
         :param table_name: The table to delete the item from.

@@ -1,7 +1,7 @@
 import json
 import traceback
 
-import boto3
+import aioboto3
 import utilities.integration_adaptors_logger as log
 
 from mhs.common.state.persistence_adapter import PersistenceAdapter
@@ -51,16 +51,16 @@ class DynamoPersistenceAdapter(PersistenceAdapter):
         sync_async_table = kwargs.get('sync_async_table', "sync_async")
         sync_async_arn = kwargs.get('sync_async_arn')
 
-        dynamo_db = boto3.resource('dynamodb')
+        dynamo_db = aioboto3.resource('dynamodb')
 
         self.tables = {
             state_table: dynamo_db.Table(state_arn),
             sync_async_table: dynamo_db.Table(sync_async_arn)
         }
 
-    def add(self, table_name, key, item):
+    async def add(self, table_name, key, item):
         try:
-            response = self._resolve_table(table_name).put_item(
+            response = await self._resolve_table(table_name).put_item(
                 Item={"key": key, "data": json.dumps(item)},
                 ReturnValues='ALL_OLD'
             )
@@ -72,10 +72,10 @@ class DynamoPersistenceAdapter(PersistenceAdapter):
             logger.error("001", 'Error creating record: {exception}', {"exception": traceback.format_exc()})
             raise RecordCreationError from e
 
-    def get(self, table_name, key):
+    async def get(self, table_name, key):
         logger.info("002", 'Getting record for key {key}', {"key": key})
         try:
-            response = self._resolve_table(table_name).get_item(
+            response = await self._resolve_table(table_name).get_item(
                 Key=key
             )
             logger.info("003", 'Response from get_item call: {response}', {"response": response})
@@ -87,10 +87,10 @@ class DynamoPersistenceAdapter(PersistenceAdapter):
             logger.error("005", 'Error getting record: {exception}', {"exception": traceback.format_exc()})
             raise RecordRetrievalError from e
 
-    def delete(self, table_name, key):
+    async def delete(self, table_name, key):
         logger.info("006", 'Deleting record for key {key}', {"key": key})
         try:
-            response = self._resolve_table(table_name).delete_item(
+            response = await self._resolve_table(table_name).delete_item(
                 Key=key,
                 ReturnValues='ALL_OLD'
             )
