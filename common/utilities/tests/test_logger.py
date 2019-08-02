@@ -27,6 +27,17 @@ class TestLogger(TestCase):
         output = log.IntegrationAdaptorsLogger('SYS')._format_values_in_map(input_dict)
         self.assertEqual(output, expected_output)
 
+    def test_dictionary_with_non_string_values(self):
+        input_dict = {
+            'EasyKey': False
+        }
+
+        expected_output = {
+            'EasyKey': 'EasyKey=False'
+        }
+        output = log.IntegrationAdaptorsLogger('SYS')._format_values_in_map(input_dict)
+        self.assertEqual(output, expected_output)
+
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_custom_audit_level(self, mock_stdout):
         log.configure_logging()
