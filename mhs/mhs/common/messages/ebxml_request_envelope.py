@@ -6,7 +6,7 @@ import email
 import email.message
 import email.policy
 import logging
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union
 from xml.etree import ElementTree
 
 from mhs.common.messages import ebxml_envelope
@@ -26,7 +26,7 @@ SYNC_REPLY = "sync_reply"
 class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     """An envelope that contains a request to be sent asynchronously to a remote MHS."""
 
-    def __init__(self, message_dictionary: Dict[str, str]):
+    def __init__(self, message_dictionary: Dict[str, Union[str, bool]]):
         """Create a new EbxmlRequestEnvelope that populates the message with the provided dictionary.
 
         :param message_dictionary: The dictionary of values to use when populating the template.
@@ -55,7 +55,8 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         return EbxmlRequestEnvelope(extracted_values)
 
     @classmethod
-    def _extract_more_values_from_xml_tree(cls, xml_tree, extracted_values):
+    def _extract_more_values_from_xml_tree(cls, xml_tree: ElementTree.Element,
+                                           extracted_values: Dict[str, Union[str, bool]]):
         cls._add_flag(extracted_values, DUPLICATE_ELIMINATION,
                       cls._extract_ebxml_value(xml_tree, "DuplicateElimination"))
         cls._add_flag(extracted_values, SYNC_REPLY, cls._extract_ebxml_value(xml_tree, "SyncReply"))

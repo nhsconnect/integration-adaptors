@@ -2,7 +2,7 @@
 import copy
 import pathlib
 import xml.etree.ElementTree as ElementTree
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any, Optional
 
 import builder.pystache_message_builder as pystache_message_builder
 import definitions
@@ -45,7 +45,7 @@ class EbxmlEnvelope(envelope.Envelope):
         {'name': RECEIVED_MESSAGE_ID, 'element_name': 'RefToMessageId', 'parent': 'MessageData'}
     ]
 
-    def __init__(self, template_file, message_dictionary: Dict[str, str]):
+    def __init__(self, template_file: str, message_dictionary: Dict[str, Any]):
         """Create a new EbxmlEnvelope that populates the specified template file with the provided dictionary.
 
         :param template_file: The template file to populate with values.
@@ -94,7 +94,7 @@ class EbxmlEnvelope(envelope.Envelope):
         return extracted_values
 
     @staticmethod
-    def _path_to_ebxml_element(name, parent=None):
+    def _path_to_ebxml_element(name: str, parent: str = None) -> str:
         path = ".//"
 
         if parent is not None:
@@ -105,7 +105,8 @@ class EbxmlEnvelope(envelope.Envelope):
         return path
 
     @staticmethod
-    def _extract_ebxml_value(xml_tree: ElementTree.Element, element_name, parent=None, required=False):
+    def _extract_ebxml_value(xml_tree: ElementTree.Element, element_name: str, parent: str = None,
+                             required: bool = False) -> Optional[ElementTree.Element]:
         xpath = EbxmlEnvelope._path_to_ebxml_element(element_name, parent=parent)
         value = xml_tree.find(xpath, namespaces=NAMESPACES)
         if value is None and required:
@@ -115,7 +116,8 @@ class EbxmlEnvelope(envelope.Envelope):
         return value
 
     @staticmethod
-    def _extract_ebxml_text_value(xml_tree: ElementTree.Element, element_name, parent=None, required=False):
+    def _extract_ebxml_text_value(xml_tree: ElementTree.Element, element_name: str, parent: str = None,
+                                  required: bool = False) -> Optional[str]:
         value = EbxmlEnvelope._extract_ebxml_value(xml_tree, element_name, parent, required)
         text = None
 
@@ -125,7 +127,8 @@ class EbxmlEnvelope(envelope.Envelope):
         return text
 
     @staticmethod
-    def _extract_attribute(xml_tree, element_name, attribute_namespace, attribute_name, values_dict, key):
+    def _extract_attribute(xml_tree: ElementTree.Element, element_name: str, attribute_namespace: Dict[str, str],
+                           attribute_name: str, values_dict: Dict[str, Any], key: str):
         xpath = EbxmlEnvelope._path_to_ebxml_element(element_name)
         element = xml_tree.find(xpath, NAMESPACES)
         if element is not None:
@@ -138,12 +141,12 @@ class EbxmlEnvelope(envelope.Envelope):
                                         f"EbXML message") from e
 
     @staticmethod
-    def _add_if_present(values_dict, key, value):
+    def _add_if_present(values_dict: Dict[str, Any], key: str, value: Any):
         if value is not None:
             values_dict[key] = value
 
     @staticmethod
-    def _add_flag(values_dict, key, value):
+    def _add_flag(values_dict: Dict[str, Any], key: str, value: Optional[Any]):
         if value is not None:
             values_dict[key] = True
         else:
