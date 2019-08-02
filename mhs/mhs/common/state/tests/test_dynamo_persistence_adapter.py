@@ -1,5 +1,8 @@
+import asyncio
 import unittest
 from unittest.mock import MagicMock, patch, Mock
+
+from utilities.test_utilities import async_test
 
 from mhs.common.state import dynamo_persistence_adapter
 from mhs.common.state.dynamo_persistence_adapter import DynamoPersistenceAdapter, RecordCreationError, \
@@ -17,6 +20,8 @@ TEST_ITEM = {"key": TEST_KEY, "data": TEST_DATA}
 TEST_GET_RESPONSE = {"Item": TEST_ITEM}
 TEST_GET_EMPTY_RESPONSE = {}
 TEST_DELETE_RESPONSE = {"Attributes": TEST_ITEM}
+TEST_DELETE_EMPTY_RESPONSE = {}
+TEST_ADD_EMPTY_RESPONSE = {"Attributes": {}}
 TEST_ADD_RESPONSE = {"Attributes": TEST_ITEM}
 TEST_EXCEPTION = Exception()
 TEST_SIDE_EFFECT = Mock(side_effect=TEST_EXCEPTION)
@@ -24,7 +29,7 @@ TEST_SIDE_EFFECT = Mock(side_effect=TEST_EXCEPTION)
 
 class TestDynamoPersistenceAdapter(unittest.TestCase):
 
-    @patch.object(dynamo_persistence_adapter.boto3, "resource")
+    @patch.object(dynamo_persistence_adapter.aioboto3, "resource")
     def setUp(self, mock_boto3_resource):
         self.mock_dynamodb = MagicMock()
         mock_boto3_resource.return_value = self.mock_dynamodb
@@ -40,106 +45,132 @@ class TestDynamoPersistenceAdapter(unittest.TestCase):
         )
 
     #   TESTING ADD METHOD
-    def test_add_success_state(self):
-        response = self.service.add(TEST_STATE_TABLE, TEST_KEY, TEST_ITEM)
+    @async_test
+    async def test_add_success_state(self):
+        self.__setFutureResponse(self.mock_table.put_item, TEST_ADD_EMPTY_RESPONSE)
+
+        response = await self.service.add(TEST_STATE_TABLE, TEST_KEY, TEST_ITEM)
 
         self.assertIsNone(response)
 
-    def test_add_success_async(self):
-        response = self.service.add(TEST_ASYNC_TABLE, TEST_KEY, TEST_ITEM)
+    @async_test
+    async def test_add_success_async(self):
+        self.__setFutureResponse(self.mock_table.put_item, TEST_ADD_EMPTY_RESPONSE)
+
+        response = await self.service.add(TEST_ASYNC_TABLE, TEST_KEY, TEST_ITEM)
 
         self.assertIsNone(response)
 
-    def test_add_invalid_table(self):
+    @async_test
+    async def test_add_invalid_table(self):
         with self.assertRaises(RecordCreationError) as ex:
-            self.service.add(TEST_INVALID_TABLE, TEST_KEY, TEST_ITEM)
+            await self.service.add(TEST_INVALID_TABLE, TEST_KEY, TEST_ITEM)
 
         self.assertIsInstance(ex.exception.__cause__, InvalidTableError)
 
-    def test_add_overwrite(self):
-        self.mock_table.put_item.return_value = TEST_ADD_RESPONSE
+    @async_test
+    async def test_add_overwrite(self):
+        self.__setFutureResponse(self.mock_table.put_item, TEST_ADD_RESPONSE)
 
-        response = self.service.add(TEST_STATE_TABLE, TEST_KEY, TEST_ITEM)
+        response = await self.service.add(TEST_STATE_TABLE, TEST_KEY, TEST_ITEM)
 
         self.assertIsInstance(response, dict)
 
-    def test_add_io_exception(self):
+    @async_test
+    async def test_add_io_exception(self):
         self.mock_table.put_item.side_effect = TEST_SIDE_EFFECT
 
         with self.assertRaises(RecordCreationError) as ex:
-            self.service.add(TEST_STATE_TABLE, TEST_KEY, TEST_ITEM)
+            await self.service.add(TEST_STATE_TABLE, TEST_KEY, TEST_ITEM)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
 
     #   TESTING GET METHOD
-    def test_get_success_state(self):
-        self.mock_table.get_item.return_value = TEST_GET_RESPONSE
+    @async_test
+    async def test_get_success_state(self):
+        self.__setFutureResponse(self.mock_table.get_item, TEST_GET_RESPONSE)
 
-        response = self.service.get(TEST_STATE_TABLE, TEST_KEY)
-
-        self.assertIsInstance(response, dict)
-
-    def test_get_success_async(self):
-        self.mock_table.get_item.return_value = TEST_GET_RESPONSE
-
-        response = self.service.get(TEST_ASYNC_TABLE, TEST_KEY)
+        response = await self.service.get(TEST_STATE_TABLE, TEST_KEY)
 
         self.assertIsInstance(response, dict)
 
-    def test_get_invalid_table(self):
+    @async_test
+    async def test_get_success_async(self):
+        self.__setFutureResponse(self.mock_table.get_item, TEST_GET_RESPONSE)
+
+        response = await self.service.get(TEST_ASYNC_TABLE, TEST_KEY)
+
+        self.assertIsInstance(response, dict)
+
+    @async_test
+    async def test_get_invalid_table(self):
         with self.assertRaises(RecordRetrievalError) as ex:
-            self.service.get(TEST_INVALID_TABLE, TEST_KEY)
+            await self.service.get(TEST_INVALID_TABLE, TEST_KEY)
         self.assertIsInstance(ex.exception.__cause__, InvalidTableError)
 
-    def test_get_invalid_key(self):
-        self.mock_table.get_item.return_value = TEST_GET_EMPTY_RESPONSE
+    @async_test
+    async def test_get_invalid_key(self):
+        self.__setFutureResponse(self.mock_table.get_item, TEST_GET_EMPTY_RESPONSE)
 
-        response = self.service.get(TEST_STATE_TABLE, TEST_INVALID_KEY)
+        response = await self.service.get(TEST_STATE_TABLE, TEST_INVALID_KEY)
 
         self.assertIsNone(response)
 
-    def test_get_io_exception(self):
+    @async_test
+    async def test_get_io_exception(self):
         self.mock_table.get_item.side_effect = TEST_SIDE_EFFECT
 
         with self.assertRaises(RecordRetrievalError) as ex:
-            self.service.get(TEST_STATE_TABLE, TEST_INVALID_KEY)
+            await self.service.get(TEST_STATE_TABLE, TEST_INVALID_KEY)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
 
     #   TESTING DELETE METHOD
-    def test_delete_success_state(self):
-        self.mock_table.delete_item.return_value = TEST_DELETE_RESPONSE
+    @async_test
+    async def test_delete_success_state(self):
+        self.__setFutureResponse(self.mock_table.delete_item, TEST_DELETE_RESPONSE)
 
-        response = self.service.delete(TEST_STATE_TABLE, TEST_KEY)
-
-        self.assertIsInstance(response, dict)
-
-    def test_delete_success_async(self):
-        self.mock_table.delete_item.return_value = TEST_DELETE_RESPONSE
-
-        response = self.service.delete(TEST_ASYNC_TABLE, TEST_KEY)
+        response = await self.service.delete(TEST_STATE_TABLE, TEST_KEY)
 
         self.assertIsInstance(response, dict)
 
-    def test_delete_invalid_table(self):
-        self.mock_table.delete_item.return_value = TEST_DELETE_RESPONSE
+    @async_test
+    async def test_delete_success_async(self):
+        self.__setFutureResponse(self.mock_table.delete_item, TEST_DELETE_RESPONSE)
+
+        response = await self.service.delete(TEST_ASYNC_TABLE, TEST_KEY)
+
+        self.assertIsInstance(response, dict)
+
+    @async_test
+    async def test_delete_invalid_table(self):
+        self.__setFutureResponse(self.mock_table.delete_item, TEST_DELETE_RESPONSE)
 
         with self.assertRaises(RecordDeletionError) as ex:
-            self.service.delete(TEST_INVALID_TABLE, TEST_KEY)
+            await self.service.delete(TEST_INVALID_TABLE, TEST_KEY)
 
         self.assertIsInstance(ex.exception.__cause__, InvalidTableError)
 
-    def test_delete_invalid_key(self):
-        self.mock_table.delete_item.return_value = TEST_GET_EMPTY_RESPONSE
+    @async_test
+    async def test_delete_invalid_key(self):
+        self.__setFutureResponse(self.mock_table.delete_item, TEST_DELETE_EMPTY_RESPONSE)
 
-        response = self.service.delete(TEST_STATE_TABLE, TEST_INVALID_KEY)
+        response = await self.service.delete(TEST_STATE_TABLE, TEST_INVALID_KEY)
 
         self.assertIsNone(response)
 
-    def test_delete_io_exception(self):
+    @async_test
+    async def test_delete_io_exception(self):
         self.mock_table.delete_item.side_effect = TEST_SIDE_EFFECT
 
         with self.assertRaises(RecordDeletionError) as ex:
-            self.service.delete(TEST_STATE_TABLE, TEST_INVALID_KEY)
+            await self.service.delete(TEST_STATE_TABLE, TEST_INVALID_KEY)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
+
+    @staticmethod
+    def __setFutureResponse(method, response):
+        future = asyncio.Future()
+        future.set_result(response)
+
+        method.return_value = future

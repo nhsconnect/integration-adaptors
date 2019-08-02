@@ -64,7 +64,7 @@ class DynamoPersistenceAdapter(PersistenceAdapter):
                 Item={"key": key, "data": json.dumps(item)},
                 ReturnValues='ALL_OLD'
             )
-            if 'Attributes' not in response:
+            if 'Attributes' not in response or response.get('Attributes', {}).get('data') is None:
                 logger.info("000", 'No previous record found: {key}', {"key": key})
                 return None
             return json.loads(response.get('Attributes', {}).get('data'))
