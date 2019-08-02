@@ -5,11 +5,13 @@ from __future__ import annotations
 import email
 import email.message
 import email.policy
-import logging
 from typing import Dict, Tuple, Union
 from xml.etree import ElementTree
 
 from mhs.common.messages import ebxml_envelope
+from utilities import integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger('COMMON_EBXML_REQUEST_ENVELOPE')
 
 EBXML_TEMPLATE = "ebxml_request"
 
@@ -51,7 +53,8 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         if payload_part:
             extracted_values[MESSAGE] = payload_part
 
-        logging.debug("Extracted values from message: %s", extracted_values)
+        logger.info('0001', 'Extracted {extracted_values} from {message}',
+                    {'extracted_values': extracted_values, 'message': message})
         return EbxmlRequestEnvelope(extracted_values)
 
     @classmethod
@@ -78,6 +81,9 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         msg = email.message_from_string(content_type_header + message)
 
+        if msg.defects:
+            logger.warning('0002', 'Found defects in MIME message during parsing. {Defects}', {'Defects': msg.defects})
+
         return msg
 
     @staticmethod
@@ -94,6 +100,11 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
             raise ebxml_envelope.EbXmlParsingError("Non-multipart message received!")
 
         message_parts = msg.get_payload()
+
+        for i, part in enumerate(message_parts):
+            if part.defects:
+                logger.warning('0003', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
+                               {'PartIndex': i, 'Defects': part.defects})
 
         ebxml_part = message_parts[0].get_payload()
 
