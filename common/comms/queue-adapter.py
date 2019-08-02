@@ -1,4 +1,0 @@
-
-
-class QueueAdapter:
-    async def
