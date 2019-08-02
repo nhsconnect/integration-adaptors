@@ -32,4 +32,5 @@ class EbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
         :return: An instance of an EbxmlAckEnvelope constructed from the message.
         """
         message_dictionary = super().parse_message(ElementTree.fromstring(message))
+        message_dictionary[RECEIVED_MESSAGE_TIMESTAMP] = message_dictionary.pop(ebxml_envelope.TIMESTAMP)
         return EbxmlAckEnvelope(message_dictionary)

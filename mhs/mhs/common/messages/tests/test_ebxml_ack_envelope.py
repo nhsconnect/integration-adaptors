@@ -1,3 +1,4 @@
+import copy
 from unittest.mock import patch
 
 import mhs.common.messages.ebxml_ack_envelope as ebxml_ack_envelope
@@ -9,7 +10,9 @@ from utilities import message_utilities
 from utilities import xml_utilities
 
 EXPECTED_EBXML = "ebxml_ack.xml"
-EXPECTED_VALUES = test_ebxml_envelope.BASE_EXPECTED_VALUES
+
+EXPECTED_VALUES = copy.deepcopy(test_ebxml_envelope.BASE_EXPECTED_VALUES)
+EXPECTED_VALUES[ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP] = EXPECTED_VALUES.pop(ebxml_envelope.TIMESTAMP)
 
 
 def get_test_message_dictionary():
@@ -82,10 +85,6 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
         first_message_id, first_message = envelope.serialize()
 
         parsed_message = ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, first_message)
-
-        # Atm, when parsing, we're not parsing out the request_message_timestamp.
-        parsed_message.message_dictionary[ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP] = test_message_dict[
-            ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP]
 
         second_message_id, second_message = parsed_message.serialize()
 
