@@ -69,3 +69,25 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
 
         with self.assertRaisesRegex(ebxml_envelope.EbXmlParsingError, "Weren't able to find required element"):
             ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, message)
+
+    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_roundtrip(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
+        mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
+        test_message_dict = get_test_message_dictionary()
+
+        envelope = ebxml_ack_envelope.EbxmlAckEnvelope(test_message_dict)
+
+        first_message_id, first_message = envelope.serialize()
+
+        parsed_message = ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, first_message)
+
+        # Atm, when parsing, we're not parsing out the request_message_timestamp.
+        parsed_message.message_dictionary[ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP] = test_message_dict[
+            ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP]
+
+        second_message_id, second_message = parsed_message.serialize()
+
+        self.assertEqual(first_message_id, second_message_id)
+        self.assertEqual(second_message, first_message)
