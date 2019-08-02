@@ -18,7 +18,7 @@ BASE_EXPECTED_VALUES = {
     ebxml_envelope.SERVICE: "urn:nhs:names:services:psis",
     ebxml_envelope.ACTION: "MCCI_IN010000UK13",
     ebxml_envelope.MESSAGE_ID: "C614484E-4B10-499A-9ACD-5D645CFACF61",
-    ebxml_envelope.REF_TO_MESSAGE_ID: "F106022D-758B-49A9-A80A-8FF211C32A43",
+    ebxml_envelope.RECEIVED_MESSAGE_ID: "F106022D-758B-49A9-A80A-8FF211C32A43",
     ebxml_envelope.TIMESTAMP: "2019-05-04T20:55:16Z",
 }
 

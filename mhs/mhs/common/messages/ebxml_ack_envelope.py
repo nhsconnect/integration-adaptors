@@ -11,7 +11,6 @@ import mhs.common.messages.ebxml_envelope as ebxml_envelope
 EBXML_TEMPLATE = "ebxml_ack"
 
 RECEIVED_MESSAGE_TIMESTAMP = "received_message_timestamp"
-RECEIVED_MESSAGE_ID = "received_message_id"
 
 
 class EbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):

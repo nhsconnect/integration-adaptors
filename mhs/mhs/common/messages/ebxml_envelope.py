@@ -22,7 +22,7 @@ SERVICE = "service"
 ACTION = "action"
 MESSAGE_ID = 'message_id'
 TIMESTAMP = 'timestamp'
-REF_TO_MESSAGE_ID = "ref_to_message_id"
+RECEIVED_MESSAGE_ID = "received_message_id"
 
 EBXML_NAMESPACE = "eb"
 SOAP_NAMESPACE = "SOAP"
@@ -42,7 +42,7 @@ class EbxmlEnvelope(envelope.Envelope):
         {'name': ACTION, 'element_name': 'Action', 'parent': None},
         {'name': MESSAGE_ID, 'element_name': 'MessageId', 'parent': 'MessageData'},
         {'name': TIMESTAMP, 'element_name': 'Timestamp', 'parent': 'MessageData'},
-        {'name': REF_TO_MESSAGE_ID, 'element_name': 'RefToMessageId', 'parent': 'MessageData'}
+        {'name': RECEIVED_MESSAGE_ID, 'element_name': 'RefToMessageId', 'parent': 'MessageData'}
     ]
 
     def __init__(self, template_file, message_dictionary: Dict[str, str]):
