@@ -145,6 +145,16 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
             with self.assertRaises(ebxml_envelope.EbXmlParsingError):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
+        with self.subTest("A multi-part MIME message with a defect in the payload"):
+            message = file_utilities.FileUtilities.get_file_string(
+                str(self.message_dir / "ebxml_request_payload_defect.msg"))
+
+            expected_values_with_test_payload = expected_values("mock-payload")
+
+            parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+            self.assertEqual(expected_values_with_test_payload, parsed_message.message_dictionary)
+
         with self.subTest("A valid request that does not contain the optional payload MIME part"):
             message = file_utilities.FileUtilities.get_file_string(
                 str(self.message_dir / "ebxml_request_no_payload.msg"))
@@ -163,7 +173,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
 
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
-        with self.subTest("An message that is not a multi-part MIME message"):
+        with self.subTest("A message that is not a multi-part MIME message"):
             with self.assertRaises(ebxml_envelope.EbXmlParsingError):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string({CONTENT_TYPE_HEADER_NAME: "text/plain"},
                                                                         "A message")
