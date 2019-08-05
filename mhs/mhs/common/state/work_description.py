@@ -120,10 +120,3 @@ class WorkDescriptionFactory:
         }
         
         return WorkDescription(persistence_store, table_name, work_description_map)
-        
-
-
-
-
-
-
