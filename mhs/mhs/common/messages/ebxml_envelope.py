@@ -1,10 +1,8 @@
 """This module defines the envelope used to wrap asynchronous messages to be sent to a remote MHS."""
 import copy
 import pathlib
-from typing import Dict, Tuple, Any, Optional
+from typing import Dict, Tuple, Any, Optional, NamedTuple
 from xml.etree.ElementTree import Element
-
-import defusedxml.ElementTree as ElementTree
 
 import builder.pystache_message_builder as pystache_message_builder
 import definitions
@@ -35,16 +33,21 @@ NAMESPACES = {SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
 class EbxmlEnvelope(envelope.Envelope):
     """An envelope that contains a message to be sent asynchronously to a remote MHS."""
 
+    class _ElementToExtractWhenParsing(NamedTuple):
+        name: str
+        xml_name: str
+        xml_parent: str = None
+
     _elements_to_extract_when_parsing = [
-        {'name': FROM_PARTY_ID, 'element_name': 'PartyId', 'parent': 'From'},
-        {'name': TO_PARTY_ID, 'element_name': 'PartyId', 'parent': 'To'},
-        {'name': CPA_ID, 'element_name': 'CPAId', 'parent': None},
-        {'name': CONVERSATION_ID, 'element_name': 'ConversationId', 'parent': None},
-        {'name': SERVICE, 'element_name': 'Service', 'parent': None},
-        {'name': ACTION, 'element_name': 'Action', 'parent': None},
-        {'name': MESSAGE_ID, 'element_name': 'MessageId', 'parent': 'MessageData'},
-        {'name': TIMESTAMP, 'element_name': 'Timestamp', 'parent': 'MessageData'},
-        {'name': RECEIVED_MESSAGE_ID, 'element_name': 'RefToMessageId', 'parent': 'MessageData'}
+        _ElementToExtractWhenParsing(FROM_PARTY_ID, 'PartyId', xml_parent='From'),
+        _ElementToExtractWhenParsing(TO_PARTY_ID, 'PartyId', xml_parent='To'),
+        _ElementToExtractWhenParsing(CPA_ID, 'CPAId'),
+        _ElementToExtractWhenParsing(CONVERSATION_ID, 'ConversationId'),
+        _ElementToExtractWhenParsing(SERVICE, 'Service'),
+        _ElementToExtractWhenParsing(ACTION, 'Action'),
+        _ElementToExtractWhenParsing(MESSAGE_ID, 'MessageId', xml_parent='MessageData'),
+        _ElementToExtractWhenParsing(TIMESTAMP, 'Timestamp', xml_parent='MessageData'),
+        _ElementToExtractWhenParsing(RECEIVED_MESSAGE_ID, 'RefToMessageId', xml_parent='MessageData')
     ]
 
     def __init__(self, template_file: str, message_dictionary: Dict[str, Any]):
@@ -92,10 +95,10 @@ class EbxmlEnvelope(envelope.Envelope):
         extracted_values = {}
 
         for element_to_extract in EbxmlEnvelope._elements_to_extract_when_parsing:
-            EbxmlEnvelope._add_if_present(extracted_values, element_to_extract['name'],
+            EbxmlEnvelope._add_if_present(extracted_values, element_to_extract.name,
                                           EbxmlEnvelope._extract_ebxml_text_value(xml_tree,
-                                                                                  element_to_extract['element_name'],
-                                                                                  parent=element_to_extract['parent'],
+                                                                                  element_to_extract.xml_name,
+                                                                                  parent=element_to_extract.xml_parent,
                                                                                   required=True))
 
         return extracted_values
