@@ -28,20 +28,23 @@ class EmptyWorkDescription(RuntimeError):
 
 class WorkDescription:
 
-    def __init__(self, persistence_store, store_data: dict):
+    def __init__(self, persistence_store, table_name: str, store_data: dict):
         if persistence_store is None:
             raise ValueError('Expected persistence store')
-        
-        self.persistence_store = persistence_store
+        if not table_name:
+            raise ValueError('Expected non empty table name')
 
-        data = store_data['DATA']
+        self.persistence_store = persistence_store
+        self.table_name = table_name
+
+        data = store_data[DATA]
         self.message_key = store_data[DATA_KEY]
         self.version = data[VERSION_KEY]
         self.timestamp = data[TIMESTAMP]
-        self.status = data['STATUS']
+        self.status = data[STATUS]
 
     def publish(self):
-        latest_data = self.persistence_store.get('default_table', self.message_key)
+        latest_data = self.persistence_store.get(self.table_name, self.message_key)
         if latest_data is not None:
             latest_version = latest_data[DATA][VERSION_KEY]
             if latest_version > self.version:
@@ -49,7 +52,7 @@ class WorkDescription:
 
         serialised = self._serialise_data()
 
-        old_data = self.persistence_store.add('default_table', serialised)
+        old_data = self.persistence_store.add(self.table_name, serialised)
         return old_data
 
     def _serialise_data(self):
@@ -68,7 +71,7 @@ class WorkDescription:
 class WorkDescriptionFactory:
 
     @staticmethod
-    def get_work_description_from_store(persistence_store, key):
+    def get_work_description_from_store(persistence_store, table_name: str, key: str):
         if persistence_store is None:
             logger.error('001', 'Failed to get work description from store: persistence store is None')
             raise ValueError('Expected non-null persistence store')
@@ -76,15 +79,16 @@ class WorkDescriptionFactory:
             logger.error('002', 'Failed to get work description from store: key is None')
             raise ValueError('Expected non-null key')
 
-        json_store_data = persistence_store.get('default_table', key)
+        json_store_data = persistence_store.get(table_name, key)
         if json_store_data is None:
             logger.error('003', 'Persistence store returned empty value for {key}', {'key': key})
             raise EmptyWorkDescription(f'Failed to find a value for key id {key}')
 
-        return WorkDescription(persistence_store, json_store_data)
+        return WorkDescription(persistence_store, table_name, json_store_data)
 
     @staticmethod
     def create_new_work_description(persistence_store,
+                                    table_name: str,
                                     key: str,
                                     timestamp: str,
                                     status: MessageStatus):
@@ -110,7 +114,7 @@ class WorkDescriptionFactory:
             }
         }
         
-        return WorkDescription(persistence_store, work_description_map)
+        return WorkDescription(persistence_store, table_name, work_description_map)
         
 
 

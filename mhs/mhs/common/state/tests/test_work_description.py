@@ -4,6 +4,8 @@ from unittest.mock import MagicMock, patch
 
 import mhs.common.state.work_description as wd
 
+DEFAULT_TABLE = 'default'
+
 
 class TestWorkDescription(unittest.TestCase):
 
@@ -18,7 +20,7 @@ class TestWorkDescription(unittest.TestCase):
         }
 
         persistence = MagicMock()
-        work_description = wd.WorkDescription(persistence, wd_input)
+        work_description = wd.WorkDescription(persistence, DEFAULT_TABLE, wd_input)
 
         self.assertEqual(work_description.status, wd.MessageStatus.IN_OUTBOUND_WORKFLOW)
         self.assertEqual(work_description.version, 1)
@@ -45,10 +47,10 @@ class TestWorkDescription(unittest.TestCase):
 
         persistence = MagicMock()
         persistence.get.return_value = old_value
-        work_description = wd.WorkDescription(persistence, wd_input)
+        work_description = wd.WorkDescription(persistence, DEFAULT_TABLE, wd_input)
 
         work_description.publish()
-        persistence.add.assert_called_with('default_table', json.dumps(wd_input))
+        persistence.add.assert_called_with(DEFAULT_TABLE, json.dumps(wd_input))
 
     def test_out_of_date_version(self):
         wd_input = {
@@ -71,14 +73,18 @@ class TestWorkDescription(unittest.TestCase):
 
         persistence = MagicMock()
         persistence.get.return_value = old_value
-        work_description = wd.WorkDescription(persistence, wd_input)
+        work_description = wd.WorkDescription(persistence, DEFAULT_TABLE, wd_input)
 
         with self.assertRaises(wd.OutOfDateVersionError):
             work_description.publish()
 
     def test_null_persistence(self):
         with self.assertRaises(ValueError):
-            wd.WorkDescription(None, {'None': 'None'})
+            wd.WorkDescription(None, DEFAULT_TABLE, {'None': 'None'})
+
+    def test_null_table(self):
+        with self.assertRaises(ValueError):
+            wd.WorkDescription("q", '', {'None': 'None'})
 
 
 class TestWorkDescriptionFactory(unittest.TestCase):
@@ -96,28 +102,30 @@ class TestWorkDescriptionFactory(unittest.TestCase):
 
         persistence = MagicMock()
         persistence.get.return_value = old_value
-        wd.WorkDescriptionFactory.get_work_description_from_store(persistence, 'aaa-aaa-aaa')
+        wd.WorkDescriptionFactory.get_work_description_from_store(persistence, DEFAULT_TABLE, 'aaa-aaa-aaa')
 
-        persistence.get.assert_called_with('default_table', 'aaa-aaa-aaa')
-        work_mock.assert_called_with(persistence, old_value)
+        persistence.get.assert_called_with(DEFAULT_TABLE, 'aaa-aaa-aaa')
+        work_mock.assert_called_with(persistence, DEFAULT_TABLE, old_value)
 
     def test_get_from_store_empty_store(self):
         with self.assertRaises(ValueError):
-            wd.WorkDescriptionFactory.get_work_description_from_store(None, 'aaa')
+            wd.WorkDescriptionFactory.get_work_description_from_store(None, DEFAULT_TABLE, 'aaa')
 
     def test_get_from_store_empty_message_id(self):
         with self.assertRaises(ValueError):
-            wd.WorkDescriptionFactory.get_work_description_from_store(MagicMock(), None)
+            wd.WorkDescriptionFactory.get_work_description_from_store(MagicMock(), DEFAULT_TABLE, None)
 
     @patch('mhs.common.state.work_description.WorkDescription')
     def test_create_work_description(self, work_mock):
         persistence = MagicMock()
         wd.WorkDescriptionFactory.create_new_work_description(persistence,
+                                                              DEFAULT_TABLE,
                                                               key='aaa-aaa',
                                                               status=wd.MessageStatus.RECEIVED,
                                                               timestamp='12:00.11')
         work_mock.assert_called_with(
             persistence,
+            DEFAULT_TABLE,
             {
                 wd.DATA_KEY: 'aaa-aaa',
                 wd.DATA: {
@@ -134,6 +142,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
             with self.assertRaises(ValueError):
                 wd.WorkDescriptionFactory.create_new_work_description(
                     persistence,
+                    table_name=DEFAULT_TABLE,
                     key=None,
                     timestamp='12',
                     status=wd.MessageStatus.RECEIVED
@@ -143,6 +152,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
             with self.assertRaises(ValueError):
                 wd.WorkDescriptionFactory.create_new_work_description(
                     persistence,
+                    table_name=DEFAULT_TABLE,
                     key='aaa',
                     timestamp=None,
                     status=wd.MessageStatus.RECEIVED
@@ -152,6 +162,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
             with self.assertRaises(ValueError):
                 wd.WorkDescriptionFactory.create_new_work_description(
                     persistence,
+                    table_name=DEFAULT_TABLE,
                     key='aaa',
                     timestamp='12',
                     status=None
