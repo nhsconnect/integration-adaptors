@@ -44,15 +44,20 @@ class WorkDescription:
         self.status = data[STATUS]
 
     async def publish(self):
+        logger.info('011', 'Attempting to publish work description {key}', {'key': self.message_key})
+        logger.info('012', 'Retrieving latest work description to check version')
         latest_data = await self.persistence_store.get(self.table_name, self.message_key)
         if latest_data is not None:
             latest_version = latest_data[DATA][VERSION_KEY]
             if latest_version > self.version:
+                logger.error('013', 'Failed to update message {key}, local version out of date',
+                             {'key': self.message_key})
                 raise OutOfDateVersionError(f'Failed to update message {self.message_key}: local version out of date ')
 
         serialised = self._serialise_data()
 
         old_data = await self.persistence_store.add(self.table_name, serialised)
+        logger.info('014', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
         return old_data
 
     def _serialise_data(self):
@@ -91,7 +96,7 @@ class WorkDescriptionFactory:
                                     table_name: str,
                                     key: str,
                                     timestamp: str,
-                                    status: MessageStatus):
+                                    status: int):
         if persistence_store is None:
             logger.error('004', 'Failed to build new work description, persistence store should not be null')
             raise ValueError('Expected persistence store to not be None')

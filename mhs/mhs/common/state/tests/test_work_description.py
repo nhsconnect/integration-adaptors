@@ -29,7 +29,6 @@ old_data = {
 
 class TestWorkDescription(unittest.TestCase):
 
-
     def test_constructor(self):
         persistence = MagicMock()
         work_description = wd.WorkDescription(persistence, DEFAULT_TABLE, input_data)
@@ -123,7 +122,6 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                     wd.STATUS: wd.MessageStatus.RECEIVED,
                     wd.VERSION_KEY: 1
                 }
-
             })
 
     def test_create_wd_null_parameters(self):
