@@ -54,14 +54,20 @@ where `ecsTaskExecutionRole` is a default role created when creating task defini
 
 Several global variables must be set within Jenkins for the scripts to work as part of the build pipeline:
 
+- ASID: The asid associated with the mhs instance (this is provided with opentest creds)
 - CLUSTER_ID: The arn of the ecs cluster
 - DOCKER_REGISTRY_URL: The address of the ECR ('https://209...')
 - DOCKER_REPOSITORY: The ECR arn (209...)
 - TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it 
 - MHS_ADDRESS: The (private) ip address where the mhs build is running - this will be the private ip of the EC2 instance
     hosting the deployment ECS cluster
+- SCR_REPOSITORY: The docker repository used to upload and retrieve the SCRWebService images
+- SCR_REPOSITORY_URL: Same as above with the full URL
+- SCR_SERVICE_ADDRESS: The endpoint address the SCRWebService can be reached on e.g `http://192.168.41.129:9000`
+- SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
 - SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
+
 
 The Jenkins worker EC2 instance will have to have the following permission in order to publish the builds to 
 ECR and start the tasks in ECS with terraform:
@@ -87,3 +93,11 @@ The EC2 instance running the mhs build (to run the integration tests against) mu
 established using the Fabric script in `scripts`. The open test certs and party key files should be copied
 to the EC2 instance in a `home/ec2-user/certs` directory (this directory is a shared volume with the running 
 mhs docker container as specified in the docker container). 
+
+
+There must also be log groups in Cloudwatch under the following names - these groups need to be created manually:
+- `/ecs/jenkins-master`
+- `/ecs/jenkins-workers-jenkins-worker`
+- `/ecs/scr-service-environment`
+- `/ecs/sonarqube`
+- `/ecs/test-environment`
