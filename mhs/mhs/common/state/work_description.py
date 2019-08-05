@@ -22,7 +22,7 @@ class OutOfDateVersionError(RuntimeError):
     pass
 
 
-class EmptyWorkDescription(RuntimeError):
+class EmptyWorkDescriptionError(RuntimeError):
     pass
 
 
@@ -43,8 +43,8 @@ class WorkDescription:
         self.timestamp = data[TIMESTAMP]
         self.status = data[STATUS]
 
-    def publish(self):
-        latest_data = self.persistence_store.get(self.table_name, self.message_key)
+    async def publish(self):
+        latest_data = await self.persistence_store.get(self.table_name, self.message_key)
         if latest_data is not None:
             latest_version = latest_data[DATA][VERSION_KEY]
             if latest_version > self.version:
@@ -52,7 +52,7 @@ class WorkDescription:
 
         serialised = self._serialise_data()
 
-        old_data = self.persistence_store.add(self.table_name, serialised)
+        old_data = await self.persistence_store.add(self.table_name, serialised)
         return old_data
 
     def _serialise_data(self):
@@ -71,7 +71,7 @@ class WorkDescription:
 class WorkDescriptionFactory:
 
     @staticmethod
-    def get_work_description_from_store(persistence_store, table_name: str, key: str):
+    async def get_work_description_from_store(persistence_store, table_name: str, key: str):
         if persistence_store is None:
             logger.error('001', 'Failed to get work description from store: persistence store is None')
             raise ValueError('Expected non-null persistence store')
@@ -79,10 +79,10 @@ class WorkDescriptionFactory:
             logger.error('002', 'Failed to get work description from store: key is None')
             raise ValueError('Expected non-null key')
 
-        json_store_data = persistence_store.get(table_name, key)
+        json_store_data = await persistence_store.get(table_name, key)
         if json_store_data is None:
             logger.error('003', 'Persistence store returned empty value for {key}', {'key': key})
-            raise EmptyWorkDescription(f'Failed to find a value for key id {key}')
+            raise EmptyWorkDescriptionError(f'Failed to find a value for key id {key}')
 
         return WorkDescription(persistence_store, table_name, json_store_data)
 

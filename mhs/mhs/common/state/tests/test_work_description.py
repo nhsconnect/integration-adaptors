@@ -1,6 +1,9 @@
+import asyncio
 import json
 import unittest
 from unittest.mock import MagicMock, patch
+
+from utilities.test_utilities import async_test
 
 import mhs.common.state.work_description as wd
 
@@ -26,7 +29,8 @@ class TestWorkDescription(unittest.TestCase):
         self.assertEqual(work_description.version, 1)
         self.assertEqual(work_description.timestamp, '12:00')
 
-    def test_publish_updates(self):
+    @async_test
+    async def test_publish_updates(self):
         wd_input = {
             wd.DATA_KEY: 'aaa-aaa-aaa',
             wd.DATA: {
@@ -45,14 +49,19 @@ class TestWorkDescription(unittest.TestCase):
             }
         }
 
+        future = asyncio.Future()
+        future.set_result(old_value)
+
         persistence = MagicMock()
-        persistence.get.return_value = old_value
+        persistence.get.return_value = future
+        persistence.add.return_value = future
         work_description = wd.WorkDescription(persistence, DEFAULT_TABLE, wd_input)
 
-        work_description.publish()
+        await work_description.publish()
         persistence.add.assert_called_with(DEFAULT_TABLE, json.dumps(wd_input))
 
-    def test_out_of_date_version(self):
+    @async_test
+    async def test_out_of_date_version(self):
         wd_input = {
             wd.DATA_KEY: 'aaa-aaa-aaa',
             wd.DATA: {
@@ -71,12 +80,15 @@ class TestWorkDescription(unittest.TestCase):
             }
         }
 
+        future = asyncio.Future()
+        future.set_result(old_value)
+
         persistence = MagicMock()
-        persistence.get.return_value = old_value
+        persistence.get.return_value = future
         work_description = wd.WorkDescription(persistence, DEFAULT_TABLE, wd_input)
 
         with self.assertRaises(wd.OutOfDateVersionError):
-            work_description.publish()
+            await work_description.publish()
 
     def test_null_persistence(self):
         with self.assertRaises(ValueError):
@@ -90,7 +102,8 @@ class TestWorkDescription(unittest.TestCase):
 class TestWorkDescriptionFactory(unittest.TestCase):
 
     @patch('mhs.common.state.work_description.WorkDescription')
-    def test_get_from_store(self, work_mock):
+    @async_test
+    async def test_get_from_store(self, work_mock):
         old_value = {
             wd.DATA_KEY: 'aaa-aaa-aaa',
             wd.DATA: {
@@ -100,20 +113,25 @@ class TestWorkDescriptionFactory(unittest.TestCase):
             }
         }
 
+        future = asyncio.Future()
+        future.set_result(old_value)
+
         persistence = MagicMock()
-        persistence.get.return_value = old_value
-        wd.WorkDescriptionFactory.get_work_description_from_store(persistence, DEFAULT_TABLE, 'aaa-aaa-aaa')
+        persistence.get.return_value = future
+        await wd.WorkDescriptionFactory.get_work_description_from_store(persistence, DEFAULT_TABLE, 'aaa-aaa-aaa')
 
         persistence.get.assert_called_with(DEFAULT_TABLE, 'aaa-aaa-aaa')
         work_mock.assert_called_with(persistence, DEFAULT_TABLE, old_value)
 
-    def test_get_from_store_empty_store(self):
+    @async_test
+    async def test_get_from_store_empty_store(self):
         with self.assertRaises(ValueError):
-            wd.WorkDescriptionFactory.get_work_description_from_store(None, DEFAULT_TABLE, 'aaa')
+            await wd.WorkDescriptionFactory.get_work_description_from_store(None, DEFAULT_TABLE, 'aaa')
 
-    def test_get_from_store_empty_message_id(self):
+    @async_test
+    async def test_get_from_store_empty_message_id(self):
         with self.assertRaises(ValueError):
-            wd.WorkDescriptionFactory.get_work_description_from_store(MagicMock(), DEFAULT_TABLE, None)
+            await wd.WorkDescriptionFactory.get_work_description_from_store(MagicMock(), DEFAULT_TABLE, None)
 
     @patch('mhs.common.state.work_description.WorkDescription')
     def test_create_work_description(self, work_mock):
