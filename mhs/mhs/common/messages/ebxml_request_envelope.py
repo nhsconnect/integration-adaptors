@@ -83,7 +83,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         if msg.defects:
             logger.warning('0002', 'Found defects in MIME message during parsing. {Defects}',
-                           {'Defects': str(msg.defects)})
+                           {'Defects': msg.defects})
 
         return msg
 
@@ -105,7 +105,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         for i, part in enumerate(message_parts):
             if part.defects:
                 logger.warning('0003', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
-                               {'PartIndex': str(i), 'Defects': str(part.defects)})
+                               {'PartIndex': i, 'Defects': part.defects})
 
         ebxml_part = message_parts[0].get_payload()
 
