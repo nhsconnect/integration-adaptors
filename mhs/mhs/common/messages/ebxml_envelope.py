@@ -98,9 +98,9 @@ class EbxmlEnvelope(envelope.Envelope):
         path = ".//"
 
         if parent is not None:
-            path += EBXML_NAMESPACE + ":" + parent + "/"
+            path += f"{EBXML_NAMESPACE}:{parent}/"
 
-        path += EBXML_NAMESPACE + ":" + name
+        path += f"{EBXML_NAMESPACE}:{name}"
 
         return path
 
