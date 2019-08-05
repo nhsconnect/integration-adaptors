@@ -4,7 +4,8 @@ an asynchronous request."""
 from __future__ import annotations
 
 from typing import Dict
-from xml.etree import ElementTree
+
+from defusedxml import ElementTree
 
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
 

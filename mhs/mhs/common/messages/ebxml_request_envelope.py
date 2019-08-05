@@ -6,7 +6,9 @@ import email
 import email.message
 import email.policy
 from typing import Dict, Tuple, Union
-from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
+
+from defusedxml import ElementTree
 
 from mhs.common.messages import ebxml_envelope
 from utilities import integration_adaptors_logger as log
@@ -58,7 +60,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         return EbxmlRequestEnvelope(extracted_values)
 
     @classmethod
-    def _extract_more_values_from_xml_tree(cls, xml_tree: ElementTree.Element,
+    def _extract_more_values_from_xml_tree(cls, xml_tree: Element,
                                            extracted_values: Dict[str, Union[str, bool]]):
         cls._add_flag(extracted_values, DUPLICATE_ELIMINATION,
                       cls._extract_ebxml_value(xml_tree, "DuplicateElimination"))

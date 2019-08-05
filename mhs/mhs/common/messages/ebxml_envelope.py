@@ -1,8 +1,10 @@
 """This module defines the envelope used to wrap asynchronous messages to be sent to a remote MHS."""
 import copy
 import pathlib
-import xml.etree.ElementTree as ElementTree
 from typing import Dict, Tuple, Any, Optional
+from xml.etree.ElementTree import Element
+
+import defusedxml.ElementTree as ElementTree
 
 import builder.pystache_message_builder as pystache_message_builder
 import definitions
@@ -76,7 +78,7 @@ class EbxmlEnvelope(envelope.Envelope):
         return message_id, self.message_builder.build_message(ebxml_message_dictionary)
 
     @staticmethod
-    def parse_message(xml_tree: ElementTree.Element) -> Dict[str, str]:
+    def parse_message(xml_tree: Element) -> Dict[str, str]:
         """Extract a dictionary of values from the provided xml Element tree.
 
         :param xml_tree: The xml tree to extract values from
@@ -105,8 +107,8 @@ class EbxmlEnvelope(envelope.Envelope):
         return path
 
     @staticmethod
-    def _extract_ebxml_value(xml_tree: ElementTree.Element, element_name: str, parent: str = None,
-                             required: bool = False) -> Optional[ElementTree.Element]:
+    def _extract_ebxml_value(xml_tree: Element, element_name: str, parent: str = None,
+                             required: bool = False) -> Optional[Element]:
         xpath = EbxmlEnvelope._path_to_ebxml_element(element_name, parent=parent)
         value = xml_tree.find(xpath, namespaces=NAMESPACES)
         if value is None and required:
@@ -116,7 +118,7 @@ class EbxmlEnvelope(envelope.Envelope):
         return value
 
     @staticmethod
-    def _extract_ebxml_text_value(xml_tree: ElementTree.Element, element_name: str, parent: str = None,
+    def _extract_ebxml_text_value(xml_tree: Element, element_name: str, parent: str = None,
                                   required: bool = False) -> Optional[str]:
         value = EbxmlEnvelope._extract_ebxml_value(xml_tree, element_name, parent, required)
         text = None
@@ -127,7 +129,7 @@ class EbxmlEnvelope(envelope.Envelope):
         return text
 
     @staticmethod
-    def _extract_attribute(xml_tree: ElementTree.Element, element_name: str, attribute_namespace: Dict[str, str],
+    def _extract_attribute(xml_tree: Element, element_name: str, attribute_namespace: Dict[str, str],
                            attribute_name: str, values_dict: Dict[str, Any], key: str):
         xpath = EbxmlEnvelope._path_to_ebxml_element(element_name)
         element = xml_tree.find(xpath, NAMESPACES)
