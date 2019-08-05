@@ -52,7 +52,7 @@ class InboundHandler(tornado.web.RequestHandler):
         }
 
         ack_message = ebxml_ack_envelope.EbxmlAckEnvelope(ack_context)
-        _, serialized_message = ack_message.serialize()
+        _, _, serialized_message = ack_message.serialize()
 
         self.set_header("Content-Type", "text/xml")
         self.write(serialized_message)

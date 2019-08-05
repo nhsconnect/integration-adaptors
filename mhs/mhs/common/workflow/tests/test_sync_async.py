@@ -31,7 +31,8 @@ class TestSyncAsyncWorkflow(TestCase):
             ebxml_request_envelope.MESSAGE: sentinel.message
         }
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
-        mock_envelope.return_value.serialize.return_value = sentinel.ebxml_id, sentinel.ebxml_message
+        mock_envelope.return_value.serialize.return_value = \
+            sentinel.ebxml_id, sentinel.http_headers, sentinel.ebxml_message
 
         is_async, actual_id, actual_response = self.workflow.prepare_message(sentinel.interaction_name,
                                                                              sentinel.message)
@@ -56,7 +57,8 @@ class TestSyncAsyncWorkflow(TestCase):
         }
         interaction_details = {sync_async.ASYNC_RESPONSE_EXPECTED: True}
         self.mock_interactions_config.get_interaction_details.return_value = interaction_details
-        mock_envelope.return_value.serialize.return_value = sentinel.ebxml_id, sentinel.ebxml_message
+        mock_envelope.return_value.serialize.return_value = \
+            sentinel.ebxml_id, sentinel.http_headers, sentinel.ebxml_message
 
         is_async, actual_id, actual_response = self.workflow.prepare_message(sentinel.interaction_name,
                                                                              sentinel.message,

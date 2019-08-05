@@ -13,6 +13,8 @@ EXPECTED_EBXML = "ebxml_ack.xml"
 
 EXPECTED_VALUES = copy.deepcopy(test_ebxml_envelope.BASE_EXPECTED_VALUES)
 EXPECTED_VALUES[ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP] = EXPECTED_VALUES.pop(ebxml_envelope.TIMESTAMP)
+EXPECTED_VALUES[ebxml_envelope.SERVICE] = 'urn:oasis:names:tc:ebxml-msg:service'
+EXPECTED_VALUES[ebxml_envelope.ACTION] = 'Acknowledgment'
 
 
 def get_test_message_dictionary():
@@ -34,15 +36,20 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
         expected_message = file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
+        expected_http_headers = {
+            'charset': 'UTF-8', 'SOAPAction': 'urn:oasis:names:tc:ebxml-msg:service/Acknowledgment',
+            'Content-Type': 'text/xml'
+        }
 
         envelope = ebxml_ack_envelope.EbxmlAckEnvelope(get_test_message_dictionary())
 
-        message_id, message = envelope.serialize()
+        message_id, http_headers, message = envelope.serialize()
 
         expected_message_bytes = expected_message.encode()
         message_bytes = message.encode()
 
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
+        self.assertEqual(expected_http_headers, http_headers)
         xml_utilities.XmlUtilities.assert_xml_equal(expected_message_bytes, message_bytes)
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
@@ -82,11 +89,11 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
 
         envelope = ebxml_ack_envelope.EbxmlAckEnvelope(test_message_dict)
 
-        first_message_id, first_message = envelope.serialize()
+        first_message_id, _, first_message = envelope.serialize()
 
         parsed_message = ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, first_message)
 
-        second_message_id, second_message = parsed_message.serialize()
+        second_message_id, _, second_message = parsed_message.serialize()
 
         self.assertEqual(first_message_id, second_message_id)
         self.assertEqual(second_message, first_message)

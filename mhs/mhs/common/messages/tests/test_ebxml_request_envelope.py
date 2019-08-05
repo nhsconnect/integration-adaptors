@@ -21,6 +21,12 @@ _ADDITIONAL_EXPECTED_VALUES = {
 }
 EXPECTED_VALUES = {**test_ebxml_envelope.BASE_EXPECTED_VALUES, **_ADDITIONAL_EXPECTED_VALUES}
 
+EXPECTED_HTTP_HEADERS = {
+    'charset': 'UTF-8',
+    'SOAPAction': 'urn:nhs:names:services:pdsquery/QUPA_IN000006UK02',
+    'Content-Type': 'multipart/related; boundary="--=_MIME-Boundary"; type=text/xml; start=ebXMLHeader@spine.nhs.uk'
+}
+
 
 def get_test_message_dictionary():
     return {
@@ -65,11 +71,12 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
 
         envelope = ebxml_request_envelope.EbxmlRequestEnvelope(get_test_message_dictionary())
 
-        message_id, message = envelope.serialize()
+        message_id, http_headers, message = envelope.serialize()
 
         normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
 
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
+        self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(self.normalized_expected_serialized_message, normalized_message)
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
@@ -81,12 +88,13 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
         message_dictionary[ebxml_envelope.MESSAGE_ID] = test_ebxml_envelope.MOCK_UUID
         envelope = ebxml_request_envelope.EbxmlRequestEnvelope(message_dictionary)
 
-        message_id, message = envelope.serialize()
+        message_id, http_headers, message = envelope.serialize()
 
         normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
 
         mock_get_uuid.assert_not_called()
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
+        self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(self.normalized_expected_serialized_message, normalized_message)
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
@@ -121,11 +129,12 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
                 message_dictionary[optional_tag] = False
                 envelope = ebxml_request_envelope.EbxmlRequestEnvelope(message_dictionary)
 
-                message_id, message = envelope.serialize()
+                message_id, http_headers, message = envelope.serialize()
 
                 normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
 
                 self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
+                self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
                 self.assertNotEqual(self.normalized_expected_serialized_message, normalized_message)
                 self.assertNotIn(optional_xml_tag, normalized_message)
 

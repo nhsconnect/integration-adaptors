@@ -37,6 +37,12 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         """
         super().__init__(EBXML_TEMPLATE, message_dictionary)
 
+    def serialize(self) -> Tuple[str, Dict[str, str], str]:
+        message_id, http_headers, message = super().serialize()
+        http_headers['Content-Type'] = 'multipart/related; boundary="--=_MIME-Boundary"; type=text/xml; ' \
+                                       'start=ebXMLHeader@spine.nhs.uk'
+        return message_id, http_headers, message
+
     @classmethod
     def from_string(cls, headers: Dict[str, str], message: str) -> EbxmlRequestEnvelope:
         """Parse the provided message string and create an instance of an EbxmlRequestEnvelope.

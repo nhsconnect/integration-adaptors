@@ -58,7 +58,7 @@ class EbxmlEnvelope(envelope.Envelope):
         ebxml_template_dir = str(pathlib.Path(definitions.ROOT_DIR) / TEMPLATES_DIR)
         self.message_builder = pystache_message_builder.PystacheMessageBuilder(ebxml_template_dir, template_file)
 
-    def serialize(self) -> Tuple[str, str]:
+    def serialize(self) -> Tuple[str, Dict[str, str], str]:
         """Produce a serialised representation of this ebXML message by populating a Mustache template with this
         object's properties.
 
@@ -75,7 +75,12 @@ class EbxmlEnvelope(envelope.Envelope):
         logger.info('0001', 'Creating ebXML message with {MessageId} and {Timestamp}',
                     {'MessageId': message_id, 'Timestamp': timestamp})
 
-        return message_id, self.message_builder.build_message(ebxml_message_dictionary)
+        message = self.message_builder.build_message(ebxml_message_dictionary)
+        http_headers = {
+            'charset': 'UTF-8',
+            'SOAPAction': f'{ebxml_message_dictionary[SERVICE]}/{ebxml_message_dictionary[ACTION]}'
+        }
+        return message_id, http_headers, message
 
     @staticmethod
     def parse_message(xml_tree: Element) -> Dict[str, str]:
