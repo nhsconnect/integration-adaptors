@@ -1,11 +1,11 @@
-import enum
 import json
-import  utilities.integration_adaptors_logger as log
+import utilities.integration_adaptors_logger as log
 
 
 logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
 
-class MessageStatus(enum.Enum):
+
+class MessageStatus:
     RECEIVED = 1
     STARTED = 2
     IN_OUTBOUND_WORKFLOW = 3
@@ -19,6 +19,10 @@ STATUS = 'STATUS'
 
 
 class OutOfDateVersionError(RuntimeError):
+    pass
+
+
+class EmptyWorkDescription(RuntimeError):
     pass
 
 
@@ -64,28 +68,49 @@ class WorkDescription:
 class WorkDescriptionFactory:
 
     @staticmethod
-    def get_work_description_from_store(persistence_store, message_id):
+    def get_work_description_from_store(persistence_store, key):
         if persistence_store is None:
+            logger.error('001', 'Failed to get work description from store: persistence store is None')
             raise ValueError('Expected non-null persistence store')
-        if message_id is None:
-            raise ValueError('Expected non-null message_id')
-        json_store_data = persistence_store.get('default_table', message_id)
+        if key is None:
+            logger.error('002', 'Failed to get work description from store: key is None')
+            raise ValueError('Expected non-null key')
+
+        json_store_data = persistence_store.get('default_table', key)
+        if json_store_data is None:
+            logger.error('003', 'Persistence store returned empty value for {key}', {'key': key})
+            raise EmptyWorkDescription(f'Failed to find a value for key id {key}')
+
         return WorkDescription(persistence_store, json_store_data)
 
     @staticmethod
-    def create_new_work_description(message_id: str,
+    def create_new_work_description(persistence_store,
+                                    key: str,
                                     timestamp: str,
                                     status: MessageStatus):
+        if persistence_store is None:
+            logger.error('004', 'Failed to build new work description, persistence store should not be null')
+            raise ValueError('Expected persistence store to not be None')
+        if not key:
+            logger.error('005', 'Failed to build new work description, key should not be null or empty')
+            raise ValueError('Expected key to not be None or empty')
+        if timestamp is None:
+            logger.error('006', 'Failed to build new work description, timestamp should not be null')
+            raise ValueError('Expected timestamp to not be None')
+        if status is None:
+            logger.error('007', 'Failed to build new work description, status should not be null')
+            raise ValueError('Expected status to not be None')
+
         work_description_map = {
-            DATA_KEY: message_id,
-            "DATA": {
+            DATA_KEY: key,
+            DATA: {
                 TIMESTAMP: timestamp,
-                'STATUS': status,
+                STATUS: status,
                 VERSION_KEY: 1
             }
         }
         
-        return WorkDescription(work_description_map)
+        return WorkDescription(persistence_store, work_description_map)
         
 
 
