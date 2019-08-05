@@ -2,7 +2,10 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
+from defusedxml import ElementTree
+
 from mhs.common.messages import ebxml_envelope
+from utilities import file_utilities
 
 EXPECTED_MESSAGES_DIR = "expected_messages"
 MESSAGE_DIR = "test_messages"
@@ -23,7 +26,22 @@ BASE_EXPECTED_VALUES = {
 }
 
 
-class TestEbxmlEnvelope(TestCase):
+class BaseTestEbxmlEnvelope(TestCase):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     message_dir = Path(current_dir) / MESSAGE_DIR
     expected_message_dir = Path(current_dir) / EXPECTED_MESSAGES_DIR
+
+
+class TestEbxmlEnvelope(BaseTestEbxmlEnvelope):
+    def test_cant_find_optional_text_value_during_parsing(self):
+        message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_header.xml"))
+
+        xml_tree = ElementTree.fromstring(message)
+        values_dict = {}
+        ebxml_envelope.EbxmlEnvelope._add_if_present(
+            values_dict,
+            'key',
+            ebxml_envelope.EbxmlEnvelope._extract_ebxml_text_value(xml_tree, 'nonExistentElement')
+        )
+
+        self.assertEqual({}, values_dict)

@@ -28,7 +28,7 @@ def get_test_message_dictionary():
     }
 
 
-class TestEbXmlAckEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
+class TestEbXmlAckEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")

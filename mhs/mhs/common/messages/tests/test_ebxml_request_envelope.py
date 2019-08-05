@@ -53,7 +53,7 @@ def expected_values(message=None):
     return values
 
 
-class TestEbxmlRequestEnvelope(test_ebxml_envelope.TestEbxmlEnvelope):
+class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
