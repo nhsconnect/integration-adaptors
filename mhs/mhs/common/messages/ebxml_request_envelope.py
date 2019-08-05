@@ -77,7 +77,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         :return: a Message that represents the message received.
         """
         content_type = headers[CONTENT_TYPE_HEADER_NAME]
-        content_type_header = CONTENT_TYPE_HEADER_NAME + ": " + content_type + "\r\n"
+        content_type_header = CONTENT_TYPE_HEADER_NAME + ": " + content_type + "\r\n\r\n"
 
         msg = email.message_from_string(content_type_header + message)
 
