@@ -1,4 +1,5 @@
 """This module defines the configuration manager component."""
+import copy
 
 from utilities.file_utilities import FileUtilities
 
@@ -19,4 +20,4 @@ class ConfigurationManager:
         :param interaction_name: The name of the interaction to retrieve details for.
         :return: A dictionary of interaction-specific details, or None if an entry for the specified name was not found.
         """
-        return self.interactions.get(interaction_name)
+        return copy.deepcopy(self.interactions.get(interaction_name))

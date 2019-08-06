@@ -6,7 +6,7 @@ import email
 import email.message
 import email.policy
 import logging
-import typing
+from typing import Dict, Tuple
 
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
 
@@ -25,7 +25,7 @@ class EbXmlParsingError(Exception):
 class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     """An envelope that contains a request to be sent asynchronously to a remote MHS."""
 
-    def __init__(self, message_dictionary: typing.Dict[str, str]):
+    def __init__(self, message_dictionary: Dict[str, str]):
         """Create a new EbxmlRequestEnvelope that populates the message with the provided dictionary.
 
         :param message_dictionary: The dictionary of values to use when populating the template.
@@ -33,7 +33,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         super().__init__(EBXML_TEMPLATE, message_dictionary)
 
     @classmethod
-    def from_string(cls, headers: typing.Dict[str, str], message: str) -> EbxmlRequestEnvelope:
+    def from_string(cls, headers: Dict[str, str], message: str) -> EbxmlRequestEnvelope:
         """Parse the provided message string and create an instance of an EbxmlRequestEnvelope.
 
         :param headers A dictionary of headers received with the message.
@@ -51,7 +51,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         return EbxmlRequestEnvelope(extracted_values)
 
     @staticmethod
-    def _parse_mime_message(headers: typing.Dict[str, str], message: str) -> email.message.Message:
+    def _parse_mime_message(headers: Dict[str, str], message: str) -> email.message.Message:
         """ Take the provided message string (and set of HTTP headers received with it) and parse it to obtain a Message
         object.
 
@@ -67,7 +67,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         return msg
 
     @staticmethod
-    def _extract_message_parts(msg: email.message.Message) -> typing.Tuple[str, str]:
+    def _extract_message_parts(msg: email.message.Message) -> Tuple[str, str]:
         """Extract the ebXML and payload parts of the message and return them as a tuple.
 
         :param msg: The message to extract parts from.

@@ -1,23 +1,23 @@
 {
-  "_description": "This template produces a Docker container that contains the MHS application and pushes it to the docker repository specified by the relevant environment variables.",
+  "_description": "This template produces a docker container for the SCR web service and pushes the result to the ECR repository.",
   "variables": {
     "app_dir": "/usr/src/app",
     "common_dir": "common",
-    "mhs_dir": "mhs",
-    "repository": "{{env `DOCKER_REPOSITORY`}}",
+    "scr_dir": "SCR",
+    "scr_service_dir": "SCRWebService",
+    "repository": "{{env `SCR_REPOSITORY`}}",
     "tag": "{{env `BUILD_TAG`}}",
-    "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
+    "docker_registry_url": "{{env `SCR_REPOSITORY`}}"
   },
   "builders": [
     {
       "type": "docker",
       "image": "python:3-slim",
-      "container_dir": "/packer-files",
       "commit": true,
       "changes": [
-        "EXPOSE 80 443",
-        "WORKDIR {{user `app_dir`}}/{{user `mhs_dir`}}",
-        "ENTRYPOINT pipenv run mhs"
+        "EXPOSE 80",
+        "WORKDIR {{user `app_dir`}}/{{user `scr_service_dir`}}",
+        "ENTRYPOINT pipenv run scr-server"
       ]
     }
   ],
@@ -35,7 +35,12 @@
     },
     {
       "type": "file",
-      "source": "{{user `mhs_dir`}}",
+      "source": "{{user `scr_dir`}}",
+      "destination": "{{user `app_dir`}}"
+    },
+    {
+      "type": "file",
+      "source": "{{user `scr_service_dir`}}",
       "destination": "{{user `app_dir`}}"
     },
     {
@@ -48,7 +53,7 @@
       "type": "shell",
       "inline": [
         "pip install pipenv",
-        "cd {{user `app_dir`}}/{{user `mhs_dir`}}",
+        "cd {{user `app_dir`}}/{{user `scr_service_dir`}}",
         "pipenv install --deploy --ignore-pipfile"
       ]
     }
