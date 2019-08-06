@@ -1,3 +1,4 @@
+"""Module for testing the Proton queue adaptor functionality."""
 import asyncio
 import unittest.mock
 
@@ -7,18 +8,18 @@ import comms.proton_queue_adaptor
 import utilities.test_utilities
 
 TEST_MESSAGE = "TEST MESSAGE"
+TEST_PROTON_MESSAGE = unittest.mock.Mock()
 TEST_QUEUE_HOST = "TEST QUEUE HOST"
 TEST_EXCEPTION = Exception()
 TEST_SIDE_EFFECT = unittest.mock.Mock(side_effect=TEST_EXCEPTION)
 
 
 class TestProtonQueueAdaptor(unittest.TestCase):
+    """Class to contain tests for the ProtonQueueAdaptor functionality."""
 
     def setUp(self) -> None:
         self.service = comms.proton_queue_adaptor.ProtonQueueAdaptor(host=TEST_QUEUE_HOST)
-        self.handler = comms.proton_queue_adaptor.ProtonMessagingHandler(TEST_QUEUE_HOST, TEST_MESSAGE)
 
-    # -- Service Tests
     # TESTING SEND ASYNC METHOD
     @unittest.mock.patch.object(proton.reactor, "Container")
     @utilities.test_utilities.async_test
@@ -31,7 +32,13 @@ class TestProtonQueueAdaptor(unittest.TestCase):
     def test_send_success(self, mock_container):
         self.service.send_sync(TEST_MESSAGE)
 
-    # -- Handler Tests
+
+class TestProtonMessagingHandler(unittest.TestCase):
+    """Class to contain tests for the ProtonMessagingHandler functionality."""
+
+    def setUp(self) -> None:
+        self.handler = comms.proton_queue_adaptor.ProtonMessagingHandler(TEST_QUEUE_HOST, TEST_PROTON_MESSAGE)
+
     # TESTING STARTUP METHOD
     def test_on_start_success(self):
         mock_event = unittest.mock.MagicMock()

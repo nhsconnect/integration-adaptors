@@ -1,3 +1,4 @@
+"""Module for Proton specific queue adaptor functionality. """
 import uuid
 
 import tornado.ioloop

@@ -1,3 +1,4 @@
+"""Module for generic queue adaptor functionality"""
 import abc
 
 
