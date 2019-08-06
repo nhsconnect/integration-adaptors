@@ -4,6 +4,7 @@ import unittest
 import mhs.common.state.work_description as wd
 from unittest.mock import MagicMock, patch
 from utilities.test_utilities import async_test
+import parameterized
 
 DEFAULT_TABLE = 'default'
 
@@ -51,6 +52,20 @@ class TestWorkDescription(unittest.TestCase):
         persistence.add.assert_called_with(DEFAULT_TABLE, json.dumps(input_data))
 
     @async_test
+    async def test_publish_update_latest_is_none(self):
+        future = asyncio.Future()
+        future.set_result(None)
+
+        persistence = MagicMock()
+        persistence.get.return_value = future
+        persistence.add.return_value = future
+        work_description = wd.WorkDescription(persistence, DEFAULT_TABLE, input_data)
+
+        await work_description.publish()
+        persistence.add.assert_called_with(DEFAULT_TABLE, json.dumps(input_data))
+
+
+    @async_test
     async def test_out_of_date_version(self):
         future = asyncio.Future()
         future.set_result({
@@ -93,6 +108,17 @@ class TestWorkDescriptionFactory(unittest.TestCase):
 
         persistence.get.assert_called_with(DEFAULT_TABLE, 'aaa-aaa-aaa')
         work_mock.assert_called_with(persistence, DEFAULT_TABLE, old_data)
+
+    @async_test
+    async def test_get_from_store_no_result_found(self):
+        future = asyncio.Future()
+        future.set_result(None)
+
+        persistence = MagicMock()
+        persistence.get.return_value = future
+
+        with self.assertRaises(wd.EmptyWorkDescriptionError):
+            await wd.WorkDescriptionFactory.get_work_description_from_store(persistence, DEFAULT_TABLE, 'aaa-aaa-aaa')
 
     @async_test
     async def test_get_from_store_empty_store(self):
@@ -155,3 +181,13 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                     timestamp='12',
                     status=None
                 )
+        with self.subTest('Null persistence'):
+            with self.assertRaises(ValueError):
+                wd.WorkDescriptionFactory.create_new_work_description(
+                    None,
+                    table_name=DEFAULT_TABLE,
+                    key='aaa',
+                    timestamp='12',
+                    status=wd.MessageStatus.RECEIVED
+                )
+

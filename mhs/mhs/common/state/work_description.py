@@ -79,7 +79,7 @@ class WorkDescription:
 
     def _serialise_data(self):
         """
-        A simple serialization method that turns the data local data into a json string which can be stored in the
+        A simple serialization method that produces a json string from the local data which can be stored in the
         persistence store
         """
         data = {
