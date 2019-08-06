@@ -1,0 +1,75 @@
+{
+  "_description": "This template produces a docker container for the SCR web service and pushes the result to the ECR repository.",
+  "variables": {
+    "app_dir": "/usr/src/app",
+    "common_dir": "common",
+    "scr_dir": "SCR",
+    "scr_service_dir": "SCRWebService",
+    "repository": "{{env `SCR_REPOSITORY`}}",
+    "tag": "{{env `BUILD_TAG`}}",
+    "docker_registry_url": "{{env `SCR_REPOSITORY`}}"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "python:3-slim",
+      "commit": true,
+      "changes": [
+        "EXPOSE 80",
+        "WORKDIR {{user `app_dir`}}/{{user `scr_service_dir`}}",
+        "ENTRYPOINT pipenv run scr-server"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "mkdir -p {{user `app_dir`}}"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `common_dir`}}",
+      "destination": "{{user `app_dir`}}"
+    },
+    {
+      "type": "file",
+      "source": "{{user `scr_dir`}}",
+      "destination": "{{user `app_dir`}}"
+    },
+    {
+      "type": "file",
+      "source": "{{user `scr_service_dir`}}",
+      "destination": "{{user `app_dir`}}"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "pip install pipenv",
+        "cd {{user `app_dir`}}/{{user `scr_service_dir`}}",
+        "pipenv install --deploy --ignore-pipfile"
+      ]
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "{{user `repository`}}",
+        "tag": "{{user `tag`}}"
+      },
+      {
+        "type": "docker-push",
+        "ecr_login": true,
+        "login_server": "{{user `docker_registry_url`}}"
+      }
+    ]
+  ]
+}

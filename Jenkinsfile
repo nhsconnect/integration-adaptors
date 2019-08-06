@@ -18,7 +18,14 @@ pipeline {
 
         stage('MHS Unit Tests') {
             steps {
-                dir('mhs-reference-implementation') {
+                dir('mhs') {
+                    executeUnitTestsWithCoverage()
+               }
+            }
+        }
+        stage('SCR Web Service Unit Tests') {
+            steps {
+                dir('SCRWebService') {
                     executeUnitTestsWithCoverage()
                }
             }
@@ -26,7 +33,8 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh label: 'Running Packer build', script: 'packer build pipeline/packer/mhs.json'
+                sh label: 'Running MHS Packer build', script: 'packer build pipeline/packer/mhs.json'
+                sh label: 'Running SCR service Packer build', script: 'packer build pipeline/packer/scr-web-service.json'
             }
         }
 
@@ -38,20 +46,48 @@ pipeline {
                             terraform apply -auto-approve \
                             -var cluster_id=${CLUSTER_ID} \
                             -var ecr_address=${DOCKER_REPOSITORY} \
+                            -var scr_ecr_address=${SCR_REPOSITORY} \
                             -var task_execution_role=${TASK_EXECUTION_ROLE} \
                             -var build_id=${BUILD_TAG} \
-                            -var mhs_log_level=DEBUG
+                            -var mhs_log_level=DEBUG \
+                            -var scr_log_level=DEBUG \
+                            -var scr_service_port=${SCR_SERVICE_PORT}
                         """
                 }
             }
         }
 
-        stage('Integration Tests') {
+        stage('MHS Integration Tests') {
             steps {
-                dir('mhs-reference-implementation') {
+                dir('mhs') {
                     // Wait for MHS container to fully stand up
-                    sh label: 'Ping MHS', script: 'sleep 20; curl ${MHS_ADDRESS}'
+                    timeout(2) {
+                        waitUntil {
+                           script {
+                               def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
+                               return (r == '405');
+                           }
+                        }
+                     }
+
                     sh label: 'Running integration tests', script: 'pipenv run inttests'
+                }
+            }
+        }
+
+        stage('SCR Service Integration Tests') {
+            steps {
+                dir('SCRWebService') {
+                     timeout(2) {
+                        waitUntil {
+                           script {
+                               def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS}:${SCR_SERVICE_PORT} || echo 1', returnStdout: true
+                               return (r == '404');
+                           }
+                        }
+                     }
+
+                    sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
                 }
             }
         }
@@ -68,9 +104,12 @@ pipeline {
                         terraform destroy -auto-approve \
                         -var cluster_id=${CLUSTER_ID} \
                         -var ecr_address=${DOCKER_REPOSITORY} \
+                        -var scr_ecr_address=${SCR_REPOSITORY} \
                         -var task_execution_role=${TASK_EXECUTION_ROLE} \
                         -var build_id=${BUILD_TAG} \
-                        -var mhs_log_level=DEBUG
+                        -var mhs_log_level=DEBUG \
+                        -var scr_log_level=DEBUG \
+                        -var scr_service_port=${SCR_SERVICE_PORT}
                      """
             }
         }
@@ -82,4 +121,5 @@ void executeUnitTestsWithCoverage() {
     sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
+    sh label: 'Running SonarQube analysis', script: "sonar-scanner -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}"
 }

@@ -24,6 +24,13 @@ RUN apt-get update && apt-get install -y build-essential checkinstall libreadlin
 # Install pipenv
 RUN pip3 install pipenv
 
+# Install sonar scanner
+RUN wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.0.0.1744-linux.zip && \
+        unzip sonar-scanner.zip -d /opt/sonar-scanner/ && \
+        chmod +x /opt/sonar-scanner/sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner && \
+        ln -s /opt/sonar-scanner/sonar-scanner-4.0.0.1744-linux/bin/sonar-scanner /usr/bin/sonar-scanner && \
+        rm sonar-scanner.zip
+
 # Install Docker
 # These commands are based on https://docs.docker.com/install/linux/docker-ce/debian/ and https://github.com/ninech/jnlp-slave-with-docker
 # This relies on docker.sock being exposed to the Jenkins slave
