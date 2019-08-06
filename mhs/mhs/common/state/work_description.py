@@ -19,14 +19,17 @@ STATUS = 'STATUS'
 
 
 class OutOfDateVersionError(RuntimeError):
+    """Exception thrown when trying to update a state and the local version is behind the remote version"""
     pass
 
 
 class EmptyWorkDescriptionError(RuntimeError):
+    """Exception thrown when no work description is found for a given key"""
     pass
 
 
 class WorkDescription:
+    """A local copy of an instance of a work description from the state store"""
 
     def __init__(self, persistence_store, table_name: str, store_data: dict):
         """
@@ -50,26 +53,38 @@ class WorkDescription:
         self.status = data[STATUS]
 
     async def publish(self):
+        """
+        Attempts to publish the local state of the work description to the state store, checks versions to avoid
+        collisions
+        :return:
+        """
         logger.info('011', 'Attempting to publish work description {key}', {'key': self.message_key})
         logger.info('012', 'Retrieving latest work description to check version')
         latest_data = await self.persistence_store.get(self.table_name, self.message_key)
         if latest_data is not None:
+            logger.info('013', 'Retrieved previous version, comparing versions')
             latest_version = latest_data[DATA][VERSION_KEY]
             if latest_version > self.version:
-                logger.error('013', 'Failed to update message {key}, local version out of date',
+                logger.error('014', 'Failed to update message {key}, local version out of date',
                              {'key': self.message_key})
                 raise OutOfDateVersionError(f'Failed to update message {self.message_key}: local version out of date ')
 
+        else:
+            logger.info('015', 'No previous version found, continuing attempt to publish new version')
         serialised = self._serialise_data()
 
         old_data = await self.persistence_store.add(self.table_name, serialised)
-        logger.info('014', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
+        logger.info('016', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
         return old_data
 
     def _serialise_data(self):
+        """
+        A simple serialization method that turns the data local data into a json string which can be stored in the
+        persistence store
+        """
         data = {
             DATA_KEY: self.message_key,
-            'DATA': {
+            DATA: {
                 TIMESTAMP: self.timestamp,
                 VERSION_KEY: self.version,
                 STATUS: self.status
