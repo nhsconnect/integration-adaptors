@@ -1,4 +1,3 @@
-import logging
 import pathlib
 import ssl
 from typing import Tuple
@@ -64,11 +63,6 @@ def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
     return workflow
 
 
-def configure_logging() -> None:
-    """Configure logging for this application."""
-    log.configure_logging()
-
-
 def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_workflow.SyncAsyncWorkflow,
                           party_key: str) -> None:
     """
@@ -94,13 +88,13 @@ def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_w
                                                                 ca_certs=certs_file))
     mhs_server.listen(443)
 
-    logging.info("Starting servers")
+    logger.info('001', 'Starting servers')
     tornado.ioloop.IOLoop.current().start()
 
 
 def main():
     config.setup_config("MHS")
-    configure_logging()
+    log.configure_logging()
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
@@ -113,4 +107,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+    finally:
+        logger.warning('002', 'Exiting application')
