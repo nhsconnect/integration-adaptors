@@ -29,6 +29,12 @@ class EmptyWorkDescriptionError(RuntimeError):
 class WorkDescription:
 
     def __init__(self, persistence_store, table_name: str, store_data: dict):
+        """
+        Given 
+        :param persistence_store:
+        :param table_name:
+        :param store_data:
+        """
         if persistence_store is None:
             raise ValueError('Expected persistence store')
         if not table_name:
@@ -74,9 +80,18 @@ class WorkDescription:
 
 
 class WorkDescriptionFactory:
+    """
+    Contains two factory methods for generating a work description instance either building a new one locally
+    or retrieving from a given persistence store
+    """
 
     @staticmethod
     async def get_work_description_from_store(persistence_store, table_name: str, key: str):
+        """
+        Attempts to retrieve and deserialize a work description instance from the given persistence store to create
+        a local work description
+        """
+
         if persistence_store is None:
             logger.error('001', 'Failed to get work description from store: persistence store is None')
             raise ValueError('Expected non-null persistence store')
@@ -97,6 +112,10 @@ class WorkDescriptionFactory:
                                     key: str,
                                     timestamp: str,
                                     status: int):
+        """
+        Builds a new local work description instance given the details of the message, these details are held locally
+        until a `publish` is executed
+        """
         if persistence_store is None:
             logger.error('004', 'Failed to build new work description, persistence store should not be null')
             raise ValueError('Expected persistence store to not be None')
