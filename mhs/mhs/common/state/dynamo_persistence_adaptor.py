@@ -10,23 +10,19 @@ logger = log.IntegrationAdaptorsLogger('DYNAMO_PERSISTENCE')
 
 
 class RecordCreationError(RuntimeError):
-    def __init__(self):
-        pass
+    pass
 
 
 class RecordDeletionError(RuntimeError):
-    def __init__(self):
-        pass
+    pass
 
 
 class RecordRetrievalError(RuntimeError):
-    def __init__(self):
-        pass
+    pass
 
 
 class InvalidTableError(RuntimeError):
-    def __init__(self):
-        pass
+    pass
 
 
 class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceAdaptor):

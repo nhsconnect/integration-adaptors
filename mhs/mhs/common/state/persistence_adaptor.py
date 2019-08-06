@@ -1,13 +1,15 @@
 """
 This module defines the state adaptor interface, used to allow support for multiple state database implementations.
 """
-import typing
+import abc
+from typing import Optional
 
 
-class PersistenceAdaptor:
+class PersistenceAdaptor(abc.ABC):
     """An adaptor that provides a common interface to the state management database."""
 
-    async def add(self, table_name: str, key: str, item: dict) -> typing.Optional[dict]:
+    @abc.abstractmethod
+    async def add(self, table_name: str, key: str, item: dict) -> Optional[dict]:
         """Add an item to a specified table, using a provided key.
 
         :param table_name: The name of the table to add the item to.
@@ -17,7 +19,8 @@ class PersistenceAdaptor:
         """
         pass
 
-    async def get(self, table_name: str, key: str) -> typing.Optional[dict]:
+    @abc.abstractmethod
+    async def get(self, table_name: str, key: str) -> Optional[dict]:
         """
         Retrieves an item from a specified table with a given key.
         :param table_name: The table to use when finding the item.
@@ -26,7 +29,8 @@ class PersistenceAdaptor:
         """
         pass
 
-    async def delete(self, table_name: str, key: str) -> typing.Optional[dict]:
+    @abc.abstractmethod
+    async def delete(self, table_name: str, key: str) -> Optional[dict]:
         """
         Removes an item from a table given it's key.
         :param table_name: The table to delete the item from.
