@@ -13,6 +13,6 @@ setup(
     description='Common utilities used by the NHS integration adaptors projects.',
     install_requires=[
         'pystache',
-        'lxml'
+        'lxml', 'python-qpid-proton', 'tornado'
     ]
 )
