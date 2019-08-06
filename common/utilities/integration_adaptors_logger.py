@@ -88,6 +88,7 @@ class IntegrationAdaptorsLogger:
         """
         new_map = {}
         for key, value in dict_values.items():
+            value = str(value)
             if ' ' in value:
                 value = f'"{value}"'
 
