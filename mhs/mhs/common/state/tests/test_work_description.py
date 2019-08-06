@@ -4,7 +4,7 @@ import unittest
 import mhs.common.state.work_description as wd
 from unittest.mock import MagicMock, patch
 from utilities.test_utilities import async_test
-import parameterized
+
 
 DEFAULT_TABLE = 'default'
 
