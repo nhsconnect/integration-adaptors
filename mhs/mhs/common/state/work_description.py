@@ -126,6 +126,7 @@ class WorkDescription:
 
         else:
             logger.info('015', 'No previous version found, continuing attempt to publish new version')
+        self.last_modified_timestamp = get_time()
         serialised = self._serialise_data()
 
         old_data = await self.persistence_store.add(serialised)

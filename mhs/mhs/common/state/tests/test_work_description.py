@@ -38,8 +38,10 @@ class TestWorkDescription(unittest.TestCase):
         self.assertEqual(work_description.created_timestamp, '11:59')
         self.assertEqual(work_description.last_modified_timestamp, '12:00')
 
+    @patch('mhs.common.state.work_description.get_time')
     @async_test
-    async def test_publish_updates(self):
+    async def test_publish_updates(self, time_mock):
+        time_mock.return_value = '12:00'
         future = asyncio.Future()
         future.set_result(old_data)
 
@@ -51,8 +53,10 @@ class TestWorkDescription(unittest.TestCase):
         await work_description.publish()
         persistence.add.assert_called_with(json.dumps(input_data))
 
+    @patch('mhs.common.state.work_description.get_time')
     @async_test
-    async def test_publish_update_latest_is_none(self):
+    async def test_publish_update_latest_is_none(self, time_mock):
+        time_mock.return_value = '12:00'
         future = asyncio.Future()
         future.set_result(None)
 
