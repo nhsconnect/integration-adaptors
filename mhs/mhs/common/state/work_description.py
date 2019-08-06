@@ -64,10 +64,10 @@ class WorkDescription:
         if latest_data is not None:
             logger.info('013', 'Retrieved previous version, comparing versions')
             latest_version = latest_data[DATA][VERSION_KEY]
-            if latest_version > self.version:
+            if latest_version >= self.version:
                 logger.error('014', 'Failed to update message {key}, local version out of date',
                              {'key': self.message_key})
-                raise OutOfDateVersionError(f'Failed to update message {self.message_key}: local version out of date ')
+                raise OutOfDateVersionError(f'Failed to update message {self.message_key}: local version out of date')
 
         else:
             logger.info('015', 'No previous version found, continuing attempt to publish new version')
