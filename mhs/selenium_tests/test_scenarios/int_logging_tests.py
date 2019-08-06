@@ -2,7 +2,7 @@ import datetime
 
 from definitions import ROOT_DIR
 from pathlib import Path
-from selenium_tests.page_objects import methods
+from selenium_tests.page_objects import methods, logs_retriever
 from unittest import TestCase
 
 # temp location/file to prove the tes works
@@ -29,25 +29,15 @@ class FunctionalTest(TestCase):
         end_time = datetime.datetime.utcnow()
         print('Time test ended: ', end_time.strftime(TIMESTAMP_FORMAT))
 
-        # todo - remove this temp code
-        # temp dirty code for testing with 'test.txt', which is a pseudo log file
-        #   the stuff in this file contain 'log' between 2019-07-25T09:37:38.123456
-        #   and 2019-07-25T09:47:59.678901...
-        time = '2019-07-25T09:37:23.646564'
-        start_time = datetime.datetime.strptime(time, TIMESTAMP_FORMAT)
-        time = '2019-07-25T09:48:01.976354'
-        end_time = datetime.datetime.strptime(time, TIMESTAMP_FORMAT)
-        # end of temp code
-
         # get the log file
-        # todo - this will need to change to retrieve to logfile from Amazon CloudWatch
-        with open(str(Path(ROOT_DIR) / LOG_DIR / LOG_FILENAME)) as file:
-            # check the timestamps in the log file are between the start & end times
-            for line in file:
-                # extract the timestamp from the line...
-                time = methods.get_log_timestamp(line)
-                print('Timestamp: ', time)
+        logs = logs_retriever.get_logs(logs_retriever.Component.MHS)
 
-                after_start = time > start_time.strftime(TIMESTAMP_FORMAT)
-                before_end = end_time.strftime(TIMESTAMP_FORMAT) > time
-                self.assertTrue(after_start & before_end)
+        # check the timestamps in the log file are between the start & end times
+        for line in logs:
+            # extract the timestamp from the line...
+            time = methods.get_log_timestamp(line)
+            print('Timestamp: ', time)
+
+            after_start = time > start_time.strftime(TIMESTAMP_FORMAT)
+            before_end = end_time.strftime(TIMESTAMP_FORMAT) > time
+            self.assertTrue(after_start and before_end)
