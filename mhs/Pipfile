@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 coverage = "~=4.5"
 unittest-xml-reporting = "~=2.5"
+boto3 = "*"
 
 [packages]
 requests = "*"
