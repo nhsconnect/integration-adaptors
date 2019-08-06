@@ -1,4 +1,5 @@
 import asyncio
+import json
 import unittest
 from unittest.mock import MagicMock, patch, Mock
 
@@ -13,7 +14,8 @@ TEST_ASYNC_ARN = "TEST ASYNC ARN"
 TEST_ASYNC_TABLE = "TEST ASYNC TABLE"
 TEST_STATE_TABLE = "TEST STATE TABLE"
 TEST_INVALID_TABLE = "TEST INVALID TABLE"
-TEST_DATA = '{"test_attribute": "test_value"}'
+TEST_DATA_OBJECT = {"test_attribute": "test_value"}
+TEST_DATA = json.dumps(TEST_DATA_OBJECT)
 TEST_KEY = "TEST_KEY"
 TEST_INVALID_KEY = "TEST INVALID KEY"
 TEST_ITEM = {"key": TEST_KEY, "data": TEST_DATA}
@@ -31,11 +33,8 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
     @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
     def setUp(self, mock_boto3_resource):
-        self.mock_dynamodb = MagicMock()
-        mock_boto3_resource.return_value = self.mock_dynamodb
-
-        self.mock_table = MagicMock()
-        self.mock_dynamodb.Table.return_value = self.mock_table
+        self.mock_dynamodb = mock_boto3_resource.return_value
+        self.mock_table = self.mock_dynamodb.Table.return_value
 
         self.service = DynamoPersistenceAdaptor(
             state_table=TEST_STATE_TABLE,
@@ -74,7 +73,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         response = await self.service.add(TEST_STATE_TABLE, TEST_KEY, TEST_ITEM)
 
-        self.assertIsInstance(response, dict)
+        self.assertEqual(response, TEST_DATA_OBJECT)
 
     @async_test
     async def test_add_io_exception(self):
@@ -92,7 +91,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         response = await self.service.get(TEST_STATE_TABLE, TEST_KEY)
 
-        self.assertIsInstance(response, dict)
+        self.assertEqual(response, TEST_DATA_OBJECT)
 
     @async_test
     async def test_get_success_async(self):
@@ -100,7 +99,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         response = await self.service.get(TEST_ASYNC_TABLE, TEST_KEY)
 
-        self.assertIsInstance(response, dict)
+        self.assertEqual(response, TEST_DATA_OBJECT)
 
     @async_test
     async def test_get_invalid_table(self):
@@ -132,7 +131,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         response = await self.service.delete(TEST_STATE_TABLE, TEST_KEY)
 
-        self.assertIsInstance(response, dict)
+        self.assertEqual(response, TEST_DATA_OBJECT)
 
     @async_test
     async def test_delete_success_async(self):
@@ -140,7 +139,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         response = await self.service.delete(TEST_ASYNC_TABLE, TEST_KEY)
 
-        self.assertIsInstance(response, dict)
+        self.assertEqual(response, TEST_DATA_OBJECT)
 
     @async_test
     async def test_delete_invalid_table(self):

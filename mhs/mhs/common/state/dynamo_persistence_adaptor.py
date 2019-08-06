@@ -61,7 +61,7 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
                 Item={'key': key, 'data': json.dumps(item)},
                 ReturnValues='ALL_OLD'
             )
-            if 'Attributes' not in response or response.get('Attributes', {}).get('data') is None:
+            if response.get('Attributes', {}).get('data') is None:
                 logger.info('000', 'No previous record found: {key}', {'key': key})
                 return None
             return json.loads(response.get('Attributes', {}).get('data'))
@@ -105,4 +105,5 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
         if table is None:
             logger.info('010', 'Table could not be found for: {table_name}', {'table_name': table_name})
             raise InvalidTableError
+        logger.info('012', 'Table found for: {table_name}', {'table_name': table_name})
         return table
