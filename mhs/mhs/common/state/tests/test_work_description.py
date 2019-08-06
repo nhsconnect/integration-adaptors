@@ -21,7 +21,7 @@ input_data = {
 old_data = {
             wd.DATA_KEY: 'aaa-aaa-aaa',
             wd.DATA: {
-                wd.VERSION_KEY: 1,
+                wd.VERSION_KEY: 0,
                 wd.TIMESTAMP: '11:00',
                 wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
             }
