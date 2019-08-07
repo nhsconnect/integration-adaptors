@@ -8,7 +8,7 @@ import boto3
 
 from definitions import ROOT_DIR
 
-_client = boto3.client('logs')
+_client = boto3.client('logs', region_name='eu-west-2')
 
 
 class Component(enum.Enum):
