@@ -4,7 +4,7 @@ import unittest
 import mhs.common.state.work_description as wd
 from unittest.mock import MagicMock, patch
 from utilities.test_utilities import async_test
-
+import copy
 
 input_data = {
     wd.DATA_KEY: 'aaa-aaa-aaa',
@@ -108,7 +108,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
         await work_description.publish()
 
-        updated = input_data.copy()
+        updated = copy.deepcopy(input_data)
         updated[wd.DATA][wd.VERSION_KEY] = 2
         print(updated)
         # Check local version updated
