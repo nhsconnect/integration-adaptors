@@ -39,6 +39,12 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
         self.table_name = kwargs.get('table_name')
 
     async def add(self, key, data):
+        """Add an item to a specified table, using a provided key.
+
+        :param key: The key used to identify the item.
+        :param data: The item to store in persistence.
+        :return: The previous version of the item which has been replaced. (None if no previous item)
+        """
         logger.info('011', 'Adding {record} for {key}', {'record': data, 'key': key})
         try:
             async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
@@ -55,6 +61,11 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
             raise RecordCreationError from e
 
     async def get(self, key):
+        """
+        Retrieves an item from a specified table with a given key.
+        :param key: The key which identifies the item to get.
+        :return: The item from the specified table with the given key. (None if no item found)
+        """
         logger.info('002', 'Getting record for {key}', {'key': key})
         try:
             async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
@@ -71,6 +82,11 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
             raise RecordRetrievalError from e
 
     async def delete(self, key):
+        """
+        Removes an item from a table given it's key.
+        :param key: The key of the item to delete.
+        :return: The instance of the item which has been deleted from persistence. (None if no item found)
+        """
         logger.info('006', 'Deleting record for {key}', {'key': key})
         try:
             async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:

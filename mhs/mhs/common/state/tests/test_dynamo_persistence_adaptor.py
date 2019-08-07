@@ -183,6 +183,13 @@ def single_loop_async_test(f):
     """
 
     def wrapper(*args, **kwargs):
+        """
+        The wrapper function which will execute the provided coroutine within the shared event loop until it has
+        completed.
+        :param args: Arguments passed into the coroutine.
+        :param kwargs: Key word arguments passed into the coroutine.
+        :return: Only once the coroutine has completed.
+        """
         coro = asyncio.coroutine(f)
         future = coro(*args, **kwargs)
         loop = asyncio.get_event_loop()
