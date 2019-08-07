@@ -10,7 +10,7 @@ input_data = {
     wd.DATA_KEY: 'aaa-aaa-aaa',
     wd.DATA: {
         wd.CREATED_TIMESTAMP: '11:59',
-        wd.LAST_MODIFIED_TIMESTAMP: '12:00',
+        wd.LATEST_TIMESTAMP: '12:00',
         wd.VERSION_KEY: 1,
         wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
     }
@@ -21,7 +21,7 @@ old_data = {
     wd.DATA: {
         wd.VERSION_KEY: 0,
         wd.CREATED_TIMESTAMP: '11:59',
-        wd.LAST_MODIFIED_TIMESTAMP: '12:00',
+        wd.LATEST_TIMESTAMP: '12:00',
         wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
     }
 }
@@ -75,7 +75,7 @@ class TestWorkDescription(unittest.TestCase):
             wd.DATA_KEY: 'aaa-aaa-aaa',
             wd.DATA: {
                 wd.VERSION_KEY: 3,
-                wd.LAST_MODIFIED_TIMESTAMP: '11:00',
+                wd.LATEST_TIMESTAMP: '11:00',
                 wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
             }
         })
@@ -97,7 +97,7 @@ class TestWorkDescription(unittest.TestCase):
             wd.DATA_KEY: 'aaa-aaa-aaa',
             wd.DATA: {
                 wd.VERSION_KEY: 1,
-                wd.LAST_MODIFIED_TIMESTAMP: '11:00',
+                wd.LATEST_TIMESTAMP: '11:00',
                 wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
             }
         })
@@ -110,13 +110,10 @@ class TestWorkDescription(unittest.TestCase):
 
         updated = copy.deepcopy(input_data)
         updated[wd.DATA][wd.VERSION_KEY] = 2
-        print(updated)
+
         # Check local version updated
         self.assertEqual(work_description.version, 2)
-
-
         persistence.add.assert_called_with(json.dumps(updated))
-
 
     def test_null_persistence(self):
         with self.assertRaises(ValueError):
@@ -173,7 +170,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.DATA_KEY: 'aaa-aaa',
                 wd.DATA: {
                     wd.CREATED_TIMESTAMP: '12',
-                    wd.LAST_MODIFIED_TIMESTAMP: '12',
+                    wd.LATEST_TIMESTAMP: '12',
                     wd.STATUS: wd.MessageStatus.RECEIVED,
                     wd.VERSION_KEY: 1
                 }

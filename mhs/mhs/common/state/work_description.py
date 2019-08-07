@@ -1,3 +1,4 @@
+from __future__ import annotations
 import json
 import utilities.integration_adaptors_logger as log
 import datetime
@@ -14,7 +15,7 @@ class MessageStatus:
 DATA_KEY = 'MESSAGE_KEY'
 VERSION_KEY = 'VERSION'
 CREATED_TIMESTAMP = 'CREATED'
-LAST_MODIFIED_TIMESTAMP = 'TIMESTAMP'
+LATEST_TIMESTAMP = 'TIMESTAMP'
 DATA = 'DATA'
 STATUS = 'STATUS'
 
@@ -34,7 +35,7 @@ def get_time():
     return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
 
 
-async def get_work_description_from_store(persistence_store, key: str):
+async def get_work_description_from_store(persistence_store, key: str) -> WorkDescription:
     """
     Attempts to retrieve and deserialize a work description instance from the given persistence store to create
     a local work description
@@ -57,7 +58,7 @@ async def get_work_description_from_store(persistence_store, key: str):
 
 def create_new_work_description(persistence_store,
                                 key: str,
-                                status: int):
+                                status: int) -> WorkDescription:
     """
     Builds a new local work description instance given the details of the message, these details are held locally
     until a `publish` is executed
@@ -77,7 +78,7 @@ def create_new_work_description(persistence_store,
         DATA_KEY: key,
         DATA: {
             CREATED_TIMESTAMP: timestamp,
-            LAST_MODIFIED_TIMESTAMP: timestamp,
+            LATEST_TIMESTAMP: timestamp,
             STATUS: status,
             VERSION_KEY: 1
         }
@@ -104,7 +105,7 @@ class WorkDescription:
         self.message_key = store_data[DATA_KEY]
         self.version = data[VERSION_KEY]
         self.created_timestamp = data[CREATED_TIMESTAMP]
-        self.last_modified_timestamp = data[LAST_MODIFIED_TIMESTAMP]
+        self.last_modified_timestamp = data[LATEST_TIMESTAMP]
         self.status = data[STATUS]
 
     async def publish(self):
@@ -122,7 +123,7 @@ class WorkDescription:
             latest_version = latest_data[DATA][VERSION_KEY]
             if latest_version == self.version:
                 logger.info('017', 'Local version matches remote, incrementing local version number')
-                self.version = self.version + 1
+                self.version += 1
             elif latest_version > self.version:
                 logger.error('014', 'Failed to update message {key}, local version out of date',
                              {'key': self.message_key})
@@ -146,7 +147,7 @@ class WorkDescription:
             DATA_KEY: self.message_key,
             DATA: {
                 CREATED_TIMESTAMP: self.created_timestamp,
-                LAST_MODIFIED_TIMESTAMP: self.last_modified_timestamp,
+                LATEST_TIMESTAMP: self.last_modified_timestamp,
                 VERSION_KEY: self.version,
                 STATUS: self.status
             }
