@@ -30,7 +30,7 @@ class EmptyWorkDescriptionError(RuntimeError):
 
 
 def get_time():
-    """Returns UTC time in the same appropriate format """
+    """Returns UTC time in the appropriate format """
     return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
 
 
@@ -115,11 +115,15 @@ class WorkDescription:
         """
         logger.info('011', 'Attempting to publish work description {key}', {'key': self.message_key})
         logger.info('012', 'Retrieving latest work description to check version')
+
         latest_data = await self.persistence_store.get(self.message_key)
         if latest_data is not None:
             logger.info('013', 'Retrieved previous version, comparing versions')
             latest_version = latest_data[DATA][VERSION_KEY]
-            if latest_version >= self.version:
+            if latest_version == self.version:
+                logger.info('017', 'Local version matches remote, incrementing local version number')
+                self.version = self.version + 1
+            elif latest_version > self.version:
                 logger.error('014', 'Failed to update message {key}, local version out of date',
                              {'key': self.message_key})
                 raise OutOfDateVersionError(f'Failed to update message {self.message_key}: local version out of date')
