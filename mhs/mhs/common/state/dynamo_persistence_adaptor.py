@@ -1,3 +1,4 @@
+"""Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
 import json
 import traceback
 
@@ -10,57 +11,41 @@ logger = log.IntegrationAdaptorsLogger('DYNAMO_PERSISTENCE')
 
 
 class RecordCreationError(RuntimeError):
+    """Error occurred when creating record."""
     pass
 
 
 class RecordDeletionError(RuntimeError):
+    """Error occurred when deleting record."""
     pass
 
 
 class RecordRetrievalError(RuntimeError):
-    pass
-
-
-class InvalidTableError(RuntimeError):
+    """Error occurred when retrieving record."""
     pass
 
 
 class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceAdaptor):
-    """
-    Class responsible for persisting items into DynamoDB.
-    """
+    """Class responsible for persisting items into a DynamoDB."""
 
     def __init__(self, **kwargs):
         """
         Constructs a DynamoDB version of a
         :class:`PersistenceAdaptor <mhs.common.state.persistence_adaptor.PersistenceAdaptor>`.
         The kwargs provided should contain the following information:
-          * state_table: The name used to refer to the table containing state items.
-          * state_arn: The Amazon Resource Name used to identify the dynamo table containing state items.
-          * sync_async_table: The name used to refer to the table containing sync_async message items.
-          * sync_async_arn: The Amazon Resource Name used to identify the dynamo table containing sync_async message
-            items.
+          * table_name: The Table Name used to identify the dynamo table containing required items.
         :param kwargs: The key word arguments required for this constructor.
         """
-        state_table = kwargs.get('state_table', 'state')
-        state_arn = kwargs.get('state_arn')
-        sync_async_table = kwargs.get('sync_async_table', 'sync_async')
-        sync_async_arn = kwargs.get('sync_async_arn')
+        self.table_name = kwargs.get('table_name')
 
-        dynamo_db = aioboto3.resource('dynamodb')
-
-        self.tables = {
-            state_table: dynamo_db.Table(state_arn),
-            sync_async_table: dynamo_db.Table(sync_async_arn)
-        }
-
-    async def add(self, table_name, key, item):
-        logger.info('011', 'Adding {record} for {key}', {'record': item, 'key': key})
+    async def add(self, key, data):
+        logger.info('011', 'Adding {record} for {key}', {'record': data, 'key': key})
         try:
-            response = await self._resolve_table(table_name).put_item(
-                Item={'key': key, 'data': json.dumps(item)},
-                ReturnValues='ALL_OLD'
-            )
+            async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
+                response = await dynamo_resource.Table(self.table_name).put_item(
+                    Item={'key': key, 'data': json.dumps(data)},
+                    ReturnValues='ALL_OLD'
+                )
             if response.get('Attributes', {}).get('data') is None:
                 logger.info('000', 'No previous record found: {key}', {'key': key})
                 return None
@@ -69,12 +54,13 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
             logger.error('001', 'Error creating record: {exception}', {'exception': traceback.format_exc()})
             raise RecordCreationError from e
 
-    async def get(self, table_name, key):
+    async def get(self, key):
         logger.info('002', 'Getting record for {key}', {'key': key})
         try:
-            response = await self._resolve_table(table_name).get_item(
-                Key=key
-            )
+            async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
+                response = await dynamo_resource.Table(self.table_name).get_item(
+                    Key={'key': key}
+                )
             logger.info('003', 'Response from get_item call: {response}', {'response': response})
             if 'Item' not in response:
                 logger.info('004', 'No item found for record: {key}', {'key': key})
@@ -84,13 +70,14 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
             logger.error('005', 'Error getting record: {exception}', {'exception': traceback.format_exc()})
             raise RecordRetrievalError from e
 
-    async def delete(self, table_name, key):
+    async def delete(self, key):
         logger.info('006', 'Deleting record for {key}', {'key': key})
         try:
-            response = await self._resolve_table(table_name).delete_item(
-                Key=key,
-                ReturnValues='ALL_OLD'
-            )
+            async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
+                response = await dynamo_resource.Table(self.table_name).delete_item(
+                    Key={'key': key},
+                    ReturnValues='ALL_OLD'
+                )
             logger.info('007', 'Response from delete_item call: {response}', {'response': response})
             if 'Attributes' not in response:
                 logger.info('008', 'No values found for record: {key}', {'key': key})
@@ -99,11 +86,3 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
         except Exception as e:
             logger.error('009', 'Error deleting record: {exception}', {'exception': traceback.format_exc()})
             raise RecordDeletionError from e
-
-    def _resolve_table(self, table_name):
-        table = self.tables.get(table_name)
-        if table is None:
-            logger.info('010', 'Table could not be found for: {table_name}', {'table_name': table_name})
-            raise InvalidTableError
-        logger.info('012', 'Table found for: {table_name}', {'table_name': table_name})
-        return table
