@@ -8,11 +8,11 @@ import tornado.ioloop
 import tornado.web
 
 import definitions
-import mhs.common.configuration.configuration_manager as configuration_manager
-import mhs.common.workflow.sync_async as sync_async_workflow
-import mhs.inbound.request.handler as async_request_handler
-import mhs.outbound.request.synchronous.handler as client_request_handler
-import mhs.outbound.transmission.outbound_transmission as outbound_transmission
+import common.configuration.configuration_manager as configuration_manager
+import common.workflow.sync_async as sync_async_workflow
+import inbound.request.handler as async_request_handler
+import outbound.request.synchronous.handler as client_request_handler
+import outbound.transmission.outbound_transmission as outbound_transmission
 import utilities.config as config
 import utilities.file_utilities as file_utilities
 
