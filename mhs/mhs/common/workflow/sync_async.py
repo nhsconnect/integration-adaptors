@@ -101,7 +101,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         context[ebxml_request_envelope.MESSAGE] = content
         request = ebxml_request_envelope.EbxmlRequestEnvelope(context)
 
-        message_id, message = request.serialize()
+        message_id, _, message = request.serialize()
 
         logging.debug("Generated ebXML wrapper with conversation ID '%s' and message ID '%s'", conversation_id,
                       message_id)

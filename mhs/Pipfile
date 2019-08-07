@@ -13,6 +13,7 @@ integration-adaptors-common = {editable = true,path = "./../common"}
 ldap3 = "*"
 tornado = "*"
 aioboto3 = "*"
+defusedxml = "~=0.6"
 
 [requires]
 python_version = "3.7"
