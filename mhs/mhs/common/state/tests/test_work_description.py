@@ -88,6 +88,36 @@ class TestWorkDescription(unittest.TestCase):
         with self.assertRaises(wd.OutOfDateVersionError):
             await work_description.publish()
 
+    @patch('mhs.common.state.work_description.get_time')
+    @async_test
+    async def test_auto_increase_version(self, time_mock):
+        time_mock.return_value = '12:00'
+        future = asyncio.Future()
+        future.set_result({
+            wd.DATA_KEY: 'aaa-aaa-aaa',
+            wd.DATA: {
+                wd.VERSION_KEY: 1,
+                wd.LAST_MODIFIED_TIMESTAMP: '11:00',
+                wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+            }
+        })
+
+        persistence = MagicMock()
+        persistence.get.return_value = future
+        persistence.add.return_value = future
+        work_description = wd.WorkDescription(persistence, input_data)
+        await work_description.publish()
+
+        updated = input_data.copy()
+        updated[wd.DATA][wd.VERSION_KEY] = 2
+        print(updated)
+        # Check local version updated
+        self.assertEqual(work_description.version, 2)
+
+
+        persistence.add.assert_called_with(json.dumps(updated))
+
+
     def test_null_persistence(self):
         with self.assertRaises(ValueError):
             wd.WorkDescription(None, {'None': 'None'})
