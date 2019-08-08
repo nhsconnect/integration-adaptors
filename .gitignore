@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # ide file
-.idea
+*.iml
 
 # C extensions
 *.so

@@ -3,11 +3,6 @@ variable "region" {
   default = "eu-west-2"
   description = "The AWS region to deploy to."
 }
-variable "profile" {
-  type = string
-  default = "default"
-  description = "The profile to use for the aws cli."
-}
 variable "cluster_id" {
   type = string
   description = "The ECS cluster to deploy to."
@@ -40,12 +35,7 @@ variable "scr_service_port" {
   type = number
   description = "The port to be exposed for the scr web service"
 }
-variable "queue_security_group_id" {
-  type = string
-  description = "The security group to use for the queues"
-}
 variable "environment" {
   type = string
   description = "A name for the environment to be used."
-  default = "test"
 }

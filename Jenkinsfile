@@ -44,14 +44,17 @@ pipeline {
                     sh label: 'Initialising Terraform', script: 'terraform init -input=false'
                     sh label: 'Applying Terraform configuration', script: """
                             terraform apply -auto-approve \
-                            -var cluster_id=${CLUSTER_ID} \
+                            -var cluster_id=${CLUSTER_ID_2} \
                             -var ecr_address=${DOCKER_REPOSITORY} \
                             -var scr_ecr_address=${SCR_REPOSITORY} \
                             -var task_execution_role=${TASK_EXECUTION_ROLE} \
                             -var build_id=${BUILD_TAG} \
                             -var mhs_log_level=DEBUG \
                             -var scr_log_level=DEBUG \
-                            -var scr_service_port=${SCR_SERVICE_PORT}
+                            -var scr_service_port=${SCR_SERVICE_PORT} \
+                            -var queue_security_group_id=${QUEUE_SG_ID} \
+                            -var environment=${ENVIRONMENT} \
+                            -var environment_description=${ENVIRONMENT_DESC}
                         """
                 }
             }
