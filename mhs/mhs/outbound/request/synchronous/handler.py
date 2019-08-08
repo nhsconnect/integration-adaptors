@@ -9,7 +9,7 @@ import tornado.web
 import mhs.common.workflow.common as common_workflow
 import mhs.common.workflow.sync_async as sync_async_workflow
 import mhs.outbound.request.common as common
-from utilities import integration_adaptors_logger as log
+from utilities import integration_adaptors_logger as log, message_utilities
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
@@ -32,12 +32,30 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
 
     async def post(self):
         message_id = self.request.headers.get('Message-Id', None)
+        log.message_id.set(message_id)
+        if not message_id:
+            message_id = message_utilities.MessageUtilities.get_uuid()
+            log.message_id.set(message_id)
+            logger.info('0006', "Didn't receive message id in incoming request from supplier, so have generated a new "
+                                "one.")
+        else:
+            logger.info('0007', 'Found message id on incoming request.')
+
+        correlation_id = self.request.headers.get('Correlation-Id', None)
+        log.correlation_id.set(correlation_id)
+        if not correlation_id:
+            correlation_id = message_utilities.MessageUtilities.get_uuid()
+            log.correlation_id.set(correlation_id)
+            logger.info('0008', "Didn't receive correlation id in incoming request from supplier, so have generated a "
+                                "new one.")
+        else:
+            logger.info('0009', 'Found correlation id on incoming request.')
 
         try:
             interaction_name = self.request.headers['Interaction-Id']
         except KeyError as e:
-            logger.warning('0005', 'Required Interaction-Id header not passed in request {Message-Id}',
-                           {'Message-Id': message_id})
+            logger.warning('0005', 'Required Interaction-Id header not passed in request {MessageId}',
+                           {'MessageId': message_id})
             raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found') from e
 
         logger.info('0001', 'Client POST received. {Request}', {'Request': str(self.request)})
