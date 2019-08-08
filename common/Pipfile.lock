@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "813ecad8a3220e73498cac30201a9e195dfcee095074f1cf3bb6bea4e98bd7f4"
+            "sha256": "bd68074e5832a7621e4be95d6bb513f2ea24934ca44fc2f1499a412423fffedf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -57,6 +57,7 @@
             "hashes": [
                 "sha256:1bbf12b79b0f84af96dce3518701a1a3c6dcd9c6a0f0b718886b2d40ef38315c"
             ],
+            "index": "pypi",
             "version": "==0.28.0"
         },
         "tornado": {
@@ -69,6 +70,7 @@
                 "sha256:c845db36ba616912074c5b1ee897f8e0124df269468f25e4fe21fe72f6edd7a9",
                 "sha256:c9399267c926a4e7c418baa5cbe91c7d1cf362d505a1ef898fde44a07c9dd8a5"
             ],
+            "index": "pypi",
             "version": "==6.0.3"
         }
     },
@@ -111,30 +113,12 @@
             "index": "pypi",
             "version": "==4.5.4"
         },
-        "python-qpid-proton": {
-            "hashes": [
-                "sha256:1bbf12b79b0f84af96dce3518701a1a3c6dcd9c6a0f0b718886b2d40ef38315c"
-            ],
-            "version": "==0.28.0"
-        },
         "six": {
             "hashes": [
                 "sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c",
                 "sha256:d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"
             ],
             "version": "==1.12.0"
-        },
-        "tornado": {
-            "hashes": [
-                "sha256:349884248c36801afa19e342a77cc4458caca694b0eda633f5878e458a44cb2c",
-                "sha256:398e0d35e086ba38a0427c3b37f4337327231942e731edaa6e9fd1865bbd6f60",
-                "sha256:4e73ef678b1a859f0cb29e1d895526a20ea64b5ffd510a2307b5998c7df24281",
-                "sha256:559bce3d31484b665259f50cd94c5c28b961b09315ccd838f284687245f416e5",
-                "sha256:abbe53a39734ef4aba061fca54e30c6b4639d3e1f59653f0da37a0003de148c7",
-                "sha256:c845db36ba616912074c5b1ee897f8e0124df269468f25e4fe21fe72f6edd7a9",
-                "sha256:c9399267c926a4e7c418baa5cbe91c7d1cf362d505a1ef898fde44a07c9dd8a5"
-            ],
-            "version": "==6.0.3"
         },
         "unittest-xml-reporting": {
             "hashes": [
