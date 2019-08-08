@@ -1,15 +1,14 @@
 """Module to test dynamo persistence adaptor functionality."""
 import asyncio
 import contextlib
+import functools
 import json
-import unittest
-from unittest.mock import patch, Mock, MagicMock
+import unittest.mock
 
-from utilities.test_utilities import async_test
+import utilities.test_utilities
 
-from mhs.common.state import dynamo_persistence_adaptor
-from mhs.common.state.dynamo_persistence_adaptor import DynamoPersistenceAdaptor, RecordCreationError, \
-    RecordRetrievalError, RecordDeletionError
+import mhs.common.state
+import mhs.common.state.dynamo_persistence_adaptor
 
 TEST_TABLE_ARN = "TEST TABLE ARN"
 TEST_DATA_OBJECT = {"test_attribute": "test_value"}
@@ -24,7 +23,7 @@ TEST_DELETE_EMPTY_RESPONSE = {}
 TEST_ADD_EMPTY_RESPONSE = {"Attributes": {}}
 TEST_ADD_RESPONSE = {"Attributes": TEST_ITEM}
 TEST_EXCEPTION = Exception()
-TEST_SIDE_EFFECT = Mock(side_effect=TEST_EXCEPTION)
+TEST_SIDE_EFFECT = unittest.mock.Mock(side_effect=TEST_EXCEPTION)
 
 
 class TestDynamoPersistenceAdaptor(unittest.TestCase):
@@ -32,113 +31,97 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
     def setUp(self):
         """Configure a dynamo persistence adaptor with the boto3 calls mocked."""
-
-        self.service = DynamoPersistenceAdaptor(
+        patcher = unittest.mock.patch.object(mhs.common.state.dynamo_persistence_adaptor.aioboto3, "resource")
+        self.mock_boto3_resource = patcher.start()
+        self.addCleanup(patcher.stop)
+        self.__configure_mocks(self.mock_boto3_resource)
+        self.service = mhs.common.state.dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
             table_name=TEST_TABLE_ARN
         )
 
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_add_success(self, mock_boto3_resource):
+    #   TESTING ADD METHOD
+    @utilities.test_utilities.async_test
+    async def test_add_success(self):
         """Test happy path for add call with no previous object."""
-        self.__configure_mocks(mock_boto3_resource)
         self.__setFutureResponse(self.mock_table.put_item, TEST_ADD_EMPTY_RESPONSE)
 
         response = await self.service.add(TEST_KEY, TEST_DATA_OBJECT)
 
         self.assertIsNone(response)
 
-    #   TESTING ADD METHOD
-
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_add_overwrite(self, mock_boto3_resource):
+    @utilities.test_utilities.async_test
+    async def test_add_overwrite(self):
         """Test happy path for add call, overwriting existing object."""
-        self.__configure_mocks(mock_boto3_resource)
         self.__setFutureResponse(self.mock_table.put_item, TEST_ADD_RESPONSE)
 
         response = await self.service.add(TEST_KEY, TEST_DATA_OBJECT)
 
         self.assertEqual(response, TEST_DATA_OBJECT)
 
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_add_io_exception(self, mock_boto3_resource):
+    @utilities.test_utilities.async_test
+    async def test_add_io_exception(self):
         """Test unhappy path for add where an IO exception occurs."""
-        self.__configure_mocks(mock_boto3_resource)
         self.mock_table.put_item.side_effect = TEST_SIDE_EFFECT
 
-        with self.assertRaises(RecordCreationError) as ex:
+        with self.assertRaises(mhs.common.state.dynamo_persistence_adaptor.RecordCreationError) as ex:
             await self.service.add(TEST_KEY, TEST_DATA_OBJECT)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
 
     #   TESTING GET METHOD
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_get_success(self, mock_boto3_resource):
+    @utilities.test_utilities.async_test
+    async def test_get_success(self):
         """Test happy path for get."""
-        self.__configure_mocks(mock_boto3_resource)
         self.__setFutureResponse(self.mock_table.get_item, TEST_GET_RESPONSE)
 
         response = await self.service.get(TEST_KEY)
 
         self.assertEqual(response, TEST_DATA_OBJECT)
 
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_get_invalid_key(self, mock_boto3_resource):
+    @utilities.test_utilities.async_test
+    async def test_get_invalid_key(self):
         """Test unhappy path for get where an invalid/missing key is provided."""
-        self.__configure_mocks(mock_boto3_resource)
         self.__setFutureResponse(self.mock_table.get_item, TEST_GET_EMPTY_RESPONSE)
 
         response = await self.service.get(TEST_INVALID_KEY)
 
         self.assertIsNone(response)
 
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_get_io_exception(self, mock_boto3_resource):
+    @utilities.test_utilities.async_test
+    async def test_get_io_exception(self):
         """Test unhappy path for get where an IO exception occurs."""
-        self.__configure_mocks(mock_boto3_resource)
         self.mock_table.get_item.side_effect = TEST_SIDE_EFFECT
 
-        with self.assertRaises(RecordRetrievalError) as ex:
+        with self.assertRaises(mhs.common.state.dynamo_persistence_adaptor.RecordRetrievalError) as ex:
             await self.service.get(TEST_INVALID_KEY)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
 
     #   TESTING DELETE METHOD
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_delete_success(self, mock_boto3_resource):
+    @utilities.test_utilities.async_test
+    async def test_delete_success(self):
         """Test happy path for delete."""
-        self.__configure_mocks(mock_boto3_resource)
         self.__setFutureResponse(self.mock_table.delete_item, TEST_DELETE_RESPONSE)
 
         response = await self.service.delete(TEST_KEY)
 
         self.assertEqual(response, TEST_DATA_OBJECT)
 
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_delete_invalid_key(self, mock_boto3_resource):
+    @utilities.test_utilities.async_test
+    async def test_delete_invalid_key(self):
         """Test unhappy path for delete where a invalid/missing key is provided."""
-        self.__configure_mocks(mock_boto3_resource)
         self.__setFutureResponse(self.mock_table.delete_item, TEST_DELETE_EMPTY_RESPONSE)
 
         response = await self.service.delete(TEST_INVALID_KEY)
 
         self.assertIsNone(response)
 
-    @patch.object(dynamo_persistence_adaptor.aioboto3, "resource")
-    @async_test
-    async def test_delete_io_exception(self, mock_boto3_resource):
+    @utilities.test_utilities.async_test
+    async def test_delete_io_exception(self):
         """Test unhappy path for delete where an IO exception occurs."""
-        self.__configure_mocks(mock_boto3_resource)
         self.mock_table.delete_item.side_effect = TEST_SIDE_EFFECT
 
-        with self.assertRaises(RecordDeletionError) as ex:
+        with self.assertRaises(mhs.common.state.dynamo_persistence_adaptor.RecordDeletionError) as ex:
             await self.service.delete(TEST_INVALID_KEY)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
@@ -157,13 +140,13 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
     def __configure_mocks(self, mock_boto3_resource):
         """Configure the standard mocks to have mappings which can be used in the tests."""
-        mock = MagicMock()
+        mock = unittest.mock.MagicMock()
         self.mock_table = mock.Table.return_value
         mock_boto3_resource.return_value = constant_context_manager(mock)
 
 
 @contextlib.asynccontextmanager
-async def constant_context_manager(mock: Mock):
+async def constant_context_manager(mock: unittest.mock.Mock):
     """
     Create a context manager which will provide a mock.
     :param mock: The mock to provide.
@@ -182,6 +165,7 @@ def single_loop_async_test(f):
     :return: a function which will execute an asynchronous unit test.
     """
 
+    @functools.wraps(f)
     def wrapper(*args, **kwargs):
         """
         The wrapper function which will execute the provided coroutine within the shared event loop until it has
@@ -204,7 +188,7 @@ class ComponentTestDynamoPersistenceAdaptor(unittest.TestCase):
 
     def setUp(self):
         """Configure a dynamo persistence adaptor with active boto3 calls."""
-        self.service = DynamoPersistenceAdaptor(
+        self.service = mhs.common.state.dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
             table_name="custom_test_db"
         )
 

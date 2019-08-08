@@ -1,4 +1,5 @@
 """Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
+import contextlib
 import json
 import traceback
 
@@ -47,8 +48,8 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
         """
         logger.info('011', 'Adding {record} for {key}', {'record': data, 'key': key})
         try:
-            async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
-                response = await dynamo_resource.Table(self.table_name).put_item(
+            async with self.__create_dynamo_table() as table:
+                response = await table.put_item(
                     Item={'key': key, 'data': json.dumps(data)},
                     ReturnValues='ALL_OLD'
                 )
@@ -68,8 +69,8 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
         """
         logger.info('002', 'Getting record for {key}', {'key': key})
         try:
-            async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
-                response = await dynamo_resource.Table(self.table_name).get_item(
+            async with self.__create_dynamo_table() as table:
+                response = await table.get_item(
                     Key={'key': key}
                 )
             logger.info('003', 'Response from get_item call: {response}', {'response': response})
@@ -89,8 +90,8 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
         """
         logger.info('006', 'Deleting record for {key}', {'key': key})
         try:
-            async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
-                response = await dynamo_resource.Table(self.table_name).delete_item(
+            async with self.__create_dynamo_table() as table:
+                response = await table.delete_item(
                     Key={'key': key},
                     ReturnValues='ALL_OLD'
                 )
@@ -102,3 +103,13 @@ class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceA
         except Exception as e:
             logger.error('009', 'Error deleting record: {exception}', {'exception': traceback.format_exc()})
             raise RecordDeletionError from e
+
+    @contextlib.asynccontextmanager
+    async def __create_dynamo_table(self):
+        """
+        Creates a connection to the table referenced by this instance.
+        :return: The table to be used by this instance.
+        """
+        async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
+            logger.info('010', 'Establishing connection to {table_name}', {'table_name': self.table_name})
+            yield dynamo_resource.Table(self.table_name)
