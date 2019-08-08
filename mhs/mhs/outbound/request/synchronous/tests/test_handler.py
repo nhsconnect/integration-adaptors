@@ -37,7 +37,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.workflow.prepare_message.return_value = False, None, REQUEST_BODY
         self.workflow.send_message.return_value = expected_response
 
-        response = self.fetch(f"/?messageId={message_id}", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+        response = self.fetch("/", method="POST",
+                              headers={"Interaction-Id": INTERACTION_NAME, "Message-Id": message_id}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body.decode(), expected_response)

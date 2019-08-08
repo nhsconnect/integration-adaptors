@@ -12,7 +12,9 @@ def call_mhs(mhs_command, hl7payload, message_id=None):
     :return: The response returned by the MHS.
     """
 
-    params = {} if message_id is None else {'messageId': message_id}
     headers = {'Interaction-Id': mhs_command}
-    response = requests.post(methods.get_hostname(), params=params, headers=headers, data=hl7payload)
+    if message_id is not None:
+        headers['Message-Id'] = message_id
+
+    response = requests.post(methods.get_hostname(), headers=headers, data=hl7payload)
     return response.text
