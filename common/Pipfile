@@ -5,11 +5,12 @@ verify_ssl = true
 
 [dev-packages]
 coverage = "~=4.5"
-tornado = "*"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
-integration-adaptors-common = {editable = true,path = "."}
+integration-adaptors-common = {editable = true, path = "."}
+tornado = "*"
+python-qpid-proton = "*"
 
 [requires]
 python_version = "3.7"
@@ -20,3 +21,6 @@ unittests-cov = 'coverage run -m xmlrunner -o test-reports -v'
 coverage-report = 'coverage report'
 coverage-report-xml = 'coverage xml'
 coverage-report-html = 'coverage html'
+local-env-prep = 'docker build -t rabbit-amqp1 local-env/rabbit/'
+local-env-start = 'docker run --rm -d --hostname localhost --name rabbit-amqp-1 -p 15672:15672 -p 5672:5672 rabbit-amqp1'
+local-env-stop = 'docker stop rabbit-amqp-1'
