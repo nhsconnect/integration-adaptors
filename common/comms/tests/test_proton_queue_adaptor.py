@@ -2,8 +2,6 @@
 import asyncio
 import unittest.mock
 
-import proton
-
 import comms.proton_queue_adaptor
 import utilities.test_utilities
 
@@ -18,6 +16,7 @@ class TestProtonQueueAdaptor(unittest.TestCase):
     """Class to contain tests for the ProtonQueueAdaptor functionality."""
 
     def setUp(self) -> None:
+        """Prepare standard mocks and service for unit testing."""
         patcher = unittest.mock.patch.object(comms.proton_queue_adaptor.proton.reactor, "Container")
         self.mock_container = patcher.start()
         self.addCleanup(patcher.stop)
@@ -28,13 +27,17 @@ class TestProtonQueueAdaptor(unittest.TestCase):
     async def test_send_async_success(self):
         """Test happy path of send_async."""
         self.mock_container.return_value.run.return_value = asyncio.Future()
+
         await self.service.send_async(TEST_MESSAGE)
+
         self.assertTrue(self.mock_container.return_value.run.called)
 
     # TESTING SEND SYNC METHOD
     def test_send_success(self):
         """Test happy path of send_sync."""
+
         self.service.send_sync(TEST_MESSAGE)
+
         self.assertTrue(self.mock_container.return_value.run.called)
 
 
@@ -42,6 +45,7 @@ class TestProtonMessagingHandler(unittest.TestCase):
     """Class to contain tests for the ProtonMessagingHandler functionality."""
 
     def setUp(self) -> None:
+        """Prepare service for testing."""
         self.handler = comms.proton_queue_adaptor.ProtonMessagingHandler(TEST_QUEUE_HOST, TEST_PROTON_MESSAGE)
 
     # TESTING STARTUP METHOD
