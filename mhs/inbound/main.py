@@ -8,10 +8,7 @@ import tornado.ioloop
 import tornado.web
 
 import definitions
-import common.configuration.configuration_manager as configuration_manager
-import common.workflow.sync_async as sync_async_workflow
-import inbound.request.handler as async_request_handler
-import outbound.transmission.outbound_transmission as outbound_transmission
+import request.handler as async_request_handler
 import utilities.config as config
 import utilities.file_utilities as file_utilities
 
@@ -41,25 +38,6 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 
     assert party_key
     return party_key
-
-
-def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
-                        party_key: str) -> sync_async_workflow.SyncAsyncWorkflow:
-    """Initialise the
-
-    :param data_dir: The directory to load interactions configuration from.
-    :param certs_dir: The directory containing certificates/keys to be used to identify this MHS to a remote MHS.
-    :param party_key: The party key to use to identify this MHS.
-    :return: The workflow that can be used to handle messages.
-    """
-    interactions_config_file = str(data_dir / "interactions" / "interactions.json")
-    config_manager = configuration_manager.ConfigurationManager(interactions_config_file)
-
-    transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
-
-    workflow = sync_async_workflow.SyncAsyncWorkflow(config_manager, transmission, party_key)
-
-    return workflow
 
 
 def configure_logging() -> None:
