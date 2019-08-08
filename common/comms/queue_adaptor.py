@@ -5,6 +5,7 @@ import abc
 class QueueAdaptor(abc.ABC):
     """Interface for a message queue adaptor."""
 
+    @abc.abstractmethod
     async def send_async(self, message: str) -> None:
         """
         Sends a message with awaits using the async flow.
@@ -12,6 +13,7 @@ class QueueAdaptor(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
     def send_sync(self, message: str) -> None:
         """
         Sends a message and blocks waiting for the send to complete.

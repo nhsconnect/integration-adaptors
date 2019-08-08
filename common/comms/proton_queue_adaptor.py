@@ -1,11 +1,12 @@
 """Module for Proton specific queue adaptor functionality. """
-import uuid
 
-import tornado.ioloop
-import comms.queue_adaptor
-import proton.reactor
 import proton.handlers
+import proton.reactor
+import tornado.ioloop
+
+import comms.queue_adaptor
 import utilities.integration_adaptors_logger as log
+import utilities.message_utilities
 
 logger = log.IntegrationAdaptorsLogger('PROTON_QUEUE')
 
@@ -25,12 +26,12 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
 
     def __init__(self, **kwargs) -> None:
         """
-        Constrcut a Proton implementation of a :class:`QueueAdaptor <comms.queue_adaptor.QueueAdaptor>`.
+        Construct a Proton implementation of a :class:`QueueAdaptor <comms.queue_adaptor.QueueAdaptor>`.
         The kwargs provided should contain the following information:
           * host: The host of the Message Queue to be interacted with.
         :param kwargs: The key word arguments required for this constructor.
         """
-        super(ProtonQueueAdaptor, self).__init__()
+        super().__init__()
         self.host = kwargs.get('host')
         logger.info('000', 'Initialized proton queue adaptor for {host}', {'host': self.host})
 
@@ -50,7 +51,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         :param message: The message body to be wrapped.
         :return: The Message in the correct format with generated uuid.
         """
-        message_id = str(uuid.uuid4())
+        message_id = utilities.message_utilities.MessageUtilities.get_uuid()
         logger.info('001', 'Constructing message with {id} for {body}', {'id': message_id, 'body': message})
         return proton.Message(id=message_id, body=message)
 
@@ -71,36 +72,36 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         :param host: The host to send the message to.
         :param message: The message to be sent to the host.
         """
-        super(ProtonMessagingHandler, self).__init__()
-        self.host = host
-        self.message = message
-        self.sender = None
-        self.sent = False
+        super().__init__()
+        self._host = host
+        self._message = message
+        self._sender = None
+        self._sent = False
 
     def on_start(self, event):
-        logger.info('002', 'Establishing connection to {host} for sending messages.', {'host': self.host})
-        self.sender = event.container.create_sender(self.host)
+        logger.info('002', 'Establishing connection to {host} for sending messages.', {'host': self._host})
+        self._sender = event.container.create_sender(self._host)
 
     def on_sendable(self, event):
         if event.sender.credit:
-            if not self.sent:
-                event.sender.send(self.message)
-                logger.info('003', 'Message sent to {host}.', {'host': self.host})
-                self.sent = True
+            if not self._sent:
+                event.sender.send(self._message)
+                logger.info('003', 'Message sent to {host}.', {'host': self._host})
+                self._sent = True
         else:
             logger.error('004', 'Failed to send message as no available credit.')
             raise MessageSendingError()
 
     def on_accepted(self, event):
-        logger.info('005', 'Message received by {host}.', {'host': self.host})
+        logger.info('005', 'Message received by {host}.', {'host': self._host})
         event.connection.close()
 
     def on_disconnected(self, event):
-        logger.info('006', 'Disconnected from {host}.', {'host': self.host})
-        if not self.sent:
+        logger.info('006', 'Disconnected from {host}.', {'host': self._host})
+        if not self._sent:
             logger.error('010', 'Disconnected before message could be sent.')
             raise EarlyDisconnectError()
 
     def on_rejected(self, event):
-        logger.warning('007', 'Message rejected by {host}.', {'host': self.host})
-        self.sent = False
+        logger.warning('007', 'Message rejected by {host}.', {'host': self._host})
+        self._sent = False
