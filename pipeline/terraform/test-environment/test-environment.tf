@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 module "ecs" {
-  source = "modules/ecs"
+  source = "./modules/ecs"
 
   region = var.region
   build_id = var.build_id
@@ -19,7 +19,7 @@ module "ecs" {
 }
 
 module "amazon-mq" {
-  source = "modules/amazon-mq"
+  source = "./modules/amazon-mq"
 
   environment = var.environment
   security_group_id = var.queue_security_group_id
