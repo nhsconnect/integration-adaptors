@@ -49,3 +49,11 @@ variable "environment" {
   description = "A name for the environment to be used."
   default = "test"
 }
+variable "queue_user" {
+  type = string
+  description = "The username for the default user to use."
+}
+variable "queue_pass" {
+  type = string
+  description = "The password for the default user to use."
+}

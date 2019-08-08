@@ -53,7 +53,9 @@ pipeline {
                             -var scr_log_level=DEBUG \
                             -var scr_service_port=${SCR_SERVICE_PORT} \
                             -var queue_security_group_id=${QUEUE_SG_ID} \
-                            -var environment=${ENVIRONMENT} 
+                            -var environment=${ENVIRONMENT} \
+                            -var queue_user=${QUEUE_USER} \
+                            -var queue_pass=${QUEUE_PASS}
                         """
                 }
             }
@@ -113,7 +115,9 @@ pipeline {
                         -var scr_log_level=DEBUG \
                         -var scr_service_port=${SCR_SERVICE_PORT} \
                         -var queue_security_group_id=${QUEUE_SG_ID} \
-                        -var environment=${ENVIRONMENT} 
+                        -var environment=${ENVIRONMENT} \
+                        -var queue_user=${QUEUE_USER} \
+                        -var queue_pass=${QUEUE_PASS}
                      """
             }
         }

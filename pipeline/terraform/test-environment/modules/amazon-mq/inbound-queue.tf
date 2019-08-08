@@ -12,8 +12,8 @@ resource "aws_mq_broker" "inbound-queue" {
   security_groups    = ["${var.security_group_id}"]
 
   user {
-    username = "ExampleUser"
-    password = "MindTheGap"
+    username = var.queue_user
+    password = var.queue_pass
   }
 }
 

@@ -23,4 +23,6 @@ module "amazon-mq" {
 
   environment = var.environment
   security_group_id = var.queue_security_group_id
+  queue_user = var.queue_user
+  queue_pass = var.queue_pass
 }
