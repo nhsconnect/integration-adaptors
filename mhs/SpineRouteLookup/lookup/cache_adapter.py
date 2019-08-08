@@ -8,7 +8,7 @@ FIFTEEN_MINUTES_IN_SECONDS = 900
 
 
 class CacheAdapter(abc.ABC):
-    """An adapter that provides a common interface to the message configuration cache."""
+    """An adapter that provides a mhs_common interface to the message configuration cache."""
 
     def __init__(self, expiry_time=FIFTEEN_MINUTES_IN_SECONDS):
         """

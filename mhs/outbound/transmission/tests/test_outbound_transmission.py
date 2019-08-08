@@ -4,7 +4,7 @@ from unittest.mock import patch, sentinel, Mock
 
 import requests
 
-import outbound.transmission.outbound_transmission as outbound_transmission
+import transmission.outbound_transmission as outbound_transmission
 
 URL_NAME = "url"
 URL_VALUE = "URL"

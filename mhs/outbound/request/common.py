@@ -1,6 +1,6 @@
-"""This module defines the common base of outbound request handlers."""
+"""This module defines the mhs_common base of outbound request handlers."""
 
 
 class CommonOutbound:
-    """The common base class for all outbound request handlers."""
+    """The mhs_common base class for all outbound request handlers."""
     pass

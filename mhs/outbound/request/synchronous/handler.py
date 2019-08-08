@@ -6,9 +6,9 @@ from typing import Dict, Callable
 import tornado.locks
 import tornado.web
 
-import common.workflow.common as common_workflow
-import common.workflow.sync_async as sync_async_workflow
-import outbound.request.common as common
+import workflow.common as common_workflow
+import workflow.sync_async as sync_async_workflow
+import request.common as common
 from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')

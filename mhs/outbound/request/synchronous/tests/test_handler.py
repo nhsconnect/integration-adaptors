@@ -3,8 +3,8 @@ import unittest.mock
 import tornado.testing
 import tornado.web
 
-from common.workflow import common as common_workflow
-import outbound.request.synchronous.handler as handler
+from workflow import common as common_workflow
+import request.synchronous.handler as handler
 
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 INTERACTION_NAME = "interaction"
