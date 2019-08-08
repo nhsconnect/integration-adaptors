@@ -112,7 +112,10 @@ pipeline {
                         -var build_id=${BUILD_TAG} \
                         -var mhs_log_level=DEBUG \
                         -var scr_log_level=DEBUG \
-                        -var scr_service_port=${SCR_SERVICE_PORT}
+                        -var scr_service_port=${SCR_SERVICE_PORT} \
+                        -var queue_security_group_id=${QUEUE_SG_ID} \
+                        -var environment=${ENVIRONMENT} \
+                        -var environment_description=${ENVIRONMENT_DESC}
                      """
             }
         }
