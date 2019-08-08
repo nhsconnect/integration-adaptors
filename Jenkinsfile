@@ -52,7 +52,7 @@ pipeline {
                             -var mhs_log_level=DEBUG \
                             -var scr_log_level=DEBUG \
                             -var scr_service_port=${SCR_SERVICE_PORT} \
-                            -var queue_security_group_id=${QUEUE_SG_IDS} \
+                            -var queue_security_group_id=${QUEUE_SG_ID} \
                             -var environment=${ENVIRONMENT} 
                         """
                 }
@@ -112,7 +112,7 @@ pipeline {
                         -var mhs_log_level=DEBUG \
                         -var scr_log_level=DEBUG \
                         -var scr_service_port=${SCR_SERVICE_PORT} \
-                        -var queue_security_group_ids=${QUEUE_SG_IDS} \
+                        -var queue_security_group_id=${QUEUE_SG_ID} \
                         -var environment=${ENVIRONMENT} 
                      """
             }

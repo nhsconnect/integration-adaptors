@@ -22,5 +22,5 @@ module "amazon-mq" {
   source = "./modules/amazon-mq"
 
   environment = var.environment
-  security_group_ids = var.queue_security_group_ids
+  security_group_id = var.queue_security_group_id
 }

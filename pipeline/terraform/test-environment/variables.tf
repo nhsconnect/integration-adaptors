@@ -40,8 +40,8 @@ variable "scr_service_port" {
   type = number
   description = "The port to be exposed for the scr web service"
 }
-variable "queue_security_group_ids" {
-  type = list(string)
+variable "queue_security_group_id" {
+  type = string
   description = "The security group to use for the queues"
 }
 variable "environment" {

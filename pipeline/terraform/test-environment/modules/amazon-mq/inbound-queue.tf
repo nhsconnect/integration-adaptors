@@ -9,7 +9,7 @@ resource "aws_mq_broker" "inbound-queue" {
   engine_type        = "ActiveMQ"
   engine_version     = "5.15.9"
   host_instance_type = "mq.t2.micro"
-  security_groups    = var.security_group_ids
+  security_groups    = ["${var.security_group_id}"]
 
   user {
     username = "ExampleUser"
