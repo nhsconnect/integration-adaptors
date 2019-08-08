@@ -1,4 +1,4 @@
-"""This module defines the common base of all workflows."""
+"""This module defines the mhs_common base of all workflows."""
 
 
 class UnknownInteractionError(Exception):

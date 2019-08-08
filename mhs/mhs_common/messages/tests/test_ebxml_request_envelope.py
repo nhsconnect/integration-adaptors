@@ -1,8 +1,8 @@
 from unittest.mock import patch
 
-import common.messages.ebxml_envelope as ebxml_envelope
-import common.messages.ebxml_request_envelope as ebxml_request_envelope
-import common.messages.tests.test_ebxml_envelope as test_ebxml_envelope
+import messages.ebxml_envelope as ebxml_envelope
+import messages.ebxml_request_envelope as ebxml_request_envelope
+import messages.tests.test_ebxml_envelope as test_ebxml_envelope
 from builder import pystache_message_builder
 from utilities import file_utilities
 from utilities import message_utilities

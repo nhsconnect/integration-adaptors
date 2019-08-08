@@ -1,6 +1,6 @@
-"""This module defines the common base for all asynchronous workflows."""
+"""This module defines the mhs_common base for all asynchronous workflows."""
 
-import common.workflow.common as common
+import workflow.common as common
 
 
 class CommonAsynchronousWorkflow(common.CommonWorkflow):

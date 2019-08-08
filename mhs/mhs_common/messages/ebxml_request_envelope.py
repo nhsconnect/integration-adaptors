@@ -10,7 +10,7 @@ from xml.etree.ElementTree import Element
 
 from defusedxml import ElementTree
 
-from common.messages import ebxml_envelope
+from messages import ebxml_envelope
 from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger('COMMON_EBXML_REQUEST_ENVELOPE')

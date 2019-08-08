@@ -5,8 +5,8 @@ from typing import Dict, Tuple, Any, Optional, NamedTuple
 from xml.etree.ElementTree import Element
 
 import builder.pystache_message_builder as pystache_message_builder
-import definitions
-import common.messages.envelope as envelope
+from definitions import ROOT_DIR
+import messages.envelope as envelope
 import utilities.message_utilities as message_utilities
 from utilities import integration_adaptors_logger as log
 
@@ -58,7 +58,7 @@ class EbxmlEnvelope(envelope.Envelope):
         """
         self.message_dictionary = message_dictionary
 
-        ebxml_template_dir = str(pathlib.Path(definitions.ROOT_DIR) / TEMPLATES_DIR)
+        ebxml_template_dir = str(pathlib.Path(ROOT_DIR) / TEMPLATES_DIR)
         self.message_builder = pystache_message_builder.PystacheMessageBuilder(ebxml_template_dir, template_file)
 
     def serialize(self) -> Tuple[str, Dict[str, str], str]:

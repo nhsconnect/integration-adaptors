@@ -1,6 +1,6 @@
 """This module defines the envelope used to wrap synchronous messages to be sent to a remote MHS."""
 
-import common.messages.envelope as envelope
+import messages.envelope as envelope
 
 
 class SoapEnvelope(envelope.Envelope):

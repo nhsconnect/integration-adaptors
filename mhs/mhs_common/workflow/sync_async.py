@@ -4,12 +4,11 @@ import copy
 import logging
 from typing import Tuple, Optional, Dict
 
-import common.configuration.configuration_manager as configuration_manager
-import common.messages.ebxml_envelope as ebxml_envelope
-import common.messages.ebxml_request_envelope as ebxml_request_envelope
-import common.workflow.common as common
-import common.workflow.common_synchronous as common_synchronous
-import outbound.transmission.outbound_transmission as outbound_transmission
+import configuration.configuration_manager as configuration_manager
+import messages.ebxml_envelope as ebxml_envelope
+import messages.ebxml_request_envelope as ebxml_request_envelope
+import workflow.common as common
+import workflow.common_synchronous as common_synchronous
 import utilities.message_utilities as message_utilities
 
 ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
@@ -18,8 +17,9 @@ ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     """Handles the workflow for the sync-async messaging pattern."""
 
+    # TODO: This used to take an outbound transmission object
     def __init__(self, config_manager: configuration_manager.ConfigurationManager,
-                 transmission: outbound_transmission.OutboundTransmission, party_id: str):
+                 transmission, party_id: str):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
 

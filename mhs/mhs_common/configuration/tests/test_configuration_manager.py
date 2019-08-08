@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
-import common.configuration.configuration_manager as configuration_manager
+import configuration.configuration_manager as configuration_manager
 
 TEST_CONFIG_DIR = "test_config"
 INTERACTIONS_JSON = "interactions.json"

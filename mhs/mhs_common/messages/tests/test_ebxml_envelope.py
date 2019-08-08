@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from defusedxml import ElementTree
 
-from common.messages import ebxml_envelope
+from messages import ebxml_envelope
 from utilities import file_utilities
 
 EXPECTED_MESSAGES_DIR = "expected_messages"

@@ -8,7 +8,7 @@ from typing import Dict, Tuple
 
 from defusedxml import ElementTree
 
-import common.messages.ebxml_envelope as ebxml_envelope
+import messages.ebxml_envelope as ebxml_envelope
 
 EBXML_TEMPLATE = "ebxml_ack"
 

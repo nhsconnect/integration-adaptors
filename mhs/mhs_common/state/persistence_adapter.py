@@ -4,5 +4,5 @@ This module defines the state adapter interface, used to allow support for multi
 
 
 class PersistenceAdapter:
-    """An adapter that provides a common interface to the state management database."""
+    """An adapter that provides a mhs_common interface to the state management database."""
     pass

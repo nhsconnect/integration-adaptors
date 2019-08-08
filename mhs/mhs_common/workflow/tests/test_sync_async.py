@@ -3,10 +3,10 @@ from unittest.mock import Mock, sentinel, patch
 
 import utilities.message_utilities as message_utilities
 
-import common.messages.ebxml_envelope as ebxml_envelope
-import common.messages.ebxml_request_envelope as ebxml_request_envelope
-import common.workflow.common as common_workflow
-import common.workflow.sync_async as sync_async
+import messages.ebxml_envelope as ebxml_envelope
+import messages.ebxml_request_envelope as ebxml_request_envelope
+import workflow.common as common_workflow
+import workflow.sync_async as sync_async
 
 PARTY_ID = "PARTY-ID"
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
@@ -19,7 +19,7 @@ class TestSyncAsyncWorkflow(TestCase):
 
         self.workflow = sync_async.SyncAsyncWorkflow(self.mock_interactions_config, self.mock_transmission, PARTY_ID)
 
-    @patch("common.messages.ebxml_request_envelope.EbxmlRequestEnvelope")
+    @patch("messages.ebxml_request_envelope.EbxmlRequestEnvelope")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_prepare_message_async(self, mock_get_uuid, mock_envelope):
         mock_get_uuid.return_value = MOCK_UUID
@@ -44,7 +44,7 @@ class TestSyncAsyncWorkflow(TestCase):
         self.assertIs(sentinel.ebxml_id, actual_id)
         self.assertIs(sentinel.ebxml_message, actual_response)
 
-    @patch("common.messages.ebxml_request_envelope.EbxmlRequestEnvelope")
+    @patch("messages.ebxml_request_envelope.EbxmlRequestEnvelope")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_prepare_message_async_message_id_passed_in(self, mock_get_uuid, mock_envelope):
         mock_get_uuid.return_value = MOCK_UUID

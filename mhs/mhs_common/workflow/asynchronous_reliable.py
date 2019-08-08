@@ -1,6 +1,6 @@
 """This module defines the asynchronous reliable workflow."""
 
-import common.workflow.common_asynchronous as common_asynchronous
+import workflow.common_asynchronous as common_asynchronous
 
 
 class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflow):
