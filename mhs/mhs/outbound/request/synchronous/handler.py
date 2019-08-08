@@ -30,10 +30,18 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
         self.async_response_received = tornado.locks.Event()
         self.async_timeout = async_timeout
 
-    async def post(self, interaction_name):
+    async def post(self):
+        message_id = self.get_query_argument("messageId", default=None)
+
+        try:
+            interaction_name = self.request.headers['Interaction-Id']
+        except KeyError as e:
+            logger.warning('0005', 'Required Interaction-Id header not passed in request {Message-Id}',
+                           {'Message-Id': message_id})
+            raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found') from e
+
         logger.info('0001', 'Client POST received. {Request}', {'Request': str(self.request)})
 
-        message_id = self.get_query_argument("messageId", default=None)
 
         async_message_id = None
         try:

@@ -16,7 +16,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
     def get_app(self):
         self.workflow = unittest.mock.Mock()
         return tornado.web.Application([
-            (r"/(.*)", handler.SynchronousHandler, dict(workflow=self.workflow, callbacks={}, async_timeout=1))
+            (r"/", handler.SynchronousHandler, dict(workflow=self.workflow, callbacks={}, async_timeout=1))
         ])
 
     def test_post_synchronous_message(self):
@@ -24,7 +24,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.workflow.prepare_message.return_value = False, None, REQUEST_BODY
         self.workflow.send_message.return_value = expected_response
 
-        response = self.fetch(f"/{INTERACTION_NAME}", method="POST", body=REQUEST_BODY)
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.headers["Content-Type"], "text/xml")
@@ -37,17 +37,22 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.workflow.prepare_message.return_value = False, None, REQUEST_BODY
         self.workflow.send_message.return_value = expected_response
 
-        response = self.fetch(f"/{INTERACTION_NAME}?messageId={message_id}", method="POST", body=REQUEST_BODY)
+        response = self.fetch(f"/?messageId={message_id}", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body.decode(), expected_response)
         self.workflow.prepare_message.assert_called_with(INTERACTION_NAME, REQUEST_BODY, message_id)
         self.workflow.send_message.assert_called_with(INTERACTION_NAME, REQUEST_BODY)
 
+    def test_post_with_no_interaction_name(self):
+        response = self.fetch("/", method="POST", body="A request")
+
+        self.assertEqual(response.code, 404)
+
     def test_post_with_invalid_interaction_name(self):
         self.workflow.prepare_message.side_effect = common_workflow.UnknownInteractionError(INTERACTION_NAME)
 
-        response = self.fetch(f"/{INTERACTION_NAME}", method="POST", body="A request")
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="A request")
 
         self.assertEqual(response.code, 404)
 
@@ -56,6 +61,6 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.workflow.prepare_message.return_value = True, MOCK_UUID, "ebXML request"
         self.workflow.send_message.return_value = "Hello world!"
 
-        response = self.fetch(f"/{INTERACTION_NAME}", method="POST", body="A request")
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="A request")
 
         self.assertEqual(response.code, 500)

@@ -80,7 +80,7 @@ def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_w
     callbacks = {}
 
     supplier_application = tornado.web.Application(
-        [(r"/(.*)", client_request_handler.SynchronousHandler,
+        [(r"/", client_request_handler.SynchronousHandler,
           dict(workflow=workflow, callbacks=callbacks, async_timeout=ASYNC_TIMEOUT))])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
     supplier_server.listen(80)
