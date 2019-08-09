@@ -3,10 +3,8 @@
 import copy
 from typing import Tuple, Dict
 
-import mhs.common.configuration.configuration_manager as configuration_manager
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
 import mhs.common.messages.ebxml_request_envelope as ebxml_request_envelope
-import mhs.common.workflow.common as common
 import mhs.common.workflow.common_synchronous as common_synchronous
 import mhs.outbound.transmission.outbound_transmission as outbound_transmission
 from utilities import integration_adaptors_logger as log, message_utilities
@@ -19,31 +17,27 @@ ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     """Handles the workflow for the sync-async messaging pattern."""
 
-    def __init__(self, config_manager: configuration_manager.ConfigurationManager,
-                 transmission: outbound_transmission.OutboundTransmission, party_id: str):
+    def __init__(self, transmission: outbound_transmission.OutboundTransmission, party_id: str):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
 
-        :param config_manager: The object that can be used to obtain configuration details.
         :param transmission: The component that can be used to send messages.
         :param party_id: The party ID of this MHS. Sent in ebXML requests.
         """
 
-        self.config_manager = config_manager
         self.transmission = transmission
         self.party_id = party_id
 
-    def prepare_message(self, interaction_name: str, content: str, message_id: str) -> Tuple[bool, str]:
+    def prepare_message(self, interaction_details: dict, content: str, message_id: str) -> Tuple[bool, str]:
         """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
 
-        :param interaction_name: The name of the interaction the message is related to.
+        :param interaction_details: The details of the interaction looked up from the config manager.
         :param content: The message content to be sent.
         :param message_id: message id to use in the message header.
         :return: A tuple containing:
         1. A flag indicating whether this message should be sent asynchronously
         2. The message to send
         """
-        interaction_details = self._get_interaction_details(interaction_name)
 
         interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
 
@@ -55,29 +49,20 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         return is_async, message
 
-    def send_message(self, interaction_name: str, message: str) -> str:
+    def send_message(self, interaction_details: dict, message: str) -> str:
         """Send the provided message for the interaction named. Returns the response received immediately, but note that
         if the interaction will result in an asynchronous response, this will simply be the acknowledgement of the
         request.
 
-        :param interaction_name: The name of the interaction the message is related to.
+        :param interaction_details: The details of the interaction looked up from the config manager.
         :param message: A string representing the message to be sent.
         :return: A string containing the immediate response to the message sent.
         :raises: An UnknownInteractionError if the interaction_name specified was not found.
         """
 
-        interaction_details = self._get_interaction_details(interaction_name)
         response = self.transmission.make_request(interaction_details, message)
         logger.info("0001", "Message sent to Spine, and response received.")
         return response
-
-    def _get_interaction_details(self, interaction_name):
-        interaction_details = self.config_manager.get_interaction_details(interaction_name)
-
-        if not interaction_details:
-            raise common.UnknownInteractionError(interaction_name)
-
-        return interaction_details
 
     def _wrap_message_in_ebxml(self, interaction_details: Dict[str, str], content: str) -> str:
         """Wrap the specified message in an ebXML wrapper.

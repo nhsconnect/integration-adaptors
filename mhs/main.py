@@ -44,21 +44,18 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     return party_key
 
 
-def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
+def initialise_workflow(certs_dir: pathlib.Path,
                         party_key: str) -> sync_async_workflow.SyncAsyncWorkflow:
-    """Initialise the
+    """Initialise the workflow
 
-    :param data_dir: The directory to load interactions configuration from.
     :param certs_dir: The directory containing certificates/keys to be used to identify this MHS to a remote MHS.
     :param party_key: The party key to use to identify this MHS.
     :return: The workflow that can be used to handle messages.
     """
-    interactions_config_file = str(data_dir / "interactions" / "interactions.json")
-    config_manager = configuration_manager.ConfigurationManager(interactions_config_file)
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
 
-    workflow = sync_async_workflow.SyncAsyncWorkflow(config_manager, transmission, party_key)
+    workflow = sync_async_workflow.SyncAsyncWorkflow(transmission, party_key)
 
     return workflow
 
@@ -68,10 +65,11 @@ def configure_logging() -> None:
     logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=config.config["LOG_LEVEL"])
 
 
-def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_workflow.SyncAsyncWorkflow,
+def start_tornado_servers(data_dir: pathlib.Path, certs_file: str, key_file: str, workflow: sync_async_workflow.SyncAsyncWorkflow,
                           party_key: str) -> None:
     """
 
+    :param data_dir: The directory to load interactions configuration from.
     :param certs_file: The filename of the certificate to be used to identify this MHS to a remote MHS.
     :param key_file: The filename of the private key for the certificate identified by certs_file.
     :param workflow: The workflow to be used to handle messages.
@@ -79,9 +77,12 @@ def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_w
     """
     callbacks = {}
 
+    interactions_config_file = str(data_dir / "interactions" / "interactions.json")
+    config_manager = configuration_manager.ConfigurationManager(interactions_config_file)
+
     supplier_application = tornado.web.Application(
         [(r"/", client_request_handler.SynchronousHandler,
-          dict(workflow=workflow, callbacks=callbacks, async_timeout=ASYNC_TIMEOUT))])
+          dict(config_manager=config_manager, workflow=workflow, callbacks=callbacks, async_timeout=ASYNC_TIMEOUT))])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
     supplier_server.listen(80)
 
@@ -106,9 +107,9 @@ def main():
     certs_file, key_file = load_certs(certs_dir)
     party_key = load_party_key(certs_dir)
 
-    workflow = initialise_workflow(data_dir, certs_dir, party_key)
+    workflow = initialise_workflow(certs_dir, party_key)
 
-    start_tornado_servers(certs_file, key_file, workflow, party_key)
+    start_tornado_servers(data_dir, certs_file, key_file, workflow, party_key)
 
 
 if __name__ == "__main__":
