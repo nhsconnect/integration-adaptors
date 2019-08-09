@@ -165,10 +165,11 @@ class TestLogger(TestCase):
             log.IntegrationAdaptorsLogger('')
 
     @patch('sys.stdout', new_callable=io.StringIO)
-    def test_time_format(self, mock_stdout):
+    def test_correct_time_format(self, mock_stdout):
         log.configure_logging()
         logger = log.IntegrationAdaptorsLogger('SYS')
         logger.info('100', 'I can still log info strings without values!')
         output = mock_stdout.getvalue()
+
         time_value = output.split('[')[1].split(']')[0]
         time.strptime(time_value, '%Y-%m-%dT%H:%M:%S.%fZ')
