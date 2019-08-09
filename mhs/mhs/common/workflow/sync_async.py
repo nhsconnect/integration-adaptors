@@ -2,9 +2,7 @@
 
 import copy
 import logging
-import typing
-
-import utilities.message_utilities as message_utilities
+from typing import Tuple, Optional, Dict
 
 import mhs.common.configuration.configuration_manager as configuration_manager
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
@@ -12,6 +10,7 @@ import mhs.common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs.common.workflow.common as common
 import mhs.common.workflow.common_synchronous as common_synchronous
 import mhs.outbound.transmission.outbound_transmission as outbound_transmission
+import utilities.message_utilities as message_utilities
 
 ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 
@@ -33,17 +32,23 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.transmission = transmission
         self.party_id = party_id
 
-    def prepare_message(self, interaction_name: str, content: str) -> typing.Tuple[bool, str, str]:
+    def prepare_message(self, interaction_name: str, content: str, message_id: Optional[str] = None) \
+            -> Tuple[bool, str, str]:
         """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
 
         :param interaction_name: The name of the interaction the message is related to.
         :param content: The message content to be sent.
+        :param message_id: message id to use in the message header. If not supplied, we generate a new message id.
+        The purpose of this param is to be used for duplicate elimination when sending async messages.
         :return: A tuple containing:
         1. A flag indicating whether this message should be sent asynchronously
         2. the ID of the message, if an asynchronous response is expected, otherwise None
         3. The message to send
         """
         interaction_details = self._get_interaction_details(interaction_name)
+
+        if message_id is not None:
+            interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
 
         is_async = interaction_details[ASYNC_RESPONSE_EXPECTED]
         if is_async:
@@ -78,8 +83,8 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         return interaction_details
 
-    def _wrap_message_in_ebxml(self, interaction_details: typing.Dict[str, str], content: str) \
-            -> typing.Tuple[str, str]:
+    def _wrap_message_in_ebxml(self, interaction_details: Dict[str, str], content: str) \
+            -> Tuple[str, str]:
         """Wrap the specified message in an ebXML wrapper.
 
         :param interaction_details: The interaction configuration to use when building the ebXML wrapper.
@@ -96,7 +101,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         context[ebxml_request_envelope.MESSAGE] = content
         request = ebxml_request_envelope.EbxmlRequestEnvelope(context)
 
-        message_id, message = request.serialize()
+        message_id, _, message = request.serialize()
 
         logging.debug("Generated ebXML wrapper with conversation ID '%s' and message ID '%s'", conversation_id,
                       message_id)

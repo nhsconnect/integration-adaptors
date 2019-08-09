@@ -1,8 +1,7 @@
 """This module defines the outbound synchronous request handler component."""
 
 import datetime
-import logging
-import typing
+from typing import Dict, Callable
 
 import tornado.locks
 import tornado.web
@@ -10,13 +9,16 @@ import tornado.web
 import mhs.common.workflow.common as common_workflow
 import mhs.common.workflow.sync_async as sync_async_workflow
 import mhs.outbound.request.common as common
+from utilities import integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
 
 class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a supplier system."""
 
     def initialize(self, workflow: sync_async_workflow.SyncAsyncWorkflow,
-                   callbacks: typing.Dict[str, typing.Callable[[str], None]], async_timeout: int):
+                   callbacks: Dict[str, Callable[[str], None]], async_timeout: int):
         """Initialise this request handler with the provided configuration values.
 
         :param workflow: The workflow to use to send messages.
@@ -28,19 +30,21 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
         self.async_response_received = tornado.locks.Event()
         self.async_timeout = async_timeout
 
-    async def post(self):
-        logging.debug("Client POST received: %s", self.request)
+    async def post(self, interaction_name):
+        logger.info('0001', 'Client POST received. {Request}', {'Request': str(self.request)})
 
-        interaction_name = self.request.uri[1:]
+        message_id = self.get_query_argument("messageId", default=None)
 
         async_message_id = None
         try:
             interaction_is_async, async_message_id, message = self.workflow.prepare_message(interaction_name,
-                                                                                            self.request.body.decode())
+                                                                                            self.request.body.decode(),
+                                                                                            message_id)
 
             if interaction_is_async:
                 self.callbacks[async_message_id] = self._write_async_response
-                logging.debug("Added callback for asynchronous message with ID '%s'", async_message_id)
+                logger.info('0002', 'Added callback for asynchronous message with {MessageId}',
+                            {'MessageId': async_message_id})
 
             immediate_response = self.workflow.send_message(interaction_name, message)
 
@@ -63,7 +67,8 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
         :raises: An HTTPError if we timed out waiting for an asynchronous response.
         """
         try:
-            logging.debug("Waiting for asynchronous response to message with ID '%s'", async_message_id)
+            logger.info('0003', 'Waiting for asynchronous response to message with {MessageId}',
+                        {'MessageId': async_message_id})
             await self.async_response_received.wait(datetime.timedelta(seconds=self.async_timeout))
         except TimeoutError:
             raise tornado.web.HTTPError(log_message=f"Timed out waiting for a response to message {async_message_id}")
@@ -81,6 +86,6 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
 
         :param message: The message to write to the response.
         """
-        logging.debug("Received asynchronous response containing message '%s'", message)
+        logger.info('0004', 'Received asynchronous response containing message {Message}', {'Message': message})
         self._write_response(message)
         self.async_response_received.set()
