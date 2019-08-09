@@ -73,40 +73,39 @@ pipeline {
             }
         }
 
-        stage('MHS Integration Tests') {
-            steps {
-                dir('mhs') {
-                    // Wait for MHS container to fully stand up
-                    timeout(2) {
-                        waitUntil {
-                           script {
-                               def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
-                               return (r == '405');
-                           }
-                        }
-                     }
+        //stage('MHS Integration Tests') {
+        //    steps {
+        //        dir('mhs') {
+        //            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+        //            // Wait for MHS container to fully stand up
+        //            timeout(2) {
+        //                waitUntil {
+        //                   script {
+        //                       def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
+        //                       return (r == '405');
+        //                   }
+        //                }
+        //             }
+        //            sh label: 'Running integration tests', script: 'pipenv run inttests'
+        //        }
+        //    }
+        //}
 
-                    sh label: 'Running integration tests', script: 'pipenv run inttests'
-                }
-            }
-        }
-
-        stage('SCR Service Integration Tests') {
-            steps {
-                dir('SCRWebService') {
-                     timeout(2) {
-                        waitUntil {
-                           script {
-                               def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS}:${SCR_SERVICE_PORT} || echo 1', returnStdout: true
-                               return (r == '404');
-                           }
-                        }
-                     }
-
-                    sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
-                }
-            }
-        }
+        //stage('SCR Service Integration Tests') {
+        //    steps {
+        //        dir('SCRWebService') {
+        //             timeout(2) {
+        //                waitUntil {
+        //                   script {
+        //                       def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS}:${SCR_SERVICE_PORT} || echo 1', returnStdout: true
+        //                       return (r == '404');
+        //                   }
+        //                }
+        //             }
+        //            sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
+        //        }
+        //    }
+        //}
     }
 
     post {

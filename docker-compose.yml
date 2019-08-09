@@ -15,6 +15,12 @@ services:
       - MHS_LOG_LEVEL=NOTSET
 
   dynamodb:
-      image: amazon/dynamodb-local
-      ports:
-          - "8000:8000"
+    image: amazon/dynamodb-local
+    ports:
+      - "8000:8000"
+  rabbitmq:
+    build: ./common/local-env/rabbit/
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    hostname: "localhost"

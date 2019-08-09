@@ -1,4 +1,3 @@
-import logging
 import pathlib
 import ssl
 from typing import Tuple
@@ -11,6 +10,9 @@ import definitions
 import request.handler as async_request_handler
 import utilities.config as config
 import utilities.file_utilities as file_utilities
+import utilities.integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger('INBOUND_MAIN')
 
 ASYNC_TIMEOUT = 30
 
@@ -40,11 +42,6 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     return party_key
 
 
-def configure_logging() -> None:
-    """Configure logging for this application."""
-    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=config.config["LOG_LEVEL"])
-
-
 def start_inbound_server(certs_file: str, key_file: str,  party_key: str) -> None:
     """
 
@@ -63,13 +60,13 @@ def start_inbound_server(certs_file: str, key_file: str,  party_key: str) -> Non
                                                                 ca_certs=certs_file))
     inbound_server.listen(443)
 
-    logging.info("Starting inbound server")
+    logger.info('011', 'Starting inbound server')
     tornado.ioloop.IOLoop.current().start()
 
 
 def main():
     config.setup_config("MHS")
-    configure_logging()
+    log.configure_logging()
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
@@ -80,4 +77,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+    finally:
+        logger.info('002', 'Exiting application')

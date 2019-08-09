@@ -1,6 +1,4 @@
-import logging
 import pathlib
-import ssl
 from typing import Tuple
 
 import tornado.httpserver
@@ -15,6 +13,9 @@ import request.synchronous.handler as client_request_handler
 import transmission.outbound_transmission as outbound_transmission
 import utilities.config as config
 import utilities.file_utilities as file_utilities
+import utilities.integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
 ASYNC_TIMEOUT = 30
 
@@ -63,11 +64,6 @@ def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
     return workflow
 
 
-def configure_logging() -> None:
-    """Configure logging for this application."""
-    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=config.config["LOG_LEVEL"])
-
-
 def start_tornado_servers(workflow: sync_async_workflow.SyncAsyncWorkflow) -> None:
     """
 
@@ -84,23 +80,24 @@ def start_tornado_servers(workflow: sync_async_workflow.SyncAsyncWorkflow) -> No
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
     supplier_server.listen(80)
 
-    logging.info("Starting outbound server")
+    logger.info('011', 'Starting outbound server')
     tornado.ioloop.IOLoop.current().start()
 
 
 def main():
     config.setup_config("MHS")
-    configure_logging()
-
+    log.configure_logging()
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
-    # certs_file, key_file = load_certs(certs_dir)
     party_key = load_party_key(certs_dir)
-
     workflow = initialise_workflow(data_dir, certs_dir, party_key)
-
     start_tornado_servers(workflow)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+    finally:
+        logger.info('002', 'Exiting application')
