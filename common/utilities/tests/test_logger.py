@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+import time
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
@@ -162,3 +163,13 @@ class TestLogger(TestCase):
     def test_undefined_log_ref_throws_error(self):
         with self.assertRaises(ValueError):
             log.IntegrationAdaptorsLogger('')
+
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_correct_time_format(self, mock_stdout):
+        log.configure_logging()
+        logger = log.IntegrationAdaptorsLogger('SYS')
+        logger.info('100', 'I can still log info strings without values!')
+        output = mock_stdout.getvalue()
+
+        time_value = output.split('[')[1].split(']')[0]
+        time.strptime(time_value, '%Y-%m-%dT%H:%M:%S.%fZ')
