@@ -66,7 +66,7 @@
         "name": "publish",
         "type": "docker-tag",
         "repository": "{{user `repository`}}",
-        "tag": "{{user `tag`}}"
+        "tag": "inbound-{{user `tag`}}"
       },
       {
         "name": "publish",
