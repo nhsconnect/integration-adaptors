@@ -130,6 +130,13 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(response.code, 404)
 
+    def test_post_with_no_body(self):
+        self.config_manager.get_interaction_details.return_value = None
+
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="")
+
+        self.assertEqual(response.code, 400)
+
     @staticmethod
     def awaitable(result):
         future = asyncio.Future()

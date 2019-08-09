@@ -30,9 +30,15 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
     async def post(self):
         message_id = self._extract_message_id()
         self._extract_correlation_id()
-        interaction_id = self._extract_interaction_id()
 
         logger.info('0006', 'Client POST received. {Request}', {'Request': str(self.request)})
+
+        body = self.request.body.decode()
+        if not body:
+            logger.warning('0009', 'Body missing from request')
+            raise tornado.web.HTTPError(400, 'Body missing from request')
+
+        interaction_id = self._extract_interaction_id()
 
         try:
             interaction_details = self._get_interaction_details(interaction_id)
@@ -48,8 +54,7 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
             raise tornado.web.HTTPError(500, "Couldn't determine workflow to invoke for interaction ID: %s",
                                         interaction_id) from e
 
-        status, response = await workflow.handle_supplier_message(message_id, interaction_details,
-                                                                  self.request.body.decode())
+        status, response = await workflow.handle_supplier_message(message_id, interaction_details, body)
 
         self._write_response(status, response)
 
@@ -89,6 +94,7 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
 
         :param message: The message to write to the response.
         """
+        logger.info('0010', 'Returning response with {HttpStatus}', {'HttpStatus': status})
         self.set_status(status)
         self.set_header("Content-Type", "text/xml")
         self.write(message)
