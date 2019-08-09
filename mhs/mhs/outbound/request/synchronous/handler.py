@@ -28,53 +28,61 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
         self.config_manager = config_manager
 
     async def post(self):
+        message_id = self._extract_message_id()
+        self._extract_correlation_id()
+        interaction_id = self._extract_interaction_id()
+
+        logger.info('0006', 'Client POST received. {Request}', {'Request': str(self.request)})
+
+        try:
+            interaction_details = self._get_interaction_details(interaction_id)
+        except common_workflow.UnknownInteractionError as e:
+            logger.warning('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
+            raise tornado.web.HTTPError(404, "Unknown interaction ID: %s", interaction_id) from e
+
+        try:
+            workflow = self.workflows[interaction_details['workflow']]
+        except KeyError as e:
+            logger.error('0008', "Weren't able to determine workflow for {InteractionId} . This likely is due to a "
+                                 "misconfiguration in interactions.json", {"InteractionId": interaction_id})
+            raise tornado.web.HTTPError(500, "Couldn't determine workflow to invoke for interaction ID: %s",
+                                        interaction_id) from e
+
+        status, response = await workflow.handle_supplier_message(message_id, interaction_details,
+                                                                  self.request.body.decode())
+
+        self._write_response(status, response)
+
+    def _extract_message_id(self):
         message_id = self.request.headers.get('Message-Id', None)
-        log.message_id.set(message_id)
         if not message_id:
             message_id = message_utilities.MessageUtilities.get_uuid()
             log.message_id.set(message_id)
             logger.info('0001', "Didn't receive message id in incoming request from supplier, so have generated a new "
                                 "one.")
         else:
+            log.message_id.set(message_id)
             logger.info('0002', 'Found message id on incoming request.')
+        return message_id
 
+    def _extract_correlation_id(self):
         correlation_id = self.request.headers.get('Correlation-Id', None)
-        log.correlation_id.set(correlation_id)
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
             log.correlation_id.set(correlation_id)
             logger.info('0003', "Didn't receive correlation id in incoming request from supplier, so have generated a "
                                 "new one.")
         else:
+            log.correlation_id.set(correlation_id)
             logger.info('0004', 'Found correlation id on incoming request.')
 
+    def _extract_interaction_id(self):
         try:
-            interaction_name = self.request.headers['Interaction-Id']
+            interaction_id = self.request.headers['Interaction-Id']
         except KeyError as e:
-            logger.warning('0005', 'Required Interaction-Id header not passed in request {MessageId}',
-                           {'MessageId': message_id})
+            logger.warning('0005', 'Required Interaction-Id header not passed in request')
             raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found') from e
-
-        logger.info('0006', 'Client POST received. {Request}', {'Request': str(self.request)})
-
-        try:
-            interaction_details = self._get_interaction_details(interaction_name)
-        except common_workflow.UnknownInteractionError as e:
-            logger.warning('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_name})
-            raise tornado.web.HTTPError(404, "Unknown interaction ID: %s", interaction_name) from e
-
-        try:
-            workflow = self.workflows[interaction_details['workflow']]
-        except KeyError as e:
-            logger.error('0008', "Weren't able to determine workflow for {InteractionId} . This likely is due to a "
-                                 "misconfiguration in interactions.json", {"InteractionId": interaction_name})
-            raise tornado.web.HTTPError(500, "Couldn't determine workflow to invoke for interaction ID: %s",
-                                        interaction_name) from e
-
-        status, response = await workflow.handle_supplier_message(message_id, interaction_details,
-                                                                  self.request.body.decode())
-
-        self._write_response(status, response)
+        return interaction_id
 
     def _write_response(self, status: int, message: str) -> None:
         """Write the given message to the response.
