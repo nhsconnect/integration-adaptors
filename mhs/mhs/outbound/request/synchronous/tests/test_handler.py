@@ -31,7 +31,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
     @patch.object(log, "message_id")
     def test_post_synchronous_message(self, mock_message_id, mock_correlation_id, mock_get_uuid):
         expected_response = "Hello world!"
-        self.workflow.prepare_message.return_value = False, None, REQUEST_BODY
+        self.workflow.prepare_message.return_value = False, REQUEST_BODY
         self.workflow.send_message.return_value = expected_response
         mock_get_uuid.side_effect = [MOCK_UUID, MOCK_UUID_2]
 
@@ -53,7 +53,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
     def test_post_message_with_message_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
         message_id = "message-id"
         expected_response = "Hello world!"
-        self.workflow.prepare_message.return_value = False, None, REQUEST_BODY
+        self.workflow.prepare_message.return_value = False, REQUEST_BODY
         self.workflow.send_message.return_value = expected_response
         mock_get_uuid.return_value = MOCK_UUID
 
@@ -76,7 +76,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
     def test_post_message_with_correlation_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
         correlation_id = "correlation-id"
         expected_response = "Hello world!"
-        self.workflow.prepare_message.return_value = False, None, REQUEST_BODY
+        self.workflow.prepare_message.return_value = False, REQUEST_BODY
         self.workflow.send_message.return_value = expected_response
         mock_get_uuid.return_value = MOCK_UUID
 

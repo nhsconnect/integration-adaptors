@@ -60,21 +60,20 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
 
         logger.info('0001', 'Client POST received. {Request}', {'Request': str(self.request)})
 
-        async_message_id = None
         try:
-            interaction_is_async, async_message_id, message = self.workflow.prepare_message(interaction_name,
-                                                                                            self.request.body.decode(),
-                                                                                            message_id)
+            interaction_is_async, message = self.workflow.prepare_message(interaction_name,
+                                                                          self.request.body.decode(),
+                                                                          message_id)
 
             if interaction_is_async:
-                self.callbacks[async_message_id] = self._write_async_response
+                self.callbacks[message_id] = self._write_async_response
                 logger.info('0002', 'Added callback for asynchronous message with {MessageId}',
-                            {'MessageId': async_message_id})
+                            {'MessageId': (message_id)})
 
             immediate_response = self.workflow.send_message(interaction_name, message)
 
             if interaction_is_async:
-                await self._pause_request(async_message_id)
+                await self._pause_request(message_id)
             else:
                 # No async response expected. Just return the response to our initial request.
                 self._write_response(immediate_response)
@@ -82,8 +81,8 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
         except common_workflow.UnknownInteractionError:
             raise tornado.web.HTTPError(404, "Unknown interaction ID: %s", interaction_name)
         finally:
-            if async_message_id in self.callbacks:
-                del self.callbacks[async_message_id]
+            if message_id in self.callbacks:
+                del self.callbacks[message_id]
 
     async def _pause_request(self, async_message_id):
         """Pause the incoming request until an asynchronous response is received (or a timeout is hit).

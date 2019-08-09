@@ -1,8 +1,7 @@
 """This module defines the sync-async workflow."""
 
 import copy
-import logging
-from typing import Tuple, Optional, Dict
+from typing import Tuple, Dict
 
 import mhs.common.configuration.configuration_manager as configuration_manager
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
@@ -10,7 +9,9 @@ import mhs.common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs.common.workflow.common as common
 import mhs.common.workflow.common_synchronous as common_synchronous
 import mhs.outbound.transmission.outbound_transmission as outbound_transmission
-import utilities.message_utilities as message_utilities
+from utilities import integration_adaptors_logger as log, message_utilities
+
+logger = log.IntegrationAdaptorsLogger('MHS_SYNC_ASYNC_WORKFLOW')
 
 ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 
@@ -32,32 +33,27 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.transmission = transmission
         self.party_id = party_id
 
-    def prepare_message(self, interaction_name: str, content: str, message_id: Optional[str] = None) \
-            -> Tuple[bool, str, str]:
+    def prepare_message(self, interaction_name: str, content: str, message_id: str) -> Tuple[bool, str]:
         """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
 
         :param interaction_name: The name of the interaction the message is related to.
         :param content: The message content to be sent.
-        :param message_id: message id to use in the message header. If not supplied, we generate a new message id.
-        The purpose of this param is to be used for duplicate elimination when sending async messages.
+        :param message_id: message id to use in the message header.
         :return: A tuple containing:
         1. A flag indicating whether this message should be sent asynchronously
-        2. the ID of the message, if an asynchronous response is expected, otherwise None
-        3. The message to send
+        2. The message to send
         """
         interaction_details = self._get_interaction_details(interaction_name)
 
-        if message_id is not None:
-            interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
+        interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
 
         is_async = interaction_details[ASYNC_RESPONSE_EXPECTED]
         if is_async:
-            message_id, message = self._wrap_message_in_ebxml(interaction_details, content)
+            message = self._wrap_message_in_ebxml(interaction_details, content)
         else:
-            message_id = None
             message = content
 
-        return is_async, message_id, message
+        return is_async, message
 
     def send_message(self, interaction_name: str, message: str) -> str:
         """Send the provided message for the interaction named. Returns the response received immediately, but note that
@@ -72,7 +68,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         interaction_details = self._get_interaction_details(interaction_name)
         response = self.transmission.make_request(interaction_details, message)
-        logging.debug("Message sent. Received response: %s", response)
+        logger.info("0001", "Message sent to Spine, and response received.")
         return response
 
     def _get_interaction_details(self, interaction_name):
@@ -83,8 +79,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         return interaction_details
 
-    def _wrap_message_in_ebxml(self, interaction_details: Dict[str, str], content: str) \
-            -> Tuple[str, str]:
+    def _wrap_message_in_ebxml(self, interaction_details: Dict[str, str], content: str) -> str:
         """Wrap the specified message in an ebXML wrapper.
 
         :param interaction_details: The interaction configuration to use when building the ebXML wrapper.
@@ -101,8 +96,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         context[ebxml_request_envelope.MESSAGE] = content
         request = ebxml_request_envelope.EbxmlRequestEnvelope(context)
 
-        message_id, _, message = request.serialize()
+        _, _, message = request.serialize()
 
-        logging.debug("Generated ebXML wrapper with conversation ID '%s' and message ID '%s'", conversation_id,
-                      message_id)
-        return message_id, message
+        logger.info("0002", "Generated ebXML wrapper with {ConversationId}", {"ConversationId": conversation_id})
+        return message
