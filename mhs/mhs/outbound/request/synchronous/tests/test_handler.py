@@ -1,3 +1,4 @@
+import asyncio
 import unittest.mock
 from unittest.mock import patch, sentinel
 
@@ -13,6 +14,8 @@ MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
 INTERACTION_NAME = "interaction"
 REQUEST_BODY = "A request"
+WORKFLOW_NAME = "workflow name"
+INTERACTION_DETAILS = {'workflow': WORKFLOW_NAME}
 
 
 class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
@@ -22,7 +25,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.config_manager = unittest.mock.Mock()
         return tornado.web.Application([
             (r"/", handler.SynchronousHandler,
-             dict(config_manager=self.config_manager, workflow=self.workflow, callbacks={}, async_timeout=1))
+             dict(config_manager=self.config_manager, workflows={WORKFLOW_NAME: self.workflow}))
         ])
 
     def tearDown(self):
@@ -32,12 +35,11 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     @patch.object(log, "correlation_id")
     @patch.object(log, "message_id")
-    def test_post_synchronous_message(self, mock_message_id, mock_correlation_id, mock_get_uuid):
+    def test_post_message(self, mock_message_id, mock_correlation_id, mock_get_uuid):
         expected_response = "Hello world!"
-        self.workflow.prepare_message.return_value = False, REQUEST_BODY
-        self.workflow.send_message.return_value = expected_response
+        self.workflow.handle_supplier_message.return_value = self.awaitable((200, expected_response))
         mock_get_uuid.side_effect = [MOCK_UUID, MOCK_UUID_2]
-        self.config_manager.get_interaction_details.return_value = sentinel.interaction_details
+        self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
 
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
@@ -46,8 +48,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
 
         self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
-        self.workflow.prepare_message.assert_called_with(sentinel.interaction_details, REQUEST_BODY, MOCK_UUID)
-        self.workflow.send_message.assert_called_with(sentinel.interaction_details, REQUEST_BODY)
+        self.workflow.handle_supplier_message.assert_called_with(MOCK_UUID, INTERACTION_DETAILS, REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(MOCK_UUID_2)
@@ -58,10 +59,9 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
     def test_post_message_with_message_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
         message_id = "message-id"
         expected_response = "Hello world!"
-        self.workflow.prepare_message.return_value = False, REQUEST_BODY
-        self.workflow.send_message.return_value = expected_response
+        self.workflow.handle_supplier_message.return_value = self.awaitable((200, expected_response))
         mock_get_uuid.return_value = MOCK_UUID
-        self.config_manager.get_interaction_details.return_value = sentinel.interaction_details
+        self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
 
         response = self.fetch("/", method="POST",
                               headers={"Interaction-Id": INTERACTION_NAME, "Message-Id": message_id}, body=REQUEST_BODY)
@@ -70,8 +70,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
         mock_get_uuid.assert_called_once()
 
-        self.workflow.prepare_message.assert_called_with(sentinel.interaction_details, REQUEST_BODY, message_id)
-        self.workflow.send_message.assert_called_with(sentinel.interaction_details, REQUEST_BODY)
+        self.workflow.handle_supplier_message.assert_called_with(message_id, INTERACTION_DETAILS, REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(message_id)
         mock_correlation_id.set.assert_called_with(MOCK_UUID)
@@ -82,10 +81,9 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
     def test_post_message_with_correlation_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
         correlation_id = "correlation-id"
         expected_response = "Hello world!"
-        self.workflow.prepare_message.return_value = False, REQUEST_BODY
-        self.workflow.send_message.return_value = expected_response
+        self.workflow.handle_supplier_message.return_value = self.awaitable((200, expected_response))
         mock_get_uuid.return_value = MOCK_UUID
-        self.config_manager.get_interaction_details.return_value = sentinel.interaction_details
+        self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
 
         response = self.fetch("/", method="POST",
                               headers={"Interaction-Id": INTERACTION_NAME, "Correlation-Id": correlation_id},
@@ -95,11 +93,30 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
         mock_get_uuid.assert_called_once()
 
-        self.workflow.prepare_message.assert_called_with(sentinel.interaction_details, REQUEST_BODY, MOCK_UUID)
-        self.workflow.send_message.assert_called_with(sentinel.interaction_details, REQUEST_BODY)
+        self.workflow.handle_supplier_message.assert_called_with(MOCK_UUID, INTERACTION_DETAILS, REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(correlation_id)
+
+    def test_post_message_where_workflow_not_found_on_interaction_details(self):
+        self.config_manager.get_interaction_details.return_value = {}
+
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+
+        self.assertEqual(response.code, 500)
+
+        self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
+        self.workflow.handle_supplier_message.assert_not_called()
+
+    def test_post_message_where_interaction_detail_has_invalid_workflow(self):
+        self.config_manager.get_interaction_details.return_value = {'workflow': 'nonexistent workflow'}
+
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+
+        self.assertEqual(response.code, 500)
+
+        self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
+        self.workflow.handle_supplier_message.assert_not_called()
 
     def test_post_with_no_interaction_name(self):
         response = self.fetch("/", method="POST", body="A request")
@@ -113,11 +130,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(response.code, 404)
 
-    def test_post_asynchronous_message_times_out(self):
-        # A request that results in an asynchronous message should time out if no asynchronous response is received.
-        self.workflow.prepare_message.return_value = True, MOCK_UUID, "ebXML request"
-        self.workflow.send_message.return_value = "Hello world!"
-
-        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="A request")
-
-        self.assertEqual(response.code, 500)
+    @staticmethod
+    def awaitable(result):
+        future = asyncio.Future()
+        future.set_result(result)
+        return future

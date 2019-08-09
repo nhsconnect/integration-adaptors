@@ -28,6 +28,10 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.transmission = transmission
         self.party_id = party_id
 
+    async def handle_supplier_message(self, message_id: str, interaction_details: dict, payload: str) \
+            -> Tuple[int, str]:
+        raise NotImplementedError()
+
     def prepare_message(self, interaction_details: dict, content: str, message_id: str) -> Tuple[bool, str]:
         """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
 
