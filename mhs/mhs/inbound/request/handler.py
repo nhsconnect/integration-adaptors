@@ -28,7 +28,7 @@ class InboundHandler(tornado.web.RequestHandler):
 
         request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
                                                                                   self.request.body.decode())
-        ref_to_id = request_message.message_dictionary[ebxml_envelope.REF_TO_MESSAGE_ID]
+        ref_to_id = request_message.message_dictionary[ebxml_envelope.RECEIVED_MESSAGE_ID]
         logging.debug("Message received is in reference to '%s'", ref_to_id)
 
         if ref_to_id in self.callbacks:
@@ -48,11 +48,11 @@ class InboundHandler(tornado.web.RequestHandler):
             ebxml_envelope.CPA_ID: message_details[ebxml_envelope.CPA_ID],
             ebxml_envelope.CONVERSATION_ID: message_details[ebxml_envelope.CONVERSATION_ID],
             ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP: message_details[ebxml_envelope.TIMESTAMP],
-            ebxml_ack_envelope.RECEIVED_MESSAGE_ID: message_details[ebxml_envelope.MESSAGE_ID]
+            ebxml_envelope.RECEIVED_MESSAGE_ID: message_details[ebxml_envelope.MESSAGE_ID]
         }
 
         ack_message = ebxml_ack_envelope.EbxmlAckEnvelope(ack_context)
-        _, serialized_message = ack_message.serialize()
+        _, _, serialized_message = ack_message.serialize()
 
         self.set_header("Content-Type", "text/xml")
         self.write(serialized_message)

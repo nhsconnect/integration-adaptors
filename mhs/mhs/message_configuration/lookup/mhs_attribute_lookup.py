@@ -4,7 +4,7 @@ information for a remote MHS."""
 import logging
 from typing import Dict
 
-import mhs.message_configuration.lookup.cache_adapter as cache_adapter
+import mhs.message_configuration.lookup.cache_adaptor as cache_adaptor
 import mhs.message_configuration.lookup.sds_client as sds_client
 
 logger = logging.getLogger(__name__)
@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 class MHSAttributeLookup:
     """A tool that allows the routing and reliability information for a remote MHS to be retrieved."""
 
-    def __init__(self, client: sds_client.SDSClient, cache: cache_adapter.CacheAdapter):
+    def __init__(self, client: sds_client.SDSClient, cache: cache_adaptor.CacheAdaptor):
         """
 
         :param client The SDS client to use when retrieving remote MHS details.
-        :param cache: The cache adapter to use to cache remote MHS details.
+        :param cache: The cache adaptor to use to cache remote MHS details.
         """
         if not client:
             raise ValueError('sds client required')

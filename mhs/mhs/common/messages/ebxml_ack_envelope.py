@@ -3,14 +3,16 @@ an asynchronous request."""
 
 from __future__ import annotations
 
-from typing import Dict
+import copy
+from typing import Dict, Tuple
+
+from defusedxml import ElementTree
 
 import mhs.common.messages.ebxml_envelope as ebxml_envelope
 
 EBXML_TEMPLATE = "ebxml_ack"
 
 RECEIVED_MESSAGE_TIMESTAMP = "received_message_timestamp"
-RECEIVED_MESSAGE_ID = "received_message_id"
 
 
 class EbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
@@ -21,7 +23,15 @@ class EbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         :param message_dictionary: The dictionary of values to use when populating the template.
         """
+        message_dictionary = copy.deepcopy(message_dictionary)
+        message_dictionary[ebxml_envelope.SERVICE] = 'urn:oasis:names:tc:ebxml-msg:service'
+        message_dictionary[ebxml_envelope.ACTION] = 'Acknowledgment'
         super().__init__(EBXML_TEMPLATE, message_dictionary)
+
+    def serialize(self) -> Tuple[str, Dict[str, str], str]:
+        message_id, http_headers, message = super().serialize()
+        http_headers['Content-Type'] = 'text/xml'
+        return message_id, http_headers, message
 
     @classmethod
     def from_string(cls, headers: Dict[str, str], message: str) -> EbxmlAckEnvelope:
@@ -31,5 +41,6 @@ class EbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
         :param message: The message to be parsed.
         :return: An instance of an EbxmlAckEnvelope constructed from the message.
         """
-        message_dictionary = super().parse_message(headers, message)
+        message_dictionary = super().parse_message(ElementTree.fromstring(message))
+        message_dictionary[RECEIVED_MESSAGE_TIMESTAMP] = message_dictionary.pop(ebxml_envelope.TIMESTAMP)
         return EbxmlAckEnvelope(message_dictionary)

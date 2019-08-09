@@ -1,4 +1,4 @@
-"""This module defines the cache adapter interface, used to allow support for multiple message configuration caching
+"""This module defines the cache adaptor interface, used to allow support for multiple message configuration caching
 implementations."""
 
 import abc
@@ -7,8 +7,8 @@ from typing import Optional, Dict
 FIFTEEN_MINUTES_IN_SECONDS = 900
 
 
-class CacheAdapter(abc.ABC):
-    """An adapter that provides a common interface to the message configuration cache."""
+class CacheAdaptor(abc.ABC):
+    """An adaptor that provides a common interface to the message configuration cache."""
 
     def __init__(self, expiry_time=FIFTEEN_MINUTES_IN_SECONDS):
         """
