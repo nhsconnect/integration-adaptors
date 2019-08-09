@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.1.1 r1855137">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Test Fragment" enabled="false"/>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="MHS_to_Spine_soap_envelop_sample" enabled="false">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">----=_MIME-Boundary&#xd;
+Content-Id: &lt;ebXMLHeader@spine.nhs.uk&gt;&#xd;
+Content-Type: text/xml; charset=UTF-8&#xd;
+Content-Transfer-Encoding: 8bit&#xd;
+&#xd;
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;SOAP:Envelope xmlns:xsi=&quot;http://www.w3c.org/2001/XML-Schema-Instance&quot; xmlns:SOAP=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:eb=&quot;http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd&quot; xmlns:hl7ebxml=&quot;urn:hl7-org:transport/ebXML/DSTUv1.0&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;&#xd;
+&lt;SOAP:Header&gt;&#xd;
+	&lt;eb:MessageHeader SOAP:mustUnderstand=&quot;1&quot; eb:version=&quot;2.0&quot;&gt;&#xd;
+		&lt;eb:From&gt;&#xd;
+			&lt;eb:PartyId eb:type=&quot;urn:nhs:names:partyType:ocs+serviceInstance&quot;&gt;${from_party_id}&lt;/eb:PartyId&gt;&#xd;
+		&lt;/eb:From&gt;&#xd;
+		&lt;eb:To&gt;&#xd;
+			&lt;eb:PartyId eb:type=&quot;urn:nhs:names:partyType:ocs+serviceInstance&quot;&gt;${to_party_id}&lt;/eb:PartyId&gt;&#xd;
+		&lt;/eb:To&gt;&#xd;
+		&lt;eb:CPAId&gt;${cpa_id}&lt;/eb:CPAId&gt;&#xd;
+		&lt;eb:ConversationId&gt;${conversation_id}&lt;/eb:ConversationId&gt;&#xd;
+		&lt;eb:Service&gt;${service}&lt;/eb:Service&gt;&#xd;
+		&lt;eb:Action&gt;${action}&lt;/eb:Action&gt;&#xd;
+		&lt;eb:MessageData&gt;&#xd;
+			&lt;eb:MessageId&gt;${message_id}&lt;/eb:MessageId&gt;&#xd;
+			&lt;eb:Timestamp&gt;${timestamp}&lt;/eb:Timestamp&gt;&#xd;
+		&lt;/eb:MessageData&gt;&#xd;
+        {{#duplicate_elimination}}&#xd;
+        &lt;eb:DuplicateElimination/&gt;&#xd;
+        {{/duplicate_elimination}}&#xd;
+    &lt;/eb:MessageHeader&gt;&#xd;
+    {{#ack_requested}}&#xd;
+    &lt;eb:AckRequested SOAP:mustUnderstand=&quot;1&quot; eb:version=&quot;2.0&quot; eb:signed=&quot;false&quot; SOAP:actor=&quot;{{ack_soap_actor}}&quot;/&gt;&#xd;
+    {{/ack_requested}}&#xd;
+    {{#sync_reply}}&#xd;
+    &lt;eb:SyncReply SOAP:mustUnderstand=&quot;1&quot; eb:version=&quot;2.0&quot; SOAP:actor=&quot;http://schemas.xmlsoap.org/soap/actor/next&quot;/&gt;&#xd;
+    {{/sync_reply}}&#xd;
+&lt;/SOAP:Header&gt;&#xd;
+&lt;SOAP:Body&gt;&#xd;
+	&lt;eb:Manifest SOAP:mustUnderstand=&quot;1&quot; eb:version=&quot;2.0&quot;&gt;&#xd;
+		&lt;eb:Reference xlink:href=&quot;cid:${message_id}@spine.nhs.uk&quot;&gt;&#xd;
+			&lt;eb:Schema eb:location=&quot;http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd&quot; eb:version=&quot;1.0&quot;/&gt;&#xd;
+			&lt;eb:Description xml:lang=&quot;en&quot;&gt;HL7 payload&lt;/eb:Description&gt;&#xd;
+			&lt;hl7ebxml:Payload style=&quot;HL7&quot; encoding=&quot;XML&quot; version=&quot;3.0&quot;/&gt;&#xd;
+		&lt;/eb:Reference&gt;&#xd;
+	&lt;/eb:Manifest&gt;&#xd;
+&lt;/SOAP:Body&gt;&#xd;
+&lt;/SOAP:Envelope&gt;&#xd;
+&#xd;
+----=_MIME-Boundary&#xd;
+Content-Id: &lt;{{message_id}}@spine.nhs.uk&gt;&#xd;
+Content-Type: text/xml; charset=UTF-8&#xd;
+Content-Transfer-Encoding: 8bit&#xd;
+&#xd;
+{{{hl7_message}}}&#xd;
+----=_MIME-Boundary--</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">8080</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path"></stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TEST_SANDPIT" enabled="false">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${test}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path"></stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+      </hashTree>
+      <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Uniform Random Timer" enabled="true">
+        <stringProp name="ConstantTimer.delay">100</stringProp>
+        <stringProp name="RandomTimer.range">1000</stringProp>
+      </UniformRandomTimer>
+      <hashTree/>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+        <collectionProp name="HeaderManager.headers"/>
+      </HeaderManager>
+      <hashTree/>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Outbound Messages Samples" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PSIS_Document_List_Data_Request_Async_Express" enabled="false">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot;?&gt;&#xd;
+&lt;QUPC_IN160101UK05 xmlns=&quot;urn:hl7-org:v3&quot;&gt;&#xd;
+            &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
+            &lt;creationTime value=&quot;${shortTimestamp}&quot;/&gt;&#xd;
+            &lt;versionCode code=&quot;3NPfIT7.2.00&quot; /&gt;&#xd;
+            &lt;interactionId root=&quot;2.16.840.1.113883.2.1.3.2.4.12&quot; extension=&quot;QUPC_IN160101UK05&quot; /&gt;&#xd;
+            &lt;processingCode code=&quot;P&quot; /&gt;&#xd;
+            &lt;processingModeCode code=&quot;T&quot; /&gt;&#xd;
+            &lt;acceptAckCode code=&quot;NE&quot; /&gt;&#xd;
+            &lt;communicationFunctionRcv typeCode=&quot;RCV&quot;&gt;&#xd;
+                &lt;device classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+                    &lt;id extension=&quot;${to_party_id}&quot; root=&quot;1.2.826.0.1285.0.2.0.107&quot; /&gt;&#xd;
+                &lt;/device&gt;&#xd;
+            &lt;/communicationFunctionRcv&gt;&#xd;
+            &lt;communicationFunctionSnd typeCode=&quot;SND&quot;&gt;&#xd;
+                &lt;device classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+                    &lt;id extension=&quot;${from_party_id}&quot; root=&quot;1.2.826.0.1285.0.2.0.107&quot; /&gt;&#xd;
+                &lt;/device&gt;&#xd;
+            &lt;/communicationFunctionSnd&gt;&#xd;
+            &lt;ControlActEvent classCode=&quot;CACT&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+                &lt;author1 typeCode=&quot;AUT&quot;&gt;&#xd;
+                    &lt;AgentSystemSDS classCode=&quot;AGNT&quot;&gt;&#xd;
+                        &lt;agentSystemSDS classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+                            &lt;id extension=&quot;${from_party_id}&quot; root=&quot;1.2.826.0.1285.0.2.0.107&quot; /&gt;&#xd;
+                        &lt;/agentSystemSDS&gt;&#xd;
+                    &lt;/AgentSystemSDS&gt;&#xd;
+                &lt;/author1&gt;&#xd;
+                &lt;query&gt;&#xd;
+                    &lt;dissentOverride&gt;&#xd;
+                        &lt;semanticsText&gt;DissentOverride&lt;/semanticsText&gt;&#xd;
+                        &lt;value code=&quot;${dissentOverride2}&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.60&quot; /&gt;&#xd;
+                    &lt;/dissentOverride&gt;&#xd;
+                    &lt;filterParameters&gt;&#xd;
+                        &lt;documentType&gt;&#xd;
+                            &lt;semanticsText&gt;DocumentType&lt;/semanticsText&gt;&#xd;
+                            &lt;value codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.15&quot; code=&quot;${documentType}&quot;/&gt;&#xd;
+                        &lt;/documentType&gt;&#xd;
+                        {{#useDateFilter}}&#xd;
+                        &lt;date&gt;&#xd;
+                            &lt;semanticsText&gt;Date&lt;/semanticsText&gt;&#xd;
+                            &lt;value&gt;&#xd;
+                            {{#lowDate}}&lt;low value=&quot;${shortTimestamp}&quot;/&gt;{{/lowDate}}&#xd;
+                            {{#highDate}}&lt;high value=&quot;${shortTimestamp}&quot;/&gt;{{/highDate}}&#xd;
+                            &lt;/value&gt;&#xd;
+                        &lt;/date&gt;&#xd;
+                        {{/useDateFilter}}&#xd;
+                    &lt;/filterParameters&gt;&#xd;
+                    &lt;nHSNumber&gt;&#xd;
+                        &lt;semanticsText&gt;NHSNumber&lt;/semanticsText&gt;&#xd;
+                        &lt;value root=&quot;2.16.840.1.113883.2.1.4.1&quot; extension=&quot;${nhs_number_AE}&quot; /&gt;&#xd;
+                    &lt;/nHSNumber&gt;&#xd;
+                &lt;/query&gt;&#xd;
+            &lt;/ControlActEvent&gt;&#xd;
+&lt;/QUPC_IN160101UK05&gt;&#xd;
+</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">80</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/psis_document_list_data_request</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP_Summary_Async_Reliable" enabled="false">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot;?&gt;&#xd;
+&lt;REPC_IN150016UK05 ITSVersion=&quot;XML_1.0&quot;&#xd;
+    xmlns=&quot;urn:hl7-org:v3&quot;&gt;&#xd;
+    &lt;id root=&quot;${id_root}&quot;/&gt;&#xd;
+    &lt;creationTime value=&quot;${shortTimestamp}&quot;/&gt;&#xd;
+    &lt;versionCode code=&quot;V3NPfIT4.2.00&quot;/&gt;&#xd;
+    &lt;interactionId root=&quot;2.16.840.1.113883.2.1.3.2.4.12&quot; extension=&quot;REPC_IN150016UK05&quot;/&gt;&#xd;
+    &lt;processingCode code=&quot;P&quot;/&gt;&#xd;
+    &lt;processingModeCode code=&quot;T&quot;/&gt;&#xd;
+    &lt;acceptAckCode code=&quot;NE&quot;/&gt;&#xd;
+    &lt;communicationFunctionRcv typeCode=&quot;RCV&quot;&gt;&#xd;
+        &lt;device classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+            &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;227319907548&quot;/&gt;&#xd;
+        &lt;/device&gt;&#xd;
+    &lt;/communicationFunctionRcv&gt;&#xd;
+    &lt;communicationFunctionSnd typeCode=&quot;SND&quot;&gt;&#xd;
+        &lt;device classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+            &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;918999199091&quot;/&gt;&#xd;
+        &lt;/device&gt;&#xd;
+    &lt;/communicationFunctionSnd&gt;&#xd;
+    &lt;ControlActEvent classCode=&quot;CACT&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+        &lt;author1 typeCode=&quot;AUT&quot;&gt;&#xd;
+            &lt;AgentSystemSDS classCode=&quot;AGNT&quot;&gt;&#xd;
+                &lt;agentSystemSDS classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+                    &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;918999199091&quot;/&gt;&#xd;
+                &lt;/agentSystemSDS&gt;&#xd;
+            &lt;/AgentSystemSDS&gt;&#xd;
+        &lt;/author1&gt;&#xd;
+        &lt;author typeCode=&quot;AUT&quot;&gt;&#xd;
+            &lt;AgentPersonSDS classCode=&quot;AGNT&quot;&gt;&#xd;
+                &lt;id root=&quot;1.2.826.0.1285.0.2.0.67&quot; extension=&quot;055888118514&quot;/&gt;&#xd;
+                &lt;agentPersonSDS classCode=&quot;PSN&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+                    &lt;id root=&quot;1.2.826.0.1285.0.2.0.65&quot; extension=&quot;979603625513&quot;/&gt;&#xd;
+                &lt;/agentPersonSDS&gt;&#xd;
+                &lt;part typeCode=&quot;PART&quot;&gt;&#xd;
+                    &lt;partSDSRole classCode=&quot;ROL&quot;&gt;&#xd;
+                        &lt;id extension=&quot;R0260&quot; root=&quot;1.2.826.0.1285.0.2.1.104&quot;/&gt;&#xd;
+                    &lt;/partSDSRole&gt;&#xd;
+                &lt;/part&gt;&#xd;
+            &lt;/AgentPersonSDS&gt;&#xd;
+        &lt;/author&gt;&#xd;
+        &lt;subject typeCode=&quot;SUBJ&quot; contextConductionInd=&quot;false&quot;&gt;&#xd;
+            &lt;GPSummary classCode=&quot;COMPOSITION&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+                &lt;id root=&quot;${id_root}&quot;/&gt;&#xd;
+                &lt;code code=&quot;196981000000101&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.15&quot; displayName=&quot;General Practice Summary&quot;/&gt;&#xd;
+                &lt;effectiveTime value=&quot;${shortTimestamp}&quot;/&gt;&#xd;
+                &lt;statusCode code=&quot;active&quot;/&gt;&#xd;
+                &lt;author typeCode=&quot;AUT&quot; contextControlCode=&quot;OP&quot;&gt;&#xd;
+                    &lt;time value=&quot;${shortTimestamp}&quot;/&gt;&#xd;
+                    &lt;UKCT_MT160018UK01.AgentPersonSDS classCode=&quot;AGNT&quot;&#xd;
+                        xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;&#xd;
+                        &lt;id root=&quot;1.2.826.0.1285.0.2.0.67&quot; extension=&quot;055888118514&quot;/&gt;&#xd;
+                        &lt;agentPersonSDS classCode=&quot;PSN&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+                            &lt;id root=&quot;1.2.826.0.1285.0.2.0.65&quot; extension=&quot;979603625513&quot;/&gt;&#xd;
+                            &lt;name&gt;&#xd;
+                                &lt;family&gt;NICA_Test_Automation_Healthchecks&lt;/family&gt;&#xd;
+                            &lt;/name&gt;&#xd;
+                        &lt;/agentPersonSDS&gt;&#xd;
+                    &lt;/UKCT_MT160018UK01.AgentPersonSDS&gt;&#xd;
+                &lt;/author&gt;&#xd;
+                &lt;excerptFrom typeCode=&quot;XCRPT&quot; inversionInd=&quot;false&quot; contextConductionInd=&quot;true&quot; negationInd=&quot;false&quot;&gt;&#xd;
+                    &lt;templateId root=&quot;2.16.840.1.113883.2.1.3.2.4.18.2&quot; extension=&quot;CSAT_RM-NPfITUK10.excerptFrom&quot;/&gt;&#xd;
+                    &lt;seperatableInd value=&quot;false&quot;/&gt;&#xd;
+                    &lt;UKCT_MT144051UK01.CareProfessionalDocumentationCRE classCode=&quot;CATEGORY&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+                        &lt;code code=&quot;163171000000105&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.15&quot; displayName=&quot;Care Professional Documentation&quot;/&gt;&#xd;
+                        &lt;component typeCode=&quot;COMP&quot; inversionInd=&quot;false&quot; negationInd=&quot;false&quot;&gt;&#xd;
+                            &lt;templateId root=&quot;2.16.840.1.113883.2.1.3.2.4.18.2&quot; extension=&quot;CSAB_RM-NPfITUK10.component&quot;/&gt;&#xd;
+                            &lt;seperatableInd value=&quot;false&quot;/&gt;&#xd;
+                            &lt;presentationText classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+                                &lt;value mediaType=&quot;text/plain&quot;&gt;&#xd;
+                                    Payload stuff&#xd;
+                                &lt;/value&gt;&#xd;
+                                &lt;id root=&quot;${id_root_alt}&quot;/&gt;&#xd;
+                                &lt;code code=&quot;PresentationText&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.126&quot; displayName=&quot;Presentation Text&quot;/&gt;&#xd;
+                                &lt;statusCode code=&quot;completed&quot;/&gt;&#xd;
+                                &lt;effectiveTime value=&quot;${shortTimestamp}&quot;/&gt;&#xd;
+                            &lt;/presentationText&gt;&#xd;
+                        &lt;/component&gt;&#xd;
+                    &lt;/UKCT_MT144051UK01.CareProfessionalDocumentationCRE&gt;&#xd;
+                &lt;/excerptFrom&gt;&#xd;
+                &lt;pertinentInformation1 typeCode=&quot;PERT&quot; inversionInd=&quot;false&quot; contextConductionInd=&quot;true&quot; negationInd=&quot;false&quot;&gt;&#xd;
+                    &lt;templateId root=&quot;2.16.840.1.113883.2.1.3.2.4.18.2&quot; extension=&quot;CSAB_RM-NPfITUK10.pertinentInformation1&quot;/&gt;&#xd;
+                    &lt;seperatableInd value=&quot;true&quot;/&gt;&#xd;
+                    &lt;pertinentRootCREType classCode=&quot;CATEGORY&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+                        &lt;code code=&quot;163171000000105&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.15&quot; displayName=&quot;Care Professional Documentation&quot;/&gt;&#xd;
+                    &lt;/pertinentRootCREType&gt;&#xd;
+                &lt;/pertinentInformation1&gt;&#xd;
+                &lt;recordTarget typeCode=&quot;RCT&quot;&gt;&#xd;
+                    &lt;patient classCode=&quot;PAT&quot;&gt;&#xd;
+                        &lt;id root=&quot;2.16.840.1.113883.2.1.4.1&quot; extension=&quot;9446245796&quot;/&gt;&#xd;
+                    &lt;/patient&gt;&#xd;
+                &lt;/recordTarget&gt;&#xd;
+            &lt;/GPSummary&gt;&#xd;
+        &lt;/subject&gt;&#xd;
+    &lt;/ControlActEvent&gt;&#xd;
+&lt;/REPC_IN150016UK05&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">80</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/gp_summary_upload</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PDS_Retrieval_Query_Synch" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot;?&gt;&#xd;
+&lt;QUPA_IN040000UK32 xmlns=&quot;urn:hl7-org:v3&quot; xmlns:hl7=&quot;urn:hl7-org:v3&quot;&gt;&#xd;
+	&lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
+	&lt;creationTime value=&quot;${shortTimestamp}&quot; /&gt;&#xd;
+	&lt;versionCode code=&quot;V3NPfIT3.0&quot; /&gt;&#xd;
+	&lt;interactionId root=&quot;2.16.840.1.113883.2.1.3.2.4.12&quot; extension=&quot;QUPA_IN040000UK32&quot; /&gt;&#xd;
+	&lt;processingCode code=&quot;P&quot; /&gt;&#xd;
+	&lt;processingModeCode code=&quot;T&quot; /&gt;&#xd;
+	&lt;acceptAckCode code=&quot;NE&quot; /&gt;&#xd;
+	&lt;communicationFunctionRcv&gt;&#xd;
+		&lt;device classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+			&lt;hl7:id xmlns:SOAP=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; extension=&quot;${to_party_id}&quot;&#xd;
+				root=&quot;1.2.826.0.1285.0.2.0.107&quot; /&gt;&#xd;
+		&lt;/device&gt;&#xd;
+	&lt;/communicationFunctionRcv&gt;&#xd;
+	&lt;communicationFunctionSnd&gt;&#xd;
+		&lt;device classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+			&lt;hl7:id xmlns:SOAP=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; extension=&quot;${from_party_id}&quot;&#xd;
+				root=&quot;1.2.826.0.1285.0.2.0.107&quot; /&gt;&#xd;
+		&lt;/device&gt;&#xd;
+	&lt;/communicationFunctionSnd&gt;&#xd;
+	&lt;ControlActEvent classCode=&quot;CACT&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+		&lt;author1 typeCode=&quot;AUT&quot;&gt;&#xd;
+			&lt;AgentSystemSDS classCode=&quot;AGNT&quot;&gt;&#xd;
+				&lt;agentSystemSDS classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+					&lt;hl7:id xmlns:SOAP=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; extension=&quot;${from_party_id}&quot;&#xd;
+						root=&quot;1.2.826.0.1285.0.2.0.107&quot; /&gt;&#xd;
+				&lt;/agentSystemSDS&gt;&#xd;
+			&lt;/AgentSystemSDS&gt;&#xd;
+		&lt;/author1&gt;&#xd;
+		&lt;query&gt;&#xd;
+			&lt;historicDataIndicator&gt;&#xd;
+				&lt;value code=&quot;0&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.36&quot; /&gt;&#xd;
+				&lt;semanticsText&gt;historicDataIndicator&lt;/semanticsText&gt;&#xd;
+			&lt;/historicDataIndicator&gt;&#xd;
+			&lt;person.id&gt;&#xd;
+				&lt;value root=&quot;2.16.840.1.113883.2.1.4.1&quot; extension=&quot;${nhsNumber}&quot; /&gt;&#xd;
+				&lt;semanticsText&gt;person.id&lt;/semanticsText&gt;&#xd;
+			&lt;/person.id&gt;&#xd;
+			&lt;retrievalItem&gt;&#xd;
+				&lt;semanticsText&gt;person.allData&lt;/semanticsText&gt;&#xd;
+			&lt;/retrievalItem&gt;&#xd;
+		&lt;/query&gt;&#xd;
+	&lt;/ControlActEvent&gt;&#xd;
+&lt;/QUPA_IN040000UK32&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">80</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/pds_retrieval</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP2GP_Common_Content_Large_Messageing_Fwrd_Reliable" enabled="false">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;COPC_IN000001UK01 xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns=&quot;urn:hl7-org:v3&quot;&gt;&#xd;
+    &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
+    &lt;creationTime value=&quot;20190416100812&quot; /&gt;&#xd;
+    &lt;versionCode code=&quot;3NPfIT7.2.02&quot; /&gt;&#xd;
+    &lt;interactionId root=&quot;2.16.840.1.113883.2.1.3.2.4.12&quot; extension=&quot;COPC_IN000001UK01&quot; /&gt;&#xd;
+    &lt;processingCode code=&quot;P&quot; /&gt;&#xd;
+    &lt;processingModeCode code=&quot;T&quot; /&gt;&#xd;
+    &lt;acceptAckCode code=&quot;NE&quot; /&gt;&#xd;
+    &lt;communicationFunctionRcv type=&quot;CommunicationFunction&quot; typeCode=&quot;RCV&quot;&gt;&#xd;
+        &lt;device type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+            &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;200000000835&quot; /&gt;&#xd;
+        &lt;/device&gt;&#xd;
+    &lt;/communicationFunctionRcv&gt;&#xd;
+    &lt;communicationFunctionSnd type=&quot;CommunicationFunction&quot; typeCode=&quot;SND&quot;&gt;&#xd;
+        &lt;device type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+            &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;031759679512&quot; /&gt;&#xd;
+        &lt;/device&gt;&#xd;
+    &lt;/communicationFunctionSnd&gt;&#xd;
+    &lt;ControlActEvent classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+        &lt;author1 type=&quot;Participation&quot; typeCode=&quot;AUT&quot;&gt;&#xd;
+            &lt;AgentSystemSDS type=&quot;RoleHeir&quot; classCode=&quot;AGNT&quot;&gt;&#xd;
+                &lt;agentSystemSDS type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+                    &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;200000000835&quot; /&gt;&#xd;
+                &lt;/agentSystemSDS&gt;&#xd;
+            &lt;/AgentSystemSDS&gt;&#xd;
+        &lt;/author1&gt;&#xd;
+        &lt;subject typeCode=&quot;SUBJ&quot; contextConductionInd=&quot;false&quot;&gt;&#xd;
+        &lt;PayloadInformation classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+        &lt;code code=&quot;GP2GPLMATTACHMENTINFO&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.202&quot; displayName=&quot;GP2GP Large Message Attachment Information&quot; /&gt;&#xd;
+        &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
+        &lt;messageType root=&quot;2.16.840.1.113883.2.1.3.2.4.18.17&quot; extension=&quot;RCMR_MT000001GB01&quot; xmlns=&quot;NPFIT:HL7:Localisation&quot; /&gt;&#xd;
+        &lt;value&gt;&#xd;
+            &lt;Gp2gpfragment xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;urn:nhs:names:services:gp2gp&quot;&gt;&#xd;
+            &lt;Version xsi:type=&quot;xsd:string&quot;&gt;01&lt;/Version&gt;&#xd;
+            &lt;Recipients&gt;&#xd;
+                &lt;Recipient&gt;${to_party_id}&lt;/Recipient&gt;&#xd;
+            &lt;/Recipients&gt;&#xd;
+            &lt;From&gt;${from_party_id}&lt;/From&gt;&#xd;
+            &lt;subject&gt;Attachment:${file_upload}&lt;/subject&gt;&#xd;
+            &lt;message-id&gt;${id_root}&lt;/message-id&gt;&#xd;
+            &lt;/Gp2gpfragment&gt;&#xd;
+        &lt;/value&gt;&#xd;
+            &lt;pertinentInformation typeCode=&quot;PERT&quot;&gt;&#xd;
+                &lt;sequenceNumber value=&quot;1&quot; /&gt;&#xd;
+                &lt;pertinentPayloadBody classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+                    &lt;code code=&quot;GP2GPLMATTACHMENT&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.202&quot; displayName=&quot;GP2GP Large Message Attachment&quot; /&gt;&#xd;
+                    &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
+                    &lt;value&gt;&#xd;
+                        &lt;reference value=&quot;file://localhost/1E49E84D-B29B-466B-93A5-432459CA549B_Treadmill%20Running%20300fps_12.avi&quot; /&gt;&#xd;
+                    &lt;/value&gt;&#xd;
+                &lt;/pertinentPayloadBody&gt;&#xd;
+                &lt;/pertinentInformation&gt;&#xd;
+            &lt;/PayloadInformation&gt;&#xd;
+        &lt;/subject&gt;&#xd;
+    &lt;/ControlActEvent&gt;&#xd;
+&lt;/COPC_IN000001UK01&gt;&#xd;
+</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">80</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/gp_to_gp</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="false">
+          <collectionProp name="Asserion.test_strings">
+            <stringProp name="49586">200</stringProp>
+          </collectionProp>
+          <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+          <boolProp name="Assertion.assume_success">false</boolProp>
+          <intProp name="Assertion.test_type">2</intProp>
+          <stringProp name="Assertion.custom_message"></stringProp>
+        </ResponseAssertion>
+        <hashTree/>
+        <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters" enabled="true">
+          <collectionProp name="UserParameters.names">
+            <stringProp name="55126294">timestamp</stringProp>
+            <stringProp name="733810682">shortTimestamp</stringProp>
+            <stringProp name="1409793545">from_party_id</stringProp>
+            <stringProp name="-1346248104">to_party_id</stringProp>
+            <stringProp name="-1422950858">action</stringProp>
+            <stringProp name="-1354262618">cpa_id</stringProp>
+            <stringProp name="1652761990">id_root</stringProp>
+            <stringProp name="2046139248">id_root_alt</stringProp>
+            <stringProp name="940331682">nhsNumber</stringProp>
+            <stringProp name="-1999822316">nhs_number_AE</stringProp>
+            <stringProp name="-1473196299">documentType</stringProp>
+            <stringProp name="1603491602">dissentOverride</stringProp>
+            <stringProp name="-1831367840">dissentOverride2</stringProp>
+          </collectionProp>
+          <collectionProp name="UserParameters.thread_values">
+            <collectionProp name="-1461500412">
+              <stringProp name="-922947048">${__BeanShell(new java.text.SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;&quot;).format(new Date()))}}</stringProp>
+              <stringProp name="1697399689">${__time(YMMddHHmmss)}</stringProp>
+              <stringProp name="-387775280">918999199091</stringProp>
+              <stringProp name="803295032">YES-0000806</stringProp>
+              <stringProp name="380125698">REPC_IN150016UK05</stringProp>
+              <stringProp name="-2413700">S20001A000182</stringProp>
+              <stringProp name="1154959476">${__javaScript(&quot;${__UUID()}&quot;.toUpperCase())}</stringProp>
+              <stringProp name="1154959476">${__javaScript(&quot;${__UUID()}&quot;.toUpperCase())}</stringProp>
+              <stringProp name="483810206">9446245796</stringProp>
+              <stringProp name="-2113169336">9689174789</stringProp>
+              <stringProp name="-912300401">196971000000103</stringProp>
+              <stringProp name="49">1</stringProp>
+              <stringProp name="48">0</stringProp>
+            </collectionProp>
+          </collectionProp>
+          <boolProp name="UserParameters.per_iteration">false</boolProp>
+        </UserParameters>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Inbound Message Samples" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="SOAP Faults" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request" enabled="false">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;SOAP:Envelope xmlns:SOAP=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:SOAP-ENV=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:crs=&quot;http://national.carerecords.nhs.uk/schema/crs/&quot; xmlns:wsa=&quot;http://schemas.xmlsoap.org/ws/2004/08/addressing&quot;&gt;&#xd;
+  &lt;SOAP:Body&gt;&#xd;
+    &lt;SOAP:Fault&gt;&#xd;
+      &lt;faultcode&gt;SOAP:Server&lt;/faultcode&gt;&#xd;
+      &lt;faultstring&gt;Application Exception&lt;/faultstring&gt;&#xd;
+      &lt;detail&gt;&#xd;
+        &lt;nasp:errorList xmlns:nasp=&quot;http://national.carerecords.nhs.uk/schema/&quot;&gt;&#xd;
+          &lt;nasp:error&gt;&#xd;
+            &lt;nasp:codeContext&gt;urn:nhs:names:error:tms&lt;/nasp:codeContext&gt;&#xd;
+            &lt;nasp:errorCode&gt;200&lt;/nasp:errorCode&gt;&#xd;
+            &lt;nasp:severity&gt;Error&lt;/nasp:severity&gt;&#xd;
+            &lt;nasp:location&gt;Not Supported&lt;/nasp:location&gt;&#xd;
+            &lt;nasp:description&gt;System failure to process message - default&lt;/nasp:description&gt;&#xd;
+          &lt;/nasp:error&gt;&#xd;
+        &lt;/nasp:errorList&gt;&#xd;
+      &lt;/detail&gt;&#xd;
+    &lt;/SOAP:Fault&gt;&#xd;
+  &lt;/SOAP:Body&gt;&#xd;
+&lt;/SOAP:Envelope&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">443</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path"></stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
