@@ -1,4 +1,3 @@
-import logging
 import pathlib
 import ssl
 from typing import Tuple, Dict
@@ -13,7 +12,10 @@ import mhs.inbound.request.handler as async_request_handler
 import mhs.outbound.request.synchronous.handler as client_request_handler
 import utilities.config as config
 import utilities.file_utilities as file_utilities
+import utilities.integration_adaptors_logger as log
 from mhs.common import workflow
+
+logger = log.IntegrationAdaptorsLogger('MHS_MAIN')
 
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
@@ -54,13 +56,8 @@ def initialise_workflows(certs_dir: pathlib.Path, party_key: str) -> Dict[str, w
     return workflow.get_workflow_map()
 
 
-def configure_logging() -> None:
-    """Configure logging for this application."""
-    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", level=config.config["LOG_LEVEL"])
-
-
-def start_tornado_servers(data_dir: pathlib.Path, certs_file: str, key_file: str, workflows: Dict[str, workflow.CommonWorkflow],
-                          party_key: str) -> None:
+def start_tornado_servers(data_dir: pathlib.Path, certs_file: str, key_file: str,
+                          workflows: Dict[str, workflow.CommonWorkflow], party_key: str) -> None:
     """
 
     :param data_dir: The directory to load interactions configuration from.
@@ -88,13 +85,13 @@ def start_tornado_servers(data_dir: pathlib.Path, certs_file: str, key_file: str
                                                                 ca_certs=certs_file))
     mhs_server.listen(443)
 
-    logging.info("Starting servers")
+    logger.info('001', 'Starting servers')
     tornado.ioloop.IOLoop.current().start()
 
 
 def main():
     config.setup_config("MHS")
-    configure_logging()
+    log.configure_logging()
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
@@ -107,4 +104,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+    finally:
+        logger.info('002', 'Exiting application')
