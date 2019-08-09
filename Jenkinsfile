@@ -16,13 +16,28 @@ pipeline {
             }
         }
 
-        stage('MHS Unit Tests') {
+        stage('MHS Common Unit Tests') {
             steps {
-                dir('mhs') {
+                dir('mhs/mhs_common') {
                     executeUnitTestsWithCoverage()
                }
             }
         }
+        stage('MHS Inbound Unit Tests') {
+            steps {
+                dir('mhs/inbound') {
+                    executeUnitTestsWithCoverage()
+               }
+            }
+        }
+        stage('MHS Outbound Unit Tests') {
+            steps {
+                dir('mhs/outbound') {
+                    executeUnitTestsWithCoverage()
+               }
+            }
+        }
+
         stage('SCR Web Service Unit Tests') {
             steps {
                 dir('SCRWebService') {
@@ -33,7 +48,8 @@ pipeline {
 
         stage('Package') {
             steps {
-                sh label: 'Running MHS Packer build', script: 'packer build pipeline/packer/mhs.json'
+                sh label: 'Running Inbound Packer build', script: 'packer build pipeline/packer/inbound.json'
+                sh label: 'Running Outbound Packer build', script: 'packer build pipeline/packer/outbound.json'
                 sh label: 'Running SCR service Packer build', script: 'packer build pipeline/packer/scr-web-service.json'
             }
         }
