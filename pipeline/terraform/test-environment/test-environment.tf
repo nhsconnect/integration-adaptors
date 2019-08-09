@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-inbound-task" {
 
       mountPoints = [{
         sourceVolume = "certs-volume"
-        containerPath = "/usr/src/app/mhs/data/certs/"
+        containerPath = "/usr/src/app/mhs/mhs_common/data/certs/"
       }]
 
       environment = [
@@ -68,7 +68,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
   [
     {
       name = "mhs"
-      image = "${var.ecr_address}:inbound-${var.build_id}"
+      image = "${var.ecr_address}:outbound-${var.build_id}"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
@@ -81,7 +81,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
 
       mountPoints = [{
         sourceVolume = "certs-volume"
-        containerPath = "/usr/src/app/mhs/data/certs/"
+        containerPath = "/usr/src/app/mhs/mhs_common/data/certs/"
       }]
 
       environment = [
@@ -116,7 +116,7 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
   [
     {
       name = "scr-service"
-      image = "${var.scr_ecr_address}:outbound-${var.build_id}"
+      image = "${var.scr_ecr_address}:${var.build_id}"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
