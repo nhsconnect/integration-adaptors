@@ -144,7 +144,7 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
     }
   ]
   )
-  cpu = "64"
+  cpu = "128"
   memory = "128"
   requires_compatibilities = [
     "EC2"
