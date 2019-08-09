@@ -7,11 +7,14 @@ services:
       - "443:443"
     environment:
       - MHS_LOG_LEVEL=NOTSET
-
-
   outbound:
     image: local/outbound
     ports:
       - "80:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
+
+  dynamodb:
+      image: amazon/dynamodb-local
+      ports:
+          - "8000:8000"
