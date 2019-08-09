@@ -48,6 +48,24 @@ I found I also needed to add a permission policy that looked like:
 where `ecsTaskExecutionRole` is a default role created when creating task definitions.
 - the Jenkins workers need their own IAM role that has sufficient permissions to run the build job.
 
+In addition, if creating amazon mq instances, the build role will require a policy containing the followng statement:
+```json
+{
+    "Sid": "<statementId>",
+    "Effect": "Allow",
+    "Action": [
+        "mq:*",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSubnets",
+        "CreateNetworkInterface"
+    ],
+    "Resource": [
+        "*"
+    ]
+}
+```
+
 [amazon-ecs plugin]: https://wiki.jenkins.io/display/JENKINS/Amazon+EC2+Container+Service+Plugin
 
 ### Permissions and global variables
