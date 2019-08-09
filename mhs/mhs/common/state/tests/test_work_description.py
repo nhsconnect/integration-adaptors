@@ -51,7 +51,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         await work_description.publish()
-        persistence.add.assert_called_with(json.dumps(input_data))
+        persistence.add.assert_called_with(input_data[wd.DATA_KEY], json.dumps(input_data))
 
     @patch('mhs.common.state.work_description.get_time')
     @async_test
@@ -66,7 +66,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         await work_description.publish()
-        persistence.add.assert_called_with(json.dumps(input_data))
+        persistence.add.assert_called_with(input_data[wd.DATA_KEY], json.dumps(input_data))
 
     @async_test
     async def test_out_of_date_version(self):
@@ -113,7 +113,7 @@ class TestWorkDescription(unittest.TestCase):
 
         # Check local version updated
         self.assertEqual(work_description.version, 2)
-        persistence.add.assert_called_with(json.dumps(updated))
+        persistence.add.assert_called_with('aaa-aaa-aaa', json.dumps(updated))
 
     def test_null_persistence(self):
         with self.assertRaises(ValueError):

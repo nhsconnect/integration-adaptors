@@ -2,6 +2,8 @@ from __future__ import annotations
 import json
 import utilities.integration_adaptors_logger as log
 import datetime
+from mhs.common.state import persistence_adaptor as pa
+
 
 logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
 
@@ -35,7 +37,7 @@ def get_time():
     return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
 
 
-async def get_work_description_from_store(persistence_store, key: str) -> WorkDescription:
+async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> WorkDescription:
     """
     Attempts to retrieve and deserialize a work description instance from the given persistence store to create
     a local work description
@@ -56,7 +58,7 @@ async def get_work_description_from_store(persistence_store, key: str) -> WorkDe
     return WorkDescription(persistence_store, json_store_data)
 
 
-def create_new_work_description(persistence_store,
+def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
                                 key: str,
                                 status: int) -> WorkDescription:
     """
@@ -90,7 +92,7 @@ def create_new_work_description(persistence_store,
 class WorkDescription:
     """A local copy of an instance of a work description from the state store"""
 
-    def __init__(self, persistence_store, store_data: dict):
+    def __init__(self, persistence_store: pa.PersistenceAdaptor, store_data: dict):
         """
         Given 
         :param persistence_store:
@@ -134,7 +136,7 @@ class WorkDescription:
         self.last_modified_timestamp = get_time()
         serialised = self._serialise_data()
 
-        old_data = await self.persistence_store.add(serialised)
+        old_data = await self.persistence_store.add(self.message_key, serialised)
         logger.info('016', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
         return old_data
 
