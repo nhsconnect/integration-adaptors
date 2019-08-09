@@ -1,6 +1,5 @@
 import time
 from typing import Dict, Optional
-
 import SpineRouteLookup.lookup.cache_adapter as cache_adapter
 
 FIFTEEN_MINUTES_IN_SECONDS = 900
@@ -10,7 +9,7 @@ def _generate_key(ods_code: str, interaction_id: str) -> str:
     return ods_code + '-' + interaction_id
 
 
-class DictionaryCache(cache_adapter.CacheAdapter):
+class DictionaryCache(cache_adaptor.CacheAdaptor):
 
     def __init__(self, expiry_time: float = FIFTEEN_MINUTES_IN_SECONDS):
         if expiry_time < 0:
