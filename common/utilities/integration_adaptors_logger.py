@@ -1,7 +1,7 @@
 import logging
 import sys
 import time
-
+import datetime as dt
 from utilities import config
 
 AUDIT = 25
@@ -14,15 +14,29 @@ def configure_logging():
     to stdout and sets the default log levels and format. This is expected to be called once at the start of a
     application.
     """
+
+    class _CustomFormatter(logging.Formatter):
+        """
+        A private formatter class, this is required to provide microsecond precision timestamps and utc
+        conversion
+        """
+        converter = dt.datetime.utcfromtimestamp
+
+        def formatTime(self, record, datefmt):
+            ct = self.converter(record.created)
+            return ct.strftime(datefmt)
+
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
     logger.setLevel(config.get_config('LOG_LEVEL'))
     handler = logging.StreamHandler(sys.stdout)
-    logging.Formatter.converter = time.gmtime
-    formatter = logging.Formatter('[%(asctime)s.%(msecs)03dZ] '
-                                  '%(message)s pid=%(process)d LogLevel=%(levelname)s ',
-                                  '%Y-%m-%dT%H:%M:%S')
+
+    formatter = _CustomFormatter(
+        fmt='[%(asctime)sZ] %(message)s pid=%(process)d LogLevel=%(levelname)s ',
+        datefmt='%Y-%m-%dT%H:%M:%S.%f')
+
     handler.setFormatter(formatter)
+
     logger.addHandler(handler)
 
 
@@ -101,4 +115,3 @@ class IntegrationAdaptorsLogger:
         """
         formatted_values = self._format_values_in_map(dict_values)
         return message.format(**formatted_values)
-
