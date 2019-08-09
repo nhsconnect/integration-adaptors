@@ -68,7 +68,7 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
   [
     {
       name = "scr-service"
-      image = "${var.scr_ecr_address}:${var.build_id}"
+      image = "${var.scr_ecr_address}:outbound-${var.build_id}"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
