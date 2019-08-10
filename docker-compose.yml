@@ -13,7 +13,6 @@ services:
       - "80:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
-
   dynamodb:
     image: amazon/dynamodb-local
     ports:
