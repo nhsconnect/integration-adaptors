@@ -1,7 +1,7 @@
 import asyncio
 import json
 import unittest
-import mhs.common.state.work_description as wd
+import state.work_description as wd
 from unittest.mock import MagicMock, patch
 from utilities.test_utilities import async_test
 import copy
@@ -38,7 +38,7 @@ class TestWorkDescription(unittest.TestCase):
         self.assertEqual(work_description.created_timestamp, '11:59')
         self.assertEqual(work_description.last_modified_timestamp, '12:00')
 
-    @patch('mhs.common.state.work_description.get_time')
+    @patch('state.work_description.get_time')
     @async_test
     async def test_publish_updates(self, time_mock):
         time_mock.return_value = '12:00'
@@ -53,7 +53,7 @@ class TestWorkDescription(unittest.TestCase):
         await work_description.publish()
         persistence.add.assert_called_with(input_data[wd.DATA_KEY], json.dumps(input_data))
 
-    @patch('mhs.common.state.work_description.get_time')
+    @patch('state.work_description.get_time')
     @async_test
     async def test_publish_update_latest_is_none(self, time_mock):
         time_mock.return_value = '12:00'
@@ -88,7 +88,7 @@ class TestWorkDescription(unittest.TestCase):
         with self.assertRaises(wd.OutOfDateVersionError):
             await work_description.publish()
 
-    @patch('mhs.common.state.work_description.get_time')
+    @patch('state.work_description.get_time')
     @async_test
     async def test_auto_increase_version(self, time_mock):
         time_mock.return_value = '12:00'
@@ -122,7 +122,7 @@ class TestWorkDescription(unittest.TestCase):
 
 class TestWorkDescriptionFactory(unittest.TestCase):
 
-    @patch('mhs.common.state.work_description.WorkDescription')
+    @patch('state.work_description.WorkDescription')
     @async_test
     async def test_get_from_store(self, work_mock):
         future = asyncio.Future()
@@ -156,8 +156,8 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         with self.assertRaises(ValueError):
             await wd.get_work_description_from_store(MagicMock(), None)
 
-    @patch('mhs.common.state.work_description.get_time')
-    @patch('mhs.common.state.work_description.WorkDescription')
+    @patch('state.work_description.get_time')
+    @patch('state.work_description.WorkDescription')
     def test_create_work_description(self, work_mock, time_mock):
         time_mock.return_value = '12'
         persistence = MagicMock()

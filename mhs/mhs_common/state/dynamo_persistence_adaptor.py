@@ -6,7 +6,7 @@ import traceback
 import aioboto3
 import utilities.integration_adaptors_logger as log
 
-import mhs.common.state.persistence_adaptor
+import state.persistence_adaptor
 
 logger = log.IntegrationAdaptorsLogger('DYNAMO_PERSISTENCE')
 
@@ -26,7 +26,7 @@ class RecordRetrievalError(RuntimeError):
     pass
 
 
-class DynamoPersistenceAdaptor(mhs.common.state.persistence_adaptor.PersistenceAdaptor):
+class DynamoPersistenceAdaptor(state.persistence_adaptor.PersistenceAdaptor):
     """Class responsible for persisting items into a DynamoDB."""
 
     def __init__(self, **kwargs):

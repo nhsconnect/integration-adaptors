@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 import utilities.integration_adaptors_logger as log
 import datetime
-from mhs.common.state import persistence_adaptor as pa
+from state import persistence_adaptor as pa
 
 
 logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
