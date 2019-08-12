@@ -8,6 +8,26 @@ pipeline {
     }
 
     stages {
+        stage('Build modules') {
+            steps{
+                dir('common'){
+                    sh label: 'Installing common dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'}
+                }
+                dir('mhs/mhs_common'){
+                    sh label: 'Installing mhs_common dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                }
+                dir('mhs/inbound'){
+                    sh label: 'Installing inbound dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                }
+                dir('mhs/outbound'){
+                    sh label: 'Installing outbound dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                }
+                dir('mhs/spineroutelookup'){
+                    sh label: 'Installing route lookup dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                }
+            }
+        }
+
         stage('Common Module Unit Tests') {
             steps {
                 dir('common') {
@@ -141,7 +161,6 @@ pipeline {
 }
 
 void executeUnitTestsWithCoverage() {
-    sh label: 'Installing dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
     sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
