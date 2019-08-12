@@ -60,10 +60,14 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
     - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
 
 ## Running an MHS Instance
-`pipenv run mhs` will run the `main.py` script (you can also run this directly). This will start up an MHS
-instance listening for 'client' requests on port 80 and asynchronous responses from Spine on port 443.
-Note that the following environment variables need to be set when running MHS:
-- `MHS_LOG_LEVEL` - log level threshold
+Since the MHS is split into multiple services the simplest way to run an instance is to use the docker-compose script
+found in the root directory. The following steps should be followed: 
+* Requirements: `Docker`, [`Packer`](https://www.packer.io/)
+* Run the `./build.sh` script found in the top level directory of this project. This will build the inbound and outbound  
+    containers ready for running
+* Run `docker-compose build`. This build all the additional containers
+* Run `docker-compose up`. This will start the inbound and outbound services, along with an instance of RabbitMQ and 
+    DynamoDb
 
 Any content POSTed to `/path` (for example) on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
