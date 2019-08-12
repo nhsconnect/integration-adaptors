@@ -2,9 +2,9 @@ from unittest import TestCase
 
 from utilities.test_utilities import async_test
 
-import SpineRouteLookup.lookup.sds_client as sds_client
-import SpineRouteLookup.lookup.sds_exception as re
-import SpineRouteLookup.lookup.tests.ldap_mocks as mocks
+import lookup.sds_client as sds_client
+import lookup.sds_exception as re
+import lookup.tests.ldap_mocks as mocks
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 

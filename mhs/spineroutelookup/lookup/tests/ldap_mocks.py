@@ -2,10 +2,10 @@ from pathlib import Path
 
 import ldap3
 
-import SpineRouteLookup.lookup.sds_client as sds_client
+import lookup.sds_client as sds_client
 from definitions import ROOT_DIR
 
-MHS_TEST_DATA_PATH = Path(ROOT_DIR) / 'spineroutelookup' / 'lookup' / 'tests' / 'data'
+MHS_TEST_DATA_PATH = Path(ROOT_DIR) / 'lookup' / 'tests' / 'data'
 SERVER_INFO_PATH = str(MHS_TEST_DATA_PATH / 'my_real_server_info.json')
 SCHEMA_PATH = str(MHS_TEST_DATA_PATH / 'my_real_server_schema.json')
 SERVER_ENTRIES_PATH = str(MHS_TEST_DATA_PATH / 'my_real_server_entries.json')

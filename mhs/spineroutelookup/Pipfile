@@ -12,6 +12,7 @@ requests = "*"
 integration-adaptors-common = {editable = true,path = "./../../common"}
 tornado = "*"
 defusedxml = "~=0.6"
+ldap3 = "*"
 mhs-common = {editable = true,path = "./../mhs_common"}
 
 [requires]
@@ -23,4 +24,4 @@ unittests-cov = 'coverage run -m xmlrunner -o test-reports -v'
 coverage-report = 'coverage report'
 coverage-report-xml = 'coverage xml'
 coverage-report-html = 'coverage html'
-start-inbound = "python main.py"
+start = "python main.py"

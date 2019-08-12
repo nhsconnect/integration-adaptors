@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from utilities.test_utilities import async_test
 
-import SpineRouteLookup.lookup.dictionary_cache as dictionary_cache
+import lookup.dictionary_cache as dictionary_cache
 
 
 class TestDictionaryCache(unittest.TestCase):

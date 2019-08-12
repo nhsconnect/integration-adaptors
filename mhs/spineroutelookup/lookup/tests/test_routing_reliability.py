@@ -2,11 +2,11 @@ import unittest
 
 from utilities.test_utilities import async_test
 
-import SpineRouteLookup.lookup.dictionary_cache as dict_cache
-import SpineRouteLookup.lookup.mhs_attribute_lookup as mhs_attribute_lookup
-import SpineRouteLookup.lookup.routing_reliability as rar
-import SpineRouteLookup.lookup.sds_exception as sds_exception
-import SpineRouteLookup.lookup.tests.ldap_mocks as mocks
+import lookup.dictionary_cache as dict_cache
+import lookup.mhs_attribute_lookup as mhs_attribute_lookup
+import lookup.routing_reliability as rar
+import lookup.sds_exception as sds_exception
+import lookup.tests.ldap_mocks as mocks
 
 PARTY_KEY = " AP4RTY-K33Y"
 INTERACTION_ID = "urn:nhs:names:services:psis:MCCI_IN010000UK13"

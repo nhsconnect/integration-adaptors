@@ -1,6 +1,6 @@
 """This module defines the component used to look up routing and reliability information for a remote MHS."""
 
-import SpineRouteLookup.lookup.mhs_attribute_lookup as mhs_attribute_lookup
+import lookup.mhs_attribute_lookup as mhs_attribute_lookup
 
 RELIABILITY_KEYS = [
     'nhsMHSSyncReplyMode',

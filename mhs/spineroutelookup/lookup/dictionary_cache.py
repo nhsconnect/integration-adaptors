@@ -1,6 +1,6 @@
 import time
 from typing import Dict, Optional
-import SpineRouteLookup.lookup.cache_adapter as cache_adapter
+import lookup.cache_adaptor as cache_adaptor
 
 FIFTEEN_MINUTES_IN_SECONDS = 900
 

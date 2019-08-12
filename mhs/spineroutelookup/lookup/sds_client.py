@@ -7,7 +7,7 @@ from typing import Dict, List
 import ldap3
 import ldap3.core.exceptions as ldap_exceptions
 
-import SpineRouteLookup.lookup.sds_exception as sds_exception
+import lookup.sds_exception as sds_exception
 
 logger = logging.getLogger(__name__)
 

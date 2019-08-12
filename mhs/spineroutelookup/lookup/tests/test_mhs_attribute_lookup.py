@@ -4,9 +4,9 @@ from unittest.mock import MagicMock, patch
 
 from utilities.test_utilities import async_test
 
-import SpineRouteLookup.lookup.dictionary_cache as dc
-import SpineRouteLookup.lookup.mhs_attribute_lookup as mhs_attribute_lookup
-import SpineRouteLookup.lookup.tests.ldap_mocks as mocks
+import lookup.dictionary_cache as dc
+import lookup.mhs_attribute_lookup as mhs_attribute_lookup
+import lookup.tests.ldap_mocks as mocks
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 

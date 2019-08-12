@@ -3,8 +3,8 @@ information for a remote MHS."""
 
 import logging
 from typing import Dict
-import mhs.message_configuration.lookup.cache_adaptor as cache_adaptor
-import mhs.message_configuration.lookup.sds_client as sds_client
+import lookup.cache_adaptor as cache_adaptor
+import lookup.sds_client as sds_client
 
 
 logger = logging.getLogger(__name__)
