@@ -11,7 +11,7 @@ pipeline {
         stage('Build modules') {
             steps{
                 dir('common'){
-                    sh label: 'Installing common dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'}
+                    sh label: 'Installing common dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                 }
                 dir('mhs/mhs_common'){
                     sh label: 'Installing mhs_common dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
