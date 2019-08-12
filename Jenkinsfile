@@ -25,6 +25,10 @@ pipeline {
                 dir('mhs/spineroutelookup'){
                     sh label: 'Installing route lookup dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                 }
+                dir('SCRWebService') {
+                    sh label: 'Installing SCR web service dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                }
+
             }
         }
 
@@ -64,7 +68,6 @@ pipeline {
                }
             }
         }
-
         stage('SCR Web Service Unit Tests') {
             steps {
                 dir('SCRWebService') {
