@@ -12,7 +12,7 @@ setup(
     author_email='',
     description='Common utilities used by the NHS integration adaptors projects.',
     install_requires=[
-        'pystache',
-        'lxml'
+        'defusedxml',
+        'aioboto3'
     ]
 )
