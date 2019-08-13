@@ -1,5 +1,4 @@
 """Module for testing the Proton queue adaptor functionality."""
-import asyncio
 import unittest.mock
 
 import comms.proton_queue_adaptor
@@ -26,9 +25,10 @@ class TestProtonQueueAdaptor(unittest.TestCase):
     @utilities.test_utilities.async_test
     async def test_send_async_success(self):
         """Test happy path of send_async."""
-        self.mock_container.return_value.run.return_value = asyncio.Future()
+        awaitable = self.service.send_async(TEST_MESSAGE)
+        self.assertFalse(self.mock_container.return_value.run.called)
 
-        await self.service.send_async(TEST_MESSAGE)
+        await awaitable
 
         self.assertTrue(self.mock_container.return_value.run.called)
 

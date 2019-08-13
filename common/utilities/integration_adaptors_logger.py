@@ -1,10 +1,14 @@
+import contextvars
+import datetime as dt
 import logging
 import sys
-import time
-import datetime as dt
+
 from utilities import config
 
 AUDIT = 25
+
+message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', default=None)
+correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default=None)
 
 
 # Set the logging info globally, make each module get a new logger based on that log ref we provide
@@ -52,7 +56,7 @@ class IntegrationAdaptorsLogger:
         self.process_key_tag = log_ref
         self.logger = logging.getLogger(log_ref)
 
-    def _format_and_write(self, message, values, process_key_num, request_id, correlation_id, level):
+    def _format_and_write(self, message, values, process_key_num, level):
         """
         Formats the string and appends the appropriate values if they are included before writing the log
         """
@@ -61,39 +65,34 @@ class IntegrationAdaptorsLogger:
 
         message = self._formatted_string(message, values)
 
-        if request_id:
-            message += f' RequestId={request_id}'
-        if correlation_id:
-            message += f' CorrelationId={correlation_id}'
+        if message_id.get():
+            message += f' RequestId={message_id.get()}'
+        if correlation_id.get():
+            message += f' CorrelationId={correlation_id.get()}'
 
         message += f' ProcessKey={self.process_key_tag + process_key_num}'
 
         self.logger.log(level, message)
 
-    def info(self, process_key_num: str, message: str, values: dict = None,
-             request_id: str = None, correlation_id=None):
+    def info(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.INFO)
+        self._format_and_write(message, values, process_key_num, logging.INFO)
 
-    def audit(self, process_key_num: str, message: str, values: dict = None,
-              request_id: str = None, correlation_id=None):
+    def audit(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, AUDIT)
+        self._format_and_write(message, values, process_key_num, AUDIT)
 
-    def warning(self, process_key_num: str, message: str, values: dict = None,
-                request_id: str = None, correlation_id=None):
+    def warning(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.WARNING)
+        self._format_and_write(message, values, process_key_num, logging.WARNING)
 
-    def error(self, process_key_num: str, message: str, values: dict = None,
-              request_id: str = None, correlation_id=None):
+    def error(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.ERROR)
+        self._format_and_write(message, values, process_key_num, logging.ERROR)
 
-    def critical(self, process_key_num: str, message: str, values: dict = None,
-                 request_id: str = None, correlation_id=None):
+    def critical(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.CRITICAL)
+        self._format_and_write(message, values, process_key_num, logging.CRITICAL)
 
     def _format_values_in_map(self, dict_values: dict) -> dict:
         """

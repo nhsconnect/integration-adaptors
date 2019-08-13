@@ -1,91 +1,106 @@
 """This module defines the outbound synchronous request handler component."""
 
-import datetime
-from typing import Dict, Callable
+from typing import Dict
 
 import tornado.locks
 import tornado.web
 
-import workflow.common as common_workflow
-import workflow.sync_async as sync_async_workflow
-import request.common as common
-from utilities import integration_adaptors_logger as log
+
+import workflow
+from configuration import configuration_manager
+from utilities import integration_adaptors_logger as log, message_utilities
+
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
 
-class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
+class SynchronousHandler(tornado.web.RequestHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a supplier system."""
 
-    def initialize(self, workflow: sync_async_workflow.SyncAsyncWorkflow,
-                   callbacks: Dict[str, Callable[[str], None]], async_timeout: int):
+    def initialize(self, workflows: Dict[str, workflow.CommonWorkflow],
+                   config_manager: configuration_manager.ConfigurationManager):
         """Initialise this request handler with the provided configuration values.
 
-        :param workflow: The workflow to use to send messages.
-        :param callbacks: The dictionary of callbacks to use when awaiting an asynchronous response.
-        :param async_timeout: The amount of time (in seconds) to wait for an asynchronous response.
+        :param workflows: The workflows to use to send messages.
+        :param config_manager: The object that can be used to obtain configuration details.
         """
-        self.workflow = workflow
-        self.callbacks = callbacks
-        self.async_response_received = tornado.locks.Event()
-        self.async_timeout = async_timeout
+        self.workflows = workflows
+        self.config_manager = config_manager
 
-    async def post(self, interaction_name):
-        logger.info('0001', 'Client POST received. {Request}', {'Request': str(self.request)})
+    async def post(self):
+        message_id = self._extract_message_id()
+        self._extract_correlation_id()
 
-        message_id = self.get_query_argument("messageId", default=None)
+        logger.info('0006', 'Outbound POST received. {Request}', {'Request': str(self.request)})
 
-        async_message_id = None
+        body = self.request.body.decode()
+        if not body:
+            logger.warning('0009', 'Body missing from request')
+            raise tornado.web.HTTPError(400, 'Body missing from request', reason='Body missing from request')
+
+        interaction_id = self._extract_interaction_id()
+
+        interaction_details = self._get_interaction_details(interaction_id)
+        if interaction_details is None:
+            logger.warning('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
+            raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
+                                        reason=f'Unknown interaction ID: {interaction_id}')
+
         try:
-            interaction_is_async, async_message_id, message = self.workflow.prepare_message(interaction_name,
-                                                                                            self.request.body.decode(),
-                                                                                            message_id)
+            workflow = self.workflows[interaction_details['workflow']]
+        except KeyError as e:
+            logger.error('0008', "Weren't able to determine workflow for {InteractionId} . This likely is due to a "
+                                 "misconfiguration in interactions.json", {"InteractionId": interaction_id})
+            raise tornado.web.HTTPError(500,
+                                        f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
+                                        reason=f"Couldn't determine workflow to invoke for interaction ID: "
+                                               f"{interaction_id}") from e
 
-            if interaction_is_async:
-                self.callbacks[async_message_id] = self._write_async_response
-                logger.info('0002', 'Added callback for asynchronous message with {MessageId}',
-                            {'MessageId': async_message_id})
+        status, response = await workflow.handle_outbound_message(message_id, interaction_details, body)
 
-            immediate_response = self.workflow.send_message(interaction_name, message)
+        self._write_response(status, response)
 
-            if interaction_is_async:
-                await self._pause_request(async_message_id)
-            else:
-                # No async response expected. Just return the response to our initial request.
-                self._write_response(immediate_response)
+    def _extract_message_id(self):
+        message_id = self.request.headers.get('Message-Id', None)
+        if not message_id:
+            message_id = message_utilities.MessageUtilities.get_uuid()
+            log.message_id.set(message_id)
+            logger.info('0001', "Didn't receive message id in incoming request from supplier, so have generated a new "
+                                "one.")
+        else:
+            log.message_id.set(message_id)
+            logger.info('0002', 'Found message id on incoming request.')
+        return message_id
 
-        except common_workflow.UnknownInteractionError:
-            raise tornado.web.HTTPError(404, "Unknown interaction ID: %s", interaction_name)
-        finally:
-            if async_message_id in self.callbacks:
-                del self.callbacks[async_message_id]
+    def _extract_correlation_id(self):
+        correlation_id = self.request.headers.get('Correlation-Id', None)
+        if not correlation_id:
+            correlation_id = message_utilities.MessageUtilities.get_uuid()
+            log.correlation_id.set(correlation_id)
+            logger.info('0003', "Didn't receive correlation id in incoming request from supplier, so have generated a "
+                                "new one.")
+        else:
+            log.correlation_id.set(correlation_id)
+            logger.info('0004', 'Found correlation id on incoming request.')
 
-    async def _pause_request(self, async_message_id):
-        """Pause the incoming request until an asynchronous response is received (or a timeout is hit).
-
-        :param async_message_id: The ID of the request that expects an asynchronous response.
-        :raises: An HTTPError if we timed out waiting for an asynchronous response.
-        """
+    def _extract_interaction_id(self):
         try:
-            logger.info('0003', 'Waiting for asynchronous response to message with {MessageId}',
-                        {'MessageId': async_message_id})
-            await self.async_response_received.wait(datetime.timedelta(seconds=self.async_timeout))
-        except TimeoutError:
-            raise tornado.web.HTTPError(log_message=f"Timed out waiting for a response to message {async_message_id}")
+            interaction_id = self.request.headers['Interaction-Id']
+        except KeyError as e:
+            logger.warning('0005', 'Required Interaction-Id header not passed in request')
+            raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found',
+                                        reason='Required Interaction-Id header not found') from e
+        return interaction_id
 
-    def _write_response(self, message: str) -> None:
+    def _write_response(self, status: int, message: str) -> None:
         """Write the given message to the response.
 
         :param message: The message to write to the response.
         """
+        logger.info('0010', 'Returning response with {HttpStatus}', {'HttpStatus': status})
+        self.set_status(status)
         self.set_header("Content-Type", "text/xml")
         self.write(message)
 
-    def _write_async_response(self, message: str) -> None:
-        """Write the given message to the response and notify anyone waiting that this has been done.
-
-        :param message: The message to write to the response.
-        """
-        logger.info('0004', 'Received asynchronous response containing message {Message}', {'Message': message})
-        self._write_response(message)
-        self.async_response_received.set()
+    def _get_interaction_details(self, interaction_name: str) -> dict:
+        return self.config_manager.get_interaction_details(interaction_name)

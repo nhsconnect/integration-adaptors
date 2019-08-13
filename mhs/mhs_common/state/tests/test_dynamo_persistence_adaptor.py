@@ -4,11 +4,10 @@ import contextlib
 import functools
 import json
 import unittest.mock
-
-import utilities.test_utilities
-
+from utilities import test_utilities
 import state
 import state.dynamo_persistence_adaptor
+
 
 TEST_TABLE_ARN = "TEST TABLE ARN"
 TEST_DATA_OBJECT = {"test_attribute": "test_value"}
@@ -40,7 +39,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
         )
 
     #   TESTING ADD METHOD
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_add_success(self):
         """Test happy path for add call with no previous object."""
         self.__setFutureResponse(self.mock_table.put_item, TEST_ADD_EMPTY_RESPONSE)
@@ -49,7 +48,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         self.assertIsNone(response)
 
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_add_overwrite(self):
         """Test happy path for add call, overwriting existing object."""
         self.__setFutureResponse(self.mock_table.put_item, TEST_ADD_RESPONSE)
@@ -58,7 +57,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         self.assertEqual(response, TEST_DATA_OBJECT)
 
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_add_io_exception(self):
         """Test unhappy path for add where an IO exception occurs."""
         self.mock_table.put_item.side_effect = TEST_SIDE_EFFECT
@@ -69,7 +68,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
 
     #   TESTING GET METHOD
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_get_success(self):
         """Test happy path for get."""
         self.__setFutureResponse(self.mock_table.get_item, TEST_GET_RESPONSE)
@@ -78,7 +77,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         self.assertEqual(response, TEST_DATA_OBJECT)
 
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_get_invalid_key(self):
         """Test unhappy path for get where an invalid/missing key is provided."""
         self.__setFutureResponse(self.mock_table.get_item, TEST_GET_EMPTY_RESPONSE)
@@ -87,7 +86,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         self.assertIsNone(response)
 
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_get_io_exception(self):
         """Test unhappy path for get where an IO exception occurs."""
         self.mock_table.get_item.side_effect = TEST_SIDE_EFFECT
@@ -98,7 +97,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
 
     #   TESTING DELETE METHOD
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_delete_success(self):
         """Test happy path for delete."""
         self.__setFutureResponse(self.mock_table.delete_item, TEST_DELETE_RESPONSE)
@@ -107,7 +106,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         self.assertEqual(response, TEST_DATA_OBJECT)
 
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_delete_invalid_key(self):
         """Test unhappy path for delete where a invalid/missing key is provided."""
         self.__setFutureResponse(self.mock_table.delete_item, TEST_DELETE_EMPTY_RESPONSE)
@@ -116,7 +115,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         self.assertIsNone(response)
 
-    @utilities.test_utilities.async_test
+    @test_utilities.async_test
     async def test_delete_io_exception(self):
         """Test unhappy path for delete where an IO exception occurs."""
         self.mock_table.delete_item.side_effect = TEST_SIDE_EFFECT
@@ -133,10 +132,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
         :param method: The method to add the response to.
         :param response: The response to be added to the method.
         """
-        future = asyncio.Future()
-        future.set_result(response)
-
-        method.return_value = future
+        method.return_value = test_utilities.awaitable(response)
 
     def __configure_mocks(self, mock_boto3_resource):
         """Configure the standard mocks to have mappings which can be used in the tests."""

@@ -22,7 +22,6 @@ ASYNC_TIMEOUT = 30
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
     """Load the necessary TLS certificates from the specified directory.
-
     :param certs_dir: The directory to load certificates from.
     :return: A tuple consisting of the file names of the client's certificates file, and the client's key.
     """
@@ -34,7 +33,6 @@ def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
 
 def load_party_key(data_dir: pathlib.Path) -> str:
     """Load this MHS's party key from the specified directory.
-
     :param data_dir: The directory to load the party key from.
     :return: The party key to use to identify this MHS.
     """
@@ -48,7 +46,6 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
                         party_key: str) -> sync_async_workflow.SyncAsyncWorkflow:
     """Initialise the
-
     :param data_dir: The directory to load interactions configuration from.
     :param certs_dir: The directory containing certificates/keys to be used to identify this MHS to a remote MHS.
     :param party_key: The party key to use to identify this MHS.
@@ -64,9 +61,8 @@ def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
     return workflow
 
 
-def start_tornado_servers(workflow: sync_async_workflow.SyncAsyncWorkflow) -> None:
+def start_tornado_server(workflow: sync_async_workflow.SyncAsyncWorkflow) -> None:
     """
-
     :param certs_file: The filename of the certificate to be used to identify this MHS to a remote MHS.
     :param key_file: The filename of the private key for the certificate identified by certs_file.
     :param workflow: The workflow to be used to handle messages.
@@ -91,7 +87,7 @@ def main():
     certs_dir = data_dir / "certs"
     party_key = load_party_key(certs_dir)
     workflow = initialise_workflow(data_dir, certs_dir, party_key)
-    start_tornado_servers(workflow)
+    start_tornado_server(workflow)
 
 
 if __name__ == "__main__":

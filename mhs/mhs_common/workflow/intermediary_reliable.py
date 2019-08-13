@@ -1,6 +1,6 @@
 """This module defines the intermediary reliable workflow."""
 
-import common.workflow.asynchronous_reliable as asynchronous_reliable
+import workflow.asynchronous_reliable as asynchronous_reliable
 
 
 class IntermediaryReliableWorkflow(asynchronous_reliable.AsynchronousReliableWorkflow):
