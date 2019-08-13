@@ -9,8 +9,7 @@ import definitions
 import configuration.configuration_manager as configuration_manager
 import workflow.sync_async as sync_async_workflow
 
-import request.synchronous.handler as client_request_handler
-import transmission.outbound_transmission as outbound_transmission
+from outbound import request as client_request_handler, transmission as outbound_transmission
 import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
