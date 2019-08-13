@@ -8,10 +8,8 @@ coverage = "~=4.5"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
-requests = "*"
 integration-adaptors-common = {editable = true,path = "./../../common"}
 tornado = "*"
-defusedxml = "~=0.6"
 mhs-common = {editable = true,path = "./../mhs_common"}
 
 [requires]

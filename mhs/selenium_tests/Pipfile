@@ -6,12 +6,12 @@ verify_ssl = true
 [dev-packages]
 coverage = "~=4.5"
 unittest-xml-reporting = "~=2.5"
-
-[packages]
 requests = "*"
 integration-adaptors-common = {editable = true,path = "./../../common"}
 tornado = "*"
 defusedxml = "~=0.6"
+
+[packages]
 
 [requires]
 python_version = "3.7"
