@@ -102,6 +102,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 500)
+        self.assertIn(f"Couldn't determine workflow to invoke for interaction ID: {INTERACTION_NAME}",
+                      response.body.decode())
 
         self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
         self.workflow.handle_outbound_message.assert_not_called()
@@ -112,6 +114,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 500)
+        self.assertIn(f"Couldn't determine workflow to invoke for interaction ID: {INTERACTION_NAME}",
+                      response.body.decode())
 
         self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
         self.workflow.handle_outbound_message.assert_not_called()
@@ -120,6 +124,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", body="A request")
 
         self.assertEqual(response.code, 404)
+        self.assertIn('Required Interaction-Id header not found', response.body.decode())
 
     def test_post_with_invalid_interaction_name(self):
         self.config_manager.get_interaction_details.return_value = None
@@ -127,6 +132,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="A request")
 
         self.assertEqual(response.code, 404)
+        self.assertIn(f'Unknown interaction ID: {INTERACTION_NAME}', response.body.decode())
 
     def test_post_with_no_body(self):
         self.config_manager.get_interaction_details.return_value = None
@@ -134,3 +140,4 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="")
 
         self.assertEqual(response.code, 400)
+        self.assertIn("Body missing from request", response.body.decode())

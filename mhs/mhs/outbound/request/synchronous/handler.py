@@ -34,22 +34,25 @@ class SynchronousHandler(tornado.web.RequestHandler):
         body = self.request.body.decode()
         if not body:
             logger.warning('0009', 'Body missing from request')
-            raise tornado.web.HTTPError(400, 'Body missing from request')
+            raise tornado.web.HTTPError(400, 'Body missing from request', reason='Body missing from request')
 
         interaction_id = self._extract_interaction_id()
 
         interaction_details = self._get_interaction_details(interaction_id)
         if interaction_details is None:
             logger.warning('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
-            raise tornado.web.HTTPError(404, "Unknown interaction ID: %s", interaction_id)
+            raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
+                                        reason=f'Unknown interaction ID: {interaction_id}')
 
         try:
             workflow = self.workflows[interaction_details['workflow']]
         except KeyError as e:
             logger.error('0008', "Weren't able to determine workflow for {InteractionId} . This likely is due to a "
                                  "misconfiguration in interactions.json", {"InteractionId": interaction_id})
-            raise tornado.web.HTTPError(500, "Couldn't determine workflow to invoke for interaction ID: %s",
-                                        interaction_id) from e
+            raise tornado.web.HTTPError(500,
+                                        f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
+                                        reason=f"Couldn't determine workflow to invoke for interaction ID: "
+                                               f"{interaction_id}") from e
 
         status, response = await workflow.handle_outbound_message(message_id, interaction_details, body)
 
@@ -83,7 +86,8 @@ class SynchronousHandler(tornado.web.RequestHandler):
             interaction_id = self.request.headers['Interaction-Id']
         except KeyError as e:
             logger.warning('0005', 'Required Interaction-Id header not passed in request')
-            raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found') from e
+            raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found',
+                                        reason='Required Interaction-Id header not found') from e
         return interaction_id
 
     def _write_response(self, status: int, message: str) -> None:
