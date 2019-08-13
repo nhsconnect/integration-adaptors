@@ -54,7 +54,7 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
             raise tornado.web.HTTPError(500, "Couldn't determine workflow to invoke for interaction ID: %s",
                                         interaction_id) from e
 
-        status, response = await workflow.handle_supplier_message(message_id, interaction_details, body)
+        status, response = await workflow.handle_outbound_message(message_id, interaction_details, body)
 
         self._write_response(status, response)
 
