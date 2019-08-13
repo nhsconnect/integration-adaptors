@@ -31,7 +31,7 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
         message_id = self._extract_message_id()
         self._extract_correlation_id()
 
-        logger.info('0006', 'Client POST received. {Request}', {'Request': str(self.request)})
+        logger.info('0006', 'Outbound POST received. {Request}', {'Request': str(self.request)})
 
         body = self.request.body.decode()
         if not body:
