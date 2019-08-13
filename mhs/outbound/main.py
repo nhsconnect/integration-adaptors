@@ -56,7 +56,7 @@ def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
 
-    workflow = sync_async_workflow.SyncAsyncWorkflow(config_manager, transmission, party_key)
+    workflow = sync_async_workflow.SyncAsyncWorkflow(transmission, party_key)
 
     return workflow
 

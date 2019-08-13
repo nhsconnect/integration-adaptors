@@ -1,6 +1,6 @@
 import requests
 
-from selenium_tests.page_objects import methods
+from page_objects import methods
 
 
 def call_mhs(mhs_command, hl7payload, message_id=None):

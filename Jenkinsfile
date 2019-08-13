@@ -10,70 +10,32 @@ pipeline {
     stages {
         stage('Build modules') {
             steps{
-                dir('common'){
-                    sh label: 'Installing common dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                }
-                dir('mhs/mhs_common'){
-                    sh label: 'Installing mhs_common dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                }
-                dir('mhs/inbound'){
-                    sh label: 'Installing inbound dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                }
-                dir('mhs/outbound'){
-                    sh label: 'Installing outbound dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                }
-                dir('mhs/spineroutelookup'){
-                    sh label: 'Installing route lookup dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                }
-                dir('SCRWebService') {
-                    sh label: 'Installing SCR web service dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                }
-
+                dir('common'){ buildModules('Installing common dependencies') }
+                dir('mhs/mhs_common'){ buildModules('Installing mhs_common dependencies') }
+                dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
+                dir('mhs/outbound'){ buildModules('Installing outbound dependencies') }
+                dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
+                dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
             }
         }
 
         stage('Common Module Unit Tests') {
-            steps {
-                dir('common') {
-                    executeUnitTestsWithCoverage()
-               }
-            }
+            steps { dir('common') { executeUnitTestsWithCoverage() } }
         }
-
         stage('MHS Common Unit Tests') {
-            steps {
-                dir('mhs/mhs_common') {
-                    executeUnitTestsWithCoverage()
-               }
-            }
+            steps { dir('mhs/mhs_common') { executeUnitTestsWithCoverage() } }
         }
         stage('MHS Inbound Unit Tests') {
-            steps {
-                dir('mhs/inbound') {
-                    executeUnitTestsWithCoverage()
-               }
-            }
+            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
         }
         stage('MHS Outbound Unit Tests') {
-            steps {
-                dir('mhs/outbound') {
-                    executeUnitTestsWithCoverage()
-               }
-            }
+            steps { dir('mhs/outbound') { executeUnitTestsWithCoverage() } }
         }
          stage('Spine Route Lookup Unit Tests') {
-            steps {
-                dir('mhs/spineroutelookup') {
-                    executeUnitTestsWithCoverage()
-               }
-            }
+            steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
         }
         stage('SCR Web Service Unit Tests') {
-            steps {
-                dir('SCRWebService') {
-                    executeUnitTestsWithCoverage()
-               }
-            }
+            steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
         }
 
         stage('Package') {
@@ -166,4 +128,8 @@ void executeUnitTestsWithCoverage() {
     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
     sh label: 'Running SonarQube analysis', script: "sonar-scanner -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}"
+}
+
+void buildModules(String action) {
+    sh label: action, script: 'pipenv install --dev --deploy --ignore-pipfile'
 }
