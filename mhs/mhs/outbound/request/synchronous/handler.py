@@ -5,7 +5,6 @@ from typing import Dict
 import tornado.locks
 import tornado.web
 
-import mhs.common.workflow.common as common_workflow
 import mhs.outbound.request.common as common
 from mhs.common import workflow
 from mhs.common.configuration import configuration_manager
@@ -40,11 +39,10 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
 
         interaction_id = self._extract_interaction_id()
 
-        try:
-            interaction_details = self._get_interaction_details(interaction_id)
-        except common_workflow.UnknownInteractionError as e:
+        interaction_details = self._get_interaction_details(interaction_id)
+        if interaction_details is None:
             logger.warning('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
-            raise tornado.web.HTTPError(404, "Unknown interaction ID: %s", interaction_id) from e
+            raise tornado.web.HTTPError(404, "Unknown interaction ID: %s", interaction_id)
 
         try:
             workflow = self.workflows[interaction_details['workflow']]
@@ -100,9 +98,4 @@ class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
         self.write(message)
 
     def _get_interaction_details(self, interaction_name: str) -> dict:
-        interaction_details = self.config_manager.get_interaction_details(interaction_name)
-
-        if interaction_details is None:
-            raise common_workflow.UnknownInteractionError(interaction_name)
-
-        return interaction_details
+        return self.config_manager.get_interaction_details(interaction_name)
