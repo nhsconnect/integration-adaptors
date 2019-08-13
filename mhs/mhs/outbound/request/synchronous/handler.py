@@ -5,7 +5,6 @@ from typing import Dict
 import tornado.locks
 import tornado.web
 
-import mhs.outbound.request.common as common
 from mhs.common import workflow
 from mhs.common.configuration import configuration_manager
 from utilities import integration_adaptors_logger as log, message_utilities
@@ -13,7 +12,7 @@ from utilities import integration_adaptors_logger as log, message_utilities
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
 
-class SynchronousHandler(common.CommonOutbound, tornado.web.RequestHandler):
+class SynchronousHandler(tornado.web.RequestHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a supplier system."""
 
     def initialize(self, workflows: Dict[str, workflow.CommonWorkflow],
