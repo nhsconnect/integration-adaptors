@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, skip
 
 from selenium_tests.page_objects import methods
 
@@ -6,7 +6,8 @@ TEST_NHS_NUMBER = '9446245796'
 GP_SUMMARY_UPLOAD_INTERACTION = 'gp_summary_upload'
 
 
-class FunctionalTest(TestCase):
+@skip("Sync Async workflow not implemented yet")
+class SyncAsyncTest(TestCase):
 
     # request scr record for patient 9446245796
     def test_scr_happy_path(self):

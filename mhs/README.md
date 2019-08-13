@@ -68,6 +68,10 @@ found in the root directory. The following steps should be followed:
 * Run `docker-compose build`. This build all the additional containers
 * Run `docker-compose up`. This will start the inbound and outbound services, along with an instance of RabbitMQ and 
     DynamoDb
+* Depending on the OS the MHS is being run on, measures may have to be taken to allow public inbound traffic so that
+the async responses from Spine can access the MHS. For example on windows a inbound rule was required in windows
+firewall to allow inbound traffic through port 443. In the AWS test environment an inbound rule was added
+in the security groups for machine the MHS was deployed to
 
 Any content POSTed to `/path` (for example) on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to

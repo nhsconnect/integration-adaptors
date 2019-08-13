@@ -116,8 +116,7 @@ pipeline {
                            }
                         }
                      }
-                     // Ignore the integration tests for now
-                    // sh label: 'Running integration tests', script: 'pipenv run inttests'
+                     sh label: 'Running integration tests', script: 'pipenv run inttests'
                 }
             }
         }
@@ -133,8 +132,7 @@ pipeline {
                            }
                         }
                      }
-                     // Ignore for now
-                    // sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
+                     sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
                 }
             }
         }
