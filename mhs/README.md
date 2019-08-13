@@ -60,7 +60,7 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
     - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
 
 ## Running an MHS Instance
-Since the MHS is split into multiple services the simplest way to run an instance is to use the docker-compose script
+Since the MHS is split into multiple services the simplest way to run an instance locally is to use the docker-compose script
 found in the root directory. The following steps should be followed: 
 * Requirements: `Docker`, [`Packer`](https://www.packer.io/)
 * Run the `./build.sh` script found in the top level directory of this project. This will build the inbound and outbound  
@@ -72,6 +72,9 @@ found in the root directory. The following steps should be followed:
 the async responses from Spine can access the MHS. For example on windows a inbound rule was required in windows
 firewall to allow inbound traffic through port 443. In the AWS test environment an inbound rule was added
 in the security groups for machine the MHS was deployed to
+* Note that when running the MHS the environment variable `MHS_LOG_LEVEL` is required to be set to one of: `NOTSET`,
+`INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least.
+
 
 Any content POSTed to `/path` (for example) on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
