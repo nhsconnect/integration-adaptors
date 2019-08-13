@@ -2,11 +2,12 @@
 
 import logging
 from pathlib import Path
+from comms import transmission_adaptor
 
 import requests
 
 
-class OutboundTransmission:
+class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
     """A component that sends HTTP requests to a remote MHS."""
 
     def __init__(self, certs_dir):

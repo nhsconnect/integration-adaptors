@@ -6,6 +6,7 @@ from typing import Tuple, Dict
 import messages.ebxml_envelope as ebxml_envelope
 import messages.ebxml_request_envelope as ebxml_request_envelope
 import workflow.common_synchronous as common_synchronous
+from comms import transmission_adaptor as ta
 
 from utilities import integration_adaptors_logger as log, message_utilities
 
@@ -19,7 +20,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     """Handles the workflow for the sync-async messaging pattern."""
 
     # TODO: This used to take an outbound transmission object
-    def __init__(self, transmission, party_id: str):
+    def __init__(self, transmission: ta.TransmissionAdaptor, party_id: str):
 
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
