@@ -9,6 +9,7 @@ import utilities.test_utilities
 
 import mhs.common.state
 import mhs.common.state.dynamo_persistence_adaptor
+from utilities import test_utilities
 
 TEST_TABLE_ARN = "TEST TABLE ARN"
 TEST_DATA_OBJECT = {"test_attribute": "test_value"}
@@ -133,10 +134,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
         :param method: The method to add the response to.
         :param response: The response to be added to the method.
         """
-        future = asyncio.Future()
-        future.set_result(response)
-
-        method.return_value = future
+        method.return_value = test_utilities.awaitable(response)
 
     def __configure_mocks(self, mock_boto3_resource):
         """Configure the standard mocks to have mappings which can be used in the tests."""
