@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "686181f2c2c192390a6a99ec4e44962ddeafb9f5d45371d7f15ead3526dc58d3"
+            "sha256": "b8ed4930ade5445359d2dacc91797a0086d67ff68426d8ae8594cf0064056470"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -164,7 +164,7 @@
         },
         "mhs-common": {
             "editable": true,
-            "path": "./../mhs_common"
+            "path": "./../common"
         },
         "multidict": {
             "hashes": [

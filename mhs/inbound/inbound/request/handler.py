@@ -5,9 +5,9 @@ from typing import Dict, Callable
 
 import tornado.web
 
-import messages.ebxml_ack_envelope as ebxml_ack_envelope
-import messages.ebxml_envelope as ebxml_envelope
-import messages.ebxml_request_envelope as ebxml_request_envelope
+import mhs_common.messages.ebxml_ack_envelope as ebxml_ack_envelope
+import mhs_common.messages.ebxml_envelope as ebxml_envelope
+import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 
 
 

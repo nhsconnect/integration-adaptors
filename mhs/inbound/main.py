@@ -8,7 +8,7 @@ import tornado.web
 
 
 import definitions
-import request.handler as async_request_handler
+import inbound.request.handler as async_request_handler
 import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log

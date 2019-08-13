@@ -8,7 +8,7 @@ import utilities.file_utilities as file_utilities
 import utilities.message_utilities as message_utilities
 import utilities.xml_utilities as xml_utilities
 
-import request.handler as handler
+import inbound.request.handler as handler
 
 MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
