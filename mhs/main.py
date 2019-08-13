@@ -1,34 +1,19 @@
 import pathlib
-import ssl
-from typing import Tuple
+from typing import Dict
 
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-import utilities.integration_adaptors_logger as log
+
 import definitions
 import mhs.common.configuration.configuration_manager as configuration_manager
-import mhs.common.workflow.sync_async as sync_async_workflow
-import mhs.inbound.request.handler as async_request_handler
 import mhs.outbound.request.synchronous.handler as client_request_handler
-import mhs.outbound.transmission.outbound_transmission as outbound_transmission
 import utilities.config as config
 import utilities.file_utilities as file_utilities
+import utilities.integration_adaptors_logger as log
+from mhs.common import workflow
 
-ASYNC_TIMEOUT = 30
 logger = log.IntegrationAdaptorsLogger('MHS_MAIN')
-
-
-def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
-    """Load the necessary TLS certificates from the specified directory.
-
-    :param certs_dir: The directory to load certificates from.
-    :return: A tuple consisting of the file names of the client's certificates file, and the client's key.
-    """
-    certs_file = str(certs_dir / "client.pem")
-    key_file = str(certs_dir / "client.key")
-
-    return certs_file, key_file
 
 
 def load_party_key(data_dir: pathlib.Path) -> str:
@@ -44,49 +29,34 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     return party_key
 
 
-def initialise_workflow(data_dir: pathlib.Path, certs_dir: pathlib.Path,
-                        party_key: str) -> sync_async_workflow.SyncAsyncWorkflow:
-    """Initialise the
+def initialise_workflows(certs_dir: pathlib.Path, party_key: str) -> Dict[str, workflow.CommonWorkflow]:
+    """Initialise the workflows
 
-    :param data_dir: The directory to load interactions configuration from.
     :param certs_dir: The directory containing certificates/keys to be used to identify this MHS to a remote MHS.
     :param party_key: The party key to use to identify this MHS.
-    :return: The workflow that can be used to handle messages.
+    :return: The workflows that can be used to handle messages.
+    """
+    # transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
+    # workflow = sync_async_workflow.SyncAsyncWorkflow(transmission, party_key)
+
+    return workflow.get_workflow_map()
+
+
+def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:
+    """
+    Start Tornado server
+
+    :param data_dir: The directory to load interactions configuration from.
+    :param workflows: The workflows to be used to handle messages.
     """
     interactions_config_file = str(data_dir / "interactions" / "interactions.json")
     config_manager = configuration_manager.ConfigurationManager(interactions_config_file)
 
-    transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
-
-    workflow = sync_async_workflow.SyncAsyncWorkflow(config_manager, transmission, party_key)
-
-    return workflow
-
-
-def start_tornado_servers(certs_file: str, key_file: str, workflow: sync_async_workflow.SyncAsyncWorkflow,
-                          party_key: str) -> None:
-    """
-
-    :param certs_file: The filename of the certificate to be used to identify this MHS to a remote MHS.
-    :param key_file: The filename of the private key for the certificate identified by certs_file.
-    :param workflow: The workflow to be used to handle messages.
-    :param party_key: The party key to use to identify this MHS.
-    """
-    callbacks = {}
-
     supplier_application = tornado.web.Application(
-        [(r"/(.*)", client_request_handler.SynchronousHandler,
-          dict(workflow=workflow, callbacks=callbacks, async_timeout=ASYNC_TIMEOUT))])
+        [(r"/", client_request_handler.SynchronousHandler,
+          dict(config_manager=config_manager, workflows=workflows))])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
     supplier_server.listen(80)
-
-    mhs_application = tornado.web.Application(
-        [(r"/.*", async_request_handler.InboundHandler, dict(callbacks=callbacks, party_id=party_key))])
-    mhs_server = tornado.httpserver.HTTPServer(mhs_application,
-                                               ssl_options=dict(certfile=certs_file, keyfile=key_file,
-                                                                cert_reqs=ssl.CERT_REQUIRED,
-                                                                ca_certs=certs_file))
-    mhs_server.listen(443)
 
     logger.info('001', 'Starting servers')
     tornado.ioloop.IOLoop.current().start()
@@ -98,18 +68,17 @@ def main():
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
-    certs_file, key_file = load_certs(certs_dir)
     party_key = load_party_key(certs_dir)
 
-    workflow = initialise_workflow(data_dir, certs_dir, party_key)
+    workflows = initialise_workflows(certs_dir, party_key)
 
-    start_tornado_servers(certs_file, key_file, workflow, party_key)
+    start_tornado_server(data_dir, workflows)
 
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+        logger.critical('002', 'Fatal exception in main application: {exception}', {'exception': e})
     finally:
-        logger.info('002', 'Exiting application')
+        logger.info('003', 'Exiting application')

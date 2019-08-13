@@ -1,12 +1,11 @@
-import asyncio
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
-
-from utilities.test_utilities import async_test
 
 import mhs.message_configuration.lookup.dictionary_cache as dc
 import mhs.message_configuration.lookup.mhs_attribute_lookup as mhs_attribute_lookup
 import mhs.message_configuration.lookup.tests.ldap_mocks as mocks
+from utilities import test_utilities
+from utilities.test_utilities import async_test
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 
@@ -69,11 +68,8 @@ class TestMHSAttributeLookup(TestCase):
     async def test_value_added_to_cache(self):
         handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), MagicMock())
 
-        future = asyncio.Future()
-        future.set_result(None)
-
-        handler.cache.retrieve_mhs_attributes_value.return_value = future
-        handler.cache.add_cache_value.return_value = future
+        handler.cache.retrieve_mhs_attributes_value.return_value = test_utilities.awaitable(None)
+        handler.cache.add_cache_value.return_value = test_utilities.awaitable(None)
 
         result = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
 
@@ -95,10 +91,8 @@ class TestMHSAttributeLookup(TestCase):
         cache = dc.DictionaryCache(expiry_time=3)
         patched_time.return_value = 1
         client = MagicMock()
-        future = asyncio.Future()
-        future.set_result({'attributes': 'testData'})
 
-        client.get_mhs_details.return_value = future
+        client.get_mhs_details.return_value = test_utilities.awaitable({'attributes': 'testData'})
         handler = mhs_attribute_lookup.MHSAttributeLookup(client, cache)
 
         await handler.cache.add_cache_value("check", "not", "added")  # value in cache for 3 seconds

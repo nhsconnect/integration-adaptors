@@ -13,6 +13,8 @@ class TestLogger(TestCase):
 
     def tearDown(self) -> None:
         logging.getLogger().handlers = []
+        log.message_id.set(None)
+        log.correlation_id.set(None)
 
     def test_dictionary_formatting(self):
         # Tests both removing the spaces and surrounding values with quotes if needed
@@ -42,9 +44,10 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_custom_audit_level(self, mock_stdout):
         log.configure_logging()
+        log.correlation_id.set('2')
         log.IntegrationAdaptorsLogger('TES') \
             .audit('100', '{There Will Be No Spaces Today}',
-                   {'There Will Be No Spaces Today': 'wow qwe'}, correlation_id=2)
+                   {'There Will Be No Spaces Today': 'wow qwe'})
 
         output = mock_stdout.getvalue()
         self.assertIn('CorrelationId=2', output)
@@ -64,11 +67,12 @@ class TestLogger(TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write(self, mock_std):
         log.configure_logging()
+        log.message_id.set('10')
+        log.correlation_id.set('5')
+
         log.IntegrationAdaptorsLogger('SYS')._format_and_write(
             message='{yes} {no} {maybe}',
             values={'yes': 'one', 'no': 'two', 'maybe': 'three'},
-            request_id=10,
-            correlation_id=5,
             level=logging.INFO,
             process_key_num='100'
         )
@@ -90,8 +94,6 @@ class TestLogger(TestCase):
         log.IntegrationAdaptorsLogger('SYS')._format_and_write(
             message='{yes} {no} {maybe}',
             values={'yes': 'one', 'no': 'two', 'maybe': 'three'},
-            request_id=None,
-            correlation_id=None,
             level=logging.INFO,
             process_key_num='100'
         )
@@ -109,24 +111,24 @@ class TestLogger(TestCase):
         logger = log.IntegrationAdaptorsLogger('SYS')
         logger._format_and_write = MagicMock()
         with self.subTest('INFO'):
-            logger.info('100', '{yes}', {'yes': 'no'}, 'REQ', 313)
-            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', 'REQ', 313, logging.INFO)
+            logger.info('100', '{yes}', {'yes': 'no'})
+            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', logging.INFO)
 
         with self.subTest('AUDIT'):
-            logger.audit('100', '{yes}', {'yes': 'no'}, 'REQ', 313)
-            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', 'REQ', 313, log.AUDIT)
+            logger.audit('100', '{yes}', {'yes': 'no'})
+            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', log.AUDIT)
 
         with self.subTest('WARNING'):
-            logger.warning('100', '{yes}', {'yes': 'no'}, 'REQ', 313)
-            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', 'REQ', 313, logging.WARNING)
+            logger.warning('100', '{yes}', {'yes': 'no'})
+            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', logging.WARNING)
 
         with self.subTest('ERROR'):
-            logger.error('100', '{yes}', {'yes': 'no'}, 'REQ', 313)
-            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', 'REQ', 313, logging.ERROR)
+            logger.error('100', '{yes}', {'yes': 'no'})
+            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', logging.ERROR)
 
         with self.subTest('CRITICAL'):
-            logger.critical('100', '{yes}', {'yes': 'no'}, 'REQ', 313)
-            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', 'REQ', 313, logging.CRITICAL)
+            logger.critical('100', '{yes}', {'yes': 'no'})
+            logger._format_and_write.assert_called_with('{yes}', {'yes': 'no'}, '100', logging.CRITICAL)
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_empty_values(self, mock_stdout):
@@ -155,10 +157,10 @@ class TestLogger(TestCase):
 
     def test_write_throws_error_on_bad_params(self):
         with self.assertRaises(ValueError):
-            log.IntegrationAdaptorsLogger('SYS')._format_and_write("message", {}, "", None, None, logging.INFO)
+            log.IntegrationAdaptorsLogger('SYS')._format_and_write("message", {}, "", logging.INFO)
 
         with self.assertRaises(ValueError):
-            log.IntegrationAdaptorsLogger('SYS')._format_and_write("message", {}, None, None, None, logging.INFO)
+            log.IntegrationAdaptorsLogger('SYS')._format_and_write("message", {}, None, logging.INFO)
 
     def test_undefined_log_ref_throws_error(self):
         with self.assertRaises(ValueError):

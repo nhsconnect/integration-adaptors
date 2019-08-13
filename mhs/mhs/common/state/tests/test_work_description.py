@@ -1,10 +1,11 @@
-import asyncio
+import copy
 import json
 import unittest
-import mhs.common.state.work_description as wd
 from unittest.mock import MagicMock, patch
+
+import mhs.common.state.work_description as wd
+from utilities import test_utilities
 from utilities.test_utilities import async_test
-import copy
 
 input_data = {
     wd.DATA_KEY: 'aaa-aaa-aaa',
@@ -44,8 +45,7 @@ class TestWorkDescription(unittest.TestCase):
     @async_test
     async def test_publish_updates(self, time_mock):
         time_mock.return_value = '12:00'
-        future = asyncio.Future()
-        future.set_result(old_data)
+        future = test_utilities.awaitable(old_data)
 
         persistence = MagicMock()
         persistence.get.return_value = future
@@ -59,8 +59,7 @@ class TestWorkDescription(unittest.TestCase):
     @async_test
     async def test_publish_update_latest_is_none(self, time_mock):
         time_mock.return_value = '12:00'
-        future = asyncio.Future()
-        future.set_result(None)
+        future = test_utilities.awaitable(None)
 
         persistence = MagicMock()
         persistence.get.return_value = future
@@ -72,8 +71,7 @@ class TestWorkDescription(unittest.TestCase):
 
     @async_test
     async def test_out_of_date_version(self):
-        future = asyncio.Future()
-        future.set_result({
+        future = test_utilities.awaitable({
             wd.DATA_KEY: 'aaa-aaa-aaa',
             wd.DATA: {
                 wd.VERSION_KEY: 3,
@@ -94,8 +92,7 @@ class TestWorkDescription(unittest.TestCase):
     @async_test
     async def test_auto_increase_version(self, time_mock):
         time_mock.return_value = '12:00'
-        future = asyncio.Future()
-        future.set_result({
+        future = test_utilities.awaitable({
             wd.DATA_KEY: 'aaa-aaa-aaa',
             wd.DATA: {
                 wd.VERSION_KEY: 1,
@@ -127,11 +124,8 @@ class TestWorkDescriptionFactory(unittest.TestCase):
     @patch('mhs.common.state.work_description.WorkDescription')
     @async_test
     async def test_get_from_store(self, work_mock):
-        future = asyncio.Future()
-        future.set_result(old_data)
-
         persistence = MagicMock()
-        persistence.get.return_value = future
+        persistence.get.return_value = test_utilities.awaitable(old_data)
         await wd.get_work_description_from_store(persistence, 'aaa-aaa-aaa')
 
         persistence.get.assert_called_with('aaa-aaa-aaa')
@@ -139,11 +133,8 @@ class TestWorkDescriptionFactory(unittest.TestCase):
 
     @async_test
     async def test_get_from_store_no_result_found(self):
-        future = asyncio.Future()
-        future.set_result(None)
-
         persistence = MagicMock()
-        persistence.get.return_value = future
+        persistence.get.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(wd.EmptyWorkDescriptionError):
             await wd.get_work_description_from_store(persistence, 'aaa-aaa-aaa')
