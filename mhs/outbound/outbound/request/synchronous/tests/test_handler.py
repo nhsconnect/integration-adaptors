@@ -2,7 +2,7 @@ import unittest.mock
 from unittest.mock import patch
 import tornado.testing
 import tornado.web
-from outbound import request as handler
+from outbound.request.synchronous import handler
 from utilities import integration_adaptors_logger as log, test_utilities
 from utilities import message_utilities
 
