@@ -12,7 +12,8 @@ input_data = {
         wd.CREATED_TIMESTAMP: '11:59',
         wd.LATEST_TIMESTAMP: '12:00',
         wd.VERSION_KEY: 1,
-        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW,
+        wd.WORKFLOW: 'sync'
     }
 }
 
@@ -22,7 +23,8 @@ old_data = {
         wd.VERSION_KEY: 0,
         wd.CREATED_TIMESTAMP: '11:59',
         wd.LATEST_TIMESTAMP: '12:00',
-        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW,
+        wd.WORKFLOW: 'sync'
     }
 }
 
@@ -172,7 +174,8 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                     wd.CREATED_TIMESTAMP: '12',
                     wd.LATEST_TIMESTAMP: '12',
                     wd.STATUS: wd.MessageStatus.RECEIVED,
-                    wd.VERSION_KEY: 1
+                    wd.VERSION_KEY: 1,
+
                 }
             })
 

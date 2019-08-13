@@ -19,6 +19,11 @@ REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
 
 
+state_data = {
+
+
+}
+
 class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     """A simple integration test for the async response endpoint."""
 
@@ -26,12 +31,13 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     message_dir = pathlib.Path(current_dir) / MESSAGES_DIR
 
     def setUp(self):
-        self.callbacks = {}
+        self.state = unittest.mock.MagicMock()
+        self.state.get.return_value =
         super().setUp()
 
     def get_app(self):
         return tornado.web.Application([
-            (r".*", handler.InboundHandler, dict(callbacks=self.callbacks, party_id=FROM_PARTY_ID))
+            (r".*", handler.InboundHandler, dict(state_store=self.state, party_id=FROM_PARTY_ID))
         ])
 
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")

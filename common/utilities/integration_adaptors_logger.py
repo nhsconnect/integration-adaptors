@@ -6,7 +6,6 @@ from utilities import config
 
 AUDIT = 25
 
-
 # Set the logging info globally, make each module get a new logger based on that log ref we provide
 def configure_logging():
     """
