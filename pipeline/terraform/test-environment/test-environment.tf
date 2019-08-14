@@ -160,7 +160,7 @@ resource "aws_ecs_service" "test-outbound-mhs-environment-service" {
   launch_type = "EC2"
 }
 
-resource "aws_ecs_service" "test-mhs-inbound-environment-service" {
+resource "aws_ecs_service" "test-inbound-mhs-environment-service" {
   name = "${var.build_id}-inbound-service"
   cluster = var.cluster_id
   task_definition = aws_ecs_task_definition.test-environment-mhs-inbound-task.arn
