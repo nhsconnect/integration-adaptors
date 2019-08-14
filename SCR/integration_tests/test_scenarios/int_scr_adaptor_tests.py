@@ -20,9 +20,11 @@ class FunctionalTest(TestCase):
         # send this to the adaptor to 'convert' it to HL7
         scr_response = methods.call_scr_adaptor(scr_json)
 
-        # todo - send this (scr_response) to the mhs and validate what comes back...
+        # todo
+        # once we know the mha end point, we need to send the scr_response to the mha
         # meanwhile, use this example response...
         mha_response = FileUtilities.get_file_string(
-            str(Path(ROOT_DIR) / 'integration_tests/data/example_response.xml'))
+            str(Path(ROOT_DIR) / 'integration_tests/data/example_mha_response.xml'))
 
+        # then validate the mha-response
         self.assertTrue(methods.check_response(mha_response), "Happy path test failed")
