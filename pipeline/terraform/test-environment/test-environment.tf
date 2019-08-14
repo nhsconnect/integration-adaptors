@@ -3,8 +3,8 @@ provider "aws" {
   region = var.region
 }
 
-resource "aws_ecs_task_definition" "test-environment-mhs-task" {
-  family = "mhs-task-${var.build_id}"
+resource "aws_ecs_task_definition" "test-environment-mhs-inbound-task" {
+  family = "mhs-inbound-task-${var.build_id}"
 
   volume {
     name = "certs-volume"
@@ -15,12 +15,12 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
   [
     {
       name = "mhs"
-      image = "${var.ecr_address}:${var.build_id}"
+      image = "${var.ecr_address}:inbound-${var.build_id}"
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group = "/ecs/test-environment"
+          awslogs-group = "/ecs/inbound-test-environment"
           awslogs-region = var.region
           awslogs-stream-prefix = var.build_id
         }
@@ -28,7 +28,60 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
 
       mountPoints = [{
         sourceVolume = "certs-volume"
-        containerPath = "/usr/src/app/mhs/data/certs/"
+        containerPath = "/usr/src/app/mhs/common/data/certs/"
+      }]
+
+      environment = [
+        {
+          name = "MHS_LOG_LEVEL"
+          value = var.mhs_log_level
+        }
+      ]
+
+      portMappings = [
+        {
+          containerPort = 443
+          hostPort = 443
+          protocol = "tcp"
+        }
+      ]
+    }
+  ]
+  )
+  cpu = "128"
+  memory = "256"
+  requires_compatibilities = [
+    "EC2"
+  ]
+  execution_role_arn = var.task_execution_role
+}
+
+resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
+  family = "mhs-outbound-task-${var.build_id}"
+
+  volume {
+    name = "certs-volume"
+    host_path = "/home/ec2-user/certs"
+  }
+
+  container_definitions = jsonencode(
+  [
+    {
+      name = "mhs"
+      image = "${var.ecr_address}:outbound-${var.build_id}"
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group = "/ecs/outbound-test-environment"
+          awslogs-region = var.region
+          awslogs-stream-prefix = var.build_id
+        }
+      }
+
+      mountPoints = [{
+        sourceVolume = "certs-volume"
+        containerPath = "/usr/src/app/mhs/common/data/certs/"
       }]
 
       environment = [
@@ -43,18 +96,13 @@ resource "aws_ecs_task_definition" "test-environment-mhs-task" {
           containerPort = 80
           hostPort = 80
           protocol = "tcp"
-        },
-        {
-          containerPort = 443
-          hostPort = 443
-          protocol = "tcp"
         }
       ]
     }
   ]
   )
-  cpu = "256"
-  memory = "512"
+  cpu = "128"
+  memory = "256"
   requires_compatibilities = [
     "EC2"
   ]
@@ -97,19 +145,25 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
   ]
   )
   cpu = "128"
-  memory = "256"
+  memory = "128"
   requires_compatibilities = [
     "EC2"
   ]
   execution_role_arn = var.task_execution_role
 }
 
-
-
-resource "aws_ecs_service" "test-mhs-environment-service" {
-  name = "${var.build_id}-service"
+resource "aws_ecs_service" "test-outbound-mhs-environment-service" {
+  name = "${var.build_id}-outbound-service"
   cluster = var.cluster_id
-  task_definition = aws_ecs_task_definition.test-environment-mhs-task.arn
+  task_definition = aws_ecs_task_definition.test-environment-mhs-outbound-task.arn
+  desired_count = 1
+  launch_type = "EC2"
+}
+
+resource "aws_ecs_service" "test-inbound-mhs-environment-service" {
+  name = "${var.build_id}-inbound-service"
+  cluster = var.cluster_id
+  task_definition = aws_ecs_task_definition.test-environment-mhs-inbound-task.arn
   desired_count = 1
   launch_type = "EC2"
 }

@@ -1,6 +1,6 @@
 import os
 
-from selenium_tests.page_objects import interactions, xml_parser
+from page_objects import interactions, xml_parser
 
 HUMAN_READABLE = 'Payload stuff'
 
