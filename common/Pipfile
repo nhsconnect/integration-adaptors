@@ -8,9 +8,10 @@ coverage = "~=4.5"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
-integration-adaptors-common = {editable = true, path = "."}
 tornado = "*"
 python-qpid-proton = "*"
+pystache = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.7"

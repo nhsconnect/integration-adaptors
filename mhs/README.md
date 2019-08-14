@@ -59,14 +59,10 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
  without the 'http://' prefix or '/' suffix
     - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
 
-## Running an MHS Instance
-`pipenv run mhs` will run the `main.py` script (you can also run this directly). This will start up an MHS
-instance listening for 'client' requests on port 80 and asynchronous responses from Spine on port 443.
-Note that the following environment variables need to be set when running MHS:
-- `MHS_LOG_LEVEL` - log level threshold
 
-Any content POSTed to `/path` (for example) on port 80 will result in the request configuration for the `path` entry in
+
+Any content POSTed to `/` on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
 `interactions.json` will allow you to define new supported interactions.
 
-You will need to complete the setup steps below before being able to successfully connect to a Spine instance.
+

@@ -1,7 +1,7 @@
 import datetime
 
 from utilities import message_utilities
-from selenium_tests.page_objects import message_builder
+from page_objects import message_builder
 
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"
 MESSAGE_XML = "xml_IN150016UK05"

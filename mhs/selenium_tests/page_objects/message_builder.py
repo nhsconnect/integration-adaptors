@@ -3,7 +3,7 @@ from builder import pystache_message_builder
 from definitions import ROOT_DIR
 from pathlib import Path
 
-TEMPLATES_DIR = "selenium_tests/data/templates"
+TEMPLATES_DIR = "data/templates"
 
 
 class MustacheMessageBuilder(pystache_message_builder.PystacheMessageBuilder):
