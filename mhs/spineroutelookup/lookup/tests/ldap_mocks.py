@@ -3,7 +3,7 @@ from pathlib import Path
 import ldap3
 
 import lookup.sds_client as sds_client
-from selenium_tests.definitions import ROOT_DIR
+from definitions import ROOT_DIR
 
 MHS_TEST_DATA_PATH = Path(ROOT_DIR) / 'lookup' / 'tests' / 'data'
 SERVER_INFO_PATH = str(MHS_TEST_DATA_PATH / 'my_real_server_info.json')

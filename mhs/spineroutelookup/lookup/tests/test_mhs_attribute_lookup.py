@@ -1,19 +1,11 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
-
-<<<<<<< HEAD:mhs/spineroutelookup/lookup/tests/test_mhs_attribute_lookup.py
-from utilities.test_utilities import async_test
-
 import lookup.dictionary_cache as dc
 import lookup.mhs_attribute_lookup as mhs_attribute_lookup
 import lookup.tests.ldap_mocks as mocks
-=======
-import mhs.message_configuration.lookup.dictionary_cache as dc
-import mhs.message_configuration.lookup.mhs_attribute_lookup as mhs_attribute_lookup
-import mhs.message_configuration.lookup.tests.ldap_mocks as mocks
 from utilities import test_utilities
 from utilities.test_utilities import async_test
->>>>>>> develop:mhs/mhs/message_configuration/lookup/tests/test_mhs_attribute_lookup.py
+
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 

@@ -7,7 +7,7 @@ TEST_NHS_NUMBER = '9446245796'
 GP_SUMMARY_UPLOAD_INTERACTION = 'gp_summary_upload'
 
 
-# @skip("Sync Async workflow not implemented yet")
+@skip("Sync Async workflow not implemented yet")
 class SyncAsyncTest(TestCase):
 
     # request scr record for patient 9446245796
