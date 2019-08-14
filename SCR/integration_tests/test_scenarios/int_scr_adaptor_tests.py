@@ -1,3 +1,7 @@
+from pathlib import Path
+
+from utilities.file_utilities import FileUtilities
+from scr_definitions import ROOT_DIR
 
 from integration_tests.page_objects import methods
 from unittest import TestCase
@@ -12,15 +16,13 @@ class FunctionalTest(TestCase):
     # request scr record for patient 9446245796
     def test_json_conversion(self):
         scr_json, uuid = methods.get_json(JSON_TEMPLATE, TEST_NHS_NUMBER)
-        # print(scr_json)
 
         # send this to the adaptor to 'convert' it to HL7
         scr_response = methods.call_scr_adaptor(scr_json)
-        print(scr_response)
 
-        # then send this to the mhs to validate...
-        # todo
+        # todo - send this (scr_response) to the mhs and validate what comes back...
+        # meanwhile, use this example response...
+        mha_response = FileUtilities.get_file_string(
+            str(Path(ROOT_DIR) / 'integration_tests/data/example_response.xml'))
 
-        # ...meanwhile, until I can get it working!
-        self.assertTrue(True)
-        # self.assertTrue(methods.check_scr_response(scr_response), "Happy path test failed")
+        self.assertTrue(methods.check_response(mha_response), "Happy path test failed")
