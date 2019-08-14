@@ -12,7 +12,7 @@ input_data = {
         wd.CREATED_TIMESTAMP: '11:59',
         wd.LATEST_TIMESTAMP: '12:00',
         wd.VERSION_KEY: 1,
-        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+        wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED
     }
 }
 
@@ -22,7 +22,7 @@ old_data = {
         wd.VERSION_KEY: 0,
         wd.CREATED_TIMESTAMP: '11:59',
         wd.LATEST_TIMESTAMP: '12:00',
-        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+        wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED
     }
 }
 
@@ -33,7 +33,7 @@ class TestWorkDescription(unittest.TestCase):
         persistence = MagicMock()
         work_description = wd.WorkDescription(persistence, input_data)
 
-        self.assertEqual(work_description.status, wd.MessageStatus.IN_OUTBOUND_WORKFLOW)
+        self.assertEqual(work_description.status, wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         self.assertEqual(work_description.version, 1)
         self.assertEqual(work_description.created_timestamp, '11:59')
         self.assertEqual(work_description.last_modified_timestamp, '12:00')
@@ -73,7 +73,7 @@ class TestWorkDescription(unittest.TestCase):
             wd.DATA: {
                 wd.VERSION_KEY: 3,
                 wd.LATEST_TIMESTAMP: '11:00',
-                wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+                wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED
             }
         })
 
@@ -94,7 +94,7 @@ class TestWorkDescription(unittest.TestCase):
             wd.DATA: {
                 wd.VERSION_KEY: 1,
                 wd.LATEST_TIMESTAMP: '11:00',
-                wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+                wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED
             }
         })
 
@@ -153,7 +153,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         persistence = MagicMock()
         wd.create_new_work_description(persistence,
                                        key='aaa-aaa',
-                                       status=wd.MessageStatus.RECEIVED)
+                                       status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         work_mock.assert_called_with(
             persistence,
             {
@@ -161,7 +161,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.DATA: {
                     wd.CREATED_TIMESTAMP: '12',
                     wd.LATEST_TIMESTAMP: '12',
-                    wd.STATUS: wd.MessageStatus.RECEIVED,
+                    wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     wd.VERSION_KEY: 1
                 }
             })
@@ -173,7 +173,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.create_new_work_description(
                     persistence,
                     key=None,
-                    status=wd.MessageStatus.RECEIVED
+                    status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
                 )
         with self.subTest('Null status'):
             with self.assertRaises(ValueError):
@@ -187,5 +187,5 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.create_new_work_description(
                     None,
                     key='aaa',
-                    status=wd.MessageStatus.RECEIVED
+                    status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
                 )

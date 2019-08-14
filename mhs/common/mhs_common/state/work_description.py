@@ -3,15 +3,21 @@ import json
 import utilities.integration_adaptors_logger as log
 import datetime
 from mhs_common.state import persistence_adaptor as pa
-
+import enum
 
 logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
 
 
-class MessageStatus:
-    RECEIVED = 1
-    STARTED = 2
-    IN_OUTBOUND_WORKFLOW = 3
+class MessageStatus(str, enum.Enum):
+    OUTBOUND_MESSAGE_RECEIVED = 'OUTBOUND_MESSAGE_RECEIVED'
+    OUTBOUND_MESSAGE_PREPARED = 'OUTBOUND_MESSAGE_PREPARED'
+    OUTBOUND_MESSAGE_PREPARATION_FAILED = 'OUTBOUND_MESSAGE_PREPARATION_FAILED'
+    OUTBOUND_MESSAGE_ACKD = 'OUTBOUND_MESSAGE_ACKD'
+    OUTBOUND_MESSAGE_TRANSMISSION_FAILED = 'OUTBOUND_MESSAGE_TRANSMISSION_FAILED'
+    OUTBOUND_MESSAGE_NACKD = 'OUTBOUND_MESSAGE_NACKD'
+    INBOUND_RESPONSE_RECEIVED = 'INBOUND_RESPONSE_RECEIVED'
+    INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED = 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'
+    INBOUND_RESPONSE_FAILED = 'INBOUND_RESPONSE_FAILED'
 
 
 DATA_KEY = 'MESSAGE_KEY'
@@ -60,7 +66,7 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
 
 def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
                                 key: str,
-                                status: int) -> WorkDescription:
+                                status: str) -> WorkDescription:
     """
     Builds a new local work description instance given the details of the message, these details are held locally
     until a `publish` is executed
