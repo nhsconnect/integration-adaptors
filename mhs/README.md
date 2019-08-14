@@ -23,12 +23,20 @@ pipenv install
 
 ### Developer Setup
 To prepare a development environment for this application, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/)
-installed and on your path, then from this directory run:
+installed and on your path, then within each of the subfolders `common`, `inbound` and `outbound` in this directory, run:
 ```
 pipenv install --dev
 ```
 
-### Running Unit Tests
+## Running MHS
+MHS is made up of multiple components, and running them all separately can be tedious. Instead, use Docker Compose, see [here](..) for how to do this.
+
+### Environment Variables
+MHS takes a number of environment variables when it is run. These are:
+* `MHS_LOG_LEVEL` This is required to be set to one of: `NOTSET`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least.
+* `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
+
+## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.
 - `pipenv run unittests-cov` will run all unit tests, generating a [Coverage](https://coverage.readthedocs.io/) report
 in the `test-reports` directory.
