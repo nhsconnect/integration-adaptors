@@ -11,7 +11,7 @@ pipeline {
         stage('Build modules') {
             steps{
                 dir('common'){ buildModules('Installing common dependencies') }
-                dir('mhs/mhs_common'){ buildModules('Installing mhs_common dependencies') }
+                dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
                 dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
                 dir('mhs/outbound'){ buildModules('Installing outbound dependencies') }
                 dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
@@ -23,7 +23,7 @@ pipeline {
             steps { dir('common') { executeUnitTestsWithCoverage() } }
         }
         stage('MHS Common Unit Tests') {
-            steps { dir('mhs/mhs_common') { executeUnitTestsWithCoverage() } }
+            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
         }
         stage('MHS Inbound Unit Tests') {
             steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }

@@ -4,7 +4,7 @@
     "app_dir": "/usr/src/app",
     "common_dir": "common",
     "inbound_dir": "mhs/inbound",
-    "mhs_common_dir": "mhs/mhs_common",
+    "mhs_common_dir": "mhs/common",
     "repository": "{{env `DOCKER_REPOSITORY`}}",
     "tag": "{{env `BUILD_TAG`}}",
     "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
