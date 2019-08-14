@@ -67,7 +67,7 @@ pipeline {
 
         stage('MHS Integration Tests') {
             steps {
-                dir('mhs') {
+                dir('mhs/selenium_tests') {
                     sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                     // Wait for MHS container to fully stand up
                     timeout(2) {

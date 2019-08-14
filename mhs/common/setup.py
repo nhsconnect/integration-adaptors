@@ -3,7 +3,7 @@ from distutils.core import setup
 import setuptools
 
 setup(
-    name='common',
+    name='mhs-common',
     version='',
     packages=setuptools.find_packages(),
     url='',
