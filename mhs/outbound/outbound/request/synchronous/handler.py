@@ -29,7 +29,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
 
     async def post(self):
         message_id = self._extract_message_id()
-        self._extract_correlation_id()
+        correlation_id = self._extract_correlation_id()
 
         logger.info('0006', 'Outbound POST received. {Request}', {'Request': str(self.request)})
 
@@ -56,7 +56,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         reason=f"Couldn't determine workflow to invoke for interaction ID: "
                                                f"{interaction_id}") from e
 
-        status, response = await workflow.handle_outbound_message(message_id, interaction_details, body)
+        status, response = await workflow.handle_outbound_message(message_id, correlation_id, interaction_details, body)
 
         self._write_response(status, response)
 
@@ -82,6 +82,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         else:
             log.correlation_id.set(correlation_id)
             logger.info('0004', 'Found correlation id on incoming request.')
+        return correlation_id
 
     def _extract_interaction_id(self):
         try:

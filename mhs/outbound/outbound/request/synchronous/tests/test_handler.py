@@ -45,7 +45,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
 
         self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
-        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, INTERACTION_DETAILS, REQUEST_BODY)
+        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, MOCK_UUID_2, INTERACTION_DETAILS,
+                                                                 REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(MOCK_UUID_2)
@@ -67,7 +68,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
         mock_get_uuid.assert_called_once()
 
-        self.workflow.handle_outbound_message.assert_called_with(message_id, INTERACTION_DETAILS, REQUEST_BODY)
+        self.workflow.handle_outbound_message.assert_called_with(message_id, MOCK_UUID, INTERACTION_DETAILS,
+                                                                 REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(message_id)
         mock_correlation_id.set.assert_called_with(MOCK_UUID)
@@ -90,7 +92,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
         mock_get_uuid.assert_called_once()
 
-        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, INTERACTION_DETAILS, REQUEST_BODY)
+        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, correlation_id, INTERACTION_DETAILS,
+                                                                 REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(correlation_id)
