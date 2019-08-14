@@ -9,7 +9,6 @@ tornado = "*"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
-mhs-common = {editable = true,path = "."}
 defusedxml = "~=0.6"
 integration-adaptors-common = {editable = true,path = "./../../common"}
 aioboto3 = "*"

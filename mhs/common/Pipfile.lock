@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "785ecc43936b51c003494cbbeb22410aef698fe11c0bfee579a5291e5b0989dd"
+            "sha256": "982c789093a26f0e86771be02dd34bf9bc2e192673c15f2182cd2b0cbaddd98c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -163,10 +163,6 @@
                 "sha256:fe489d486cd00b739be826e8c1be188ddb74c7a1ca784d93d06fda882a6a1681"
             ],
             "version": "==4.4.1"
-        },
-        "mhs-common": {
-            "editable": true,
-            "path": "."
         },
         "multidict": {
             "hashes": [
