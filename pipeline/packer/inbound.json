@@ -26,7 +26,6 @@
     {
       "type": "shell",
       "inline": [
-        "mkdir -p {{user `app_dir`}}",
         "mkdir -p {{user `app_dir`}}/mhs"
       ]
     },
