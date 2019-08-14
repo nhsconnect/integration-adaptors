@@ -10,7 +10,7 @@ from mhs_common.state.persistence_adaptor import PersistenceAdaptor
 import mhs_common.messages.ebxml_ack_envelope as ebxml_ack_envelope
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
-
+from utilities import message_utilities
 
 logger = log.IntegrationAdaptorsLogger('INBOUND_HANDLER')
 
