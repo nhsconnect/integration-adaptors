@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-inbound-task" {
 
       mountPoints = [{
         sourceVolume = "certs-volume"
-        containerPath = "/usr/src/app/mhs/mhs_common/data/certs/"
+        containerPath = "/usr/src/app/mhs/common/data/certs/"
       }]
 
       environment = [
@@ -81,7 +81,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
 
       mountPoints = [{
         sourceVolume = "certs-volume"
-        containerPath = "/usr/src/app/mhs/mhs_common/data/certs/"
+        containerPath = "/usr/src/app/mhs/common/data/certs/"
       }]
 
       environment = [
