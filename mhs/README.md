@@ -61,7 +61,7 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
 
 
 
-Any content POSTed to `/path` (for example) on port 80 will result in the request configuration for the `path` entry in
+Any content POSTed to `/` on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
 `interactions.json` will allow you to define new supported interactions.
 

@@ -75,7 +75,7 @@
       },
       {
         "type": "docker-tag",
-        "repository": "local/inbound"
+        "repository": "local/mhs-inbound"
       }
     ]
   ]

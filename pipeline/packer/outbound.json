@@ -75,7 +75,7 @@
       },
       {
         "type": "docker-tag",
-        "repository": "local/outbound"
+        "repository": "local/mhs-outbound"
       }
     ]
   ]

@@ -2,13 +2,13 @@ version: '3'
 
 services:
   inbound:
-    image: local/inbound
+    image: local/mhs-inbound
     ports:
       - "443:443"
     environment:
       - MHS_LOG_LEVEL=NOTSET
   outbound:
-    image: local/outbound
+    image: local/mhs-outbound
     ports:
       - "80:80"
     environment:
