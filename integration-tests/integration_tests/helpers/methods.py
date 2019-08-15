@@ -22,8 +22,8 @@ def get_hostname():
     return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
 
 
-def get_interaction(interaction_name, nhs_number, pass_message_id=False):
-    return interactions.process_request(interaction_name, get_asid(), nhs_number, HUMAN_READABLE,
+def get_interaction(interaction_name, template, nhs_number, pass_message_id=False):
+    return interactions.process_request(interaction_name, template, get_asid(), nhs_number, HUMAN_READABLE,
                                         pass_message_id=pass_message_id)
 
 
