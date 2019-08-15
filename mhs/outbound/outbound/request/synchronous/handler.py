@@ -100,7 +100,11 @@ class SynchronousHandler(tornado.web.RequestHandler):
         """
         logger.info('0010', 'Returning response with {HttpStatus}', {'HttpStatus': status})
         self.set_status(status)
-        self.set_header("Content-Type", "text/xml")
+        if 400 <= status:
+            content_type = "text/plain"
+        else:
+            content_type = "text/xml"
+        self.set_header("Content-Type", content_type)
         self.write(message)
 
     def _get_interaction_details(self, interaction_name: str) -> dict:

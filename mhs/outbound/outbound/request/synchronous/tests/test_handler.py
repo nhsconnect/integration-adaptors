@@ -98,6 +98,21 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(correlation_id)
 
+    def test_post_message_where_workflow_returns_error_response(self):
+        for http_status in [400, 409, 500, 503]:
+            with self.subTest(http_status=http_status):
+                expected_response = "Error response body"
+                self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((http_status,
+                                                                                               expected_response))
+                self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
+
+                response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME},
+                                      body=REQUEST_BODY)
+
+                self.assertEqual(response.code, http_status)
+                self.assertEqual(response.headers["Content-Type"], "text/plain")
+                self.assertEqual(response.body.decode(), expected_response)
+
     def test_post_message_where_workflow_not_found_on_interaction_details(self):
         self.config_manager.get_interaction_details.return_value = {}
 
