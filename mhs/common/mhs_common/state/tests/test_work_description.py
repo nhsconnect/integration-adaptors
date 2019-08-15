@@ -111,6 +111,23 @@ class TestWorkDescription(unittest.TestCase):
         self.assertEqual(work_description.version, 2)
         persistence.add.assert_called_with('aaa-aaa-aaa', json.dumps(updated))
 
+    @patch('utilities.timing.get_time')
+    @async_test
+    async def test_set_status(self, time_mock):
+        time_mock.return_value = '12:00'
+        future = test_utilities.awaitable(old_data)
+
+        persistence = MagicMock()
+        persistence.get.return_value = future
+        persistence.add.return_value = future
+        work_description = wd.WorkDescription(persistence, input_data)
+
+        new_data = copy.deepcopy(input_data)
+        new_data[wd.DATA][wd.STATUS] = wd.MessageStatus.OUTBOUND_MESSAGE_ACKD
+
+        await work_description.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+        persistence.add.assert_called_with(input_data[wd.DATA_KEY], json.dumps(new_data))
+
     def test_null_persistence(self):
         with self.assertRaises(ValueError):
             wd.WorkDescription(None, {'None': 'None'})

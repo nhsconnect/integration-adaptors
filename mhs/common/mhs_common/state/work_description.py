@@ -144,6 +144,15 @@ class WorkDescription:
         logger.info('016', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
         return old_data
 
+    async def set_status(self, new_status: MessageStatus):
+        """
+        Helper method for setting the status and publishing to the state store
+
+        :param new_status: new status to set
+        """
+        self.status = new_status
+        await self.publish()
+
     def _serialise_data(self):
         """
         A simple serialization method that produces a json string from the local data which can be stored in the
