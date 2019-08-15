@@ -36,6 +36,11 @@ state_data = [
 
 
 async def state_return_values(message_key):
+    """
+    A method to emulate a state store returning values for a given key
+    :param message_key:
+    :return: data associated with that key
+    """
     resposes = [data for data in state_data if data[wd.DATA_KEY] == message_key]
     if not resposes:
         return None
@@ -130,6 +135,7 @@ class TestInboundWorkflow(tornado.testing.AsyncHTTPSTestCase):
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
 
+        print(ack_response.headers)
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)

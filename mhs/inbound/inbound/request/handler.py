@@ -78,8 +78,10 @@ class InboundHandler(tornado.web.RequestHandler):
 
         ack_message = ebxml_ack_envelope.EbxmlAckEnvelope(ack_context)
         message_id, http_headers, serialized_message = ack_message.serialize()
-
-        self.set_header("Content-Type", "text/xml")
+        print(http_headers)
+        for k, v in http_headers.items():
+            self.set_header(k, v)
+            
         self.write(serialized_message)
 
     def _extract_correlation_id(self, message):
