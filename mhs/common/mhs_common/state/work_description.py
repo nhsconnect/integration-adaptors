@@ -66,7 +66,7 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
 
 def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
                                 key: str,
-                                status: str) -> WorkDescription:
+                                status: MessageStatus) -> WorkDescription:
     """
     Builds a new local work description instance given the details of the message, these details are held locally
     until a `publish` is executed
@@ -110,11 +110,11 @@ class WorkDescription:
         self.persistence_store = persistence_store
 
         data = store_data[DATA]
-        self.message_key = store_data[DATA_KEY]
-        self.version = data[VERSION_KEY]
-        self.created_timestamp = data[CREATED_TIMESTAMP]
-        self.last_modified_timestamp = data[LATEST_TIMESTAMP]
-        self.status = data[STATUS]
+        self.message_key: str = store_data[DATA_KEY]
+        self.version: int = data[VERSION_KEY]
+        self.created_timestamp: str = data[CREATED_TIMESTAMP]
+        self.last_modified_timestamp: str = data[LATEST_TIMESTAMP]
+        self.status: MessageStatus = data[STATUS]
 
     async def publish(self):
         """
