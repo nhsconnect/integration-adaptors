@@ -58,6 +58,7 @@ pipeline {
                             -var task_execution_role=${TASK_EXECUTION_ROLE} \
                             -var build_id=${BUILD_TAG} \
                             -var mhs_log_level=DEBUG \
+                            -var mhs_state_table_name=mhs-state \
                             -var scr_log_level=DEBUG \
                             -var scr_service_port=${SCR_SERVICE_PORT}
                         """
@@ -115,6 +116,7 @@ pipeline {
                         -var task_execution_role=${TASK_EXECUTION_ROLE} \
                         -var build_id=${BUILD_TAG} \
                         -var mhs_log_level=DEBUG \
+                        -var mhs_state_table_name=mhs-state \
                         -var scr_log_level=DEBUG \
                         -var scr_service_port=${SCR_SERVICE_PORT}
                      """
