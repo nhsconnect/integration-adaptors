@@ -52,10 +52,18 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     def setUp(self):
         self.state = unittest.mock.MagicMock()
         self.state.get = unittest.mock.MagicMock(side_effect=state_return_values)
+
+        mock_workflow = unittest.mock.MagicMock()
+        future = test_utilities.awaitable('resutl')
+        mock_workflow.handle_inbound_message.return_value = future
+        self.mocked_workflows = {
+            workflow.ASYNC_EXPRESS: mock_workflow
+        }
+
         super().setUp()
 
     def get_app(self):
-        workflows = workflow.get_workflow_map()
+        workflows = self.mocked_workflows
         return tornado.web.Application([
             (r".*", handler.InboundHandler, dict(workflows=workflows, state_store=self.state, party_id=FROM_PARTY_ID))
         ])
@@ -86,18 +94,10 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
             message,
             '<html><title>500: Unknown message reference</title><body>500: Unknown message reference</body></html>')
 
-    @unittest.mock.patch.object(workflow, 'get_workflow_map')
-    def test_correct_workflow(self, workflow_mock):
-        mock_workflow = unittest.mock.MagicMock()
-        mock_workflow.handle_inbound_message = test_utilities.awaitable(True)
-        mocked_workflows = {
-            workflow.ASYNC_EXPRESS: mock_workflow
-        }
-        workflow_mock.return_value = mocked_workflows
+    def test_correct_workflow(self):
+            request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+            ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+            self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
 
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
-        mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
-
-        self.assertEqual(ack_response.code, 200)
+            self.assertEqual(ack_response.code, 200)
