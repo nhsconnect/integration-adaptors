@@ -14,6 +14,7 @@ import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
+from outbound.transmission import outbound_transmission
 
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
@@ -39,10 +40,9 @@ def initialise_workflows(certs_dir: pathlib.Path, party_key: str,
     :param persistence_store: The persistence adaptor for the state database
     :return: The workflows that can be used to handle messages.
     """
-    # transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
-    # workflow = sync_async_workflow.SyncAsyncWorkflow(transmission, party_key)
+    transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
 
-    return workflow.get_workflow_map(persistence_store)
+    return workflow.get_workflow_map(persistence_store, transmission, party_key)
 
 
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:
