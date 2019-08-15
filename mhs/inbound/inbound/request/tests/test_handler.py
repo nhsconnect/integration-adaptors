@@ -63,14 +63,13 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         super().setUp()
 
     def get_app(self):
-        workflows = self.mocked_workflows
         return tornado.web.Application([
-            (r".*", handler.InboundHandler, dict(workflows=workflows, state_store=self.state, party_id=FROM_PARTY_ID))
+            (r".*", handler.InboundHandler, dict(workflows=self.mocked_workflows, state_store=self.state, party_id=FROM_PARTY_ID))
         ])
 
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_post(self, mock_get_uuid, mock_get_timestamp):
+    def test_receive_ack(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
         expected_ack_response = file_utilities.FileUtilities.get_file_string(
@@ -95,9 +94,9 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
             '<html><title>500: Unknown message reference</title><body>500: Unknown message reference</body></html>')
 
     def test_correct_workflow(self):
-            request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
-            ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
-            self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
 
-            self.assertEqual(ack_response.code, 200)
+        self.assertEqual(ack_response.code, 200)

@@ -45,25 +45,26 @@ class InboundHandler(tornado.web.RequestHandler):
         try:
             work_description = await wd.get_work_description_from_store(self.state_store, ref_to_message_id)
         except wd.EmptyWorkDescriptionError as e:
-            logger.warning('007', 'No work description found in state store with {messageId}',
+            logger.warning('003', 'No work description found in state store with {messageId}',
                            {'messageId': ref_to_message_id})
-            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message'
+            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
                                              'received from spine',
                                         reason="Unknown message reference") from e
 
         message_workflow = self.workflows[work_description.workflow]
-        logger.info('008', 'Retrieved word description from state store, forwarding message to {workflow}',
+        logger.info('004', 'Retrieved word description from state store, forwarding message to {workflow}',
                     {'workflow': message_workflow})
         received_message = request_message.message_dictionary[ebxml_request_envelope.MESSAGE]
         try:
             await message_workflow.handle_inbound_message(work_description, received_message)
             self._send_ack(request_message)
         except Exception as e:
-            logger.error('009', 'Exception in workflow {e}', {'e': e})
+            logger.error('005', 'Exception in workflow {e}', {'e': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
                                              ' failed to complete workflow') from e
 
     def _send_ack(self, parsed_message: ebxml_envelope.EbxmlEnvelope):
+        logger.info('010', 'Building and sending acknowledgement')
         message_details = parsed_message.message_dictionary
 
         ack_context = {
@@ -86,10 +87,10 @@ class InboundHandler(tornado.web.RequestHandler):
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
             log.correlation_id.set(correlation_id)
-            logger.info('0003', "Didn't receive conversation id from inbound request , so have generated a new one.")
+            logger.info('006', "Didn't receive conversation id from inbound request , so have generated a new one.")
         else:
             log.correlation_id.set(correlation_id)
-            logger.info('0004', 'Found correlation id on inbound request.')
+            logger.info('007', 'Found correlation id on inbound request.')
 
     def _extract_message_id(self, message):
         """
@@ -99,10 +100,10 @@ class InboundHandler(tornado.web.RequestHandler):
         """
         message_id = message.message_dictionary[ebxml_envelope.MESSAGE_ID]
         if not message_id:
-            logger.info('0005', "Didn't receive message id in inbound message")
+            logger.info('008', "Didn't receive message id in inbound message")
         else:
             log.message_id.set(message_id)
-            logger.info('0006', 'Found inbound message id on request.')
+            logger.info('009', 'Found inbound message id on request.')
         return message_id
 
     def extract_ref_message(self, message):
