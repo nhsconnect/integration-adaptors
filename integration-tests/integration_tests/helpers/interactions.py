@@ -4,18 +4,17 @@ from integration_tests.helpers import methods
 from integration_tests.helpers.build_message import build_message
 
 
-def process_request(interaction_name, template, asid, nhs_number, human_readable, pass_message_id):
+def process_request(interaction_name, asid, nhs_number, human_readable, pass_message_id):
     """ Renders the template and passes it the the MHS
 
-    :param interaction_name: the type of message
-    :param template: the template to use
+    :param interaction_name: the type of message (also the template name)
     :param asid: the asid, as supplied from NHS digital
     :param nhs_number: the NHS number for the test patient
     :param human_readable: the text to be sent on to SPINE
     :param pass_message_id: flag to indicate if we need to pass on the message ID
     :return: response received from the MHS
     """
-    scr, message_id = build_message(template, asid, nhs_number, human_readable)
+    scr, message_id = build_message(asid, nhs_number, human_readable)
     if not pass_message_id:
         message_id = None
 
@@ -34,8 +33,7 @@ def call_mhs(mhs_command, hl7payload, message_id=None):
     if message_id is not None:
         headers['Message-Id'] = message_id
 
-    response = requests.post(methods.get_mhs_hostname() + mhs_command, headers=headers, data=hl7payload)
-    # response = requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
+    response = requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
     return response.text
 
 

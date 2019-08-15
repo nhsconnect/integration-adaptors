@@ -13,7 +13,6 @@ class XmlMessageParser:
         :param message: The message to be parsed.
         :return: the parsed message.
         """
-
         return et.fromstring(message)
 
     def path_to_hl7xml_element(self, name, parent=None):

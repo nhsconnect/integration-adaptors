@@ -48,16 +48,15 @@ def get_scr_adaptor_hostname():
     return "http://" + os.environ.get('SCR_ADAPTOR_ADDRESS', 'localhost') + "/"
 
 
-def get_interaction_from_template(interaction_name, template, nhs_number, payload, pass_message_id=False):
+def get_interaction_from_template(interaction_name, nhs_number, payload, pass_message_id=False):
     """
     Sends the template to bo rendered and passed on to the the MHS
-    :param interaction_name: the type of message
-    :param template: the template to use
+    :param interaction_name: the type of message (also the template name)
     :param nhs_number: the NHS number for the test patient
     :param pass_message_id: flag to indicate if we need to pass on the message ID
     :return: the response from the MHS
     """
-    return interactions.process_request(interaction_name, template, get_asid(), nhs_number, payload,
+    return interactions.process_request(interaction_name, get_asid(), nhs_number, payload,
                                         pass_message_id=pass_message_id)
 
 
