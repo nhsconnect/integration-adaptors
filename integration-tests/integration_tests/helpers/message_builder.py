@@ -1,7 +1,7 @@
 
 from builder import pystache_message_builder
 from pathlib import Path
-from scr_definitions import ROOT_DIR
+from test_definitions import ROOT_DIR
 
 TEMPLATES_DIR = "integration_tests/data/templates"
 

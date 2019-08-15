@@ -1,7 +1,11 @@
 import os
+from pathlib import Path
 
-from integration_tests.page_objects import build_json, xml_parser
-from scr.gp_summary_update import SummaryCareRecord
+from utilities.file_utilities import FileUtilities
+
+from integration_tests.helpers import interactions, xml_parser
+from integration_tests.helpers.build_scr import build_message
+from test_definitions import ROOT_DIR
 
 HUMAN_READABLE = 'Payload stuff'
 
@@ -18,8 +22,13 @@ def get_hostname():
     return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
 
 
+def get_interaction(interaction_name, nhs_number, pass_message_id=False):
+    return interactions.process_request(interaction_name, get_asid(), nhs_number, HUMAN_READABLE,
+                                        pass_message_id=pass_message_id)
+
+
 def get_json(template, patient_nhs_number):
-    return build_json.build_scr_json(template, get_asid(), patient_nhs_number, HUMAN_READABLE)
+    return build_message(template, get_asid(), patient_nhs_number, HUMAN_READABLE)
 
 
 def call_scr_adaptor(json_string):
@@ -28,7 +37,15 @@ def call_scr_adaptor(json_string):
     :param json_string:
     :return: populated template xml string
     """
-    return SummaryCareRecord().populate_template_with_json_string(json_string)
+
+    # TODO
+    # once we know the scr_adaptor end point, we need to send the json_string to the scr_adaptor
+    # meanwhile, use this example response...
+    scr_adaptor_response = FileUtilities.get_file_string(
+        str(Path(ROOT_DIR) / 'integration_tests/data/example_mhs_response.xml'))
+
+    return scr_adaptor_response
+    # return SummaryCareRecord().populate_template_with_json_string(json_string)
 
 
 def check_response(returned_xml):
