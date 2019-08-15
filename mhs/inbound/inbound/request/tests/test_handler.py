@@ -6,23 +6,42 @@ import tornado.testing
 import tornado.web
 import utilities.file_utilities as file_utilities
 import utilities.message_utilities as message_utilities
+import utilities.test_utilities as test_utilities
 import utilities.xml_utilities as xml_utilities
-
+from mhs_common.state import work_description as wd
 import inbound.request.handler as handler
+import mhs_common.workflow as workflow
 
 MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
 EXPECTED_RESPONSE_FILE = "ebxml_ack.xml"
+UNSOLICITED_REQUEST_FILE = "ebxml_unsolicited.msg"
 FROM_PARTY_ID = "FROM-PARTY-ID"
 CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
 REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
 
+state_data = [
+    {
+        wd.DATA_KEY: 'B4D38C15-4981-4366-BDE9-8F56EDC4AB72',
+        wd.DATA: {
+            wd.VERSION_KEY: 0,
+            wd.CREATED_TIMESTAMP: '11:59',
+            wd.LATEST_TIMESTAMP: '12:00',
+            wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW,
+            wd.WORKFLOW: workflow.ASYNC_EXPRESS
+        }
+    }
+]
 
-state_data = {
 
+async def state_return_values(message_key):
+    resposes = [data for data in state_data if data[wd.DATA_KEY] == message_key]
+    if not resposes:
+        return None
+    else:
+        return resposes[0]
 
-}
 
 class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     """A simple integration test for the async response endpoint."""
@@ -32,12 +51,13 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
     def setUp(self):
         self.state = unittest.mock.MagicMock()
-        self.state.get.return_value =
+        self.state.get = unittest.mock.MagicMock(side_effect=state_return_values)
         super().setUp()
 
     def get_app(self):
+        workflows = workflow.get_workflow_map()
         return tornado.web.Application([
-            (r".*", handler.InboundHandler, dict(state_store=self.state, party_id=FROM_PARTY_ID))
+            (r".*", handler.InboundHandler, dict(workflows=workflows, state_store=self.state, party_id=FROM_PARTY_ID))
         ])
 
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
@@ -48,21 +68,36 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         expected_ack_response = file_utilities.FileUtilities.get_file_string(
             str(self.message_dir / EXPECTED_RESPONSE_FILE))
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
-        mock_callback = unittest.mock.Mock()
-        self.callbacks[REF_TO_MESSAGE_ID] = mock_callback
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
 
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
-        mock_callback.assert_called_with(EXPECTED_MESSAGE)
 
-    def test_post_no_callback(self):
-        # If there is no callback registered for the message ID the response is in reference to, an HTTP 500 should be
-        # returned.
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+    def test_post_unsolicited_message(self):
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / UNSOLICITED_REQUEST_FILE))
 
         response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
 
         self.assertEqual(response.code, 500)
+        message = response.body.decode('utf-8')
+        self.assertEqual(
+            message,
+            '<html><title>500: Unknown message reference</title><body>500: Unknown message reference</body></html>')
+
+    @unittest.mock.patch.object(workflow, 'get_workflow_map')
+    def test_correct_workflow(self, workflow_mock):
+        mock_workflow = unittest.mock.MagicMock()
+        mock_workflow.handle_inbound_message = test_utilities.awaitable(True)
+        mocked_workflows = {
+            workflow.ASYNC_EXPRESS: mock_workflow
+        }
+        workflow_mock.return_value = mocked_workflows
+
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
+
+        self.assertEqual(ack_response.code, 200)

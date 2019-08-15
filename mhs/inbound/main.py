@@ -1,3 +1,4 @@
+import os
 import pathlib
 import ssl
 from typing import Tuple
@@ -5,7 +6,6 @@ from typing import Tuple
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-
 
 import definitions
 import inbound.request.handler as async_request_handler
@@ -43,7 +43,7 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     return party_key
 
 
-def start_inbound_server(certs_file: str, key_file: str,  party_key: str) -> None:
+def start_inbound_server(certs_file: str, key_file: str, party_key: str) -> None:
     """
 
     :param certs_file: The filename of the certificate to be used to identify this MHS to a remote MHS.
@@ -55,10 +55,16 @@ def start_inbound_server(certs_file: str, key_file: str,  party_key: str) -> Non
 
     inbound_application = tornado.web.Application(
         [(r"/.*", async_request_handler.InboundHandler, dict(callbacks=callbacks, party_id=party_key))])
+
+    # Ensure Client authentication 
+    ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    # Assert client must present a cert
+    ssl_ctx.verify_mode = ssl.CERT_REQUIRED
+    ssl_ctx.load_cert_chain(certs_file, key_file)
+    ssl_ctx.load_verify_locations(certs_file)
+
     inbound_server = tornado.httpserver.HTTPServer(inbound_application,
-                                               ssl_options=dict(certfile=certs_file, keyfile=key_file,
-                                                                cert_reqs=ssl.CERT_REQUIRED,
-                                                                ca_certs=certs_file))
+                                                   ssl_options=ssl_ctx)
     inbound_server.listen(443)
 
     logger.info('011', 'Starting inbound server')

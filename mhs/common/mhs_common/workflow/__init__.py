@@ -7,6 +7,11 @@ from mhs_common.workflow.common import CommonWorkflow
 from mhs_common.workflow.intermediary_reliable import IntermediaryReliableWorkflow
 from mhs_common.workflow.synchronous import SynchronousWorkflow
 
+ASYNC_EXPRESS = 'async-express'
+ASYNC_RELIABLE = 'async-reliable'
+FORWARD_RELIABLE = 'forward-reliable'
+SYNC = 'sync'
+
 
 def get_workflow_map() -> Dict[str, CommonWorkflow]:
     """
@@ -15,8 +20,8 @@ def get_workflow_map() -> Dict[str, CommonWorkflow]:
     :return: a map of workflows
     """
     return {
-        'async-express': AsynchronousExpressWorkflow(),
-        'async-reliable': AsynchronousReliableWorkflow(),
-        'forward-reliable': IntermediaryReliableWorkflow(),
-        'sync': SynchronousWorkflow(),
+        ASYNC_EXPRESS: AsynchronousExpressWorkflow(),
+        ASYNC_RELIABLE: AsynchronousReliableWorkflow(),
+        FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
+        SYNC: SynchronousWorkflow()
     }

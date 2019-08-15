@@ -11,6 +11,7 @@ import mhs_common.messages.ebxml_ack_envelope as ebxml_ack_envelope
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 from utilities import message_utilities
+import mhs_common.workflow as workflow
 
 logger = log.IntegrationAdaptorsLogger('INBOUND_HANDLER')
 
@@ -19,12 +20,16 @@ class InboundHandler(tornado.web.RequestHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a remote MHS."""
     state_store: PersistenceAdaptor
     party_id: str
+    workflows: Dict[str, workflow.CommonWorkflow]
 
-    def initialize(self, state_store: pa.PersistenceAdaptor, party_id: str):
+    def initialize(self, workflows: Dict[str, workflow.CommonWorkflow],
+                   state_store: pa.PersistenceAdaptor, party_id: str):
         """Initialise this request handler with the provided dependencies.
+        :param workflows:
         :param state_store: The state store
         :param party_id: The party ID of this MHS. Sent in ebXML acknowledgements.
         """
+        self.workflows = workflows
         self.party_id = party_id
         self.state_store = state_store
 
@@ -37,18 +42,26 @@ class InboundHandler(tornado.web.RequestHandler):
 
         logger.info('002', 'Message received has reference to {messageID}', {'messageID': ref_to_message_id})
 
-        work_description = None
         try:
             work_description = await wd.get_work_description_from_store(self.state_store, ref_to_message_id)
-        except wd.EmptyWorkDescriptionError:
+        except wd.EmptyWorkDescriptionError as e:
             logger.warning('007', 'No work description found in state store with {messageId}',
                            {'messageId': ref_to_message_id})
-            # TODO add unimplemented unsolicited workflow
-        workflow = work_description.workflow
-        # try:
-        #   Workflowlist[workflow].handle_inbound_message(request_message, work_description)
-        # except e
-        #   raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to ')
+            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message'
+                                             'received from spine',
+                                        reason="Unknown message reference") from e
+
+        message_workflow = self.workflows[work_description.workflow]
+        logger.info('008', 'Retrieved word description from state store, forwarding message to {workflow}',
+                    {'workflow': message_workflow})
+        received_message = request_message.message_dictionary[ebxml_request_envelope.MESSAGE]
+        try:
+            await message_workflow.handle_inbound_message(work_description, received_message)
+            self._send_ack(request_message)
+        except Exception as e:
+            logger.error('009', 'Exception in workflow {e}', {'e': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
+                                             ' failed to complete workflow') from e
 
     def _send_ack(self, parsed_message: ebxml_envelope.EbxmlEnvelope):
         message_details = parsed_message.message_dictionary
