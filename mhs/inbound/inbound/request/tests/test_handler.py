@@ -100,3 +100,36 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
 
         self.assertEqual(ack_response.code, 200)
+
+
+class TestInboundWorkflow(tornado.testing.AsyncHTTPSTestCase):
+    """A simple integration test for the async response endpoint."""
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    message_dir = pathlib.Path(current_dir) / MESSAGES_DIR
+
+    def setUp(self):
+        self.state = unittest.mock.MagicMock()
+        self.state.get = unittest.mock.MagicMock(side_effect=state_return_values)
+        super().setUp()
+
+    def get_app(self):
+        return tornado.web.Application([
+            (r".*", handler.InboundHandler,
+             dict(workflows=workflow.get_workflow_map(), state_store=self.state, party_id=FROM_PARTY_ID))
+        ])
+
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_receive_ack(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+        mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
+        expected_ack_response = file_utilities.FileUtilities.get_file_string(
+            str(self.message_dir / EXPECTED_RESPONSE_FILE))
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+
+        self.assertEqual(ack_response.code, 200)
+        self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
+        xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)

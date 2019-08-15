@@ -77,7 +77,7 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     if status is None:
         logger.error('007', 'Failed to build new work description, status should not be null')
         raise ValueError('Expected status to not be None')
-    if status is None:
+    if workflow is None:
         logger.error('008', 'Failed to build new work description, workflow should not be null')
         raise ValueError('Expected workflow to not be None')
 
