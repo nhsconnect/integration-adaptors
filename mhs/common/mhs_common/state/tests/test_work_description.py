@@ -155,7 +155,9 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         persistence = MagicMock()
         wd.create_new_work_description(persistence,
                                        key='aaa-aaa',
-                                       status=wd.MessageStatus.RECEIVED)
+                                       status=wd.MessageStatus.RECEIVED,
+                                       workflow='sync'
+                                       )
         work_mock.assert_called_with(
             persistence,
             {
@@ -165,7 +167,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                     wd.LATEST_TIMESTAMP: '12',
                     wd.STATUS: wd.MessageStatus.RECEIVED,
                     wd.VERSION_KEY: 1,
-
+                    wd.WORKFLOW: 'sync'
                 }
             })
 
@@ -176,19 +178,30 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.create_new_work_description(
                     persistence,
                     key=None,
-                    status=wd.MessageStatus.RECEIVED
+                    status=wd.MessageStatus.RECEIVED,
+                    workflow='sync'
                 )
         with self.subTest('Null status'):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     persistence,
                     key='aaa',
-                    status=None
+                    status=None,
+                    workflow='sync'
                 )
         with self.subTest('Null persistence'):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     None,
                     key='aaa',
-                    status=wd.MessageStatus.RECEIVED
+                    status=wd.MessageStatus.RECEIVED,
+                    workflow='sync'
+                )
+        with self.subTest('Null persistence'):
+            with self.assertRaises(ValueError):
+                wd.create_new_work_description(
+                    persistence,
+                    key='aaa',
+                    status=wd.MessageStatus.RECEIVED,
+                    workflow=None
                 )
