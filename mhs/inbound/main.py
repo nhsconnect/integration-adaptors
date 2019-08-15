@@ -1,7 +1,6 @@
-import os
 import pathlib
 import ssl
-from typing import Tuple
+from typing import Tuple, Dict
 
 import tornado.httpserver
 import tornado.ioloop
@@ -12,10 +11,24 @@ import inbound.request.handler as async_request_handler
 import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
+from mhs_common import workflow
+from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
 
 logger = log.IntegrationAdaptorsLogger('INBOUND_MAIN')
 
 ASYNC_TIMEOUT = 30
+
+
+def initialise_workflows(certs_dir: pathlib.Path, party_key: str) -> Dict[str, workflow.CommonWorkflow]:
+    """Initialise the workflows
+    :param certs_dir: The directory containing certificates/keys to be used to identify this MHS to a remote MHS.
+    :param party_key: The party key to use to identify this MHS.
+    :return: The workflows that can be used to handle messages.
+    """
+    # transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
+    # workflow = sync_async_workflow.SyncAsyncWorkflow(transmission, party_key)
+
+    return workflow.get_workflow_map()
 
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
@@ -43,28 +56,29 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     return party_key
 
 
-def start_inbound_server(certs_file: str, key_file: str, party_key: str) -> None:
+def start_inbound_server(certs_file: str, key_file: str, party_key: str,
+                         workflows: Dict[str, workflow.CommonWorkflow],
+                         persistence_store: persistence_adaptor
+                         ) -> None:
     """
 
     :param certs_file: The filename of the certificate to be used to identify this MHS to a remote MHS.
     :param key_file: The filename of the private key for the certificate identified by certs_file.
-    :param workflow: The workflow to be used to handle messages.
+    :param workflows: The workflows to be used to handle messages.
     :param party_key: The party key to use to identify this MHS.
     """
-    callbacks = {}
 
     inbound_application = tornado.web.Application(
-        [(r"/.*", async_request_handler.InboundHandler, dict(callbacks=callbacks, party_id=party_key))])
+        [(r"/.*", async_request_handler.InboundHandler, dict(workflows=workflows, party_id=party_key))])
 
-    # Ensure Client authentication 
+    # Ensure Client authentication
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    # Assert client must present a cert
-    ssl_ctx.verify_mode = ssl.CERT_REQUIRED
     ssl_ctx.load_cert_chain(certs_file, key_file)
+    # The docs suggest we have to specify both that we must verify the client cert and the locations
+    ssl_ctx.verify_mode = ssl.CERT_REQUIRED
     ssl_ctx.load_verify_locations(certs_file)
 
-    inbound_server = tornado.httpserver.HTTPServer(inbound_application,
-                                                   ssl_options=ssl_ctx)
+    inbound_server = tornado.httpserver.HTTPServer(inbound_application, ssl_options=ssl_ctx)
     inbound_server.listen(443)
 
     logger.info('011', 'Starting inbound server')
@@ -80,7 +94,10 @@ def main():
     certs_file, key_file = load_certs(certs_dir)
     party_key = load_party_key(certs_dir)
 
-    start_inbound_server(certs_file, key_file, party_key)
+    workflows = initialise_workflows(certs_dir, party_key)
+    store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))
+
+    start_inbound_server(certs_file, key_file, party_key, workflows, store)
 
 
 if __name__ == "__main__":

@@ -34,11 +34,11 @@ class InboundHandler(tornado.web.RequestHandler):
         self.state_store = state_store
 
     async def post(self):
-        logger.info('001', 'Inboound POST recieved: {request}', {'request': self.request})
+        logger.info('001', 'Inbound POST recieved: {request}', {'request': self.request})
 
         request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
                                                                                   self.request.body.decode())
-        ref_to_message_id = request_message.message_dictionary[ebxml_envelope.RECEIVED_MESSAGE_ID]
+        ref_to_message_id = self.extract_ref_message(request_message)
 
         logger.info('002', 'Message received has reference to {messageID}', {'messageID': ref_to_message_id})
 
@@ -91,14 +91,31 @@ class InboundHandler(tornado.web.RequestHandler):
             log.correlation_id.set(correlation_id)
             logger.info('0004', 'Found correlation id on inbound request.')
 
-    def _extract_message_id(self):
-        message_id = self.request.headers.get('Message-Id', None)
+    def _extract_message_id(self, message):
+        """
+        Extracts the message id of the inbound message, this is to be logg
+        :param message:
+        :return:
+        """
+        message_id = message.message_dictionary[ebxml_envelope.MESSAGE_ID]
         if not message_id:
-            message_id = message_utilities.MessageUtilities.get_uuid()
-            log.message_id.set(message_id)
-            logger.info('0005', "Didn't receive message id in incoming request from supplier, so have generated a new "
-                                "one.")
+            logger.info('0005', "Didn't receive message id in inbound message")
         else:
             log.message_id.set(message_id)
-            logger.info('0006', 'Found message id on incoming request.')
+            logger.info('0006', 'Found inbound message id on request.')
         return message_id
+
+    def extract_ref_message(self, message):
+        """
+        Extracts the reference-to message id and assigns it as the message Id in logging
+        :param message:
+        :return: the message id the inbound message is a response to
+        """
+        try:
+            message_id = message.message_dictionary[ebxml_envelope.RECEIVED_MESSAGE_ID]
+            log.message_id.set(message_id)
+            logger.info('0008', 'Found message id on inbound message.')
+            return message_id
+        except KeyError:
+            logger.info('0007', "No Message reference found ")
+            return None
