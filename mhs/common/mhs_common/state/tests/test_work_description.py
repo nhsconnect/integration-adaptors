@@ -38,7 +38,7 @@ class TestWorkDescription(unittest.TestCase):
         self.assertEqual(work_description.created_timestamp, '11:59')
         self.assertEqual(work_description.last_modified_timestamp, '12:00')
 
-    @patch('mhs_common.state.work_description.get_time')
+    @patch('utilities.timing.get_time')
     @async_test
     async def test_publish_updates(self, time_mock):
         time_mock.return_value = '12:00'
@@ -52,7 +52,7 @@ class TestWorkDescription(unittest.TestCase):
         await work_description.publish()
         persistence.add.assert_called_with(input_data[wd.DATA_KEY], json.dumps(input_data))
 
-    @patch('mhs_common.state.work_description.get_time')
+    @patch('utilities.timing.get_time')
     @async_test
     async def test_publish_update_latest_is_none(self, time_mock):
         time_mock.return_value = '12:00'
@@ -85,7 +85,7 @@ class TestWorkDescription(unittest.TestCase):
         with self.assertRaises(wd.OutOfDateVersionError):
             await work_description.publish()
 
-    @patch('mhs_common.state.work_description.get_time')
+    @patch('utilities.timing.get_time')
     @async_test
     async def test_auto_increase_version(self, time_mock):
         time_mock.return_value = '12:00'
@@ -146,7 +146,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         with self.assertRaises(ValueError):
             await wd.get_work_description_from_store(MagicMock(), None)
 
-    @patch('mhs_common.state.work_description.get_time')
+    @patch('utilities.timing.get_time')
     @patch('mhs_common.state.work_description.WorkDescription')
     def test_create_work_description(self, work_mock, time_mock):
         time_mock.return_value = '12'

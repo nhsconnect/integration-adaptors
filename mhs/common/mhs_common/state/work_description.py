@@ -2,6 +2,9 @@ from __future__ import annotations
 import json
 import utilities.integration_adaptors_logger as log
 import datetime
+
+from utilities import timing
+
 from mhs_common.state import persistence_adaptor as pa
 import enum
 
@@ -36,11 +39,6 @@ class OutOfDateVersionError(RuntimeError):
 class EmptyWorkDescriptionError(RuntimeError):
     """Exception thrown when no work description is found for a given key"""
     pass
-
-
-def get_time():
-    """Returns UTC time in the appropriate format """
-    return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
 
 
 async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> WorkDescription:
@@ -81,7 +79,7 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
         logger.error('007', 'Failed to build new work description, status should not be null')
         raise ValueError('Expected status to not be None')
 
-    timestamp = get_time()
+    timestamp = timing.get_time()
     work_description_map = {
         DATA_KEY: key,
         DATA: {
@@ -139,7 +137,7 @@ class WorkDescription:
 
         else:
             logger.info('015', 'No previous version found, continuing attempt to publish new version')
-        self.last_modified_timestamp = get_time()
+        self.last_modified_timestamp = timing.get_time()
         serialised = self._serialise_data()
 
         old_data = await self.persistence_store.add(self.message_key, serialised)

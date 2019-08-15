@@ -1,3 +1,4 @@
+import datetime
 import inspect
 import logging
 import time
@@ -90,3 +91,6 @@ def time_request(func):
 
     return method_wrapper
 
+def get_time() -> str:
+    """Returns UTC time in the appropriate format """
+    return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')

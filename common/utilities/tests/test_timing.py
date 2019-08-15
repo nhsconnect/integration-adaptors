@@ -1,10 +1,9 @@
-
+import datetime
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application, RequestHandler
-
 from utilities import timing
 from utilities.test_utilities import async_test
 
@@ -106,6 +105,11 @@ class TestTimeUtilities(TestCase):
             res = await self.var_parameters_async("whew", 1, "three", 4)
             log_mock.assert_called_with('func_name=var_parameters_async took duration=5')
             self.assertEqual("whew1three4", res)
+
+    @patch('utilities.timing.datetime')
+    def test_get_time(self, mock_datetime):
+        mock_datetime.datetime.utcnow.return_value = datetime.datetime(2019, 1, 5, 12, 13, 14, 567)
+        self.assertEqual('2019-01-05T12:13:14.000567', timing.get_time())
 
     @timing.time_function
     def default_method(self):
