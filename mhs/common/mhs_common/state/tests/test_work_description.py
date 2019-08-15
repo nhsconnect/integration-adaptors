@@ -197,7 +197,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                     status=wd.MessageStatus.RECEIVED,
                     workflow='sync'
                 )
-        with self.subTest('Null persistence'):
+        with self.subTest('Null workflow'):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     persistence,
