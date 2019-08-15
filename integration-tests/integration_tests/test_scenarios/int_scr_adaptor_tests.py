@@ -1,10 +1,11 @@
 from pathlib import Path
 
 from utilities.file_utilities import FileUtilities
-from scr_definitions import ROOT_DIR
 
-from integration_tests.page_objects import methods
 from unittest import TestCase
+
+from integration_tests.helpers import methods
+from test_definitions import ROOT_DIR
 
 GP_SUMMARY_UPLOAD_INTERACTION = 'gp_summary_upload'
 JSON_TEMPLATE = 'json_hash16UK05'
@@ -20,11 +21,11 @@ class FunctionalTest(TestCase):
         # send this to the adaptor to 'convert' it to HL7
         scr_response = methods.call_scr_adaptor(scr_json)
 
-        # todo
-        # once we know the mha end point, we need to send the scr_response to the mha
+        # TODO
+        # once we know the mhs end point, we need to send the scr_response to the mhs
         # meanwhile, use this example response...
-        mha_response = FileUtilities.get_file_string(
-            str(Path(ROOT_DIR) / 'integration_tests/data/example_mha_response.xml'))
+        mhs_response = FileUtilities.get_file_string(
+            str(Path(ROOT_DIR) / 'integration_tests/data/example_mhs_response.xml'))
 
-        # then validate the mha-response
-        self.assertTrue(methods.check_response(mha_response), "Happy path test failed")
+        # then validate the mhs-response
+        self.assertTrue(methods.check_response(mhs_response), "Happy path test failed")
