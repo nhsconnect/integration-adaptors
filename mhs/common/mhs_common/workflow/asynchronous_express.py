@@ -39,7 +39,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         logger.info('0004', 'About to make outbound request')
         start_time = timing.get_time()
         try:
-            response = self.transmission.make_request(interaction_details, message)
+            response = await self.transmission.make_request(interaction_details, message)
             end_time = timing.get_time()
         except requests.exceptions.HTTPError as e:
             logger.warning('0005', 'Received HTTP error from Spine. {HTTPStatus} {Exception}',
