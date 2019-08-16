@@ -120,6 +120,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 500)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn(f"Couldn't determine workflow to invoke for interaction ID: {INTERACTION_NAME}",
                       response.body.decode())
 
@@ -132,6 +133,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 500)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn(f"Couldn't determine workflow to invoke for interaction ID: {INTERACTION_NAME}",
                       response.body.decode())
 
@@ -142,6 +144,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", body="A request")
 
         self.assertEqual(response.code, 404)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn('Required Interaction-Id header not found', response.body.decode())
 
     def test_post_with_invalid_interaction_name(self):
@@ -150,6 +153,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="A request")
 
         self.assertEqual(response.code, 404)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn(f'Unknown interaction ID: {INTERACTION_NAME}', response.body.decode())
 
     def test_post_with_no_body(self):
@@ -158,4 +162,5 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="")
 
         self.assertEqual(response.code, 400)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn("Body missing from request", response.body.decode())

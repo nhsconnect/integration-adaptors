@@ -1,6 +1,6 @@
 """This module defines the outbound synchronous request handler component."""
 
-from typing import Dict
+from typing import Dict, Any
 
 import tornado.locks
 import tornado.web
@@ -59,6 +59,10 @@ class SynchronousHandler(tornado.web.RequestHandler):
         status, response = await workflow.handle_outbound_message(message_id, correlation_id, interaction_details, body)
 
         self._write_response(status, response)
+
+    def write_error(self, status_code: int, **kwargs: Any):
+        self.set_header('Content-Type', 'text/plain')
+        self.finish(f'{status_code}: {self._reason}')
 
     def _extract_message_id(self):
         message_id = self.request.headers.get('Message-Id', None)
