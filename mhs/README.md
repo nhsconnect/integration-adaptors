@@ -29,7 +29,7 @@ pipenv install --dev
 ```
 
 ## Running MHS
-MHS is made up of multiple components, and running them all separately can be tedious. Instead, use Docker Compose, see [here](..) for how to do this.
+MHS is made up of multiple components, and running them all separately can be tedious. Instead, use Docker Compose, see [here](../README.md) for how to do this.
 
 ### Environment Variables
 MHS takes a number of environment variables when it is run. These are:
