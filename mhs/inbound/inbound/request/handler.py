@@ -37,18 +37,18 @@ class InboundHandler(tornado.web.RequestHandler):
     @time_request
     async def post(self):
         logger.info('001', 'Inbound POST received: {request}', {'request': self.request})
+        request_message = None
+        try:
+            request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
+                                                                                      self.request.body.decode())
+        except ebxml_envelope.EbXmlParsingError as e:
+            logger.error('020', f'Failed to parse response: {e}')
+            raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
+                                        reason=f'Exception in workflow') from e
 
-        request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
-                                                                                  self.request.body.decode())
         ref_to_message_id = self.extract_ref_message(request_message)
         self._extract_correlation_id(request_message)
         self._extract_message_id(request_message)
-
-        if not ref_to_message_id:
-            logger.warning('000', 'No reference to message Id found, this indicates an unsolicited inbound message'
-                                  'has been received')
-            raise tornado.web.HTTPError(500, 'No reference to message id found, unsolicited message recieved',
-                                        reason="Unknown message reference")
 
         try:
             work_description = await wd.get_work_description_from_store(self.state_store, ref_to_message_id)
@@ -69,7 +69,8 @@ class InboundHandler(tornado.web.RequestHandler):
         except Exception as e:
             logger.error('005', 'Exception in workflow {e}', {'e': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
-                                             ' failed to complete workflow') from e
+                                             ' failed to complete workflow',
+                                        reason=f'Exception in workflow') from e
 
     def _send_ack(self, parsed_message: ebxml_envelope.EbxmlEnvelope):
         logger.info('012', 'Building and sending acknowledgement')
@@ -108,11 +109,8 @@ class InboundHandler(tornado.web.RequestHandler):
         :return:
         """
         message_id = message.message_dictionary[ebxml_envelope.MESSAGE_ID]
-        if not message_id:
-            logger.info('008', "Didn't receive message id in inbound message")
-        else:
-            log.inbound_message_id.set(message_id)
-            logger.info('009', 'Found inbound message id on request.')
+        log.inbound_message_id.set(message_id)
+        logger.info('009', 'Found inbound message id on request.')
 
     def extract_ref_message(self, message):
         """
@@ -120,11 +118,8 @@ class InboundHandler(tornado.web.RequestHandler):
         :param message:
         :return: the message id the inbound message is a response to
         """
-        try:
-            message_id = message.message_dictionary[ebxml_envelope.RECEIVED_MESSAGE_ID]
-            log.message_id.set(message_id)
-            logger.info('010', 'Found message id on inbound message.')
-            return message_id
-        except KeyError:
-            logger.info('011', "No Message reference found")
-            return None
+        message_id = message.message_dictionary[ebxml_envelope.RECEIVED_MESSAGE_ID]
+        log.message_id.set(message_id)
+        logger.info('010', 'Found message id on inbound message.')
+        return message_id
+

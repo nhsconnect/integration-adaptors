@@ -16,6 +16,7 @@ MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
 EXPECTED_RESPONSE_FILE = "ebxml_ack.xml"
 UNSOLICITED_REQUEST_FILE = "ebxml_unsolicited.msg"
+NO_REF_FILE = "ebxml_no_reference.msg"
 FROM_PARTY_ID = "FROM-PARTY-ID"
 CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
 REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
@@ -51,17 +52,18 @@ async def state_return_values(message_key):
 class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     """A simple integration test for the async response endpoint."""
 
-    message_dir = pathlib.Path(__file__)/'..' / MESSAGES_DIR
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    message_dir = pathlib.Path(current_dir) / MESSAGES_DIR
 
     def setUp(self):
         self.state = unittest.mock.MagicMock()
         self.state.get.side_effect = state_return_values
 
-        mock_workflow = unittest.mock.MagicMock()
+        self.mock_workflow = unittest.mock.MagicMock()
         future = test_utilities.awaitable('result')
-        mock_workflow.handle_inbound_message.return_value = future
+        self.mock_workflow.handle_inbound_message.return_value = future
         self.mocked_workflows = {
-            workflow.ASYNC_EXPRESS: mock_workflow
+            workflow.ASYNC_EXPRESS: self.mock_workflow
         }
 
         super().setUp()
@@ -105,11 +107,38 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(ack_response.code, 200)
 
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_workflow_throws_exception(self, mock_get_uuid, mock_get_timestamp):
+        self.mock_workflow.handle_inbound_message.side_effect = Exception("what a failure")
+        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+        mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+
+        response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+
+        self.assertEqual(response.code, 500)
+        expected = b'<html><title>500: Exception in workflow</title><body>500: ' \
+                   b'Exception in workflow</body></html>'.decode('utf-8')
+        self.assertEqual(response.body.decode('utf-8'), expected)
+
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_no_reference_to_id(self,  mock_get_uuid, mock_get_timestamp):
+        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+        mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / NO_REF_FILE))
+
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+
+        self.assertEqual(ack_response.code, 500)
+
 
 class TestInboundWorkflow(tornado.testing.AsyncHTTPSTestCase):
     """A simple integration test for the async response endpoint."""
 
-    message_dir = pathlib.Path(__file__)/'..' / MESSAGES_DIR
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    message_dir = pathlib.Path(current_dir) / MESSAGES_DIR
 
     def setUp(self):
         self.state = unittest.mock.MagicMock()
