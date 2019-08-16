@@ -35,11 +35,6 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.workflow = async_express.AsynchronousExpressWorkflow(PARTY_KEY, self.mock_persistence_store,
                                                                   self.mock_transmission_adaptor)
 
-    def tearDown(self):
-        self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
-                                                                      MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
-        self.mock_ebxml_request_envelope.assert_called_once()
-
     @async_test
     async def test_handle_outbound_message(self):
         response = mock.MagicMock()
@@ -60,6 +55,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.assertEqual(202, status)
         self.assertEqual('', message)
+        self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
+                                                                      MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
