@@ -29,15 +29,10 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                            work_description.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         await wdo.publish()
 
-        try:
-            message = self._serialize_outbound_message(correlation_id, interaction_details, message_id, payload)
-        except Exception as e:
-            logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
-            await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
-            return 500, 'Error serialising outbound message'
-        else:
-            logger.info('0003', 'Message serialised successfully')
-            await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
+        error, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
+                                                                payload, wdo)
+        if error:
+            return error
 
         logger.info('0004', 'About to make outbound request')
         start_time = timing.get_time()
@@ -73,10 +68,18 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment})
 
-    def _serialize_outbound_message(self, correlation_id, interaction_details, message_id, payload):
-        interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
-        interaction_details[ebxml_request_envelope.MESSAGE] = payload
-        interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
-        interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
-        _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
-        return message
+    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo):
+        try:
+            interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
+            interaction_details[ebxml_request_envelope.MESSAGE] = payload
+            interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
+            interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
+            _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
+        except Exception as e:
+            logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
+            await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+            return (500, 'Error serialising outbound message'), None
+
+        logger.info('0003', 'Message serialised successfully')
+        await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
+        return None, message
