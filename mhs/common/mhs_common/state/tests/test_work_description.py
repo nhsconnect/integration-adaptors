@@ -5,6 +5,7 @@ from mhs_common.state import work_description as wd
 from unittest.mock import MagicMock, patch
 from utilities import test_utilities
 from utilities.test_utilities import async_test
+from mhs_common import workflow
 
 input_data = {
     wd.DATA_KEY: 'aaa-aaa-aaa',
@@ -12,7 +13,8 @@ input_data = {
         wd.CREATED_TIMESTAMP: '11:59',
         wd.LATEST_TIMESTAMP: '12:00',
         wd.VERSION_KEY: 1,
-        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW,
+        wd.WORKFLOW: workflow.SYNC
     }
 }
 
@@ -22,7 +24,8 @@ old_data = {
         wd.VERSION_KEY: 0,
         wd.CREATED_TIMESTAMP: '11:59',
         wd.LATEST_TIMESTAMP: '12:00',
-        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW
+        wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW,
+        wd.WORKFLOW: workflow.SYNC
     }
 }
 
@@ -153,7 +156,9 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         persistence = MagicMock()
         wd.create_new_work_description(persistence,
                                        key='aaa-aaa',
-                                       status=wd.MessageStatus.RECEIVED)
+                                       status=wd.MessageStatus.RECEIVED,
+                                       workflow=workflow.SYNC
+                                       )
         work_mock.assert_called_with(
             persistence,
             {
@@ -162,7 +167,8 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                     wd.CREATED_TIMESTAMP: '12',
                     wd.LATEST_TIMESTAMP: '12',
                     wd.STATUS: wd.MessageStatus.RECEIVED,
-                    wd.VERSION_KEY: 1
+                    wd.VERSION_KEY: 1,
+                    wd.WORKFLOW: workflow.SYNC
                 }
             })
 
@@ -173,19 +179,30 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.create_new_work_description(
                     persistence,
                     key=None,
-                    status=wd.MessageStatus.RECEIVED
+                    status=wd.MessageStatus.RECEIVED,
+                    workflow=workflow.SYNC
                 )
         with self.subTest('Null status'):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     persistence,
                     key='aaa',
-                    status=None
+                    status=None,
+                    workflow=workflow.SYNC
                 )
         with self.subTest('Null persistence'):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     None,
                     key='aaa',
-                    status=wd.MessageStatus.RECEIVED
+                    status=wd.MessageStatus.RECEIVED,
+                    workflow=workflow.SYNC
+                )
+        with self.subTest('Null workflow'):
+            with self.assertRaises(ValueError):
+                wd.create_new_work_description(
+                    persistence,
+                    key='aaa',
+                    status=wd.MessageStatus.RECEIVED,
+                    workflow=None
                 )

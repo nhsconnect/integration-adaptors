@@ -20,6 +20,7 @@ CREATED_TIMESTAMP = 'CREATED'
 LATEST_TIMESTAMP = 'LATEST_TIMESTAMP'
 DATA = 'DATA'
 STATUS = 'STATUS'
+WORKFLOW = 'WORKFLOW'
 
 
 class OutOfDateVersionError(RuntimeError):
@@ -60,7 +61,9 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
 
 def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
                                 key: str,
-                                status: int) -> WorkDescription:
+                                status: int,
+                                workflow: str
+                                ) -> WorkDescription:
     """
     Builds a new local work description instance given the details of the message, these details are held locally
     until a `publish` is executed
@@ -74,6 +77,9 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     if status is None:
         logger.error('007', 'Failed to build new work description, status should not be null')
         raise ValueError('Expected status to not be None')
+    if workflow is None:
+        logger.error('008', 'Failed to build new work description, workflow should not be null')
+        raise ValueError('Expected workflow to not be None')
 
     timestamp = get_time()
     work_description_map = {
@@ -82,7 +88,8 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
             CREATED_TIMESTAMP: timestamp,
             LATEST_TIMESTAMP: timestamp,
             STATUS: status,
-            VERSION_KEY: 1
+            VERSION_KEY: 1,
+            WORKFLOW: workflow
         }
     }
 
@@ -109,6 +116,7 @@ class WorkDescription:
         self.created_timestamp = data[CREATED_TIMESTAMP]
         self.last_modified_timestamp = data[LATEST_TIMESTAMP]
         self.status = data[STATUS]
+        self.workflow = data[WORKFLOW]
 
     async def publish(self):
         """
@@ -151,7 +159,8 @@ class WorkDescription:
                 CREATED_TIMESTAMP: self.created_timestamp,
                 LATEST_TIMESTAMP: self.last_modified_timestamp,
                 VERSION_KEY: self.version,
-                STATUS: self.status
+                STATUS: self.status,
+                WORKFLOW: self.workflow
             }
         }
 
