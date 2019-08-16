@@ -222,6 +222,6 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.create_new_work_description(
                     persistence,
                     key='aaa',
-                    status=wd.MessageStatus.RECEIVED,
+                    status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     workflow=None
                 )
