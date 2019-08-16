@@ -10,6 +10,9 @@ TIMESTAMP = 'timestamp'
 ASID = 'asid'
 PATIENT_NHS_NUMBER = 'patient_nhs_number'
 PAYLOAD = 'payload'
+TO_PARTY_ID = 'to_party_id'
+FILE_UPLOAD = 'file_upload'
+DISSENT_OVERRIDE = 'dissentOverride'
 
 
 def build_message(template, asid, patient_nhs_number, payload):
@@ -25,13 +28,19 @@ def build_message(template, asid, patient_nhs_number, payload):
     current_utc_time = datetime.datetime.utcnow()
     timestamp = current_utc_time.strftime(TIMESTAMP_FORMAT)
     uuid = message_utilities.MessageUtilities.get_uuid()
+    to_party_id = 'YES-0000806'
+    file_upload = 'test file will go here'
+    dissentOverride = '0'
 
     message = message_builder.MustacheMessageBuilder(template).build_message({
         UUID: uuid,
         TIMESTAMP: timestamp,
         ASID: asid,
         PAYLOAD: payload,
-        PATIENT_NHS_NUMBER: patient_nhs_number
+        PATIENT_NHS_NUMBER: patient_nhs_number,
+        TO_PARTY_ID: to_party_id,
+        FILE_UPLOAD: file_upload,
+        DISSENT_OVERRIDE: dissentOverride
     })
 
     return message, uuid
