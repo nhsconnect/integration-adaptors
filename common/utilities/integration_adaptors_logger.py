@@ -9,7 +9,7 @@ AUDIT = 25
 
 message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', default=None)
 correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default=None)
-
+inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
 
 # Set the logging info globally, make each module get a new logger based on that log ref we provide
 def configure_logging():
@@ -69,6 +69,9 @@ class IntegrationAdaptorsLogger:
             message += f' RequestId={message_id.get()}'
         if correlation_id.get():
             message += f' CorrelationId={correlation_id.get()}'
+        if inbound_message_id.get():
+            message += f' InboundMessageId={inbound_message_id.get()}'
+
 
         message += f' ProcessKey={self.process_key_tag + process_key_num}'
 

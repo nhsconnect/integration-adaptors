@@ -1,6 +1,7 @@
 """This module defines the common base of all workflows."""
 import abc
 from typing import Tuple
+import mhs_common.state.work_description as wd
 
 
 class CommonWorkflow(abc.ABC):
@@ -18,5 +19,15 @@ class CommonWorkflow(abc.ABC):
         :param interaction_details: interaction details used to construct the message to send outbound
         :param payload: payload to send outbound
         :return: the HTTP status and body to return as a response
+        """
+        pass
+
+    @abc.abstractmethod
+    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
+        """
+        Handles an inbound message from an external system (typically from spine)
+        :param work_description:
+        :param payload:
+        :return:
         """
         pass

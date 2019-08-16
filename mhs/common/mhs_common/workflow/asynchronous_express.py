@@ -9,6 +9,7 @@ from utilities import timing
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor, work_description
 from mhs_common.workflow import common_asynchronous
+from mhs_common.state import work_description as wd
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -16,7 +17,7 @@ logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow):
     """Handles the workflow for the asynchronous express messaging pattern."""
 
-    def __init__(self, party_key: str, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
+    def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
@@ -84,3 +85,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         logger.info('0003', 'Message serialised successfully')
         await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, message
+
+    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
+        pass

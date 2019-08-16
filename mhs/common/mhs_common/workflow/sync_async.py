@@ -7,6 +7,7 @@ import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 from mhs_common.workflow import common_synchronous
 from comms import transmission_adaptor as ta
+from mhs_common.state import work_description as wd
 
 from utilities import integration_adaptors_logger as log, message_utilities
 
@@ -34,6 +35,10 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str) -> Tuple[int, str]:
+        raise NotImplementedError()
+
+    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str) \
+            -> Tuple[int, str]:
         raise NotImplementedError()
 
     def prepare_message(self, interaction_details: dict, content: str, message_id: str) -> Tuple[bool, str]:
