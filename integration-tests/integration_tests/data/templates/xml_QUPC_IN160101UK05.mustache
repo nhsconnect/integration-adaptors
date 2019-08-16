@@ -1,0 +1,53 @@
+<QUPC_IN160101UK05 xmlns="urn:hl7-org:v3">
+            <id root="{{uuid}}" />
+            <creationTime value="{{timestamp}}"/>
+            <versionCode code="3NPfIT7.2.00" />
+            <interactionId root="2.16.840.1.113883.2.1.3.2.4.12" extension="QUPC_IN160101UK05" />
+            <processingCode code="P" />
+            <processingModeCode code="T" />
+            <acceptAckCode code="NE" />
+            <communicationFunctionRcv typeCode="RCV">
+                <device classCode="DEV" determinerCode="INSTANCE">
+                    <id extension="{{to_party_id}}" root="1.2.826.0.1285.0.2.0.107" />
+                </device>
+            </communicationFunctionRcv>
+            <communicationFunctionSnd typeCode="SND">
+                <device classCode="DEV" determinerCode="INSTANCE">
+                    <id extension="{{asid}}" root="1.2.826.0.1285.0.2.0.107" />
+                </device>
+            </communicationFunctionSnd>
+            <ControlActEvent classCode="CACT" moodCode="EVN">
+                <author1 typeCode="AUT">
+                    <AgentSystemSDS classCode="AGNT">
+                        <agentSystemSDS classCode="DEV" determinerCode="INSTANCE">
+                            <id extension="{{asid}}" root="1.2.826.0.1285.0.2.0.107" />
+                        </agentSystemSDS>
+                    </AgentSystemSDS>
+                </author1>
+                <query>
+                    <dissentOverride>
+                        <semanticsText>DissentOverride</semanticsText>
+                        <value code="{{dissentOverride}}" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.60" />
+                    </dissentOverride>
+                    <filterParameters>
+                        <documentType>
+                            <semanticsText>DocumentType</semanticsText>
+                            <value codeSystem="2.16.840.1.113883.2.1.3.2.4.15" code="${documentType}"/>
+                        </documentType>
+                        {{#useDateFilter}}
+                        <date>
+                            <semanticsText>Date</semanticsText>
+                            <value>
+                            {{#lowDate}}<low value="{{timestamp}}"/>{{/lowDate}}
+                            {{#highDate}}<high value="{{timestamp}}"/>{{/highDate}}
+                            </value>
+                        </date>
+                        {{/useDateFilter}}
+                    </filterParameters>
+                    <nHSNumber>
+                        <semanticsText>NHSNumber</semanticsText>
+                        <value root="2.16.840.1.113883.2.1.4.1" extension="{{patient_nhs_number}}" />
+                    </nHSNumber>
+                </query>
+            </ControlActEvent>
+</QUPC_IN160101UK05>
