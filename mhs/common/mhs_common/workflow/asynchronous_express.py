@@ -16,8 +16,8 @@ logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow):
     """Handles the workflow for the asynchronous express messaging pattern."""
 
-    def __init__(self, persistence_store: persistence_adaptor.PersistenceAdaptor,
-                 transmission: transmission_adaptor.TransmissionAdaptor, party_key: str):
+    def __init__(self, party_key: str, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
+                 transmission: transmission_adaptor.TransmissionAdaptor = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key

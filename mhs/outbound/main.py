@@ -42,7 +42,7 @@ def initialise_workflows(certs_dir: pathlib.Path, party_key: str,
     """
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
 
-    return workflow.get_workflow_map(persistence_store, transmission, party_key)
+    return workflow.get_workflow_map(party_key, persistence_store, transmission)
 
 
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:

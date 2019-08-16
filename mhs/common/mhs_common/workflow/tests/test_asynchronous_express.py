@@ -32,8 +32,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.workflow = async_express.AsynchronousExpressWorkflow(self.mock_persistence_store,
-                                                                  self.mock_transmission_adaptor, PARTY_KEY)
+        self.workflow = async_express.AsynchronousExpressWorkflow(PARTY_KEY, self.mock_persistence_store,
+                                                                  self.mock_transmission_adaptor)
 
     def tearDown(self):
         self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
