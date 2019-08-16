@@ -35,8 +35,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.workflow = async_express.AsynchronousExpressWorkflow(PARTY_KEY, self.mock_persistence_store,
                                                                   self.mock_transmission_adaptor)
 
+    @mock.patch.object(async_express, 'logger')
     @async_test
-    async def test_handle_outbound_message(self):
+    async def test_handle_outbound_message(self, log_mock):
         response = mock.MagicMock()
         response.status_code = 202
 
@@ -64,6 +65,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(expected_interaction_details,
                                                                             SERIALIZED_MESSAGE)
+        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
     @async_test
     async def test_handle_outbound_message_serialisation_fails(self):
@@ -81,8 +83,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                          self.mock_work_description.set_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
+    @mock.patch.object(async_express, 'logger')
     @async_test
-    async def test_handle_outbound_message_http_error_when_calling_outbound_transmission(self):
+    async def test_handle_outbound_message_http_error_when_calling_outbound_transmission(self, log_mock):
         self.setup_mock_work_description()
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
@@ -102,6 +105,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_status.call_args_list)
+        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
     @async_test
     async def test_handle_outbound_message_error_when_calling_outbound_transmission(self):
@@ -124,8 +128,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
              mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
             self.mock_work_description.set_status.call_args_list)
 
+    @mock.patch.object(async_express, 'logger')
     @async_test
-    async def test_handle_outbound_message_non_http_202_success_response_received(self):
+    async def test_handle_outbound_message_non_http_202_success_response_received(self, log_mock):
         self.setup_mock_work_description()
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
@@ -143,8 +148,14 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_status.call_args_list)
+        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
     def setup_mock_work_description(self):
         self.mock_work_description = self.mock_create_new_work_description.return_value
         self.mock_work_description.publish.return_value = test_utilities.awaitable(None)
         self.mock_work_description.set_status.return_value = test_utilities.awaitable(None)
+
+    def assert_audit_log_recorded_with_message_status(self, log_mock, message_status):
+        log_mock.audit.assert_called_once()
+        audit_log_dict = log_mock.audit.call_args[0][2]
+        self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
