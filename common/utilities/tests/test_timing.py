@@ -109,7 +109,7 @@ class TestTimeUtilities(TestCase):
     @patch('utilities.timing.datetime')
     def test_get_time(self, mock_datetime):
         mock_datetime.datetime.utcnow.return_value = datetime.datetime(2019, 1, 5, 12, 13, 14, 567)
-        self.assertEqual('2019-01-05T12:13:14.000567', timing.get_time())
+        self.assertEqual('2019-01-05T12:13:14.000567Z', timing.get_time())
 
     @timing.time_function
     def default_method(self):
