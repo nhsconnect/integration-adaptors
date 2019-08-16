@@ -39,14 +39,16 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             logger.info('0003', 'Message serialised successfully')
             await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
 
+        logger.info('0004', 'About to make outbound request')
+        start_time = timing.get_time()
         try:
-            logger.info('0004', 'About to make outbound request')
-            start_time = timing.get_time()
             response = await self.transmission.make_request(interaction_details, message)
             end_time = timing.get_time()
         except requests.exceptions.HTTPError as e:
             logger.warning('0005', 'Received HTTP error from Spine. {HTTPStatus} {Exception}',
                            {'HTTPStatus': e.response.http_status, 'Exception': e})
+            self._record_outbound_audit_log(timing.get_time(), start_time,
+                                            work_description.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             return 500, 'Error received from Spine'
         except Exception as e:
@@ -55,16 +57,21 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             return 500, 'Error making outbound request'
 
         if response.status_code == 202:
-            logger.audit('0007', 'Async-express workflow invoked. Message sent to Spine and acknowledgment received. '
-                                 '{RequestSentTime} {AcknowledgmentReceivedTime}',
-                         {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time})
+            self._record_outbound_audit_log(end_time, start_time, work_description.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             return 202, ''
         else:
             logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
                            {'HTTPStatus': response.status_code})
+            self._record_outbound_audit_log(end_time, start_time, work_description.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             return 500, "Didn't get expected success response from Spine"
+
+    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
+        logger.audit('0007', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
+                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
+                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
+                      'Acknowledgment': acknowledgment})
 
     def _serialize_outbound_message(self, correlation_id, interaction_details, message_id, payload):
         interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
