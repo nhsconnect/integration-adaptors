@@ -17,7 +17,6 @@ MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
 EXPECTED_RESPONSE_FILE = "ebxml_ack.xml"
 UNSOLICITED_REQUEST_FILE = "ebxml_unsolicited.msg"
-NO_CONVERSATION_ID = "ebxml_no_conversation_id.msg"
 NO_REF_FILE = "ebxml_no_reference.msg"
 FROM_PARTY_ID = "FROM-PARTY-ID"
 CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
@@ -126,19 +125,19 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(ack_response.code, 500)
 
-    def test_logging_context_variables_are_set(self):
-        log.correlation_id = unittest.mock.MagicMock()
-        log.inbound_message_id = unittest.mock.MagicMock()
-        log.message_id = unittest.mock.MagicMock()
+    @unittest.mock.patch.object(log, "inbound_message_id")
+    @unittest.mock.patch.object(log, "correlation_id")
+    @unittest.mock.patch.object(log, "message_id")
+    def test_logging_context_variables_are_set(self, mock_message_id, mock_correlation_id, mock_inbound_message_id):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
         self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
 
         self.assertEqual(ack_response.code, 200)
-        log.correlation_id.set.assert_called_with('10F5A436-1913-43F0-9F18-95EA0E43E61A')
+        mock_correlation_id.set.assert_called_with('10F5A436-1913-43F0-9F18-95EA0E43E61A')
         log.inbound_message_id.set.assert_called_with('C614484E-4B10-499A-9ACD-5D645CFACF61')
-        log.message_id.set.assert_called_with('B4D38C15-4981-4366-BDE9-8F56EDC4AB72')
+        mock_message_id.set.assert_called_with('B4D38C15-4981-4366-BDE9-8F56EDC4AB72')
 
 
 class TestInboundWorkflow(tornado.testing.AsyncHTTPSTestCase):
