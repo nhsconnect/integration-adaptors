@@ -30,12 +30,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         await wdo.publish()
 
         try:
-            # Call message packer to serialise message
-            interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
-            interaction_details[ebxml_request_envelope.MESSAGE] = payload
-            interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
-            interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
-            _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
+            message = self._serialize_outbound_message(correlation_id, interaction_details, message_id, payload)
         except Exception as e:
             logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
             await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
@@ -70,3 +65,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                            {'HTTPStatus': response.status_code})
             await wdo.set_status(work_description.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             return 500, "Didn't get expected success response from Spine"
+
+    def _serialize_outbound_message(self, correlation_id, interaction_details, message_id, payload):
+        interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
+        interaction_details[ebxml_request_envelope.MESSAGE] = payload
+        interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
+        interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
+        _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
+        return message
