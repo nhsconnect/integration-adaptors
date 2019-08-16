@@ -31,7 +31,7 @@ def get_mhs_hostname():
     Looks up the mhs hostname from the environment settings
     :return: the mhs hostname
 
-    The mhs hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
+    The hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'localhost'
     """
     return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
