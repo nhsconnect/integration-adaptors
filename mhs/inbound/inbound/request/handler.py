@@ -12,6 +12,7 @@ import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 from utilities import message_utilities
 import mhs_common.workflow as workflow
+from utilities.timing import time_request
 
 logger = log.IntegrationAdaptorsLogger('INBOUND_HANDLER')
 
@@ -33,14 +34,21 @@ class InboundHandler(tornado.web.RequestHandler):
         self.party_id = party_id
         self.state_store = state_store
 
+    @time_request
     async def post(self):
-        logger.info('001', 'Inbound POST recieved: {request}', {'request': self.request})
+        logger.info('001', 'Inbound POST received: {request}', {'request': self.request})
 
         request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
                                                                                   self.request.body.decode())
         ref_to_message_id = self.extract_ref_message(request_message)
+        self._extract_correlation_id(request_message)
+        self._extract_message_id(request_message)
 
-        logger.info('002', 'Message received has reference to {messageID}', {'messageID': ref_to_message_id})
+        if not ref_to_message_id:
+            logger.warning('000', 'No reference to message Id found, this indicates an unsolicited inbound message'
+                                  'has been received')
+            raise tornado.web.HTTPError(500, 'No reference to message id found, unsolicited message recieved',
+                                        reason="Unknown message reference")
 
         try:
             work_description = await wd.get_work_description_from_store(self.state_store, ref_to_message_id)
@@ -52,7 +60,7 @@ class InboundHandler(tornado.web.RequestHandler):
                                         reason="Unknown message reference") from e
 
         message_workflow = self.workflows[work_description.workflow]
-        logger.info('004', 'Retrieved word description from state store, forwarding message to {workflow}',
+        logger.info('004', 'Retrieved work description from state store, forwarding message to {workflow}',
                     {'workflow': message_workflow})
         received_message = request_message.message_dictionary[ebxml_request_envelope.MESSAGE]
         try:
@@ -64,7 +72,7 @@ class InboundHandler(tornado.web.RequestHandler):
                                              ' failed to complete workflow') from e
 
     def _send_ack(self, parsed_message: ebxml_envelope.EbxmlEnvelope):
-        logger.info('010', 'Building and sending acknowledgement')
+        logger.info('012', 'Building and sending acknowledgement')
         message_details = parsed_message.message_dictionary
 
         ack_context = {
@@ -78,7 +86,6 @@ class InboundHandler(tornado.web.RequestHandler):
 
         ack_message = ebxml_ack_envelope.EbxmlAckEnvelope(ack_context)
         message_id, http_headers, serialized_message = ack_message.serialize()
-        print(http_headers)
         for k, v in http_headers.items():
             self.set_header(k, v)
             
@@ -104,9 +111,8 @@ class InboundHandler(tornado.web.RequestHandler):
         if not message_id:
             logger.info('008', "Didn't receive message id in inbound message")
         else:
-            log.message_id.set(message_id)
+            log.inbound_message_id.set(message_id)
             logger.info('009', 'Found inbound message id on request.')
-        return message_id
 
     def extract_ref_message(self, message):
         """
@@ -117,8 +123,8 @@ class InboundHandler(tornado.web.RequestHandler):
         try:
             message_id = message.message_dictionary[ebxml_envelope.RECEIVED_MESSAGE_ID]
             log.message_id.set(message_id)
-            logger.info('0008', 'Found message id on inbound message.')
+            logger.info('010', 'Found message id on inbound message.')
             return message_id
         except KeyError:
-            logger.info('0007', "No Message reference found ")
+            logger.info('011', "No Message reference found")
             return None

@@ -12,5 +12,5 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             -> Tuple[int, str]:
         raise NotImplementedError()
 
-    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
+    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str) -> str:
         pass

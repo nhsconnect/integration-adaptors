@@ -51,15 +51,14 @@ async def state_return_values(message_key):
 class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     """A simple integration test for the async response endpoint."""
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    message_dir = pathlib.Path(current_dir) / MESSAGES_DIR
+    message_dir = pathlib.Path(__file__)/'..' / MESSAGES_DIR
 
     def setUp(self):
         self.state = unittest.mock.MagicMock()
-        self.state.get = unittest.mock.MagicMock(side_effect=state_return_values)
+        self.state.get.side_effect = state_return_values
 
         mock_workflow = unittest.mock.MagicMock()
-        future = test_utilities.awaitable('resutl')
+        future = test_utilities.awaitable('result')
         mock_workflow.handle_inbound_message.return_value = future
         self.mocked_workflows = {
             workflow.ASYNC_EXPRESS: mock_workflow
@@ -110,17 +109,16 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 class TestInboundWorkflow(tornado.testing.AsyncHTTPSTestCase):
     """A simple integration test for the async response endpoint."""
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    message_dir = pathlib.Path(current_dir) / MESSAGES_DIR
+    message_dir = pathlib.Path(__file__)/'..' / MESSAGES_DIR
 
     def setUp(self):
         self.state = unittest.mock.MagicMock()
-        self.state.get = unittest.mock.MagicMock(side_effect=state_return_values)
+        self.state.get.side_effect = state_return_values
         super().setUp()
 
     def get_app(self):
         return tornado.web.Application([
-            (r".*", handler.InboundHandler,
+            (r"/.*", handler.InboundHandler,
              dict(workflows=workflow.get_workflow_map(), state_store=self.state, party_id=FROM_PARTY_ID))
         ])
 
@@ -135,7 +133,6 @@ class TestInboundWorkflow(tornado.testing.AsyncHTTPSTestCase):
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
 
-        print(ack_response.headers)
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)

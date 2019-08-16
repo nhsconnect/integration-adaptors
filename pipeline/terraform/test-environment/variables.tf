@@ -24,6 +24,10 @@ variable "mhs_log_level" {
   type = string
   description = "Log level for the MHS application."
 }
+variable "mhs_state_table_name" {
+  type = string
+  description = "Name of the DynamoDB state table used by the MHS application."
+}
 variable "scr_log_level" {
   type = string
   description = "Log Level for the SCR Web Service"

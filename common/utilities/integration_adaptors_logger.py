@@ -70,7 +70,7 @@ class IntegrationAdaptorsLogger:
         if correlation_id.get():
             message += f' CorrelationId={correlation_id.get()}'
         if inbound_message_id.get():
-            message += f'InboundMessageId={inbound_message_id.get()}'
+            message += f' InboundMessageId={inbound_message_id.get()}'
 
 
         message += f' ProcessKey={self.process_key_tag + process_key_num}'
