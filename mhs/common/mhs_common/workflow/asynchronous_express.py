@@ -22,6 +22,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         self.transmission = transmission
         self.party_key = party_key
 
+    @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str) -> Tuple[int, str]:
         logger.info('0001', 'Entered async express workflow to handle outbound message')

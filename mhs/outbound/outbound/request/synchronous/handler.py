@@ -8,8 +8,7 @@ import tornado.web
 
 import mhs_common.workflow as workflow
 from mhs_common.configuration import configuration_manager
-from utilities import integration_adaptors_logger as log, message_utilities
-
+from utilities import integration_adaptors_logger as log, message_utilities, timing
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
@@ -27,6 +26,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         self.workflows = workflows
         self.config_manager = config_manager
 
+    @timing.time_request
     async def post(self):
         message_id = self._extract_message_id()
         correlation_id = self._extract_correlation_id()

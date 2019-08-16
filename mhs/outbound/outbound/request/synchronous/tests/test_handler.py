@@ -1,11 +1,12 @@
 import unittest.mock
 from unittest.mock import patch
+
 import tornado.testing
 import tornado.web
-from outbound.request.synchronous import handler
 from utilities import integration_adaptors_logger as log, test_utilities
 from utilities import message_utilities
 
+from outbound.request.synchronous import handler
 
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
