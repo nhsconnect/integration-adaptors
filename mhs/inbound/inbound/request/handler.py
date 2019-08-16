@@ -37,14 +37,14 @@ class InboundHandler(tornado.web.RequestHandler):
     @time_request
     async def post(self):
         logger.info('001', 'Inbound POST received: {request}', {'request': self.request})
-        request_message = None
+
         try:
             request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
                                                                                       self.request.body.decode())
         except ebxml_envelope.EbXmlParsingError as e:
-            logger.error('020', f'Failed to parse response: {e}')
+            logger.error('020', 'Failed to parse response: {exception}', {'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
-                                        reason=f'Exception in workflow') from e
+                                        reason=f'Exception during inbound message parsing {e}') from e
 
         ref_to_message_id = self.extract_ref_message(request_message)
         self._extract_correlation_id(request_message)
@@ -89,18 +89,13 @@ class InboundHandler(tornado.web.RequestHandler):
         message_id, http_headers, serialized_message = ack_message.serialize()
         for k, v in http_headers.items():
             self.set_header(k, v)
-            
+
         self.write(serialized_message)
 
     def _extract_correlation_id(self, message):
         correlation_id = message.message_dictionary[ebxml_envelope.CONVERSATION_ID]
-        if not correlation_id:
-            correlation_id = message_utilities.MessageUtilities.get_uuid()
-            log.correlation_id.set(correlation_id)
-            logger.info('006', "Didn't receive conversation id from inbound request , so have generated a new one.")
-        else:
-            log.correlation_id.set(correlation_id)
-            logger.info('007', 'Found correlation id on inbound request.')
+        log.correlation_id.set(correlation_id)
+        logger.info('007', 'Set correlation id from inbound request.')
 
     def _extract_message_id(self, message):
         """
@@ -122,4 +117,3 @@ class InboundHandler(tornado.web.RequestHandler):
         log.message_id.set(message_id)
         logger.info('010', 'Found message id on inbound message.')
         return message_id
-
