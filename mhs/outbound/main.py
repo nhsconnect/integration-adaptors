@@ -13,6 +13,8 @@ import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
 
+from outbound.outbound.transmission import outbound_transmission
+
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
 
@@ -28,13 +30,12 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     return party_key
 
 
-def initialise_workflows(certs_dir: pathlib.Path, party_key: str) -> Dict[str, workflow.CommonWorkflow]:
+def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str) -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
-    :param certs_dir: The directory containing certificates/keys to be used to identify this MHS to a remote MHS.
+    :param transmission: The transmission object to be used to make requests to the spine endpoints
     :param party_key: The party key to use to identify this MHS.
     :return: The workflows that can be used to handle messages.
     """
-    # transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
     # workflow = sync_async_workflow.SyncAsyncWorkflow(transmission, party_key)
 
     return workflow.get_workflow_map()
@@ -65,9 +66,14 @@ def main():
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
+    client_cert = "client.cert"
+    client_key = "client.key"
+    ca_certs = "client.pem"
+    max_retries = 3
     party_key = load_party_key(certs_dir)
 
-    workflows = initialise_workflows(certs_dir, party_key)
+    transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs, max_retries)
+    workflows = initialise_workflows(transmission, party_key)
 
     start_tornado_server(data_dir, workflows)
 
