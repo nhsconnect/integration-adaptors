@@ -89,5 +89,16 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, message
 
+    @timing.time_function
     async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
-        pass
+        logger.info('0009', 'Entered async express workflow to handle inbound message')
+        await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
+        try:
+            await self.queue_adaptor.send_async(payload)
+        except Exception as e:
+            logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
+            await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
+            raise e
+        else:
+            logger.info('0011', 'Placed message onto inbound queue successfully')
+            await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
