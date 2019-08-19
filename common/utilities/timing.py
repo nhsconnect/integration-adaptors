@@ -1,7 +1,11 @@
+import datetime
 import inspect
-import logging
 import time
 from functools import wraps
+
+import utilities.integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger('TIMING')
 
 
 class Stopwatch:
@@ -25,12 +29,13 @@ def _begin_stopwatch():
 
 def _log_time(duration, func_name):
     duration = round(duration, 3)
-    logging.info(f'func_name={func_name} took duration={duration}')
+    logger.info('0001', '{FuncName} took {Duration}', {'FuncName': func_name, 'Duration': duration})
 
 
 def _log_tornado_time(duration, handler, func_name):
     duration = round(duration, 3)
-    logging.info(f'func_name={func_name} from handler={handler} took duration={duration}')
+    logger.info('0002', '{FuncName} from {Handler} took {Duration}',
+                {'FuncName': func_name, 'Handler': handler, 'Duration': duration})
 
 
 def time_function(func):
@@ -90,3 +95,7 @@ def time_request(func):
 
     return method_wrapper
 
+
+def get_time() -> str:
+    """Returns UTC time in the appropriate format """
+    return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')

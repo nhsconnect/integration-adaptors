@@ -33,8 +33,8 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.transmission = transmission
         self.party_id = party_id
 
-    async def handle_outbound_message(self, message_id: str, interaction_details: dict, payload: str) \
-            -> Tuple[int, str]:
+    async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+                                      payload: str) -> Tuple[int, str]:
         raise NotImplementedError()
 
     async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str) \
