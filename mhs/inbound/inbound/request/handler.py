@@ -67,7 +67,7 @@ class InboundHandler(tornado.web.RequestHandler):
             await message_workflow.handle_inbound_message(work_description, received_message)
             self._send_ack(request_message)
         except Exception as e:
-            logger.error('005', 'Exception in workflow {e}', {'e': e})
+            logger.error('005', 'Exception in workflow {exception}', {'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
                                              ' failed to complete workflow',
                                         reason=f'Exception in workflow') from e
