@@ -42,10 +42,6 @@ class TestOutboundTransmission(TestCase):
 
     @patch("requests.post")
     def test_make_request(self, mock_post):
-        mock_result = Mock()
-        mock_result.content = sentinel.content
-        mock_post.return_value = mock_result
-
         interaction_details = {
             URL_NAME: URL_VALUE,
             TYPE_NAME: TYPE_VALUE,
@@ -64,8 +60,8 @@ class TestOutboundTransmission(TestCase):
                                      cert=(CLIENT_CERT_PATH, CLIENT_KEY_PATH),
                                      verify=CLIENT_PEM_PATH
                                      )
-        mock_result.raise_for_status.assert_called()
-        self.assertIs(actual_response, sentinel.content, "Expected content should be returned.")
+        mock_post.return_value.raise_for_status.assert_called()
+        self.assertIs(actual_response, mock_post.return_value, "Expected content should be returned.")
 
     def test_build_headers(self):
         actual_headers = outbound_transmission.OutboundTransmission._build_headers({
