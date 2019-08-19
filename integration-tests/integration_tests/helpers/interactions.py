@@ -14,7 +14,7 @@ def process_request(interaction_name, asid, nhs_number, human_readable, pass_mes
     :param pass_message_id: flag to indicate if we need to pass on the message ID
     :return: response received from the MHS
     """
-    scr, message_id = build_message(asid, nhs_number, human_readable)
+    scr, message_id = build_message(interaction_name, asid, nhs_number, human_readable)
     if not pass_message_id:
         message_id = None
 

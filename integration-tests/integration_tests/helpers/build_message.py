@@ -14,7 +14,10 @@ TO_PARTY_ID = 'to_party_id'
 FILE_UPLOAD = 'file_upload'
 DISSENT_OVERRIDE = 'dissentOverride'
 USE_DATE_FILTER = 'useDateFilter'
+<<<<<<< HEAD:integration-tests/integration_tests/helpers/build_message.py
 DOCUMENT_TYPE = 'documentType'
+=======
+>>>>>>> minor refactoring:integration-tests/integration_tests/helpers/build_message.py
 
 
 def build_message(template, asid, patient_nhs_number, payload):
@@ -33,7 +36,10 @@ def build_message(template, asid, patient_nhs_number, payload):
     file_upload = 'test file will go here'
     dissentOverride = '0'
     useDateFilter = False
+<<<<<<< HEAD:integration-tests/integration_tests/helpers/build_message.py
     documentType = '196971000000103'
+=======
+>>>>>>> minor refactoring:integration-tests/integration_tests/helpers/build_message.py
 
     message = message_builder.MustacheMessageBuilder(template).build_message({
         UUID: uuid,
@@ -44,8 +50,12 @@ def build_message(template, asid, patient_nhs_number, payload):
         TO_PARTY_ID: to_party_id,
         FILE_UPLOAD: file_upload,
         DISSENT_OVERRIDE: dissentOverride,
+<<<<<<< HEAD:integration-tests/integration_tests/helpers/build_message.py
         USE_DATE_FILTER: useDateFilter,
         DOCUMENT_TYPE: documentType
+=======
+        USE_DATE_FILTER: useDateFilter
+>>>>>>> minor refactoring:integration-tests/integration_tests/helpers/build_message.py
     })
 
     return message, uuid
