@@ -26,8 +26,8 @@ class CommonWorkflow(abc.ABC):
     async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
         """
         Handles an inbound message from an external system (typically from spine)
-        :param work_description:
-        :param payload:
-        :return:
+
+        :param work_description: work description object for the payload
+        :param payload: payload to handle
         """
         pass
