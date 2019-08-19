@@ -67,7 +67,8 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
     """
 
     inbound_application = tornado.web.Application(
-        [(r"/.*", async_request_handler.InboundHandler, dict(workflows=workflows, party_id=party_key))])
+        [(r"/.*", async_request_handler.InboundHandler, dict(workflows=workflows, party_id=party_key,
+                                                             state_store=persistence_store))])
 
     # Ensure Client authentication
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
