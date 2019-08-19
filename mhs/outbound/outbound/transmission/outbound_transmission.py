@@ -31,7 +31,6 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         self._client_key = str(Path(certs_dir) / client_key)
         self._ca_certs = str(Path(certs_dir) / ca_certs)
         self._max_retries = max_retries
-        self._http_client = httpclient.AsyncHTTPClient()
 
     async def make_request(self, interaction_details, message):
         """Make a request for the specified interaction, containing the provided message. Raises an exception if a
@@ -54,13 +53,13 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         retries_remaining = self._max_retries
         while retries_remaining > 0:
             try:
-                response = await self._http_client.fetch(url,
-                                                         method=request_method,
-                                                         body=message,
-                                                         headers=headers,
-                                                         client_cert=self._client_cert,
-                                                         client_key=self._client_key,
-                                                         ca_certs=self._ca_certs)
+                response = await httpclient.AsyncHTTPClient().fetch(url,
+                                                                    method=request_method,
+                                                                    body=message,
+                                                                    headers=headers,
+                                                                    client_cert=self._client_cert,
+                                                                    client_key=self._client_key,
+                                                                    ca_certs=self._ca_certs)
                 return response
             except Exception as e:
                 if self._is_retriable(e):

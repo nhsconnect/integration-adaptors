@@ -57,7 +57,7 @@ class TestOutboundTransmission(TestCase):
 
     @async_test
     async def test_make_request(self):
-        with patch.object(self.transmission._http_client, "fetch") as mock_fetch:
+        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
             mock_fetch.return_value = awaitable(sentinel.result)
 
             actual_response = await self.transmission.make_request(INTERACTION_DETAILS, MESSAGE)
@@ -75,7 +75,7 @@ class TestOutboundTransmission(TestCase):
 
     @async_test
     async def test_make_request_non_retriable(self):
-        with patch.object(self.transmission._http_client, "fetch") as mock_fetch:
+        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
             mock_fetch.side_effect = httpclient.HTTPClientError(code=400)
 
             with self.assertRaises(httpclient.HTTPClientError):
@@ -83,7 +83,7 @@ class TestOutboundTransmission(TestCase):
 
     @async_test
     async def test_make_request_retriable(self):
-        with patch.object(self.transmission._http_client, "fetch") as mock_fetch:
+        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
             mock_fetch.side_effect = [httpclient.HTTPClientError(code=599), awaitable(sentinel.result)]
 
             actual_response = await self.transmission.make_request(INTERACTION_DETAILS, "")
@@ -92,11 +92,12 @@ class TestOutboundTransmission(TestCase):
 
     @async_test
     async def test_make_request_max_retries(self):
-        with patch.object(self.transmission._http_client, "fetch") as mock_fetch:
+        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
             mock_fetch.side_effect = httpclient.HTTPClientError(code=599)
 
             with self.assertRaises(outbound_transmission.MaxRetriesExceeded):
                 await self.transmission.make_request(INTERACTION_DETAILS, "")
+                self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
 
 
     def test_is_tornado_network_error(self):
