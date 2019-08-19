@@ -1,17 +1,16 @@
 """This module defines the inbound request handler component."""
 
-from utilities import integration_adaptors_logger as log
-from typing import Dict, Callable
-import tornado.web
+from typing import Dict
 
-from mhs_common.state import persistence_adaptor as pa
-from mhs_common.state import work_description as wd
-from mhs_common.state.persistence_adaptor import PersistenceAdaptor
 import mhs_common.messages.ebxml_ack_envelope as ebxml_ack_envelope
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
-from utilities import message_utilities
 import mhs_common.workflow as workflow
+import tornado.web
+from mhs_common.state import persistence_adaptor as pa
+from mhs_common.state import work_description as wd
+from mhs_common.state.persistence_adaptor import PersistenceAdaptor
+from utilities import integration_adaptors_logger as log
 from utilities.timing import time_request
 
 logger = log.IntegrationAdaptorsLogger('INBOUND_HANDLER')
