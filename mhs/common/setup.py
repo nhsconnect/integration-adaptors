@@ -13,6 +13,7 @@ setup(
     description='Common utilities used by the NHS integration adaptors projects.',
     install_requires=[
         'defusedxml',
-        'aioboto3'
+        'aioboto3',
+        'requests'
     ]
 )
