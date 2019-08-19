@@ -1,11 +1,12 @@
 import unittest.mock
 from unittest.mock import patch
+
 import tornado.testing
 import tornado.web
-from outbound.request.synchronous import handler
 from utilities import integration_adaptors_logger as log, test_utilities
 from utilities import message_utilities
 
+from outbound.request.synchronous import handler
 
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
@@ -45,7 +46,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
 
         self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
-        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, INTERACTION_DETAILS, REQUEST_BODY)
+        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, MOCK_UUID_2, INTERACTION_DETAILS,
+                                                                 REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(MOCK_UUID_2)
@@ -67,7 +69,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
         mock_get_uuid.assert_called_once()
 
-        self.workflow.handle_outbound_message.assert_called_with(message_id, INTERACTION_DETAILS, REQUEST_BODY)
+        self.workflow.handle_outbound_message.assert_called_with(message_id, MOCK_UUID, INTERACTION_DETAILS,
+                                                                 REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(message_id)
         mock_correlation_id.set.assert_called_with(MOCK_UUID)
@@ -90,10 +93,26 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.body.decode(), expected_response)
         mock_get_uuid.assert_called_once()
 
-        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, INTERACTION_DETAILS, REQUEST_BODY)
+        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, correlation_id, INTERACTION_DETAILS,
+                                                                 REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(correlation_id)
+
+    def test_post_message_where_workflow_returns_error_response(self):
+        for http_status in [400, 409, 500, 503]:
+            with self.subTest(http_status=http_status):
+                expected_response = "Error response body"
+                self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((http_status,
+                                                                                               expected_response))
+                self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
+
+                response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME},
+                                      body=REQUEST_BODY)
+
+                self.assertEqual(response.code, http_status)
+                self.assertEqual(response.headers["Content-Type"], "text/plain")
+                self.assertEqual(response.body.decode(), expected_response)
 
     def test_post_message_where_workflow_not_found_on_interaction_details(self):
         self.config_manager.get_interaction_details.return_value = {}
@@ -101,6 +120,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 500)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn(f"Couldn't determine workflow to invoke for interaction ID: {INTERACTION_NAME}",
                       response.body.decode())
 
@@ -113,6 +133,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         self.assertEqual(response.code, 500)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn(f"Couldn't determine workflow to invoke for interaction ID: {INTERACTION_NAME}",
                       response.body.decode())
 
@@ -123,6 +144,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", body="A request")
 
         self.assertEqual(response.code, 404)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn('Required Interaction-Id header not found', response.body.decode())
 
     def test_post_with_invalid_interaction_name(self):
@@ -131,6 +153,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="A request")
 
         self.assertEqual(response.code, 404)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn(f'Unknown interaction ID: {INTERACTION_NAME}', response.body.decode())
 
     def test_post_with_no_body(self):
@@ -139,4 +162,5 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body="")
 
         self.assertEqual(response.code, 400)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn("Body missing from request", response.body.decode())

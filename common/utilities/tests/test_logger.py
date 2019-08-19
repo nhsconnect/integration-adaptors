@@ -69,6 +69,7 @@ class TestLogger(TestCase):
         log.configure_logging()
         log.message_id.set('10')
         log.correlation_id.set('5')
+        log.inbound_message_id.set('8')
 
         log.IntegrationAdaptorsLogger('SYS')._format_and_write(
             message='{yes} {no} {maybe}',
@@ -87,6 +88,7 @@ class TestLogger(TestCase):
         self.assertIn(' maybe=three ', output)
         self.assertIn(' yes=one ', output)
         self.assertIn(f' pid={os.getpid()}', output)
+        self.assertIn('InboundMessageId=8', output)
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_format_and_write_empty_vals(self, mock_std):
@@ -175,3 +177,4 @@ class TestLogger(TestCase):
 
         time_value = output.split('[')[1].split(']')[0]
         time.strptime(time_value, '%Y-%m-%dT%H:%M:%S.%fZ')
+

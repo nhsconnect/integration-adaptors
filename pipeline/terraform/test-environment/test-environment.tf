@@ -35,6 +35,10 @@ resource "aws_ecs_task_definition" "test-environment-mhs-inbound-task" {
         {
           name = "MHS_LOG_LEVEL"
           value = var.mhs_log_level
+        },
+        {
+          name = "MHS_STATE_TABLE_NAME",
+          value = var.mhs_state_table_name
         }
       ]
 
@@ -88,6 +92,10 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
         {
           name = "MHS_LOG_LEVEL"
           value = var.mhs_log_level
+        },
+        {
+          name = "MHS_STATE_TABLE_NAME",
+          value = var.mhs_state_table_name
         }
       ]
 

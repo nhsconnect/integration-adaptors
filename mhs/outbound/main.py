@@ -7,11 +7,14 @@ import tornado.web
 
 import definitions
 import mhs_common.configuration.configuration_manager as configuration_manager
+from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
+
 import outbound.request.synchronous.handler as client_request_handler
 import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
+from outbound.transmission import outbound_transmission
 
 from outbound.outbound.transmission import outbound_transmission
 
@@ -29,16 +32,17 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     assert party_key
     return party_key
 
-
-def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str) -> Dict[str, workflow.CommonWorkflow]:
+def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
+                         persistence_store: persistence_adaptor.PersistenceAdaptor) \
+        -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :param transmission: The transmission object to be used to make requests to the spine endpoints
     :param party_key: The party key to use to identify this MHS.
+    :param persistence_store: The persistence adaptor for the state database
     :return: The workflows that can be used to handle messages.
     """
-    # workflow = sync_async_workflow.SyncAsyncWorkflow(transmission, party_key)
 
-    return workflow.get_workflow_map()
+    return workflow.get_workflow_map(party_key, persistence_store, transmission)
 
 
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:
@@ -71,9 +75,11 @@ def main():
     ca_certs = "client.pem"
     max_retries = 3
     party_key = load_party_key(certs_dir)
+    persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+        table_name=config.get_config('STATE_TABLE_NAME'))
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs, max_retries)
-    workflows = initialise_workflows(transmission, party_key)
+    workflows = initialise_workflows(transmission, party_key, persistence_store)
 
     start_tornado_server(data_dir, workflows)
 

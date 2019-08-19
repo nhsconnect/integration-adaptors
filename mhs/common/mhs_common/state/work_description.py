@@ -2,16 +2,25 @@ from __future__ import annotations
 import json
 import utilities.integration_adaptors_logger as log
 import datetime
-from mhs_common.state import persistence_adaptor as pa
 
+from utilities import timing
+
+from mhs_common.state import persistence_adaptor as pa
+import enum
 
 logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
 
 
-class MessageStatus:
-    RECEIVED = 1
-    STARTED = 2
-    IN_OUTBOUND_WORKFLOW = 3
+class MessageStatus(str, enum.Enum):
+    OUTBOUND_MESSAGE_RECEIVED = 'OUTBOUND_MESSAGE_RECEIVED'
+    OUTBOUND_MESSAGE_PREPARED = 'OUTBOUND_MESSAGE_PREPARED'
+    OUTBOUND_MESSAGE_PREPARATION_FAILED = 'OUTBOUND_MESSAGE_PREPARATION_FAILED'
+    OUTBOUND_MESSAGE_ACKD = 'OUTBOUND_MESSAGE_ACKD'
+    OUTBOUND_MESSAGE_TRANSMISSION_FAILED = 'OUTBOUND_MESSAGE_TRANSMISSION_FAILED'
+    OUTBOUND_MESSAGE_NACKD = 'OUTBOUND_MESSAGE_NACKD'
+    INBOUND_RESPONSE_RECEIVED = 'INBOUND_RESPONSE_RECEIVED'
+    INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED = 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'
+    INBOUND_RESPONSE_FAILED = 'INBOUND_RESPONSE_FAILED'
 
 
 DATA_KEY = 'MESSAGE_KEY'
@@ -20,6 +29,7 @@ CREATED_TIMESTAMP = 'CREATED'
 LATEST_TIMESTAMP = 'LATEST_TIMESTAMP'
 DATA = 'DATA'
 STATUS = 'STATUS'
+WORKFLOW = 'WORKFLOW'
 
 
 class OutOfDateVersionError(RuntimeError):
@@ -30,11 +40,6 @@ class OutOfDateVersionError(RuntimeError):
 class EmptyWorkDescriptionError(RuntimeError):
     """Exception thrown when no work description is found for a given key"""
     pass
-
-
-def get_time():
-    """Returns UTC time in the appropriate format """
-    return datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f')
 
 
 async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> WorkDescription:
@@ -60,7 +65,9 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
 
 def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
                                 key: str,
-                                status: int) -> WorkDescription:
+                                status: MessageStatus,
+                                workflow: str
+                                ) -> WorkDescription:
     """
     Builds a new local work description instance given the details of the message, these details are held locally
     until a `publish` is executed
@@ -74,15 +81,19 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     if status is None:
         logger.error('007', 'Failed to build new work description, status should not be null')
         raise ValueError('Expected status to not be None')
+    if workflow is None:
+        logger.error('008', 'Failed to build new work description, workflow should not be null')
+        raise ValueError('Expected workflow to not be None')
 
-    timestamp = get_time()
+    timestamp = timing.get_time()
     work_description_map = {
         DATA_KEY: key,
         DATA: {
             CREATED_TIMESTAMP: timestamp,
             LATEST_TIMESTAMP: timestamp,
             STATUS: status,
-            VERSION_KEY: 1
+            VERSION_KEY: 1,
+            WORKFLOW: workflow
         }
     }
 
@@ -104,11 +115,12 @@ class WorkDescription:
         self.persistence_store = persistence_store
 
         data = store_data[DATA]
-        self.message_key = store_data[DATA_KEY]
-        self.version = data[VERSION_KEY]
-        self.created_timestamp = data[CREATED_TIMESTAMP]
-        self.last_modified_timestamp = data[LATEST_TIMESTAMP]
-        self.status = data[STATUS]
+        self.message_key: str = store_data[DATA_KEY]
+        self.version: int = data[VERSION_KEY]
+        self.created_timestamp: str = data[CREATED_TIMESTAMP]
+        self.last_modified_timestamp: str = data[LATEST_TIMESTAMP]
+        self.status: MessageStatus = data[STATUS]
+        self.workflow: str = data[WORKFLOW]
 
     async def publish(self):
         """
@@ -133,12 +145,21 @@ class WorkDescription:
 
         else:
             logger.info('015', 'No previous version found, continuing attempt to publish new version')
-        self.last_modified_timestamp = get_time()
+        self.last_modified_timestamp = timing.get_time()
         serialised = self._serialise_data()
 
         old_data = await self.persistence_store.add(self.message_key, serialised)
         logger.info('016', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
         return old_data
+
+    async def set_status(self, new_status: MessageStatus):
+        """
+        Helper method for setting the status and publishing to the state store
+
+        :param new_status: new status to set
+        """
+        self.status = new_status
+        await self.publish()
 
     def _serialise_data(self):
         """
@@ -151,7 +172,8 @@ class WorkDescription:
                 CREATED_TIMESTAMP: self.created_timestamp,
                 LATEST_TIMESTAMP: self.last_modified_timestamp,
                 VERSION_KEY: self.version,
-                STATUS: self.status
+                STATUS: self.status,
+                WORKFLOW: self.workflow
             }
         }
 

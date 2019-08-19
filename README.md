@@ -4,9 +4,9 @@ This repository contains adaptors which accelerate integration with national NHS
 
 These adaptors hide the complexity of integration with the interfaces provided by the current national systems by
 implementing an adaptor layer. The integrating supplier sees only a simplified and standardised set of interfaces which
-the adaptor layer presents. The adaptor layer is responsible for interacting with the legacy NHSD interface estate. 
+the adaptor layer presents. The adaptor layer is responsible for interacting with the legacy NHSD interface estate.
 
-In the diagram below, NHS Digital are providing the set of adaptors shown as the "Adaptor Layer". This list of adaptors shown here is only a representative sample of those planned. 
+In the diagram below, NHS Digital are providing the set of adaptors shown as the "Adaptor Layer". This list of adaptors shown here is only a representative sample of those planned.
 
 A supplier is therefore required only to implement a simplified set of standard clients to the adaptor layer, integrating with a simplified and standardised set of interfaces exposed by the Adaptor layer. This set of clients is shown in the "Interface Layer".
 
@@ -35,17 +35,16 @@ Each directory contains its own README.md file which provides more details.
 
 
 ## Running a development cluster
-It is possible to run a local development cluster including the MHS. The following steps describe the process: 
+It is possible to run a local development cluster including the MHS. The following steps describe the process:
 * Requirements: `Docker`, [`Packer`](https://www.packer.io/)
-* Run the `./build.sh` script found in the top level directory of this project. This will build the inbound and outbound  
+* Run the `./build.sh` script found in the top level directory of this project. This will build the inbound and outbound
     containers ready for running
 * Run `docker-compose build`. This will build all the additional containers
-* Run `docker-compose up`. This will start the inbound and outbound services, along with an instance of RabbitMQ and 
+* Run `docker-compose up`. This will start the inbound and outbound services, along with an instance of RabbitMQ and
     DynamoDb
 * Depending on the OS the MHS is being run on, measures may have to be taken to allow public inbound traffic so that
 the async responses from Spine can access the MHS. For example on windows a inbound rule was required in windows
 firewall to allow inbound traffic through port 443. In the AWS test environment an inbound rule was added
 in the security groups for machine the MHS was deployed to
-* Note that when running the MHS the environment variable `MHS_LOG_LEVEL` is required to be set to one of: `NOTSET`,
-`INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least. This 
-is currently set by default to `NOTSET` in the `docker-compose.yml` file but should be changed if needed.
+* Note that the `MHS_LOG_LEVEL` environment variable (as documented [here](mhs)) is set by default to `NOTSET` in the
+`docker-compose.yml` file but should be changed if needed.

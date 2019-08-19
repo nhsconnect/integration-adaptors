@@ -65,7 +65,8 @@ class EbxmlEnvelope(envelope.Envelope):
         """Produce a serialised representation of this ebXML message by populating a Mustache template with this
         object's properties.
 
-        :return: A tuple string containing the ID generated for message created and the message value.
+        :return: A tuple string containing the message ID, HTTP headers to be sent with the message and the message
+        itself.
         """
         ebxml_message_dictionary = copy.deepcopy(self.message_dictionary)
 

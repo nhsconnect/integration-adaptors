@@ -1,6 +1,6 @@
 """This module defines the outbound synchronous request handler component."""
 
-from typing import Dict
+from typing import Dict, Any
 
 import tornado.locks
 import tornado.web
@@ -8,8 +8,7 @@ import tornado.web
 
 import mhs_common.workflow as workflow
 from mhs_common.configuration import configuration_manager
-from utilities import integration_adaptors_logger as log, message_utilities
-
+from utilities import integration_adaptors_logger as log, message_utilities, timing
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
@@ -27,9 +26,10 @@ class SynchronousHandler(tornado.web.RequestHandler):
         self.workflows = workflows
         self.config_manager = config_manager
 
+    @timing.time_request
     async def post(self):
         message_id = self._extract_message_id()
-        self._extract_correlation_id()
+        correlation_id = self._extract_correlation_id()
 
         logger.info('0006', 'Outbound POST received. {Request}', {'Request': str(self.request)})
 
@@ -56,9 +56,13 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         reason=f"Couldn't determine workflow to invoke for interaction ID: "
                                                f"{interaction_id}") from e
 
-        status, response = await workflow.handle_outbound_message(message_id, interaction_details, body)
+        status, response = await workflow.handle_outbound_message(message_id, correlation_id, interaction_details, body)
 
         self._write_response(status, response)
+
+    def write_error(self, status_code: int, **kwargs: Any):
+        self.set_header('Content-Type', 'text/plain')
+        self.finish(f'{status_code}: {self._reason}')
 
     def _extract_message_id(self):
         message_id = self.request.headers.get('Message-Id', None)
@@ -82,6 +86,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         else:
             log.correlation_id.set(correlation_id)
             logger.info('0004', 'Found correlation id on incoming request.')
+        return correlation_id
 
     def _extract_interaction_id(self):
         try:
@@ -99,7 +104,11 @@ class SynchronousHandler(tornado.web.RequestHandler):
         """
         logger.info('0010', 'Returning response with {HttpStatus}', {'HttpStatus': status})
         self.set_status(status)
-        self.set_header("Content-Type", "text/xml")
+        if 400 <= status:
+            content_type = "text/plain"
+        else:
+            content_type = "text/xml"
+        self.set_header("Content-Type", content_type)
         self.write(message)
 
     def _get_interaction_details(self, interaction_name: str) -> dict:
