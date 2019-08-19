@@ -2,16 +2,17 @@ import os
 import pathlib
 import unittest.mock
 
+import mhs_common.workflow as workflow
 import tornado.testing
 import tornado.web
 import utilities.file_utilities as file_utilities
+import utilities.integration_adaptors_logger as log
 import utilities.message_utilities as message_utilities
 import utilities.test_utilities as test_utilities
 import utilities.xml_utilities as xml_utilities
 from mhs_common.state import work_description as wd
+
 import inbound.request.handler as handler
-import mhs_common.workflow as workflow
-import utilities.integration_adaptors_logger as log
 
 MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
@@ -30,7 +31,7 @@ state_data = [
             wd.VERSION_KEY: 0,
             wd.CREATED_TIMESTAMP: '11:59',
             wd.LATEST_TIMESTAMP: '12:00',
-            wd.STATUS: wd.MessageStatus.IN_OUTBOUND_WORKFLOW,
+            wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
             wd.WORKFLOW: workflow.ASYNC_EXPRESS
         }
     }
