@@ -3,13 +3,14 @@ from typing import Tuple
 
 import requests
 import utilities.integration_adaptors_logger as log
+from comms import queue_adaptor
 from comms import transmission_adaptor
 from utilities import timing
 
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor
-from mhs_common.workflow import common_asynchronous
 from mhs_common.state import work_description as wd
+from mhs_common.workflow import common_asynchronous
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -18,10 +19,12 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     """Handles the workflow for the asynchronous express messaging pattern."""
 
     def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
-                 transmission: transmission_adaptor.TransmissionAdaptor = None):
+                 transmission: transmission_adaptor.TransmissionAdaptor = None,
+                 queue_adaptor: queue_adaptor.QueueAdaptor = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key
+        self.queue_adaptor = queue_adaptor
 
     @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,

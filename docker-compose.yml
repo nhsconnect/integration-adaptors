@@ -7,6 +7,8 @@ services:
       - "443:443"
     environment:
       - MHS_LOG_LEVEL=NOTSET
+      - MHS_INBOUND_QUEUE_HOST=localhost:5672
+      - MHS_STATE_TABLE_NAME=mhs_state
   outbound:
     image: local/mhs-outbound
     ports:
