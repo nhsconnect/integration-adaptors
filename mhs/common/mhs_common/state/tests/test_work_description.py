@@ -1,5 +1,4 @@
 import copy
-import json
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -55,7 +54,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         await work_description.publish()
-        persistence.add.assert_called_with(input_data[wd.DATA_KEY], json.dumps(input_data))
+        persistence.add.assert_called_with(input_data[wd.DATA_KEY], input_data)
 
     @patch('utilities.timing.get_time')
     @async_test
@@ -69,7 +68,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         await work_description.publish()
-        persistence.add.assert_called_with(input_data[wd.DATA_KEY], json.dumps(input_data))
+        persistence.add.assert_called_with(input_data[wd.DATA_KEY], input_data)
 
     @async_test
     async def test_out_of_date_version(self):
@@ -114,7 +113,7 @@ class TestWorkDescription(unittest.TestCase):
 
         # Check local version updated
         self.assertEqual(work_description.version, 2)
-        persistence.add.assert_called_with('aaa-aaa-aaa', json.dumps(updated))
+        persistence.add.assert_called_with('aaa-aaa-aaa', updated)
 
     @patch('utilities.timing.get_time')
     @async_test
@@ -131,7 +130,7 @@ class TestWorkDescription(unittest.TestCase):
         new_data[wd.DATA][wd.STATUS] = wd.MessageStatus.OUTBOUND_MESSAGE_ACKD
 
         await work_description.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
-        persistence.add.assert_called_with(input_data[wd.DATA_KEY], json.dumps(new_data))
+        persistence.add.assert_called_with(input_data[wd.DATA_KEY], new_data)
 
     def test_null_persistence(self):
         with self.assertRaises(ValueError):

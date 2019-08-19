@@ -163,10 +163,10 @@ class WorkDescription:
 
     def _serialise_data(self):
         """
-        A simple serialization method that produces a json string from the local data which can be stored in the
+        A simple serialization method that produces an object from the local data which can be stored in the
         persistence store
         """
-        data = {
+        return {
             DATA_KEY: self.message_key,
             DATA: {
                 CREATED_TIMESTAMP: self.created_timestamp,
@@ -176,5 +176,3 @@ class WorkDescription:
                 WORKFLOW: self.workflow
             }
         }
-
-        return json.dumps(data)
