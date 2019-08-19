@@ -1,11 +1,6 @@
-
 from unittest import TestCase
 
 from integration_tests.helpers import interactions, methods
-
-# SUMMARY_UPLOAD_INTERACTION = 'gp_summary_upload'
-# TEMPLATE_JSON = 'hash16UK05'
-# TEST_NHS_NUMBER = '9446245796'
 
 
 class FunctionalTest(TestCase):

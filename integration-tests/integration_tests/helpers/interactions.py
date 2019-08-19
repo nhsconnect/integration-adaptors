@@ -34,8 +34,7 @@ def call_mhs(mhs_command, hl7payload, message_id=None):
     if message_id is not None:
         headers['Message-Id'] = message_id
 
-    response = requests.post(methods.get_mhs_hostname() + mhs_command, headers=headers, data=hl7payload)
-    # response = requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
+    response = requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
     return response.text
 
 
