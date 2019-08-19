@@ -52,12 +52,8 @@ def call_scr_adaptor(json_string):
     # return scr_adaptor_response.text
 
     # meanwhile, build an example response...
-    # TEMPLATE_XML = 'COPC_IN000001UK01'
-    # TEMPLATE_XML = 'QUPA_IN040000UK32'
-    # TEMPLATE_XML = 'QUPC_IN160101UK05'
-    # TEMPLATE_XML = 'REPC_IN150016UK05'
     scr_adaptor_response, message_id = build_message('REPC_IN150016UK05',
                                                      methods.get_asid(),
-                                                     '9446245796',
+                                                     '9689177869',
                                                      'json message test')
     return scr_adaptor_response
