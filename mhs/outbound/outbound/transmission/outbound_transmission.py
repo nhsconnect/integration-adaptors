@@ -1,6 +1,7 @@
 """This module defines the outbound transmission component."""
 
 from pathlib import Path
+from typing import Dict
 
 from comms import transmission_adaptor
 from tornado import httpclient
@@ -20,7 +21,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
 
     """A component that sends HTTP requests to a remote MHS."""
 
-    def __init__(self, certs_dir, client_cert, client_key, ca_certs, max_retries):
+    def __init__(self, certs_dir: str, client_cert: str, client_key: str, ca_certs: str, max_retries: int):
         """Create a new OutboundTransmission that loads certificates from the specified directory.
         :param certs_dir: A string containing the path to the directory to load certificates from.
         :param client_cert: A string containing the name of the client certificate file in the certs directory.
@@ -33,7 +34,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         self._ca_certs = str(Path(certs_dir) / ca_certs)
         self._max_retries = max_retries
 
-    async def make_request(self, interaction_details, message) -> httpclient.HTTPResponse:
+    async def make_request(self, interaction_details: Dict[str, str], message: str) -> httpclient.HTTPResponse:
         """Make a request for the specified interaction, containing the provided message. Raises an exception if a
         non-success HTTP status code is returned by the server.
 
@@ -48,19 +49,20 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
 
         request_method = OutboundTransmission._get_request_method(interaction_details)
 
-        logger.info("0001", "About to send message with {headers} to {url} : {message}",
-                    {"headers": headers, "url": url, "message": message})
 
         retries_remaining = self._max_retries
         while retries_remaining > 0:
             try:
+                logger.info("0001", "About to send message with {headers} to {url} : {message}",
+                            {"headers": headers, "url": url, "message": message})
                 response = await httpclient.AsyncHTTPClient().fetch(url,
                                                                     method=request_method,
                                                                     body=message,
                                                                     headers=headers,
                                                                     client_cert=self._client_cert,
                                                                     client_key=self._client_key,
-                                                                    ca_certs=self._ca_certs)
+                                                                    ca_certs=self._ca_certs,
+                                                                    validate_cert=True)
                 logger.info("0002", "Sent message with {headers} to {url} and received status code {code} : {message}",
                             {"headers": headers, "url": url, "message": message, "code": response.code})
                 return response
@@ -99,7 +101,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         return True
 
     @staticmethod
-    def _build_headers(interaction_details):
+    def _build_headers(interaction_details: Dict[str, str]):
         headers = {'type': interaction_details['type'],
                    'Content-Type': interaction_details['content_type'],
                    'charset': interaction_details['charset'],
@@ -108,7 +110,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         return headers
 
     @staticmethod
-    def _get_request_method(interaction_details):
+    def _get_request_method(interaction_details: Dict[str, str]):
         request_method = "POST"
 
         if interaction_details['request_type'] == "GET":

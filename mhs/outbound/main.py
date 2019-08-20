@@ -30,6 +30,7 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     assert party_key
     return party_key
 
+
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
                          persistence_store: persistence_adaptor.PersistenceAdaptor) \
         -> Dict[str, workflow.CommonWorkflow]:
@@ -71,12 +72,13 @@ def main():
     client_cert = "client.cert"
     client_key = "client.key"
     ca_certs = "client.pem"
-    max_retries = 3
+    max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     party_key = load_party_key(certs_dir)
     persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
 
-    transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs, max_retries)
+    transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
+                                                              max_retries)
     workflows = initialise_workflows(transmission, party_key, persistence_store)
 
     start_tornado_server(data_dir, workflows)
