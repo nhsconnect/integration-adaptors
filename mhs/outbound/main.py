@@ -16,8 +16,6 @@ import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
 from outbound.transmission import outbound_transmission
 
-from outbound.outbound.transmission import outbound_transmission
-
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
 
