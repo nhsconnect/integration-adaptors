@@ -13,6 +13,8 @@ class XmlMessageParser:
         :param message: The message to be parsed.
         :return: the parsed message.
         """
+        if message is None:
+            return None
 
         return et.fromstring(message)
 
