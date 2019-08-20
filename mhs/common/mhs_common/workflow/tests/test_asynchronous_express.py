@@ -8,6 +8,7 @@ from utilities import test_utilities
 from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_express as async_express
+from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
@@ -65,7 +66,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(202, status)
         self.assertEqual('', message)
         self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
-                                                                      MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+                                                                      MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                                                                      workflow.ASYNC_EXPRESS)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
