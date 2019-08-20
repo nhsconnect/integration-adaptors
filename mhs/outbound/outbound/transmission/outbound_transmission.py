@@ -48,7 +48,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
 
         request_method = OutboundTransmission._get_request_method(interaction_details)
 
-        logger.info("001", "About to send message with {headers} to {url} : {message}",
+        logger.info("0001", "About to send message with {headers} to {url} : {message}",
                     {"headers": headers, "url": url, "message": message})
 
         retries_remaining = self._max_retries
@@ -61,11 +61,13 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                                                     client_cert=self._client_cert,
                                                                     client_key=self._client_key,
                                                                     ca_certs=self._ca_certs)
+                logger.info("0002", "Sent message with {headers} to {url} and received status code {code} : {message}",
+                            {"headers": headers, "url": url, "message": message, "code": response.code})
                 return response
             except Exception as e:
                 if self._is_retriable(e):
                     retries_remaining -= 1
-                    logger.warning("002",
+                    logger.warning("0003",
                                    "A retriable error was encountered {exception} {retries_remaining} {max_retries}",
                                    {"exception": e,
                                     "retries_remaining": retries_remaining,
@@ -74,6 +76,9 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                 else:
                     raise e
 
+        logger.warning("0004",
+                       "A request has exceeded the maximum number of retries, {max_retries} retries",
+                       {"max_retries": self._max_retries})
         raise MaxRetriesExceeded("The max number of retries to make a request has been exceeded")
 
     def _is_tornado_network_error(self, e):
