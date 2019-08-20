@@ -14,6 +14,7 @@ TO_PARTY_ID = 'to_party_id'
 FILE_UPLOAD = 'file_upload'
 DISSENT_OVERRIDE = 'dissentOverride'
 USE_DATE_FILTER = 'useDateFilter'
+DOCUMENT_TYPE = 'documentType'
 
 
 def build_message(template, asid, patient_nhs_number, payload):
@@ -32,6 +33,7 @@ def build_message(template, asid, patient_nhs_number, payload):
     file_upload = 'test file will go here'
     dissentOverride = '0'
     useDateFilter = False
+    documentType = '196971000000103'
 
     message = message_builder.MustacheMessageBuilder(template).build_message({
         UUID: uuid,
@@ -42,7 +44,8 @@ def build_message(template, asid, patient_nhs_number, payload):
         TO_PARTY_ID: to_party_id,
         FILE_UPLOAD: file_upload,
         DISSENT_OVERRIDE: dissentOverride,
-        USE_DATE_FILTER: useDateFilter
+        USE_DATE_FILTER: useDateFilter,
+        DOCUMENT_TYPE: documentType
     })
 
     return message, uuid
