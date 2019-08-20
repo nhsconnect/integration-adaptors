@@ -1,6 +1,6 @@
 from pathlib import Path
 from unittest import TestCase
-from unittest.mock import patch, sentinel, Mock
+from unittest.mock import patch, sentinel
 
 import definitions
 from tornado import httpclient

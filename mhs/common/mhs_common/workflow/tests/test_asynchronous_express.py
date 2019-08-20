@@ -2,7 +2,7 @@ import asyncio
 import unittest
 from unittest import mock
 
-import requests
+from tornado import httpclient
 from utilities import test_utilities
 from utilities.test_utilities import async_test
 
@@ -39,7 +39,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     @async_test
     async def test_handle_outbound_message(self, log_mock):
         response = mock.MagicMock()
-        response.status_code = 202
+        response.code = 202
 
         self.setup_mock_work_description()
 
@@ -90,10 +90,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-        response = mock.MagicMock()
-        response.status_code = 409
         future = asyncio.Future()
-        future.set_exception(requests.exceptions.HTTPError(response=response))
+        future.set_exception(httpclient.HTTPClientError(code=409))
         self.mock_transmission_adaptor.make_request.return_value = future
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
@@ -136,7 +134,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
         response = mock.MagicMock()
-        response.status_code = 200
+        response.code = 200
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,

@@ -1,7 +1,8 @@
 """This module defines the outbound transmission component."""
 
-from comms import transmission_adaptor
 from pathlib import Path
+
+from comms import transmission_adaptor
 from tornado import httpclient
 from utilities import integration_adaptors_logger as log
 
@@ -32,13 +33,13 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         self._ca_certs = str(Path(certs_dir) / ca_certs)
         self._max_retries = max_retries
 
-    async def make_request(self, interaction_details, message):
+    async def make_request(self, interaction_details, message) -> httpclient.HTTPResponse:
         """Make a request for the specified interaction, containing the provided message. Raises an exception if a
         non-success HTTP status code is returned by the server.
 
         :param interaction_details: A dictionary containing details of the interaction this message is for.
         :param message: The message body to send.
-        :return: The content of the response returned by the remote end.
+        :return: The tornado HTTPResponse object that represents the reponse of the object
         """
 
         url = interaction_details['url']
@@ -70,7 +71,6 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                     "retries_remaining": retries_remaining,
                                     "max_retries": self._max_retries
                                     })
-                    continue
                 else:
                     raise e
 

@@ -1,15 +1,15 @@
 """This module defines the asynchronous express workflow."""
 from typing import Tuple
 
-import requests
 import utilities.integration_adaptors_logger as log
 from comms import transmission_adaptor
+from tornado import httpclient
 from utilities import timing
 
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor
-from mhs_common.workflow import common_asynchronous
 from mhs_common.state import work_description as wd
+from mhs_common.workflow import common_asynchronous
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -41,9 +41,9 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         try:
             response = await self.transmission.make_request(interaction_details, message)
             end_time = timing.get_time()
-        except requests.exceptions.HTTPError as e:
+        except httpclient.HTTPClientError as e:
             logger.warning('0005', 'Received HTTP error from Spine. {HTTPStatus} {Exception}',
-                           {'HTTPStatus': e.response.http_status, 'Exception': e})
+                           {'HTTPStatus': e.code, 'Exception': e})
             self._record_outbound_audit_log(timing.get_time(), start_time,
                                             wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
@@ -53,13 +53,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request'
 
-        if response.status_code == 202:
+        if response.code == 202:
             self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             return 202, ''
         else:
             logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
-                           {'HTTPStatus': response.status_code})
+                           {'HTTPStatus': response.code})
             self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             return 500, "Didn't get expected success response from Spine"
