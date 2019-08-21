@@ -14,6 +14,12 @@ services:
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_STATE_TABLE_NAME=mhs_state
+  spineroutelookup:
+    image: local/mhs-spineroutelookup
+    ports:
+      - "8443:443"
+    environment:
+      - MHS_LOG_LEVEL=NOTSET
   dynamodb:
     image: amazon/dynamodb-local
     ports:
