@@ -4,7 +4,7 @@ This package contains a pre-assured implementation of a Message Handling Service
 details of Spine messaging and provide a simple interface to allow HL7 messages to be sent to a remote MHS.
 
 ## Setup
-A `data/certs` directory should be created with the following files (containing the certificates & keys required to
+A `common/data/certs` directory should be created with the following files (containing the certificates & keys required to
 perform client authentication to the Spine instance you are using. For Openttest, these will have been provided when you
 were granted access):
 - `client.cert` - Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate,

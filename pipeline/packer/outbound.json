@@ -1,5 +1,5 @@
 {
-  "_description": "This packer file produces a inbound image and has the capability to publish to a given repository",
+  "_description": "This packer file produces an outbound image and has the capability to publish to a given repository",
   "variables": {
     "app_dir": "/usr/src/app",
     "common_dir": "common",
