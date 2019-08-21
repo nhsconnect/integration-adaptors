@@ -77,6 +77,7 @@ class FunctionalTest(TestCase):
 
     # Message Pattern Type: Asynchronous Reliable
     # Interaction: SCR-Adaptor using json template (json_hash16UK05), which forms GP Summary (REPC_IN150016UK05)
+    @skip('waiting for RT-12 - Implement MHS Async Reliable Message Pattern')
     def test_scr_adaptor(self):
         scr_json, uuid = methods.get_json('hash16UK05', 9689177869, 'json message test')
 
