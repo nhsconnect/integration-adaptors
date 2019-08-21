@@ -67,7 +67,7 @@ Several global variables must be set within Jenkins for the scripts to work as p
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
 - SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
-
+- SPINEROUTELOOKUP_SERVICE_PORT: The port the Spine Route Lookup service should listen on
 
 The Jenkins worker EC2 instance will have to have the following permission in order to publish the builds to 
 ECR and start the tasks in ECS with terraform:

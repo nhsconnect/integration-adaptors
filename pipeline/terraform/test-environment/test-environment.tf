@@ -117,6 +117,59 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
   execution_role_arn = var.task_execution_role
 }
 
+resource "aws_ecs_task_definition" "test-environment-mhs-spineroutelookup-task" {
+  family = "mhs-spineroutelookup-task-${var.build_id}"
+
+  volume {
+    name = "certs-volume"
+    host_path = "/home/ec2-user/certs"
+  }
+
+  container_definitions = jsonencode(
+  [
+    {
+      name = "spineroutelookup"
+      image = "${var.ecr_address}:spineroutelookup-${var.build_id}"
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group = "/ecs/spineroutelookup-test-environment"
+          awslogs-region = var.region
+          awslogs-stream-prefix = var.build_id
+        }
+      }
+
+      mountPoints = [{
+        sourceVolume = "certs-volume"
+        containerPath = "/usr/src/app/mhs/common/data/certs/"
+      }]
+
+      environment = [
+        {
+          name = "MHS_LOG_LEVEL"
+          value = var.mhs_log_level
+        }
+      ]
+
+      portMappings = [
+        {
+          containerPort = 443
+          hostPort = var.spineroutelookup_service_port
+          protocol = "tcp"
+        }
+      ]
+    }
+  ]
+  )
+  cpu = "128"
+  memory = "256"
+  requires_compatibilities = [
+    "EC2"
+  ]
+  execution_role_arn = var.task_execution_role
+}
+
 resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
   family = "scr-service-task-${var.build_id}"
 
@@ -172,6 +225,14 @@ resource "aws_ecs_service" "test-inbound-mhs-environment-service" {
   name = "${var.build_id}-inbound-service"
   cluster = var.cluster_id
   task_definition = aws_ecs_task_definition.test-environment-mhs-inbound-task.arn
+  desired_count = 1
+  launch_type = "EC2"
+}
+
+resource "aws_ecs_service" "test-spineroutelookup-mhs-environment-service" {
+  name = "${var.build_id}-spineroutelookup-service"
+  cluster = var.cluster_id
+  task_definition = aws_ecs_task_definition.test-environment-mhs-spineroutelookup-task.arn
   desired_count = 1
   launch_type = "EC2"
 }

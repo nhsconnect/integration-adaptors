@@ -60,7 +60,8 @@ pipeline {
                             -var mhs_log_level=DEBUG \
                             -var mhs_state_table_name=mhs-state \
                             -var scr_log_level=DEBUG \
-                            -var scr_service_port=${SCR_SERVICE_PORT}
+                            -var scr_service_port=${SCR_SERVICE_PORT} \
+                            -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT}
                         """
                 }
             }
@@ -118,7 +119,8 @@ pipeline {
                         -var mhs_log_level=DEBUG \
                         -var mhs_state_table_name=mhs-state \
                         -var scr_log_level=DEBUG \
-                        -var scr_service_port=${SCR_SERVICE_PORT}
+                        -var scr_service_port=${SCR_SERVICE_PORT} \
+                        -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT}
                      """
             }
         }

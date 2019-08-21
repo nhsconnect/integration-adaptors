@@ -40,4 +40,7 @@ variable "scr_service_port" {
   type = number
   description = "The port to be exposed for the scr web service"
 }
-
+variable "spineroutelookup_service_port" {
+  type = number
+  description = "The port to be exposed for the Spine Route Lookup service"
+}
