@@ -58,17 +58,19 @@ class TestOutboundTransmission(TestCase):
     @async_test
     async def test_make_request(self):
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
+            sentinel.result.code = 200
             mock_fetch.return_value = awaitable(sentinel.result)
 
             actual_response = await self.transmission.make_request(INTERACTION_DETAILS, MESSAGE)
 
-            mock_fetch.assert_called_with(URL_VALUE,
+            mock_fetch.assert_called_with(url=URL_VALUE,
                                           method="POST",
                                           body=MESSAGE,
                                           headers=self.expected_headers,
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
+                                          validate_cert=True
                                           )
 
             self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
@@ -84,6 +86,7 @@ class TestOutboundTransmission(TestCase):
     @async_test
     async def test_make_request_retriable(self):
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
+            sentinel.result.code = 200
             mock_fetch.side_effect = [httpclient.HTTPClientError(code=599), awaitable(sentinel.result)]
 
             actual_response = await self.transmission.make_request(INTERACTION_DETAILS, "")

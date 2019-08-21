@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict
 
 from comms import transmission_adaptor
+from comms.common_https import CommonHttps
 from tornado import httpclient
 from utilities import integration_adaptors_logger as log
 
@@ -49,20 +50,14 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
 
         request_method = OutboundTransmission._get_request_method(interaction_details)
 
-
         retries_remaining = self._max_retries
         while retries_remaining > 0:
             try:
                 logger.info("0001", "About to send message with {headers} to {url} : {message}",
                             {"headers": headers, "url": url, "message": message})
-                response = await httpclient.AsyncHTTPClient().fetch(url,
-                                                                    method=request_method,
-                                                                    body=message,
-                                                                    headers=headers,
-                                                                    client_cert=self._client_cert,
-                                                                    client_key=self._client_key,
-                                                                    ca_certs=self._ca_certs,
-                                                                    validate_cert=True)
+                response = await CommonHttps.make_request(url=url, method=request_method, headers=headers, body=message,
+                                                          client_cert=self._client_cert, client_key=self._client_key,
+                                                          ca_certs=self._ca_certs)
                 logger.info("0002", "Sent message with {headers} to {url} and received status code {code} : {message}",
                             {"headers": headers, "url": url, "message": message, "code": response.code})
                 return response
