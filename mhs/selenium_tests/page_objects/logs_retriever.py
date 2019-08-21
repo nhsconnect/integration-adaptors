@@ -1,7 +1,7 @@
 import enum
 import os
 from operator import itemgetter
-from typing import List, Generator
+from typing import List, Generator, AnyStr
 
 import boto3
 
@@ -28,6 +28,10 @@ def get_logs(component: Component) -> Generator:
     if os.environ.get("MHS_ADDRESS", "localhost") == "localhost":
         return _get_logs_from_file(component)
     return _get_logs_from_aws_cloud_watch(component)
+
+
+def get_logs_as_list(component: Component) -> List[AnyStr]:
+    return list(get_logs(component))
 
 
 def _get_logs_from_file(component: Component) -> Generator:
@@ -78,8 +82,3 @@ def _get_logs_from_aws_cloud_watch(component: Component) -> Generator:
 
         if next_token is None:
             break
-
-
-if __name__ == '__main__':
-    for i in get_logs(Component.MHS):
-        print(i)
