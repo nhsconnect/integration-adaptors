@@ -102,6 +102,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
             await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
             raise e
-        else:
-            logger.info('0011', 'Placed message onto inbound queue successfully')
-            await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+
+        logger.info('0011', 'Placed message onto inbound queue successfully')
+        await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
