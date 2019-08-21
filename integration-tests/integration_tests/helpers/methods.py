@@ -38,8 +38,6 @@ def get_mhs_hostname():
 
 
 def get_scr_adaptor_hostname():
-<<<<<<< HEAD
-=======
     """
     Looks up the scr adaptor hostname from the environment settings
     :return: the scr adaptor hostname
@@ -47,19 +45,6 @@ def get_scr_adaptor_hostname():
     The scr adaptor hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'localhost'
     """
-    return "http://" + os.environ.get('SCR_ADAPTOR_ADDRESS', 'localhost') + "/"
-
-
-def get_interaction_from_template(interaction_name, template, nhs_number, payload, pass_message_id=False):
->>>>>>> minor refactoring
-    """
-    Looks up the scr adaptor hostname from the environment settings
-    :return: the scr adaptor hostname
-
-    The scr adaptor hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
-        if this is not set, it will default to 'localhost'
-    """
-<<<<<<< HEAD
     return "http://" + os.environ.get('SCR_ADAPTOR_ADDRESS', 'localhost') + "/"
 
 
@@ -75,12 +60,6 @@ def get_interaction_from_template(interaction_name, nhs_number, payload, pass_me
                                         pass_message_id=pass_message_id)
 
 
-=======
-    return interactions.process_request(interaction_name, template, get_asid(), nhs_number, payload,
-                                        pass_message_id=pass_message_id)
-
-
->>>>>>> minor refactoring
 def get_json(template, patient_nhs_number, payload):
     """
     renders the template
