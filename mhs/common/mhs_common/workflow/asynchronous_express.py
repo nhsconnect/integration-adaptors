@@ -91,11 +91,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         return None, message
 
     @timing.time_function
-    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
+                                     payload: str):
         logger.info('0009', 'Entered async express workflow to handle inbound message')
         await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
         try:
-            await self.queue_adaptor.send_async(payload)
+            await self.queue_adaptor.send_async(payload, properties={'message-id': message_id,
+                                                                     'correlation-id': correlation_id})
         except Exception as e:
             logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
             await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)

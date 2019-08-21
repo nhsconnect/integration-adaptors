@@ -169,9 +169,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_inbound_message(self.mock_work_description, PAYLOAD)
+        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
 
-        self.mock_queue_adaptor.send_async.assert_called_once_with(PAYLOAD)
+        self.mock_queue_adaptor.send_async.assert_called_once_with(PAYLOAD, properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_status.call_args_list)
@@ -184,7 +184,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.return_value = future
 
         with self.assertRaises(proton_queue_adaptor.MessageSendingError):
-            await self.workflow.handle_inbound_message(self.mock_work_description, PAYLOAD)
+            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
 
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],

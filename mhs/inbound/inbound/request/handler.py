@@ -46,7 +46,7 @@ class InboundHandler(tornado.web.RequestHandler):
                                         reason=f'Exception during inbound message parsing {e}') from e
 
         ref_to_message_id = self.extract_ref_message(request_message)
-        self._extract_correlation_id(request_message)
+        correlation_id = self._extract_correlation_id(request_message)
         self._extract_message_id(request_message)
 
         try:
@@ -63,7 +63,8 @@ class InboundHandler(tornado.web.RequestHandler):
                     {'workflow': message_workflow})
         received_message = request_message.message_dictionary[ebxml_request_envelope.MESSAGE]
         try:
-            await message_workflow.handle_inbound_message(work_description, received_message)
+            await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
+                                                          received_message)
             self._send_ack(request_message)
         except Exception as e:
             logger.error('005', 'Exception in workflow {exception}', {'exception': e})
@@ -95,6 +96,7 @@ class InboundHandler(tornado.web.RequestHandler):
         correlation_id = message.message_dictionary[ebxml_envelope.CONVERSATION_ID]
         log.correlation_id.set(correlation_id)
         logger.info('007', 'Set correlation id from inbound request.')
+        return correlation_id
 
     def _extract_message_id(self, message):
         """
