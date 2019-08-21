@@ -7,6 +7,7 @@ verify_ssl = true
 coverage = "~=4.5"
 tornado = "*"
 unittest-xml-reporting = "~=2.5"
+boto3 = "*"
 
 [packages]
 defusedxml = "~=0.6"
