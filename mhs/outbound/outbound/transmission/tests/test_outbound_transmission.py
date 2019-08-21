@@ -1,3 +1,4 @@
+import ssl
 from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch, sentinel
@@ -63,7 +64,7 @@ class TestOutboundTransmission(TestCase):
 
             actual_response = await self.transmission.make_request(INTERACTION_DETAILS, MESSAGE)
 
-            mock_fetch.assert_called_with(url=URL_VALUE,
+            mock_fetch.assert_called_with(URL_VALUE,
                                           method="POST",
                                           body=MESSAGE,
                                           headers=self.expected_headers,
@@ -77,11 +78,17 @@ class TestOutboundTransmission(TestCase):
 
     @async_test
     async def test_make_request_non_retriable(self):
-        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
-            mock_fetch.side_effect = httpclient.HTTPClientError(code=400)
+        errors_and_expected = [("HTTPClientError 400", httpclient.HTTPClientError(code=400), httpclient.HTTPClientError),
+                               ("SSLCertVerificationError", ssl.SSLCertVerificationError(), ssl.SSLCertVerificationError),
+                               ("SSLError", ssl.SSLError, ssl.SSLError)
+                               ]
+        for description, error, expected_result in errors_and_expected:
+            with self.subTest(description):
+                with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
+                    mock_fetch.side_effect = error
 
-            with self.assertRaises(httpclient.HTTPClientError):
-                await self.transmission.make_request(INTERACTION_DETAILS, "")
+                    with self.assertRaises(expected_result):
+                        await self.transmission.make_request(INTERACTION_DETAILS, "")
 
     @async_test
     async def test_make_request_retriable(self):

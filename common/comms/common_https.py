@@ -1,6 +1,8 @@
 from typing import Dict
-from utilities import integration_adaptors_logger as log
+
 from tornado import httpclient
+
+from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger("COMMON_HTTPS")
 
@@ -12,7 +14,7 @@ class CommonHttps:
                      client_key: str = None, ca_certs: str = None):
         logger.info("0001", "About to send {method} request with {headers} to {url} : {body}",
                     {"method": method, "headers": headers, "url": url, "body": body})
-        response = await httpclient.AsyncHTTPClient().fetch(url=url,
+        response = await httpclient.AsyncHTTPClient().fetch(url,
                                                             method=method,
                                                             body=body,
                                                             headers=headers,

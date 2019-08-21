@@ -1,8 +1,10 @@
 from unittest import TestCase
-from unittest.mock import patch, sentinel, Mock
-from utilities.test_utilities import async_test, awaitable
+from unittest.mock import patch, Mock
+
 from tornado import httpclient
+
 from comms.common_https import CommonHttps
+from utilities.test_utilities import async_test, awaitable
 
 URL = "ABC.ABC"
 METHOD = "GET"
@@ -25,7 +27,7 @@ class TestCommonHttps(TestCase):
                                                              client_cert=CLIENT_CERT, client_key=CLIENT_KEY,
                                                              ca_certs=CA_CERTS)
 
-            mock_fetch.assert_called_with(url=URL,
+            mock_fetch.assert_called_with(URL,
                                           method=METHOD,
                                           body=BODY,
                                           headers=HEADERS,
@@ -44,7 +46,7 @@ class TestCommonHttps(TestCase):
 
             actual_response = await CommonHttps.make_request(url=URL, method=METHOD, headers=HEADERS, body=BODY)
 
-            mock_fetch.assert_called_with(url=URL,
+            mock_fetch.assert_called_with(URL,
                                           method=METHOD,
                                           body=BODY,
                                           headers=HEADERS,

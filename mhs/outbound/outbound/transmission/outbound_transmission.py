@@ -1,6 +1,7 @@
 """This module defines the outbound transmission component."""
 
 from pathlib import Path
+from ssl import SSLError
 from typing import Dict
 
 from comms import transmission_adaptor
@@ -17,7 +18,8 @@ class MaxRetriesExceeded(Exception):
 
 class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
     errors_not_to_retry = [
-        httpclient.HTTPClientError
+        httpclient.HTTPClientError,
+        SSLError
     ]
 
     """A component that sends HTTP requests to a remote MHS."""
