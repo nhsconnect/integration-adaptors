@@ -13,6 +13,8 @@ root CA Certificate.
 - `client.pem` - A copy of client.cert
 - `party_key.txt` - The party key associated with your MHS build
 
+The certs path and each files name should also be refrenced in the main method of mhs/outbound/main.py.
+
 If you are using Opentest, each of these credentials will have been provided when you were granted access.
 
 Finally, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/) installed and on your path, then from this
@@ -35,6 +37,7 @@ MHS is made up of multiple components, and running them all separately can be te
 MHS takes a number of environment variables when it is run. These are:
 * `MHS_LOG_LEVEL` This is required to be set to one of: `NOTSET`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least.
 * `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
+* `MHS_OUTBOUND_TRANSMISSION_MAX_RETRIES` This is the maximum number of retries for outbound requests. If no value is given a default of 3 is used.
 
 ## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.

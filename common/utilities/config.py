@@ -39,5 +39,6 @@ def get_config(key: str, default: str = None) -> str:
     elif default is not None:
         return default
     else:
+        # Can't use IntegrationAdaptorsLogger due to circular dependency
         logging.exception(f'Failed to get config ConfigName:"{key}" ProcessKey=CONFIG001')
         raise KeyError
