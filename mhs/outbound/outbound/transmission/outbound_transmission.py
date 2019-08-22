@@ -38,14 +38,6 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         self._max_retries = max_retries
 
     async def make_request(self, url: str, headers: Dict[str, str], message: str) -> httpclient.HTTPResponse:
-        """Make a request for the specified interaction, containing the provided message. Raises an exception if a
-        non-success HTTP status code is returned by the server.
-
-        :param url: A string containing the url to send the request to.
-        :param headers: A dictionary for the HTTP headers.
-        :param message: The message body to send.
-        :return: The tornado HTTPResponse object that represents the reponse of the object
-        """
 
         request_method = "POST"
 

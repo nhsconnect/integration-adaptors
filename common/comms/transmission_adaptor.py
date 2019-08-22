@@ -1,10 +1,19 @@
 import abc
+from typing import Dict
+
+from tornado import httpclient
 
 
 class TransmissionAdaptor(abc.ABC):
 
     @abc.abstractmethod
-    async def make_request(self,  interaction_details, message):
-        """Given a set of interaction details and a message, the message is propagated to the appropriate
-        endpoint along with the necessary headers"""
+    async def make_request(self, url: str, headers: Dict[str, str], message: str) -> httpclient.HTTPResponse:
+        """Make a POST request to the given url, containing the provided message and HTTP headers. Raises an
+        exception if a non-success HTTP status code is returned by the server.
+
+        :param url: A string containing the url to send the request to.
+        :param headers: A dictionary for the HTTP headers.
+        :param message: The message body to send.
+        :return: The tornado HTTPResponse object that represents the response of the object
+        """
         pass
