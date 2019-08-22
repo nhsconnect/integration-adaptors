@@ -1,12 +1,8 @@
 import datetime
 
-from definitions import ROOT_DIR
-from pathlib import Path
 from selenium_tests.page_objects import methods, logs_retriever
 from unittest import TestCase
 
-# temp location/file to prove the tes works
-# todo - extract the log file from Amazon CloudWatch
 LOG_DIR = "selenium_tests/data"
 LOG_FILENAME = "test.txt"
 
