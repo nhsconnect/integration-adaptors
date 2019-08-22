@@ -45,7 +45,8 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
 
     def send_sync(self, message: str, properties: Dict[str, Any] = None) -> None:
         logger.info('009', 'Sending message synchronously.')
-        self.__send(self.__construct_message(message, properties=properties))
+        payload = self.__construct_message(message, properties=properties)
+        self.__send(payload)
 
     @staticmethod
     def __construct_message(message: str, properties: Dict[str, Any] = None) -> proton.Message:
