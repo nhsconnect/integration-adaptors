@@ -31,16 +31,15 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     return party_key
 
 
-def initialise_workflows(certs_dir: pathlib.Path, party_key: str,
+def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
                          persistence_store: persistence_adaptor.PersistenceAdaptor) \
         -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
-    :param certs_dir: The directory containing certificates/keys to be used to identify this MHS to a remote MHS.
+    :param transmission: The transmission object to be used to make requests to the spine endpoints
     :param party_key: The party key to use to identify this MHS.
     :param persistence_store: The persistence adaptor for the state database
     :return: The workflows that can be used to handle messages.
     """
-    transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
 
     return workflow.get_workflow_map(party_key, persistence_store, transmission)
 
@@ -70,11 +69,17 @@ def main():
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
+    client_cert = "client.cert"
+    client_key = "client.key"
+    ca_certs = "client.pem"
+    max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     party_key = load_party_key(certs_dir)
     persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
 
-    workflows = initialise_workflows(certs_dir, party_key, persistence_store)
+    transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
+                                                              max_retries)
+    workflows = initialise_workflows(transmission, party_key, persistence_store)
 
     start_tornado_server(data_dir, workflows)
 
