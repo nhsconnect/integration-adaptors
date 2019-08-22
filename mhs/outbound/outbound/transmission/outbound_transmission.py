@@ -4,9 +4,10 @@ from pathlib import Path
 from ssl import SSLError
 from typing import Dict
 
-from comms import transmission_adaptor
-from comms.common_https import CommonHttps
+from mhs_common.transmission import transmission_adaptor
 from tornado import httpclient
+
+from comms.common_https import CommonHttps
 from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger("OUTBOUND_TRANSMISSION")

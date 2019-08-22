@@ -3,7 +3,6 @@ from typing import Tuple
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
-from comms import transmission_adaptor
 from tornado import httpclient
 from utilities import timing
 
@@ -11,6 +10,7 @@ from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
+from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')

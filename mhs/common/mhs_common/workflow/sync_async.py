@@ -3,12 +3,12 @@
 import copy
 from typing import Tuple, Dict
 
-from comms import transmission_adaptor as ta
 from utilities import integration_adaptors_logger as log, message_utilities
 
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 from mhs_common.state import work_description as wd
+from mhs_common.transmission import transmission_adaptor as ta
 from mhs_common.workflow import common_synchronous
 
 logger = log.IntegrationAdaptorsLogger('MHS_SYNC_ASYNC_WORKFLOW')
