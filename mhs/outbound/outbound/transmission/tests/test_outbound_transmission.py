@@ -97,7 +97,8 @@ class TestOutboundTransmission(TestCase):
 
             with self.assertRaises(outbound_transmission.MaxRetriesExceeded):
                 await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
-                self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
+
+            self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
 
     def test_is_tornado_network_error(self):
         errors_and_expected = [("not HTTPClientError", ValueError(), False),
