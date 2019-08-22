@@ -1,17 +1,17 @@
 """This module defines the asynchronous express workflow."""
 from typing import Tuple
 
-import requests
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from comms import transmission_adaptor
+from tornado import httpclient
 from utilities import timing
 
+from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.workflow import common_asynchronous
-from mhs_common import workflow
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -35,7 +35,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                            wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED, workflow.ASYNC_EXPRESS)
         await wdo.publish()
 
-        error, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
+        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
                                                                 payload, wdo)
         if error:
             return error
@@ -43,11 +43,12 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         logger.info('0004', 'About to make outbound request')
         start_time = timing.get_time()
         try:
-            response = await self.transmission.make_request(interaction_details, message)
+            url = interaction_details['url']
+            response = await self.transmission.make_request(url, http_headers, message)
             end_time = timing.get_time()
-        except requests.exceptions.HTTPError as e:
+        except httpclient.HTTPClientError as e:
             logger.warning('0005', 'Received HTTP error from Spine. {HTTPStatus} {Exception}',
-                           {'HTTPStatus': e.response.http_status, 'Exception': e})
+                           {'HTTPStatus': e.code, 'Exception': e})
             self._record_outbound_audit_log(timing.get_time(), start_time,
                                             wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
@@ -57,13 +58,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request'
 
-        if response.status_code == 202:
+        if response.code == 202:
             self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             return 202, ''
         else:
             logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
-                           {'HTTPStatus': response.status_code})
+                           {'HTTPStatus': response.code})
             self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             return 500, "Didn't get expected success response from Spine"
@@ -84,11 +85,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         except Exception as e:
             logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
-            return (500, 'Error serialising outbound message'), None
+            return (500, 'Error serialising outbound message'), None, None
 
         logger.info('0003', 'Message serialised successfully')
         await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
-        return None, message
+        return None, http_headers, message
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,

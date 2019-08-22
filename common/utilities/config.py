@@ -25,16 +25,20 @@ def setup_config(component_name: str):
             config[k[len(prefix):]] = v
 
 
-def get_config(key: str) -> str:
+def get_config(key: str, default: str = None) -> str:
     """
     Get config variable or error out (and log the error)
 
     :param key: key to lookup
+    :param default: default value to return if none is found
     :return: the config variable
     """
-    try:
+
+    if key in config:
         return config[key]
-    except KeyError as e:
+    elif default is not None:
+        return default
+    else:
         # Can't use IntegrationAdaptorsLogger due to circular dependency
         logging.exception(f'Failed to get config ConfigName:"{key}" ProcessKey=CONFIG001')
-        raise e
+        raise KeyError
