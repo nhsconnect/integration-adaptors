@@ -37,20 +37,17 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         self._ca_certs = str(Path(certs_dir) / ca_certs)
         self._max_retries = max_retries
 
-    async def make_request(self, interaction_details: Dict[str, str], message: str) -> httpclient.HTTPResponse:
+    async def make_request(self, url: str, headers: Dict[str, str], message: str) -> httpclient.HTTPResponse:
         """Make a request for the specified interaction, containing the provided message. Raises an exception if a
         non-success HTTP status code is returned by the server.
 
-        :param interaction_details: A dictionary containing details of the interaction this message is for.
+        :param url: A string containing the url to send the request to.
+        :param headers: A dictionary containing details of the interaction this message is for.
         :param message: The message body to send.
         :return: The tornado HTTPResponse object that represents the reponse of the object
         """
 
-        url = interaction_details['url']
-
-        headers = OutboundTransmission._build_headers(interaction_details)
-
-        request_method = OutboundTransmission._get_request_method(interaction_details)
+        request_method = "POST"
 
         retries_remaining = self._max_retries
         while retries_remaining > 0:
@@ -60,20 +57,20 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                 response = await CommonHttps.make_request(url=url, method=request_method, headers=headers, body=message,
                                                           client_cert=self._client_cert, client_key=self._client_key,
                                                           ca_certs=self._ca_certs)
-                logger.info("0002", "Sent message with {headers} to {url} and received status code {code} : {message}",
+                logger.info("0002", "Sent message: {message}, with {headers} to {url} and received status code {code}",
                             {"headers": headers, "url": url, "message": message, "code": response.code})
                 return response
             except Exception as e:
-                if self._is_retriable(e):
-                    retries_remaining -= 1
-                    logger.warning("0003",
-                                   "A retriable error was encountered {exception} {retries_remaining} {max_retries}",
-                                   {"exception": e,
-                                    "retries_remaining": retries_remaining,
-                                    "max_retries": self._max_retries
-                                    })
-                else:
+                if not self._is_retriable(e):
                     raise e
+
+                retries_remaining -= 1
+                logger.warning("0003",
+                               "A retriable error was encountered {exception} {retries_remaining} {max_retries}",
+                               {"exception": e,
+                                "retries_remaining": retries_remaining,
+                                "max_retries": self._max_retries
+                                })
 
         logger.warning("0004",
                        "A request has exceeded the maximum number of retries, {max_retries} retries",
@@ -96,21 +93,3 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                 return False
 
         return True
-
-    @staticmethod
-    def _build_headers(interaction_details: Dict[str, str]):
-        headers = {'type': interaction_details['type'],
-                   'Content-Type': interaction_details['content_type'],
-                   'charset': interaction_details['charset'],
-                   'SOAPAction': interaction_details['soap_action'],
-                   'start': interaction_details['start']}
-        return headers
-
-    @staticmethod
-    def _get_request_method(interaction_details: Dict[str, str]):
-        request_method = "POST"
-
-        if interaction_details['request_type'] == "GET":
-            request_method = "GET"
-
-        return request_method

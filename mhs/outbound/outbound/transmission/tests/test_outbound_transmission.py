@@ -22,14 +22,12 @@ SOAP_ACTION_VALUE = "SOAP_ACTION"
 START_VALUE = "START"
 START_NAME = "start"
 REQUEST_TYPE_NAME = "request_type"
-INTERACTION_DETAILS = {
-    URL_NAME: URL_VALUE,
-    TYPE_NAME: TYPE_VALUE,
-    CONTENT_TYPE_NAME: CONTENT_TYPE_VALUE,
-    CHARSET_NAME: CHARSET_VALUE,
-    SOAP_ACTION_NAME: SOAP_ACTION_VALUE,
-    START_NAME: START_VALUE,
-    REQUEST_TYPE_NAME: "POST"
+HEADERS = {
+    "type": TYPE_VALUE,
+    "Content-Type": CONTENT_TYPE_VALUE,
+    "charset": CHARSET_VALUE,
+    "SOAPAction": SOAP_ACTION_VALUE,
+    'start': START_VALUE
 }
 MESSAGE = "message"
 
@@ -44,14 +42,6 @@ MAX_RETRIES = 3
 
 
 class TestOutboundTransmission(TestCase):
-    expected_headers = {
-        "type": TYPE_VALUE,
-        "Content-Type": CONTENT_TYPE_VALUE,
-        "charset": CHARSET_VALUE,
-        "SOAPAction": SOAP_ACTION_VALUE,
-        'start': START_VALUE
-    }
-
     def setUp(self):
         self.transmission = outbound_transmission.OutboundTransmission(CERTS_DIR, CLIENT_CERT, CLIENT_KEY, CA_CERTS,
                                                                        MAX_RETRIES)
@@ -62,12 +52,12 @@ class TestOutboundTransmission(TestCase):
             sentinel.result.code = 200
             mock_fetch.return_value = awaitable(sentinel.result)
 
-            actual_response = await self.transmission.make_request(INTERACTION_DETAILS, MESSAGE)
+            actual_response = await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
 
             mock_fetch.assert_called_with(URL_VALUE,
                                           method="POST",
                                           body=MESSAGE,
-                                          headers=self.expected_headers,
+                                          headers=HEADERS,
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
@@ -88,7 +78,7 @@ class TestOutboundTransmission(TestCase):
                     mock_fetch.side_effect = error
 
                     with self.assertRaises(expected_result):
-                        await self.transmission.make_request(INTERACTION_DETAILS, "")
+                        await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
 
     @async_test
     async def test_make_request_retriable(self):
@@ -96,7 +86,7 @@ class TestOutboundTransmission(TestCase):
             sentinel.result.code = 200
             mock_fetch.side_effect = [httpclient.HTTPClientError(code=599), awaitable(sentinel.result)]
 
-            actual_response = await self.transmission.make_request(INTERACTION_DETAILS, "")
+            actual_response = await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
 
             self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
 
@@ -106,9 +96,8 @@ class TestOutboundTransmission(TestCase):
             mock_fetch.side_effect = httpclient.HTTPClientError(code=599)
 
             with self.assertRaises(outbound_transmission.MaxRetriesExceeded):
-                await self.transmission.make_request(INTERACTION_DETAILS, "")
+                await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
                 self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
-
 
     def test_is_tornado_network_error(self):
         errors_and_expected = [("not HTTPClientError", ValueError(), False),
@@ -132,27 +121,3 @@ class TestOutboundTransmission(TestCase):
                 result = self.transmission._is_retriable(error)
 
                 self.assertEqual(result, expected_result)
-
-    def test_build_headers(self):
-        actual_headers = outbound_transmission.OutboundTransmission._build_headers({
-            TYPE_NAME: TYPE_VALUE,
-            CONTENT_TYPE_NAME: CONTENT_TYPE_VALUE,
-            CHARSET_NAME: CHARSET_VALUE,
-            SOAP_ACTION_NAME: SOAP_ACTION_VALUE,
-            START_NAME: START_VALUE
-        })
-
-        self.assertEqual(self.expected_headers, actual_headers, "Headers produced should match the expected set.")
-
-    def test_get_request_method(self):
-        supported_http_methods = {"GET": "GET", "OTHER": "POST"}
-
-        for http_method in supported_http_methods:
-            with self.subTest(http_method=http_method):
-                expected_request_method = supported_http_methods[http_method]
-
-                actual_request_method = outbound_transmission.OutboundTransmission._get_request_method(
-                    {"request_type": http_method})
-
-                self.assertEqual(expected_request_method, actual_request_method,
-                                 "Request method returned should match expected one.")

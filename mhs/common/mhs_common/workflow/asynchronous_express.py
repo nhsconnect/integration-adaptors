@@ -32,7 +32,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                            wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED, workflow.ASYNC_EXPRESS)
         await wdo.publish()
 
-        error, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
+        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
                                                                 payload, wdo)
         if error:
             return error
@@ -40,7 +40,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         logger.info('0004', 'About to make outbound request')
         start_time = timing.get_time()
         try:
-            response = await self.transmission.make_request(interaction_details, message)
+            url = interaction_details['url']
+            response = await self.transmission.make_request(url, http_headers, message)
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
             logger.warning('0005', 'Received HTTP error from Spine. {HTTPStatus} {Exception}',
@@ -81,11 +82,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         except Exception as e:
             logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
-            return (500, 'Error serialising outbound message'), None
+            return (500, 'Error serialising outbound message'), None, None
 
         logger.info('0003', 'Message serialised successfully')
         await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
-        return None, message
+        return None, http_headers, message
 
     async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
         pass
