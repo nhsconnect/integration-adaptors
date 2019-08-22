@@ -10,6 +10,7 @@ from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor
 from mhs_common.workflow import common_asynchronous
 from mhs_common.state import work_description as wd
+from mhs_common import workflow
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -28,7 +29,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                       payload: str) -> Tuple[int, str]:
         logger.info('0001', 'Entered async express workflow to handle outbound message')
         wdo = wd.create_new_work_description(self.persistence_store, message_id,
-                                                           wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+                                                           wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED, workflow.ASYNC_EXPRESS)
         await wdo.publish()
 
         error, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,

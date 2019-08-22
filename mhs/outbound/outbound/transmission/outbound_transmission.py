@@ -45,7 +45,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         # Raise an error if a 4xx or 5xx HTTP status was returned.
         response.raise_for_status()
 
-        return response.content
+        return response
 
     @staticmethod
     def _build_headers(interaction_details):
