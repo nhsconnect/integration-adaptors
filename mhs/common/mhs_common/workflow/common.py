@@ -28,7 +28,7 @@ class CommonWorkflow(abc.ABC):
         """
         Handles an inbound message from an external system (typically from spine)
 
-        :param message_id: ID of the message
+        :param message_id: ID of the message the original request to Spine was made with
         :param correlation_id: correlation ID of the request
         :param work_description: work description object for the payload
         :param payload: payload to handle
