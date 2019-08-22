@@ -42,7 +42,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         non-success HTTP status code is returned by the server.
 
         :param url: A string containing the url to send the request to.
-        :param headers: A dictionary containing details of the interaction this message is for.
+        :param headers: A dictionary for the HTTP headers.
         :param message: The message body to send.
         :return: The tornado HTTPResponse object that represents the reponse of the object
         """

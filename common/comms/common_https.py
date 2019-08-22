@@ -33,6 +33,6 @@ class CommonHttps:
                                                             ca_certs=ca_certs,
                                                             validate_cert=True)
         logger.info("0002",
-                    "Sent {method} request with {headers} to {url} with body: {body}, and received status code {code}",
+                    "Sent {method} request with {headers} to {url} with {body}, and received status code {code}",
                     {"method": method, "headers": headers, "url": url, "body": body, "code": response.code})
         return response
