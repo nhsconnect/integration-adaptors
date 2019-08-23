@@ -49,7 +49,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('011', 'Adding {record} for {key}', {'record': data, 'key': key})
         try:
-            async with self.__create_dynamo_table() as table:
+            async with self.__get_dynamo_table() as table:
                 response = await table.put_item(
                     Item={'key': key, 'data': json.dumps(data)},
                     ReturnValues='ALL_OLD'
@@ -70,7 +70,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('002', 'Getting record for {key}', {'key': key})
         try:
-            async with self.__create_dynamo_table() as table:
+            async with self.__get_dynamo_table() as table:
                 response = await table.get_item(
                     Key={'key': key}
                 )
@@ -91,7 +91,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('006', 'Deleting record for {key}', {'key': key})
         try:
-            async with self.__create_dynamo_table() as table:
+            async with self.__get_dynamo_table() as table:
                 response = await table.delete_item(
                     Key={'key': key},
                     ReturnValues='ALL_OLD'
@@ -106,7 +106,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
             raise RecordDeletionError from e
 
     @contextlib.asynccontextmanager
-    async def __create_dynamo_table(self):
+    async def __get_dynamo_table(self):
         """
         Creates a connection to the table referenced by this instance.
         :return: The table to be used by this instance.
