@@ -5,7 +5,10 @@ import traceback
 
 import aioboto3
 import utilities.integration_adaptors_logger as log
+from utilities import config
+
 from mhs_common.state import persistence_adaptor
+
 logger = log.IntegrationAdaptorsLogger('DYNAMO_PERSISTENCE')
 
 
@@ -108,6 +111,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         Creates a connection to the table referenced by this instance.
         :return: The table to be used by this instance.
         """
-        async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
+        async with aioboto3.resource('dynamodb', region_name='eu-west-2',
+                                     endpoint_url=config.get_config('DYNAMODB_ENDPOINT_URL', None)) as dynamo_resource:
             logger.info('010', 'Establishing connection to {table_name}', {'table_name': self.table_name})
             yield dynamo_resource.Table(self.table_name)

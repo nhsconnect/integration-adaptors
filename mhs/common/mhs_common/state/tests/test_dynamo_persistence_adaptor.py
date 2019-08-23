@@ -4,9 +4,11 @@ import contextlib
 import functools
 import json
 import unittest.mock
-from utilities import test_utilities
-import mhs_common.state.dynamo_persistence_adaptor
 
+import utilities.config
+from utilities import test_utilities
+
+import mhs_common.state.dynamo_persistence_adaptor
 
 TEST_TABLE_ARN = "TEST TABLE ARN"
 TEST_DATA_OBJECT = {"test_attribute": "test_value"}
@@ -123,6 +125,25 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
             await self.service.delete(TEST_INVALID_KEY)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
+
+    #   TESTING BOTO3 RESOURCE CALL
+    @test_utilities.async_test
+    async def test_boto3_resource_created_correctly(self):
+        self.__setFutureResponse(self.mock_table.get_item, TEST_GET_RESPONSE)
+
+        await self.service.get(TEST_KEY)
+
+        self.mock_boto3_resource.assert_called_once_with('dynamodb', region_name='eu-west-2', endpoint_url=None)
+
+    @unittest.mock.patch.dict(utilities.config.config, {'DYNAMODB_ENDPOINT_URL': 'http://localhost:8000'})
+    @test_utilities.async_test
+    async def test_boto3_resource_created_correctly_with_endpoint_url(self):
+        self.__setFutureResponse(self.mock_table.get_item, TEST_GET_RESPONSE)
+
+        await self.service.get(TEST_KEY)
+
+        self.mock_boto3_resource.assert_called_once_with('dynamodb', region_name='eu-west-2',
+                                                         endpoint_url='http://localhost:8000')
 
     @staticmethod
     def __setFutureResponse(method, response) -> None:
