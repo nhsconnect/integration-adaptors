@@ -24,7 +24,9 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :return: The workflows that can be used to handle messages.
     """
-    queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(host=config.get_config('INBOUND_QUEUE_HOST'))
+    queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(host=config.get_config('INBOUND_QUEUE_HOST'),
+                                                            username=config.get_config('INBOUND_QUEUE_USERNAME'),
+                                                            password=config.get_config('INBOUND_QUEUE_PASSWORD'))
 
     return workflow.get_workflow_map(queue_adaptor=queue_adaptor)
 
