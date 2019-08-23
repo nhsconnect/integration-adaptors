@@ -22,11 +22,12 @@ NO_REF_FILE = "ebxml_no_reference.msg"
 FROM_PARTY_ID = "FROM-PARTY-ID"
 CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
 REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
+CORRELATION_ID = '10F5A436-1913-43F0-9F18-95EA0E43E61A'
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
 
 state_data = [
     {
-        wd.DATA_KEY: 'B4D38C15-4981-4366-BDE9-8F56EDC4AB72',
+        wd.DATA_KEY: REF_TO_MESSAGE_ID,
         wd.DATA: {
             wd.VERSION_KEY: 0,
             wd.CREATED_TIMESTAMP: '11:59',
@@ -62,8 +63,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.state.get.side_effect = state_return_values
 
         self.mock_workflow = unittest.mock.MagicMock()
-        future = test_utilities.awaitable('result')
-        self.mock_workflow.handle_inbound_message.return_value = future
+        self.mock_workflow.handle_inbound_message.return_value = test_utilities.awaitable(None)
         self.mocked_workflows = {
             workflow.ASYNC_EXPRESS: self.mock_workflow
         }
@@ -89,6 +89,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
+        self.mock_workflow.handle_inbound_message.assert_called_once_with(REF_TO_MESSAGE_ID, CORRELATION_ID, unittest.mock.ANY, EXPECTED_MESSAGE)
 
     def test_post_unsolicited_message(self):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / UNSOLICITED_REQUEST_FILE))
@@ -136,39 +137,6 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
 
         self.assertEqual(ack_response.code, 200)
-        mock_correlation_id.set.assert_called_with('10F5A436-1913-43F0-9F18-95EA0E43E61A')
+        mock_correlation_id.set.assert_called_with(CORRELATION_ID)
         log.inbound_message_id.set.assert_called_with('C614484E-4B10-499A-9ACD-5D645CFACF61')
-        mock_message_id.set.assert_called_with('B4D38C15-4981-4366-BDE9-8F56EDC4AB72')
-
-
-class TestInboundWorkflow(tornado.testing.AsyncHTTPSTestCase):
-    """A simple integration test for the async response endpoint."""
-
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    message_dir = pathlib.Path(current_dir) / MESSAGES_DIR
-
-    def setUp(self):
-        self.state = unittest.mock.MagicMock()
-        self.state.get.side_effect = state_return_values
-        super().setUp()
-
-    def get_app(self):
-        return tornado.web.Application([
-            (r"/.*", handler.InboundHandler,
-             dict(workflows=workflow.get_workflow_map(), state_store=self.state, party_id=FROM_PARTY_ID))
-        ])
-
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_receive_ack(self, mock_get_uuid, mock_get_timestamp):
-        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
-        mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        expected_ack_response = file_utilities.FileUtilities.get_file_string(
-            str(self.message_dir / EXPECTED_RESPONSE_FILE))
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
-
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
-
-        self.assertEqual(ack_response.code, 200)
-        self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
-        xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
+        mock_message_id.set.assert_called_with(REF_TO_MESSAGE_ID)

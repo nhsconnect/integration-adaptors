@@ -2,7 +2,7 @@
 from typing import Tuple
 
 import utilities.integration_adaptors_logger as log
-from comms import transmission_adaptor
+from comms import queue_adaptor
 from tornado import httpclient
 from utilities import timing
 
@@ -10,6 +10,7 @@ from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
+from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
@@ -19,10 +20,12 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     """Handles the workflow for the asynchronous express messaging pattern."""
 
     def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
-                 transmission: transmission_adaptor.TransmissionAdaptor = None):
+                 transmission: transmission_adaptor.TransmissionAdaptor = None,
+                 queue_adaptor: queue_adaptor.QueueAdaptor = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key
+        self.queue_adaptor = queue_adaptor
 
     @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
@@ -88,5 +91,18 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
 
-    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
-        pass
+    @timing.time_function
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
+                                     payload: str):
+        logger.info('0009', 'Entered async express workflow to handle inbound message')
+        await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
+        try:
+            await self.queue_adaptor.send_async(payload, properties={'message-id': message_id,
+                                                                     'correlation-id': correlation_id})
+        except Exception as e:
+            logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
+            await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
+            raise e
+
+        logger.info('0011', 'Placed message onto inbound queue successfully')
+        await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)

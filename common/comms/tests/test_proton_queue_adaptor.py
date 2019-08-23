@@ -4,13 +4,16 @@ import unittest.mock
 import comms.proton_queue_adaptor
 import utilities.test_utilities
 
+TEST_UUID = "TEST UUID"
 TEST_MESSAGE = "TEST MESSAGE"
+TEST_PROPERTIES = {'test-property-name': 'test-property-value'}
 TEST_PROTON_MESSAGE = unittest.mock.Mock()
 TEST_QUEUE_HOST = "TEST QUEUE HOST"
 TEST_EXCEPTION = Exception()
 TEST_SIDE_EFFECT = unittest.mock.Mock(side_effect=TEST_EXCEPTION)
 
 
+@unittest.mock.patch('utilities.message_utilities.MessageUtilities.get_uuid', new=lambda: TEST_UUID)
 class TestProtonQueueAdaptor(unittest.TestCase):
     """Class to contain tests for the ProtonQueueAdaptor functionality."""
 
@@ -22,6 +25,7 @@ class TestProtonQueueAdaptor(unittest.TestCase):
         self.service = comms.proton_queue_adaptor.ProtonQueueAdaptor(host=TEST_QUEUE_HOST)
 
     # TESTING SEND ASYNC METHOD
+
     @utilities.test_utilities.async_test
     async def test_send_async_success(self):
         """Test happy path of send_async."""
@@ -30,15 +34,41 @@ class TestProtonQueueAdaptor(unittest.TestCase):
 
         await awaitable
 
-        self.assertTrue(self.mock_container.return_value.run.called)
+        self.assert_proton_called_correctly()
+
+    @utilities.test_utilities.async_test
+    async def test_send_async_with_properties_success(self):
+        """Test happy path of send_async."""
+        awaitable = self.service.send_async(TEST_MESSAGE, properties=TEST_PROPERTIES)
+        self.assertFalse(self.mock_container.return_value.run.called)
+
+        await awaitable
+
+        self.assert_proton_called_correctly(properties=TEST_PROPERTIES)
 
     # TESTING SEND SYNC METHOD
+
     def test_send_success(self):
         """Test happy path of send_sync."""
 
         self.service.send_sync(TEST_MESSAGE)
 
+        self.assert_proton_called_correctly()
+
+    def test_send_with_properties_success(self):
+        """Test happy path of send_sync."""
+
+        self.service.send_sync(TEST_MESSAGE, properties=TEST_PROPERTIES)
+
+        self.assert_proton_called_correctly(properties=TEST_PROPERTIES)
+
+    def assert_proton_called_correctly(self, properties=None):
         self.assertTrue(self.mock_container.return_value.run.called)
+        proton_messaging_handler = self.mock_container.call_args[0][0]
+        self.assertEqual(TEST_QUEUE_HOST, proton_messaging_handler._host)
+        self.assertEqual(TEST_MESSAGE, proton_messaging_handler._message.body)
+        self.assertEqual(TEST_UUID, proton_messaging_handler._message.id)
+        self.assertEqual(properties, proton_messaging_handler._message.properties)
 
 
 class TestProtonMessagingHandler(unittest.TestCase):

@@ -38,6 +38,7 @@ MHS takes a number of environment variables when it is run. These are:
 * `MHS_LOG_LEVEL` This is required to be set to one of: `NOTSET`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least.
 * `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
 * `MHS_OUTBOUND_TRANSMISSION_MAX_RETRIES` This is the maximum number of retries for outbound requests. If no value is given a default of 3 is used.
+* `MHS_INBOUND_QUEUE_HOST` (inbound only) The host url of the amqp inbound queue. e.g. `amqps://example.com:port/queue-name`. Note that if the amqp connection being used is a secured connection (which it should be in production), then the url should start with `amqps://` and not `amqp+ssl://`.
 
 ## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.
