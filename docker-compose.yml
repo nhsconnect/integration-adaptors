@@ -17,7 +17,7 @@ services:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_STATE_TABLE_NAME=mhs_state
   dynamodb:
-    image: amazon/dynamodb-local
+    build: ./common/local-env/dynamodb-local
     ports:
       - "8000:8000"
   rabbitmq:
