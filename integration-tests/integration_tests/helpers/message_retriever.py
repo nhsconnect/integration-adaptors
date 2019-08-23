@@ -2,12 +2,18 @@ from __future__ import print_function
 
 from proton.utils import BlockingConnection
 
+from integration_tests.helpers import methods
+
 
 def get_inbound_response():
-    conn = BlockingConnection("localhost:5672")
-    receiver = conn.create_receiver("inbound")
-    msg = receiver.receive(timeout=30)
-    receiver.accept()
-    conn.close()
+    """ Retrieve the response from the inbound queue
 
-    return msg.properties['message-id'], msg.properties['correlation-id'], msg.body
+    :return: A tuple of the message-id, correlation-id and the message body.
+    """
+    connection = BlockingConnection(methods.get_mhs_inbound_hostname())
+    receiver = connection.create_receiver("inbound")
+    message = receiver.receive(timeout=30)
+    receiver.accept()
+    connection.close()
+
+    return message.properties['message-id'], message.properties['correlation-id'], message.body

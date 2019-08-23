@@ -25,8 +25,19 @@ def get_asid():
     return os.environ.get('ASID', os.environ.get('ASID', asid))
 
 
+def get_mhs_inbound_hostname():
+    """ Looks up the mhs inbound hostname from the environment settings
+
+    :return: the mhs inbound hostname
+
+    The mhs inbound hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
+        if this is not set, it will default to 'localhost:5672'
+    """
+    return os.environ.get('INBOUND_ADDRESS', 'localhost:5672')
+
+
 def get_mhs_hostname():
-    """     Looks up the mhs hostname from the environment settings
+    """ Looks up the mhs hostname from the environment settings
 
     :return: the mhs hostname
 
@@ -47,20 +58,23 @@ def get_scr_adaptor_hostname():
     return "http://" + os.environ.get('SCR_ADAPTOR_ADDRESS', 'localhost') + "/"
 
 
-def get_interaction_from_template(type, template, nhs_number, payload, pass_message_id=False, pass_correlation_id=False):
+def get_interaction_from_template(type, template, nhs_number, payload,
+                                  pass_message_id=False, pass_correlation_id=False):
     """ Sends the template to be rendered and passed on to the the MHS
 
     :param type: the message type (one of 'async express', 'async reliable', 'synchronous' or 'forward_reliable'
     :param template: the template name
     :param nhs_number: the NHS number for the test patient
+    :param payload: the text to be sent on to SPINE
     :param pass_message_id: flag to indicate if we need to pass on the message ID
+    :param pass_correlation_id: flag to indicate if we need to pass on the correlation ID
     :return: the response from the MHS
     """
     return interactions.process_request(template, get_asid(), nhs_number, payload, pass_message_id, pass_correlation_id)
 
 
 def get_json(template, patient_nhs_number, payload):
-    """ renders the template
+    """ Renders the template
 
     :param template: the template to use
     :param patient_nhs_number: the NHS number of the test patient
@@ -79,9 +93,25 @@ def check_response(returned_xml, section_name):
     """
     parser = xml_parser.XmlMessageParser()
     returned_data = parser.parse_message(returned_xml)
-    value = parser.extract_hl7xml_value(returned_data, section_name)
+    section = parser.extract_hl7xml_section(returned_data, section_name)
 
-    return value is not None
+    return section is not None
+
+
+def get_section(xml, attribute, section_name, parent=None):
+    """ Extracts the data from an XML section
+    
+    :param xml: the message that we're checking
+    :param attribute: the attribute we want
+    :param section_name: the section we're looking for
+    :param parent: ...and it's parent (optional)
+    :return: the extracted data
+    """
+    parser = xml_parser.XmlMessageParser()
+    returned_data = parser.parse_message(xml)
+    value = parser.extract_hl7xml_text_value(returned_data, attribute, section_name, parent=parent)
+
+    return value
 
 
 def check_status_code(response, expected_code):
