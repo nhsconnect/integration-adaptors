@@ -7,6 +7,7 @@ services:
       - "443:443"
     environment:
       - MHS_LOG_LEVEL=NOTSET
+      - MHS_INBOUND_QUEUE_HOST=localhost:5672
       - MHS_STATE_TABLE_NAME=mhs_state
   outbound:
     image: local/mhs-outbound
@@ -18,9 +19,11 @@ services:
   spineroutelookup:
     image: local/mhs-spineroutelookup
     ports:
-      - "8443:443"
+      - "8080:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
+      - MHS_SDS_URL=ldap://msg.opentest.hscic.gov.uk
+      - MHS_DISABLE_SDS_TLS=True
   dynamodb:
     image: amazon/dynamodb-local
     ports:

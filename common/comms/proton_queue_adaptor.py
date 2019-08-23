@@ -1,5 +1,7 @@
 """Module for Proton specific queue adaptor functionality. """
 
+from typing import Dict, Any
+
 import proton.handlers
 import proton.reactor
 import tornado.ioloop
@@ -35,25 +37,29 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         self.host = kwargs.get('host')
         logger.info('000', 'Initialized proton queue adaptor for {host}', {'host': self.host})
 
-    async def send_async(self, message: str) -> None:
+    async def send_async(self, message: str, properties: Dict[str, Any] = None) -> None:
         logger.info('008', 'Sending message asynchronously.')
+        payload = self.__construct_message(message, properties=properties)
         await tornado.ioloop.IOLoop.current() \
-            .run_in_executor(executor=None, func=lambda: self.__send(self.__construct_message(message)))
+            .run_in_executor(executor=None, func=lambda: self.__send(payload))
 
-    def send_sync(self, message: str) -> None:
+    def send_sync(self, message: str, properties: Dict[str, Any] = None) -> None:
         logger.info('009', 'Sending message synchronously.')
-        self.__send(self.__construct_message(message))
+        payload = self.__construct_message(message, properties=properties)
+        self.__send(payload)
 
     @staticmethod
-    def __construct_message(message: str) -> proton.Message:
+    def __construct_message(message: str, properties: Dict[str, Any] = None) -> proton.Message:
         """
         Build a message with a generated uuid, and specified message body.
         :param message: The message body to be wrapped.
+        :param properties: Optional application properties to send with the message.
         :return: The Message in the correct format with generated uuid.
         """
         message_id = utilities.message_utilities.MessageUtilities.get_uuid()
-        logger.info('001', 'Constructing message with {id} for {body}', {'id': message_id, 'body': message})
-        return proton.Message(id=message_id, body=message)
+        logger.info('001', 'Constructing message with {id} for {body} and {applicationProperties}',
+                    {'id': message_id, 'body': message, 'applicationProperties': properties})
+        return proton.Message(id=message_id, body=message, properties=properties)
 
     def __send(self, message: proton.Message) -> None:
         """

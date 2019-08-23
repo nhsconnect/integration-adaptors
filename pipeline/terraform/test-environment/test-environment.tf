@@ -149,12 +149,20 @@ resource "aws_ecs_task_definition" "test-environment-mhs-spineroutelookup-task" 
         {
           name = "MHS_LOG_LEVEL"
           value = var.mhs_log_level
+        },
+        {
+          name = "MHS_SDS_URL"
+          value = var.spineroutelookup_service_sds_url
+        },
+        {
+          name = "MHS_DISABLE_SDS_TLS"
+          value = var.spineroutelookup_service_disable_sds_tls
         }
       ]
 
       portMappings = [
         {
-          containerPort = 443
+          containerPort = 80
           hostPort = var.spineroutelookup_service_port
           protocol = "tcp"
         }

@@ -42,5 +42,14 @@ variable "scr_service_port" {
 }
 variable "spineroutelookup_service_port" {
   type = number
-  description = "The port to be exposed for the Spine Route Lookup service"
+  description = "The port to be exposed for the Spine Route Lookup service."
+}
+variable "spineroutelookup_service_sds_url" {
+  type = string
+  description = "The SDS URL the Spine Route Lookup service should communicate with."
+}
+variable "spineroutelookup_service_disable_sds_tls" {
+  type = string
+  description = "Whether TLS should be disabled for connections to SDS."
+  default = "False"
 }
