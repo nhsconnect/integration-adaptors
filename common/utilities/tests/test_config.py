@@ -42,6 +42,13 @@ class TestConfig(unittest.TestCase):
 
         self.assertEqual("111", config.get_config("LOG_LEVEL", default="111"))
 
+    def test_get_config_default_none(self, mock_environ):
+        mock_environ["PREFIX_TEST"] = "123"
+
+        config.setup_config("PREFIX")
+
+        self.assertIsNone(config.get_config("LOG_LEVEL", default=None))
+
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_get_config_no_config_variable_found(self, mock_stdout, mock_environ):
         mock_environ["PREFIX_LOG_LEVEL"] = "INFO"

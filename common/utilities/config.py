@@ -7,7 +7,7 @@ using `get_config` (or directly use `config` for more complex use cases).
 """
 import logging
 import os
-from typing import Dict
+from typing import Dict, Optional
 
 config: Dict[str, str] = {}
 
@@ -25,7 +25,10 @@ def setup_config(component_name: str):
             config[k[len(prefix):]] = v
 
 
-def get_config(key: str, default: str = None) -> str:
+_config_default = object()
+
+
+def get_config(key: str, default: Optional[str] = _config_default) -> str:
     """
     Get config variable or error out (and log the error)
 
@@ -36,7 +39,7 @@ def get_config(key: str, default: str = None) -> str:
 
     if key in config:
         return config[key]
-    elif default is not None:
+    elif default is not _config_default:
         return default
     else:
         # Can't use IntegrationAdaptorsLogger due to circular dependency
