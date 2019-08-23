@@ -2,6 +2,7 @@ import contextvars
 import datetime as dt
 import logging
 import sys
+import traceback
 
 from utilities import config
 
@@ -36,7 +37,7 @@ def configure_logging():
     handler = logging.StreamHandler(sys.stdout)
 
     formatter = _CustomFormatter(
-        fmt='[%(asctime)sZ] %(message)s pid=%(process)d LogLevel=%(levelname)s ',
+        fmt='[%(asctime)sZ] %(message)s pid=%(process)d LogLevel=%(levelname)s LoggerName=%(name)s',
         datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
     handler.setFormatter(formatter)
@@ -72,8 +73,12 @@ class IntegrationAdaptorsLogger:
         if inbound_message_id.get():
             message += f' InboundMessageId={inbound_message_id.get()}'
 
-
         message += f' ProcessKey={self.process_key_tag + process_key_num}'
+
+        exc_inf = sys.exc_info()
+        if all(exc_inf):
+            (etype, value, trace) = exc_inf
+            message += f' Traceback={traceback.format_exception(etype, value, trace)}'
 
         self.logger.log(level, message)
 
