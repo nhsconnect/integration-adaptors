@@ -9,6 +9,11 @@ services:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_INBOUND_QUEUE_HOST=localhost:5672
       - MHS_STATE_TABLE_NAME=mhs_state
+      - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
+      # boto3 requires some AWS creds to be provided, even
+      # when connecting to local DynamoDB
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
   outbound:
     image: local/mhs-outbound
     ports:
@@ -16,6 +21,9 @@ services:
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_STATE_TABLE_NAME=mhs_state
+      - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
   dynamodb:
     build: ./common/local-env/dynamodb-local
     ports:
