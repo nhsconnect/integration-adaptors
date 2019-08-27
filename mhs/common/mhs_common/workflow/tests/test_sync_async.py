@@ -82,7 +82,7 @@ class TestSyncAsyncWorkFlowInbound(TestCase):
             'data': 'wqe'
         })
         
-        work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
 
     @test_utilities.async_test
     async def test_inbound_workflow_exception_in_store(self):
@@ -95,7 +95,7 @@ class TestSyncAsyncWorkFlowInbound(TestCase):
         with self.assertRaises(ValueError):
             await self.workflow.handle_inbound_message('1', 'cor_id', work_description, 'wqe')
 
-        work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
+        work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
 
 
 
