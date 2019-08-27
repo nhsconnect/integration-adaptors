@@ -11,10 +11,6 @@ PARTY_ID = "PARTY-ID"
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 
 
-def throws_exception(x, y):
-    raise ValueError('Fake error')
-
-
 class TestSyncAsyncWorkflow(TestCase):
     
     def setUp(self):
@@ -65,37 +61,42 @@ class TestSyncAsyncWorkflow(TestCase):
         self.assertIs(sentinel.response, actual_response)
 
 
-class TestSyncAsyncWorkFlowInbound(TestCase):
+class TestSyncAsyncWorkflowInbound(TestCase):
+
+    def setUp(self):
+        self.persistence = MagicMock()
+        self.work_description = MagicMock()
+
+        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence)
 
     @test_utilities.async_test
     async def test_inbound_workflow_happy_path(self):
-        persistence = MagicMock()
-        work_description = MagicMock()
-        work_description.set_status.return_value = test_utilities.awaitable(True)
-        persistence.add.return_value = test_utilities.awaitable(True)
+        self.workflow.sync_async_store.add.return_value = test_utilities.awaitable(True)
+        self.work_description.set_status.return_value = test_utilities.awaitable(True)
+
+        await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
         
-        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=persistence)
-        await self.workflow.handle_inbound_message('1', 'cor_id', work_description, 'wqe')
-        
-        persistence.add.assert_called_with('1', {
+        self.persistence.add.assert_called_with('1', {
             'correlation_id': 'cor_id',
             'data': 'wqe'
         })
         
-        work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
+        self.work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
 
     @test_utilities.async_test
     async def test_inbound_workflow_exception_in_store(self):
-        persistence = MagicMock()
-        work_description = MagicMock()
-        work_description.set_status.return_value = test_utilities.awaitable(True)
-        persistence.add.side_effect = throws_exception
+        def throws_exception(x, y):
+            raise ValueError('Fake error')
 
-        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=persistence)
+        self.persistence.add.side_effect = throws_exception
+        self.work_description.set_status.return_value = test_utilities.awaitable(True)
+
+        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence)
         with self.assertRaises(ValueError):
-            await self.workflow.handle_inbound_message('1', 'cor_id', work_description, 'wqe')
+            await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
 
-        work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
+        self.work_description.set_status.assert_called_with(
+            wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
 
 
 

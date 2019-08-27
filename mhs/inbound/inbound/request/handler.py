@@ -18,20 +18,20 @@ logger = log.IntegrationAdaptorsLogger('INBOUND_HANDLER')
 
 class InboundHandler(tornado.web.RequestHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a remote MHS."""
-    state_store: PersistenceAdaptor
+    work_description_store: PersistenceAdaptor
     party_id: str
     workflows: Dict[str, workflow.CommonWorkflow]
 
     def initialize(self, workflows: Dict[str, workflow.CommonWorkflow],
-                   state_store: pa.PersistenceAdaptor, party_id: str):
+                   work_description_store: pa.PersistenceAdaptor, party_id: str):
         """Initialise this request handler with the provided dependencies.
         :param workflows:
-        :param state_store: The state store
+        :param work_description_store: The state store
         :param party_id: The party ID of this MHS. Sent in ebXML acknowledgements.
         """
         self.workflows = workflows
         self.party_id = party_id
-        self.state_store = state_store
+        self.work_description_store = work_description_store
 
     @time_request
     async def post(self):
@@ -50,7 +50,7 @@ class InboundHandler(tornado.web.RequestHandler):
         self._extract_message_id(request_message)
 
         try:
-            work_description = await wd.get_work_description_from_store(self.state_store, ref_to_message_id)
+            work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
         except wd.EmptyWorkDescriptionError as e:
             logger.warning('003', 'No work description found in state store with {messageId}',
                            {'messageId': ref_to_message_id})

@@ -29,10 +29,10 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
         host=config.get_config('INBOUND_QUEUE_HOST'),
         username=config.get_config('INBOUND_QUEUE_USERNAME'),
         password=config.get_config('INBOUND_QUEUE_PASSWORD'))
-    store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+    sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
-    return workflow.get_workflow_map(queue_adaptor=queue_adaptor, sync_async_store=store)
+    return workflow.get_workflow_map(queue_adaptor=queue_adaptor, sync_async_store=sync_async_store)
 
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
@@ -62,7 +62,7 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 
 def start_inbound_server(certs_file: str, key_file: str, party_key: str,
                          workflows: Dict[str, workflow.CommonWorkflow],
-                         persistence_store: persistence_adaptor
+                         persistence_store: persistence_adaptor.PersistenceAdaptor
                          ) -> None:
     """
 
@@ -75,7 +75,7 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
 
     inbound_application = tornado.web.Application(
         [(r"/.*", async_request_handler.InboundHandler, dict(workflows=workflows, party_id=party_key,
-                                                             state_store=persistence_store))])
+                                                             work_description_store=persistence_store))])
 
     # Ensure Client authentication
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)

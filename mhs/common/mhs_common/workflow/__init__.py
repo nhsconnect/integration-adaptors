@@ -20,7 +20,7 @@ SYNC_ASYNC = 'sync-async'
 
 
 def get_workflow_map(party_key: str = None,
-                     persistence_store: persistence_adaptor.PersistenceAdaptor = None,
+                     work_description_store: persistence_adaptor.PersistenceAdaptor = None,
                      sync_async_store: persistence_adaptor.PersistenceAdaptor = None,
                      transmission: transmission_adaptor.TransmissionAdaptor = None,
                      queue_adaptor: queue_adaptor.QueueAdaptor = None) -> Dict[str, CommonWorkflow]:
@@ -30,9 +30,9 @@ def get_workflow_map(party_key: str = None,
     :return: a map of workflows
     """
     return {
-        ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, persistence_store, transmission, queue_adaptor),
+        ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, work_description_store, transmission, queue_adaptor),
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(),
         FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
-        SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission = transmission, sync_async_store=persistence_store),
+        SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission=transmission, sync_async_store=sync_async_store),
         SYNC: SynchronousWorkflow()
     }
