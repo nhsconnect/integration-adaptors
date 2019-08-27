@@ -32,7 +32,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         The kwargs provided should contain the following information:
           * host: The host of the Message Queue to be interacted with.
           * username: The username to use to connect to the Message Queue.
-          * password The password to user to connect to the Message Queue.
+          * password The password to use to connect to the Message Queue.
         :param kwargs: The key word arguments required for this constructor.
         """
         super().__init__()
