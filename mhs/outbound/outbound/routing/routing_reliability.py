@@ -2,7 +2,7 @@ import json
 from typing import Dict
 
 from comms import common_https
-from utilities import integration_adaptors_logger as log
+from utilities import integration_adaptors_logger as log, timing
 
 ROUTING_PATH = "routing"
 RELIABILITY_PATH = "reliability"
@@ -21,6 +21,7 @@ class RoutingAndReliability:
         """
         self.url = spine_route_lookup_url
 
+    @timing.time_function
     async def get_end_point(self, org_code: str, service_id: str) -> Dict:
         """Get the endpoint of the MHS registered for the specified org code and service ID.
 
@@ -45,6 +46,7 @@ class RoutingAndReliability:
                          "{service_id}. {exception}", {"org_code": org_code, "service_id": service_id, "exception": e})
             raise e
 
+    @timing.time_function
     async def get_reliability(self, org_code: str, service_id: str) -> Dict:
         """Get the reliability information for the MHS registered for the specified org code and service ID.
 
