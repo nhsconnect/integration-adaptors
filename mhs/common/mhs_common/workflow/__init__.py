@@ -32,6 +32,6 @@ def get_workflow_map(party_key: str = None,
         ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, persistence_store, transmission, queue_adaptor),
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(),
         FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
-        SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission = None, persistence_store=per),
+        SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission = None, persistence_store=persistence_store),
         SYNC: SynchronousWorkflow()
     }
