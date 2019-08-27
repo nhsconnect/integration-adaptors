@@ -56,6 +56,8 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         reason=f"Couldn't determine workflow to invoke for interaction ID: "
                                                f"{interaction_id}") from e
 
+        # TODO-if sync-async in header and supported for interaction, then wrap in sync-async and invoke
+
         status, response = await workflow.handle_outbound_message(message_id, correlation_id, interaction_details, body)
 
         self._write_response(status, response)
