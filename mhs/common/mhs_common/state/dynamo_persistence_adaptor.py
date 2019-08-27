@@ -5,7 +5,10 @@ import traceback
 
 import aioboto3
 import utilities.integration_adaptors_logger as log
+from utilities import config
+
 from mhs_common.state import persistence_adaptor
+
 logger = log.IntegrationAdaptorsLogger('DYNAMO_PERSISTENCE')
 
 
@@ -46,7 +49,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('011', 'Adding {record} for {key}', {'record': data, 'key': key})
         try:
-            async with self.__create_dynamo_table() as table:
+            async with self.__get_dynamo_table() as table:
                 response = await table.put_item(
                     Item={'key': key, 'data': json.dumps(data)},
                     ReturnValues='ALL_OLD'
@@ -67,7 +70,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('002', 'Getting record for {key}', {'key': key})
         try:
-            async with self.__create_dynamo_table() as table:
+            async with self.__get_dynamo_table() as table:
                 response = await table.get_item(
                     Key={'key': key}
                 )
@@ -88,7 +91,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('006', 'Deleting record for {key}', {'key': key})
         try:
-            async with self.__create_dynamo_table() as table:
+            async with self.__get_dynamo_table() as table:
                 response = await table.delete_item(
                     Key={'key': key},
                     ReturnValues='ALL_OLD'
@@ -103,11 +106,12 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
             raise RecordDeletionError from e
 
     @contextlib.asynccontextmanager
-    async def __create_dynamo_table(self):
+    async def __get_dynamo_table(self):
         """
         Creates a connection to the table referenced by this instance.
         :return: The table to be used by this instance.
         """
-        async with aioboto3.resource('dynamodb', region_name='eu-west-2') as dynamo_resource:
+        async with aioboto3.resource('dynamodb', region_name='eu-west-2',
+                                     endpoint_url=config.get_config('DYNAMODB_ENDPOINT_URL', None)) as dynamo_resource:
             logger.info('010', 'Establishing connection to {table_name}', {'table_name': self.table_name})
             yield dynamo_resource.Table(self.table_name)

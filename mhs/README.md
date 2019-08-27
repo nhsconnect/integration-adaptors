@@ -39,6 +39,8 @@ MHS takes a number of environment variables when it is run. These are:
 * `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
 * `MHS_OUTBOUND_TRANSMISSION_MAX_RETRIES` This is the maximum number of retries for outbound requests. If no value is given a default of 3 is used.
 * `MHS_INBOUND_QUEUE_HOST` (inbound only) The host url of the amqp inbound queue. e.g. `amqps://example.com:port/queue-name`. Note that if the amqp connection being used is a secured connection (which it should be in production), then the url should start with `amqps://` and not `amqp+ssl://`.
+* `MHS_INBOUND_QUEUE_USERNAME` (inbound only) The username to use when connecting to the amqp inbound queue.
+* `MHS_INBOUND_QUEUE_PASSWORD` (inbound only) The password to use when connecting to the amqp inbound queue.
 * `MHS_SDS_URL` (Spine Route Lookup service only) The URL to communicate with SDS on. e.g. `ldaps://example.com`
 * `MHS_DISABLE_SDS_TLS` (Spine Route Lookup service only) A flag that can be set to disable TLS for SDS connections.
 *Must* be set to exactly `True` for TLS to be disabled.
