@@ -74,7 +74,7 @@ class TestSyncAsyncWorkFlowInbound(TestCase):
         work_description.set_status.return_value = test_utilities.awaitable(True)
         persistence.add.return_value = test_utilities.awaitable(True)
         
-        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, persistence_store=persistence )
+        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=persistence)
         await self.workflow.handle_inbound_message('1', 'cor_id', work_description, 'wqe')
         
         persistence.add.assert_called_with('1', {
@@ -91,7 +91,7 @@ class TestSyncAsyncWorkFlowInbound(TestCase):
         work_description.set_status.return_value = test_utilities.awaitable(True)
         persistence.add.side_effect = throws_exception
 
-        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, persistence_store=persistence)
+        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=persistence)
         with self.assertRaises(ValueError):
             await self.workflow.handle_inbound_message('1', 'cor_id', work_description, 'wqe')
 

@@ -25,16 +25,16 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     def __init__(self,
                  party_id: str,
                  transmission: ta.TransmissionAdaptor = None,
-                 persistence_store: pa.PersistenceAdaptor = None):
+                 sync_async_store: pa.PersistenceAdaptor = None):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
         :param transmission: The component that can be used to send messages.
-        :param persistence_store: The resynchronisor state store
+        :param sync_async_store: The resynchronisor state store
         :param party_id: The party ID of this MHS. Sent in ebXML requests.
         """
 
         self.transmission = transmission
-        self.persistence_store = persistence_store
+        self.sync_async_store = sync_async_store
         self.party_id = party_id
 
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
@@ -48,7 +48,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         try:
             logger.info('002', 'Attempting to add inbound message to sync-async store')
-            await self.persistence_store.add(message_id, {
+            await self.sync_async_store.add(message_id, {
                 CORRELATION_ID: correlation_id,
                 MESSAGE_DATA: payload
             })
