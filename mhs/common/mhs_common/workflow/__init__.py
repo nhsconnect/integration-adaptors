@@ -16,6 +16,7 @@ ASYNC_EXPRESS = 'async-express'
 ASYNC_RELIABLE = 'async-reliable'
 FORWARD_RELIABLE = 'forward-reliable'
 SYNC = 'sync'
+SYNC_ASYNC = 'sync-async'
 
 
 def get_workflow_map(party_key: str = None,
