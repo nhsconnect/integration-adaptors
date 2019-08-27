@@ -24,7 +24,11 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :return: The workflows that can be used to handle messages.
     """
-    queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(host=config.get_config('INBOUND_QUEUE_HOST'))
+
+    queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
+        host=config.get_config('INBOUND_QUEUE_HOST'),
+        username=config.get_config('INBOUND_QUEUE_USERNAME'),
+        password=config.get_config('INBOUND_QUEUE_PASSWORD'))
     store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_TABLE_NAME'))
 

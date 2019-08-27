@@ -8,6 +8,8 @@ services:
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_INBOUND_QUEUE_HOST=rabbitmq:5672/inbound
+      - MHS_INBOUND_QUEUE_USERNAME=guest
+      - MHS_INBOUND_QUEUE_PASSWORD=guest
       - MHS_STATE_TABLE_NAME=mhs_state
       - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state
       - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
