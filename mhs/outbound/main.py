@@ -41,7 +41,7 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
     :return: The workflows that can be used to handle messages.
     """
 
-    return workflow.get_workflow_map(party_key, persistence_store, transmission)
+    return workflow.get_workflow_map(party_key, persistence_store=persistence_store, transmission=transmission)
 
 
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:

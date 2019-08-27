@@ -62,6 +62,7 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
                          ) -> None:
     """
 
+    :param persistence_store: persistence store adaptor for message information
     :param certs_file: The filename of the certificate to be used to identify this MHS to a remote MHS.
     :param key_file: The filename of the private key for the certificate identified by certs_file.
     :param workflows: The workflows to be used to handle messages.
