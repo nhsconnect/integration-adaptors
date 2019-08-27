@@ -54,11 +54,11 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             })
         except Exception as e:
             logger.warning('003', 'Failed to put message into sync-async store due to {Exception}', {'Exception': e})
-            await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
+            await work_description.set_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
             raise e
 
         logger.info('004', 'Placed message onto inbound queue successfully')
-        await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        await work_description.set_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
 
     def prepare_message(self, interaction_details: dict, content: str, message_id: str) -> Tuple[bool, str]:
         """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
