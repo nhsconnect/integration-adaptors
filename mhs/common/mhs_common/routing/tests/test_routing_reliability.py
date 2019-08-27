@@ -4,7 +4,7 @@ from unittest import mock
 
 from utilities import test_utilities
 
-from outbound.routing import routing_reliability
+from mhs_common.routing import routing_reliability
 
 BASE_URL = "https://example.com"
 HTTP_METHOD = "GET"
