@@ -10,6 +10,7 @@ from mhs_common.workflow.asynchronous_reliable import AsynchronousReliableWorkfl
 from mhs_common.workflow.common import CommonWorkflow
 from mhs_common.workflow.intermediary_reliable import IntermediaryReliableWorkflow
 from mhs_common.workflow.synchronous import SynchronousWorkflow
+from mhs_common.workflow.sync_async import SyncAsyncWorkflow
 
 ASYNC_EXPRESS = 'async-express'
 ASYNC_RELIABLE = 'async-reliable'
@@ -17,7 +18,9 @@ FORWARD_RELIABLE = 'forward-reliable'
 SYNC = 'sync'
 
 
-def get_workflow_map(party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
+def get_workflow_map(party_key: str = None,
+                     persistence_store: persistence_adaptor.PersistenceAdaptor = None,
+                     sync_async_store: persistence_adaptor.PersistenceAdaptor = None,
                      transmission: transmission_adaptor.TransmissionAdaptor = None,
                      queue_adaptor: queue_adaptor.QueueAdaptor = None) -> Dict[str, CommonWorkflow]:
     """
@@ -29,5 +32,6 @@ def get_workflow_map(party_key: str = None, persistence_store: persistence_adapt
         ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, persistence_store, transmission, queue_adaptor),
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(),
         FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
+        SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission = None, persistence_store=per),
         SYNC: SynchronousWorkflow()
     }

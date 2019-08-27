@@ -25,8 +25,10 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     :return: The workflows that can be used to handle messages.
     """
     queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(host=config.get_config('INBOUND_QUEUE_HOST'))
+    store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+        table_name=config.get_config('SYNC_ASYNC_TABLE_NAME'))
 
-    return workflow.get_workflow_map(queue_adaptor=queue_adaptor)
+    return workflow.get_workflow_map(queue_adaptor=queue_adaptor, sync_async_store=store)
 
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
