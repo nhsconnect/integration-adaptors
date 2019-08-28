@@ -25,7 +25,9 @@ def get_workflow_map(party_key: str = None,
                      transmission: transmission_adaptor.TransmissionAdaptor = None,
                      inbound_async_queue: queue_adaptor.QueueAdaptor = None,
                      sync_async_store_retries: int = None,
-                     sync_async_store_retry_delay: int = None
+                     sync_async_store_retry_delay: int = None,
+                     inbound_queue_max_retries: int = None,
+                     inbound_queue_retry_delay: int = None
                      ) -> Dict[str, CommonWorkflow]:
     """
     Get a map of workflows. Keys for each workflow should correspond with keys used in interactions.json
@@ -33,7 +35,8 @@ def get_workflow_map(party_key: str = None,
     :return: a map of workflows
     """
     return {
-        ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, work_description_store, transmission, inbound_async_queue),
+        ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, work_description_store, transmission,
+                                                   inbound_async_queue, inbound_queue_max_retries, inbound_queue_retry_delay),
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(),
         FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
         SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission=transmission, sync_async_store=sync_async_store,

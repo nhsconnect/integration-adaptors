@@ -32,12 +32,16 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
+    inbound_queue_max_retries = int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3'))
+    inbound_queue_retry_delay = int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100'))
     sync_async_retries = int(config.get_config('SYNC_ASYNC_STORE_MAX_RETRIES', default='3'))
     sync_async_delay = int(config.get_config('SYNC_ASYNC_STORE_RETRY_DELAY', default='100'))
     return workflow.get_workflow_map(inbound_async_queue=queue_adaptor,
                                      sync_async_store=sync_async_store,
                                      sync_async_store_retries=sync_async_retries,
-                                     sync_async_store_retry_delay=sync_async_delay
+                                     sync_async_store_retry_delay=sync_async_delay,
+                                     inbound_queue_max_retries=inbound_queue_max_retries,
+                                     inbound_queue_retry_delay=inbound_queue_retry_delay
                                      )
 
 
