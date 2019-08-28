@@ -60,8 +60,8 @@ pipeline {
                             -var build_id=${BUILD_TAG} \
                             -var mhs_log_level=DEBUG \
                             -var mhs_state_table_name=mhs-state \
-                            -var mhs_spine_route_lookup_url= ${SPINEROUTELOOKUP_SERVICE_URL} \
-                            -var mhs_spine_org_code= ${SPINE_ORG_CODE} \
+                            -var mhs_spine_route_lookup_url=${SPINEROUTELOOKUP_SERVICE_URL} \
+                            -var mhs_spine_org_code=${SPINE_ORG_CODE} \
                             -var scr_log_level=DEBUG \
                             -var scr_service_port=${SCR_SERVICE_PORT} \
                             -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT} \
@@ -124,9 +124,13 @@ pipeline {
                         -var build_id=${BUILD_TAG} \
                         -var mhs_log_level=DEBUG \
                         -var mhs_state_table_name=mhs-state \
+                        -var mhs_spine_route_lookup_url=${SPINEROUTELOOKUP_SERVICE_URL} \
+                        -var mhs_spine_org_code=${SPINE_ORG_CODE} \
                         -var scr_log_level=DEBUG \
                         -var scr_service_port=${SCR_SERVICE_PORT} \
-                        -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT}
+                        -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT} \
+                        -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_SDS_URL} \
+                        -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
                      """
             }
         }
