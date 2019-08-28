@@ -1,13 +1,14 @@
 """This module defines the component used to orchestrate the retrieval and caching of routing and reliability
 information for a remote MHS."""
 
-import logging
 from typing import Dict
+
+from utilities import integration_adaptors_logger as log
+
 import lookup.cache_adaptor as cache_adaptor
 import lookup.sds_client as sds_client
 
-
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_ATTRIBUTE_LOOKUP')
 
 
 class MHSAttributeLookup:
@@ -37,11 +38,12 @@ class MHSAttributeLookup:
         """
         cache_value = await self.cache.retrieve_mhs_attributes_value(ods_code, interaction_id)
         if cache_value:
-            logger.info(f'MHS details found in cache for ods code: {ods_code} & interaction id: {interaction_id}')
+            logger.info('0001', 'MHS details found in cache for {ods_code} & {interaction_id}',
+                        {'ods_code': ods_code, 'interaction_id': interaction_id})
             return cache_value
 
         endpoint_details = await self.sds_client.get_mhs_details(ods_code, interaction_id)
-        logger.info(f'MHS details obtained from sds, adding to cache for ods code: {ods_code} '
-                    f'interaction id: {interaction_id}')
+        logger.info('0002', 'MHS details obtained from sds, adding to cache for {ods_code} & {interaction_id}',
+                    {'ods_code': ods_code, 'interaction_id': interaction_id})
         await self.cache.add_cache_value(ods_code, interaction_id, endpoint_details)
         return endpoint_details

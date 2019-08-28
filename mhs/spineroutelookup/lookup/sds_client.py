@@ -1,15 +1,15 @@
 """This module contains the client used to make requests to SDS."""
 
 import asyncio
-import logging
 from typing import Dict, List
 
 import ldap3
 import ldap3.core.exceptions as ldap_exceptions
+from utilities import integration_adaptors_logger as log
 
 import lookup.sds_exception as sds_exception
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_MAIN')
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 
@@ -48,13 +48,13 @@ class SDSClient:
         accredited_system_lookup = await self._accredited_system_lookup(ods_code, interaction_id)
 
         if not accredited_system_lookup:
-            logger.error(f"Failed to find accredited system details for ods code : {ods_code} and interaction id: "
-                         f"{interaction_id}")
+            logger.error("0001", "Failed to find accredited system details for {ods_code} & {interaction_id}",
+                         {"ods_code": ods_code, "interaction_id": interaction_id})
             raise sds_exception.SDSException('No response from accredited system lookup')
 
         if len(accredited_system_lookup) > 1:
-            logger.warning(f"More than one accredited system details returned on inputs: "
-                           f"ods: {ods_code} - interaction: {interaction_id}")
+            logger.warning("0002", "More than one accredited system details returned on inputs: {ods_code} & "
+                                   "{interaction_id}", {"ods_code": ods_code, "interaction_id": interaction_id})
 
         # As per the spec exactly one result should be returned
         response = accredited_system_lookup[0]
@@ -63,12 +63,13 @@ class SDSClient:
         details = await self._mhs_details_lookup(party_key, interaction_id)
 
         if not details:
-            logger.error(f'No mhs details returned for party key: {party_key} and interaction id : {interaction_id}')
+            logger.error("0003", "No mhs details returned for {party_key} & {interaction_id}",
+                         {"party_key": party_key, "interaction_id": interaction_id})
             raise sds_exception.SDSException(f'No mhs details returned for party key: '
                                              f'{party_key} and interaction id : {interaction_id}')
         if len(details) > 1:
-            logger.warning(f"More than one mhs details returned on inputs: "
-                           f"ods: {ods_code} - interaction: {interaction_id}")
+            logger.warning("0004", "More than one mhs details returned on inputs: {ods_code} & {interaction_id}",
+                           {"ods_code": ods_code, "interaction_id": interaction_id})
         return details[0]['attributes']
 
     async def _accredited_system_lookup(self, ods_code: str, interaction_id: str) -> List:
@@ -83,11 +84,11 @@ class SDSClient:
         message_id = self.connection.search(search_base=NHS_SERVICES_BASE,
                                             search_filter=search_filter,
                                             attributes=MHS_PARTY_KEY)
-        logger.info(f'Message id - {message_id} - for query: ods code - {ods_code} '
-                    f': interaction id - {interaction_id}')
+        logger.info("0005", "{message_id} - for query: {ods_code} {interaction_id}",
+                    {"message_id": message_id, "ods_code": ods_code, "interaction_id": interaction_id})
 
         response = await self._get_query_result(message_id)
-        logger.info(f'Found accredited supplier details for message_id: {message_id}')
+        logger.info("0006", "Found accredited supplier details for {message_id}", {"message_id": message_id})
 
         return response
 
@@ -104,11 +105,11 @@ class SDSClient:
                                             search_filter=search_filter,
                                             attributes=mhs_attributes)
 
-        logger.info(f'Message id - {message_id} - for query: party key - {party_key} '
-                    f': interaction id - {interaction_id}')
+        logger.info("0007", "{message_id} - for query: {party_key} {interaction_id}",
+                    {"message_id": message_id, "party_key": party_key, "interaction_id": interaction_id})
 
         response = await self._get_query_result(message_id)
-        logger.info(f'Found mhs details for message_id: {message_id}')
+        logger.info("0008", "Found mhs details for {message_id}", {"message_id": message_id})
 
         return response
 
@@ -118,6 +119,6 @@ class SDSClient:
         try:
             response, result = await loop.run_in_executor(None, self.connection.get_response, message_id, self.timeout)
         except ldap_exceptions.LDAPResponseTimeoutError:
-            logger.error(f'LDAP query timed out for message id: {message_id}')
+            logger.error("0009", "LDAP query timed out for {message_id}", {"message_id": message_id})
 
         return response
