@@ -8,13 +8,12 @@ from typing import Dict
 from comms.common_https import CommonHttps
 from mhs_common.transmission import transmission_adaptor
 from tornado import httpclient
+
+from comms.common_https import CommonHttps
+from exceptions import MaxRetriesExceeded
 from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger("OUTBOUND_TRANSMISSION")
-
-
-class MaxRetriesExceeded(Exception):
-    pass
 
 
 class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
@@ -46,7 +45,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         request_method = "POST"
 
         retries_remaining = self._max_retries
-        while retries_remaining > 0:
+        while True:
             try:
                 logger.info("0001", "About to send message with {headers} to {url} : {message}",
                             {"headers": headers, "url": url, "message": message})
@@ -67,17 +66,15 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                 "retries_remaining": retries_remaining,
                                 "max_retries": self._max_retries
                                 })
+                if retries_remaining <= 0:
+                    logger.warning("0004",
+                                   "A request has exceeded the maximum number of retries, {max_retries} retries",
+                                   {"max_retries": self._max_retries})
+                    raise MaxRetriesExceeded("The max number of retries to make a request has been exceeded") from e
 
                 logger.info("0005", "Waiting for {retry_delay} milliseconds before next request attempt.",
                             {"retry_delay": self._retry_delay})
-
-                if retries_remaining > 0:
-                    await asyncio.sleep(self._retry_delay / 1000)
-
-        logger.warning("0004",
-                       "A request has exceeded the maximum number of retries, {max_retries} retries",
-                       {"max_retries": self._max_retries})
-        raise MaxRetriesExceeded("The max number of retries to make a request has been exceeded")
+                await asyncio.sleep(self._retry_delay / 1000)
 
     def _is_tornado_network_error(self, e):
         if isinstance(e, httpclient.HTTPClientError):
