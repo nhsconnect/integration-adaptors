@@ -17,7 +17,6 @@ from mhs_common.workflow import common_asynchronous
 
 ORG_CODE_CONFIG_KEY = "SPINE_ORG_CODE"
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
-MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
@@ -45,12 +44,12 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         await wdo.publish()
 
         try:
-            url, cpa_id, to_party_key = await self._lookup_endpoint_details(interaction_details, wdo)
+            url, to_party_key = await self._lookup_endpoint_details(interaction_details, wdo)
         except Exception:
             return 500, 'Error obtaining outbound URL'
 
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
-                                                                              interaction_details, payload, wdo, cpa_id,
+                                                                              interaction_details, payload, wdo,
                                                                               to_party_key)
         if error:
             return error
@@ -89,14 +88,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment})
 
-    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo, cpa_id,
+    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key):
         try:
             interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
             interaction_details[ebxml_request_envelope.MESSAGE] = payload
             interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
             interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
-            interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
         except Exception as e:
@@ -109,7 +107,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         return None, http_headers, message
 
     async def _lookup_endpoint_details(self, interaction_details: Dict, wdo: wd.WorkDescription) \
-            -> Tuple[str, str, str]:
+            -> Tuple[str, str]:
         try:
             service = interaction_details[ebxml_envelope.SERVICE]
             action = interaction_details[ebxml_envelope.ACTION]
@@ -121,13 +119,10 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             endpoint_details = await self.routing_reliability.get_end_point(org_code, service_id)
             # TODO: What if this isn't the right size?
             url = endpoint_details[MHS_END_POINT_KEY][0]
-            cpa_id = endpoint_details[MHS_CPA_ID_KEY]
             to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
-            logger.info('0013', 'Retrieved endpoint details for {org_code} & {service_id}. {url}, {cpa_id}, '
-                                '{to_party_key}',
-                        {'org_code': org_code, 'service_id': service_id, 'url': url, 'cpa_id': cpa_id,
-                         'to_party_key': to_party_key})
-            return url, cpa_id, to_party_key
+            logger.info('0013', 'Retrieved endpoint details for {org_code} & {service_id}. {url}, {to_party_key}',
+                        {'org_code': org_code, 'service_id': service_id, 'url': url, 'to_party_key': to_party_key})
+            return url, to_party_key
         except Exception as e:
             logger.warning('0014', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
