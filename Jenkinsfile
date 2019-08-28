@@ -67,7 +67,6 @@ pipeline {
                             -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT} \
                             -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_SDS_URL} \
                             -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
-                            }
                         """
                 }
             }
