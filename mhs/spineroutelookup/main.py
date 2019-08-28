@@ -8,7 +8,7 @@ from utilities import integration_adaptors_logger as log
 
 import definitions
 from lookup import dictionary_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, routing_reliability
-from request import routing_handler, reliability_handler
+from request import routing_handler, reliability_handler, routing_reliability_handler
 
 logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_MAIN')
 
@@ -50,7 +50,8 @@ def start_tornado_server(routing: routing_reliability.RoutingAndReliability) -> 
     handler_dependencies = {"routing": routing}
     application = tornado.web.Application([
         ("/routing", routing_handler.RoutingRequestHandler, handler_dependencies),
-        ("/reliability", reliability_handler.ReliabilityRequestHandler, handler_dependencies)
+        ("/reliability", reliability_handler.ReliabilityRequestHandler, handler_dependencies),
+        ("/routing-reliability", routing_reliability_handler.RoutingReliabilityRequestHandler, handler_dependencies)
     ])
     server = tornado.httpserver.HTTPServer(application)
     server.listen(80)
