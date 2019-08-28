@@ -52,7 +52,7 @@ def call_scr_adaptor(json_string):
     :return: the response from the adaptor
     """
 
-    # TODO
+    # TODO RT-186
     # once we know the scr_adaptor end point, we need to send the json_string to the scr_adaptor
     # scr_adaptor_response = requests.post(methods.get_scr_adaptor_hostname() + json_string)
     # return scr_adaptor_response.text
