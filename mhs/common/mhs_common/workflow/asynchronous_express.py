@@ -6,7 +6,6 @@ import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from tornado import httpclient
-from utilities import config
 from utilities import timing
 
 from mhs_common import workflow
