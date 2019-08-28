@@ -26,6 +26,8 @@ services:
       - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
+      - MHS_SPINE_ROUTE_LOOKUP_URL=http://spineroutelookup:80
+      - MHS_SPINE_ORG_CODE=YES
   spineroutelookup:
     image: local/mhs-spineroutelookup
     ports:

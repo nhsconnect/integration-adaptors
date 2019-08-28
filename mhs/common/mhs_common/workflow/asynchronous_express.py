@@ -1,17 +1,24 @@
 """This module defines the asynchronous express workflow."""
-from typing import Tuple
+from typing import Tuple, Dict
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from tornado import httpclient
+from utilities import config
 from utilities import timing
 
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
+from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous
+
+ORG_CODE_CONFIG_KEY = "SPINE_ORG_CODE"
+MHS_END_POINT_KEY = 'nhsMHSEndPoint'
+MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -21,29 +28,36 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
     def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
-                 queue_adaptor: queue_adaptor.QueueAdaptor = None):
+                 queue_adaptor: queue_adaptor.QueueAdaptor = None,
+                 routing_reliability: routing_reliability.RoutingAndReliability = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key
         self.queue_adaptor = queue_adaptor
+        self.routing_reliability = routing_reliability
 
     @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str) -> Tuple[int, str]:
         logger.info('0001', 'Entered async express workflow to handle outbound message')
         wdo = wd.create_new_work_description(self.persistence_store, message_id,
-                                                           wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED, workflow.ASYNC_EXPRESS)
+                                             wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED, workflow.ASYNC_EXPRESS)
         await wdo.publish()
 
-        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
-                                                                payload, wdo)
+        try:
+            url, cpa_id, to_party_key = await self._lookup_endpoint_details(interaction_details, wdo)
+        except Exception:
+            return 500, 'Error obtaining outbound URL'
+
+        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
+                                                                              interaction_details, payload, wdo, cpa_id,
+                                                                              to_party_key)
         if error:
             return error
 
         logger.info('0004', 'About to make outbound request')
         start_time = timing.get_time()
         try:
-            url = interaction_details['url']
             response = await self.transmission.make_request(url, http_headers, message)
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
@@ -75,12 +89,15 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment})
 
-    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo):
+    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo, cpa_id,
+                                          to_party_key):
         try:
             interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
             interaction_details[ebxml_request_envelope.MESSAGE] = payload
             interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
             interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
+            interaction_details[ebxml_envelope.CPA_ID] = cpa_id
+            interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
         except Exception as e:
             logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
@@ -90,6 +107,31 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         logger.info('0003', 'Message serialised successfully')
         await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
+
+    async def _lookup_endpoint_details(self, interaction_details: Dict, wdo: wd.WorkDescription) \
+            -> Tuple[str, str, str]:
+        try:
+            service = interaction_details[ebxml_envelope.SERVICE]
+            action = interaction_details[ebxml_envelope.ACTION]
+            service_id = service + ":" + action
+            org_code = config.get_config(ORG_CODE_CONFIG_KEY)
+
+            logger.info('0012', 'Looking up endpoint details for {org_code} & {service_id}.',
+                        {'org_code': org_code, 'service_id': service_id})
+            endpoint_details = await self.routing_reliability.get_end_point(org_code, service_id)
+            # TODO: What if this isn't the right size?
+            url = endpoint_details[MHS_END_POINT_KEY][0]
+            cpa_id = endpoint_details[MHS_CPA_ID_KEY]
+            to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
+            logger.info('0013', 'Retrieved endpoint details for {org_code} & {service_id}. {url}, {cpa_id}, '
+                                '{to_party_key}',
+                        {'org_code': org_code, 'service_id': service_id, 'url': url, 'cpa_id': cpa_id,
+                         'to_party_key': to_party_key})
+            return url, cpa_id, to_party_key
+        except Exception as e:
+            logger.warning('0014', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})
+            await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            raise e
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,

@@ -28,6 +28,14 @@ variable "mhs_state_table_name" {
   type = string
   description = "Name of the DynamoDB state table used by the MHS application."
 }
+variable "mhs_spine_route_lookup_url" {
+  type = string
+  description = "The URL of the Spine route lookup service."
+}
+variable "mhs_spine_org_code" {
+  type = string
+  description = "The organisation code for the Spine instance that your MHS is communicating with."
+}
 variable "scr_log_level" {
   type = string
   description = "Log Level for the SCR Web Service"

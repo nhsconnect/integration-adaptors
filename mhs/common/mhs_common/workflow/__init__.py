@@ -10,6 +10,7 @@ from mhs_common.workflow.asynchronous_reliable import AsynchronousReliableWorkfl
 from mhs_common.workflow.common import CommonWorkflow
 from mhs_common.workflow.intermediary_reliable import IntermediaryReliableWorkflow
 from mhs_common.workflow.synchronous import SynchronousWorkflow
+from mhs_common.routing import routing_reliability
 
 ASYNC_EXPRESS = 'async-express'
 ASYNC_RELIABLE = 'async-reliable'
@@ -19,14 +20,17 @@ SYNC = 'sync'
 
 def get_workflow_map(party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                      transmission: transmission_adaptor.TransmissionAdaptor = None,
-                     queue_adaptor: queue_adaptor.QueueAdaptor = None) -> Dict[str, CommonWorkflow]:
+                     queue_adaptor: queue_adaptor.QueueAdaptor = None,
+                     routing_reliability: routing_reliability.RoutingAndReliability = None) \
+        -> Dict[str, CommonWorkflow]:
     """
     Get a map of workflows. Keys for each workflow should correspond with keys used in interactions.json
 
     :return: a map of workflows
     """
     return {
-        ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, persistence_store, transmission, queue_adaptor),
+        ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, persistence_store, transmission, queue_adaptor,
+                                                   routing_reliability),
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(),
         FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
         SYNC: SynchronousWorkflow()

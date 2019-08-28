@@ -96,6 +96,14 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
         {
           name = "MHS_STATE_TABLE_NAME",
           value = var.mhs_state_table_name
+        },
+        {
+          name = "MHS_SPINE_ROUTE_LOOKUP_URL",
+          value = var.mhs_spine_route_lookup_url
+        },
+        {
+          name = "MHS_SPINE_ORG_CODE",
+          value = var.mhs_spine_org_code
         }
       ]
 

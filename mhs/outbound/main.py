@@ -1,19 +1,19 @@
 import pathlib
 from typing import Dict
 
+import definitions
+import mhs_common.configuration.configuration_manager as configuration_manager
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-
-import definitions
-import mhs_common.configuration.configuration_manager as configuration_manager
-from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
-
-import outbound.request.synchronous.handler as client_request_handler
 import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
+from mhs_common.routing import routing_reliability
+from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
+
+import outbound.request.synchronous.handler as client_request_handler
 from outbound.transmission import outbound_transmission
 
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
@@ -32,16 +32,20 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 
 
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
-                         persistence_store: persistence_adaptor.PersistenceAdaptor) \
+                         persistence_store: persistence_adaptor.PersistenceAdaptor,
+                         routing_reliability: routing_reliability.RoutingAndReliability) \
         -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :param transmission: The transmission object to be used to make requests to the spine endpoints
     :param party_key: The party key to use to identify this MHS.
     :param persistence_store: The persistence adaptor for the state database
+    :param routing_reliability: The routing and reliability component to use to request routing/reliability details
+    from.
     :return: The workflows that can be used to handle messages.
     """
 
-    return workflow.get_workflow_map(party_key, persistence_store, transmission)
+    return workflow.get_workflow_map(party_key=party_key, persistence_store=persistence_store,
+                                     transmission=transmission, routing_reliability=routing_reliability)
 
 
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:
@@ -77,9 +81,11 @@ def main():
     persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
 
+    routing = routing_reliability.RoutingAndReliability(config.get_config('SPINE_ROUTE_LOOKUP_URL'))
+
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
                                                               max_retries)
-    workflows = initialise_workflows(transmission, party_key, persistence_store)
+    workflows = initialise_workflows(transmission, party_key, persistence_store, routing)
 
     start_tornado_server(data_dir, workflows)
 
