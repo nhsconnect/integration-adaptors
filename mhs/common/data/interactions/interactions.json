@@ -5,11 +5,6 @@
     "request_type": "POST",
     "service": "urn:nhs:names:services:psisquery",
     "action": "QUPC_IN160101UK05",
-    "soap_action": "urn:nhs:names:services:psisquery/QUPC_IN160101UK05",
-    "content_type": "multipart/related; boundary=\"--=_MIME-Boundary\"",
-    "type": "text/xml",
-    "charset": "UTF-8",
-    "start": "<ebXMLHeader@spine.nhs.uk>",
     "async_response_expected": true,
     "to_party_id": "YES-0000806",
     "cpa_id": "S20001A000182",
@@ -23,11 +18,6 @@
     "request_type": "POST",
     "service": "urn:nhs:names:services:psis",
     "action": "REPC_IN150016UK05",
-    "soap_action": "urn:nhs:names:services:psis/REPC_IN150016UK05",
-    "content_type": "multipart/related; boundary=\"--=_MIME-Boundary\"",
-    "type": "text/xml",
-    "charset": "UTF-8",
-    "start": "<ebXMLHeader@spine.nhs.uk>",
     "async_response_expected": true,
     "to_party_id": "YES-0000806",
     "cpa_id": "S20001A000182",
@@ -38,12 +28,6 @@
   },
   "get_nhs_number": {
     "url": "https://msg.opentest.hscic.gov.uk/smsp/pds",
-    "request_type": "POST",
-    "soap_action": "urn:nhs-itk:services:201005:getNHSNumber-v1-0",
-    "content_type": "",
-    "type": "text/xml",
-    "charset": "UTF-8",
-    "start": "<ebXMLHeader@spine.nhs.uk>",
     "async_response_expected": false
   }
 }

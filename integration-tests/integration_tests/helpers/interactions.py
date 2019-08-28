@@ -1,4 +1,5 @@
 import requests
+
 from utilities import message_utilities
 
 from integration_tests.helpers import methods

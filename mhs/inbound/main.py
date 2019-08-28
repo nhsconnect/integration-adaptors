@@ -2,33 +2,33 @@ import pathlib
 import ssl
 from typing import Tuple, Dict
 
+import definitions
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-
-import definitions
-import inbound.request.handler as async_request_handler
 import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
+from comms import proton_queue_adaptor
 from mhs_common import workflow
 from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
+
+import inbound.request.handler as async_request_handler
 
 logger = log.IntegrationAdaptorsLogger('INBOUND_MAIN')
 
 ASYNC_TIMEOUT = 30
 
 
-def initialise_workflows(certs_dir: pathlib.Path, party_key: str) -> Dict[str, workflow.CommonWorkflow]:
+def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
-    :param certs_dir: The directory containing certificates/keys to be used to identify this MHS to a remote MHS.
-    :param party_key: The party key to use to identify this MHS.
     :return: The workflows that can be used to handle messages.
     """
-    # transmission = outbound_transmission.OutboundTransmission(str(certs_dir))
-    # workflow = sync_async_workflow.SyncAsyncWorkflow(transmission, party_key)
+    queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(host=config.get_config('INBOUND_QUEUE_HOST'),
+                                                            username=config.get_config('INBOUND_QUEUE_USERNAME'),
+                                                            password=config.get_config('INBOUND_QUEUE_PASSWORD'))
 
-    return workflow.get_workflow_map()
+    return workflow.get_workflow_map(queue_adaptor=queue_adaptor)
 
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
@@ -69,7 +69,8 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
     """
 
     inbound_application = tornado.web.Application(
-        [(r"/.*", async_request_handler.InboundHandler, dict(workflows=workflows, party_id=party_key))])
+        [(r"/.*", async_request_handler.InboundHandler, dict(workflows=workflows, party_id=party_key,
+                                                             state_store=persistence_store))])
 
     # Ensure Client authentication
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -94,7 +95,7 @@ def main():
     certs_file, key_file = load_certs(certs_dir)
     party_key = load_party_key(certs_dir)
 
-    workflows = initialise_workflows(certs_dir, party_key)
+    workflows = initialise_workflows()
     store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))
 
     start_inbound_server(certs_file, key_file, party_key, workflows, store)

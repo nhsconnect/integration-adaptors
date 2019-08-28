@@ -23,11 +23,14 @@ class CommonWorkflow(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
+                                     payload: str):
         """
         Handles an inbound message from an external system (typically from spine)
-        :param work_description:
-        :param payload:
-        :return:
+
+        :param message_id: ID of the message the original request to Spine was made with
+        :param correlation_id: correlation ID of the request
+        :param work_description: work description object for the payload
+        :param payload: payload to handle
         """
         pass

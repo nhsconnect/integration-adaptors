@@ -10,8 +10,6 @@ from integration_tests.helpers.build_message import build_message
 def get_asid():
     """ Looks up the asid from the environment settings
 
-    :return: the asid
-
     The asid should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will read from 'asid.txt' (excluded from the repo)
         or default to '123456789012' if 'asid.txt' is not found
@@ -39,8 +37,6 @@ def get_mhs_inbound_hostname():
 def get_mhs_hostname():
     """ Looks up the mhs hostname from the environment settings
 
-    :return: the mhs hostname
-
     The mhs hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'localhost'
     """
@@ -49,8 +45,6 @@ def get_mhs_hostname():
 
 def get_scr_adaptor_hostname():
     """ Looks up the scr adaptor hostname from the environment settings
-
-    :return: the scr adaptor hostname
 
     The scr adaptor hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'localhost'
@@ -79,7 +73,6 @@ def get_json(template, patient_nhs_number, payload):
     :param template: the template to use
     :param patient_nhs_number: the NHS number of the test patient
     :param payload: the actual payload message being inserted into the template
-    :return: populated template xml string
     """
     return build_message(template, get_asid(), patient_nhs_number, payload)
 
