@@ -70,7 +70,9 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
 
                 logger.info("0005", "Waiting for {retry_delay} milliseconds before next request attempt.",
                             {"retry_delay": self._retry_delay})
-                await asyncio.sleep(self._retry_delay / 1000)
+
+                if retries_remaining > 0:
+                    await asyncio.sleep(self._retry_delay / 1000)
 
         logger.warning("0004",
                        "A request has exceeded the maximum number of retries, {max_retries} retries",

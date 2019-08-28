@@ -109,7 +109,7 @@ class TestOutboundTransmission(TestCase):
                 await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
 
             self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
-            expected_sleep_arguments = [call(RETRY_DELAY_IN_SECONDS) for i in range(MAX_RETRIES)]
+            expected_sleep_arguments = [call(RETRY_DELAY_IN_SECONDS) for i in range(MAX_RETRIES - 1)]
             self.assertEqual(expected_sleep_arguments, mock_sleep.call_args_list)
 
     def test_is_tornado_network_error(self):
