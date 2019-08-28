@@ -10,7 +10,10 @@ import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
+<< << << < HEAD
 from mhs_common.routing import routing_reliability
+== == == =
+>> >> >> > develop
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 
 import outbound.request.synchronous.handler as client_request_handler
@@ -77,6 +80,7 @@ def main():
     client_key = "client.key"
     ca_certs = "client.pem"
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
+    retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
     party_key = load_party_key(certs_dir)
     persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
@@ -84,7 +88,7 @@ def main():
     routing = routing_reliability.RoutingAndReliability(config.get_config('SPINE_ROUTE_LOOKUP_URL'))
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
-                                                              max_retries)
+                                                              max_retries, retry_delay)
     workflows = initialise_workflows(transmission, party_key, persistence_store, routing)
 
     start_tornado_server(data_dir, workflows)

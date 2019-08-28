@@ -1,13 +1,13 @@
 """This module defines the outbound transmission component."""
 
+import asyncio
 from pathlib import Path
 from ssl import SSLError
 from typing import Dict
 
+from comms.common_https import CommonHttps
 from mhs_common.transmission import transmission_adaptor
 from tornado import httpclient
-
-from comms.common_https import CommonHttps
 from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger("OUTBOUND_TRANSMISSION")
@@ -25,18 +25,21 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
 
     """A component that sends HTTP requests to a remote MHS."""
 
-    def __init__(self, certs_dir: str, client_cert: str, client_key: str, ca_certs: str, max_retries: int):
+    def __init__(self, certs_dir: str, client_cert: str, client_key: str, ca_certs: str, max_retries: int,
+                 retry_delay: int):
         """Create a new OutboundTransmission that loads certificates from the specified directory.
         :param certs_dir: A string containing the path to the directory to load certificates from.
         :param client_cert: A string containing the name of the client certificate file in the certs directory.
         :param client_key: A string containing the name of the client private key file in the certs directory.
         :param ca_certs: A string containing the name of the certificate authority certificate file in the certs directory.
         :param max_retries: An integer with the value of the max number times to retry sending the request.
+        :param retry_delay: An integer representing the delay (in milliseconds) to use between retry attempts.
         """
         self._client_cert = str(Path(certs_dir) / client_cert)
         self._client_key = str(Path(certs_dir) / client_key)
         self._ca_certs = str(Path(certs_dir) / ca_certs)
         self._max_retries = max_retries
+        self._retry_delay = retry_delay
 
     async def make_request(self, url: str, headers: Dict[str, str], message: str) -> httpclient.HTTPResponse:
 
@@ -64,6 +67,12 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                 "retries_remaining": retries_remaining,
                                 "max_retries": self._max_retries
                                 })
+
+                logger.info("0005", "Waiting for {retry_delay} milliseconds before next request attempt.",
+                            {"retry_delay": self._retry_delay})
+
+                if retries_remaining > 0:
+                    await asyncio.sleep(self._retry_delay / 1000)
 
         logger.warning("0004",
                        "A request has exceeded the maximum number of retries, {max_retries} retries",
