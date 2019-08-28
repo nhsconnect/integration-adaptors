@@ -74,9 +74,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
 
                 logger.info("0005", "Waiting for {retry_delay} milliseconds before next request attempt.",
                             {"retry_delay": self._retry_delay})
-
-                if retries_remaining > 0:
-                    await asyncio.sleep(self._retry_delay / 1000)
+                await asyncio.sleep(self._retry_delay / 1000)
 
     def _is_tornado_network_error(self, e):
         if isinstance(e, httpclient.HTTPClientError):
