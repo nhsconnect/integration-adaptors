@@ -24,11 +24,15 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
     def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
-                 queue_adaptor: queue_adaptor.QueueAdaptor = None):
+                 queue_adaptor: queue_adaptor.QueueAdaptor = None,
+                 inbound_queue_max_retries: int = None,
+                 inbound_queue_retry_delay: int = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key
         self.queue_adaptor = queue_adaptor
+        self.inbound_queue_max_retries = inbound_queue_max_retries
+        self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000
 
     @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
@@ -99,8 +103,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                      payload: str):
         logger.info('0009', 'Entered async express workflow to handle inbound message')
         await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
-        retries_remaining = int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3'))
-        retry_delay = int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000
+        retries_remaining = self.inbound_queue_max_retries
         while True:
             try:
                 await self.queue_adaptor.send_async(payload, properties={'message-id': message_id,
@@ -113,7 +116,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                     await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
                     raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
                                              'been exceeded') from e
-                await asyncio.sleep(retry_delay)
+                await asyncio.sleep(self.inbound_queue_retry_delay)
 
         logger.info('0011', 'Placed message onto inbound queue successfully')
         await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)

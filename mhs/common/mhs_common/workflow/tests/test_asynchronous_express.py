@@ -31,6 +31,9 @@ INTERACTION_DETAILS = {
 }
 PAYLOAD = 'payload'
 SERIALIZED_MESSAGE = 'serialized-message'
+INBOUND_QUEUE_MAX_RETRIES = 3
+INBOUND_QUEUE_RETRY_DELAY = 100
+INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
 
 
 class TestAsynchronousExpressWorkflow(unittest.TestCase):
@@ -50,7 +53,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.workflow = async_express.AsynchronousExpressWorkflow(party_key=PARTY_KEY,
                                                                   persistence_store=self.mock_persistence_store,
                                                                   transmission=self.mock_transmission_adaptor,
-                                                                  queue_adaptor=self.mock_queue_adaptor)
+                                                                  queue_adaptor=self.mock_queue_adaptor,
+                                                                  inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+                                                                  inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
 
     ############################
     # Outbound tests
@@ -204,7 +209,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_status.call_args_list)
-        mock_sleep.assert_called_once_with(0.1)
+        mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -219,7 +224,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
-        self.assertEqual([mock.call(0.1), mock.call(0.1)], mock_sleep.call_args_list)
+        self.assertEqual(
+            [mock.call(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS) for _ in range(INBOUND_QUEUE_MAX_RETRIES - 1)],
+            mock_sleep.call_args_list)
 
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
