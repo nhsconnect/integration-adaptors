@@ -1,9 +1,12 @@
 """This module defines the asynchronous express workflow."""
+import asyncio
 from typing import Tuple
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
+from exceptions import MaxRetriesExceeded
 from tornado import httpclient
+from utilities import config
 from utilities import timing
 
 from mhs_common import workflow
@@ -96,13 +99,21 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                      payload: str):
         logger.info('0009', 'Entered async express workflow to handle inbound message')
         await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
-        try:
-            await self.queue_adaptor.send_async(payload, properties={'message-id': message_id,
-                                                                     'correlation-id': correlation_id})
-        except Exception as e:
-            logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
-            await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
-            raise e
+        retries_remaining = int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3'))
+        retry_delay = int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000
+        while True:
+            try:
+                await self.queue_adaptor.send_async(payload, properties={'message-id': message_id,
+                                                                         'correlation-id': correlation_id})
+                break
+            except Exception as e:
+                logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
+                retries_remaining -= 1
+                if retries_remaining <= 0:
+                    await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
+                    raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
+                                             'been exceeded') from e
+                await asyncio.sleep(retry_delay)
 
         logger.info('0011', 'Placed message onto inbound queue successfully')
         await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)

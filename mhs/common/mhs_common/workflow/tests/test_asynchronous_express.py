@@ -2,6 +2,7 @@ import asyncio
 import unittest
 from unittest import mock
 
+import exceptions
 from comms import proton_queue_adaptor
 from tornado import httpclient
 from utilities import test_utilities
@@ -186,15 +187,39 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_status.call_args_list)
 
+    @mock.patch('asyncio.sleep')
     @async_test
-    async def test_handle_inbound_message_error_putting_message_onto_queue(self):
+    async def test_handle_inbound_message_error_putting_message_onto_queue_then_success(self, mock_sleep):
+        self.setup_mock_work_description()
+        error_future = asyncio.Future()
+        error_future.set_exception(proton_queue_adaptor.MessageSendingError())
+        self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
+        mock_sleep.return_value = test_utilities.awaitable(None)
+
+        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+
+        self.mock_queue_adaptor.send_async.assert_called_with(PAYLOAD,
+                                                              properties={'message-id': MESSAGE_ID,
+                                                                          'correlation-id': CORRELATION_ID})
+        self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
+                          mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
+                         self.mock_work_description.set_status.call_args_list)
+        mock_sleep.assert_called_once_with(0.1)
+
+    @mock.patch('asyncio.sleep')
+    @async_test
+    async def test_handle_inbound_message_error_putting_message_onto_queue_despite_retries(self, mock_sleep):
         self.setup_mock_work_description()
         future = asyncio.Future()
         future.set_exception(proton_queue_adaptor.MessageSendingError())
         self.mock_queue_adaptor.send_async.return_value = future
+        mock_sleep.return_value = test_utilities.awaitable(None)
 
-        with self.assertRaises(proton_queue_adaptor.MessageSendingError):
+        with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
             await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+        self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
+
+        self.assertEqual([mock.call(0.1), mock.call(0.1)], mock_sleep.call_args_list)
 
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],

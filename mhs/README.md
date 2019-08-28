@@ -41,6 +41,8 @@ MHS takes a number of environment variables when it is run. These are:
 * `MHS_INBOUND_QUEUE_HOST` (inbound only) The host url of the amqp inbound queue. e.g. `amqps://example.com:port/queue-name`. Note that if the amqp connection being used is a secured connection (which it should be in production), then the url should start with `amqps://` and not `amqp+ssl://`.
 * `MHS_INBOUND_QUEUE_USERNAME` (inbound only) The username to use when connecting to the amqp inbound queue.
 * `MHS_INBOUND_QUEUE_PASSWORD` (inbound only) The password to use when connecting to the amqp inbound queue.
+* `MHS_INBOUND_QUEUE_MAX_RETRIES` (inbound only) The max number of times to retry putting a message onto the amqp inbound queue. Defaults to 3.
+* `MHS_INBOUND_QUEUE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying putting a message onto the amqp inbound queue. Defaults to 100ms.
 
 ## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.
