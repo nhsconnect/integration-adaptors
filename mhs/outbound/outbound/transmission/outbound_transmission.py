@@ -8,13 +8,10 @@ from mhs_common.transmission import transmission_adaptor
 from tornado import httpclient
 
 from comms.common_https import CommonHttps
+from exceptions import MaxRetriesExceeded
 from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger("OUTBOUND_TRANSMISSION")
-
-
-class MaxRetriesExceeded(Exception):
-    pass
 
 
 class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
