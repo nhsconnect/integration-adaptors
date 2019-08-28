@@ -31,7 +31,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         self.party_key = party_key
         self.queue_adaptor = queue_adaptor
         self.inbound_queue_max_retries = inbound_queue_max_retries
-        self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000
+        self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
 
     @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
