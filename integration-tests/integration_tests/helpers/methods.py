@@ -12,13 +12,13 @@ def get_asid():
 
     The asid should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will read from 'asid.txt' (excluded from the repo)
-        or default to '123456789012' if 'asid.txt' is not found
+        or default to None if 'asid.txt' is not found
     """
     try:
         asid_file = str(Path(ROOT_DIR) / "data/certs/asid.txt")
         asid = FileUtilities.get_file_string(asid_file)
     except:
-        asid = 123456789012
+        asid = None
 
     return os.environ.get('ASID', os.environ.get('ASID', asid))
 
@@ -65,6 +65,44 @@ def get_interaction_from_template(type, template, nhs_number, payload,
     :return: the response from the MHS
     """
     return interactions.process_request(template, get_asid(), nhs_number, payload, pass_message_id, pass_correlation_id)
+
+
+def get_log_timestamp(log_line):
+    """ Returns the timestamp extracted from the line of the log
+
+    :param log_line: the line from the log file
+    :return: the timestamp from the line
+
+    The format of the log file is timestamp - level: details
+        the timestamp is in yyyy-mm-ddThh:mm:ss.ffffff format, so just return the first 26 chars
+    """
+    return log_line[:26]
+
+
+def get_log_level(log_line):
+    """ Returns the log level extracted from the line of the log
+
+    :param log_line:
+    :return:
+
+    The format of the log file is timestamp - level: details
+        start by removing the timestamp and ' - ' then return upto the ':'
+    """
+    line = log_line[29:].split(':', 1)
+    return line[0]
+
+
+def get_log_description(log_line):
+    """ Returns the log level extracted from the line of the log
+
+    :param log_line:
+    :return:
+
+    The format of the log file is timestamp - level: details
+        start by removing the timestamp and ' - ' then return after the ':', stripping the end of line character
+    """
+    line = log_line[29:].split(':', 1)
+    return line[1].rstrip('\n')
 
 
 def get_json(template, patient_nhs_number, payload):
