@@ -112,9 +112,15 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                 logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
                 retries_remaining -= 1
                 if retries_remaining <= 0:
+                    logger.warning("0012",
+                                   "Exceeded the maximum number of retries, {max_retries} retries, when putting "
+                                   "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
                     await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
                     raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
                                              'been exceeded') from e
+
+                logger.info("0013", "Waiting for {retry_delay} seconds before retrying putting message onto inbound "
+                                    "queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
         logger.info('0011', 'Placed message onto inbound queue successfully')
