@@ -10,6 +10,7 @@ from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor as ta
 from mhs_common.workflow import common_synchronous
 from mhs_common.state import persistence_adaptor as pa
+from exceptions import MaxRetriesExceeded
 
 logger = log.IntegrationAdaptorsLogger('MHS_SYNC_ASYNC_WORKFLOW')
 
@@ -71,10 +72,12 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             except Exception as e:
                 logger.warning('021', 'Exception raised while adding to sync-async store {exception} {retry}',
                                {'exception': e, 'retry': retry})
-                if retry == 0:
-                    logger.error('022', 'Final retry has been attempted for adding message to sync async store')
-                    raise e
                 retry -= 1
+                if retry == 0:
+                    logger.warning('022', 'Final retry has been attempted for adding message to sync async store')
+                    raise MaxRetriesExceeded('Max number of retries exceeded whilst attempting to put the message'
+                                             'on the sync-async store') from e
+                
                 await asyncio.sleep(self.sync_async_store_retry_delay)
 
     def prepare_message(self, interaction_details: dict, content: str, message_id: str) -> Tuple[bool, str]:

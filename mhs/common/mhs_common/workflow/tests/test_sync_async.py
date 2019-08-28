@@ -1,6 +1,8 @@
 from unittest import TestCase
 from unittest.mock import Mock, sentinel, patch, MagicMock
 import utilities.message_utilities as message_utilities
+from exceptions import MaxRetriesExceeded
+
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 from mhs_common.workflow import sync_async
@@ -98,14 +100,14 @@ class TestSyncAsyncWorkflowInbound(TestCase):
                                                      sync_async_store=self.persistence,
                                                      sync_async_store_max_retries=3,
                                                      sync_async_store_retry_delay=100)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(MaxRetriesExceeded):
             await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
 
         self.work_description.set_status.assert_called_with(
             wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
 
-        self.assertEqual(self.persistence.add.call_count, 4)
-        self.assertEqual(mock_sleep.call_count, 3)
+        self.assertEqual(self.persistence.add.call_count, 3)
+        self.assertEqual(mock_sleep.call_count, 2)
         mock_sleep.assert_called_with(100/1000)
 
 
