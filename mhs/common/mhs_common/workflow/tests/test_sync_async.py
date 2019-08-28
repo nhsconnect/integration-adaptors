@@ -83,20 +83,31 @@ class TestSyncAsyncWorkflowInbound(TestCase):
         
         self.work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
 
+    @patch('asyncio.sleep')
     @test_utilities.async_test
-    async def test_inbound_workflow_exception_in_store(self):
+    async def test_inbound_workflow_exception_in_store_retries(self, mock_sleep):
+        mock_sleep.return_value = test_utilities.awaitable(None)
+
         def add_to_store_mock_throws_exception(key, value):
             raise ValueError('Fake error')
 
         self.persistence.add.side_effect = add_to_store_mock_throws_exception
         self.work_description.set_status.return_value = test_utilities.awaitable(True)
 
-        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence)
+        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None,
+                                                     sync_async_store=self.persistence,
+                                                     sync_async_store_max_retries=3,
+                                                     sync_async_store_retry_delay=100)
         with self.assertRaises(ValueError):
             await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
 
         self.work_description.set_status.assert_called_with(
             wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
+
+        self.assertEqual(self.persistence.add.call_count, 4)
+        self.assertEqual(mock_sleep.call_count, 3)
+        mock_sleep.assert_called_with(100/1000)
+
 
 
 
