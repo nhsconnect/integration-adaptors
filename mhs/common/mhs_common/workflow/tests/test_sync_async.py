@@ -85,10 +85,10 @@ class TestSyncAsyncWorkflowInbound(TestCase):
 
     @test_utilities.async_test
     async def test_inbound_workflow_exception_in_store(self):
-        def throws_exception(x, y):
+        def add_to_store_mock_throws_exception(key, value):
             raise ValueError('Fake error')
 
-        self.persistence.add.side_effect = throws_exception
+        self.persistence.add.side_effect = add_to_store_mock_throws_exception
         self.work_description.set_status.return_value = test_utilities.awaitable(True)
 
         self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence)

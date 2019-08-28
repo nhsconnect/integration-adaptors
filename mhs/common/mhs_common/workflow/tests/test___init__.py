@@ -6,11 +6,13 @@ import unittest
 
 class TestWorkflow(unittest.TestCase):
     def test_get_workflow_map_for_outbound(self):
-        workflow_map = workflow.get_workflow_map(party_key=sentinel.party_key, work_description_store=sentinel.persistence_store, transmission=sentinel.transmission)
+        workflow_map = workflow.get_workflow_map(party_key=sentinel.party_key,
+                                                 work_description_store=sentinel.persistence_store,
+                                                 transmission=sentinel.transmission)
         self.check_workflows_are_present(workflow_map)
 
     def test_get_workflow_map_for_inbound(self):
-        workflow_map = workflow.get_workflow_map(queue_adaptor=sentinel.queue_adaptor)
+        workflow_map = workflow.get_workflow_map(inbound_async_queue=sentinel.queue_adaptor)
         self.check_workflows_are_present(workflow_map)
 
     def check_workflows_are_present(self, workflow_map):
