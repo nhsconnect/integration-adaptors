@@ -32,7 +32,7 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
-    return workflow.get_workflow_map(queue_adaptor=queue_adaptor, sync_async_store=sync_async_store)
+    return workflow.get_workflow_map(inbound_async_queue=queue_adaptor, sync_async_store=sync_async_store)
 
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
