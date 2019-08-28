@@ -10,10 +10,7 @@ import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
-<< << << < HEAD
 from mhs_common.routing import routing_reliability
-== == == =
->> >> >> > develop
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 
 import outbound.request.synchronous.handler as client_request_handler
