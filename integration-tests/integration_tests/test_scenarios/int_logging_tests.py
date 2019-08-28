@@ -15,12 +15,12 @@ class FunctionalTest(TestCase):
         print('Time test started: ', start_time.strftime(TIMESTAMP_FORMAT))
 
         # fire off an (MHS) action that will generate a log file
-        # methods.get_interaction_from_template('async express',
-        #                                       'QUPC_IN160101UK05',
-        #                                       '9689174746',
-        #                                       'Asynchronous Express test')
-        # # then retrieve the response from the queue...
-        # _, _, inbound_response = message_retriever.get_inbound_response()
+        methods.get_interaction_from_template('async express',
+                                              'QUPC_IN160101UK05',
+                                              '9689174746',
+                                              'Asynchronous Express test')
+        # then retrieve the response from the queue...
+        _, _, inbound_response = message_retriever.get_inbound_response()
 
         # stop the clock
         end_time = datetime.datetime.utcnow()
