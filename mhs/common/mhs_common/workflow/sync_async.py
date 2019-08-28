@@ -1,10 +1,9 @@
 """This module defines the sync-async workflow."""
 
 import copy
+import asyncio
 from typing import Tuple, Dict
-
 from utilities import integration_adaptors_logger as log, message_utilities
-
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 from mhs_common.state import work_description as wd
@@ -44,21 +43,41 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('001', 'Entered sync-async inbound workflow')
-        await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
-
-        try:
-            logger.info('002', 'Attempting to add inbound message to sync-async store')
-            await self.sync_async_store.add(message_id, {
-                CORRELATION_ID: correlation_id,
-                MESSAGE_DATA: payload
-            })
-        except Exception as e:
-            logger.warning('003', 'Failed to put message into sync-async store due to {Exception}', {'Exception': e})
-            await work_description.set_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
-            raise e
-
+        await self._update_state_store(work_description, wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
+        await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: payload})
         logger.info('004', 'Placed message onto inbound queue successfully')
-        await work_description.set_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
+        await self._update_state_store(work_description, wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
+
+    async def _update_state_store(self, work_description, status):
+        retry = 0
+        while retry < 3:  # TODO: Set to config value
+            try:
+                await work_description.set_status(status)
+                logger.info('006', 'Updated work description store')
+                return
+            except Exception as e:
+                logger.error('005', 'Exception raised whilst updating state store: {exception}', {'exception': e})
+                if retry == 3:
+                    raise e
+                retry += 1
+                await asyncio.sleep(0.5)  # TODO: Set to config value
+
+    async def _add_to_sync_async_store(self, key, data):
+        logger.info('002', 'Attempting to add inbound message to sync-async store')
+        retry = 0
+        while True:  # TODO set config
+            try:
+                await self.sync_async_store.add(key, data)
+                logger.info('003', 'Successfully updated state store')
+                break
+            except Exception as e:
+                logger.warning('021', 'Exception raised while adding to sync-async store {exception} {retry}',
+                               {'exception': e, 'retry': retry})
+                if retry == 3:  # TODO: config
+                    logger.error('022', 'Final retry has been attempted for adding message to sync async store')
+                    raise e
+                retry += 1
+                await asyncio.sleep(0.5)  # TODO config
 
     def prepare_message(self, interaction_details: dict, content: str, message_id: str) -> Tuple[bool, str]:
         """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
