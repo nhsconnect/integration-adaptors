@@ -24,7 +24,10 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     def __init__(self,
                  party_id: str,
                  transmission: ta.TransmissionAdaptor = None,
-                 sync_async_store: pa.PersistenceAdaptor = None):
+                 sync_async_store: pa.PersistenceAdaptor = None,
+                 sync_async_store_max_retries: int = None,
+                 sync_async_store_retry_delay: int = None
+                 ):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
         :param transmission: The component that can be used to send messages.
@@ -35,6 +38,8 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.transmission = transmission
         self.sync_async_store = sync_async_store
         self.party_id = party_id
+        self.sync_async_store_max_retries = sync_async_store_max_retries
+        self.sync_async_store_retry_delay = sync_async_store_retry_delay
 
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str) -> Tuple[int, str]:
