@@ -75,11 +75,6 @@ class IntegrationAdaptorsLogger:
 
         message += f' ProcessKey={self.process_key_tag + process_key_num}'
 
-        exc_inf = sys.exc_info()
-        if all(exc_inf):
-            (etype, value, trace) = exc_inf
-            message += f' Traceback={traceback.format_exception(etype, value, trace)}'
-
         self.logger.log(level, message)
 
     def info(self, process_key_num: str, message: str, values: dict = None):
@@ -107,6 +102,13 @@ class IntegrationAdaptorsLogger:
         Replaces the values in the map with key=value so that the key in a string can be replaced with the correct
         log format, also surrounds the value with quotes if it contains spaces and removes spaces from the key
         """
+
+        if "Exception" in dict_values:
+            exc_inf = sys.exc_info()
+            if all(exc_inf):
+                (etype, value, trace) = exc_inf
+                dict_values["Exception"] = f'{value}{traceback.format_exception(etype, value, trace)}'
+
         new_map = {}
         for key, value in dict_values.items():
             value = str(value)
