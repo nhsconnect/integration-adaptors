@@ -25,7 +25,7 @@ resource "aws_subnet" "mhs_subnet" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.build_id}-mhs-subnet-${count.index}"
+    Name = "${var.build_id}-mhs-subnet-${data.aws_availability_zones.all.names[count.index]}"
     BuildId = var.build_id
   }
 }
