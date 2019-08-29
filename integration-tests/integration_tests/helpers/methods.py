@@ -31,7 +31,8 @@ def get_mhs_inbound_queue():
     The mhs inbound hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'localhost:5672'
     """
-    return "http://" + os.environ.get('INBOUND_QUEUE_HOST', 'localhost:5672') + "/"
+    
+    return os.environ.get('INBOUND_QUEUE_HOST', 'http://localhost:5672/')
 
 
 def get_mhs_hostname():
