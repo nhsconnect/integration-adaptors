@@ -61,9 +61,9 @@ pipeline {
                             -var mhs_state_table_name=mhs-state \
                             -var scr_log_level=DEBUG \
                             -var scr_service_port=${SCR_SERVICE_PORT} \
-                            -var mhs_inbound_queue_host=${INBOUND_QUEUE_HOST} \
-                            -var mhs_inbound_queue_username=${QUEUE_USER} \
-                            -var mhs_inbound_queue_password=${QUEUE_PASS}
+                            -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
+                            -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
+                            -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD}
                         """
                 }
             }
@@ -106,9 +106,9 @@ pipeline {
                         -var mhs_state_table_name=mhs-state \
                         -var scr_log_level=DEBUG \
                         -var scr_service_port=${SCR_SERVICE_PORT} \
-                        -var mhs_inbound_queue_host=${INBOUND_QUEUE_HOST} \
-                        -var mhs_inbound_queue_username=${QUEUE_USER} \
-                        -var mhs_inbound_queue_password=${QUEUE_PASS}
+                        -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
+                        -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
+                        -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD}
                      """
             }
         }
