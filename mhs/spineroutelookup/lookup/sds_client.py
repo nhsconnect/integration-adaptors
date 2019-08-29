@@ -9,7 +9,7 @@ from utilities import integration_adaptors_logger as log
 
 import lookup.sds_exception as sds_exception
 
-logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_MAIN')
+logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_CLIENT')
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 
