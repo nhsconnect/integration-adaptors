@@ -10,3 +10,7 @@ resource "aws_vpc" "mhs_vpc" {
     Name = "${var.build_id}-vpc"
   }
 }
+
+resource "aws_ecs_cluster" "mhs_cluster" {
+  name = "${var.build_id}-mhs-cluster"
+}
