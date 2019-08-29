@@ -24,14 +24,25 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :return: The workflows that can be used to handle messages.
     """
-    queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(host=config.get_config('INBOUND_QUEUE_HOST'),
-                                                            username=config.get_config('INBOUND_QUEUE_USERNAME'),
-                                                            password=config.get_config('INBOUND_QUEUE_PASSWORD'))
+
+    queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
+        host=config.get_config('INBOUND_QUEUE_HOST'),
+        username=config.get_config('INBOUND_QUEUE_USERNAME'),
+        password=config.get_config('INBOUND_QUEUE_PASSWORD'))
+    sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+        table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
     inbound_queue_max_retries = int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3'))
     inbound_queue_retry_delay = int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='1000'))
-    return workflow.get_workflow_map(queue_adaptor=queue_adaptor, inbound_queue_max_retries=inbound_queue_max_retries,
-                                     inbound_queue_retry_delay=inbound_queue_retry_delay)
+    sync_async_retries = int(config.get_config('SYNC_ASYNC_STORE_MAX_RETRIES', default='3'))
+    sync_async_delay = int(config.get_config('SYNC_ASYNC_STORE_RETRY_DELAY', default='100'))
+    return workflow.get_workflow_map(inbound_async_queue=queue_adaptor,
+                                     sync_async_store=sync_async_store,
+                                     sync_async_store_retries=sync_async_retries,
+                                     sync_async_store_retry_delay=sync_async_delay,
+                                     inbound_queue_max_retries=inbound_queue_max_retries,
+                                     inbound_queue_retry_delay=inbound_queue_retry_delay
+                                     )
 
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
@@ -61,10 +72,11 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 
 def start_inbound_server(certs_file: str, key_file: str, party_key: str,
                          workflows: Dict[str, workflow.CommonWorkflow],
-                         persistence_store: persistence_adaptor
+                         persistence_store: persistence_adaptor.PersistenceAdaptor
                          ) -> None:
     """
 
+    :param persistence_store: persistence store adaptor for message information
     :param certs_file: The filename of the certificate to be used to identify this MHS to a remote MHS.
     :param key_file: The filename of the private key for the certificate identified by certs_file.
     :param workflows: The workflows to be used to handle messages.
@@ -73,7 +85,7 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
 
     inbound_application = tornado.web.Application(
         [(r"/.*", async_request_handler.InboundHandler, dict(workflows=workflows, party_id=party_key,
-                                                             state_store=persistence_store))])
+                                                             work_description_store=persistence_store))])
 
     # Ensure Client authentication
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
