@@ -103,11 +103,13 @@ class IntegrationAdaptorsLogger:
         log format, also surrounds the value with quotes if it contains spaces and removes spaces from the key
         """
 
-        if "Exception" in dict_values:
-            exc_inf = sys.exc_info()
-            if all(exc_inf):
-                (etype, value, trace) = exc_inf
-                dict_values["Exception"] = f'{value}{traceback.format_exception(etype, value, trace)}'
+        for key in dict_values.keys():
+            if str(key).lower() == "exception":
+                exc_inf = sys.exc_info()
+                if all(exc_inf):
+                    (etype, value, trace) = exc_inf
+                    dict_values[key] = f'{value}{traceback.format_exception(etype, value, trace)}'
+                    break
 
         new_map = {}
         for key, value in dict_values.items():
