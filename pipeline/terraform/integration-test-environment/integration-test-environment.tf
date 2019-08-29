@@ -30,6 +30,15 @@ resource "aws_subnet" "mhs_subnet" {
   }
 }
 
+resource "aws_internet_gateway" "mhs_igw" {
+  vpc_id = aws_vpc.mhs_vpc.id
+
+  tags = {
+    Name = "${var.build_id}-mhs-igw"
+    BuildId = var.build_id
+  }
+}
+
 resource "aws_ecs_cluster" "mhs_cluster" {
   name = "${var.build_id}-mhs-cluster"
 

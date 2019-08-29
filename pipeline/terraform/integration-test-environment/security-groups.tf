@@ -53,17 +53,6 @@ resource "aws_security_group" "sds_cache_security_group" {
   }
 }
 
-resource "aws_security_group" "ig_security_group" {
-  name = "Internet Gateway Security Group"
-  description = "The security group used to control traffic for the Internet Gateway."
-  vpc_id = aws_vpc.mhs_vpc.id
-
-  tags = {
-    Name = "${var.build_id}-ig-sg"
-    BuildId = var.build_id
-  }
-}
-
 resource "aws_security_group" "alb_outbound_security_group" {
   name = "Outbound ALB Security Group"
   description = "The security group used to control traffic for the outbound MHS Application Load Balancer."
