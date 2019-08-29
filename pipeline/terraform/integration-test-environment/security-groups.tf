@@ -31,24 +31,13 @@ resource "aws_security_group" "mhs_inbound_security_group" {
   }
 }
 
-resource "aws_security_group" "state_db_security_group" {
-  name = "State Database Security Group"
-  description = "The security group used to control traffic for the state database endpoint."
+resource "aws_security_group" "dynamo_db_security_group" {
+  name = "DynamoDB Security Group"
+  description = "The security group used to control traffic for the DynamoDB endpoint."
   vpc_id = aws_vpc.mhs_vpc.id
 
   tags = {
-    Name = "${var.build_id}-state-db-sg"
-    BuildId = var.build_id
-  }
-}
-
-resource "aws_security_group" "sync_async_db_security_group" {
-  name = "Sync-Async Database Security Group"
-  description = "The security group used to control traffic for the sync-async database endpoint."
-  vpc_id = aws_vpc.mhs_vpc.id
-
-  tags = {
-    Name = "${var.build_id}-sync-async-db-sg"
+    Name = "${var.build_id}-dynamo-db-sg"
     BuildId = var.build_id
   }
 }
