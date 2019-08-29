@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:crs="http://national.carerecords.nhs.uk/schema/crs/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+  <SOAP:Body>
+    <SOAP:Fault>
+      <faultcode>SOAP:Server</faultcode>
+      <faultstring>Application Exception</faultstring>
+      <detail/>
+    </SOAP:Fault>
+  </SOAP:Body>
+</SOAP:Envelope>
