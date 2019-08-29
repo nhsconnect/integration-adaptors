@@ -13,4 +13,8 @@ resource "aws_vpc" "mhs_vpc" {
 
 resource "aws_ecs_cluster" "mhs_cluster" {
   name = "${var.build_id}-mhs-cluster"
+
+  tags = {
+        "BuildId" = "${var.build_id}"
+    }
 }
