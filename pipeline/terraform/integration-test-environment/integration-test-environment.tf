@@ -38,12 +38,3 @@ resource "aws_internet_gateway" "mhs_igw" {
     BuildId = var.build_id
   }
 }
-
-resource "aws_ecs_cluster" "mhs_cluster" {
-  name = "${var.build_id}-mhs-cluster"
-
-  tags = {
-    Name = "${var.build_id}-mhs-cluster"
-    BuildId = var.build_id
-  }
-}
