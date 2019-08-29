@@ -15,6 +15,6 @@ resource "aws_ecs_cluster" "mhs_cluster" {
   name = "${var.build_id}-mhs-cluster"
 
   tags = {
-        "BuildId" = "${var.build_id}"
-    }
+    BuildId = "${var.build_id}"
+  }
 }
