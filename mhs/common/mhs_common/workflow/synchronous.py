@@ -12,5 +12,6 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                       payload: str) -> Tuple[int, str]:
         raise NotImplementedError()
 
-    async def handle_inbound_message(self, work_description: wd.WorkDescription, payload: str):
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
+                                     payload: str):
         raise NotImplementedError()
