@@ -29,7 +29,7 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
                                                             password=config.get_config('INBOUND_QUEUE_PASSWORD'))
 
     inbound_queue_max_retries = int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3'))
-    inbound_queue_retry_delay = int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100'))
+    inbound_queue_retry_delay = int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='1000'))
     return workflow.get_workflow_map(queue_adaptor=queue_adaptor, inbound_queue_max_retries=inbound_queue_max_retries,
                                      inbound_queue_retry_delay=inbound_queue_retry_delay)
 
