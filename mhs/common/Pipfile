@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+coverage = "~=4.5"
+tornado = "*"
+unittest-xml-reporting = "~=2.5"
+
+[packages]
+defusedxml = "~=0.6"
+integration-adaptors-common = {editable = true,path = "./../../common"}
+aioboto3 = "*"
+
+[requires]
+python_version = "3.7"
+
+[scripts]
+unittests = 'python -m xmlrunner -o test-reports -v'
+unittests-cov = 'coverage run -m xmlrunner -o test-reports -v'
+coverage-report = 'coverage report'
+coverage-report-xml = 'coverage xml'
+coverage-report-html = 'coverage html'

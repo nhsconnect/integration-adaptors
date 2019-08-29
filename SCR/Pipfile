@@ -13,4 +13,4 @@ scr = {editable = true,path = "."}
 python_version = "3.7"
 
 [scripts]
-tests = "python -m unittest -v"
+unittests = "python -m unittest -v"

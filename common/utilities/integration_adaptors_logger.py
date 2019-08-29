@@ -1,11 +1,15 @@
+import contextvars
+import datetime as dt
 import logging
 import sys
-import time
 
 from utilities import config
 
 AUDIT = 25
 
+message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', default=None)
+correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default=None)
+inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
 
 # Set the logging info globally, make each module get a new logger based on that log ref we provide
 def configure_logging():
@@ -14,15 +18,29 @@ def configure_logging():
     to stdout and sets the default log levels and format. This is expected to be called once at the start of a
     application.
     """
+
+    class _CustomFormatter(logging.Formatter):
+        """
+        A private formatter class, this is required to provide microsecond precision timestamps and utc
+        conversion
+        """
+        converter = dt.datetime.utcfromtimestamp
+
+        def formatTime(self, record, datefmt):
+            ct = self.converter(record.created)
+            return ct.strftime(datefmt)
+
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
     logger.setLevel(config.get_config('LOG_LEVEL'))
     handler = logging.StreamHandler(sys.stdout)
-    logging.Formatter.converter = time.gmtime
-    formatter = logging.Formatter('[%(asctime)s.%(msecs)03dZ] '
-                                  '%(message)s pid=%(process)d LogLevel=%(levelname)s ',
-                                  '%Y-%m-%dT%H:%M:%S')
+
+    formatter = _CustomFormatter(
+        fmt='[%(asctime)sZ] %(message)s pid=%(process)d LogLevel=%(levelname)s ',
+        datefmt='%Y-%m-%dT%H:%M:%S.%f')
+
     handler.setFormatter(formatter)
+
     logger.addHandler(handler)
 
 
@@ -38,7 +56,7 @@ class IntegrationAdaptorsLogger:
         self.process_key_tag = log_ref
         self.logger = logging.getLogger(log_ref)
 
-    def _format_and_write(self, message, values, process_key_num, request_id, correlation_id, level):
+    def _format_and_write(self, message, values, process_key_num, level):
         """
         Formats the string and appends the appropriate values if they are included before writing the log
         """
@@ -47,39 +65,37 @@ class IntegrationAdaptorsLogger:
 
         message = self._formatted_string(message, values)
 
-        if request_id:
-            message += f' RequestId={request_id}'
-        if correlation_id:
-            message += f' CorrelationId={correlation_id}'
+        if message_id.get():
+            message += f' RequestId={message_id.get()}'
+        if correlation_id.get():
+            message += f' CorrelationId={correlation_id.get()}'
+        if inbound_message_id.get():
+            message += f' InboundMessageId={inbound_message_id.get()}'
+
 
         message += f' ProcessKey={self.process_key_tag + process_key_num}'
 
         self.logger.log(level, message)
 
-    def info(self, process_key_num: str, message: str, values: dict = None,
-             request_id: str = None, correlation_id=None):
+    def info(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.INFO)
+        self._format_and_write(message, values, process_key_num, logging.INFO)
 
-    def audit(self, process_key_num: str, message: str, values: dict = None,
-              request_id: str = None, correlation_id=None):
+    def audit(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, AUDIT)
+        self._format_and_write(message, values, process_key_num, AUDIT)
 
-    def warning(self, process_key_num: str, message: str, values: dict = None,
-                request_id: str = None, correlation_id=None):
+    def warning(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.WARNING)
+        self._format_and_write(message, values, process_key_num, logging.WARNING)
 
-    def error(self, process_key_num: str, message: str, values: dict = None,
-              request_id: str = None, correlation_id=None):
+    def error(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.ERROR)
+        self._format_and_write(message, values, process_key_num, logging.ERROR)
 
-    def critical(self, process_key_num: str, message: str, values: dict = None,
-                 request_id: str = None, correlation_id=None):
+    def critical(self, process_key_num: str, message: str, values: dict = None):
         values = values if values is not None else {}
-        self._format_and_write(message, values, process_key_num, request_id, correlation_id, logging.CRITICAL)
+        self._format_and_write(message, values, process_key_num, logging.CRITICAL)
 
     def _format_values_in_map(self, dict_values: dict) -> dict:
         """
@@ -101,4 +117,3 @@ class IntegrationAdaptorsLogger:
         """
         formatted_values = self._format_values_in_map(dict_values)
         return message.format(**formatted_values)
-

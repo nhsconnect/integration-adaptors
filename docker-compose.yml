@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  inbound:
+    image: local/mhs-inbound
+    ports:
+      - "443:443"
+    environment:
+      - MHS_LOG_LEVEL=NOTSET
+      - MHS_INBOUND_QUEUE_HOST=rabbitmq:5672/inbound
+      - MHS_INBOUND_QUEUE_USERNAME=guest
+      - MHS_INBOUND_QUEUE_PASSWORD=guest
+      - MHS_STATE_TABLE_NAME=mhs_state
+      - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state
+      - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
+      # boto3 requires some AWS creds to be provided, even
+      # when connecting to local DynamoDB
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+  outbound:
+    image: local/mhs-outbound
+    ports:
+      - "80:80"
+    environment:
+      - MHS_LOG_LEVEL=NOTSET
+      - MHS_STATE_TABLE_NAME=mhs_state
+      - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+  dynamodb:
+    build: ./common/local-env/dynamodb-local
+    ports:
+      - "8000:8000"
+  rabbitmq:
+    build: ./common/local-env/rabbit/
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    hostname: "localhost"

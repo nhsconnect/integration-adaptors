@@ -13,6 +13,8 @@ root CA Certificate.
 - `client.pem` - A copy of client.cert
 - `party_key.txt` - The party key associated with your MHS build
 
+The certs path and each files name should also be refrenced in the main method of mhs/outbound/main.py.
+
 If you are using Opentest, each of these credentials will have been provided when you were granted access.
 
 Finally, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/) installed and on your path, then from this
@@ -23,12 +25,29 @@ pipenv install
 
 ### Developer Setup
 To prepare a development environment for this application, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/)
-installed and on your path, then from this directory run:
+installed and on your path, then within each of the subfolders `common`, `inbound` and `outbound` in this directory, run:
 ```
 pipenv install --dev
 ```
 
-### Running Unit Tests
+## Running MHS
+MHS is made up of multiple components, and running them all separately can be tedious. Instead, use Docker Compose, see [here](../README.md) for how to do this.
+
+### Environment Variables
+MHS takes a number of environment variables when it is run. These are:
+* `MHS_LOG_LEVEL` This is required to be set to one of: `NOTSET`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least.
+* `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
+* `MHS_OUTBOUND_TRANSMISSION_MAX_RETRIES` (outbound only) This is the maximum number of retries for outbound requests. If no value is given a default of 3 is used.
+* `MHS_OUTBOUND_TRANSMISSION_RETRY_DELAY` (outbound only) The delay between retries of outbound requests in milliseconds. If no value is given, a default of `100` is used.
+* `MHS_INBOUND_QUEUE_HOST` (inbound only) The host url of the amqp inbound queue. e.g. `amqps://example.com:port/queue-name`. Note that if the amqp connection being used is a secured connection (which it should be in production), then the url should start with `amqps://` and not `amqp+ssl://`.
+* `MHS_INBOUND_QUEUE_USERNAME` (inbound only) The username to use when connecting to the amqp inbound queue.
+* `MHS_INBOUND_QUEUE_PASSWORD` (inbound only) The password to use when connecting to the amqp inbound queue.
+* `MHS_INBOUND_QUEUE_MAX_RETRIES` (inbound only) The max number of times to retry putting a message onto the amqp inbound queue. Defaults to 3.
+* `MHS_INBOUND_QUEUE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying putting a message onto the amqp inbound queue. Defaults to 100ms.
+* `SYNC_ASYNC_STORE_MAX_RETRIES'` (inbound only) The max number of retries when attempting to add a message to the sync-async store. Defaults to 3 
+* `SYNC_ASYNC_STORE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying placing a message on the sysnc-async store. Defaults to 100ms
+
+## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.
 - `pipenv run unittests-cov` will run all unit tests, generating a [Coverage](https://coverage.readthedocs.io/) report
 in the `test-reports` directory.
@@ -59,14 +78,10 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
  without the 'http://' prefix or '/' suffix
     - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
 
-## Running an MHS Instance
-`pipenv run mhs` will run the `main.py` script (you can also run this directly). This will start up an MHS
-instance listening for 'client' requests on port 80 and asynchronous responses from Spine on port 443.
-Note that the following environment variables need to be set when running MHS:
-- `MHS_LOG_LEVEL` - log level threshold
 
-Any content POSTed to `/path` (for example) on port 80 will result in the request configuration for the `path` entry in
+
+Any content POSTed to `/` on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
 `interactions.json` will allow you to define new supported interactions.
 
-You will need to complete the setup steps below before being able to successfully connect to a Spine instance.
+

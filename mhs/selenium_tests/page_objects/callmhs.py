@@ -1,6 +1,6 @@
 import requests
 
-from selenium_tests.page_objects import methods
+from page_objects import methods
 
 
 def call_mhs(mhs_command, hl7payload, message_id=None):
@@ -12,6 +12,9 @@ def call_mhs(mhs_command, hl7payload, message_id=None):
     :return: The response returned by the MHS.
     """
 
-    params = {} if message_id is None else {'messageId': message_id}
-    response = requests.post(methods.get_hostname() + mhs_command, params=params, data=hl7payload)
+    headers = {'Interaction-Id': mhs_command}
+    if message_id is not None:
+        headers['Message-Id'] = message_id
+
+    response = requests.post(methods.get_hostname(), headers=headers, data=hl7payload)
     return response.text
