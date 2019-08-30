@@ -31,17 +31,6 @@ resource "aws_security_group" "mhs_inbound_security_group" {
   }
 }
 
-resource "aws_security_group" "dynamo_db_security_group" {
-  name = "DynamoDB Security Group"
-  description = "The security group used to control traffic for the DynamoDB endpoint."
-  vpc_id = aws_vpc.mhs_vpc.id
-
-  tags = {
-    Name = "${var.build_id}-dynamo-db-sg"
-    BuildId = var.build_id
-  }
-}
-
 resource "aws_security_group" "sds_cache_security_group" {
   name = "SDS Cache Security Group"
   description = "The security group used to control traffic for the SDS cache endpoint."
