@@ -1,5 +1,4 @@
 resource "aws_lb" "outbound_alb" {
-  name = "MHS-Outbound-ALB"
   internal = true
   load_balancer_type = "application"
   subnets = aws_subnet.mhs_subnet.*.id
@@ -38,7 +37,6 @@ resource "aws_lb_listener" "outbound_alb_listener" {
 }
 
 resource "aws_lb" "route_alb" {
-  name = "MHS-Route-ALB"
   internal = true
   load_balancer_type = "application"
   subnets = aws_subnet.mhs_subnet.*.id
