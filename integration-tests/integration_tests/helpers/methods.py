@@ -15,7 +15,7 @@ def get_asid():
         or default to None if 'asid.txt' is not found
     """
     try:
-        asid_file = str(Path(ROOT_DIR) / "data/certs/asid.txt")
+        asid_file = str(Path(ROOT_DIR) / "integration_tests/data/certs/asid.txt")
         asid = FileUtilities.get_file_string(asid_file)
     except:
         asid = None
