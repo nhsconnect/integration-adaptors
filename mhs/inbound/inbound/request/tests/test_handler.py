@@ -72,7 +72,8 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         return tornado.web.Application([
-            (r".*", handler.InboundHandler, dict(workflows=self.mocked_workflows, state_store=self.state, party_id=FROM_PARTY_ID))
+            (r".*", handler.InboundHandler, dict(workflows=self.mocked_workflows,
+                                                 work_description_store=self.state, party_id=FROM_PARTY_ID))
         ])
 
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")

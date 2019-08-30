@@ -1,4 +1,4 @@
-# National Integration Adaptor
+# National Integration Adaptors
 
 This repository contains adaptors which accelerate integration with national NHS systems.
 
