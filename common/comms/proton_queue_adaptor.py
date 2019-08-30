@@ -31,10 +31,14 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         Construct a Proton implementation of a :class:`QueueAdaptor <comms.queue_adaptor.QueueAdaptor>`.
         The kwargs provided should contain the following information:
           * host: The host of the Message Queue to be interacted with.
+          * username: The username to use to connect to the Message Queue.
+          * password The password to use to connect to the Message Queue.
         :param kwargs: The key word arguments required for this constructor.
         """
         super().__init__()
         self.host = kwargs.get('host')
+        self.username = kwargs.get('username')
+        self.password = kwargs.get('password')
         logger.info('000', 'Initialized proton queue adaptor for {host}', {'host': self.host})
 
     async def send_async(self, message: str, properties: Dict[str, Any] = None) -> None:
@@ -66,27 +70,32 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         Performs a synchronous send of a message, to the host defined when this adaptor was constructed.
         :param message: The message to be sent.
         """
-        proton.reactor.Container(ProtonMessagingHandler(self.host, message)).run()
+        proton.reactor.Container(ProtonMessagingHandler(self.host, self.username, self.password, message)).run()
 
 
 class ProtonMessagingHandler(proton.handlers.MessagingHandler):
     """Implementation of a Proton MessagingHandler which will send a single message."""
 
-    def __init__(self, host, message: proton.Message) -> None:
+    def __init__(self, host: str, username: str, password: str, message: proton.Message) -> None:
         """
         Constructs a MessagingHandler which will send a specified message to a specified host.
         :param host: The host to send the message to.
+        :param username: The username to login to the host with.
+        :param password: The password to login to the host with.
         :param message: The message to be sent to the host.
         """
         super().__init__()
         self._host = host
+        self._username = username
+        self._password = password
         self._message = message
         self._sender = None
         self._sent = False
 
     def on_start(self, event):
         logger.info('002', 'Establishing connection to {host} for sending messages.', {'host': self._host})
-        self._sender = event.container.create_sender(self._host)
+        self._sender = event.container.create_sender(proton.Url(self._host, username=self._username,
+                                                                password=self._password))
 
     def on_sendable(self, event):
         if event.sender.credit:
