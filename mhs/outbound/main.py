@@ -18,18 +18,6 @@ from outbound.transmission import outbound_transmission
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
 
-def load_party_key(data_dir: pathlib.Path) -> str:
-    """Load this MHS's party key from the specified directory.
-    :param data_dir: The directory to load the party key from.
-    :return: The party key to use to identify this MHS.
-    """
-    party_key_file = str(data_dir / "party_key.txt")
-    party_key = file_utilities.FileUtilities.get_file_string(party_key_file)
-
-    assert party_key
-    return party_key
-
-
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
                          persistence_store: persistence_adaptor.PersistenceAdaptor) \
         -> Dict[str, workflow.CommonWorkflow]:
@@ -71,9 +59,15 @@ def main():
     client_cert = "client.cert"
     client_key = "client.key"
     ca_certs = "client.pem"
+
+    certs_dir.mkdir(parents=True, exist_ok=True)
+    (certs_dir / client_cert).write_text(config.get_config('CLIENT_CERT'))
+    (certs_dir / client_key).write_text(config.get_config('CLIENT_KEY'))
+    (certs_dir / ca_certs).write_text(config.get_config('CA_CERTS'))
+
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
-    party_key = load_party_key(certs_dir)
+    party_key = config.get_config('PARTY_KEY')
     persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
 

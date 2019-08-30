@@ -7,6 +7,9 @@ services:
       - "443:443"
     environment:
       - MHS_LOG_LEVEL=NOTSET
+      - MHS_PARTY_KEY
+      - MHS_CLIENT_KEY
+      - MHS_CA_CERTS
       - MHS_INBOUND_QUEUE_HOST=rabbitmq:5672/inbound
       - MHS_INBOUND_QUEUE_USERNAME=guest
       - MHS_INBOUND_QUEUE_PASSWORD=guest
@@ -23,6 +26,10 @@ services:
       - "80:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
+      - MHS_PARTY_KEY
+      - MHS_CLIENT_CERT
+      - MHS_CLIENT_KEY
+      - MHS_CA_CERTS
       - MHS_STATE_TABLE_NAME=mhs_state
       - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
       - AWS_ACCESS_KEY_ID=test

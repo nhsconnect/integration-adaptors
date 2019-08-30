@@ -24,6 +24,24 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
             value = var.mhs_state_table_name
           }
         ]
+        secrets = [
+          {
+            name = "MHS_PARTY_KEY"
+            valueFrom = var.party_key_arn
+          },
+          {
+            name = "MHS_CLIENT_CERT"
+            valueFrom = var.client_cert_arn
+          },
+          {
+            name = "MHS_CLIENT_KEY"
+            valueFrom = var.client_key_arn
+          },
+          {
+            name = "MHS_CA_CERTS"
+            valueFrom = var.ca_certs_arn
+          }
+        ]
         essential = true
         logConfiguration = {
           logDriver = "awslogs"
@@ -90,6 +108,18 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
           {
             name      = "MHS_INBOUND_QUEUE_PASSWORD"
             valueFrom = var.inbound_queue_password_arn
+          },
+          {
+            name = "MHS_PARTY_KEY"
+            valueFrom = var.party_key_arn
+          },
+          {
+            name = "MHS_CLIENT_KEY"
+            valueFrom = var.client_key_arn
+          },
+          {
+            name = "MHS_CA_CERTS"
+            valueFrom = var.ca_certs_arn
           }
         ]
         essential = true

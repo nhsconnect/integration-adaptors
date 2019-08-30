@@ -42,6 +42,16 @@ It is possible to run a local development cluster including the MHS. The followi
 * Run `docker-compose build`. This will build all the additional containers
 * Run `docker-compose up`. This will start the inbound and outbound services, along with an instance of RabbitMQ and
     DynamoDb
+  * Note that the environment variables `MHS_PARTY_KEY`, `MHS_CLIENT_CERT`, `MHS_CLIENT_KEY` and `MHS_CA_CERTS` need to
+  be set when running this command. These variables should be set as described [here](mhs). A simple way of setting this
+  up once is to create a bash file `configure-env-vars.sh` that looks like:
+  ```sh
+  export MHS_PARTY_KEY="your party key here"
+  export MHS_CLIENT_CERT=$'client cert here'
+  export MHS_CLIENT_KEY=$'client key here'
+  export MHS_CA_CERTS=$'ca certs here'
+  ```
+  and then run `source configure-env-vars.sh` before running `docker-compose up`.
 * Depending on the OS the MHS is being run on, measures may have to be taken to allow public inbound traffic so that
 the async responses from Spine can access the MHS. For example on windows a inbound rule was required in windows
 firewall to allow inbound traffic through port 443. In the AWS test environment an inbound rule was added

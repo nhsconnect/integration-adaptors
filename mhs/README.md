@@ -4,18 +4,7 @@ This package contains a pre-assured implementation of a Message Handling Service
 details of Spine messaging and provide a simple interface to allow HL7 messages to be sent to a remote MHS.
 
 ## Setup
-A `data/certs` directory should be created with the following files (containing the certificates & keys required to
-perform client authentication to the Spine instance you are using. For Openttest, these will have been provided when you
-were granted access):
-- `client.cert` - Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate,
-root CA Certificate.
-- `client.key` - Your endpoint private key
-- `client.pem` - A copy of client.cert
-- `party_key.txt` - The party key associated with your MHS build
-
-The certs path and each files name should also be refrenced in the main method of mhs/outbound/main.py.
-
-If you are using Opentest, each of these credentials will have been provided when you were granted access.
+You'll need to have a connection to Spine. For testing purposes, you can use [Opentest](https://nhs-digital-opentest.github.io/Welcome/index.html).
 
 Finally, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/) installed and on your path, then from this
 directory run:
@@ -36,6 +25,10 @@ MHS is made up of multiple components, and running them all separately can be te
 ### Environment Variables
 MHS takes a number of environment variables when it is run. These are:
 * `MHS_LOG_LEVEL` This is required to be set to one of: `NOTSET`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least.
+* `MHS_PARTY_KEY` The party key associated with your MHS.
+* `MHS_CLIENT_CERT` (outbound only) Your endpoint certificate
+* `MHS_CLIENT_KEY` Your endpoint private key
+* `MHS_CA_CERTS` Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate, root CA Certificate.
 * `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
 * `MHS_OUTBOUND_TRANSMISSION_MAX_RETRIES` (outbound only) This is the maximum number of retries for outbound requests. If no value is given a default of 3 is used.
 * `MHS_OUTBOUND_TRANSMISSION_RETRY_DELAY` (outbound only) The delay between retries of outbound requests in milliseconds. If no value is given, a default of `100` is used.
@@ -44,8 +37,10 @@ MHS takes a number of environment variables when it is run. These are:
 * `MHS_INBOUND_QUEUE_PASSWORD` (inbound only) The password to use when connecting to the amqp inbound queue.
 * `MHS_INBOUND_QUEUE_MAX_RETRIES` (inbound only) The max number of times to retry putting a message onto the amqp inbound queue. Defaults to 3.
 * `MHS_INBOUND_QUEUE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying putting a message onto the amqp inbound queue. Defaults to 100ms.
-* `SYNC_ASYNC_STORE_MAX_RETRIES'` (inbound only) The max number of retries when attempting to add a message to the sync-async store. Defaults to 3 
+* `SYNC_ASYNC_STORE_MAX_RETRIES'` (inbound only) The max number of retries when attempting to add a message to the sync-async store. Defaults to 3
 * `SYNC_ASYNC_STORE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying placing a message on the sysnc-async store. Defaults to 100ms
+
+Note that if you are using Opentest, you should use the credentials you were given when you got access to set `MHS_PARTY_KEY`, `MHS_CLIENT_CERT`, `MHS_CLIENT_KEY` and `MHS_CA_CERTS`.
 
 ## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.
@@ -83,5 +78,3 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
 Any content POSTed to `/` on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
 `interactions.json` will allow you to define new supported interactions.
-
-

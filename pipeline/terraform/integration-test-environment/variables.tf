@@ -53,3 +53,23 @@ variable "inbound_queue_password_arn" {
   type = string
   description = "ARN of the secrets manager secret of the password to use when connecting to the inbound queue."
 }
+
+variable "party_key_arn" {
+  type = string
+  description = "ARN of the secrets manager secret of the party key associated with the MHS."
+}
+
+variable "client_cert_arn" {
+  type = string
+  description = "ARN of the secrets manager secret of the endpoint certificate."
+}
+
+variable "client_key_arn" {
+  type = string
+  description = "ARN of the secrets manager secret of the endpoint private key."
+}
+
+variable "ca_certs_arn" {
+  type = string
+  description = "ARN of the secrets manager secret of the endpoint certificate, endpoint issuing subCA certificate, root CA Certificate (all in that order)."
+}
