@@ -46,6 +46,9 @@ def configure_logging():
 
 
 class IntegrationAdaptorsLogger:
+    """
+    To log exceptions correctly, key them with 'exception'
+    """
 
     def __init__(self, log_ref: str):
         """
@@ -105,11 +108,8 @@ class IntegrationAdaptorsLogger:
 
         for key in dict_values.keys():
             if str(key).lower() == "exception":
-                exc_inf = sys.exc_info()
-                if all(exc_inf):
-                    (etype, value, trace) = exc_inf
-                    dict_values[key] = f'{value}{traceback.format_exception(etype, value, trace)}'
-                    break
+                dict_values[key] = self._format_exception(str(dict_values[key]))
+                break
 
         new_map = {}
         for key, value in dict_values.items():
@@ -126,3 +126,16 @@ class IntegrationAdaptorsLogger:
         """
         formatted_values = self._format_values_in_map(dict_values)
         return message.format(**formatted_values)
+
+    @staticmethod
+    def _format_exception(message: str) -> str:
+        """
+        Returns a formatted string of the last exception on the stack
+        """
+        exc_inf = sys.exc_info()
+        if all(exc_inf):
+            (etype, value, trace) = exc_inf
+            if message:
+                return f'{message}, {traceback.format_exception(etype, value, trace)}'
+            else:
+                return f'{traceback.format_exception(etype, value, trace)}'
