@@ -2,11 +2,10 @@ resource "aws_lb" "outbound_alb" {
   name = "MHS-Outbound-ALB"
   internal = true
   load_balancer_type = "application"
-  subnets = data.aws_subnet_ids.all_in_vpc.ids
+  subnets = aws_subnet.mhs_subnet.*.id
   security_groups = [
     aws_security_group.alb_outbound_security_group.id
   ]
-
 
   tags = {
     Name = "${var.build_id}-mhs-outbound-alb"

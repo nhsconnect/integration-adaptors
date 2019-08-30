@@ -21,8 +21,8 @@ resource "aws_vpc_endpoint" "ecr_endpoint" {
     aws_security_group.ecr_security_group.id
   ]
 
-  # An endpoint network interface is created in all of the VPC's subnets.
-  subnet_ids = data.aws_subnet_ids.all_in_vpc.ids
+  # An endpoint network interface is created in all of the subnets we have created.
+  subnet_ids = aws_subnet.mhs_subnet.*.id
 
   tags = {
     Name = "${var.build_id}-ecr-endpoint"
@@ -53,8 +53,8 @@ resource "aws_vpc_endpoint" "cloudwatch_endpoint" {
     aws_security_group.cloudwatch_security_group.id
   ]
 
-  # An endpoint network interface is created in all of the VPC's subnets.
-  subnet_ids = data.aws_subnet_ids.all_in_vpc.ids
+  # An endpoint network interface is created in all of the subnets we have created.
+  subnet_ids = aws_subnet.mhs_subnet.*.id
 
   tags = {
     Name = "${var.build_id}-cloudwatch-endpoint"

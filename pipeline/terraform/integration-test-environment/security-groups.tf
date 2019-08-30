@@ -70,7 +70,7 @@ resource "aws_security_group" "ecr_security_group" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = data.aws_subnet.all_in_vpc.*.cidr_block
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
     description = "HTTPS"
   }
 
@@ -89,7 +89,7 @@ resource "aws_security_group" "cloudwatch_security_group" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = data.aws_subnet.all_in_vpc.*.cidr_block
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
     description = "HTTPS"
   }
 
@@ -97,7 +97,7 @@ resource "aws_security_group" "cloudwatch_security_group" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = data.aws_subnet.all_in_vpc.*.cidr_block
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
     description = "HTTPS"
   }
 

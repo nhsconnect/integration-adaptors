@@ -5,15 +5,6 @@ provider "aws" {
 
 data "aws_availability_zones" "all" {}
 
-data "aws_subnet_ids" "all_in_vpc" {
-  vpc_id = aws_vpc.mhs_vpc.id
-}
-
-data "aws_subnet" "all_in_vpc" {
-  count = length(data.aws_subnet_ids.all_in_vpc.ids)
-  id = tolist(data.aws_subnet_ids.all_in_vpc.ids)[count.index]
-}
-
 resource "aws_vpc" "mhs_vpc" {
   cidr_block = "10.0.0.0/16"
   enable_dns_hostnames = true
