@@ -144,6 +144,16 @@ resource "aws_security_group" "alb_route_security_group" {
   description = "The security group used to control traffic for the MHS routing component Application Load Balancer."
   vpc_id = aws_vpc.mhs_vpc.id
 
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    description = "Inbound HTTP connections"
+  }
+
   tags = {
     Name = "${var.build_id}-alb-route-sg"
     BuildId = var.build_id
