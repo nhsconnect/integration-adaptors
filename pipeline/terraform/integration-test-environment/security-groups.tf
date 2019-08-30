@@ -36,6 +36,14 @@ resource "aws_security_group" "ecr_security_group" {
   description = "The security group used to control traffic for the ECR VPC endpoint."
   vpc_id = aws_vpc.mhs_vpc.id
 
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = data.aws_subnet.all_in_vpc.*.cidr_block
+    description = "HTTPS"
+  }
+
   tags = {
     Name = "${var.build_id}-ecr-endpoint-sg"
     BuildId = var.build_id
@@ -47,8 +55,24 @@ resource "aws_security_group" "cloudwatch_security_group" {
   description = "The security group used to control traffic for the Cloudwatch VPC endpoint."
   vpc_id = aws_vpc.mhs_vpc.id
 
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = data.aws_subnet.all_in_vpc.*.cidr_block
+    description = "HTTPS"
+  }
+
+  egress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = data.aws_subnet.all_in_vpc.*.cidr_block
+    description = "HTTPS"
+  }
+
   tags = {
-    Name = "${var.build_id}-ecr-endpoint-sg"
+    Name = "${var.build_id}-cloudwatch-endpoint-sg"
     BuildId = var.build_id
   }
 }
