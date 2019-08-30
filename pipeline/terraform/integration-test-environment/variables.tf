@@ -9,6 +9,16 @@ variable "build_id" {
   description = "ID used to identify the current build."
 }
 
+variable "mhs_outbound_service_instance_count" {
+  type = number
+  description = "The desired number of instances of MHS outbound to run."
+}
+
+variable "mhs_inbound_service_instance_count" {
+  type = number
+  description = "The desired number of instances of MHS inbound to run."
+}
+
 variable "task_role_arn" {
   type = string
   description = "ARN of the IAM role for MHS containers to use other AWS services."

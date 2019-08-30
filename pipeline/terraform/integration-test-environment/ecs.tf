@@ -170,3 +170,41 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
   task_role_arn      = var.task_role_arn
   execution_role_arn = var.execution_role_arn
 }
+
+resource "aws_ecs_service" "mhs_outbound_service" {
+  name                               = "${var.build_id}-mhs-outbound"
+  cluster                            = aws_ecs_cluster.mhs_cluster.id
+  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 100
+  desired_count                      = var.mhs_outbound_service_instance_count
+  launch_type                        = "FARGATE"
+  scheduling_strategy                = "REPLICA"
+  task_definition                    = aws_ecs_task_definition.mhs_outbound_task.arn
+
+  network_configuration {
+    assign_public_ip = false
+    security_groups = [
+      aws_security_group.mhs_outbound_security_group.id
+    ]
+    subnets = [for subnet in aws_subnet.mhs_subnet : subnet.id]
+  }
+}
+
+resource "aws_ecs_service" "mhs_inbound_service" {
+  name                               = "${var.build_id}-mhs-inbound"
+  cluster                            = aws_ecs_cluster.mhs_cluster.id
+  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 100
+  desired_count                      = var.mhs_inbound_service_instance_count
+  launch_type                        = "FARGATE"
+  scheduling_strategy                = "REPLICA"
+  task_definition                    = aws_ecs_task_definition.mhs_inbound_task.arn
+
+  network_configuration {
+    assign_public_ip = false
+    security_groups = [
+      aws_security_group.mhs_inbound_security_group.id
+    ]
+    subnets = [for subnet in aws_subnet.mhs_subnet : subnet.id]
+  }
+}
