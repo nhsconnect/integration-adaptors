@@ -1,32 +1,62 @@
 resource "aws_security_group" "mhs_outbound_security_group" {
-  name = "MHS Outbound Security Group"
+  name        = "MHS Outbound Security Group"
   description = "The security group used to control traffic for the MHS Outbound component."
-  vpc_id = aws_vpc.mhs_vpc.id
+  vpc_id      = aws_vpc.mhs_vpc.id
+
+  egress {
+    from_port = 443
+    to_port   = 443
+
+    cidr_blocks     = [for subnet in aws_subnet.mhs_subnet : subnet.cidr_block]
+    prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+    protocol        = "tcp"
+    description     = "HTTPS"
+  }
 
   tags = {
-    Name = "${var.build_id}-mhs-outbound-sg"
+    Name    = "${var.build_id}-mhs-outbound-sg"
     BuildId = var.build_id
   }
 }
 
 resource "aws_security_group" "mhs_route_security_group" {
-  name = "MHS Route Security Group"
+  name        = "MHS Route Security Group"
   description = "The security group used to control traffic for the MHS Routing component."
-  vpc_id = aws_vpc.mhs_vpc.id
+  vpc_id      = aws_vpc.mhs_vpc.id
+
+  egress {
+    from_port = 443
+    to_port   = 443
+
+    cidr_blocks     = [for subnet in aws_subnet.mhs_subnet : subnet.cidr_block]
+    prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+    protocol        = "tcp"
+    description     = "HTTPS"
+  }
 
   tags = {
-    Name = "${var.build_id}-mhs-route-sg"
+    Name    = "${var.build_id}-mhs-route-sg"
     BuildId = var.build_id
   }
 }
 
 resource "aws_security_group" "mhs_inbound_security_group" {
-  name = "MHS Inbound Security Group"
+  name        = "MHS Inbound Security Group"
   description = "The security group used to control traffic for the MHS Inbound component."
-  vpc_id = aws_vpc.mhs_vpc.id
+  vpc_id      = aws_vpc.mhs_vpc.id
+
+  egress {
+    from_port = 443
+    to_port   = 443
+
+    cidr_blocks     = [for subnet in aws_subnet.mhs_subnet : subnet.cidr_block]
+    prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+    protocol        = "tcp"
+    description     = "HTTPS"
+  }
 
   tags = {
-    Name = "${var.build_id}-mhs-inbound-sg"
+    Name    = "${var.build_id}-mhs-inbound-sg"
     BuildId = var.build_id
   }
 }
