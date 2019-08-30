@@ -34,7 +34,6 @@ class FunctionalTest(TestCase):
         for line in logs:
             # extract the timestamp from the line...
             time = methods.get_log_timestamp(line)
-            print('Timestamp: ', time)
 
             after_start = time > start_time.strftime(TIMESTAMP_FORMAT)
             before_end = end_time.strftime(TIMESTAMP_FORMAT) > time

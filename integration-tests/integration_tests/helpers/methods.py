@@ -73,36 +73,37 @@ def get_log_timestamp(log_line):
     :param log_line: the line from the log file
     :return: the timestamp from the line
 
-    The format of the log file is timestamp - level: details
-        the timestamp is in yyyy-mm-ddThh:mm:ss.ffffff format, so just return the first 26 chars
+    The format of the log file is [timestamp] details LogLevel=level
+        the timestamp is in yyyy-mm-ddThh:mm:ss.ffffff format, so just return 26 chars from the 2nd char
     """
-    return log_line[:26]
+    return log_line[1:26]
 
 
 def get_log_level(log_line):
     """ Returns the log level extracted from the line of the log
 
     :param log_line:
-    :return:
+    :return: the log level
 
-    The format of the log file is timestamp - level: details
-        start by removing the timestamp and ' - ' then return upto the ':'
+    The format of the log file is [timestamp] details LogLevel=level
+        start by removing the timestamp and details then return after the 'LogLevel=',
+        stripping the end of line character
     """
-    line = log_line[29:].split(':', 1)
-    return line[0]
+    line = log_line[30:].split(' LogLevel=', 1)
+    return line[1].rstrip('\n')
 
 
 def get_log_description(log_line):
     """ Returns the log level extracted from the line of the log
 
     :param log_line:
-    :return:
+    :return: the log details
 
-    The format of the log file is timestamp - level: details
-        start by removing the timestamp and ' - ' then return after the ':', stripping the end of line character
+    The format of the log file is [timestamp] details LogLevel=level
+        start by removing the timestamp and then return up to the 'LogLevel='
     """
-    line = log_line[29:].split(':', 1)
-    return line[1].rstrip('\n')
+    line = log_line[30:].split(' LogLevel=', 1)
+    return line[0]
 
 
 def get_json(template, patient_nhs_number, payload):
