@@ -7,6 +7,22 @@ resource "aws_ecs_cluster" "mhs_cluster" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "mhs_outbound_log_group" {
+  name = "/ecs/${var.build_id}-mhs-outbound"
+  tags = {
+    Name    = "${var.build_id}-mhs-outbound-log-group"
+    BuildId = var.build_id
+  }
+}
+
+resource "aws_cloudwatch_log_group" "mhs_inbound_log_group" {
+  name = "/ecs/${var.build_id}-mhs-inbound"
+  tags = {
+    Name    = "${var.build_id}-mhs-inbound-log-group"
+    BuildId = var.build_id
+  }
+}
+
 resource "aws_ecs_task_definition" "mhs_outbound_task" {
   family = "${var.build_id}-mhs-outbound"
   container_definitions = jsonencode(
@@ -26,19 +42,19 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
         ]
         secrets = [
           {
-            name = "MHS_PARTY_KEY"
+            name      = "MHS_PARTY_KEY"
             valueFrom = var.party_key_arn
           },
           {
-            name = "MHS_CLIENT_CERT"
+            name      = "MHS_CLIENT_CERT"
             valueFrom = var.client_cert_arn
           },
           {
-            name = "MHS_CLIENT_KEY"
+            name      = "MHS_CLIENT_KEY"
             valueFrom = var.client_key_arn
           },
           {
-            name = "MHS_CA_CERTS"
+            name      = "MHS_CA_CERTS"
             valueFrom = var.ca_certs_arn
           }
         ]
@@ -46,7 +62,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = "/ecs/${var.build_id}-mhs-outbound"
+            awslogs-group         = aws_cloudwatch_log_group.mhs_outbound_log_group.name
             awslogs-region        = var.region
             awslogs-stream-prefix = var.build_id
           }
@@ -71,7 +87,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
     Name    = "${var.build_id}-mhs-outbound-task"
     BuildId = var.build_id
   }
-  task_role_arn = var.task_role_arn
+  task_role_arn      = var.task_role_arn
   execution_role_arn = var.execution_role_arn
 }
 
@@ -110,15 +126,15 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
             valueFrom = var.inbound_queue_password_arn
           },
           {
-            name = "MHS_PARTY_KEY"
+            name      = "MHS_PARTY_KEY"
             valueFrom = var.party_key_arn
           },
           {
-            name = "MHS_CLIENT_KEY"
+            name      = "MHS_CLIENT_KEY"
             valueFrom = var.client_key_arn
           },
           {
-            name = "MHS_CA_CERTS"
+            name      = "MHS_CA_CERTS"
             valueFrom = var.ca_certs_arn
           }
         ]
@@ -126,7 +142,7 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = "/ecs/${var.build_id}-mhs-inbound"
+            awslogs-group         = aws_cloudwatch_log_group.mhs_inbound_log_group.name
             awslogs-region        = var.region
             awslogs-stream-prefix = var.build_id
           }
@@ -151,6 +167,6 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
     Name    = "${var.build_id}-mhs-inbound-task"
     BuildId = var.build_id
   }
-  task_role_arn = var.task_role_arn
+  task_role_arn      = var.task_role_arn
   execution_role_arn = var.execution_role_arn
 }
