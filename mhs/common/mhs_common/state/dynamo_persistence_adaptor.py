@@ -59,7 +59,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 return None
             return json.loads(response.get('Attributes', {}).get('data'))
         except Exception as e:
-            logger.error('001', 'Error creating record: {exception}', {'exception': traceback.format_exc()})
+            logger.error('001', 'Error creating record: {exception}', {'exception': e})
             raise RecordCreationError from e
 
     async def get(self, key):
@@ -80,7 +80,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 return None
             return json.loads(response.get('Item', {}).get('data'))
         except Exception as e:
-            logger.error('005', 'Error getting record: {exception}', {'exception': traceback.format_exc()})
+            logger.error('005', 'Error getting record: {exception}', {'exception': e})
             raise RecordRetrievalError from e
 
     async def delete(self, key):
@@ -102,7 +102,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 return None
             return json.loads(response.get('Attributes', {}).get('data'))
         except Exception as e:
-            logger.error('009', 'Error deleting record: {exception}', {'exception': traceback.format_exc()})
+            logger.error('009', 'Error deleting record: {exception}', {'exception': e})
             raise RecordDeletionError from e
 
     @contextlib.asynccontextmanager
