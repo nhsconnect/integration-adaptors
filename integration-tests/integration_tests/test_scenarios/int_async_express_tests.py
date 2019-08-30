@@ -16,6 +16,10 @@ class FunctionalTest(TestCase):
         self.assertTrue(methods.check_status_code(outbound_response, 202),
                         "Async Express outbound test failed")
 
+    def tests_assert_ssl_with_proton(self):
+        import proton
+        self.assertTrue(proton.SSL.present())
+
     def test_async_express_inbound_message_id(self):
         # send the message
         outbound_response, sent_message_id, _ = methods.get_interaction_from_template('async express',
