@@ -1,6 +1,6 @@
 import datetime
 
-from unittest import TestCase
+from unittest import skip, TestCase
 
 from integration_tests.helpers import message_retriever, methods, logs_retriever
 
@@ -9,6 +9,7 @@ TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 class FunctionalTest(TestCase):
 
+    @skip("RT-77 work in progress")
     def test_logging_file(self):
         # start the clock
         start_time = datetime.datetime.utcnow()
@@ -35,8 +36,6 @@ class FunctionalTest(TestCase):
             time = methods.get_log_timestamp(line)
             print('Timestamp: ', time)
 
-            # after_start = time > start_time.strftime(TIMESTAMP_FORMAT)
-            after_start = True
+            after_start = time > start_time.strftime(TIMESTAMP_FORMAT)
             before_end = end_time.strftime(TIMESTAMP_FORMAT) > time
-            # before_end = True
             self.assertTrue(after_start and before_end)
