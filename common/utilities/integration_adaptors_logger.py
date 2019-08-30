@@ -2,6 +2,7 @@ import contextvars
 import datetime as dt
 import logging
 import sys
+from typing import Optional, List
 
 from utilities import config
 
@@ -11,8 +12,9 @@ message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', d
 correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default=None)
 inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
 
+
 # Set the logging info globally, make each module get a new logger based on that log ref we provide
-def configure_logging():
+def configure_logging(handlers: Optional[List] = None):
     """
     A general method to load the overall config of the system, specifically it modifies the root handler to output
     to stdout and sets the default log levels and format. This is expected to be called once at the start of a
@@ -32,16 +34,20 @@ def configure_logging():
 
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
-    logger.setLevel(config.get_config('LOG_LEVEL'))
-    handler = logging.StreamHandler(sys.stdout)
+    logger.setLevel(config.get_config('LOG_LEVEL', 'DEBUG'))
 
     formatter = _CustomFormatter(
         fmt='[%(asctime)sZ] %(message)s pid=%(process)d LogLevel=%(levelname)s ',
         datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
-    handler.setFormatter(formatter)
-
-    logger.addHandler(handler)
+    if handlers:
+        for handler in handlers:
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+    else:
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
 
 class IntegrationAdaptorsLogger:

@@ -76,7 +76,7 @@ def get_log_timestamp(log_line):
     The format of the log file is timestamp - level: details
         the timestamp is in yyyy-mm-ddThh:mm:ss.ffffff format, so just return the first 26 chars
     """
-    return log_line[:26]
+    return log_line[1:26]
 
 
 def get_log_level(log_line):
