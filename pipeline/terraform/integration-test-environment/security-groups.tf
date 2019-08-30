@@ -31,6 +31,28 @@ resource "aws_security_group" "mhs_inbound_security_group" {
   }
 }
 
+resource "aws_security_group" "ecr_security_group" {
+  name = "ECR Endpoint Security Group"
+  description = "The security group used to control traffic for the ECR VPC endpoint."
+  vpc_id = aws_vpc.mhs_vpc.id
+
+  tags = {
+    Name = "${var.build_id}-ecr-endpoint-sg"
+    BuildId = var.build_id
+  }
+}
+
+resource "aws_security_group" "cloudwatch_security_group" {
+  name = "Cloudwatch Endpoint Security Group"
+  description = "The security group used to control traffic for the Cloudwatch VPC endpoint."
+  vpc_id = aws_vpc.mhs_vpc.id
+
+  tags = {
+    Name = "${var.build_id}-ecr-endpoint-sg"
+    BuildId = var.build_id
+  }
+}
+
 resource "aws_security_group" "sds_cache_security_group" {
   name = "SDS Cache Security Group"
   description = "The security group used to control traffic for the SDS cache endpoint."
