@@ -7,7 +7,7 @@ resource "aws_security_group" "mhs_outbound_security_group" {
     from_port = 443
     to_port   = 443
 
-    cidr_blocks     = [for subnet in aws_subnet.mhs_subnet : subnet.cidr_block]
+    cidr_blocks     = aws_subnet.mhs_subnet.*.cidr_block
     prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
     protocol        = "tcp"
     description     = "HTTPS"
@@ -28,7 +28,7 @@ resource "aws_security_group" "mhs_route_security_group" {
     from_port = 443
     to_port   = 443
 
-    cidr_blocks     = [for subnet in aws_subnet.mhs_subnet : subnet.cidr_block]
+    cidr_blocks     = aws_subnet.mhs_subnet.*.cidr_block
     prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
     protocol        = "tcp"
     description     = "HTTPS"
@@ -49,7 +49,7 @@ resource "aws_security_group" "mhs_inbound_security_group" {
     from_port = 443
     to_port   = 443
 
-    cidr_blocks     = [for subnet in aws_subnet.mhs_subnet : subnet.cidr_block]
+    cidr_blocks     = aws_subnet.mhs_subnet.*.cidr_block
     prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
     protocol        = "tcp"
     description     = "HTTPS"
