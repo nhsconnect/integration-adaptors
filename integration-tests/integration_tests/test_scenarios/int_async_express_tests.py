@@ -11,14 +11,10 @@ class FunctionalTest(TestCase):
                                                                         'QUPC_IN160101UK05',
                                                                         '9689177621',
                                                                         'Asynchronous Express test')
-        # we need to 'accept' the message in the queue, so it is removed and does impact on subsequent tests
+        # we need to 'accept' the message in the queue, so it is removed and doesn't impact on subsequent tests
         message_retriever.get_inbound_response()
         self.assertTrue(methods.check_status_code(outbound_response, 202),
                         "Async Express outbound test failed")
-
-    def tests_assert_ssl_with_proton(self):
-        import proton
-        self.assertTrue(proton.SSL.present())
 
     def test_async_express_inbound_message_id(self):
         # send the message
