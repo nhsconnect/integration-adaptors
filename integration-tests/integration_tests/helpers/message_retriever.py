@@ -17,3 +17,13 @@ def get_inbound_response():
     connection.close()
 
     return message.properties['message-id'], message.properties['correlation-id'], message.body
+
+
+def get_message_state(message_id):
+    """ Retrieve the message state from the statedb
+
+    :param message_id:
+    :return: the message state
+    """
+    # store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))
+    # store.get(message_id)
