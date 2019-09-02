@@ -13,7 +13,6 @@ resource "aws_lb" "outbound_alb" {
 }
 
 resource "aws_lb_target_group" "outbound_alb_target_group" {
-  name = "MHS-Outbound-ALB-Target-Group"
   port = 80
   protocol = "HTTP"
   target_type = "ip"
@@ -51,7 +50,6 @@ resource "aws_lb" "route_alb" {
 }
 
 resource "aws_lb_target_group" "route_alb_target_group" {
-  name = "MHS-Route-ALB-Target-Group"
   port = 80
   protocol = "HTTP"
   target_type = "ip"
