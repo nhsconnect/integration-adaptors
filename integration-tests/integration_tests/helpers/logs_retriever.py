@@ -38,23 +38,6 @@ def _get_logs_from_file(component: Component) -> Generator:
     yield from open(os.path.join(ROOT_DIR, "log_files", _component_log_filename_map[component]))
 
 
-    # Deprecated
-# def __get_logs_from_aws_cloud_watch(log_group_name: Component) -> List:
-#     log_stream_name_prefix = os.environ.get("BUILD_TAG", None)
-#
-#     log_streams = _client.describe_log_streams(
-#         logGroupName=log_group_name,
-#         logStreamNamePrefix=log_stream_name_prefix
-#     )["logStreams"]
-#     assert len(log_streams) == 1
-#     log_stream_name = log_streams[0]["logStreamName"]
-#
-#     log_events = _client.get_log_events(
-#         logGroupName=log_group_name, logStreamName=log_stream_name
-#     )["events"]
-#     return list(map(itemgetter("message"), log_events))
-
-
 def _get_logs_from_aws_cloud_watch(component: Component) -> Generator:
     log_group_name = _component_log_group_name_map[component]
     log_prefix = os.environ.get("BUILD_TAG", None)
