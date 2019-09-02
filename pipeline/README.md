@@ -9,6 +9,15 @@ These resources consist of the following directories:
 
 The pipeline itself is defined in the `Jenkinsfile` in the root of the repository.
 
+# Pre-Requisites
+
+In order to run the build pipeline, the following resources must be created manually:
+
+- An S3 bucket to be used to store the Terraform state database. This allows deployed resources to be re-used in
+subsequent builds, reducing the time needed to deploy updated services.
+- A DynamoDB table to be used to allow Terraform to lock the shared state, preventing issues if concurrent deployments
+of the same environment are performed. The table must have a primary key named LockID.
+
 # Jenkins
 
 We are running a Jenkins master instance as an ECS Docker container. This is configured to, via the [amazon-ecs plugin], spin up Jenkins worker ECS Docker containers to run the pipeline.
@@ -67,9 +76,14 @@ Several global variables must be set within Jenkins for the scripts to work as p
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
 - SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
-- TF_STATE_BUCKET: The name of an S3 bucket to use to store Terraform state in.
-- TF_STATE_BUCKET_REGION: The region that the Terraform state S3 bucket resides in.
-- TF_STATE_FILE: The name of the file within the S3 bucket to store terraform state in
+- TF_STATE_BUCKET: The name of an S3 bucket to use to store Terraform state in. As described in
+[Pre-Requisites](#pre-requisites)
+- TF_STATE_BUCKET_REGION: The region that the Terraform state S3 bucket (as described in
+[Pre-Requisites](#pre-requisites)) resides in.
+- TF_STATE_FILE: The name of the file within the S3 bucket (as described in [Pre-Requisites](#pre-requisites)) to store
+terraform state in
+- TF_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
+[Pre-Requisites](#pre-requisites)).
 
 The Jenkins worker EC2 instance will have to have the following permission in order to publish the builds to 
 ECR and start the tasks in ECS with terraform:
