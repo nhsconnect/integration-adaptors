@@ -18,6 +18,11 @@ resource "aws_lb_target_group" "outbound_alb_target_group" {
   target_type = "ip"
   vpc_id = aws_vpc.mhs_vpc.id
 
+  health_check {
+    path = "/"
+    matcher = "405"
+  }
+
   tags = {
     Name = "${var.environment_id}-mhs-outbound-alb-target-group"
     EnvironmentId = var.environment_id
