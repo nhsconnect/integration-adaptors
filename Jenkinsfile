@@ -49,7 +49,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 dir('pipeline/terraform/test-environment') {
-                    sh label: 'Initialising Terraform', script: 'terraform init -input=false'
+                    sh label: 'Initialising Terraform', script: """
+                            terraform init \
+                            -backend-config="bucket=${TF_STATE_BUCKET}" \
+                            -backend-config="key=${TF_STATE_FILE}" \
+                            -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                            -input=false
+                        """
                     sh label: 'Applying Terraform configuration', script: """
                             terraform apply -auto-approve \
                             -var cluster_id=${CLUSTER_ID} \
@@ -105,22 +111,6 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-        }
-        cleanup {
-            dir('pipeline/terraform/test-environment') {
-                    sh label: 'Destroying Terraform configuration', script: """
-                        terraform destroy -auto-approve \
-                        -var cluster_id=${CLUSTER_ID} \
-                        -var ecr_address=${DOCKER_REPOSITORY} \
-                        -var scr_ecr_address=${SCR_REPOSITORY} \
-                        -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                        -var build_id=${BUILD_TAG} \
-                        -var mhs_log_level=DEBUG \
-                        -var mhs_state_table_name=mhs-state \
-                        -var scr_log_level=DEBUG \
-                        -var scr_service_port=${SCR_SERVICE_PORT}
-                     """
-            }
         }
     }
 }
