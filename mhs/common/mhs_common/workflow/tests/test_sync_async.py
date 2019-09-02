@@ -8,8 +8,18 @@ from mhs_common.workflow import sync_async
 PARTY_ID = "PARTY-ID"
 
 
-class TestSyncAsyncWorkflow(TestCase):
-    pass
+class TestSyncAsyncWorkflowOutbound(TestCase):
+
+    def setUp(self):
+        self.persistence = MagicMock()
+        self.work_description = MagicMock()
+
+        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence)
+
+    @test_utilities.async_test
+    async def test_outbound_happy_path(self):
+        pass
+
 
 
 class TestSyncAsyncWorkflowInbound(TestCase):
