@@ -14,12 +14,16 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         self.persistence = MagicMock()
         self.work_description = MagicMock()
 
-        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence)
+        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence,
+                                                     work_description_store=MagicMock())
 
     @test_utilities.async_test
     async def test_outbound_happy_path(self):
-        pass
-
+        workflow = MagicMock()
+        await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
+                                                               'payload',
+                                                               workflow
+                                                               )
 
 
 class TestSyncAsyncWorkflowInbound(TestCase):
@@ -36,12 +40,12 @@ class TestSyncAsyncWorkflowInbound(TestCase):
         self.work_description.set_status.return_value = test_utilities.awaitable(True)
 
         await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
-        
+
         self.persistence.add.assert_called_with('1', {
             'correlation_id': 'cor_id',
             'data': 'wqe'
         })
-        
+
         self.work_description.set_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
 
     @patch('asyncio.sleep')
@@ -67,5 +71,4 @@ class TestSyncAsyncWorkflowInbound(TestCase):
 
         self.assertEqual(self.persistence.add.call_count, 3)
         self.assertEqual(mock_sleep.call_count, 2)
-        mock_sleep.assert_called_with(100/1000)
-
+        mock_sleep.assert_called_with(100 / 1000)
