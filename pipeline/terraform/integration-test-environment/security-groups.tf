@@ -3,6 +3,14 @@ resource "aws_security_group" "mhs_outbound_security_group" {
   description = "The security group used to control traffic for the MHS Outbound component."
   vpc_id = aws_vpc.mhs_vpc.id
 
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    description = "HTTP"
+  }
+
   egress {
     from_port = 443
     to_port = 443
@@ -26,6 +34,14 @@ resource "aws_security_group" "mhs_route_security_group" {
   description = "The security group used to control traffic for the MHS Routing component."
   vpc_id = aws_vpc.mhs_vpc.id
 
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    description = "HTTP"
+  }
+
   egress {
     from_port = 443
     to_port = 443
@@ -48,6 +64,14 @@ resource "aws_security_group" "mhs_inbound_security_group" {
   name = "MHS Inbound Security Group"
   description = "The security group used to control traffic for the MHS Inbound component."
   vpc_id = aws_vpc.mhs_vpc.id
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    description = "HTTPS"
+  }
 
   egress {
     from_port = 443
@@ -139,6 +163,15 @@ resource "aws_security_group" "alb_outbound_security_group" {
     description = "Inbound HTTP connections"
   }
 
+  egress {
+    from_port = 80
+    to_port = 80
+
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    protocol = "tcp"
+    description = "Downstream HTTP connections"
+  }
+
   tags = {
     Name = "${var.environment_id}-alb-outbound-sg"
     EnvironmentId = var.environment_id
@@ -158,6 +191,15 @@ resource "aws_security_group" "alb_route_security_group" {
       "0.0.0.0/0"
     ]
     description = "Inbound HTTP connections"
+  }
+
+  egress {
+    from_port = 80
+    to_port = 80
+
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    protocol = "tcp"
+    description = "Downstream HTTP connections"
   }
 
   tags = {
