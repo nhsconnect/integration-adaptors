@@ -64,7 +64,7 @@ pipeline {
                             -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
                             -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
                             -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
-                            -var sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME}
+                            -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME}
                         """
                 }
             }
@@ -110,7 +110,7 @@ pipeline {
                         -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
                         -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
                         -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
-                        -var sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME}
+                        -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME}
                      """
             }
         }
