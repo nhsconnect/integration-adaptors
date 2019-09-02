@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
           },
           {
             name  = "MHS_STATE_TABLE_NAME"
-            value = var.mhs_state_table_name
+            value = aws_dynamodb_table.mhs_state_table.name
           }
         ]
         secrets = [
@@ -105,11 +105,11 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
           },
           {
             name  = "MHS_STATE_TABLE_NAME"
-            value = var.mhs_state_table_name
+            value = aws_dynamodb_table.mhs_state_table.name
           },
           {
             name  = "MHS_SYNC_ASYNC_STATE_TABLE_NAME"
-            value = var.mhs_sync_async_table_name
+            value = aws_dynamodb_table.mhs_sync_async_table.name
           },
           {
             name  = "MHS_INBOUND_QUEUE_HOST"

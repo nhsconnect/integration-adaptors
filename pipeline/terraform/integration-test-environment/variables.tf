@@ -39,14 +39,24 @@ variable "mhs_log_level" {
   description = "Log level for the MHS application."
 }
 
-variable "mhs_state_table_name" {
-  type = string
-  description = "Name of the DynamoDB state table used by the MHS application."
+variable "mhs_state_table_read_capacity" {
+  type = number
+  description = "Read capacity of the DynamoDB state table used by the MHS application."
 }
 
-variable "mhs_sync_async_table_name" {
-  type = string
-  description = "Name of the DynamoDB sync-async table used by the MHS application."
+variable "mhs_state_table_write_capacity" {
+  type = number
+  description = "Write capacity of the DynamoDB state table used by the MHS application."
+}
+
+variable "mhs_sync_async_table_read_capacity" {
+  type = number
+  description = "Read capacity of the DynamoDB sync-async table used by the MHS application."
+}
+
+variable "mhs_sync_async_table_write_capacity" {
+  type = number
+  description = "Write capacity of the DynamoDB sync-async table used by the MHS application."
 }
 
 variable "inbound_queue_host" {
