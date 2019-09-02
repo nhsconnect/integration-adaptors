@@ -1,63 +1,69 @@
 resource "aws_security_group" "mhs_outbound_security_group" {
-  name        = "MHS Outbound Security Group"
+  name = "MHS Outbound Security Group"
   description = "The security group used to control traffic for the MHS Outbound component."
-  vpc_id      = aws_vpc.mhs_vpc.id
+  vpc_id = aws_vpc.mhs_vpc.id
 
   egress {
     from_port = 443
-    to_port   = 443
+    to_port = 443
 
-    cidr_blocks     = aws_subnet.mhs_subnet.*.cidr_block
-    prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-    protocol        = "tcp"
-    description     = "HTTPS"
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    prefix_list_ids = [
+      aws_vpc_endpoint.s3_endpoint.prefix_list_id,
+      aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+    protocol = "tcp"
+    description = "HTTPS"
   }
 
   tags = {
-    Name    = "${var.build_id}-mhs-outbound-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-outbound-sg"
+    EnvironmentId = var.environment_id
   }
 }
 
 resource "aws_security_group" "mhs_route_security_group" {
-  name        = "MHS Route Security Group"
+  name = "MHS Route Security Group"
   description = "The security group used to control traffic for the MHS Routing component."
-  vpc_id      = aws_vpc.mhs_vpc.id
+  vpc_id = aws_vpc.mhs_vpc.id
 
   egress {
     from_port = 443
-    to_port   = 443
+    to_port = 443
 
-    cidr_blocks     = aws_subnet.mhs_subnet.*.cidr_block
-    prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-    protocol        = "tcp"
-    description     = "HTTPS"
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    prefix_list_ids = [
+      aws_vpc_endpoint.s3_endpoint.prefix_list_id,
+      aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+    protocol = "tcp"
+    description = "HTTPS"
   }
 
   tags = {
-    Name    = "${var.build_id}-mhs-route-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-route-sg"
+    EnvironmentId = var.environment_id
   }
 }
 
 resource "aws_security_group" "mhs_inbound_security_group" {
-  name        = "MHS Inbound Security Group"
+  name = "MHS Inbound Security Group"
   description = "The security group used to control traffic for the MHS Inbound component."
-  vpc_id      = aws_vpc.mhs_vpc.id
+  vpc_id = aws_vpc.mhs_vpc.id
 
   egress {
     from_port = 443
-    to_port   = 443
+    to_port = 443
 
-    cidr_blocks     = aws_subnet.mhs_subnet.*.cidr_block
-    prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id, aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-    protocol        = "tcp"
-    description     = "HTTPS"
+    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    prefix_list_ids = [
+      aws_vpc_endpoint.s3_endpoint.prefix_list_id,
+      aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+    protocol = "tcp"
+    description = "HTTPS"
   }
 
   tags = {
-    Name    = "${var.build_id}-mhs-inbound-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-inbound-sg"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -75,8 +81,8 @@ resource "aws_security_group" "ecr_security_group" {
   }
 
   tags = {
-    Name = "${var.build_id}-ecr-endpoint-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-ecr-endpoint-sg"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -102,8 +108,8 @@ resource "aws_security_group" "cloudwatch_security_group" {
   }
 
   tags = {
-    Name = "${var.build_id}-cloudwatch-endpoint-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-cloudwatch-endpoint-sg"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -113,8 +119,8 @@ resource "aws_security_group" "sds_cache_security_group" {
   vpc_id = aws_vpc.mhs_vpc.id
 
   tags = {
-    Name = "${var.build_id}-sds-cache-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-sds-cache-sg"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -134,8 +140,8 @@ resource "aws_security_group" "alb_outbound_security_group" {
   }
 
   tags = {
-    Name = "${var.build_id}-alb-outbound-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-alb-outbound-sg"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -155,8 +161,8 @@ resource "aws_security_group" "alb_route_security_group" {
   }
 
   tags = {
-    Name = "${var.build_id}-alb-route-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-alb-route-sg"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -166,7 +172,7 @@ resource "aws_security_group" "async_response_queue_security_group" {
   vpc_id = aws_vpc.mhs_vpc.id
 
   tags = {
-    Name = "${var.build_id}-async-response-queue-sg"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-async-response-queue-sg"
+    EnvironmentId = var.environment_id
   }
 }

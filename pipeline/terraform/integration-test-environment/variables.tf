@@ -4,6 +4,11 @@ variable "region" {
   description = "The AWS region to deploy to."
 }
 
+variable "environment_id" {
+  type = string
+  description = "An ID used to identify the environment being deployed by this configuration."
+}
+
 variable "build_id" {
   type = string
   description = "ID used to identify the current build."

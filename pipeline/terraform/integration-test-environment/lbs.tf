@@ -7,8 +7,8 @@ resource "aws_lb" "outbound_alb" {
   ]
 
   tags = {
-    Name = "${var.build_id}-mhs-outbound-alb"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-outbound-alb"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -19,8 +19,8 @@ resource "aws_lb_target_group" "outbound_alb_target_group" {
   vpc_id = aws_vpc.mhs_vpc.id
 
   tags = {
-    Name = "${var.build_id}-mhs-outbound-alb-target-group"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-outbound-alb-target-group"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -44,8 +44,8 @@ resource "aws_lb" "route_alb" {
   ]
 
   tags = {
-    Name = "${var.build_id}-mhs-route-alb"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-route-alb"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -56,8 +56,8 @@ resource "aws_lb_target_group" "route_alb_target_group" {
   vpc_id = aws_vpc.mhs_vpc.id
 
   tags = {
-    Name = "${var.build_id}-mhs-route-alb-target-group"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-route-alb-target-group"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -78,8 +78,8 @@ resource "aws_lb" "inbound_nlb" {
   subnets = aws_subnet.mhs_subnet.*.id
 
   tags = {
-    Name = "${var.build_id}-mhs-inbound-nlb"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-inbound-nlb"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -90,8 +90,8 @@ resource "aws_lb_target_group" "inbound_nlb_target_group" {
   vpc_id = aws_vpc.mhs_vpc.id
 
   tags = {
-    Name = "${var.build_id}-mhs-inbound-nlb-target-group"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-inbound-nlb-target-group"
+    EnvironmentId = var.environment_id
   }
 }
 

@@ -6,8 +6,8 @@ resource "aws_vpc_endpoint" "dynamodb_endpoint" {
   ]
 
   tags = {
-    Name = "${var.build_id}-dynamodb-endpoint"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-dynamodb-endpoint"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -25,8 +25,8 @@ resource "aws_vpc_endpoint" "ecr_endpoint" {
   subnet_ids = aws_subnet.mhs_subnet.*.id
 
   tags = {
-    Name = "${var.build_id}-ecr-endpoint"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-ecr-endpoint"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -38,8 +38,8 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   ]
 
   tags = {
-    Name = "${var.build_id}-s3-endpoint"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-s3-endpoint"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -57,7 +57,7 @@ resource "aws_vpc_endpoint" "cloudwatch_endpoint" {
   subnet_ids = aws_subnet.mhs_subnet.*.id
 
   tags = {
-    Name = "${var.build_id}-cloudwatch-endpoint"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-cloudwatch-endpoint"
+    EnvironmentId = var.environment_id
   }
 }

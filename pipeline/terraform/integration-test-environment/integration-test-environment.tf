@@ -10,8 +10,8 @@ resource "aws_vpc" "mhs_vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "${var.build_id}-vpc"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-vpc"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -25,8 +25,8 @@ resource "aws_subnet" "mhs_subnet" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.build_id}-mhs-subnet-${data.aws_availability_zones.all.names[count.index]}"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-subnet-${data.aws_availability_zones.all.names[count.index]}"
+    EnvironmentId = var.environment_id
   }
 }
 
@@ -34,7 +34,7 @@ resource "aws_internet_gateway" "mhs_igw" {
   vpc_id = aws_vpc.mhs_vpc.id
 
   tags = {
-    Name = "${var.build_id}-mhs-igw"
-    BuildId = var.build_id
+    Name = "${var.environment_id}-mhs-igw"
+    EnvironmentId = var.environment_id
   }
 }

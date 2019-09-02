@@ -1,30 +1,30 @@
 resource "aws_ecs_cluster" "mhs_cluster" {
-  name = "${var.build_id}-mhs-cluster"
+  name = "${var.environment_id}-mhs-cluster"
 
   tags = {
-    Name    = "${var.build_id}-mhs-cluster"
-    BuildId = var.build_id
+    Name    = "${var.environment_id}-mhs-cluster"
+    EnvironmentId = var.environment_id
   }
 }
 
 resource "aws_cloudwatch_log_group" "mhs_outbound_log_group" {
-  name = "/ecs/${var.build_id}-mhs-outbound"
+  name = "/ecs/${var.environment_id}-mhs-outbound"
   tags = {
-    Name    = "${var.build_id}-mhs-outbound-log-group"
-    BuildId = var.build_id
+    Name    = "${var.environment_id}-mhs-outbound-log-group"
+    EnvironmentId = var.environment_id
   }
 }
 
 resource "aws_cloudwatch_log_group" "mhs_inbound_log_group" {
-  name = "/ecs/${var.build_id}-mhs-inbound"
+  name = "/ecs/${var.environment_id}-mhs-inbound"
   tags = {
-    Name    = "${var.build_id}-mhs-inbound-log-group"
-    BuildId = var.build_id
+    Name    = "${var.environment_id}-mhs-inbound-log-group"
+    EnvironmentId = var.environment_id
   }
 }
 
 resource "aws_ecs_task_definition" "mhs_outbound_task" {
-  family = "${var.build_id}-mhs-outbound"
+  family = "${var.environment_id}-mhs-outbound"
   container_definitions = jsonencode(
     [
       {
@@ -84,15 +84,15 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
     "FARGATE"
   ]
   tags = {
-    Name    = "${var.build_id}-mhs-outbound-task"
-    BuildId = var.build_id
+    Name    = "${var.environment_id}-mhs-outbound-task"
+    EnvironmentId = var.environment_id
   }
   task_role_arn      = var.task_role_arn
   execution_role_arn = var.execution_role_arn
 }
 
 resource "aws_ecs_task_definition" "mhs_inbound_task" {
-  family = "${var.build_id}-mhs-inbound"
+  family = "${var.environment_id}-mhs-inbound"
   container_definitions = jsonencode(
     [
       {
@@ -164,15 +164,15 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
     "FARGATE"
   ]
   tags = {
-    Name    = "${var.build_id}-mhs-inbound-task"
-    BuildId = var.build_id
+    Name    = "${var.environment_id}-mhs-inbound-task"
+    EnvironmentId = var.environment_id
   }
   task_role_arn      = var.task_role_arn
   execution_role_arn = var.execution_role_arn
 }
 
 resource "aws_ecs_service" "mhs_outbound_service" {
-  name                               = "${var.build_id}-mhs-outbound"
+  name                               = "${var.environment_id}-mhs-outbound"
   cluster                            = aws_ecs_cluster.mhs_cluster.id
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
@@ -197,7 +197,7 @@ resource "aws_ecs_service" "mhs_outbound_service" {
 }
 
 resource "aws_ecs_service" "mhs_inbound_service" {
-  name                               = "${var.build_id}-mhs-inbound"
+  name                               = "${var.environment_id}-mhs-inbound"
   cluster                            = aws_ecs_cluster.mhs_cluster.id
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
