@@ -23,7 +23,7 @@ class SyncAsyncResynchroniser:
         self.retry_interval = retry_interval / 1000
         self.sync_async_store = sync_async_store
 
-    async def pause_request(self, message_id:str) -> dict:
+    async def pause_request(self, message_id: str) -> dict:
         time_waited = 0
         while time_waited < self.retry_timeout:
             item = await self.sync_async_store.get(message_id)
