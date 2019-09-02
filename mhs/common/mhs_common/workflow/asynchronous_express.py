@@ -35,14 +35,17 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
     @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
-                                      payload: str) -> Tuple[int, str]:
+                                      payload: str, wdo: wd.WorkDescription) -> Tuple[int, str]:
         logger.info('0001', 'Entered async express workflow to handle outbound message')
-        wdo = wd.create_new_work_description(self.persistence_store, message_id,
-                                                           wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED, workflow.ASYNC_EXPRESS)
+        if not wdo:
+            wdo = wd.create_new_work_description(self.persistence_store, message_id,
+                                                 wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                                                 workflow.ASYNC_EXPRESS)
         await wdo.publish()
 
-        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
-                                                                payload, wdo)
+        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
+                                                                              interaction_details,
+                                                                              payload, wdo)
         if error:
             return error
 

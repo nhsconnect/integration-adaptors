@@ -1,21 +1,15 @@
 """This module defines the sync-async workflow."""
-
-from typing import Tuple
-from utilities import integration_adaptors_logger as log
-from mhs_common.state import work_description as wd
-from mhs_common.workflow import common_synchronous, common_asynchronous
-import copy
 import asyncio
 from typing import Tuple, Dict
-from utilities import integration_adaptors_logger as log, message_utilities
-import mhs_common.messages.ebxml_envelope as ebxml_envelope
-import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
+from utilities import integration_adaptors_logger as log
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor as ta
 from mhs_common.workflow import common_synchronous
 from mhs_common.state import persistence_adaptor as pa
 from exceptions import MaxRetriesExceeded
-
+from mhs_common.workflow import common
+from mhs_common import workflow
+from mhs_common.workflow import sync_async_resynchroniser
 
 logger = log.IntegrationAdaptorsLogger('MHS_SYNC_ASYNC_WORKFLOW')
 
@@ -31,8 +25,10 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                  party_id: str,
                  transmission: ta.TransmissionAdaptor = None,
                  sync_async_store: pa.PersistenceAdaptor = None,
+                 work_description_store: pa.PersistenceAdaptor = None,
                  sync_async_store_max_retries: int = None,
-                 sync_async_store_retry_delay: int = None
+                 sync_async_store_retry_delay: int = None,
+                 resynchroniser: sync_async_resynchroniser.SyncAsyncResynchroniser = None
                  ):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
@@ -43,17 +39,50 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         self.transmission = transmission
         self.sync_async_store = sync_async_store
+        self.work_description_store = work_description_store
         self.party_id = party_id
+        self.resynchroniser = resynchroniser
         self.sync_async_store_max_retries = sync_async_store_max_retries
         self.sync_async_store_retry_delay = sync_async_store_retry_delay / 1000 if sync_async_store_retry_delay \
             else None
 
-
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
-                                      payload: str) -> Tuple[int, str]:
-        return await self.workflow.handle_outbound_message(message_id, correlation_id, interaction_details, payload)
-        # TODO-look at return value, if it's an ack, then pause request, else passthrough error
-        # TODO-when request resumes, return response it resumed with
+                                      payload: str,
+                                      work_description: wd.WorkDescription
+                                      ) -> Tuple[int, str]:
+        raise NotImplementedError("This method is not implemented for the sync-async workflow, consider using"
+                                  "`self.handle_sync_async_message` instead")
+
+    async def handle_sync_async_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+                                                 payload: str,
+                                                 async_workflow: common.CommonWorkflow
+                                                 ) -> Tuple[int, str, wd.WorkDescription]:
+
+        logger.info('0001', 'Entered sync-async workflow to handle outbound message')
+        wdo = wd.create_new_work_description(self.work_description_store, message_id,
+                                             wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                                             workflow.SYNC_ASYNC)
+
+        status_code, response = await async_workflow.handle_outbound_message(message_id, correlation_id,
+                                                                             interaction_details, payload, wdo)
+        if not (status_code == 202):
+            logger.info('0002', 'No ACK received ')
+            return status_code, response, wdo
+
+        status_code, response = self._retrieve_async_response(message_id, wdo)
+        return status_code, response, wdo
+
+    async def _retrieve_async_response(self, message_id, wdo: wd.WorkDescription):
+        try:
+            response = await self.resynchroniser.pause_request(message_id)
+            log.correlation_id.set(response[CORRELATION_ID])
+            logger.info('0003', 'Retrieved async response from sync-async store, set correlation ID')
+            await wdo.set_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED)
+            return 200, response[MESSAGE_DATA]
+        except sync_async_resynchroniser.SyncAsyncResponseException as e:
+            logger.error('0004', 'No async response placed on async store within timeout for {messageId}',
+                         {'messageId': message_id})
+            return 500, "No async response received from sync-async store"
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
@@ -85,6 +114,5 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                     logger.warning('022', 'Final retry has been attempted for adding message to sync async store')
                     raise MaxRetriesExceeded('Max number of retries exceeded whilst attempting to put the message'
                                              'on the sync-async store') from e
-                
-                await asyncio.sleep(self.sync_async_store_retry_delay)
 
+                await asyncio.sleep(self.sync_async_store_retry_delay)
