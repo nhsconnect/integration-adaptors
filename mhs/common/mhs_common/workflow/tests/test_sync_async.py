@@ -4,6 +4,7 @@ from exceptions import MaxRetriesExceeded
 from mhs_common.state import work_description as wd
 from utilities import test_utilities
 from mhs_common.workflow import sync_async
+from mhs_common import workflow
 
 PARTY_ID = "PARTY-ID"
 
@@ -13,17 +14,45 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
     def setUp(self):
         self.persistence = MagicMock()
         self.work_description = MagicMock()
-
+        self.work_description_store = MagicMock()
+        self.resync = MagicMock()
         self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence,
-                                                     work_description_store=MagicMock())
+                                                     work_description_store=self.work_description_store,
+                                                     resynchroniser=self.resync)
 
+    @patch('mhs_common.state.work_description.create_new_work_description')
     @test_utilities.async_test
-    async def test_outbound_happy_path(self):
-        workflow = MagicMock()
+    async def test_sync_async_happy_path(self, wd_mock):
+        wd_mock.return_value = MagicMock()
+        async_workflow = MagicMock()
+        result = (200, {sync_async.MESSAGE_DATA: "Data", sync_async.CORRELATION_ID: 'cor123'})
+        async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
+
         await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
                                                                'payload',
-                                                               workflow
+                                                               async_workflow
                                                                )
+        wd_mock.assert_called_with(self.work_description_store,
+                                   'id123', wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                                   workflow.SYNC_ASYNC
+                                   )
+        async_workflow.handle_outbound_message.assert_called_once()
+
+    @patch('mhs_common.state.work_description.create_new_work_description')
+    @test_utilities.async_test
+    async def test_async_workflow_return_error_code(self, wd_mock):
+        wd_mock.return_value = MagicMock()
+        async_workflow = MagicMock()
+        result = (500, "Failed to reach spine")
+        async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
+
+        status, response, wdo = await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
+                                                                                       'payload',
+                                                                                       async_workflow
+                                                                                       )
+        self.assertEqual(status, 500)
+        self.assertEqual("Failed to reach spine", response)
+
 
 
 class TestSyncAsyncWorkflowInbound(TestCase):
