@@ -213,4 +213,10 @@ resource "aws_ecs_service" "mhs_inbound_service" {
     ]
     subnets = aws_subnet.mhs_subnet.*.id
   }
+
+  load_balancer {
+    container_name   = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].name
+    container_port   = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].portMappings[0].hostPort
+    target_group_arn = aws_lb_target_group.inbound_nlb_target_group.arn
+  }
 }

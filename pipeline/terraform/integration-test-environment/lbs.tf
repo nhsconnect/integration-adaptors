@@ -71,3 +71,37 @@ resource "aws_lb_listener" "route_alb_listener" {
     target_group_arn = aws_lb_target_group.route_alb_target_group.arn
   }
 }
+
+resource "aws_lb" "inbound_nlb" {
+  internal = true
+  load_balancer_type = "network"
+  subnets = aws_subnet.mhs_subnet.*.id
+
+  tags = {
+    Name = "${var.build_id}-mhs-inbound-nlb"
+    BuildId = var.build_id
+  }
+}
+
+resource "aws_lb_target_group" "inbound_nlb_target_group" {
+  port = 443
+  protocol = "TCP"
+  target_type = "ip"
+  vpc_id = aws_vpc.mhs_vpc.id
+
+  tags = {
+    Name = "${var.build_id}-mhs-inbound-nlb-target-group"
+    BuildId = var.build_id
+  }
+}
+
+resource "aws_lb_listener" "inbound_nlb_listener" {
+  load_balancer_arn = aws_lb.inbound_nlb.arn
+  port = "443"
+  protocol = "TCP"
+
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.inbound_nlb_target_group.arn
+  }
+}

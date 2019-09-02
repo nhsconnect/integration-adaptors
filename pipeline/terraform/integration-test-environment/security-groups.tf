@@ -160,17 +160,6 @@ resource "aws_security_group" "alb_route_security_group" {
   }
 }
 
-resource "aws_security_group" "alb_inbound_security_group" {
-  name = "Inbound ALB Security Group"
-  description = "The security group used to control traffic for the inbound MHS Application Load Balancer."
-  vpc_id = aws_vpc.mhs_vpc.id
-
-  tags = {
-    Name = "${var.build_id}-alb-inbound-sg"
-    BuildId = var.build_id
-  }
-}
-
 resource "aws_security_group" "async_response_queue_security_group" {
   name = "Async Response Queue Security Group"
   description = "The security group used to control traffic for the asynchronous response queue endpoint."
