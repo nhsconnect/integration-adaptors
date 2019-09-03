@@ -41,7 +41,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             wdo = wd.create_new_work_description(self.persistence_store, message_id,
                                                  wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                                                  workflow.ASYNC_EXPRESS)
-        await wdo.publish()
+            await wdo.publish()
 
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
                                                                               interaction_details,

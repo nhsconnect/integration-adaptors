@@ -15,7 +15,6 @@ import outbound.request.synchronous.handler as client_request_handler
 from outbound.transmission import outbound_transmission
 from mhs_common.workflow import sync_async_resynchroniser as resync
 
-
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
 
@@ -44,7 +43,10 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
     :return: The workflows that can be used to handle messages.
     """
 
-    resynchroniser = resync.SyncAsyncResynchroniser(sync_async_store, 10, 1)
+    resynchroniser = resync.SyncAsyncResynchroniser(sync_async_store,
+                                                    int(config.get_config('RESYNC_TIMEOUT', '20')),
+                                                    int(config.get_config('RESYNC_INTERVAL', '1')))
+
     return workflow.get_workflow_map(party_key,
                                      work_description_store=persistence_store,
                                      transmission=transmission,

@@ -121,14 +121,14 @@ class WorkDescription:
         self.persistence_store = persistence_store
         self._deserialize_data(store_data)
 
-    def _deserialize_data(self, full_data):
-        data = full_data[DATA]
-        self.message_key: str = full_data[DATA_KEY]
-        self.version: int = data[VERSION_KEY]
-        self.created_timestamp: str = data[CREATED_TIMESTAMP]
-        self.last_modified_timestamp: str = data[LATEST_TIMESTAMP]
-        self.status: MessageStatus = data[STATUS]
-        self.workflow: str = data[WORKFLOW]
+    def _deserialize_data(self, store_data):
+        data_attribute = store_data[DATA]
+        self.message_key: str = store_data[DATA_KEY]
+        self.version: int = data_attribute[VERSION_KEY]
+        self.created_timestamp: str = data_attribute[CREATED_TIMESTAMP]
+        self.last_modified_timestamp: str = data_attribute[LATEST_TIMESTAMP]
+        self.status: MessageStatus = data_attribute[STATUS]
+        self.workflow: str = data_attribute[WORKFLOW]
 
     async def publish(self):
         """
@@ -162,6 +162,11 @@ class WorkDescription:
         return old_data
 
     async def update(self):
+        """
+        Retrieves the copy of the data from the store with the self.message_key key, this is an overwrite so
+        should be used to care not to remove local data
+        :return:
+        """
         json_store_data = await self.persistence_store.get(self.message_key)
         if json_store_data is None:
             logger.error('003', 'Persistence store returned empty value for {key}', {'key': self.message_key})

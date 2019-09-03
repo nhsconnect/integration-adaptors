@@ -1,9 +1,8 @@
 """This module defines the sync-async workflow."""
 import asyncio
-from typing import Tuple, Dict
+from typing import Tuple
 from utilities import integration_adaptors_logger as log
 from mhs_common.state import work_description as wd
-from mhs_common.transmission import transmission_adaptor as ta
 from mhs_common.workflow import common_synchronous
 from mhs_common.state import persistence_adaptor as pa
 from exceptions import MaxRetriesExceeded
@@ -22,8 +21,6 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     """Handles the workflow for the sync-async messaging pattern."""
 
     def __init__(self,
-                 party_id: str,
-                 transmission: ta.TransmissionAdaptor = None,
                  sync_async_store: pa.PersistenceAdaptor = None,
                  work_description_store: pa.PersistenceAdaptor = None,
                  sync_async_store_max_retries: int = None,
@@ -32,15 +29,13 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                  ):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
-        :param transmission: The component that can be used to send messages.
-        :param sync_async_store: The resynchronisor state store
         :param party_id: The party ID of this MHS. Sent in ebXML requests.
+        :param sync_async_store: The resynchronisor state store
+        :param work_description_store: The persistence store instance that holds the work description data
+        :param
         """
-
-        self.transmission = transmission
         self.sync_async_store = sync_async_store
         self.work_description_store = work_description_store
-        self.party_id = party_id
         self.resynchroniser = resynchroniser
         self.sync_async_store_max_retries = sync_async_store_max_retries
         self.sync_async_store_retry_delay = sync_async_store_retry_delay / 1000 if sync_async_store_retry_delay \
@@ -73,6 +68,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         return status_code, response, wdo
 
     async def _retrieve_async_response(self, message_id, wdo: wd.WorkDescription):
+        logger.info('0005', 'Attempting to retrieve the async response from the async store')
         try:
             response = await self.resynchroniser.pause_request(message_id)
             log.correlation_id.set(response[CORRELATION_ID])
