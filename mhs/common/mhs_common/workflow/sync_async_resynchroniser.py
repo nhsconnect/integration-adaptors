@@ -15,7 +15,7 @@ class SyncAsyncResynchroniser:
 
     def __init__(self, sync_async_store: persistence_adaptor.PersistenceAdaptor,
                  retry_timeout: int,
-                 retry_interval: int
+                 retry_interval: float
                  ):
         """
         :param sync_async_store: The store where the sync-async messages are placed from the inbound service
@@ -23,7 +23,7 @@ class SyncAsyncResynchroniser:
         :param retry_interval: The time between polling requests to the sync-async store in milliseconds
         """
         self.retry_timeout = retry_timeout
-        self.retry_interval = retry_interval / 1000
+        self.retry_interval = retry_interval
         self.sync_async_store = sync_async_store
 
     async def pause_request(self, message_id: str) -> dict:
