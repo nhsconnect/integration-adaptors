@@ -1,6 +1,6 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
-from typing import Tuple
+from typing import Tuple, Optional
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
@@ -35,7 +35,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
     @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
-                                      payload: str, wdo: wd.WorkDescription) -> Tuple[int, str]:
+                                      payload: str, wdo: Optional[wd.WorkDescription]) -> Tuple[int, str]:
         logger.info('0001', 'Entered async express workflow to handle outbound message')
         if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store, message_id,

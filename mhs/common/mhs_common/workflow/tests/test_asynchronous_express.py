@@ -91,7 +91,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         expected_interaction_details.update(INTERACTION_DETAILS)
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD)
+                                                                      PAYLOAD, None)
 
         self.assertEqual(202, status)
         self.assertEqual('', message)
@@ -113,7 +113,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.return_value.serialize.side_effect = Exception()
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD)
+                                                                      PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
@@ -134,7 +134,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_transmission_adaptor.make_request.return_value = future
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD)
+                                                                      PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error received from Spine', message)
@@ -155,7 +155,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_transmission_adaptor.make_request.return_value = future
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD)
+                                                                      PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error making outbound request', message)
@@ -177,7 +177,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD)
+                                                                      PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual("Didn't get expected success response from Spine", message)
