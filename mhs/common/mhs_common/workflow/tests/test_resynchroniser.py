@@ -29,7 +29,7 @@ class TestSyncAsyncReSynchroniser(TestCase):
         store = MagicMock()
         sleep_mock.return_value = test_utilities.awaitable(1)
         store.get.return_value = test_utilities.awaitable(None)
-        resynchroniser = resync.SyncAsyncResynchroniser(store, 20, 1000)
+        resynchroniser = resync.SyncAsyncResynchroniser(store, 20, 1)
 
         with self.assertRaises(resync.SyncAsyncResponseException):
             await resynchroniser.pause_request('Message')
