@@ -29,10 +29,10 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                  ):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
-        :param party_id: The party ID of this MHS. Sent in ebXML requests.
         :param sync_async_store: The resynchronisor state store
         :param work_description_store: The persistence store instance that holds the work description data
-        :param
+        :param sync_async_store_retry_delay: time between sync async store publish attempts
+        :param sync_async_store_max_retries: number of retries whilst publishing something to the sync-async store
         """
         self.sync_async_store = sync_async_store
         self.work_description_store = work_description_store

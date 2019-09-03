@@ -106,6 +106,37 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
+    @mock.patch('mhs_common.state.work_description.create_new_work_description')
+    @mock.patch.object(async_express, 'logger')
+    @async_test
+    async def test_handle_outbound_doesnt_overwrite_work_description(self, log_mock, wdo_mock):
+        response = mock.MagicMock()
+        response.code = 202
+
+        self.setup_mock_work_description()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, HTTP_HEADERS, SERIALIZED_MESSAGE)
+        self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
+
+        expected_interaction_details = {ebxml_envelope.MESSAGE_ID: MESSAGE_ID, ebxml_request_envelope.MESSAGE: PAYLOAD,
+                                        ebxml_envelope.FROM_PARTY_ID: PARTY_KEY,
+                                        ebxml_envelope.CONVERSATION_ID: CORRELATION_ID}
+        expected_interaction_details.update(INTERACTION_DETAILS)
+
+        wdo = mock.MagicMock()
+        wdo.workflow = 'This should not change'
+        wdo.set_status.return_value = test_utilities.awaitable(True)
+        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+                                                                      PAYLOAD, wdo)
+
+        self.assertEqual(202, status)
+        wdo_mock.assert_not_called()
+        self.assertEqual(wdo.workflow, 'This should not change')
+
+
+
+
+
     @async_test
     async def test_handle_outbound_message_serialisation_fails(self):
         self.setup_mock_work_description()

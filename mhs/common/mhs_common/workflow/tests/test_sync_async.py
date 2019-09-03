@@ -17,7 +17,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         self.work_description = MagicMock()
         self.work_description_store = MagicMock()
         self.resync = MagicMock()
-        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None, sync_async_store=self.persistence,
+        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID,
                                                      work_description_store=self.work_description_store,
                                                      resynchroniser=self.resync)
 
