@@ -40,4 +40,16 @@ variable "scr_service_port" {
   type = number
   description = "The port to be exposed for the scr web service"
 }
+variable "mhs_inbound_queue_host" {
+  type = string
+  description = "The address of the async inbound queue"
+}
+variable "mhs_inbound_queue_username" {
+  type = string
+  description = "The username of the async inbound queue"
+}
+variable "mhs_inbound_queue_password" {
+  type = string
+  description = "The password for the async inbound queue"
 
+}
