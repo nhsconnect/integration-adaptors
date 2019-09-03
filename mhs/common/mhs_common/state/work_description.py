@@ -119,9 +119,11 @@ class WorkDescription:
             raise ValueError('Expected persistence store')
 
         self.persistence_store = persistence_store
+        self._deserialize_data(store_data)
 
-        data = store_data[DATA]
-        self.message_key: str = store_data[DATA_KEY]
+    def _deserialize_data(self, full_data):
+        data = full_data[DATA]
+        self.message_key: str = full_data[DATA_KEY]
         self.version: int = data[VERSION_KEY]
         self.created_timestamp: str = data[CREATED_TIMESTAMP]
         self.last_modified_timestamp: str = data[LATEST_TIMESTAMP]
@@ -157,6 +159,14 @@ class WorkDescription:
         old_data = await self.persistence_store.add(self.message_key, serialised)
         logger.info('016', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
         return old_data
+
+    async def update(self):
+        json_store_data = await self.persistence_store.get(self.message_key)
+        if json_store_data is None:
+            logger.error('003', 'Persistence store returned empty value for {key}', {'key': self.message_key})
+            raise EmptyWorkDescriptionError(f'Failed to find a value for key id {self.message_key}')
+        self._deserialize_data(json_store_data)
+
 
     async def set_status(self, new_status: MessageStatus):
         """

@@ -85,10 +85,12 @@ def main():
     party_key = load_party_key(certs_dir)
     work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
+    sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+        table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
                                                               max_retries, retry_delay)
-    workflows = initialise_workflows(transmission, party_key, work_description_store)
+    workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store)
 
     start_tornado_server(data_dir, workflows)
 

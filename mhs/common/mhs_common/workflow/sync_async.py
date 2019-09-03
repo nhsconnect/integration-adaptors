@@ -77,6 +77,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             response = await self.resynchroniser.pause_request(message_id)
             log.correlation_id.set(response[CORRELATION_ID])
             logger.info('0003', 'Retrieved async response from sync-async store, set correlation ID')
+            await wdo.update()
             await wdo.set_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED)
             return 200, response[MESSAGE_DATA]
         except sync_async_resynchroniser.SyncAsyncResponseException as e:

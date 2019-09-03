@@ -45,7 +45,8 @@ def get_workflow_map(party_key: str = None,
         SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission=transmission, sync_async_store=sync_async_store,
                                       sync_async_store_max_retries=sync_async_store_retries,
                                       sync_async_store_retry_delay=sync_async_store_retry_delay,
-                                      resynchroniser=resynchroniser
+                                      resynchroniser=resynchroniser,
+                                      work_description_store=work_description_store
                                       ),
         SYNC: SynchronousWorkflow()
     }

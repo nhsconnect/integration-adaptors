@@ -25,6 +25,7 @@ services:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_STATE_TABLE_NAME=mhs_state
       - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
+      - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
   dynamodb:
