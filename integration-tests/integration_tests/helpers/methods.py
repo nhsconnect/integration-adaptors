@@ -21,7 +21,7 @@ def get_asid():
         asid_file = str(Path(ROOT_DIR) / "data/certs/asid.txt")
         asid = FileUtilities.get_file_string(asid_file)
     except:
-        asid = 123456789012
+        asid = 918999199084
 
     return os.environ.get('ASID', os.environ.get('ASID', asid))
 
