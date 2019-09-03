@@ -59,12 +59,14 @@ class CommonWorkflow(abc.ABC):
             assert 'Content-Type' in response_headers
             if response_headers['Content-Type'] == 'text/xml':
                 parsed_body = ElementTree.fromstring(response_body)
+                default_fields =  {'errorType': 'ebxml_error'}
 
                 if SOAPFault.is_soap_fault(parsed_body):
                     fault: SOAPFault = SOAPFault.from_parsed(response_headers, parsed_body)
 
                     for error in fault.error_list:
-                        err_text = ', '.join([f'{k}={v}' for k, v in error.items()])
+                        all_fields = {**error, **default_fields}
+                        err_text = ', '.join([f'{k}={v}' for k, v in all_fields.items()])
                         logger.error('0010', f'SOAP Fault returned from Spine: {err_text}')
 
         return 500, client_message
