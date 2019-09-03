@@ -65,6 +65,6 @@ class CommonWorkflow(abc.ABC):
 
                     for error in fault.error_list:
                         err_text = ', '.join([f'{k}={v}' for k, v in error.items()])
-                        logger.error(f'Error from Spine: {err_text}', '0010')
+                        logger.error('0010', f'SOAP Fault returned from Spine: {err_text}')
 
         return 500, client_message
