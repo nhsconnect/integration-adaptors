@@ -55,7 +55,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         reason=f"Couldn't determine workflow to invoke for interaction ID: "
                                         f"{interaction_id}") from e
 
-        if interaction_details['sync-async']:
+        if self._is_sync_async(interaction_details):
             async_workflow: workflow.SyncAsyncWorkflow = self.workflows[workflow.SYNC_ASYNC]
             status, response, wdo = await async_workflow.handle_sync_async_outbound_message(message_id, correlation_id,
                                                                                             interaction_details, body,
@@ -65,6 +65,13 @@ class SynchronousHandler(tornado.web.RequestHandler):
             status, response = await wf.handle_outbound_message(message_id, correlation_id, interaction_details, body,
                                                                 None)
             self._write_response(status, response)
+
+    def _is_sync_async(self, inteaction_details):
+        try:
+            flag = inteaction_details['sync-async']
+            return flag
+        except KeyError:
+            return False
 
     async def return_sync_async_response(self, status: int, response: str, wdo: wd.WorkDescription):
         try:
