@@ -1,6 +1,7 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
-from typing import Tuple
+from typing import Tuple, AnyStr
+from xml.etree import ElementTree
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
@@ -10,6 +11,7 @@ from utilities import timing
 
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
+from mhs_common.messages.soap_fault import SOAPFault
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
@@ -34,15 +36,23 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
 
     @timing.time_function
-    async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+    async def handle_outbound_message(self,
+                                      message_id: str,
+                                      correlation_id: str,
+                                      interaction_details: dict,
                                       payload: str) -> Tuple[int, str]:
-        logger.info('0001', 'Entered async express workflow to handle outbound message')
-        wdo = wd.create_new_work_description(self.persistence_store, message_id,
-                                                           wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED, workflow.ASYNC_EXPRESS)
-        await wdo.publish()
 
-        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
-                                                                payload, wdo)
+        logger.info('0001', 'Entered async express workflow to handle outbound message')
+        wdo = wd.create_new_work_description(self.persistence_store,
+                                             message_id,
+                                             wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                                             workflow.ASYNC_EXPRESS)
+        await wdo.publish()
+        error, http_headers, message = await self._serialize_outbound_message(message_id,
+                                                                              correlation_id,
+                                                                              interaction_details,
+                                                                              payload,
+                                                                              wdo)
         if error:
             return error
 
@@ -58,7 +68,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             self._record_outbound_audit_log(timing.get_time(), start_time,
                                             wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            return 500, 'Error received from Spine'
+            return AsynchronousExpressWorkflow.handle_spine_fault(e, logger)
         except Exception as e:
             logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
