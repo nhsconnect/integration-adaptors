@@ -54,7 +54,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
                                         reason=f"Couldn't determine workflow to invoke for interaction ID: "
                                         f"{interaction_id}") from e
-        print(f"interaction-sync-async {interaction_details['sync-async']}")
+
         if interaction_details['sync-async']:
             async_workflow: workflow.SyncAsyncWorkflow = self.workflows[workflow.SYNC_ASYNC]
             status, response, wdo = await async_workflow.handle_sync_async_outbound_message(message_id, correlation_id,
@@ -73,7 +73,8 @@ class SynchronousHandler(tornado.web.RequestHandler):
         except Exception as e:
             logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
             await wdo.set_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
-        
+
+
     def write_error(self, status_code: int, **kwargs: Any):
         self.set_header('Content-Type', 'text/plain')
         self.finish(f'{status_code}: {self._reason}')

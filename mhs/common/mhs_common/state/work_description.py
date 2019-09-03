@@ -140,6 +140,7 @@ class WorkDescription:
         logger.info('012', 'Retrieving latest work description to check version')
 
         latest_data = await self.persistence_store.get(self.message_key)
+
         if latest_data is not None:
             logger.info('013', 'Retrieved previous version, comparing versions')
             latest_version = latest_data[DATA][VERSION_KEY]
@@ -166,7 +167,6 @@ class WorkDescription:
             logger.error('003', 'Persistence store returned empty value for {key}', {'key': self.message_key})
             raise EmptyWorkDescriptionError(f'Failed to find a value for key id {self.message_key}')
         self._deserialize_data(json_store_data)
-
 
     async def set_status(self, new_status: MessageStatus):
         """
