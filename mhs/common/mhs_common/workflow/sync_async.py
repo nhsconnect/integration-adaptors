@@ -69,7 +69,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             logger.info('0002', 'No ACK received ')
             return status_code, response, wdo
 
-        status_code, response = self._retrieve_async_response(message_id, wdo)
+        status_code, response = await self._retrieve_async_response(message_id, wdo)
         return status_code, response, wdo
 
     async def _retrieve_async_response(self, message_id, wdo: wd.WorkDescription):

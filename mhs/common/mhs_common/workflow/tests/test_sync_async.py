@@ -1,10 +1,11 @@
 from unittest import TestCase
-from unittest.mock import Mock, sentinel, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from exceptions import MaxRetriesExceeded
 from mhs_common.state import work_description as wd
 from utilities import test_utilities
 from mhs_common.workflow import sync_async
 from mhs_common import workflow
+from mhs_common.workflow import sync_async_resynchroniser as resynchroniser
 
 PARTY_ID = "PARTY-ID"
 
@@ -53,6 +54,24 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         self.assertEqual(status, 500)
         self.assertEqual("Failed to reach spine", response)
 
+    @patch('mhs_common.state.work_description.create_new_work_description')
+    @test_utilities.async_test
+    async def test_resync_failure(self, wd_mock):
+        async def resync_raises_exception(fake_key):
+            raise resynchroniser.SyncAsyncResponseException()
+
+        async_workflow = MagicMock()
+
+        self.resync.pause_request.side_effect = resync_raises_exception
+        result = (202, "Huge success")
+        async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
+
+        status, response, wdo = await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
+                                                                                       'payload',
+                                                                                       async_workflow
+                                                                                       )
+        self.assertEqual(status, 500)
+        self.assertEqual("No async response received from sync-async store", response)
 
 
 class TestSyncAsyncWorkflowInbound(TestCase):
