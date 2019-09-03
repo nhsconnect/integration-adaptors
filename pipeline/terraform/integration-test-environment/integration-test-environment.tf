@@ -15,7 +15,7 @@ resource "aws_vpc" "mhs_vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "${var.environment_id}-vpc"
+    Name = "${var.environment_id}-mhs-vpc"
     EnvironmentId = var.environment_id
   }
 }
