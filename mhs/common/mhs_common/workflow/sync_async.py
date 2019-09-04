@@ -73,14 +73,14 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             response = await self.resynchroniser.pause_request(message_id)
             log.correlation_id.set(response[CORRELATION_ID])
             logger.info('0003', 'Retrieved async response from sync-async store, set correlation ID')
-            await self._update_state_store_success_retriaval(wdo)
+            await self._update_state_store_success_retrieval(wdo)
             return 200, response[MESSAGE_DATA]
         except sync_async_resynchroniser.SyncAsyncResponseException as e:
             logger.error('0004', 'No async response placed on async store within timeout for {messageId}',
                          {'messageId': message_id})
             return 500, "No async response received from sync-async store"
 
-    async def _update_state_store_success_retriaval(self, wdo):
+    async def _update_state_store_success_retrieval(self, wdo):
         attempts = 0
         while attempts < 4:
             try:
@@ -93,8 +93,6 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                     raise e
                 else:
                     attempts += 1
-
-
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
