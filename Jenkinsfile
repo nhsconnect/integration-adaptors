@@ -4,11 +4,14 @@ pipeline {
     }
 
     environment {
-      BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+      // TODO: This is temporary to avoid the need to rebuild images when testing Terraform!
+      //BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+      BUILD_TAG = "feature-RT-179-test-env-restructure-28"
     }
 
     stages {
         stage('Build modules') {
+            /*
             steps{
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
@@ -17,38 +20,53 @@ pipeline {
                 dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
                 dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
             }
+            */
         }
 
         stage('Common Module Unit Tests') {
+            /*
             steps { dir('common') { executeUnitTestsWithCoverage() } }
+            */
         }
         stage('MHS Common Unit Tests') {
+            /*
             steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
+            */
         }
         stage('MHS Inbound Unit Tests') {
+            /*
             steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
+            */
         }
         stage('MHS Outbound Unit Tests') {
+            /*
             steps { dir('mhs/outbound') { executeUnitTestsWithCoverage() } }
+            */
         }
          stage('Spine Route Lookup Unit Tests') {
+            /*
             steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
+            */
         }
         stage('SCR Web Service Unit Tests') {
+            /*
             steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
+            */
         }
 
         stage('Package') {
+            /*
             steps {
                 sh label: 'Running Inbound Packer build', script: 'packer build pipeline/packer/inbound.json'
                 sh label: 'Running Outbound Packer build', script: 'packer build pipeline/packer/outbound.json'
                 sh label: 'Running SCR service Packer build', script: 'packer build pipeline/packer/scr-web-service.json'
             }
+            */
         }
 
         stage('Deploy') {
             steps {
-                dir('pipeline/terraform/test-environment') {
+                dir('pipeline/terraform/integration-test-environment') {
                     sh label: 'Initialising Terraform', script: """
                             terraform init \
                             -backend-config="bucket=${TF_STATE_BUCKET}" \
@@ -59,21 +77,32 @@ pipeline {
                         """
                     sh label: 'Applying Terraform configuration', script: """
                             terraform apply -auto-approve \
-                            -var cluster_id=${CLUSTER_ID} \
-                            -var ecr_address=${DOCKER_REPOSITORY} \
-                            -var scr_ecr_address=${SCR_REPOSITORY} \
-                            -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                            -var environment_id="build" \
                             -var build_id=${BUILD_TAG} \
+                            -var mhs_outbound_service_instance_count=3 \
+                            -var mhs_inbound_service_instance_count=3 \
+                            -var task_role_arn=${TASK_ROLE} \
+                            -var execution_role_arn=${TASK_EXECUTION_ROLE} \
+                            -var ecr_address=${DOCKER_REPOSITORY} \
                             -var mhs_log_level=DEBUG \
-                            -var mhs_state_table_name=mhs-state \
-                            -var scr_log_level=DEBUG \
-                            -var scr_service_port=${SCR_SERVICE_PORT}
+                            -var mhs_state_table_read_capacity=5 \
+                            -var mhs_state_table_write_capacity=5 \
+                            -var mhs_sync_async_table_read_capacity=5 \
+                            -var mhs_sync_async_table_write_capacity=5 \
+                            -var inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
+                            -var inbound_queue_username_arn=${} \
+                            -var inbound_queue_password_arn=${} \
+                            -var party_key_arn=${PARTY_KEY_ARN} \
+                            -var client_cert_arn=${CLIENT_CERT_ARN} \
+                            -var client_key_arn=${CLIENT_KEY_ARN} \
+                            -var ca_certs_arn=${CA_CERTS_ARN}
                         """
                 }
             }
         }
 
         stage('MHS Integration Tests') {
+            /*
             steps {
                 dir('mhs/selenium_tests') {
                     sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
@@ -89,9 +118,11 @@ pipeline {
                      sh label: 'Running integration tests', script: 'pipenv run inttests'
                 }
             }
+            */
         }
 
         stage('SCR Service Integration Tests') {
+            /*
             steps {
                 dir('SCRWebService') {
                      timeout(2) {
@@ -105,14 +136,17 @@ pipeline {
                      sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
                 }
             }
+            */
         }
     }
 
     post {
+        /*
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
         }
+        */
     }
 }
 
