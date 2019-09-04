@@ -94,6 +94,7 @@ order to allow the built containers to be published to ECR and the integration t
 - AmazonECS_FullAccess
 - AmazonDynamoDBFullAccess
 - CloudWatchLogsFullAccess
+- AmazonRoute53FullAccess
 
 The role associated with the box should also have the `AmazonECSTaskExecutionRolePolicy` and 
 `AmazonEC2ContainerServiceforEC2Role` policies.
