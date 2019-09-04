@@ -8,7 +8,7 @@ pipeline {
       //BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
       ENVIRONMENT_ID = "build"
       BUILD_TAG = "feature-RT-179-test-env-restructure-28"
-      MHS_INBOUND_QUEUE_NAME = ""${ENVIRONMENT_ID}-inbound"
+      MHS_INBOUND_QUEUE_NAME = "${ENVIRONMENT_ID}-inbound"
     }
 
     stages {
