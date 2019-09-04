@@ -76,8 +76,8 @@ pipeline {
                             -var mhs_sync_async_table_read_capacity=5 \
                             -var mhs_sync_async_table_write_capacity=5 \
                             -var inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
-                            -var inbound_queue_username_arn=${} \
-                            -var inbound_queue_password_arn=${} \
+                            -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
+                            -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
                             -var party_key_arn=${PARTY_KEY_ARN} \
                             -var client_cert_arn=${CLIENT_CERT_ARN} \
                             -var client_key_arn=${CLIENT_KEY_ARN} \
