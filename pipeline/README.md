@@ -67,7 +67,7 @@ Several global variables must be set within Jenkins for the scripts to work as p
 - CLUSTER_ID: The arn of the ecs cluster
 - DOCKER_REGISTRY_URL: The address of the ECR ('https://209...')
 - DOCKER_REPOSITORY: The ECR arn (209...)
-- TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it 
+- TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it
 - MHS_ADDRESS: The (private) ip address where the mhs build is running - this will be the private ip of the EC2 instance
     hosting the deployment ECS cluster
 - SCR_REPOSITORY: The docker repository used to upload and retrieve the SCRWebService images
@@ -96,13 +96,13 @@ order to allow the built containers to be published to ECR and the integration t
 - CloudWatchLogsFullAccess
 - AmazonRoute53FullAccess
 
-The role associated with the box should also have the `AmazonECSTaskExecutionRolePolicy` and 
+The role associated with the box should also have the `AmazonECSTaskExecutionRolePolicy` and
 `AmazonEC2ContainerServiceforEC2Role` policies.
 
-The EC2 instance running the mhs build (to run the integration tests against) must have the opentest connection 
+The EC2 instance running the mhs build (to run the integration tests against) must have the opentest connection
 established using the Fabric script in `scripts`. The open test certs and party key files should be copied
-to the EC2 instance in a `home/ec2-user/certs` directory (this directory is a shared volume with the running 
-mhs docker container as specified in the docker container). 
+to the EC2 instance in a `home/ec2-user/certs` directory (this directory is a shared volume with the running
+mhs docker container as specified in the docker container).
 
 
 There must also be log groups in Cloudwatch under the following names - these groups need to be created manually:
