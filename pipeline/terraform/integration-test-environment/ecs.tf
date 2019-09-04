@@ -194,6 +194,10 @@ resource "aws_ecs_service" "mhs_outbound_service" {
     container_port   = jsondecode(aws_ecs_task_definition.mhs_outbound_task.container_definitions)[0].portMappings[0].hostPort
     target_group_arn = aws_lb_target_group.outbound_alb_target_group.arn
   }
+
+  depends_on = [
+    aws_lb.outbound_alb
+  ]
 }
 
 resource "aws_ecs_service" "mhs_inbound_service" {
@@ -219,4 +223,8 @@ resource "aws_ecs_service" "mhs_inbound_service" {
     container_port   = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].portMappings[0].hostPort
     target_group_arn = aws_lb_target_group.inbound_nlb_target_group.arn
   }
+
+  depends_on = [
+    aws_lb.inbound_nlb
+  ]
 }
