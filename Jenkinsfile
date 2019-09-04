@@ -141,12 +141,10 @@ pipeline {
     }
 
     post {
-        /*
         always {
-            cobertura coberturaReportFile: '**/coverage.xml'
-            junit '**/test-reports/*.xml'
+            // cobertura coberturaReportFile: '**/coverage.xml'
+            // junit '**/test-reports/*.xml'
         }
-        */
     }
 }
 
