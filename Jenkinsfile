@@ -6,7 +6,9 @@ pipeline {
     environment {
       // TODO: This is temporary to avoid the need to rebuild images when testing Terraform!
       //BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+      ENVIRONMENT_ID = "build"
       BUILD_TAG = "feature-RT-179-test-env-restructure-28"
+      MHS_INBOUND_QUEUE_NAME = ""${ENVIRONMENT_ID}-inbound"
     }
 
     stages {
@@ -63,7 +65,7 @@ pipeline {
                         """
                     sh label: 'Applying Terraform configuration', script: """
                             terraform apply -auto-approve \
-                            -var environment_id="build" \
+                            -var environment_id=${ENVIRONMENT_ID} \
                             -var build_id=${BUILD_TAG} \
                             -var mhs_outbound_service_instance_count=3 \
                             -var mhs_inbound_service_instance_count=3 \
@@ -75,7 +77,7 @@ pipeline {
                             -var mhs_state_table_write_capacity=5 \
                             -var mhs_sync_async_table_read_capacity=5 \
                             -var mhs_sync_async_table_write_capacity=5 \
-                            -var inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
+                            -var inbound_queue_url="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                             -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
                             -var party_key_arn=${PARTY_KEY_ARN} \

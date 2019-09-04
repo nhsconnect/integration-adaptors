@@ -26,7 +26,7 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     """
 
     queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
-        host=config.get_config('INBOUND_QUEUE_HOST'),
+        host=config.get_config('INBOUND_QUEUE_URL'),
         username=config.get_config('INBOUND_QUEUE_USERNAME'),
         password=config.get_config('INBOUND_QUEUE_PASSWORD'))
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
