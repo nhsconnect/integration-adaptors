@@ -2,6 +2,8 @@
 from typing import Tuple, Dict, AnyStr, List
 from xml.etree import ElementTree
 
+from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
+
 from mhs_common.messages.soap_envelope import SoapEnvelope
 
 
@@ -35,12 +37,14 @@ ERR_CODE_CONTEXT = 'codeContext'
 
 ERR_FIELDS = [ERR_CODE, ERR_SEVERITY, ERR_LOCATION, ERR_DESCRIPTION, ERR_CODE_CONTEXT]
 
+logger = IntegrationAdaptorsLogger('SOAP_FAULT_PARSER')
+
 
 def _extract_tag_text(elem: ElementTree.ElementTree, path: AnyStr) -> AnyStr:
     try:
         return elem.find(path, NS).text
     except AttributeError as e:
-        # Log error here
+        logger.error('0001', f'Error while extracting value of {path}')
         raise e
 
 

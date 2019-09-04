@@ -10,8 +10,8 @@ from tornado import httpclient
 from utilities import timing
 
 from mhs_common import workflow
+from mhs_common.errors.soap_handler import handle_soap_error
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
-from mhs_common.messages.soap_fault import SOAPFault
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
@@ -63,12 +63,16 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             response = await self.transmission.make_request(url, http_headers, message)
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
-            logger.warning('0005', 'Received HTTP error from Spine. {HTTPStatus} {Exception}',
+            logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                            {'HTTPStatus': e.code, 'Exception': e})
             self._record_outbound_audit_log(timing.get_time(), start_time,
                                             wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            return AsynchronousExpressWorkflow.handle_spine_fault(e, logger)
+
+            if e.response:
+                return handle_soap_error(e.response.code, e.response.headers, e.response.body)
+
+            return 500, f'Error(s) received from Spine: {e}'
         except Exception as e:
             logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
