@@ -58,7 +58,7 @@ pipeline {
                             -backend-config="bucket=${TF_STATE_BUCKET}" \
                             -backend-config="key=${TF_STATE_FILE}" \
                             -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                            -backend-config="dynamodb_table=${TF_LOCK_TABLE_NAME}"
+                            -backend-config="dynamodb_table=${TF_LOCK_TABLE_NAME}" \
                             -input=false
                         """
                     sh label: 'Applying Terraform configuration', script: """
