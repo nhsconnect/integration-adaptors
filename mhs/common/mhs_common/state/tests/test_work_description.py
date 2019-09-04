@@ -14,7 +14,8 @@ input_data = {
         wd.CREATED_TIMESTAMP: '11:59',
         wd.LATEST_TIMESTAMP: '12:00',
         wd.VERSION_KEY: 1,
-        wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
+        wd.INBOUND_STATUS: None,
+        wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
         wd.WORKFLOW: workflow.SYNC
     }
 }
@@ -25,7 +26,8 @@ old_data = {
         wd.VERSION_KEY: 0,
         wd.CREATED_TIMESTAMP: '11:59',
         wd.LATEST_TIMESTAMP: '12:00',
-        wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
+        wd.INBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
+        wd.OUTBOUND_STATUS: None,
         wd.WORKFLOW: workflow.SYNC
     }
 }
@@ -37,7 +39,7 @@ class TestWorkDescription(unittest.TestCase):
         persistence = MagicMock()
         work_description = wd.WorkDescription(persistence, input_data)
 
-        self.assertEqual(work_description.status, wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
+        self.assertEqual(work_description.outbound_status, wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         self.assertEqual(work_description.version, 1)
         self.assertEqual(work_description.created_timestamp, '11:59')
         self.assertEqual(work_description.last_modified_timestamp, '12:00')
@@ -77,7 +79,7 @@ class TestWorkDescription(unittest.TestCase):
             wd.DATA: {
                 wd.VERSION_KEY: 3,
                 wd.LATEST_TIMESTAMP: '11:00',
-                wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED
+                wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED
             }
         })
 
@@ -98,7 +100,7 @@ class TestWorkDescription(unittest.TestCase):
             wd.DATA: {
                 wd.VERSION_KEY: 1,
                 wd.LATEST_TIMESTAMP: '11:00',
-                wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED
+                wd.INBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
             }
         })
 
@@ -117,7 +119,7 @@ class TestWorkDescription(unittest.TestCase):
 
     @patch('utilities.timing.get_time')
     @async_test
-    async def test_set_status(self, time_mock):
+    async def test_set_outbound_status(self, time_mock):
         time_mock.return_value = '12:00'
         future = test_utilities.awaitable(old_data)
 
@@ -127,9 +129,26 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         new_data = copy.deepcopy(input_data)
-        new_data[wd.DATA][wd.STATUS] = wd.MessageStatus.OUTBOUND_MESSAGE_ACKD
+        new_data[wd.DATA][wd.OUTBOUND_STATUS] = wd.MessageStatus.OUTBOUND_MESSAGE_ACKD
 
-        await work_description.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+        await work_description.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+        persistence.add.assert_called_with(input_data[wd.DATA_KEY], new_data)
+
+    @patch('utilities.timing.get_time')
+    @async_test
+    async def test_set_inbound_status(self, time_mock):
+        time_mock.return_value = '12:00'
+        future = test_utilities.awaitable(old_data)
+
+        persistence = MagicMock()
+        persistence.get.return_value = future
+        persistence.add.return_value = future
+        work_description = wd.WorkDescription(persistence, input_data)
+
+        new_data = copy.deepcopy(input_data)
+        new_data[wd.DATA][wd.INBOUND_STATUS] = wd.MessageStatus.INBOUND_RESPONSE_FAILED
+
+        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
         persistence.add.assert_called_with(input_data[wd.DATA_KEY], new_data)
 
     def test_null_persistence(self):
@@ -174,7 +193,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         persistence = MagicMock()
         wd.create_new_work_description(persistence,
                                        key='aaa-aaa',
-                                       status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                                       outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                                        workflow=workflow.SYNC
                                        )
         work_mock.assert_called_with(
@@ -184,7 +203,8 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.DATA: {
                     wd.CREATED_TIMESTAMP: '12',
                     wd.LATEST_TIMESTAMP: '12',
-                    wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                    wd.INBOUND_STATUS: None,
+                    wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     wd.VERSION_KEY: 1,
                     wd.WORKFLOW: workflow.SYNC
                 }
@@ -197,15 +217,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.create_new_work_description(
                     persistence,
                     key=None,
-                    status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
-                    workflow=workflow.SYNC
-                )
-        with self.subTest('Null status'):
-            with self.assertRaises(ValueError):
-                wd.create_new_work_description(
-                    persistence,
-                    key='aaa',
-                    status=None,
+                    outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     workflow=workflow.SYNC
                 )
         with self.subTest('Null persistence'):
@@ -213,7 +225,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.create_new_work_description(
                     None,
                     key='aaa',
-                    status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                    outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     workflow=workflow.SYNC
                 )
         with self.subTest('Null workflow'):
@@ -221,6 +233,6 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                 wd.create_new_work_description(
                     persistence,
                     key='aaa',
-                    status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                    outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     workflow=None
                 )

@@ -50,15 +50,15 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('001', 'Entered sync-async inbound workflow')
-        await work_description.set_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
+        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
 
         try:
             await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: payload})
             logger.info('004', 'Placed message onto inbound queue successfully')
-            await work_description.set_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
+            await work_description.set_inbound_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
         except Exception as e:
             logger.error('005', 'Failed to write to sync-async store')
-            await work_description.set_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
+            await work_description.set_inbound_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
             raise e
 
     async def _add_to_sync_async_store(self, key, data):

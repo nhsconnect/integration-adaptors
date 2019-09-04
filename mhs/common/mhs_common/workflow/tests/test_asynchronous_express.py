@@ -101,7 +101,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
-            self.mock_work_description.set_status.call_args_list)
+            self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
@@ -119,7 +119,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual('Error serialising outbound message', message)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
-                         self.mock_work_description.set_status.call_args_list)
+                         self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
     @mock.patch.object(async_express, 'logger')
@@ -141,7 +141,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
-            self.mock_work_description.set_status.call_args_list)
+            self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
     @async_test
@@ -163,7 +163,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
              mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
-            self.mock_work_description.set_status.call_args_list)
+            self.mock_work_description.set_outbound_status.call_args_list)
 
     @mock.patch.object(async_express, 'logger')
     @async_test
@@ -184,7 +184,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
-            self.mock_work_description.set_status.call_args_list)
+            self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
     ############################
@@ -203,7 +203,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                                                                'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
-                         self.mock_work_description.set_status.call_args_list)
+                         self.mock_work_description.set_inbound_status.call_args_list)
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -221,7 +221,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                                                           'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
-                         self.mock_work_description.set_status.call_args_list)
+                         self.mock_work_description.set_inbound_status.call_args_list)
         mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
 
     @mock.patch('asyncio.sleep')
@@ -243,12 +243,13 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
-                         self.mock_work_description.set_status.call_args_list)
+                         self.mock_work_description.set_inbound_status.call_args_list)
 
     def setup_mock_work_description(self):
         self.mock_work_description = self.mock_create_new_work_description.return_value
         self.mock_work_description.publish.return_value = test_utilities.awaitable(None)
-        self.mock_work_description.set_status.return_value = test_utilities.awaitable(None)
+        self.mock_work_description.set_outbound_status.return_value = test_utilities.awaitable(None)
+        self.mock_work_description.set_inbound_status.return_value = test_utilities.awaitable(None)
 
     def assert_audit_log_recorded_with_message_status(self, log_mock, message_status):
         log_mock.audit.assert_called_once()
