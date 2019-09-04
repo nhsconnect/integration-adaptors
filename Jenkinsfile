@@ -77,7 +77,7 @@ pipeline {
                             -var mhs_state_table_write_capacity=5 \
                             -var mhs_sync_async_table_read_capacity=5 \
                             -var mhs_sync_async_table_write_capacity=5 \
-                            -var inbound_queue_url="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
+                            -var inbound_queue_host="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                             -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
                             -var party_key_arn=${PARTY_KEY_ARN} \
