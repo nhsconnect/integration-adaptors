@@ -27,22 +27,18 @@
                 <query>
                     <dissentOverride>
                         <semanticsText>DissentOverride</semanticsText>
-                        <value code="{{dissentOverride}}" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.60" />
+                        <value code="{{dissentOverride}}" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.60" displayName="Demonstration">
+                            <originalText>Demonstration</originalText>
+                        </value>
                     </dissentOverride>
                     <filterParameters>
-                        <documentType>
-                            <semanticsText>DocumentType</semanticsText>
-                            <value codeSystem="2.16.840.1.113883.2.1.3.2.4.15" code="${documentType}"/>
-                        </documentType>
-                        {{#useDateFilter}}
                         <date>
                             <semanticsText>Date</semanticsText>
                             <value>
-                            {{#lowDate}}<low value="{{timestamp}}"/>{{/lowDate}}
-                            {{#highDate}}<high value="{{timestamp}}"/>{{/highDate}}
+                                <low value="20100908161126"/>
+                                <high value="{{timestamp}}"/>
                             </value>
                         </date>
-                        {{/useDateFilter}}
                     </filterParameters>
                     <nHSNumber>
                         <semanticsText>NHSNumber</semanticsText>

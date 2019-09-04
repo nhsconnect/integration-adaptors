@@ -119,6 +119,7 @@ venv.bak/
 **/*.key
 **/*.pem
 **/certs/party_key.txt
+**/certs/asid.txt
 
 
 mhs-reference-implementation/selenium_tests/data/local_asid

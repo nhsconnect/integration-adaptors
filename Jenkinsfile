@@ -88,9 +88,9 @@ pipeline {
         }
 
         /*
-        stage('MHS Integration Tests') {
+        stage('Integration Tests') {
             steps {
-                dir('mhs/selenium_tests') {
+                dir('integration-tests') {
                     sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                     // Wait for MHS container to fully stand up
                     timeout(2) {
@@ -106,21 +106,6 @@ pipeline {
             }
         }
 
-        stage('SCR Service Integration Tests') {
-            steps {
-                dir('SCRWebService') {
-                     timeout(2) {
-                        waitUntil {
-                           script {
-                               def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS}:${SCR_SERVICE_PORT} || echo 1', returnStdout: true
-                               return (r == '404');
-                           }
-                        }
-                     }
-                     sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
-                }
-            }
-        }
         */
     }
 
