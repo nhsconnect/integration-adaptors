@@ -89,7 +89,6 @@ pipeline {
             }
         }
 
-        /*
         stage('Integration Tests') {
             environment {
                 dir('pipeline/terraform/integration-test-environment') {
@@ -112,8 +111,6 @@ pipeline {
                 }
             }
         }
-
-        */
     }
 
     //post {
