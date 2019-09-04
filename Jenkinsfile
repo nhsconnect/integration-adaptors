@@ -67,6 +67,7 @@ pipeline {
                             terraform apply -auto-approve \
                             -var environment_id=${ENVIRONMENT_ID} \
                             -var build_id=${BUILD_TAG} \
+                            -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
                             -var mhs_outbound_service_instance_count=3 \
                             -var mhs_inbound_service_instance_count=3 \
                             -var task_role_arn=${TASK_ROLE} \

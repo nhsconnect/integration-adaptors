@@ -14,6 +14,11 @@ variable "build_id" {
   description = "ID used to identify the current build."
 }
 
+variable "internal_root_domain" {
+  type = string
+  description = "Domain name to be used internally to refer to parts of the MHS (subdomains will be created off of this root domain). This domain name should not clash with any domain name on the internet. e.g. internal.somedomainyoucontrol.com"
+}
+
 variable "mhs_outbound_service_instance_count" {
   type = number
   description = "The desired number of instances of MHS outbound to run."
