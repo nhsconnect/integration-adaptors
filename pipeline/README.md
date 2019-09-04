@@ -85,22 +85,15 @@ terraform state in
 - TF_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
 [Pre-Requisites](#pre-requisites)).
 
-The Jenkins worker EC2 instance will have to have the following permission in order to publish the builds to 
-ECR and start the tasks in ECS with terraform:
-
-- ecs:DescribeServices
-- ecs:CreateService
-- ecs:DeleteService
-- ecs:UpdateService
-- ecs:DescribeTaskDefinition
-- ecs:DeregisterTaskDefinition
-- ecs:RegisterTaskDefinition
-- ecr:UploadLayerPart
-- ecr:CompleteLayerUpload
-- ecr:PutImage
-- ecr:InitiateLayerUpload
-- iam:PassRole
-	
+The Jenkins worker EC2 instances must have an IAM role assigned that includes the following AWS managed IAM policies, in
+order to allow the built containers to be published to ECR and the integration test environment to be stood up by Terraform:
+- AmazonS3FullAccess
+- AmazonVPCFullAccess
+- ElasticLoadBalancingFullAccess
+- AmazonEC2ContainerRegistryPowerUser
+- AmazonECS_FullAccess
+- AmazonDynamoDBFullAccess
+- CloudWatchLogsFullAccess
 
 The role associated with the box should also have the `AmazonECSTaskExecutionRolePolicy` and 
 `AmazonEC2ContainerServiceforEC2Role` policies.
