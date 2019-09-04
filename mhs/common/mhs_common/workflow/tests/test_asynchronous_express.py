@@ -55,7 +55,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                                                   transmission=self.mock_transmission_adaptor,
                                                                   queue_adaptor=self.mock_queue_adaptor,
                                                                   inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                                  inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
+                                                                  inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+                                                                  persistence_store_max_retries=3)
 
     def test_construct_workflow_with_only_outbound_params(self):
         workflow = async_express.AsynchronousExpressWorkflow(party_key=mock.sentinel.party_key,

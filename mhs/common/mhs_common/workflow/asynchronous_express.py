@@ -25,11 +25,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
                  inbound_queue_max_retries: int = None,
-                 inbound_queue_retry_delay: int = None):
+                 inbound_queue_retry_delay: int = None,
+                 persistence_store_max_retries: int = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key
         self.queue_adaptor = queue_adaptor
+        self.store_retries = persistence_store_max_retries
         self.inbound_queue_max_retries = inbound_queue_max_retries
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
 
@@ -69,7 +71,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
         if response.code == 202:
             self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
-            await self._update_status_with_retries(wdo, wdo.set_outbound_status,wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+            await wd.update_status_with_retries(wdo, wdo.set_outbound_status, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+                                                self.store_retries)
             return 202, ''
         else:
             logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
@@ -104,10 +107,10 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0009', 'Entered async express workflow to handle inbound message')
-        await self._update_status_with_retries(work_description,
-                                               work_description.set_inbound_status,
-                                               wd.MessageStatus.INBOUND_RESPONSE_RECEIVED
-                                               )
+        await wd.update_status_with_retries(work_description,
+                                            work_description.set_inbound_status,
+                                            wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
+                                            self.store_retries)
 
         retries_remaining = self.inbound_queue_max_retries
         while True:
@@ -132,19 +135,3 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
         logger.info('0011', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
-
-    async def _update_status_with_retries(self, wdo: wd.WorkDescription,
-                                          update_status_method,
-                                          status: wd.MessageStatus):
-        attempts = 0
-        while attempts < 4:
-            try:
-                await wdo.update()
-                await update_status_method(status)
-                break
-            except wd.OutOfDateVersionError as e:
-                logger.error('0021', 'Failed attempt to update state store')
-                if attempts == 3:
-                    raise e
-                else:
-                    attempts += 1

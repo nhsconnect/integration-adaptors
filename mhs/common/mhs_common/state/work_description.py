@@ -45,6 +45,24 @@ class EmptyWorkDescriptionError(RuntimeError):
     pass
 
 
+async def update_status_with_retries(wdo: WorkDescription,
+                                     update_status_method,
+                                     status: MessageStatus,
+                                     retries: int):
+    attempts = 0
+    while attempts < retries + 1:
+        try:
+            await wdo.update()
+            await update_status_method(status)
+            break
+        except OutOfDateVersionError as e:
+            logger.error('0021', 'Failed attempt to update state store')
+            if attempts == retries:
+                raise e
+            else:
+                attempts += 1
+
+
 async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> WorkDescription:
     """
     Attempts to retrieve and deserialize a work description instance from the given persistence store to create

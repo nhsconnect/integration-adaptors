@@ -26,7 +26,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                  party_id: str,
                  transmission: ta.TransmissionAdaptor = None,
                  sync_async_store: pa.PersistenceAdaptor = None,
-                 sync_async_store_max_retries: int = None,
+                 persistence_store_max_retries: int = None,
                  sync_async_store_retry_delay: int = None
                  ):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
@@ -39,7 +39,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.transmission = transmission
         self.sync_async_store = sync_async_store
         self.party_id = party_id
-        self.sync_async_store_max_retries = sync_async_store_max_retries
+        self.sync_async_store_max_retries = persistence_store_max_retries
         self.sync_async_store_retry_delay = sync_async_store_retry_delay / 1000 if sync_async_store_retry_delay \
             else None
 

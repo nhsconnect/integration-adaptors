@@ -98,7 +98,7 @@ class TestSyncAsyncWorkflowInbound(TestCase):
 
         self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID, transmission=None,
                                                      sync_async_store=self.persistence,
-                                                     sync_async_store_max_retries=3,
+                                                     persistence_store_max_retries=3,
                                                      sync_async_store_retry_delay=100)
         with self.assertRaises(MaxRetriesExceeded):
             await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
