@@ -14,6 +14,15 @@ variable "build_id" {
   description = "ID used to identify the current build."
 }
 
+variable "supplier_vpc_id" {
+  type = string
+  description = "VPC id of the supplier system that connects to the MHS"
+}
+variable "opentest_vpc_id" {
+  type = string
+  description = "VPC id of the VPC that contains the Opentest connection to Spine"
+}
+
 variable "internal_root_domain" {
   type = string
   description = "Domain name to be used internally to refer to parts of the MHS (subdomains will be created off of this root domain). This domain name should not clash with any domain name on the internet. e.g. internal.somedomainyoucontrol.com"

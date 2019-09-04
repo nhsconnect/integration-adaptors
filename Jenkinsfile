@@ -67,6 +67,8 @@ pipeline {
                             terraform apply -auto-approve \
                             -var environment_id=${ENVIRONMENT_ID} \
                             -var build_id=${BUILD_TAG} \
+                            -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
+                            -var opentest_vpc_id=${OPENTEST_VPC_ID} \
                             -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
                             -var mhs_outbound_service_instance_count=3 \
                             -var mhs_inbound_service_instance_count=3 \
