@@ -85,6 +85,9 @@ pipeline {
                             -var client_key_arn=${CLIENT_KEY_ARN} \
                             -var ca_certs_arn=${CA_CERTS_ARN}
                         """
+                    env.MHS_ADDRESS = sh label: 'Obtaining inbound LB DNS name', script: """
+                            terraform output inbound_lb_address
+                    """
                 }
             }
         }
