@@ -85,15 +85,17 @@ pipeline {
                             -var client_key_arn=${CLIENT_KEY_ARN} \
                             -var ca_certs_arn=${CA_CERTS_ARN}
                         """
-                    env.MHS_ADDRESS = sh label: 'Obtaining inbound LB DNS name', script: """
-                            terraform output inbound_lb_address
-                    """
                 }
             }
         }
 
         /*
         stage('Integration Tests') {
+            environment {
+                dir('pipeline/terraform/integration-test-environment') {
+                    MHS_ADDRESS = sh label: 'Obtaining inbound LB DNS name', returnStdout: true, script: "terraform output inbound_lb_address"
+                }
+            }
             steps {
                 dir('integration-tests') {
                     sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
