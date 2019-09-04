@@ -10,8 +10,8 @@ pipeline {
     }
 
     stages {
+        /*
         stage('Build modules') {
-            /*
             steps{
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
@@ -20,49 +20,35 @@ pipeline {
                 dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
                 dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
             }
-            */
         }
 
         stage('Common Module Unit Tests') {
-            /*
             steps { dir('common') { executeUnitTestsWithCoverage() } }
-            */
         }
         stage('MHS Common Unit Tests') {
-            /*
             steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-            */
         }
         stage('MHS Inbound Unit Tests') {
-            /*
             steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-            */
         }
         stage('MHS Outbound Unit Tests') {
-            /*
             steps { dir('mhs/outbound') { executeUnitTestsWithCoverage() } }
-            */
         }
          stage('Spine Route Lookup Unit Tests') {
-            /*
             steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
-            */
         }
         stage('SCR Web Service Unit Tests') {
-            /*
             steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
-            */
         }
 
         stage('Package') {
-            /*
             steps {
                 sh label: 'Running Inbound Packer build', script: 'packer build pipeline/packer/inbound.json'
                 sh label: 'Running Outbound Packer build', script: 'packer build pipeline/packer/outbound.json'
                 sh label: 'Running SCR service Packer build', script: 'packer build pipeline/packer/scr-web-service.json'
             }
-            */
         }
+        */
 
         stage('Deploy') {
             steps {
@@ -101,8 +87,8 @@ pipeline {
             }
         }
 
+        /*
         stage('MHS Integration Tests') {
-            /*
             steps {
                 dir('mhs/selenium_tests') {
                     sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
@@ -118,11 +104,9 @@ pipeline {
                      sh label: 'Running integration tests', script: 'pipenv run inttests'
                 }
             }
-            */
         }
 
         stage('SCR Service Integration Tests') {
-            /*
             steps {
                 dir('SCRWebService') {
                      timeout(2) {
@@ -136,8 +120,8 @@ pipeline {
                      sh label: 'Running SCR integration tests', script: 'pipenv run inttests'
                 }
             }
-            */
         }
+        */
     }
 
     post {
