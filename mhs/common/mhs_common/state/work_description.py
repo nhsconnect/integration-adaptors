@@ -157,8 +157,7 @@ class WorkDescription:
 
     async def update(self):
         """
-        Retrieves the copy of the data from the store with the self.message_key key, this is an overwrite so
-        should be used to care not to remove local data
+        This retrieves the remote version of the work description object and updates the local version
         :return:
         """
         json_store_data = await self.persistence_store.get(self.message_key)
