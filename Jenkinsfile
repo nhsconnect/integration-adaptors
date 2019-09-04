@@ -124,14 +124,12 @@ pipeline {
         */
     }
 
-    /*
-    post {
-        always {
-            cobertura coberturaReportFile: '**/coverage.xml'
-            junit '**/test-reports/*.xml'
-        }
-    }
-    */
+    //post {
+    //    always {
+    //        cobertura coberturaReportFile: '**/coverage.xml'
+    //        junit '**/test-reports/*.xml'
+    //    }
+    //}
 }
 
 void executeUnitTestsWithCoverage() {
