@@ -96,8 +96,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(202, status)
         self.assertEqual('', message)
         self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
-                                                                      MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
-                                                                      workflow.ASYNC_EXPRESS)
+                                                                      workflow.ASYNC_EXPRESS,
+                                                                      MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
@@ -250,6 +250,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_work_description.publish.return_value = test_utilities.awaitable(None)
         self.mock_work_description.set_outbound_status.return_value = test_utilities.awaitable(None)
         self.mock_work_description.set_inbound_status.return_value = test_utilities.awaitable(None)
+        self.mock_work_description.update.return_value = test_utilities.awaitable(None)
 
     def assert_audit_log_recorded_with_message_status(self, log_mock, message_status):
         log_mock.audit.assert_called_once()

@@ -37,12 +37,15 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str) -> Tuple[int, str]:
         logger.info('0001', 'Entered async express workflow to handle outbound message')
-        wdo = wd.create_new_work_description(self.persistence_store, message_id,
-                                                           wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED, workflow.ASYNC_EXPRESS)
+        wdo = wd.create_new_work_description(self.persistence_store,
+                                             message_id,
+                                             workflow.ASYNC_EXPRESS,
+                                             wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         await wdo.publish()
 
-        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id, interaction_details,
-                                                                payload, wdo)
+        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
+                                                                              interaction_details,
+                                                                              payload, wdo)
         if error:
             return error
 
@@ -66,7 +69,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
         if response.code == 202:
             self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+            await self._update_status_with_retries(wdo, wdo.set_outbound_status,wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             return 202, ''
         else:
             logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
@@ -101,7 +104,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0009', 'Entered async express workflow to handle inbound message')
-        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
+        await self._update_status_with_retries(work_description,
+                                               work_description.set_inbound_status,
+                                               wd.MessageStatus.INBOUND_RESPONSE_RECEIVED
+                                               )
+
         retries_remaining = self.inbound_queue_max_retries
         while True:
             try:
@@ -125,3 +132,19 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
         logger.info('0011', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+
+    async def _update_status_with_retries(self, wdo: wd.WorkDescription,
+                                          update_status_method,
+                                          status: wd.MessageStatus):
+        attempts = 0
+        while attempts < 4:
+            try:
+                await wdo.update()
+                await update_status_method(status)
+                break
+            except wd.OutOfDateVersionError as e:
+                logger.error('0021', 'Failed attempt to update state store')
+                if attempts == 3:
+                    raise e
+                else:
+                    attempts += 1

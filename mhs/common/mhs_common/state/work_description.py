@@ -155,8 +155,17 @@ class WorkDescription:
         logger.info('016', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
         return old_data
 
-    async def set_status(self, status):
-        raise ValueError('set status not here any more philip')
+    async def update(self):
+        """
+        Retrieves the copy of the data from the store with the self.message_key key, this is an overwrite so
+        should be used to care not to remove local data
+        :return:
+        """
+        json_store_data = await self.persistence_store.get(self.message_key)
+        if json_store_data is None:
+            logger.error('003', 'Persistence store returned empty value for {key}', {'key': self.message_key})
+            raise EmptyWorkDescriptionError(f'Failed to find a value for key id {self.message_key}')
+        self._deserialize_data(json_store_data)
 
     async def set_inbound_status(self, new_status: MessageStatus):
         """
@@ -192,3 +201,13 @@ class WorkDescription:
                 WORKFLOW: self.workflow
             }
         }
+
+    def _deserialize_data(self, store_data):
+        data_attribute = store_data[DATA]
+        self.message_key: str = store_data[DATA_KEY]
+        self.version: int = data_attribute[VERSION_KEY]
+        self.created_timestamp: str = data_attribute[CREATED_TIMESTAMP]
+        self.last_modified_timestamp: str = data_attribute[LATEST_TIMESTAMP]
+        self.inbound_status: MessageStatus = data_attribute[INBOUND_STATUS]
+        self.outbound_status: MessageStatus = data_attribute[OUTBOUND_STATUS]
+        self.workflow: str = data_attribute[WORKFLOW]
