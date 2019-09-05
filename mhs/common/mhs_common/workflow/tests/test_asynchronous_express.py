@@ -170,7 +170,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                                                       PAYLOAD, None)
 
         self.assertEqual(500, status)
-        self.assertEqual('Error received from Spine', message)
+        self.assertTrue('Error(s) received from Spine' in message)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
