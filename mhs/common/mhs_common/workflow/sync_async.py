@@ -61,7 +61,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         status_code, response = await async_workflow.handle_outbound_message(message_id, correlation_id,
                                                                              interaction_details, payload, wdo)
         if not (status_code == 202):
-            logger.info('0002', 'No ACK received ')
+            logger.warning('0002', 'No ACK received ')
             return status_code, response, wdo
 
         status_code, response = await self._retrieve_async_response(message_id, wdo)
@@ -71,8 +71,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         logger.info('0005', 'Attempting to retrieve the async response from the async store')
         try:
             response = await self.resynchroniser.pause_request(message_id)
-            log.correlation_id.set(response[CORRELATION_ID])
-            logger.info('0003', 'Retrieved async response from sync-async store, set correlation ID')
+            logger.info('0003', 'Retrieved async response from sync-async store')
             await self._update_state_store_success_retrieval(wdo)
             return 200, response[MESSAGE_DATA]
         except sync_async_resynchroniser.SyncAsyncResponseException as e:

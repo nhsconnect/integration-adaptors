@@ -2,7 +2,7 @@ import tornado
 import tornado.gen
 from mhs_common.state import persistence_adaptor
 from utilities import integration_adaptors_logger as log
-
+import asyncio
 
 logger = log.IntegrationAdaptorsLogger('RESYNCHRONISER')
 
@@ -35,7 +35,7 @@ class SyncAsyncResynchroniser:
                 logger.info('002', 'Message found in sync-async store, ending polling')
                 return item
             logger.info('003', 'Failed to find async response after {time}s', {'time': time_waited})
-            await tornado.gen.sleep(self.retry_interval)
+            await asyncio.sleep(self.retry_interval)
 
             time_waited += self.retry_interval
         logger.error('004', 'Resync timer exceeded, waited {time}s', {'time': time_waited})
