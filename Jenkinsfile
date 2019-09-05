@@ -42,6 +42,7 @@ pipeline {
         stage('SCR Web Service Unit Tests') {
             steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
         }
+        */
 
         stage('Package') {
             steps {
@@ -50,7 +51,6 @@ pipeline {
                 sh label: 'Running SCR service Packer build', script: 'packer build pipeline/packer/scr-web-service.json'
             }
         }
-        */
 
         stage('Deploy') {
             steps {
@@ -74,7 +74,7 @@ pipeline {
                             -var mhs_inbound_service_instance_count=3 \
                             -var task_role_arn=${TASK_ROLE} \
                             -var execution_role_arn=${TASK_EXECUTION_ROLE} \
-                            -var ecr_address=${DOCKER_REPOSITORY} \
+                            -var ecr_address=${DOCKER_REGISTRY} \
                             -var mhs_log_level=DEBUG \
                             -var mhs_state_table_read_capacity=5 \
                             -var mhs_state_table_write_capacity=5 \

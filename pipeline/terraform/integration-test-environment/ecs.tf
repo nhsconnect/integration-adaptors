@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
     [
       {
         name  = "mhs-outbound"
-        image = "${var.ecr_address}/mhs/outbound:${var.build_id}"
+        image = "${var.ecr_address}/mhs/outbound:outbound-${var.build_id}"
         environment = [
           {
             name  = "MHS_LOG_LEVEL"
@@ -97,7 +97,7 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
     [
       {
         name  = "mhs-inbound"
-        image = "${var.ecr_address}/mhs/inbound:${var.build_id}"
+        image = "${var.ecr_address}/mhs/inbound:inbound-${var.build_id}"
         environment = [
           {
             name  = "MHS_LOG_LEVEL"
