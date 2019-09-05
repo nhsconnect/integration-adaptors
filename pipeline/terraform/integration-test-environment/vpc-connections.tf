@@ -14,7 +14,7 @@ resource "aws_vpc_peering_connection" "supplier_peering_connection" {
   }
 
   tags = {
-    Name = "${var.environment_id}-mhs-opentest-peering-connection"
+    Name = "${var.environment_id}-mhs-supplier-peering-connection"
     EnvironmentId = var.environment_id
   }
 }
