@@ -2,7 +2,6 @@ from unittest import skip, TestCase
 
 from integration_tests.helpers import methods, interactions, message_retriever
 
-@skip('DO NOT CHECK-IN!!!!!!')
 class FunctionalTest(TestCase):
 
     # Message Pattern Type: Asynchronous Express

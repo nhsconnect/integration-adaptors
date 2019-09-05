@@ -15,7 +15,6 @@ class FunctionalTest(TestCase):
         self.assertTrue(integration_tests.helpers.methods.check_status_code(outbound_response, 202),
                         "Async Reliable outbound test failed")
 
-    @skip('DO NOT CHECK-IN!!!!!!')
     def test_async_reliable_inbound_message_id(self):
         # send the message
         outbound_response, sent_message_id, _ = integration_tests.helpers.methods.get_interaction_from_template('async reliable',
@@ -29,7 +28,6 @@ class FunctionalTest(TestCase):
         self.assertEqual(received_message_id, sent_message_id,
                          "Async Reliable inbound message Id test failed")
 
-    @skip('DO NOT CHECK-IN!!!!!!')
     def test_async_reliable_inbound_correlation_id(self):
         # send the message
         outbound_response, _, sent_correlation_id = integration_tests.helpers.methods.get_interaction_from_template('async reliable',
@@ -43,7 +41,6 @@ class FunctionalTest(TestCase):
         self.assertEqual(received_correlation_id, sent_correlation_id,
                          "Async Reliable inbound correlation Id test failed")
 
-    @skip('DO NOT CHECK-IN!!!!!!')
     def test_async_reliable_inbound_response(self):
         # send the message
         integration_tests.helpers.methods.get_interaction_from_template('async reliable',
@@ -55,7 +52,6 @@ class FunctionalTest(TestCase):
         self.assertTrue(integration_tests.helpers.methods.check_response(inbound_response, 'queryResponseCode'),
                         "Async Reliable inbound response test failed")
 
-    @skip('DO NOT CHECK-IN!!!!!!')
     def test_async_reliable_inbound_patient(self):
         # send the message
         integration_tests.helpers.methods.get_interaction_from_template('async reliable',
