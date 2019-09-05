@@ -65,13 +65,10 @@ Several global variables must be set within Jenkins for the scripts to work as p
 
 - ASID: The asid associated with the mhs instance (this is provided with opentest creds)
 - CLUSTER_ID: The arn of the ecs cluster
-- DOCKER_REGISTRY_URL: The address of the ECR ('https://209...')
-- DOCKER_REPOSITORY: The ECR arn (209...)
+- DOCKER_REGISTRY: The address of the Docker registry to publish built containers to. e.g. `randomid.dkr.ecr.eu-west-2.amazonaws.com` This should not include an `http://` prefix, or repository names/paths.
 - TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it
 - MHS_ADDRESS: The (private) ip address where the mhs build is running - this will be the private ip of the EC2 instance
     hosting the deployment ECS cluster
-- SCR_REPOSITORY: The docker repository used to upload and retrieve the SCRWebService images
-- SCR_REPOSITORY_URL: Same as above with the full URL
 - SCR_SERVICE_ADDRESS: The endpoint address the SCRWebService can be reached on e.g `http://192.168.41.129:9000`
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
