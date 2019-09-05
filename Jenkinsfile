@@ -92,7 +92,7 @@ pipeline {
                         env.MHS_ADDRESS = sh (
                             label: 'Obtaining outbound LB DNS name',
                             returnStdout: true,
-                            script: "terraform output outbound_lb_addressá"
+                            script: "terraform output outbound_lb_domain_name"
                         ).trim()
                     }
                 }

@@ -40,11 +40,6 @@ resource "aws_lb_listener" "outbound_alb_listener" {
   }
 }
 
-output "outbound_lb_address" {
-  value = aws_lb.outbound_alb.dns_name
-  description = "The DNS name of the MHS outbound service's load balancer."
-}
-
 resource "aws_lb" "route_alb" {
   internal = true
   load_balancer_type = "application"
@@ -82,11 +77,6 @@ resource "aws_lb_listener" "route_alb_listener" {
   }
 }
 
-output "route_lb_address" {
-  value = aws_lb.route_alb.dns_name
-  description = "The DNS name of the MHS route service's load balancer."
-}
-
 resource "aws_lb" "inbound_nlb" {
   internal = true
   load_balancer_type = "network"
@@ -119,9 +109,4 @@ resource "aws_lb_listener" "inbound_nlb_listener" {
     type = "forward"
     target_group_arn = aws_lb_target_group.inbound_nlb_target_group.arn
   }
-}
-
-output "inbound_lb_address" {
-  value = aws_lb.inbound_nlb.dns_name
-  description = "The DNS name of the MHS inbound service's load balancer."
 }
