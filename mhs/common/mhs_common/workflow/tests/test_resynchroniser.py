@@ -23,7 +23,7 @@ class TestSyncAsyncReSynchroniser(TestCase):
         result = await resynchroniser.pause_request('Message')
         self.assertTrue(result)
 
-    @patch('tornado.gen.sleep')
+    @patch('asyncio.sleep')
     @test_utilities.async_test
     async def test_resync_no_response(self, sleep_mock):
         store = MagicMock()

@@ -126,7 +126,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         wdo = mock.MagicMock()
         wdo.workflow = 'This should not change'
-        wdo.set_status.return_value = test_utilities.awaitable(True)
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
+        wdo.update.return_value = test_utilities.awaitable(True)
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                       PAYLOAD, wdo)
 

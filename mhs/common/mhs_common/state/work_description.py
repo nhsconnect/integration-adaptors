@@ -222,10 +222,10 @@ class WorkDescription:
 
     def _deserialize_data(self, store_data):
         data_attribute = store_data[DATA]
-        self.message_key: str = store_data[DATA_KEY]
-        self.version: int = data_attribute[VERSION_KEY]
-        self.created_timestamp: str = data_attribute[CREATED_TIMESTAMP]
-        self.last_modified_timestamp: str = data_attribute[LATEST_TIMESTAMP]
-        self.inbound_status: MessageStatus = data_attribute[INBOUND_STATUS]
-        self.outbound_status: MessageStatus = data_attribute[OUTBOUND_STATUS]
-        self.workflow: str = data_attribute[WORKFLOW]
+        self.message_key: str = store_data.get(DATA_KEY)
+        self.version: int = data_attribute.get(VERSION_KEY)
+        self.created_timestamp: str = data_attribute.get(CREATED_TIMESTAMP)
+        self.last_modified_timestamp: str = data_attribute.get(LATEST_TIMESTAMP)
+        self.inbound_status: MessageStatus = data_attribute.get(INBOUND_STATUS)
+        self.outbound_status: MessageStatus = data_attribute.get(OUTBOUND_STATUS)
+        self.workflow: str = data_attribute.get(WORKFLOW)
