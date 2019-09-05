@@ -34,9 +34,9 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
                                                                async_workflow
                                                                )
         wd_mock.assert_called_with(self.work_description_store,
-                                   'id123', wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
-                                   workflow.SYNC_ASYNC
-                                   )
+                                   'id123',
+                                   workflow.SYNC_ASYNC,
+                                   outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         async_workflow.handle_outbound_message.assert_called_once()
 
     @patch('mhs_common.state.work_description.create_new_work_description')

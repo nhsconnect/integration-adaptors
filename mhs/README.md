@@ -48,7 +48,7 @@ MHS takes a number of environment variables when it is run. These are:
 * `MHS_INBOUND_QUEUE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying putting a message onto the amqp inbound queue. Defaults to 100ms.
 * `MHS_SYNC_ASYNC_STORE_MAX_RETRIES'` (inbound only) The max number of retries when attempting to add a message to the sync-async store. Defaults to 3 
 * `MHS_SYNC_ASYNC_STORE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying placing a message on the sysnc-async store. Defaults to 100ms
-* `MHS_RESYNC_TIMEOUT` The total time (in seconds) to wait for a sync-async response to be placed on the sync-async store, defaults to 20s
+* `MHS_RESYNC_RETRIES` (outbound only) The total number of attempts made to the sync-async store during resynchronisation, defaults to 20
 * `MHS_RESYNC_INTERVAL` The time in between polls of the sync-async store, the interval is in seconds and defaults to 1
 
 
