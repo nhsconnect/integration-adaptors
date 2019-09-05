@@ -23,7 +23,8 @@ class TestOutboundSOAPHandler(unittest.TestCase):
 
     def test_single_error(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml' )
-        self.assertTrue(' ' in handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
+        self.assertTrue('System failure to process message - default' in
+                        handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
 
     def test_multiple_errors(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')

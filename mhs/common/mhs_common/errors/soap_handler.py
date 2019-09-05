@@ -12,17 +12,20 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
     Analyzes response from NHS which works in as web service mode
     and returns result of interpretation to external client
 
-    :param code: NHS response code
-    :param headers: NHS response headers
-    :param body: NHS response body
+    :param code: HTTP response code
+    :param headers: HTTP response headers
+    :param body: HTTP response body
     :return: Response to external client represented as HTTP status code and body
     """
     if code != 500:
         logger.warning('0001', 'Not HTTP 500 response. {Code} {Body}', {'Code': code, 'Body': body})
         return code, body
 
-    assert 'Content-Type' in headers, 'No Content-Type header in Spine response, response cannot be handled!'
-    assert headers['Content-Type'] == 'text/xml', 'Unexpected Content-Type {}!'.format(headers['Content-Type'])
+    if 'Content-Type' not in headers:
+        raise ValueError('No Content-Type header in Spine response, response cannot be handled!')
+
+    if headers['Content-Type'] == 'text/xml':
+        raise ValueError('Unexpected Content-Type {}!'.format(headers['Content-Type']))
 
     parsed_body = ElementTree.fromstring(body)
 
