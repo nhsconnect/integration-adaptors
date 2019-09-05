@@ -32,8 +32,8 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
                          persistence_store: persistence_adaptor.PersistenceAdaptor,
-                         sync_async_store: persistence_adaptor.PersistenceAdaptor
-                         ) \
+                         sync_async_store: persistence_adaptor.PersistenceAdaptor,
+                         persistence_store_retries: int) \
         -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :param sync_async_store:
@@ -50,7 +50,8 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
     return workflow.get_workflow_map(party_key,
                                      work_description_store=persistence_store,
                                      transmission=transmission,
-                                     resynchroniser=resynchroniser
+                                     resynchroniser=resynchroniser,
+                                     persistence_store_max_retries=persistence_store_retries
                                      )
 
 
@@ -82,8 +83,10 @@ def main():
     client_cert = "client.cert"
     client_key = "client.key"
     ca_certs = "client.pem"
-    max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
-    retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
+    max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default='3'))
+    retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default='100'))
+    store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
+
     party_key = load_party_key(certs_dir)
     work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
@@ -92,8 +95,8 @@ def main():
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
                                                               max_retries, retry_delay)
-    workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store)
 
+    workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store, store_retries)
     start_tornado_server(data_dir, workflows)
 
 

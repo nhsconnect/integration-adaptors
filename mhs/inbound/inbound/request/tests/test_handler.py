@@ -32,7 +32,7 @@ state_data = [
             wd.VERSION_KEY: 0,
             wd.CREATED_TIMESTAMP: '11:59',
             wd.LATEST_TIMESTAMP: '12:00',
-            wd.STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+            wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
             wd.WORKFLOW: workflow.ASYNC_EXPRESS
         }
     }
