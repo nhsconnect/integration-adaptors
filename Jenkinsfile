@@ -4,10 +4,8 @@ pipeline {
     }
 
     environment {
-      // TODO: This is temporary to avoid the need to rebuild images when testing Terraform!
-      //BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+      BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
       ENVIRONMENT_ID = "build"
-      BUILD_TAG = "feature-RT-179-test-env-restructure-28"
       MHS_INBOUND_QUEUE_NAME = "${ENVIRONMENT_ID}-inbound"
     }
 
@@ -52,15 +50,14 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy MHS') {
             steps {
                 dir('pipeline/terraform/integration-test-environment') {
                     sh label: 'Initialising Terraform', script: """
                             terraform init \
                             -backend-config="bucket=${TF_STATE_BUCKET}" \
-                            -backend-config="key=${TF_STATE_FILE}" \
                             -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                            -backend-config="dynamodb_table=${TF_LOCK_TABLE_NAME}" \
+                            -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
                             -input=false
                         """
                     sh label: 'Applying Terraform configuration', script: """
@@ -96,6 +93,30 @@ pipeline {
                             script: "terraform output outbound_lb_domain_name"
                         ).trim()
                     }
+                }
+            }
+        }
+
+        stage('Deploy SCR') {
+            steps {
+                dir('pipeline/terraform/integration-test-environment') {
+                    sh label: 'Initialising Terraform', script: """
+                            terraform init \
+                            -backend-config="bucket=${TF_STATE_BUCKET}" \
+                            -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                            -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
+                            -input=false
+                        """
+                    sh label: 'Applying Terraform configuration', script: """
+                            terraform apply -auto-approve \
+                            -var environment_id=${ENVIRONMENT_ID} \
+                            -var build_id=${BUILD_TAG} \
+                            -var cluster_id=${CLUSTER_ID} \
+                            -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                            -var ecr_address=${DOCKER_REGISTRY} \
+                            -var scr_log_level=DEBUG \
+                            -var scr_service_port=${SCR_SERVICE_PORT}
+                        """
                 }
             }
         }
