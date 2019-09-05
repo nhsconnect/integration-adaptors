@@ -7,7 +7,6 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import utilities.config as config
-import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
@@ -19,7 +18,8 @@ logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
 
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
-                         persistence_store: persistence_adaptor.PersistenceAdaptor) \
+                         persistence_store: persistence_adaptor.PersistenceAdaptor,
+                         persistence_store_retries: int) \
         -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :param transmission: The transmission object to be used to make requests to the spine endpoints
@@ -28,7 +28,8 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
     :return: The workflows that can be used to handle messages.
     """
 
-    return workflow.get_workflow_map(party_key,work_description_store=persistence_store, transmission=transmission)
+    return workflow.get_workflow_map(party_key, work_description_store=persistence_store, transmission=transmission,
+                                     persistence_store_max_retries=persistence_store_retries)
 
 
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:
@@ -67,13 +68,15 @@ def main():
 
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
+    store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
+
     party_key = config.get_config('PARTY_KEY')
     persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
                                                               max_retries, retry_delay)
-    workflows = initialise_workflows(transmission, party_key, persistence_store)
+    workflows = initialise_workflows(transmission, party_key, persistence_store, store_retries)
 
     start_tornado_server(data_dir, workflows)
 

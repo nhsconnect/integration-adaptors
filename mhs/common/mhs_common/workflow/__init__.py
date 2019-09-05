@@ -24,7 +24,7 @@ def get_workflow_map(party_key: str = None,
                      sync_async_store: persistence_adaptor.PersistenceAdaptor = None,
                      transmission: transmission_adaptor.TransmissionAdaptor = None,
                      inbound_async_queue: queue_adaptor.QueueAdaptor = None,
-                     sync_async_store_retries: int = None,
+                     persistence_store_max_retries: int = None,
                      sync_async_store_retry_delay: int = None,
                      inbound_queue_max_retries: int = None,
                      inbound_queue_retry_delay: int = None
@@ -36,11 +36,13 @@ def get_workflow_map(party_key: str = None,
     """
     return {
         ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, work_description_store, transmission,
-                                                   inbound_async_queue, inbound_queue_max_retries, inbound_queue_retry_delay),
+                                                   inbound_async_queue, inbound_queue_max_retries,
+                                                   inbound_queue_retry_delay,
+                                                   persistence_store_max_retries=persistence_store_max_retries),
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(),
         FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
         SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission=transmission, sync_async_store=sync_async_store,
-                                      sync_async_store_max_retries=sync_async_store_retries,
+                                      persistence_store_max_retries=persistence_store_max_retries,
                                       sync_async_store_retry_delay=sync_async_store_retry_delay),
         SYNC: SynchronousWorkflow()
     }
