@@ -3,30 +3,33 @@ resource "aws_security_group" "mhs_outbound_security_group" {
   description = "The security group used to control traffic for the MHS Outbound component."
   vpc_id = aws_vpc.mhs_vpc.id
 
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
-    description = "HTTP"
-  }
-
-  egress {
-    from_port = 443
-    to_port = 443
-
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
-    prefix_list_ids = [
-      aws_vpc_endpoint.s3_endpoint.prefix_list_id,
-      aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-    protocol = "tcp"
-    description = "HTTPS"
-  }
-
   tags = {
     Name = "${var.environment_id}-mhs-outbound-sg"
     EnvironmentId = var.environment_id
   }
+}
+
+resource "aws_security_group_rule" "mhs_outbound_security_group_ingress_rule" {
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  type = "ingress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  description = "HTTP"
+}
+
+resource "aws_security_group_rule" "mhs_outbound_security_group_egress_rule" {
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  prefix_list_ids = [
+    aws_vpc_endpoint.s3_endpoint.prefix_list_id,
+    aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+  description = "HTTPS"
 }
 
 resource "aws_security_group" "mhs_route_security_group" {
@@ -34,31 +37,35 @@ resource "aws_security_group" "mhs_route_security_group" {
   description = "The security group used to control traffic for the MHS Routing component."
   vpc_id = aws_vpc.mhs_vpc.id
 
-  ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
-    description = "HTTP"
-  }
-
-  egress {
-    from_port = 443
-    to_port = 443
-
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
-    prefix_list_ids = [
-      aws_vpc_endpoint.s3_endpoint.prefix_list_id,
-      aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-    protocol = "tcp"
-    description = "HTTPS"
-  }
-
   tags = {
     Name = "${var.environment_id}-mhs-route-sg"
     EnvironmentId = var.environment_id
   }
 }
+
+resource "aws_security_group_rule" "mhs_route_security_group_ingress_rule" {
+  security_group_id = aws_security_group.mhs_route_security_group.id
+  type = "ingress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  description = "HTTP"
+}
+
+resource "aws_security_group_rule" "mhs_route_security_group_egress_rule" {
+  security_group_id = aws_security_group.mhs_route_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  prefix_list_ids = [
+    aws_vpc_endpoint.s3_endpoint.prefix_list_id,
+    aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+  description = "HTTPS"
+}
+
 
 resource "aws_security_group" "mhs_inbound_security_group" {
   name = "MHS Inbound Security Group"
