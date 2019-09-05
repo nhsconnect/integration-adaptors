@@ -194,3 +194,28 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
 
         wdo.set_outbound_status.assert_called_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
+
+    def test_sync_async_workflow_invoked(self):
+        expected_response = "Hello world!"
+        wdo = unittest.mock.MagicMock()
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
+        result = test_utilities.awaitable((200, expected_response, wdo))
+
+        self.sync_async_workflow.handle_sync_async_outbound_message.return_value = result
+        self.config_manager.get_interaction_details.return_value = {'sync-async': True, 'workflow': WORKFLOW_NAME}
+
+        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+        self.sync_async_workflow.handle_sync_async_outbound_message.assert_called_once()
+
+    def test_sync_async_workflow_not_invoked(self):
+        expected_response = "Hello world!"
+        wdo = unittest.mock.MagicMock()
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
+        result = test_utilities.awaitable((200, expected_response))
+
+        self.workflow.handle_outbound_message.return_value = result
+        self.config_manager.get_interaction_details.return_value = {'sync-async': False, 'workflow': WORKFLOW_NAME}
+
+        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+        self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
+        self.workflow.handle_outbound_message.assert_called_once()
