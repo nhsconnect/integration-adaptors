@@ -97,7 +97,6 @@ class TestSyncAsyncWorkflowInbound(TestCase):
 
         self.work_description.set_inbound_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
 
-
     @patch('asyncio.sleep')
     @test_utilities.async_test
     async def test_inbound_workflow_exception_in_store_retries(self, mock_sleep):
