@@ -76,10 +76,10 @@ class SynchronousHandler(tornado.web.RequestHandler):
     async def return_sync_async_response(self, status: int, response: str, wdo: wd.WorkDescription):
         try:
             self._write_response(status, response)
-            await wdo.set_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
         except Exception as e:
             logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
-            await wdo.set_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
 
 
     def write_error(self, status_code: int, **kwargs: Any):
