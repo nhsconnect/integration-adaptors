@@ -15,8 +15,8 @@ In order to run the build pipeline, the following resources must be created manu
 
 - An S3 bucket to be used to store the Terraform state database. This allows deployed resources to be re-used in
 subsequent builds, reducing the time needed to deploy updated services.
-- A DynamoDB table to be used to allow Terraform to lock the shared state, preventing issues if concurrent deployments
-of the same environment are performed. The table must have a primary key named LockID.
+- Two DynamoDB tables to be used to allow Terraform to lock the shared state of the MHS & SCR configurations, preventing issues if concurrent deployments
+of the same environment are performed. These tables must have a primary key named `LockID`.
 
 # Jenkins
 
@@ -79,7 +79,9 @@ Several global variables must be set within Jenkins for the scripts to work as p
 [Pre-Requisites](#pre-requisites)) resides in.
 - TF_STATE_FILE: The name of the file within the S3 bucket (as described in [Pre-Requisites](#pre-requisites)) to store
 terraform state in
-- TF_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
+- TF_MHS_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
+[Pre-Requisites](#pre-requisites)).
+- TF_SCR_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
 [Pre-Requisites](#pre-requisites)).
 
 The Jenkins worker EC2 instances must have an IAM role assigned that includes the following AWS managed IAM policies, in
