@@ -4,7 +4,7 @@ This package contains a pre-assured implementation of a Message Handling Service
 details of Spine messaging and provide a simple interface to allow HL7 messages to be sent to a remote MHS.
 
 ## Setup
-A `data/certs` directory should be created with the following files (containing the certificates & keys required to
+A `common/data/certs` directory should be created with the following files (containing the certificates & keys required to
 perform client authentication to the Spine instance you are using. For Openttest, these will have been provided when you
 were granted access):
 - `client.cert` - Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate,
@@ -29,6 +29,14 @@ installed and on your path, then within each of the subfolders `common`, `inboun
 ```
 pipenv install --dev
 ```
+
+If the build fails due to dependency issues with proton, follow these instructions:
+1) Visit: https://visualstudio.microsoft.com/downloads/
+2) Download the 'Community Edition'
+3) Run the installer once the download has completed
+4) Select the **Desktop development with C++** workload option
+5) Once the installation has completed you may have to reboot.
+
 
 ## Running MHS
 MHS is made up of multiple components, and running them all separately can be tedious. Instead, use Docker Compose, see [here](../README.md) for how to do this.
@@ -78,7 +86,8 @@ When running the tests locally, you will need to set the MHS_ADDRESS and ASID in
  without the 'http://' prefix or '/' suffix
     - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
 
-
+Timeouts received whilst waiting for a response from Spine on a Windows machine could be due to the machine rejecting incoming connections on port 443. In order to open the port, follow these instructions:
+https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/create-an-inbound-port-rule
 
 Any content POSTed to `/` on port 80 will result in the request configuration for the `path` entry in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
