@@ -84,7 +84,6 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                          {'messageId': message_id})
             return 500, "No async response received from sync-async store"
 
-
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('001', 'Entered sync-async inbound workflow')

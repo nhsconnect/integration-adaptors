@@ -3,10 +3,12 @@ from unittest.mock import patch
 
 import tornado.testing
 import tornado.web
+import tornado.util
 from utilities import integration_adaptors_logger as log, test_utilities
 from utilities import message_utilities
-
+import mhs_common.state.work_description as wd
 from outbound.request.synchronous import handler
+
 
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
@@ -14,16 +16,18 @@ INTERACTION_NAME = "interaction"
 REQUEST_BODY = "A request"
 WORKFLOW_NAME = "workflow name"
 INTERACTION_DETAILS = {'workflow': WORKFLOW_NAME}
-
+SYNC_ASYNC_WORKFLOW = "sync-async"
 
 class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.workflow = unittest.mock.Mock()
+        self.sync_async_workflow = unittest.mock.MagicMock()
         self.config_manager = unittest.mock.Mock()
         return tornado.web.Application([
             (r"/", handler.SynchronousHandler,
-             dict(config_manager=self.config_manager, workflows={WORKFLOW_NAME: self.workflow}))
+             dict(config_manager=self.config_manager, workflows={WORKFLOW_NAME: self.workflow,
+                                                                 SYNC_ASYNC_WORKFLOW: self.sync_async_workflow}))
         ])
 
     def tearDown(self):
@@ -164,3 +168,29 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.code, 400)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn("Body missing from request", response.body.decode())
+
+    def test_handler_updates_store_for_sync_async(self):
+        expected_response = "Hello world!"
+        wdo = unittest.mock.MagicMock()
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
+        result = test_utilities.awaitable((200, expected_response, wdo))
+
+        self.sync_async_workflow.handle_sync_async_outbound_message.return_value = result
+        self.config_manager.get_interaction_details.return_value = {'sync-async': True, 'workflow': WORKFLOW_NAME}
+
+        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+        wdo.set_outbound_status.assert_called_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+
+    @patch('outbound.request.synchronous.handler.SynchronousHandler._write_response')
+    def test_handler_updates_store_for_sync_async_failure_response(self, write_mock):
+        write_mock.side_effect = Exception('Dam the connection was closed')
+        expected_response = "Hello world!"
+        wdo = unittest.mock.MagicMock()
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
+        result = test_utilities.awaitable((200, expected_response, wdo))
+
+        self.sync_async_workflow.handle_sync_async_outbound_message.return_value = result
+        self.config_manager.get_interaction_details.return_value = {'sync-async': True, 'workflow': WORKFLOW_NAME}
+        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+
+        wdo.set_outbound_status.assert_called_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)

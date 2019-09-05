@@ -55,9 +55,9 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         reason=f"Couldn't determine workflow to invoke for interaction ID: "
                                         f"{interaction_id}") from e
 
-        if self._is_sync_async(interaction_details):
-            async_workflow: workflow.SyncAsyncWorkflow = self.workflows[workflow.SYNC_ASYNC]
-            status, response, wdo = await async_workflow.handle_sync_async_outbound_message(message_id, correlation_id,
+        if interaction_details.get('sync-async'):
+            sync_async_workflow: workflow.SyncAsyncWorkflow = self.workflows[workflow.SYNC_ASYNC]
+            status, response, wdo = await sync_async_workflow.handle_sync_async_outbound_message(message_id, correlation_id,
                                                                                             interaction_details, body,
                                                                                             wf)
             await self.return_sync_async_response(status, response, wdo)
@@ -66,13 +66,6 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                                                 None)
             self._write_response(status, response)
 
-    def _is_sync_async(self, inteaction_details):
-        try:
-            flag = inteaction_details['sync-async']
-            return flag
-        except KeyError:
-            return False
-
     async def return_sync_async_response(self, status: int, response: str, wdo: wd.WorkDescription):
         try:
             self._write_response(status, response)
@@ -80,7 +73,6 @@ class SynchronousHandler(tornado.web.RequestHandler):
         except Exception as e:
             logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
-
 
     def write_error(self, status_code: int, **kwargs: Any):
         self.set_header('Content-Type', 'text/plain')

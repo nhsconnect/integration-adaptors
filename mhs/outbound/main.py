@@ -31,7 +31,7 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 
 
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
-                         persistence_store: persistence_adaptor.PersistenceAdaptor,
+                         work_description_store: persistence_adaptor.PersistenceAdaptor,
                          sync_async_store: persistence_adaptor.PersistenceAdaptor,
                          persistence_store_retries: int) \
         -> Dict[str, workflow.CommonWorkflow]:
@@ -39,16 +39,16 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
     :param sync_async_store:
     :param transmission: The transmission object to be used to make requests to the spine endpoints
     :param party_key: The party key to use to identify this MHS.
-    :param persistence_store: The persistence adaptor for the state database
+    :param work_description_store: The persistence adaptor for the state database
     :return: The workflows that can be used to handle messages.
     """
 
     resynchroniser = resync.SyncAsyncResynchroniser(sync_async_store,
-                                                    int(config.get_config('RESYNC_TIMEOUT', '20')),
+                                                    int(config.get_config('MAX_RESYNC_RETRIES', '20')),
                                                     float(config.get_config('RESYNC_INTERVAL', '1.0')))
 
     return workflow.get_workflow_map(party_key,
-                                     work_description_store=persistence_store,
+                                     work_description_store=work_description_store,
                                      transmission=transmission,
                                      resynchroniser=resynchroniser,
                                      persistence_store_max_retries=persistence_store_retries
