@@ -1,14 +1,22 @@
 resource "aws_route53_zone" "mhs_hosted_zone" {
   name = "${var.environment_id}.${var.internal_root_domain}"
 
-  vpc {
-    vpc_id = aws_vpc.mhs_vpc.id
-  }
-
   tags = {
     Name = "${var.environment_id}-mhs-hosted-zone"
     EnvironmentId = var.environment_id
   }
+
+  lifecycle {
+    # Ignore changes to vpc_id as this is managed by aws_route53_zone_association resources
+    ignore_changes = [
+      vpc_id
+    ]
+  }
+}
+
+resource "aws_route53_zone_association" "mhs_hosted_zone_mhs_vpc_association" {
+  zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
+  vpc_id  = aws_vpc.mhs_vpc.id
 }
 
 resource "aws_route53_record" "mhs_outbound_load_balancer_record" {

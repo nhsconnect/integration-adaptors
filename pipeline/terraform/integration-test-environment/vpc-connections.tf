@@ -33,6 +33,12 @@ resource "aws_route" "mhs_to_supplier_route" {
   vpc_peering_connection_id = aws_vpc_peering_connection.supplier_peering_connection.id
 }
 
+resource "aws_route53_zone_association" "supplier_hosted_zone_mhs_vpc_association" {
+  zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
+  vpc_id  = data.aws_vpc.supplier_vpc.id
+}
+
+
 data "aws_vpc" "opentest_vpc" {
   id = var.opentest_vpc_id
 }
@@ -66,4 +72,9 @@ resource "aws_route" "opentest_to_mhs_route" {
   route_table_id = data.aws_vpc.opentest_vpc.main_route_table_id
   destination_cidr_block = aws_vpc.mhs_vpc.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.opentest_peering_connection.id
+}
+
+resource "aws_route53_zone_association" "opentest_hosted_zone_mhs_vpc_association" {
+  zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
+  vpc_id  = data.aws_vpc.opentest_vpc.id
 }
