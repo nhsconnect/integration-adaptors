@@ -27,6 +27,12 @@ resource "aws_route" "supplier_to_mhs_route" {
   vpc_peering_connection_id = aws_vpc_peering_connection.supplier_peering_connection.id
 }
 
+resource "aws_route" "mhs_to_supplier_route" {
+  route_table_id = aws_vpc.mhs_vpc.main_route_table_id
+  destination_cidr_block = data.aws_vpc.supplier_vpc.cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.supplier_peering_connection.id
+}
+
 data "aws_vpc" "opentest_vpc" {
   id = var.opentest_vpc_id
 }
