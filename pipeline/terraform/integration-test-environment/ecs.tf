@@ -2,7 +2,7 @@ resource "aws_ecs_cluster" "mhs_cluster" {
   name = "${var.environment_id}-mhs-cluster"
 
   tags = {
-    Name    = "${var.environment_id}-mhs-cluster"
+    Name          = "${var.environment_id}-mhs-cluster"
     EnvironmentId = var.environment_id
   }
 }
@@ -10,7 +10,7 @@ resource "aws_ecs_cluster" "mhs_cluster" {
 resource "aws_cloudwatch_log_group" "mhs_outbound_log_group" {
   name = "/ecs/${var.environment_id}-mhs-outbound"
   tags = {
-    Name    = "${var.environment_id}-mhs-outbound-log-group"
+    Name          = "${var.environment_id}-mhs-outbound-log-group"
     EnvironmentId = var.environment_id
   }
 }
@@ -18,9 +18,22 @@ resource "aws_cloudwatch_log_group" "mhs_outbound_log_group" {
 resource "aws_cloudwatch_log_group" "mhs_inbound_log_group" {
   name = "/ecs/${var.environment_id}-mhs-inbound"
   tags = {
-    Name    = "${var.environment_id}-mhs-inbound-log-group"
+    Name          = "${var.environment_id}-mhs-inbound-log-group"
     EnvironmentId = var.environment_id
   }
+}
+
+locals {
+  mhs_outbound_base_environment_vars = [
+    {
+      name  = "MHS_LOG_LEVEL"
+      value = var.mhs_log_level
+    },
+    {
+      name  = "MHS_STATE_TABLE_NAME"
+      value = aws_dynamodb_table.mhs_state_table.name
+    }
+  ]
 }
 
 resource "aws_ecs_task_definition" "mhs_outbound_task" {
@@ -30,20 +43,12 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
       {
         name  = "mhs-outbound"
         image = "${var.ecr_address}/mhs/outbound:outbound-${var.build_id}"
-        environment = [
+        environment = var.mhs_outbound_http_proxy == "" ? local.mhs_outbound_base_environment_vars : concat(local.mhs_outbound_base_environment_vars, [
           {
-            name  = "MHS_LOG_LEVEL"
-            value = var.mhs_log_level
-          },
-          {
-            name  = "MHS_STATE_TABLE_NAME"
-            value = aws_dynamodb_table.mhs_state_table.name
-          },
-          {
-            name = "MHS_HTTP_PROXY"
+            name  = "MHS_HTTP_PROXY"
             value = var.mhs_outbound_http_proxy
           }
-        ]
+        ])
         secrets = [
           {
             name      = "MHS_PARTY_KEY"
@@ -88,7 +93,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
     "FARGATE"
   ]
   tags = {
-    Name    = "${var.environment_id}-mhs-outbound-task"
+    Name          = "${var.environment_id}-mhs-outbound-task"
     EnvironmentId = var.environment_id
   }
   task_role_arn      = var.task_role_arn
@@ -168,7 +173,7 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
     "FARGATE"
   ]
   tags = {
-    Name    = "${var.environment_id}-mhs-inbound-task"
+    Name          = "${var.environment_id}-mhs-inbound-task"
     EnvironmentId = var.environment_id
   }
   task_role_arn      = var.task_role_arn

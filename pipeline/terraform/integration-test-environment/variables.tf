@@ -61,6 +61,7 @@ variable "mhs_log_level" {
 variable "mhs_outbound_http_proxy" {
   type = string
   description = "Address of the HTTP proxy to proxy downstream requests from MHS outbound via."
+  default = ""
 }
 
 variable "mhs_state_table_read_capacity" {
