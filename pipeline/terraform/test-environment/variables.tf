@@ -51,5 +51,8 @@ variable "mhs_inbound_queue_username" {
 variable "mhs_inbound_queue_password" {
   type = string
   description = "The password for the async inbound queue"
-
+}
+variable "mhs_sync_async_state_table_name" {
+  type = string
+  description = "The name of the sync async store table"
 }
