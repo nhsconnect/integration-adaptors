@@ -38,6 +38,10 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
           {
             name  = "MHS_STATE_TABLE_NAME"
             value = aws_dynamodb_table.mhs_state_table.name
+          },
+          {
+            name = "MHS_HTTP_PROXY"
+            value = var.mhs_outbound_http_proxy
           }
         ]
         secrets = [

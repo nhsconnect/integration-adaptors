@@ -27,7 +27,7 @@
       "type": "shell",
       "inline": [
         "apt-get update",
-        "apt-get install build-essential -y",
+        "apt-get install build-essential libcurl4-openssl-dev libssl-dev -y",
         "mkdir -p {{user `app_dir`}}/mhs"
       ]
     },

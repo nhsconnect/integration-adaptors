@@ -58,6 +58,11 @@ variable "mhs_log_level" {
   description = "Log level for the MHS application."
 }
 
+variable "mhs_outbound_http_proxy" {
+  type = string
+  description = "Address of the HTTP proxy to proxy downstream requests from MHS outbound via."
+}
+
 variable "mhs_state_table_read_capacity" {
   type = number
   description = "Read capacity of the DynamoDB state table used by the MHS application."

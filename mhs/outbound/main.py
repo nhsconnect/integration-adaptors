@@ -3,19 +3,30 @@ from typing import Dict
 
 import definitions
 import mhs_common.configuration.configuration_manager as configuration_manager
+import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-import utilities.config as config
-import utilities.file_utilities as file_utilities
-import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 
 import outbound.request.synchronous.handler as client_request_handler
+import utilities.config as config
+import utilities.integration_adaptors_logger as log
 from outbound.transmission import outbound_transmission
 
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
+
+
+def configure_http_proxy():
+    """
+    Configure Tornado to use a http proxy if a http proxy was set in config
+    """
+    https_proxy = config.get_config('HTTP_PROXY', default=None)
+    if https_proxy is not None:
+        http_client_defaults = {'proxy_host': https_proxy, 'proxy_port': 3128}
+        tornado.httpclient.AsyncHTTPClient.configure('tornado.curl_httpclient.CurlAsyncHTTPClient',
+                                                     defaults=http_client_defaults)
 
 
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
@@ -53,6 +64,8 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
 def main():
     config.setup_config("MHS")
     log.configure_logging()
+
+    configure_http_proxy()
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
