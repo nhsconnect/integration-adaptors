@@ -49,15 +49,16 @@ async def update_status_with_retries(wdo: WorkDescription,
                                      update_status_method,
                                      status: MessageStatus,
                                      retries: int):
-    attempts = 0
+    attempts = 1
     while attempts < retries + 1:
         try:
             await wdo.update()
             await update_status_method(status)
             break
         except OutOfDateVersionError as e:
-            logger.error('0021', 'Failed attempt to update state store')
+            logger.warning('0021', f'Failed attempt to update state store on retry {attempts} of {retries}')
             if attempts == retries:
+                logger.error('0022', 'Maximum number of retries reached for attempting to update state store')
                 raise e
             else:
                 attempts += 1
@@ -103,6 +104,10 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     if workflow is None:
         logger.error('008', 'Failed to build new work description, workflow should not be null')
         raise ValueError('Expected workflow to not be None')
+    if not inbound_status and not outbound_status:
+        logger.error('007', 'Failed to build work description, expected inbound or outbound status to be present:'
+                            '{inbound} {outbound}', {'inbound': inbound_status, 'outbound': outbound_status})
+        raise ValueError('Expected inbound/outbound to not be null')
 
     timestamp = timing.get_time()
     work_description_map = {

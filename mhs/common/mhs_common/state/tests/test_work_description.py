@@ -100,7 +100,7 @@ class TestWorkDescription(unittest.TestCase):
             wd.DATA: {
                 wd.VERSION_KEY: 1,
                 wd.LATEST_TIMESTAMP: '11:00',
-                wd.INBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
+                wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
             }
         })
 
@@ -154,6 +154,59 @@ class TestWorkDescription(unittest.TestCase):
     def test_null_persistence(self):
         with self.assertRaises(ValueError):
             wd.WorkDescription(None, {'None': 'None'})
+
+    @async_test
+    async def test_update_status(self):
+        new_data = {
+            wd.DATA_KEY: 'aaa-aaa-aaa',
+            wd.DATA: {
+                wd.CREATED_TIMESTAMP: '11:59',
+                wd.LATEST_TIMESTAMP: '13:00',
+                wd.VERSION_KEY: 1,
+                wd.INBOUND_STATUS: None,
+                wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+                wd.WORKFLOW: workflow.SYNC
+            }
+        }
+        persistence = MagicMock()
+        persistence.get.return_value = test_utilities.awaitable(new_data)
+        work_description = wd.WorkDescription(persistence, old_data)
+
+        await work_description.update()
+
+        self.assertEqual(work_description.version, 1)
+        self.assertEqual(work_description.outbound_status, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+        self.assertEqual(work_description.last_modified_timestamp, '13:00')
+
+    @async_test
+    async def test_update_status(self):
+        persistence = MagicMock()
+        persistence.get.return_value = test_utilities.awaitable(None)
+        work_description = wd.WorkDescription(persistence, old_data)
+
+        with self.assertRaises(wd.EmptyWorkDescriptionError):
+            await work_description.update()
+
+    @async_test
+    async def test_deserialize(self):
+        new_data = {
+            wd.DATA_KEY: 'aaa-aaa-aaa',
+            wd.DATA: {
+                wd.CREATED_TIMESTAMP: '11:59',
+                wd.LATEST_TIMESTAMP: '13:00',
+                wd.VERSION_KEY: 1,
+                wd.INBOUND_STATUS: None,
+                wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+                wd.WORKFLOW: workflow.SYNC
+            }
+        }
+
+        work_description = wd.WorkDescription(MagicMock(), old_data)
+        work_description._deserialize_data(new_data)
+
+        self.assertEqual(work_description.version, 1)
+        self.assertEqual(work_description.outbound_status, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+        self.assertEqual(work_description.last_modified_timestamp, '13:00')
 
 
 class TestWorkDescriptionFactory(unittest.TestCase):
@@ -236,3 +289,49 @@ class TestWorkDescriptionFactory(unittest.TestCase):
                     outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     workflow=None
                 )
+        with self.subTest('Null statuses'):
+            with self.assertRaises(ValueError):
+                wd.create_new_work_description(
+                    persistence,
+                    key='aaa',
+                    outbound_status=None,
+                    inbound_status=None,
+                    workflow=workflow.SYNC_ASYNC
+                )
+
+        with self.subTest('Single null status should not raise error'):
+            wd.create_new_work_description(
+                persistence,
+                key='aaa',
+                outbound_status=wd.MessageStatus.INBOUND_RESPONSE_FAILED,
+                inbound_status=None,
+                workflow=workflow.SYNC_ASYNC
+            )
+
+class TestWorkDescriptionStatusUpdateRetry(unittest.TestCase):
+
+    @test_utilities.async_test
+    async def test_update_success(self):
+        wdo = MagicMock()
+        wdo.update.return_value = test_utilities.awaitable(True)
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
+        await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
+                                            wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+                                            20)
+        self.assertEqual(wdo.update.call_count, 1)
+        self.assertEqual(wdo.set_outbound_status.call_count, 1)
+
+    @test_utilities.async_test
+    async def test_update_correct_number_retries(self):
+        async def throws_out_of_date_exception(param):
+            raise wd.OutOfDateVersionError
+
+        wdo = MagicMock()
+        wdo.update.return_value = test_utilities.awaitable(True)
+        wdo.set_outbound_status.side_effect = throws_out_of_date_exception
+        with self.assertRaises(wd.OutOfDateVersionError):
+            await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
+                                                wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+                                                20)
+        self.assertEqual(wdo.update.call_count, 20)
+        self.assertEqual(wdo.set_outbound_status.call_count, 20)
