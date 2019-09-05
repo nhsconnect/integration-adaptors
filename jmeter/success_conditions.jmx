@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.1.1 r1855137">
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.0 r1840935">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
@@ -177,7 +177,43 @@ Content-Transfer-Encoding: 8bit&#xd;
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Outbound Messages Samples" enabled="true">
+      <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters" enabled="true">
+        <collectionProp name="UserParameters.names">
+          <stringProp name="55126294">timestamp</stringProp>
+          <stringProp name="733810682">shortTimestamp</stringProp>
+          <stringProp name="1409793545">from_party_id</stringProp>
+          <stringProp name="-1346248104">to_party_id</stringProp>
+          <stringProp name="-1422950858">action</stringProp>
+          <stringProp name="-1354262618">cpa_id</stringProp>
+          <stringProp name="1652761990">id_root</stringProp>
+          <stringProp name="2046139248">id_root_alt</stringProp>
+          <stringProp name="940331682">nhsNumber</stringProp>
+          <stringProp name="-1999822316">nhs_number_AE</stringProp>
+          <stringProp name="-1473196299">documentType</stringProp>
+          <stringProp name="1603491602">dissentOverride</stringProp>
+          <stringProp name="-1831367840">dissentOverride2</stringProp>
+        </collectionProp>
+        <collectionProp name="UserParameters.thread_values">
+          <collectionProp name="-1461500412">
+            <stringProp name="-922947048">${__BeanShell(new java.text.SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;&quot;).format(new Date()))}}</stringProp>
+            <stringProp name="1697399689">${__time(YMMddHHmmss)}</stringProp>
+            <stringProp name="-387775280">918999199091</stringProp>
+            <stringProp name="803295032">YES-0000806</stringProp>
+            <stringProp name="380125698">REPC_IN150016UK05</stringProp>
+            <stringProp name="-2413700">S20001A000182</stringProp>
+            <stringProp name="1154959476">${__javaScript(&quot;${__UUID()}&quot;.toUpperCase())}</stringProp>
+            <stringProp name="1154959476">${__javaScript(&quot;${__UUID()}&quot;.toUpperCase())}</stringProp>
+            <stringProp name="483810206">9446245796</stringProp>
+            <stringProp name="-2113169336">9689174789</stringProp>
+            <stringProp name="-912300401">196971000000103</stringProp>
+            <stringProp name="49">1</stringProp>
+            <stringProp name="48">0</stringProp>
+          </collectionProp>
+        </collectionProp>
+        <boolProp name="UserParameters.per_iteration">false</boolProp>
+      </UserParameters>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Async_Express_Pattern" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -190,7 +226,24 @@ Content-Transfer-Encoding: 8bit&#xd;
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PSIS_Document_List_Data_Request_Async_Express" enabled="false">
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">message_id</stringProp>
+              <stringProp name="Header.value"></stringProp>
+            </elementProp>
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">correlation_id</stringProp>
+              <stringProp name="Header.value"></stringProp>
+            </elementProp>
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Interaction-Id</stringProp>
+              <stringProp name="Header.value">QUPC_IN160101UK05</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PSIS_Document_List_Data_Request_Async_Express" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -259,7 +312,7 @@ Content-Transfer-Encoding: 8bit&#xd;
           <stringProp name="HTTPSampler.port">80</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/psis_document_list_data_request</stringProp>
+          <stringProp name="HTTPSampler.path"></stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -270,6 +323,139 @@ Content-Transfer-Encoding: 8bit&#xd;
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
+        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="false">
+          <collectionProp name="Asserion.test_strings">
+            <stringProp name="49586">200</stringProp>
+          </collectionProp>
+          <stringProp name="Assertion.test_field">Assertion.response_message</stringProp>
+          <boolProp name="Assertion.assume_success">false</boolProp>
+          <intProp name="Assertion.test_type">2</intProp>
+          <stringProp name="Assertion.custom_message"></stringProp>
+        </ResponseAssertion>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Inbound Message Samples" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Forward_Reliable_Pattern" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP2GP_Common_Content_Large_Messageing_Fwrd_Reliable" enabled="false">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;COPC_IN000001UK01 xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns=&quot;urn:hl7-org:v3&quot;&gt;&#xd;
+    &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
+    &lt;creationTime value=&quot;20190416100812&quot; /&gt;&#xd;
+    &lt;versionCode code=&quot;3NPfIT7.2.02&quot; /&gt;&#xd;
+    &lt;interactionId root=&quot;2.16.840.1.113883.2.1.3.2.4.12&quot; extension=&quot;COPC_IN000001UK01&quot; /&gt;&#xd;
+    &lt;processingCode code=&quot;P&quot; /&gt;&#xd;
+    &lt;processingModeCode code=&quot;T&quot; /&gt;&#xd;
+    &lt;acceptAckCode code=&quot;NE&quot; /&gt;&#xd;
+    &lt;communicationFunctionRcv type=&quot;CommunicationFunction&quot; typeCode=&quot;RCV&quot;&gt;&#xd;
+        &lt;device type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+            &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;200000000835&quot; /&gt;&#xd;
+        &lt;/device&gt;&#xd;
+    &lt;/communicationFunctionRcv&gt;&#xd;
+    &lt;communicationFunctionSnd type=&quot;CommunicationFunction&quot; typeCode=&quot;SND&quot;&gt;&#xd;
+        &lt;device type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+            &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;031759679512&quot; /&gt;&#xd;
+        &lt;/device&gt;&#xd;
+    &lt;/communicationFunctionSnd&gt;&#xd;
+    &lt;ControlActEvent classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+        &lt;author1 type=&quot;Participation&quot; typeCode=&quot;AUT&quot;&gt;&#xd;
+            &lt;AgentSystemSDS type=&quot;RoleHeir&quot; classCode=&quot;AGNT&quot;&gt;&#xd;
+                &lt;agentSystemSDS type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
+                    &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;200000000835&quot; /&gt;&#xd;
+                &lt;/agentSystemSDS&gt;&#xd;
+            &lt;/AgentSystemSDS&gt;&#xd;
+        &lt;/author1&gt;&#xd;
+        &lt;subject typeCode=&quot;SUBJ&quot; contextConductionInd=&quot;false&quot;&gt;&#xd;
+        &lt;PayloadInformation classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+        &lt;code code=&quot;GP2GPLMATTACHMENTINFO&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.202&quot; displayName=&quot;GP2GP Large Message Attachment Information&quot; /&gt;&#xd;
+        &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
+        &lt;messageType root=&quot;2.16.840.1.113883.2.1.3.2.4.18.17&quot; extension=&quot;RCMR_MT000001GB01&quot; xmlns=&quot;NPFIT:HL7:Localisation&quot; /&gt;&#xd;
+        &lt;value&gt;&#xd;
+            &lt;Gp2gpfragment xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;urn:nhs:names:services:gp2gp&quot;&gt;&#xd;
+            &lt;Version xsi:type=&quot;xsd:string&quot;&gt;01&lt;/Version&gt;&#xd;
+            &lt;Recipients&gt;&#xd;
+                &lt;Recipient&gt;${to_party_id}&lt;/Recipient&gt;&#xd;
+            &lt;/Recipients&gt;&#xd;
+            &lt;From&gt;${from_party_id}&lt;/From&gt;&#xd;
+            &lt;subject&gt;Attachment:${file_upload}&lt;/subject&gt;&#xd;
+            &lt;message-id&gt;${id_root}&lt;/message-id&gt;&#xd;
+            &lt;/Gp2gpfragment&gt;&#xd;
+        &lt;/value&gt;&#xd;
+            &lt;pertinentInformation typeCode=&quot;PERT&quot;&gt;&#xd;
+                &lt;sequenceNumber value=&quot;1&quot; /&gt;&#xd;
+                &lt;pertinentPayloadBody classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
+                    &lt;code code=&quot;GP2GPLMATTACHMENT&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.202&quot; displayName=&quot;GP2GP Large Message Attachment&quot; /&gt;&#xd;
+                    &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
+                    &lt;value&gt;&#xd;
+                        &lt;reference value=&quot;file://localhost/1E49E84D-B29B-466B-93A5-432459CA549B_Treadmill%20Running%20300fps_12.avi&quot; /&gt;&#xd;
+                    &lt;/value&gt;&#xd;
+                &lt;/pertinentPayloadBody&gt;&#xd;
+                &lt;/pertinentInformation&gt;&#xd;
+            &lt;/PayloadInformation&gt;&#xd;
+        &lt;/subject&gt;&#xd;
+    &lt;/ControlActEvent&gt;&#xd;
+&lt;/COPC_IN000001UK01&gt;&#xd;
+</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">80</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path"></stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Async_Reliable_Pattern" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP_Summary_Async_Reliable" enabled="false">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
@@ -391,7 +577,21 @@ Content-Transfer-Encoding: 8bit&#xd;
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PDS_Retrieval_Query_Synch" enabled="true">
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Sync_Pattern" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PDS_Retrieval_Query_Synch" enabled="false">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -451,206 +651,6 @@ Content-Transfer-Encoding: 8bit&#xd;
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/pds_retrieval</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout"></stringProp>
-        </HTTPSamplerProxy>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP2GP_Common_Content_Large_Messageing_Fwrd_Reliable" enabled="false">
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">&lt;COPC_IN000001UK01 xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns=&quot;urn:hl7-org:v3&quot;&gt;&#xd;
-    &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
-    &lt;creationTime value=&quot;20190416100812&quot; /&gt;&#xd;
-    &lt;versionCode code=&quot;3NPfIT7.2.02&quot; /&gt;&#xd;
-    &lt;interactionId root=&quot;2.16.840.1.113883.2.1.3.2.4.12&quot; extension=&quot;COPC_IN000001UK01&quot; /&gt;&#xd;
-    &lt;processingCode code=&quot;P&quot; /&gt;&#xd;
-    &lt;processingModeCode code=&quot;T&quot; /&gt;&#xd;
-    &lt;acceptAckCode code=&quot;NE&quot; /&gt;&#xd;
-    &lt;communicationFunctionRcv type=&quot;CommunicationFunction&quot; typeCode=&quot;RCV&quot;&gt;&#xd;
-        &lt;device type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
-            &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;200000000835&quot; /&gt;&#xd;
-        &lt;/device&gt;&#xd;
-    &lt;/communicationFunctionRcv&gt;&#xd;
-    &lt;communicationFunctionSnd type=&quot;CommunicationFunction&quot; typeCode=&quot;SND&quot;&gt;&#xd;
-        &lt;device type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
-            &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;031759679512&quot; /&gt;&#xd;
-        &lt;/device&gt;&#xd;
-    &lt;/communicationFunctionSnd&gt;&#xd;
-    &lt;ControlActEvent classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
-        &lt;author1 type=&quot;Participation&quot; typeCode=&quot;AUT&quot;&gt;&#xd;
-            &lt;AgentSystemSDS type=&quot;RoleHeir&quot; classCode=&quot;AGNT&quot;&gt;&#xd;
-                &lt;agentSystemSDS type=&quot;Device&quot; classCode=&quot;DEV&quot; determinerCode=&quot;INSTANCE&quot;&gt;&#xd;
-                    &lt;id root=&quot;1.2.826.0.1285.0.2.0.107&quot; extension=&quot;200000000835&quot; /&gt;&#xd;
-                &lt;/agentSystemSDS&gt;&#xd;
-            &lt;/AgentSystemSDS&gt;&#xd;
-        &lt;/author1&gt;&#xd;
-        &lt;subject typeCode=&quot;SUBJ&quot; contextConductionInd=&quot;false&quot;&gt;&#xd;
-        &lt;PayloadInformation classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
-        &lt;code code=&quot;GP2GPLMATTACHMENTINFO&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.202&quot; displayName=&quot;GP2GP Large Message Attachment Information&quot; /&gt;&#xd;
-        &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
-        &lt;messageType root=&quot;2.16.840.1.113883.2.1.3.2.4.18.17&quot; extension=&quot;RCMR_MT000001GB01&quot; xmlns=&quot;NPFIT:HL7:Localisation&quot; /&gt;&#xd;
-        &lt;value&gt;&#xd;
-            &lt;Gp2gpfragment xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;urn:nhs:names:services:gp2gp&quot;&gt;&#xd;
-            &lt;Version xsi:type=&quot;xsd:string&quot;&gt;01&lt;/Version&gt;&#xd;
-            &lt;Recipients&gt;&#xd;
-                &lt;Recipient&gt;${to_party_id}&lt;/Recipient&gt;&#xd;
-            &lt;/Recipients&gt;&#xd;
-            &lt;From&gt;${from_party_id}&lt;/From&gt;&#xd;
-            &lt;subject&gt;Attachment:${file_upload}&lt;/subject&gt;&#xd;
-            &lt;message-id&gt;${id_root}&lt;/message-id&gt;&#xd;
-            &lt;/Gp2gpfragment&gt;&#xd;
-        &lt;/value&gt;&#xd;
-            &lt;pertinentInformation typeCode=&quot;PERT&quot;&gt;&#xd;
-                &lt;sequenceNumber value=&quot;1&quot; /&gt;&#xd;
-                &lt;pertinentPayloadBody classCode=&quot;OBS&quot; moodCode=&quot;EVN&quot;&gt;&#xd;
-                    &lt;code code=&quot;GP2GPLMATTACHMENT&quot; codeSystem=&quot;2.16.840.1.113883.2.1.3.2.4.17.202&quot; displayName=&quot;GP2GP Large Message Attachment&quot; /&gt;&#xd;
-                    &lt;id root=&quot;${id_root}&quot; /&gt;&#xd;
-                    &lt;value&gt;&#xd;
-                        &lt;reference value=&quot;file://localhost/1E49E84D-B29B-466B-93A5-432459CA549B_Treadmill%20Running%20300fps_12.avi&quot; /&gt;&#xd;
-                    &lt;/value&gt;&#xd;
-                &lt;/pertinentPayloadBody&gt;&#xd;
-                &lt;/pertinentInformation&gt;&#xd;
-            &lt;/PayloadInformation&gt;&#xd;
-        &lt;/subject&gt;&#xd;
-    &lt;/ControlActEvent&gt;&#xd;
-&lt;/COPC_IN000001UK01&gt;&#xd;
-</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">80</stringProp>
-          <stringProp name="HTTPSampler.protocol"></stringProp>
-          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/gp_to_gp</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout"></stringProp>
-        </HTTPSamplerProxy>
-        <hashTree/>
-        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="false">
-          <collectionProp name="Asserion.test_strings">
-            <stringProp name="49586">200</stringProp>
-          </collectionProp>
-          <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-          <boolProp name="Assertion.assume_success">false</boolProp>
-          <intProp name="Assertion.test_type">2</intProp>
-          <stringProp name="Assertion.custom_message"></stringProp>
-        </ResponseAssertion>
-        <hashTree/>
-        <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters" enabled="true">
-          <collectionProp name="UserParameters.names">
-            <stringProp name="55126294">timestamp</stringProp>
-            <stringProp name="733810682">shortTimestamp</stringProp>
-            <stringProp name="1409793545">from_party_id</stringProp>
-            <stringProp name="-1346248104">to_party_id</stringProp>
-            <stringProp name="-1422950858">action</stringProp>
-            <stringProp name="-1354262618">cpa_id</stringProp>
-            <stringProp name="1652761990">id_root</stringProp>
-            <stringProp name="2046139248">id_root_alt</stringProp>
-            <stringProp name="940331682">nhsNumber</stringProp>
-            <stringProp name="-1999822316">nhs_number_AE</stringProp>
-            <stringProp name="-1473196299">documentType</stringProp>
-            <stringProp name="1603491602">dissentOverride</stringProp>
-            <stringProp name="-1831367840">dissentOverride2</stringProp>
-          </collectionProp>
-          <collectionProp name="UserParameters.thread_values">
-            <collectionProp name="-1461500412">
-              <stringProp name="-922947048">${__BeanShell(new java.text.SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;HH:mm:ss&apos;Z&apos;&quot;).format(new Date()))}}</stringProp>
-              <stringProp name="1697399689">${__time(YMMddHHmmss)}</stringProp>
-              <stringProp name="-387775280">918999199091</stringProp>
-              <stringProp name="803295032">YES-0000806</stringProp>
-              <stringProp name="380125698">REPC_IN150016UK05</stringProp>
-              <stringProp name="-2413700">S20001A000182</stringProp>
-              <stringProp name="1154959476">${__javaScript(&quot;${__UUID()}&quot;.toUpperCase())}</stringProp>
-              <stringProp name="1154959476">${__javaScript(&quot;${__UUID()}&quot;.toUpperCase())}</stringProp>
-              <stringProp name="483810206">9446245796</stringProp>
-              <stringProp name="-2113169336">9689174789</stringProp>
-              <stringProp name="-912300401">196971000000103</stringProp>
-              <stringProp name="49">1</stringProp>
-              <stringProp name="48">0</stringProp>
-            </collectionProp>
-          </collectionProp>
-          <boolProp name="UserParameters.per_iteration">false</boolProp>
-        </UserParameters>
-        <hashTree/>
-      </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Inbound Message Samples" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-      </ThreadGroup>
-      <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="SOAP Faults" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-      </ThreadGroup>
-      <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request" enabled="false">
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
-&lt;SOAP:Envelope xmlns:SOAP=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:SOAP-ENV=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:crs=&quot;http://national.carerecords.nhs.uk/schema/crs/&quot; xmlns:wsa=&quot;http://schemas.xmlsoap.org/ws/2004/08/addressing&quot;&gt;&#xd;
-  &lt;SOAP:Body&gt;&#xd;
-    &lt;SOAP:Fault&gt;&#xd;
-      &lt;faultcode&gt;SOAP:Server&lt;/faultcode&gt;&#xd;
-      &lt;faultstring&gt;Application Exception&lt;/faultstring&gt;&#xd;
-      &lt;detail&gt;&#xd;
-        &lt;nasp:errorList xmlns:nasp=&quot;http://national.carerecords.nhs.uk/schema/&quot;&gt;&#xd;
-          &lt;nasp:error&gt;&#xd;
-            &lt;nasp:codeContext&gt;urn:nhs:names:error:tms&lt;/nasp:codeContext&gt;&#xd;
-            &lt;nasp:errorCode&gt;200&lt;/nasp:errorCode&gt;&#xd;
-            &lt;nasp:severity&gt;Error&lt;/nasp:severity&gt;&#xd;
-            &lt;nasp:location&gt;Not Supported&lt;/nasp:location&gt;&#xd;
-            &lt;nasp:description&gt;System failure to process message - default&lt;/nasp:description&gt;&#xd;
-          &lt;/nasp:error&gt;&#xd;
-        &lt;/nasp:errorList&gt;&#xd;
-      &lt;/detail&gt;&#xd;
-    &lt;/SOAP:Fault&gt;&#xd;
-  &lt;/SOAP:Body&gt;&#xd;
-&lt;/SOAP:Envelope&gt;</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">443</stringProp>
-          <stringProp name="HTTPSampler.protocol"></stringProp>
-          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path"></stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

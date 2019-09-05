@@ -1,7 +1,7 @@
 {
   "QUPC_IN160101UK05": {
     "workflow": "async-express",
-    "url": "https://msg.opentest.hscic.gov.uk/sync-service",
+    "url": "https://localhost:4001/sync-service",
     "request_type": "POST",
     "service": "urn:nhs:names:services:psisquery",
     "action": "QUPC_IN160101UK05",
