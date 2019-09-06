@@ -87,7 +87,7 @@ resource "aws_security_group_rule" "mhs_inbound_security_group_ingress_rule" {
   description = "HTTPS"
 }
 
-resource "aws_security_group_rule" "mhs_route_security_group_egress_rule" {
+resource "aws_security_group_rule" "mhs_inbound_security_group_egress_rule" {
   security_group_id = aws_security_group.mhs_inbound_security_group.id
   type = "egress"
   from_port = 443
