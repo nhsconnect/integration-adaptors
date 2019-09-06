@@ -43,6 +43,9 @@ RUN apt-get update && \
         apt-get update && \
         apt-get install -qq -y --no-install-recommends docker-ce=18.06.3~ce~3-0~debian
 
+# Install curl and libSSL, so Tornado can use the CURL HTTP client.
+RUN apt-get update && apt-get install -y libcurl4-openssl-dev libssl-dev
+
 # Leave as root to allow for running docker builds
 
 ENTRYPOINT [\"jenkins-slave\"]
