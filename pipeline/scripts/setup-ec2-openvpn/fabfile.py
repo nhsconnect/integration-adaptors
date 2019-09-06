@@ -41,3 +41,21 @@ def setup_ec2_openvpn(c):
     # Start OpenVPN on server startup
     c.sudo("chkconfig --level 2345 openvpn on")
     logging.info("Set OpenVPN to be started on server startup")
+
+
+@task
+def setup_squid(c):
+    """
+    Install and configure Squid to act as a HTTP proxy for requests from MHS outbound to Spine
+    """
+    c.sudo("yum install -y squid")
+    logging.info("Installed Squid")
+
+    c.put(str(Path(CURRENT_DIR) / "squid.conf"), remote="squid.conf")
+    c.run(f"sudo mv squid.conf /etc/squid/squid.conf")
+    logging.info("Configured Squid")
+
+    c.sudo("systemctl restart squid.service")
+    logging.info("Started Squid")
+    c.sudo("systemctl enable squid.service")
+    logging.info("Set Squid to be started on server startup")
