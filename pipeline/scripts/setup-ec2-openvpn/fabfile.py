@@ -96,7 +96,7 @@ def setup_haproxy(c, mhs_inbound_load_balancer_url):
     Install and configure HAProxy to work as a passthrough proxy for:
 
     - passing inbound requests from Spine to MHS inbound
-    - passing ldap requests from MHS spine route lookup to SDS (Spine Directory Service)
+    - passing LDAP requests from MHS spine route lookup to SDS (Spine Directory Service)
     """
     c.run("wget -O haproxy-2.0.5.tgz http://www.haproxy.org/download/2.0/src/haproxy-2.0.5.tar.gz")
     logging.info("Downloaded HAProxy")
