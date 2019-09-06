@@ -43,7 +43,7 @@ def get_mhs_inbound_queue_name():
     The mhs inbound queue name should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'inbound'
     """
-    return os.environ.get('MHS_INBOUND_QUEUE_URL', 'inbound')
+    return os.environ.get('MHS_INBOUND_QUEUE_NAME', 'inbound')
 
 
 def get_mhs_inbound_queue_certs():
