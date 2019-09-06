@@ -60,6 +60,34 @@ pipeline {
                             -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
                             -input=false
                         """
+                    sh label: 'Destroy any existing MHS services', script: """
+                            terraform destroy -auto-approve \
+                            -target=aws_ecs_service.mhs_inbound_service \
+                            -target=aws_ecs_service.mhs_outbound_service \
+                            -var environment_id=${ENVIRONMENT_ID} \
+                            -var build_id=${BUILD_TAG} \
+                            -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
+                            -var opentest_vpc_id=${OPENTEST_VPC_ID} \
+                            -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
+                            -var mhs_outbound_service_instance_count=3 \
+                            -var mhs_inbound_service_instance_count=3 \
+                            -var task_role_arn=${TASK_ROLE} \
+                            -var execution_role_arn=${TASK_EXECUTION_ROLE} \
+                            -var ecr_address=${DOCKER_REGISTRY} \
+                            -var mhs_log_level=DEBUG \
+                            -var mhs_outbound_http_proxy=${MHS_OUTBOUND_HTTP_PROXY} \
+                            -var mhs_state_table_read_capacity=5 \
+                            -var mhs_state_table_write_capacity=5 \
+                            -var mhs_sync_async_table_read_capacity=5 \
+                            -var mhs_sync_async_table_write_capacity=5 \
+                            -var inbound_queue_host="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
+                            -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
+                            -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
+                            -var party_key_arn=${PARTY_KEY_ARN} \
+                            -var client_cert_arn=${CLIENT_CERT_ARN} \
+                            -var client_key_arn=${CLIENT_KEY_ARN} \
+                            -var ca_certs_arn=${CA_CERTS_ARN}
+                        """
                     sh label: 'Applying Terraform configuration', script: """
                             terraform apply -auto-approve \
                             -var environment_id=${ENVIRONMENT_ID} \
