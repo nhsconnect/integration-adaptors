@@ -13,10 +13,15 @@ The pipeline itself is defined in the `Jenkinsfile` in the root of the repositor
 
 In order to run the build pipeline, the following resources must be created manually:
 
-- An S3 bucket to be used to store the Terraform state database. This allows deployed resources to be re-used in
+- An S3 bucket to be used to store the Terraform state databases for the MHS & SCR configurations. This allows deployed resources to be re-used in
 subsequent builds, reducing the time needed to deploy updated services.
 - Two DynamoDB tables to be used to allow Terraform to lock the shared state of the MHS & SCR configurations, preventing issues if concurrent deployments
 of the same environment are performed. These tables must have a primary key named `LockID`.
+- Log groups in Cloudwatch under the following names:
+    - `/ecs/jenkins-master`
+    - `/ecs/jenkins-workers-jenkins-worker`
+    - `/ecs/scr-service-environment`
+    - `/ecs/sonarqube`
 
 # Jenkins
 
@@ -55,58 +60,64 @@ I found I also needed to add a permission policy that looked like:
 }
 ```
 where `ecsTaskExecutionRole` is a default role created when creating task definitions.
-- the Jenkins workers need their own IAM role that has sufficient permissions to run the build job.
+- The Jenkins worker EC2 instance must have an IAM role assigned that includes the following AWS managed IAM policies,
+in order to allow the built containers to be published to ECR and the integration test environment to be stood up by
+Terraform:
+    - AmazonS3FullAccess
+    - AmazonVPCFullAccess
+    - ElasticLoadBalancingFullAccess
+    - AmazonEC2ContainerRegistryPowerUser
+    - AmazonECS_FullAccess
+    - AmazonDynamoDBFullAccess
+    - CloudWatchLogsFullAccess
+    - AmazonRoute53FullAccess
 
 [amazon-ecs plugin]: https://wiki.jenkins.io/display/JENKINS/Amazon+EC2+Container+Service+Plugin
 
-### Permissions and global variables
+### Global variables
 
-Several global variables must be set within Jenkins for the scripts to work as part of the build pipeline:
+Several global environment variables must be set within Jenkins for the scripts to work as part of the build pipeline:
 
-- ASID: The asid associated with the mhs instance (this is provided with opentest creds)
+- INTEGRATION_TEST_ASID: The asid associated with the mhs instance (this is provided with opentest creds)
 - CLUSTER_ID: The arn of the ecs cluster
 - DOCKER_REGISTRY: The address of the Docker registry to publish built containers to. e.g. `randomid.dkr.ecr.eu-west-2.amazonaws.com` This should not include an `http://` prefix, or repository names/paths.
+- TASK_ROLE: The IAM role that will be applied to the running MHS container tasks
 - TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it
-- MHS_ADDRESS: The (private) ip address where the mhs build is running - this will be the private ip of the EC2 instance
-    hosting the deployment ECS cluster
 - SCR_SERVICE_ADDRESS: The endpoint address the SCRWebService can be reached on e.g `http://192.168.41.129:9000`
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
 - SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
-- TF_STATE_BUCKET: The name of an S3 bucket to use to store Terraform state in. As described in
+- TF_STATE_BUCKET: The name of an S3 bucket to use to store both MHS & SCR Terraform state in. As described in
 [Pre-Requisites](#pre-requisites)
 - TF_STATE_BUCKET_REGION: The region that the Terraform state S3 bucket (as described in
 [Pre-Requisites](#pre-requisites)) resides in.
-- TF_STATE_FILE: The name of the file within the S3 bucket (as described in [Pre-Requisites](#pre-requisites)) to store
-terraform state in
 - TF_MHS_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
 [Pre-Requisites](#pre-requisites)).
 - TF_SCR_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
 [Pre-Requisites](#pre-requisites)).
-
-The Jenkins worker EC2 instances must have an IAM role assigned that includes the following AWS managed IAM policies, in
-order to allow the built containers to be published to ECR and the integration test environment to be stood up by Terraform:
-- AmazonS3FullAccess
-- AmazonVPCFullAccess
-- ElasticLoadBalancingFullAccess
-- AmazonEC2ContainerRegistryPowerUser
-- AmazonECS_FullAccess
-- AmazonDynamoDBFullAccess
-- CloudWatchLogsFullAccess
-- AmazonRoute53FullAccess
-
-The role associated with the box should also have the `AmazonECSTaskExecutionRolePolicy` and
-`AmazonEC2ContainerServiceforEC2Role` policies.
-
-The EC2 instance running the mhs build (to run the integration tests against) must have the opentest connection
-established using the Fabric script in `scripts`. The open test certs and party key files should be copied
-to the EC2 instance in a `home/ec2-user/certs` directory (this directory is a shared volume with the running
-mhs docker container as specified in the docker container).
-
-
-There must also be log groups in Cloudwatch under the following names - these groups need to be created manually:
-- `/ecs/jenkins-master`
-- `/ecs/jenkins-workers-jenkins-worker`
-- `/ecs/scr-service-environment`
-- `/ecs/sonarqube`
-- `/ecs/test-environment`
+- SUPPLIER_VPC_ID: The ID of the VPC that represents the supplier system that will connect to the MHS
+- OPENTEST_VPC_ID: The ID of the VPC that contains the machine which manages the Opentest connection to Spine
+- INTERNAL_ROOT_DOMAIN: The domain name to be used internally to refer to parts of the MHS (subdomains will be created
+from this root domain). This domain name should not clash with any domain name on the internet. e.g.
+internal.somedomainyoucontrol.com"
+- MHS_OUTBOUND_HTTP_PROXY: The hostname of the HTTP proxy being used to route connections to Spine. E.g. an Opentest
+proxy machine.
+- MHS_INBOUND_QUEUE_URL: The host url of the amqp inbound queue broker. e.g. `amqps://example.com:port`. Note that if
+the amqp connection being used is a secured connection (which it should be in production), then the url should start
+with `amqps://` and not `amqp+ssl://`. This URL should not include the queue name.
+- MHS_INBOUND_QUEUE_NAME: The name of the queue on the broker identified by `MHS_INBOUND_QUEUE_URL` to place inbound
+messages on. e.g `queue-name`
+- INBOUND_QUEUE_USERNAME_ARN: The ARN (in secrets manager) of the username to use when connecting to the AMQP inbound
+queue.
+- MHS_INBOUND_QUEUE_USERNAME: The username to use when connecting to the AMQP inbound queue (used by the integration
+tests)
+- MHS_INBOUND_QUEUE_PASSWORD: The password to use when connecting to the AMQP inbound queue (used by the integration
+tests)
+- INBOUND_QUEUE_PASSWORD_ARN: The ARN (in secrets manager) of the password to use when connecting to the AMQP inbound
+queue.
+- PARTY_KEY_ARN: The ARN (in secrets manager) of the party key associated with your MHS.
+- CLIENT_CERT_ARN: The ARN (in secrets manager) of the client certificate the outbound MHS should present.
+- CLIENT_KEY_ARN: The ARN (in secrets manager) of the private key for the client certificate identified by
+`CLIENT_CERT_ARN`
+- CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented by
+incoming connections to the MHS.
