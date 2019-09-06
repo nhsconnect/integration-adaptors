@@ -87,7 +87,10 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('001', 'Entered sync-async inbound workflow')
-        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
+        await wd.update_status_with_retries(work_description,
+                                            work_description.set_inbound_status,
+                                            wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
+                                            self.persistence_store_retries)
 
         try:
             await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: payload})

@@ -81,12 +81,13 @@ class TestSyncAsyncWorkflowInbound(TestCase):
         self.persistence = MagicMock()
         self.work_description = MagicMock()
 
-        self.workflow = sync_async.SyncAsyncWorkflow(sync_async_store=self.persistence)
+        self.workflow = sync_async.SyncAsyncWorkflow(sync_async_store=self.persistence, persistence_store_max_retries=3)
 
     @test_utilities.async_test
     async def test_inbound_workflow_happy_path(self):
         self.workflow.sync_async_store.add.return_value = test_utilities.awaitable(True)
         self.work_description.set_inbound_status.return_value = test_utilities.awaitable(True)
+        self.work_description.update.return_value = test_utilities.awaitable(True)
 
         await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
 
@@ -101,6 +102,7 @@ class TestSyncAsyncWorkflowInbound(TestCase):
     @test_utilities.async_test
     async def test_inbound_workflow_exception_in_store_retries(self, mock_sleep):
         mock_sleep.return_value = test_utilities.awaitable(None)
+        self.work_description.update.return_value = test_utilities.awaitable(True)
 
         def add_to_store_mock_throws_exception(key, value):
             raise ValueError('Fake error')
