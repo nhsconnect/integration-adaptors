@@ -38,6 +38,15 @@ resource "aws_route53_zone_association" "supplier_hosted_zone_mhs_vpc_associatio
   vpc_id  = data.aws_vpc.supplier_vpc.id
 }
 
+resource "aws_security_group_rule" "mhs_inbound_security_group_amazon_mq_egress_rule" {
+  security_group_id = aws_security_group.mhs_inbound_security_group.id
+  type = "egress"
+  from_port = 5671
+  to_port = 5671
+  protocol = "tcp"
+  cidr_blocks = [data.aws_vpc.supplier_vpc.cidr_block]
+  description = "Amazon MQ connection"
+}
 
 data "aws_vpc" "opentest_vpc" {
   id = var.opentest_vpc_id
