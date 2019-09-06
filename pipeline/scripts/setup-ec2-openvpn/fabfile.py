@@ -9,7 +9,10 @@ logging.basicConfig(level=logging.INFO)
 
 
 @task
-def setup_ec2_openvpn(c):
+def setup_ec2_openvpn_for_ecs_container(c):
+    """
+    Install and configure OpenVPN on an EC2 instance created by AWS ECS
+    """
     # Install OpenVPN (note that Docker gets installed/setup by AWS ECS)
     c.sudo("yum install -y openvpn")
     logging.info("Installed OpenVPN")
@@ -40,6 +43,45 @@ def setup_ec2_openvpn(c):
 
     # Start OpenVPN on server startup
     c.sudo("chkconfig --level 2345 openvpn on")
+    logging.info("Set OpenVPN to be started on server startup")
+
+
+@task
+def setup_ec2_openvpn(c):
+    """
+    Install and configure OpenVPN on an EC2 instance running Amazon Linux 2 AMI
+    """
+    # Install OpenVPN
+    c.sudo("amazon-linux-extras install -y epel")
+    c.sudo("yum install -y openvpn")
+    logging.info("Installed OpenVPN")
+
+    # Create up/down scripts
+    for up_down in ["up.sh", "down.sh"]:
+        c.put(str(Path(CURRENT_DIR) / f"openvpn-{up_down}"), remote=f"openvpn-{up_down}")
+        c.run(f"sudo mv openvpn-{up_down} /etc/openvpn/{up_down}")
+        c.sudo(f"chmod +x /etc/openvpn/{up_down}")
+
+    # Add VPN config file
+    vpn_conf_filename = "vpn-config.conf"
+    vpn_conf_temp_filename = "vpn-config-first.conf"
+    c.put(vpn_conf_filename, remote=vpn_conf_temp_filename)
+
+    # Add up/down config to VPN config file
+    extra_vpn_conf_filename = "additional-openvpn-config.conf"
+    c.put(str(Path(CURRENT_DIR) / extra_vpn_conf_filename), remote=extra_vpn_conf_filename)
+    c.run(
+        fr"""printf '%s\n\n%s' "$(cat {extra_vpn_conf_filename})" "$(cat {vpn_conf_temp_filename})" > {vpn_conf_filename}""")
+    c.sudo(f"mv {vpn_conf_filename} /etc/openvpn/client/{vpn_conf_filename}")
+
+    logging.info("Configured OpenVPN")
+
+    # Start OpenVPN
+    c.sudo("systemctl restart openvpn-client@vpn-config")
+    logging.info("Started OpenVPN")
+
+    # Start OpenVPN on server startup
+    c.sudo("systemctl enable openvpn-client@vpn-config")
     logging.info("Set OpenVPN to be started on server startup")
 
 
