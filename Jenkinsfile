@@ -99,7 +99,7 @@ pipeline {
 
         stage('Deploy SCR') {
             steps {
-                dir('pipeline/terraform/integration-test-environment') {
+                dir('pipeline/terraform/scr-test-environment') {
                     sh label: 'Initialising Terraform', script: """
                             terraform init \
                             -backend-config="bucket=${TF_STATE_BUCKET}" \
