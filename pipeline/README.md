@@ -5,7 +5,8 @@ This directory contains resources related to the CI/CD pipeline used to build th
 These resources consist of the following directories:
 - `packer` - [Packer](https://www.packer.io/) templates used to build container images used as part of the pipeline
 - `scripts`- Custom scripts that are used as part of the pipeline
-- `terraform` - [Terraform](https://www.terraform.io/) configurations used to deploy the container images used as part of the pipeline
+- `terraform` - [Terraform](https://www.terraform.io/) configurations used to deploy the test environments used as part
+of the pipeline
 
 The pipeline itself is defined in the `Jenkinsfile` in the root of the repository.
 
@@ -22,6 +23,21 @@ of the same environment are performed. These tables must have a primary key name
     - `/ecs/jenkins-workers-jenkins-worker`
     - `/ecs/scr-service-environment`
     - `/ecs/sonarqube`
+- An IAM role for the 'Elastic Container Service Task' trusted entity with the built-in
+  `AmazonECSTaskExecutionRolePolicy`. You can use the `ecsTaskExecutionRole` created for you automatically by AWS when
+  creating a task definition from the console, if available.
+- An IAM role for the EC2 instance (i.e Jenkins worker) running the build pipeline. This must include the following AWS managed IAM policies,
+in order to allow the built containers to be published to ECR and the integration test environment to be stood up by
+Terraform:
+    - AmazonS3FullAccess
+    - AmazonVPCFullAccess
+    - ElasticLoadBalancingFullAccess
+    - AmazonEC2ContainerRegistryPowerUser
+    - AmazonECS_FullAccess
+    - AmazonDynamoDBFullAccess
+    - CloudWatchLogsFullAccess
+    - AmazonRoute53FullAccess
+- An ECS Cluster for the SCR application to be deployed into. This must be an EC2 Linux cluster.
 
 # Jenkins
 
@@ -60,26 +76,18 @@ I found I also needed to add a permission policy that looked like:
 }
 ```
 where `ecsTaskExecutionRole` is a default role created when creating task definitions.
-- The Jenkins worker EC2 instance must have an IAM role assigned that includes the following AWS managed IAM policies,
-in order to allow the built containers to be published to ECR and the integration test environment to be stood up by
-Terraform:
-    - AmazonS3FullAccess
-    - AmazonVPCFullAccess
-    - ElasticLoadBalancingFullAccess
-    - AmazonEC2ContainerRegistryPowerUser
-    - AmazonECS_FullAccess
-    - AmazonDynamoDBFullAccess
-    - CloudWatchLogsFullAccess
-    - AmazonRoute53FullAccess
+- The Jenkins worker EC2 instance must have an IAM role assigned, as described in [the pre-requisites](#pre-requisites)
+section above. 
 
 [amazon-ecs plugin]: https://wiki.jenkins.io/display/JENKINS/Amazon+EC2+Container+Service+Plugin
 
-### Global variables
+## Global variables
 
 Several global environment variables must be set within Jenkins for the scripts to work as part of the build pipeline:
 
 - INTEGRATION_TEST_ASID: The asid associated with the mhs instance (this is provided with opentest creds)
-- CLUSTER_ID: The arn of the ecs cluster
+- CLUSTER_ID: The arn of the ecs cluster the SCR application should be deployed into (as described in
+[Pre-Requisites](#pre-requisites))
 - DOCKER_REGISTRY: The address of the Docker registry to publish built containers to. e.g. `randomid.dkr.ecr.eu-west-2.amazonaws.com` This should not include an `http://` prefix, or repository names/paths.
 - TASK_ROLE: The IAM role that will be applied to the running MHS container tasks
 - TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it
@@ -87,8 +95,8 @@ Several global environment variables must be set within Jenkins for the scripts 
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
 - SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
-- TF_STATE_BUCKET: The name of an S3 bucket to use to store both MHS & SCR Terraform state in. As described in
-[Pre-Requisites](#pre-requisites)
+- TF_STATE_BUCKET: The name of an S3 bucket to use to store both MHS & SCR Terraform state in (as described in
+[Pre-Requisites](#pre-requisites)).
 - TF_STATE_BUCKET_REGION: The region that the Terraform state S3 bucket (as described in
 [Pre-Requisites](#pre-requisites)) resides in.
 - TF_MHS_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
