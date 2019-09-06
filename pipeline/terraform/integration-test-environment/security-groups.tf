@@ -15,21 +15,50 @@ resource "aws_security_group_rule" "mhs_outbound_security_group_ingress_rule" {
   from_port = 80
   to_port = 80
   protocol = "tcp"
-  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  source_security_group_id = aws_security_group.alb_outbound_security_group.id
   description = "HTTP"
 }
 
-resource "aws_security_group_rule" "mhs_outbound_security_group_egress_rule" {
+resource "aws_security_group_rule" "mhs_outbound_security_group_vpc_endpoints_egress_rule" {
   security_group_id = aws_security_group.mhs_outbound_security_group.id
   type = "egress"
   from_port = 443
   to_port = 443
   protocol = "tcp"
-  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
   prefix_list_ids = [
     aws_vpc_endpoint.s3_endpoint.prefix_list_id,
     aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-  description = "HTTPS"
+  description = "S3 and DynamoDb access."
+}
+
+resource "aws_security_group_rule" "mhs_outbound_security_group_route_egress_rule" {
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  type = "egress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.alb_route_security_group.id
+  description = "HTTP connections to Route service LB."
+}
+
+resource "aws_security_group_rule" "mhs_outbound_security_group_ecr_egress_rule" {
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.ecr_security_group.id
+  description = "HTTPS connections to ECR endpoint."
+}
+
+resource "aws_security_group_rule" "mhs_outbound_security_group_cloudwatch_egress_rule" {
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.cloudwatch_security_group.id
+  description = "HTTPS connections to Cloudwatch endpoint"
 }
 
 resource "aws_security_group" "mhs_route_security_group" {
@@ -49,7 +78,7 @@ resource "aws_security_group_rule" "mhs_route_security_group_ingress_rule" {
   from_port = 80
   to_port = 80
   protocol = "tcp"
-  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  source_security_group_id = aws_security_group.alb_route_security_group.id
   description = "HTTP"
 }
 
@@ -59,11 +88,30 @@ resource "aws_security_group_rule" "mhs_route_security_group_egress_rule" {
   from_port = 443
   to_port = 443
   protocol = "tcp"
-  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
   prefix_list_ids = [
     aws_vpc_endpoint.s3_endpoint.prefix_list_id,
-    aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-  description = "HTTPS"
+  ]
+  description = "S3 access."
+}
+
+resource "aws_security_group_rule" "mhs_route_security_group_ecr_egress_rule" {
+  security_group_id = aws_security_group.mhs_route_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.ecr_security_group.id
+  description = "HTTPS connections to ECR endpoint."
+}
+
+resource "aws_security_group_rule" "mhs_route_security_group_cloudwatch_egress_rule" {
+  security_group_id = aws_security_group.mhs_route_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.cloudwatch_security_group.id
+  description = "HTTPS connections to Cloudwatch endpoint"
 }
 
 resource "aws_security_group" "mhs_inbound_security_group" {
@@ -93,11 +141,30 @@ resource "aws_security_group_rule" "mhs_inbound_security_group_egress_rule" {
   from_port = 443
   to_port = 443
   protocol = "tcp"
-  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
   prefix_list_ids = [
     aws_vpc_endpoint.s3_endpoint.prefix_list_id,
     aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-  description = "HTTPS"
+  description = "S3 and DynamoDb access."
+}
+
+resource "aws_security_group_rule" "mhs_inbound_security_group_ecr_egress_rule" {
+  security_group_id = aws_security_group.mhs_inbound_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.ecr_security_group.id
+  description = "HTTPS connections to ECR endpoint."
+}
+
+resource "aws_security_group_rule" "mhs_inbound_security_group_cloudwatch_egress_rule" {
+  security_group_id = aws_security_group.mhs_inbound_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.cloudwatch_security_group.id
+  description = "HTTPS connections to Cloudwatch endpoint"
 }
 
 resource "aws_security_group" "ecr_security_group" {
@@ -109,7 +176,11 @@ resource "aws_security_group" "ecr_security_group" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    security_groups = [
+      aws_security_group.mhs_outbound_security_group.id,
+      aws_security_group.mhs_route_security_group.id,
+      aws_security_group.mhs_inbound_security_group.id
+    ]
     description = "HTTPS"
   }
 
@@ -128,15 +199,11 @@ resource "aws_security_group" "cloudwatch_security_group" {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
-    description = "HTTPS"
-  }
-
-  egress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    security_groups = [
+      aws_security_group.mhs_outbound_security_group.id,
+      aws_security_group.mhs_route_security_group.id,
+      aws_security_group.mhs_inbound_security_group.id
+    ]
     description = "HTTPS"
   }
 
@@ -167,7 +234,7 @@ resource "aws_security_group" "alb_outbound_security_group" {
     to_port = 80
     protocol = "tcp"
     cidr_blocks = [
-      "0.0.0.0/0"
+      data.aws_vpc.supplier_vpc.cidr_block
     ]
     description = "Inbound HTTP connections"
   }
@@ -176,7 +243,9 @@ resource "aws_security_group" "alb_outbound_security_group" {
     from_port = 80
     to_port = 80
 
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    security_groups = [
+      aws_security_group.mhs_outbound_security_group.id
+    ]
     protocol = "tcp"
     description = "Downstream HTTP connections"
   }
@@ -196,8 +265,8 @@ resource "aws_security_group" "alb_route_security_group" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [
-      "0.0.0.0/0"
+    security_groups = [
+      aws_security_group.mhs_outbound_security_group.id
     ]
     description = "Inbound HTTP connections"
   }
@@ -206,24 +275,15 @@ resource "aws_security_group" "alb_route_security_group" {
     from_port = 80
     to_port = 80
 
-    cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+    security_groups = [
+      aws_security_group.mhs_route_security_group.id
+    ]
     protocol = "tcp"
     description = "Downstream HTTP connections"
   }
 
   tags = {
     Name = "${var.environment_id}-alb-route-sg"
-    EnvironmentId = var.environment_id
-  }
-}
-
-resource "aws_security_group" "async_response_queue_security_group" {
-  name = "Async Response Queue Security Group"
-  description = "The security group used to control traffic for the asynchronous response queue endpoint."
-  vpc_id = aws_vpc.mhs_vpc.id
-
-  tags = {
-    Name = "${var.environment_id}-async-response-queue-sg"
     EnvironmentId = var.environment_id
   }
 }
