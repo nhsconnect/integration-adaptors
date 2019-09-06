@@ -33,7 +33,9 @@ def setup_ec2_openvpn_for_ecs_container(c):
     extra_vpn_conf_filename = "additional-openvpn-config.conf"
     c.put(str(Path(CURRENT_DIR) / extra_vpn_conf_filename), remote=extra_vpn_conf_filename)
     c.run(
-        fr"""printf '%s\n\n%s' "$(cat {extra_vpn_conf_filename})" "$(cat {vpn_conf_temp_filename})" > {vpn_conf_filename}""")
+        fr'''printf '%s\n\n%s' "$(cat {extra_vpn_conf_filename})" "$(cat {vpn_conf_temp_filename})"'''
+        f' > {vpn_conf_filename}'
+    )
     c.sudo(f"mv {vpn_conf_filename} /etc/openvpn/{vpn_conf_filename}")
 
     logging.info("Configured OpenVPN")
@@ -72,7 +74,9 @@ def setup_ec2_openvpn(c):
     extra_vpn_conf_filename = "additional-openvpn-config.conf"
     c.put(str(Path(CURRENT_DIR) / extra_vpn_conf_filename), remote=extra_vpn_conf_filename)
     c.run(
-        fr"""printf '%s\n\n%s' "$(cat {extra_vpn_conf_filename})" "$(cat {vpn_conf_temp_filename})" > {vpn_conf_filename}""")
+        fr'''printf '%s\n\n%s' "$(cat {extra_vpn_conf_filename})" "$(cat {vpn_conf_temp_filename})"'''
+        f' > {vpn_conf_filename}'
+    )
     c.sudo(f"mv {vpn_conf_filename} /etc/openvpn/client/{vpn_conf_filename}")
 
     logging.info("Configured OpenVPN")
@@ -137,5 +141,6 @@ def setup_squid(c):
 
     c.sudo("systemctl restart squid.service")
     logging.info("Started Squid")
+
     c.sudo("systemctl enable squid.service")
     logging.info("Set Squid to be started on server startup")
