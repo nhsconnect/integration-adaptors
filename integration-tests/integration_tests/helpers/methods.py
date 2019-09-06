@@ -43,7 +43,7 @@ def get_mhs_inbound_queue_name():
     The mhs inbound queue name should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'inbound'
     """
-    return os.environ.get('MHS_INBOUND_QUEUE_NAME', 'inbound')
+    return os.environ.get('MHS_INBOUND_QUEUE_URL', 'inbound')
 
 
 def get_mhs_inbound_queue_certs():
@@ -111,7 +111,7 @@ def check_response(returned_xml, section_name):
 
 def get_section(xml, attribute, section_name, parent=None):
     """ Extracts the data from an XML section
-    
+
     :param xml: the message that we're checking
     :param attribute: the attribute we want
     :param section_name: the section we're looking for
