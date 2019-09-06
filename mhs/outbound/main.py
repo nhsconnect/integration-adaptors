@@ -18,15 +18,11 @@ from outbound.transmission import outbound_transmission
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
 
-def configure_http_proxy():
+def configure_http_client():
     """
-    Configure Tornado to use a http proxy if a http proxy was set in config
+    Configure Tornado to use the curl HTTP client.
     """
-    https_proxy = config.get_config('HTTP_PROXY', default=None)
-    if https_proxy is not None:
-        http_client_defaults = {'proxy_host': https_proxy, 'proxy_port': 3128}
-        tornado.httpclient.AsyncHTTPClient.configure('tornado.curl_httpclient.CurlAsyncHTTPClient',
-                                                     defaults=http_client_defaults)
+    tornado.httpclient.AsyncHTTPClient.configure('tornado.curl_httpclient.CurlAsyncHTTPClient')
 
 
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
@@ -67,7 +63,7 @@ def main():
     config.setup_config("MHS")
     log.configure_logging()
 
-    configure_http_proxy()
+    configure_http_client()
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
@@ -88,8 +84,13 @@ def main():
     persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
 
+    http_proxy_host = config.get_config('OUTBOUND_HTTP_PROXY', default=None)
+    http_proxy_port = None
+    if http_proxy_host is not None:
+        http_proxy_port = int(config.get_config('OUTBOUND_HTTP_PROXY_PORT', default="3128"))
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
-                                                              max_retries, retry_delay)
+                                                              max_retries, retry_delay, http_proxy_host,
+                                                              http_proxy_port)
     workflows = initialise_workflows(transmission, party_key, persistence_store, store_retries)
 
     start_tornado_server(data_dir, workflows)

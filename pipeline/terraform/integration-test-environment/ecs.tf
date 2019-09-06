@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
         image = "${var.ecr_address}/mhs/outbound:outbound-${var.build_id}"
         environment = var.mhs_outbound_http_proxy == "" ? local.mhs_outbound_base_environment_vars : concat(local.mhs_outbound_base_environment_vars, [
           {
-            name  = "MHS_HTTP_PROXY"
+            name  = "MHS_OUTBOUND_HTTP_PROXY"
             value = var.mhs_outbound_http_proxy
           }
         ])

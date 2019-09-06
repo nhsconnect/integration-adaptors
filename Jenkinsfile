@@ -10,7 +10,6 @@ pipeline {
     }
 
     stages {
-        /*
         stage('Build modules') {
             steps{
                 dir('common'){ buildModules('Installing common dependencies') }
@@ -40,7 +39,6 @@ pipeline {
         stage('SCR Web Service Unit Tests') {
             steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
         }
-        */
 
         stage('Package') {
             steps {
@@ -168,12 +166,12 @@ pipeline {
         }
     }
 
-    //post {
-    //    always {
-    //        cobertura coberturaReportFile: '**/coverage.xml'
-    //        junit '**/test-reports/*.xml'
-    //    }
-    //}
+    post {
+        always {
+            cobertura coberturaReportFile: '**/coverage.xml'
+            junit '**/test-reports/*.xml'
+        }
+    }
 }
 
 void executeUnitTestsWithCoverage() {
