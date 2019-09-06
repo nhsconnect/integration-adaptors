@@ -135,10 +135,6 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         wdo_mock.assert_not_called()
         self.assertEqual(wdo.workflow, 'This should not change')
 
-
-
-
-
     @async_test
     async def test_handle_outbound_message_serialisation_fails(self):
         self.setup_mock_work_description()
