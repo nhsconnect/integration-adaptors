@@ -21,7 +21,7 @@ def get_asid():
     except:
         asid = None
 
-    return os.environ.get('ASID', os.environ.get('ASID', asid))
+    return os.environ.get('INTEGRATION_TEST_ASID', asid)
 
 
 def get_mhs_inbound_queue_url():
