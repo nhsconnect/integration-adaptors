@@ -57,7 +57,7 @@ resource "aws_ecs_task_definition" "test-environment-mhs-inbound-task" {
           value = var.mhs_sync_async_state_table_name
         },
         {
-          name = "MAX_RESYNC_RETRIES",
+          name = "MHS_RESYNC_RETRIES",
           value = var.mhs_resynchroniser_max_retries
         },
         {
