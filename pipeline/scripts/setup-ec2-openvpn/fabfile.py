@@ -1,3 +1,4 @@
+import io
 import logging
 import os
 from pathlib import Path
@@ -83,6 +84,43 @@ def setup_ec2_openvpn(c):
     # Start OpenVPN on server startup
     c.sudo("systemctl enable openvpn-client@vpn-config")
     logging.info("Set OpenVPN to be started on server startup")
+
+
+@task(help={"mhs_inbound_load_balancer_url": "url of the MHS inbound load balancer to forward Spine messages to"})
+def setup_haproxy(c, mhs_inbound_load_balancer_url):
+    """
+    Install and configure HAProxy to work as a passthrough proxy for:
+
+    - passing inbound requests from Spine to MHS inbound
+    - passing ldap requests from MHS spine route lookup to SDS (Spine Directory Service)
+    """
+    c.run("wget -O haproxy-2.0.5.tgz http://www.haproxy.org/download/2.0/src/haproxy-2.0.5.tar.gz")
+    logging.info("Downloaded HAProxy")
+
+    c.sudo("yum install -y gcc systemd-devel.x86_64")
+    c.run("tar xzvf haproxy-2.0.5.tgz")
+
+    logging.info("Compiling HAProxy (with Systemd support)")
+    c.run("make -C haproxy-2.0.5 TARGET=generic USE_SYSTEMD=1")
+    logging.info("HAProxy compilation succeeded")
+
+    c.sudo("make -C haproxy-2.0.5 install")
+    c.run("make -C haproxy-2.0.5/contrib/systemd")
+    c.sudo("cp haproxy-2.0.5/contrib/systemd/haproxy.service /etc/systemd/system/")
+    logging.info("Installed HAProxy")
+
+    haproxy_config = (Path(CURRENT_DIR) / "haproxy.cfg").read_text().replace("mhs-inbound-load-balancer-url",
+                                                                             mhs_inbound_load_balancer_url)
+    c.put(io.StringIO(haproxy_config), remote="haproxy.cfg")
+    c.run(f"sudo mv haproxy.cfg /etc/haproxy/haproxy.cfg")
+    logging.info("Configured HAProxy")
+
+    c.sudo("systemctl daemon-reload")
+    c.sudo("systemctl restart haproxy.service")
+    logging.info("Started HAProxy")
+
+    c.sudo("systemctl enable haproxy.service")
+    logging.info("Set HAProxy to be started on server startup")
 
 
 @task
