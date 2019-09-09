@@ -12,6 +12,7 @@ PARTY_ID = "PARTY-ID"
 
 class TestSyncAsyncWorkflowOutbound(TestCase):
 
+
     def setUp(self):
         self.persistence = MagicMock()
         self.work_description = MagicMock()
@@ -19,25 +20,43 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         self.resync = MagicMock()
         self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID,
                                                      work_description_store=self.work_description_store,
-                                                     resynchroniser=self.resync)
+                                                     resynchroniser=self.resync,
+                                                     persistence_store_max_retries=3)
 
+    @patch('mhs_common.state.work_description.update_status_with_retries')
     @patch('mhs_common.state.work_description.create_new_work_description')
     @test_utilities.async_test
-    async def test_sync_async_happy_path(self, wd_mock):
+    async def test_sync_async_happy_path(self, wd_mock, update_mock):
         wd_mock.return_value = MagicMock()
+        update_mock.return_value = test_utilities.awaitable(True)
         async_workflow = MagicMock()
-        result = (200, {sync_async.MESSAGE_DATA: "Data", sync_async.CORRELATION_ID: 'cor123'})
+        self.resync.pause_request.return_value = test_utilities.awaitable({sync_async.MESSAGE_DATA: 'data'})
+        result = (202, {})
         async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
-        await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
-                                                               'payload',
-                                                               async_workflow
-                                                               )
+        code, body, wdo = await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
+                                                                                 'payload',
+                                                                                 async_workflow
+                                                                                 )
+
         wd_mock.assert_called_with(self.work_description_store,
                                    'id123',
                                    workflow.SYNC_ASYNC,
                                    outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+
+
         async_workflow.handle_outbound_message.assert_called_once()
+        async_workflow.handle_outbound_message.assert_called_with('id123', 'cor123', {}, 'payload',
+                                                                  wd_mock.return_value)
+        update_mock.assert_called_with(wd_mock.return_value,
+                                       wd_mock.return_value.set_outbound_status,
+                                       wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED,
+                                       3)
+
+        self.assertEqual(code, 200)
+        self.assertEqual(body, 'data')
+        self.assertEqual(wdo, wd_mock.return_value)
+
 
     @patch('mhs_common.state.work_description.create_new_work_description')
     @test_utilities.async_test
@@ -56,7 +75,6 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
 
     @test_utilities.async_test
     async def test_resync_failure(self):
-
         async def resync_raises_exception(fake_key):
             raise resynchroniser.SyncAsyncResponseException()
 
@@ -66,7 +84,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
             self.resync.pause_request.side_effect = resync_raises_exception
             result = (202, "Huge success")
             async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
-    
+
             status, response, wdo = await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
                                                                                            'payload',
                                                                                            async_workflow
