@@ -13,7 +13,8 @@ for details. If running this on your local machine, the simplest option is to
 [install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) and run `aws configure`.
 
 Next, you will need to have built the Docker container images containing the MHS. This can be done by running the
-command `packer build pipeline/packer/scr-web-service.json` in the root of this repository.
+command `packer build pipeline/packer/scr-web-service.json` in the root of this repository. Note that this will also
+push the built images to AWS ECR.
 
 Once you have configured AWS authentication, you can run the following commands in this directory:
 ```

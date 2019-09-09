@@ -11,8 +11,12 @@ the [authentication section of the Terraform AWS documentation](https://www.terr
 for details. If running this on your local machine, the simplest option is to
 [install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) and run `aws configure`.
 
-Next, you will need to have built the Docker container images containing the MHS. This can be done using the
-`build.sh` script in the root of this repository.
+Next, you will need to have built the Docker container images containing the MHS. This can be done by running from the root of this repository:
+```sh
+packer build pipeline/packer/inbound.json
+packer build pipeline/packer/outbound.json
+```
+Note that this will also push the built images to AWS ECR.
 
 Once you have configured AWS authentication, you can run the following commands in this directory:
 ```

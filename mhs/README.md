@@ -6,8 +6,8 @@ details of Spine messaging and provide a simple interface to allow HL7 messages 
 ## Setup
 You'll need to have a connection to Spine. For testing purposes, you can use [Opentest](https://nhs-digital-opentest.github.io/Welcome/index.html).
 
-Finally, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/) installed and on your path, then from this
-directory run:
+Finally, ensure you have [Pipenv](https://docs.pipenv.org/en/latest/) installed and on your path, then within each of
+the subfolders `common`, `inbound` and `outbound` in this directory, run:
 ```
 pipenv install
 ```
