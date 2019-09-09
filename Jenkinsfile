@@ -84,7 +84,9 @@ pipeline {
                             -var party_key_arn=${PARTY_KEY_ARN} \
                             -var client_cert_arn=${CLIENT_CERT_ARN} \
                             -var client_key_arn=${CLIENT_KEY_ARN} \
-                            -var ca_certs_arn=${CA_CERTS_ARN}
+                            -var ca_certs_arn=${CA_CERTS_ARN} \
+                            -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                            -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
                         """
                     sh label: 'Applying Terraform configuration', script: """
                             terraform apply -auto-approve \
@@ -110,7 +112,9 @@ pipeline {
                             -var party_key_arn=${PARTY_KEY_ARN} \
                             -var client_cert_arn=${CLIENT_CERT_ARN} \
                             -var client_key_arn=${CLIENT_KEY_ARN} \
-                            -var ca_certs_arn=${CA_CERTS_ARN}
+                            -var ca_certs_arn=${CA_CERTS_ARN} \
+                            -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                            -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
                         """
                     script {
                         env.MHS_ADDRESS = sh (

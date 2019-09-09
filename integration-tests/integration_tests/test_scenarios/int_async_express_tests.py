@@ -11,6 +11,7 @@ class FunctionalTest(TestCase):
                                                                         'QUPC_IN160101UK05',
                                                                         '9689177621',
                                                                         'Asynchronous Express test')
+
         # we need to 'accept' the message in the queue, so it is removed and doesn't impact on subsequent tests
         message_retriever.get_inbound_response()
         self.assertTrue(methods.check_status_code(outbound_response, 202),

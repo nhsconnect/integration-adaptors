@@ -1,6 +1,6 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
-from typing import Tuple, AnyStr
+from typing import Tuple, Optional, AnyStr
 from xml.etree import ElementTree
 
 import utilities.integration_adaptors_logger as log
@@ -42,14 +42,17 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                       message_id: str,
                                       correlation_id: str,
                                       interaction_details: dict,
-                                      payload: str) -> Tuple[int, str]:
+                                      payload: str,
+                                      wdo: Optional[wd.WorkDescription]) -> Tuple[int, str]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
-        wdo = wd.create_new_work_description(self.persistence_store,
-                                             message_id,
-                                             workflow.ASYNC_EXPRESS,
-                                             wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
-        await wdo.publish()
+        if not wdo:
+            wdo = wd.create_new_work_description(self.persistence_store,
+                                                 message_id,
+                                                 workflow.ASYNC_EXPRESS,
+                                                 wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
+                                                 )
+            await wdo.publish()
 
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
                                                                               interaction_details,

@@ -32,6 +32,18 @@ locals {
     {
       name  = "MHS_STATE_TABLE_NAME"
       value = aws_dynamodb_table.mhs_state_table.name
+        },
+        {
+          name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME",
+          value = var.mhs_sync_async_state_table_name
+        },
+        {
+          name = "MHS_RESYNC_RETRIES",
+          value = var.mhs_resynchroniser_max_retries
+        },
+        {
+          name = "MHS_RESYNC_INTERVAL",
+          value = var.mhs_resynchroniser_interval
     }
   ]
 }

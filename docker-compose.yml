@@ -32,8 +32,11 @@ services:
       - MHS_CA_CERTS
       - MHS_STATE_TABLE_NAME=mhs_state
       - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
+      - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
+      - MHS_RESYNC_INTERVAL=1
+      - MAX_RESYNC_RETRIES=20
   dynamodb:
     build: ./common/local-env/dynamodb-local
     ports:
