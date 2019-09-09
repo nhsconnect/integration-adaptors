@@ -34,9 +34,9 @@ class TestOutboundSOAPHandler(unittest.TestCase):
         self.assertTrue('The message is not well formed' in response)
 
     def test_no_content_type(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             handle_soap_error(500, {}, 'Some body')
 
     def test_non_xml_content_type(self):
-        with self.assertRaises(AssertionError):
-            self.assertRaises(AssertionError, handle_soap_error(500, {'Content-Type': 'text/html'}, 'Some body'))
+        with self.assertRaises(ValueError):
+            self.assertRaises(ValueError, handle_soap_error(500, {'Content-Type': 'text/html'}, 'Some body'))
