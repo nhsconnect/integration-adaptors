@@ -35,7 +35,7 @@ locals {
         },
         {
           name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME",
-          value = var.mhs_sync_async_state_table_name
+          value = aws_dynamodb_table.mhs_sync_async_table.name
         },
         {
           name = "MHS_RESYNC_RETRIES",
