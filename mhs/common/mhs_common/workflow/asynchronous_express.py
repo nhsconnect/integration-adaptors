@@ -1,6 +1,6 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
-from typing import Dict
+from typing import Dict, List
 from typing import Tuple
 
 import utilities.integration_adaptors_logger as log
@@ -131,7 +131,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         return None, http_headers, message
 
     async def _lookup_endpoint_details(self, interaction_details: Dict, wdo: wd.WorkDescription) \
-            -> Tuple[str, str]:
+            -> Tuple[str, str, str]:
         try:
             service = interaction_details[ebxml_envelope.SERVICE]
             action = interaction_details[ebxml_envelope.ACTION]
@@ -141,17 +141,35 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             logger.info('0012', 'Looking up endpoint details for {org_code} & {service_id}.',
                         {'org_code': org_code, 'service_id': service_id})
             endpoint_details = await self.routing_reliability.get_end_point(org_code, service_id)
-            # TODO: What if this isn't the right size?
-            url = endpoint_details[MHS_END_POINT_KEY][0]
+
+            url = AsynchronousExpressWorkflow._extract_endpoint_url(endpoint_details)
             to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
             cpa_id = endpoint_details[MHS_CPA_ID_KEY]
-            logger.info('0013', 'Retrieved endpoint details for {org_code} & {service_id}. {url}, {to_party_key}',
-                        {'org_code': org_code, 'service_id': service_id, 'url': url, 'to_party_key': to_party_key})
+            logger.info('0013', 'Retrieved endpoint details for {org_code} & {service_id}. {url}, {to_party_key}, '
+                                '{cpa_id}',
+                        {'org_code': org_code, 'service_id': service_id, 'url': url, 'to_party_key': to_party_key,
+                         'cpa_id': cpa_id})
             return url, to_party_key, cpa_id
         except Exception as e:
             logger.warning('0014', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             raise e
+
+    @staticmethod
+    def _extract_endpoint_url(endpoint_details: Dict[str, List[str]]) -> str:
+        endpoint_urls = endpoint_details[MHS_END_POINT_KEY]
+
+        if len(endpoint_urls) == 0:
+            logger.error('0015', 'Did not receive any endpoint URLs when looking up endpoint details.')
+            raise IndexError("Did not receive any endpoint URLs when looking up endpoint details.")
+
+        url = endpoint_urls[0]
+
+        if len(endpoint_urls) > 1:
+            logger.warning('0016', 'Received more than one URL when looking up endpoint details. Using {url}. '
+                                   '{urls_received}', {'url': url, 'urls_received': endpoint_urls})
+
+        return url
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,

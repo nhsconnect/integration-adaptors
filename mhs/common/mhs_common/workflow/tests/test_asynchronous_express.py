@@ -40,6 +40,10 @@ SERIALIZED_MESSAGE = 'serialized-message'
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
 INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
+
+MHS_END_POINT_KEY = 'nhsMHSEndPoint'
+MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
+MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 SPINE_ORG_CODE_CONFIG_KEY = 'SPINE_ORG_CODE'
 SPINE_ORG_CODE = "spine-org-code"
 
@@ -155,6 +159,22 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                          self.mock_work_description.set_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
+    @async_test
+    async def test_extract_endpoint_url_no_endpoints_returned(self):
+        endpoint_details = {MHS_END_POINT_KEY: []}
+
+        with self.assertRaises(IndexError):
+            async_express.AsynchronousExpressWorkflow._extract_endpoint_url(endpoint_details)
+
+    @async_test
+    async def test_extract_endpoint_url_multiple_endpoints_returned(self):
+        expected_url = "first_url"
+        endpoint_details = {MHS_END_POINT_KEY: [expected_url, "second-url"]}
+
+        actual_url = async_express.AsynchronousExpressWorkflow._extract_endpoint_url(endpoint_details)
+
+        self.assertEqual(expected_url, actual_url)
+
     @mock.patch.object(async_express, 'logger')
     @async_test
     async def test_handle_outbound_message_http_error_when_calling_outbound_transmission(self, log_mock):
@@ -226,7 +246,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     def _setup_routing_mocks(self):
         config.config[SPINE_ORG_CODE_CONFIG_KEY] = SPINE_ORG_CODE
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
-            'nhsMHSEndPoint': [URL], 'nhsMHSPartyKey': TO_PARTY_KEY, 'nhsMhsCPAId': CPA_ID})
+            MHS_END_POINT_KEY: [URL], MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY, MHS_CPA_ID_KEY: CPA_ID})
 
     ############################
     # Inbound tests
