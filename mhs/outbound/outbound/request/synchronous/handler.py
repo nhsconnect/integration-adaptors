@@ -130,8 +130,6 @@ class SynchronousHandler(tornado.web.RequestHandler):
         return is_sync_async
 
     def _should_invoke_sync_async_workflow(self, interaction_config, sync_async_header):
-        print(interaction_config)
-        print(sync_async_header)
         if interaction_config and sync_async_header:
             return True
         elif (not interaction_config) and sync_async_header:
@@ -141,7 +139,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                                'that does not support sync-async')
         elif interaction_config and (not sync_async_header):
             return False
-        elif (not interaction_config) and (not sync_async_header):
+        else:
             return False
 
     async def _invoke_sync_async(self, message_id, correlation_id, interaction_details, body, async_workflow):
@@ -182,7 +180,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
             logger.error('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
             raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
                                         reason=f'Unknown interaction ID: {interaction_id}')
-        print(f"deets:{interaction_details}")
+
         return interaction_details
 
     def _get_interaction_details(self, interaction_name: str) -> dict:

@@ -14,7 +14,6 @@ MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
 INTERACTION_NAME = "interaction"
 REQUEST_BODY = "A request"
 WORKFLOW_NAME = "workflow name"
-
 INTERACTION_DETAILS = {'workflow': WORKFLOW_NAME, 'sync-async': 'true'}
 SYNC_ASYNC_WORKFLOW = "sync-async"
 

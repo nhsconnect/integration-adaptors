@@ -12,7 +12,6 @@ PARTY_ID = "PARTY-ID"
 
 class TestSyncAsyncWorkflowOutbound(TestCase):
 
-
     def setUp(self):
         self.persistence = MagicMock()
         self.work_description = MagicMock()
@@ -44,7 +43,6 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
                                    workflow.SYNC_ASYNC,
                                    outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
 
-
         async_workflow.handle_outbound_message.assert_called_once()
         async_workflow.handle_outbound_message.assert_called_with('id123', 'cor123', {}, 'payload',
                                                                   wd_mock.return_value)
@@ -56,7 +54,6 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         self.assertEqual(code, 200)
         self.assertEqual(body, 'data')
         self.assertEqual(wdo, wd_mock.return_value)
-
 
     @patch('mhs_common.state.work_description.create_new_work_description')
     @test_utilities.async_test

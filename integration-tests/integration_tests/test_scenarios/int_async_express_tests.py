@@ -3,16 +3,6 @@ from unittest import TestCase
 from integration_tests.helpers import methods, message_retriever
 import xml.etree.ElementTree as ET
 
-namespaces = {
-    'soap': 'http://schemas.xmlsoap.org/soap/envelope/',
-    'a': 'http://www.etis.fskab.se/v1.0/ETISws',
-    'wsa': 'http://www.w3.org/2005/08/addressing',
-    'xmlns': 'urn:hl7-org:v3',
-    'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-    'xsi': 'urn:hl7-org:v3',
-    'xmlns:npfitlc': 'NPFIT:HL7:Localisation'
-}
-
 
 class FunctionalTest(TestCase):
 

@@ -35,12 +35,10 @@ class SyncAsyncResynchroniser:
                 logger.info('002', 'Message found in sync-async store, ending polling')
                 return item
             logger.warning('003', f'Failed to find async response after {retries} of {self.max_retries}')
-
             retries += 1
 
             if not (retries == self.max_retries):
                 await asyncio.sleep(self.retry_interval)
 
         logger.error('004', 'Resync retries exceeded, attempted {retries}', {'retries': retries})
-
         raise SyncAsyncResponseException('Polling on the sync async store timed out')
