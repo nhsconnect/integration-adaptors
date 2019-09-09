@@ -203,6 +203,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         response = mock.MagicMock()
         response.code = 200
+        response.headers = {'Content-Type': 'text/xml'}
+        response.body = '<a></a>'
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
