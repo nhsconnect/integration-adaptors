@@ -1,6 +1,17 @@
 from unittest import TestCase
 
 from integration_tests.helpers import methods, message_retriever
+import xml.etree.ElementTree as ET
+
+namespaces = {
+    'soap': 'http://schemas.xmlsoap.org/soap/envelope/',
+    'a': 'http://www.etis.fskab.se/v1.0/ETISws',
+    'wsa': 'http://www.w3.org/2005/08/addressing',
+    'xmlns': 'urn:hl7-org:v3',
+    'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+    'xsi': 'urn:hl7-org:v3',
+    'xmlns:npfitlc': 'NPFIT:HL7:Localisation'
+}
 
 
 class FunctionalTest(TestCase):
@@ -10,7 +21,8 @@ class FunctionalTest(TestCase):
         outbound_response, _, _ = methods.get_interaction_from_template('async express',
                                                                         'QUPC_IN160101UK05',
                                                                         '9689177621',
-                                                                        'Asynchronous Express test')
+                                                                        'Asynchronous Express test', 
+                                                                        sync_async=False)
 
         # we need to 'accept' the message in the queue, so it is removed and doesn't impact on subsequent tests
         message_retriever.get_inbound_response()
@@ -65,3 +77,24 @@ class FunctionalTest(TestCase):
         patient_number = methods.get_section(inbound_response, 'extension', 'id', 'patient')
         self.assertEqual(patient_number, '9689177923',
                          "Async Express inbound response test failed")
+
+
+class TestSyncAsyncWrapper(TestCase):
+
+    def test_async_express_sync_async_wrap(self):
+        # the response is just an acknowledgement from spine...
+        outbound_response, _, _ = methods.get_interaction_from_template('async express',
+                                                                        'QUPC_IN160101UK05',
+                                                                        '9689177621',
+                                                                        'Asynchronous Express test',
+                                                                        sync_async=True)
+        self.assertTrue(methods.check_status_code(outbound_response, 200),
+                        "Async Express outbound test failed")
+
+        root = ET.ElementTree(ET.fromstring(outbound_response.text)).getroot()
+
+        for child in root.iter():
+            if child.tag == '{urn:hl7-org:v3}queryResponseCode':
+                self.assertEqual(child.attrib['code'], 'OK')
+                break
+
