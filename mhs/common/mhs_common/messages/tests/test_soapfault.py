@@ -5,7 +5,7 @@ from unittest import TestCase
 
 from utilities.file_utilities import FileUtilities
 
-from mhs_common.messages.soap_fault import SOAPFault
+from mhs_common.messages.soap_fault_envelope import SOAPFault
 
 
 class TestSOAPFault(TestCase):

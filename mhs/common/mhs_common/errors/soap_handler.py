@@ -1,7 +1,7 @@
 from typing import Dict, AnyStr, Tuple
 from xml.etree import ElementTree
 from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
-from mhs_common.messages.soap_fault import SOAPFault
+from mhs_common.messages.soap_fault_envelope import SOAPFault
 from mhs_common.errors import ERROR_RESPONSE_DEFAULTS
 
 logger = IntegrationAdaptorsLogger('SOAP_ERROR_HANDLER')
