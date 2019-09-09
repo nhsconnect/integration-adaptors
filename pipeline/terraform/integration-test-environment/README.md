@@ -84,3 +84,19 @@ terraform destroy \
     -var client_key_arn=<client_certificate_key_secrets_manager_arn> \
     -var ca_certs_arn=<CA_certificates_secrets_manager_arn>
 ```
+
+### Supplier/Opentest VPC config
+Note that the Terraform config in this folder has only the minimal config to connect the MHS VPC
+with the supplier and Opentest VPCs (ie create a VPC peering connection and configure the route
+tables of all VPCs). Any further configuration to allow inbound/outbound requests between the
+VPCs must be done manually.
+
+In practice, this means that:
+- the supplier VPC needs to:
+  - allow outbound traffic on port 80 to the MHS outbound load balancer
+  - allow inbound traffic on port 5671 to the Amazon MQ instance
+- the Opentest VPC needs to:
+  - allow outbound traffic on port 443 to the MHS inbound load balancer for requests/responses
+  from Spine
+  - allow inbound traffic from the MHS VPC on port 3128 for the HTTP proxy
+  - allow inbound traffic from the MHS VPC on port 389 for LDAP requests
