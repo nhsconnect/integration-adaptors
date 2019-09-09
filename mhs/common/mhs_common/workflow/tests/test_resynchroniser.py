@@ -34,5 +34,5 @@ class TestSyncAsyncReSynchroniser(TestCase):
         with self.assertRaises(resync.SyncAsyncResponseException):
             await resynchroniser.pause_request('Message')
 
-        self.assertEqual(sleep_mock.call_count, 20)
+        self.assertEqual(sleep_mock.call_count, 19)
         self.assertEqual(store.get.call_count, 20)

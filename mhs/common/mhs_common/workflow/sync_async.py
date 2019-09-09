@@ -37,7 +37,6 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.sync_async_store = sync_async_store
         self.work_description_store = work_description_store
         self.resynchroniser = resynchroniser
-        self.sync_async_store_max_retries = persistence_store_max_retries
         self.sync_async_store_retry_delay = sync_async_store_retry_delay / 1000 if sync_async_store_retry_delay \
             else None
         self.persistence_store_retries = persistence_store_max_retries
@@ -103,7 +102,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
     async def _add_to_sync_async_store(self, key, data):
         logger.info('002', 'Attempting to add inbound message to sync-async store')
-        retry = self.sync_async_store_max_retries
+        retry = self.persistence_store_retries
         while True:
             try:
                 await self.sync_async_store.add(key, data)

@@ -19,7 +19,7 @@ class SyncAsyncResynchroniser:
                  ):
         """
         :param sync_async_store: The store where the sync-async messages are placed from the inbound service
-        :param max_retries: The total time to poll the sync-async store for a async response in seconds
+        :param max_retries: The total number of polling attempts to the sync async store while attempting to resynchronise
         :param retry_interval: The time between polling requests to the sync-async store in milliseconds
         """
         self.max_retries = max_retries
@@ -35,8 +35,10 @@ class SyncAsyncResynchroniser:
                 logger.info('002', 'Message found in sync-async store, ending polling')
                 return item
             logger.warning('003', f'Failed to find async response after {retries} of {self.max_retries}')
-            await asyncio.sleep(self.retry_interval)
-
             retries += 1
-        logger.error('004', 'Resync timer exceeded, waited {time}s', {'time': retries})
+
+            if not (retries == self.max_retries):
+                await asyncio.sleep(self.retry_interval)
+
+        logger.error('004', 'Resync retries exceeded, attempted {retry}', {'retry': retries})
         raise SyncAsyncResponseException('Polling on the sync async store timed out')

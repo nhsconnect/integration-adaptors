@@ -204,8 +204,9 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.sync_async_workflow.handle_sync_async_outbound_message.return_value = result
         self.config_manager.get_interaction_details.return_value = {'sync-async': True, 'workflow': WORKFLOW_NAME}
 
-        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_called_once()
+        self.assertEqual(expected_response.encode(), response.body)
 
     def test_sync_async_workflow_not_invoked(self):
         expected_response = "Hello world!"
@@ -216,6 +217,8 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.workflow.handle_outbound_message.return_value = result
         self.config_manager.get_interaction_details.return_value = {'sync-async': False, 'workflow': WORKFLOW_NAME}
 
-        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME}, body=REQUEST_BODY)
+
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_called_once()
+        self.assertEqual(expected_response.encode(), response.body)
