@@ -121,7 +121,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         return wf
 
     def _extract_sync_async_from_interaction_details(self, interaction_details):
-        is_sync_async = interaction_details.get('sync-async')
+        is_sync_async = interaction_details.get('sync_async')
         if is_sync_async is None:
             logger.error('0032', 'Failed to retrieve sync-async flag from interactions.json')
             raise tornado.web.HTTPError(500, f'Failed to parse sync-async flag from interactions.json file',
