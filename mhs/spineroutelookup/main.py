@@ -7,10 +7,25 @@ from utilities import config
 from utilities import integration_adaptors_logger as log
 
 import definitions
-from lookup import dictionary_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, routing_reliability
+from lookup import cache_adaptor, dictionary_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, \
+    routing_reliability
 from request import routing_handler, reliability_handler, routing_reliability_handler
 
 logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_MAIN')
+
+
+def load_cache_implementation():
+    cache_implementation_key = config.get_config("SDS_CACHE_IMPLEMENTATION",
+                                                 dictionary_cache.IMPLEMENTATION_DICTIONARY_KEY)
+    cache = cache_adaptor.implementations[cache_implementation_key]
+
+    cache_expiry_time = config.get_config("SDS_CACHE_EXPIRY_TIME", cache_adaptor.FIFTEEN_MINUTES_IN_SECONDS)
+
+    logger.info('005',
+                'Using the dictionary cache {cache} identified by {cache_implementation_key} with {cache_expiry_time}',
+                {'cache': cache, 'cache_implementation_key': cache_implementation_key,
+                 'cache_expiry_time': cache_expiry_time})
+    return cache(cache_expiry_time)
 
 
 def initialise_routing(sds_url: str, tls: bool = True) -> routing_reliability.RoutingAndReliability:
@@ -22,7 +37,7 @@ def initialise_routing(sds_url: str, tls: bool = True) -> routing_reliability.Ro
     """
     logger.info('004', 'Configuring connection to SDS using {url} {tls}', {"url": sds_url, "tls": tls})
 
-    cache = dictionary_cache.DictionaryCache()
+    cache = load_cache_implementation()
 
     if tls:
         certs_dir = pathlib.Path(definitions.ROOT_DIR) / "data" / "certs"

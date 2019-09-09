@@ -55,7 +55,12 @@ MHS takes a number of environment variables when it is run. These are:
 * `MHS_SDS_URL` (Spine Route Lookup service only) The URL to communicate with SDS on. e.g. `ldaps://example.com`
 * `MHS_DISABLE_SDS_TLS` (Spine Route Lookup service only) A flag that can be set to disable TLS for SDS connections.
 *Must* be set to exactly `True` for TLS to be disabled.
->>>>>>> develop
+* `MHS_SDS_CACHE_IMPLEMENTATION` (Spine Route Lookup service only) Identifies the caching implementation to use when
+caching values retrieved from SDS. This value is optional. Possible values are:
+    * `DICTIONARY_CACHE` - An in-memory cache using a Python dictionary. Not suitable for production use. If no
+    implementation is specified, this is the default.
+* `MHS_SDS_CACHE_EXPIRY_TIME` (Spine Route Lookup service only). An optional value that specifies the time (in seconds)
+that a value should be held in the SDS cache. Defaults to `900` (fifteen minutes)
 
 ## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.
