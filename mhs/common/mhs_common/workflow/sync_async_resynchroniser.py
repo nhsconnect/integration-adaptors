@@ -40,5 +40,5 @@ class SyncAsyncResynchroniser:
             if not (retries == self.max_retries):
                 await asyncio.sleep(self.retry_interval)
 
-        logger.error('004', 'Resync retries exceeded, attempted {retry}', {'retry': retries})
+        logger.error('004', 'Resync retries exceeded, attempted {retries}', {'retries': retries})
         raise SyncAsyncResponseException('Polling on the sync async store timed out')
