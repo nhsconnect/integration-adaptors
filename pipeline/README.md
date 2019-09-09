@@ -107,4 +107,6 @@ There must also be log groups in Cloudwatch under the following names - these gr
 - `/ecs/jenkins-workers-jenkins-worker`
 - `/ecs/scr-service-environment`
 - `/ecs/sonarqube`
-- `/ecs/test-environment`
+- `/ecs/outbound-test-environment`
+- `/ecs/inbound-test-environment`
+- `/ecs/spineroutelookup-test-environment`

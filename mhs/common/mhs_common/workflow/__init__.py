@@ -29,7 +29,7 @@ def get_workflow_map(party_key: str = None,
                      sync_async_store_retry_delay: int = None,
                      inbound_queue_max_retries: int = None,
                      inbound_queue_retry_delay: int = None,
-                     routing_reliability: routing_reliability.RoutingAndReliability = None) \
+                     routing: routing_reliability.RoutingAndReliability = None) \
         -> Dict[str, CommonWorkflow]:
     """
     Get a map of workflows. Keys for each workflow should correspond with keys used in interactions.json
@@ -41,7 +41,7 @@ def get_workflow_map(party_key: str = None,
                                                    inbound_async_queue, inbound_queue_max_retries,
                                                    inbound_queue_retry_delay,
                                                    persistence_store_max_retries=persistence_store_max_retries,
-                                                   routing_reliability=routing_reliability),
+                                                   routing=routing),
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(),
         FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
         SYNC_ASYNC: SyncAsyncWorkflow(party_key, transmission=transmission, sync_async_store=sync_async_store,

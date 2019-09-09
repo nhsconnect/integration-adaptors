@@ -9,7 +9,7 @@ class TestWorkflow(unittest.TestCase):
         workflow_map = workflow.get_workflow_map(party_key=sentinel.party_key,
                                                  work_description_store=sentinel.persistence_store,
                                                  transmission=sentinel.transmission,
-                                                 routing_reliability=sentinel.routing_reliability)
+                                                 routing=sentinel.routing_reliability)
         self.check_workflows_are_present(workflow_map)
 
     def test_get_workflow_map_for_inbound(self):

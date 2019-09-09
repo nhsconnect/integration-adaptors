@@ -35,7 +35,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                  inbound_queue_max_retries: int = None,
                  inbound_queue_retry_delay: int = None,
                  persistence_store_max_retries: int = None,
-                 routing_reliability: routing_reliability.RoutingAndReliability = None):
+                 routing: routing_reliability.RoutingAndReliability = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key
@@ -43,7 +43,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         self.store_retries = persistence_store_max_retries
         self.inbound_queue_max_retries = inbound_queue_max_retries
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
-        self.routing_reliability = routing_reliability
+        self.routing_reliability = routing
 
     @timing.time_function
     async def handle_outbound_message(self,

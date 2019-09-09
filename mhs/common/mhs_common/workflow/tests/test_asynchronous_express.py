@@ -14,8 +14,8 @@ from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
 
-FROM_PARTY_KEY = 'to-party-key'
-TO_PARTY_KEY = 'from-party-key'
+FROM_PARTY_KEY = 'from-party-key'
+TO_PARTY_KEY = 'to-party-key'
 MESSAGE_ID = 'message-id'
 CORRELATION_ID = 'correlation-id'
 URL = 'a.a'
@@ -65,13 +65,13 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                                                   inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
                                                                   inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
                                                                   persistence_store_max_retries=3,
-                                                                  routing_reliability=self.mock_routing_reliability)
+                                                                  routing=self.mock_routing_reliability)
 
     def test_construct_workflow_with_only_outbound_params(self):
         workflow = async_express.AsynchronousExpressWorkflow(party_key=mock.sentinel.party_key,
                                                              persistence_store=mock.sentinel.persistence_store,
                                                              transmission=mock.sentinel.transmission,
-                                                             routing_reliability=self.mock_routing_reliability)
+                                                             routing=self.mock_routing_reliability)
         self.assertIsNotNone(workflow)
 
     def test_construct_workflow_with_only_inbound_params(self):

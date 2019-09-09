@@ -34,7 +34,7 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
                          persistence_store: persistence_adaptor.PersistenceAdaptor,
                          persistence_store_retries: int,
-                         routing_reliability: routing_reliability.RoutingAndReliability) \
+                         routing: routing_reliability.RoutingAndReliability) \
         -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :param transmission: The transmission object to be used to make requests to the spine endpoints
@@ -46,8 +46,7 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
     """
 
     return workflow.get_workflow_map(party_key, work_description_store=persistence_store, transmission=transmission,
-                                     persistence_store_max_retries=persistence_store_retries,
-                                     routing_reliability=routing_reliability)
+                                     persistence_store_max_retries=persistence_store_retries, routing=routing)
 
 
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:

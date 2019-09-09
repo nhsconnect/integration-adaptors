@@ -15,7 +15,7 @@
       "image": "python:3-slim",
       "commit": true,
       "changes": [
-        "EXPOSE 443",
+        "EXPOSE 80",
         "WORKDIR {{user `app_dir`}}/{{user `spineroutelookup_dir`}}",
         "ENTRYPOINT pipenv run start"
       ]
