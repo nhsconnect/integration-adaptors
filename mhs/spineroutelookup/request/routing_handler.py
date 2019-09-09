@@ -3,7 +3,7 @@ from utilities import timing, integration_adaptors_logger as log
 
 from lookup import routing_reliability
 
-logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_ROUTING_REQUEST_HANDLER')
+logger = log.IntegrationAdaptorsLogger('SRL_ROUTING_REQUEST_HANDLER')
 
 
 class RoutingRequestHandler(tornado.web.RequestHandler):

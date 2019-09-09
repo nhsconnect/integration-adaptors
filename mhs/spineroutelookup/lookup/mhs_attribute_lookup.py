@@ -8,7 +8,7 @@ from utilities import integration_adaptors_logger as log
 import lookup.cache_adaptor as cache_adaptor
 import lookup.sds_client as sds_client
 
-logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_ATTRIBUTE_LOOKUP')
+logger = log.IntegrationAdaptorsLogger('SRL_ATTRIBUTE_LOOKUP')
 
 
 class MHSAttributeLookup:
