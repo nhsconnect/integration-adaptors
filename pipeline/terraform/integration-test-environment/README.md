@@ -100,3 +100,7 @@ In practice, this means that:
   from Spine
   - allow inbound traffic from the MHS VPC on port 3128 for the HTTP proxy
   - allow inbound traffic from the MHS VPC on port 389 for LDAP requests
+
+Also note that the MHS VPC uses the private ip address cidr block 10.0.0.0/16. The supplier
+and Opentest VPCs will need to use non-overlapping cidr blocks in order for the VPC
+peering connections to successfully be created.
