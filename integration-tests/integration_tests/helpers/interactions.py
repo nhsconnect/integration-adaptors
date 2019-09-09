@@ -1,41 +1,48 @@
 import requests
 
+from utilities import message_utilities
+
 from integration_tests.helpers import methods
 from integration_tests.helpers.build_message import build_message
 
 
-def process_request(interaction_name, template, asid, nhs_number, human_readable, pass_message_id):
+def process_request(template, asid, nhs_number, human_readable, pass_message_id, pass_correlation_id):
     """ Renders the template and passes it the the MHS
 
-    :param interaction_name: the type of message
-    :param template: the template to use
+    :param template: the template name
     :param asid: the asid, as supplied from NHS digital
     :param nhs_number: the NHS number for the test patient
     :param human_readable: the text to be sent on to SPINE
     :param pass_message_id: flag to indicate if we need to pass on the message ID
-    :return: response received from the MHS
+    :param pass_correlation_id: flag to indicate if we need to pass on the correlation ID
+    :return: A tuple of the response received from the MHS, the message ID and the correlation ID
     """
     scr, message_id = build_message(template, asid, nhs_number, human_readable)
-    if not pass_message_id:
-        message_id = None
+    correlation_id = message_utilities.MessageUtilities.get_uuid()
+    response = call_mhs(template, scr, message_id, pass_message_id, correlation_id, pass_correlation_id)
 
-    return call_mhs(interaction_name, scr, message_id)
+    return response, message_id, correlation_id
 
 
-def call_mhs(mhs_command, hl7payload, message_id=None):
+def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_id, pass_correlation_id):
     """Call the MHS with the provided details.
 
     :param mhs_command: The command/interaction name to call the MHS with.
     :param hl7payload: The HL7 payload to send to the MHS.
-    :param message_id: The message id to optionally pass as a query param
+    :param message_id: The message ID to (optionally) pass as a query param
+    :param pass_message_id: flag to indicate if we need to pass on the message ID
+    :param correlation_id: The correlation ID to (optionally) pass as a query param
+    :param pass_correlation_id: flag to indicate if we need to pass on the correlation ID
     :return: The response returned by the MHS.
     """
     headers = {'Interaction-Id': mhs_command}
-    if message_id is not None:
+    if pass_message_id:
         headers['Message-Id'] = message_id
 
-    response = requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
-    return response.text
+    if pass_correlation_id:
+        headers['Correlation-Id'] = correlation_id
+
+    return requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
 
 
 def call_scr_adaptor(json_string):
@@ -45,7 +52,7 @@ def call_scr_adaptor(json_string):
     :return: the response from the adaptor
     """
 
-    # TODO
+    # TODO RT-186
     # once we know the scr_adaptor end point, we need to send the json_string to the scr_adaptor
     # scr_adaptor_response = requests.post(methods.get_scr_adaptor_hostname() + json_string)
     # return scr_adaptor_response.text

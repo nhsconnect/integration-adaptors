@@ -105,8 +105,9 @@ class TestOutboundTransmission(TestCase):
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
             mock_fetch.side_effect = httpclient.HTTPClientError(code=599)
 
-            with self.assertRaises(outbound_transmission.MaxRetriesExceeded):
+            with self.assertRaises(outbound_transmission.MaxRetriesExceeded) as cm:
                 await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
+            self.assertEqual(mock_fetch.side_effect, cm.exception.__cause__)
 
             self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
             expected_sleep_arguments = [call(RETRY_DELAY_IN_SECONDS) for i in range(MAX_RETRIES - 1)]

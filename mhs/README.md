@@ -37,13 +37,17 @@ MHS is made up of multiple components, and running them all separately can be te
 MHS takes a number of environment variables when it is run. These are:
 * `MHS_LOG_LEVEL` This is required to be set to one of: `NOTSET`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least.
 * `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
+* `MHS_STATE_STORE_RETRIES'` The max number of retries when attempting to interact with either the work description or sync-async store. Defaults to 3 
 * `MHS_OUTBOUND_TRANSMISSION_MAX_RETRIES` (outbound only) This is the maximum number of retries for outbound requests. If no value is given a default of 3 is used.
 * `MHS_OUTBOUND_TRANSMISSION_RETRY_DELAY` (outbound only) The delay between retries of outbound requests in milliseconds. If no value is given, a default of `100` is used.
 * `MHS_INBOUND_QUEUE_HOST` (inbound only) The host url of the amqp inbound queue. e.g. `amqps://example.com:port/queue-name`. Note that if the amqp connection being used is a secured connection (which it should be in production), then the url should start with `amqps://` and not `amqp+ssl://`.
 * `MHS_INBOUND_QUEUE_USERNAME` (inbound only) The username to use when connecting to the amqp inbound queue.
 * `MHS_INBOUND_QUEUE_PASSWORD` (inbound only) The password to use when connecting to the amqp inbound queue.
+* `MHS_INBOUND_QUEUE_MAX_RETRIES` (inbound only) The max number of times to retry putting a message onto the amqp inbound queue. Defaults to 3.
+* `MHS_INBOUND_QUEUE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying putting a message onto the amqp inbound queue. Defaults to 100ms.
+* `SYNC_ASYNC_STORE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying placing a message on the sysnc-async store. Defaults to 100ms
 * `MHS_SPINE_ROUTE_LOOKUP_URL` (outbound only) The URL of the Spine route lookup service. E.g `https://example.com`. This URL should not contain path or query parameter parts.
-* `MHS_SPINE_ORG_CODE` The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
+* `MHS_SPINE_ORG_CODE` (outbound only) The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
 * `MHS_SDS_URL` (Spine Route Lookup service only) The URL to communicate with SDS on. e.g. `ldaps://example.com`
 * `MHS_DISABLE_SDS_TLS` (Spine Route Lookup service only) A flag that can be set to disable TLS for SDS connections.
 *Must* be set to exactly `True` for TLS to be disabled.

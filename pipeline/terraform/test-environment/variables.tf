@@ -48,6 +48,22 @@ variable "scr_service_port" {
   type = number
   description = "The port to be exposed for the scr web service"
 }
+variable "mhs_inbound_queue_host" {
+  type = string
+  description = "The address of the async inbound queue"
+}
+variable "mhs_inbound_queue_username" {
+  type = string
+  description = "The username of the async inbound queue"
+}
+variable "mhs_inbound_queue_password" {
+  type = string
+  description = "The password for the async inbound queue"
+}
+variable "mhs_sync_async_state_table_name" {
+  type = string
+  description = "The name of the sync async store table"
+}
 variable "spineroutelookup_service_port" {
   type = number
   description = "The port to be exposed for the Spine Route Lookup service."
