@@ -64,8 +64,9 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.publish()
 
         try:
-            url, to_party_key, cpa_id = await self._lookup_endpoint_details(interaction_details, wdo)
+            url, to_party_key, cpa_id = await self._lookup_endpoint_details(interaction_details)
         except Exception:
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error obtaining outbound URL'
 
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
@@ -133,8 +134,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
 
-    async def _lookup_endpoint_details(self, interaction_details: Dict, wdo: wd.WorkDescription) \
-            -> Tuple[str, str, str]:
+    async def _lookup_endpoint_details(self, interaction_details: Dict) -> Tuple[str, str, str]:
         try:
             service = interaction_details[ebxml_envelope.SERVICE]
             action = interaction_details[ebxml_envelope.ACTION]
@@ -155,7 +155,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             return url, to_party_key, cpa_id
         except Exception as e:
             logger.warning('0014', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})
-            await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             raise e
 
     @staticmethod

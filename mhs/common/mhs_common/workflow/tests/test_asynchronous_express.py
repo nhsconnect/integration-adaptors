@@ -138,7 +138,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self._setup_routing_mocks()
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (
-        MESSAGE_ID, HTTP_HEADERS, SERIALIZED_MESSAGE)
+            MESSAGE_ID, HTTP_HEADERS, SERIALIZED_MESSAGE)
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
         expected_interaction_details = {ebxml_envelope.MESSAGE_ID: MESSAGE_ID, ebxml_request_envelope.MESSAGE: PAYLOAD,
@@ -179,6 +179,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     @async_test
     async def test_handle_outbound_message_error_when_looking_up_url(self):
         self.setup_mock_work_description()
+        config.config[SPINE_ORG_CODE_CONFIG_KEY] = SPINE_ORG_CODE
         self.mock_routing_reliability.get_end_point.side_effect = Exception()
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
@@ -188,7 +189,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual('Error obtaining outbound URL', message)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
-                         self.mock_work_description.set_status.call_args_list)
+                         self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
     @async_test
