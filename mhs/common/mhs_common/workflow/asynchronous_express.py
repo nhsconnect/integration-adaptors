@@ -7,7 +7,6 @@ import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from tornado import httpclient
-from utilities import config
 from utilities import timing
 
 from mhs_common import workflow
@@ -19,7 +18,6 @@ from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous
 
-ORG_CODE_CONFIG_KEY = "SPINE_ORG_CODE"
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
@@ -139,19 +137,15 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             service = interaction_details[ebxml_envelope.SERVICE]
             action = interaction_details[ebxml_envelope.ACTION]
             service_id = service + ":" + action
-            org_code = config.get_config(ORG_CODE_CONFIG_KEY)
 
-            logger.info('0012', 'Looking up endpoint details for {org_code} & {service_id}.',
-                        {'org_code': org_code, 'service_id': service_id})
-            endpoint_details = await self.routing_reliability.get_end_point(org_code, service_id)
+            logger.info('0012', 'Looking up endpoint details for {service_id}.', {'service_id': service_id})
+            endpoint_details = await self.routing_reliability.get_end_point(service_id)
 
             url = AsynchronousExpressWorkflow._extract_endpoint_url(endpoint_details)
             to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
             cpa_id = endpoint_details[MHS_CPA_ID_KEY]
-            logger.info('0013', 'Retrieved endpoint details for {org_code} & {service_id}. {url}, {to_party_key}, '
-                                '{cpa_id}',
-                        {'org_code': org_code, 'service_id': service_id, 'url': url, 'to_party_key': to_party_key,
-                         'cpa_id': cpa_id})
+            logger.info('0013', 'Retrieved endpoint details for {service_id}. {url}, {to_party_key}, {cpa_id}',
+                        {'service_id': service_id, 'url': url, 'to_party_key': to_party_key, 'cpa_id': cpa_id})
             return url, to_party_key, cpa_id
         except Exception as e:
             logger.warning('0014', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})

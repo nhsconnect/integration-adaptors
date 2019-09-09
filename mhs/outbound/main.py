@@ -101,7 +101,9 @@ def main():
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
-    routing = routing_reliability.RoutingAndReliability(config.get_config('SPINE_ROUTE_LOOKUP_URL'))
+    spine_route_lookup_url = config.get_config('SPINE_ROUTE_LOOKUP_URL')
+    spine_org_code = config.get_config('SPINE_ORG_CODE')
+    routing = routing_reliability.RoutingAndReliability(spine_route_lookup_url, spine_org_code)
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
                                                               max_retries, retry_delay)
