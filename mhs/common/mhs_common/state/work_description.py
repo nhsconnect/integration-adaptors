@@ -18,6 +18,9 @@ class MessageStatus(str, enum.Enum):
     OUTBOUND_MESSAGE_ACKD = 'OUTBOUND_MESSAGE_ACKD'
     OUTBOUND_MESSAGE_TRANSMISSION_FAILED = 'OUTBOUND_MESSAGE_TRANSMISSION_FAILED'
     OUTBOUND_MESSAGE_NACKD = 'OUTBOUND_MESSAGE_NACKD'
+    OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED = 'OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED'
+    OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND = 'OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND'
+    OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED = 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED'
     INBOUND_RESPONSE_RECEIVED = 'INBOUND_RESPONSE_RECEIVED'
     INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED = 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'
     INBOUND_RESPONSE_FAILED = 'INBOUND_RESPONSE_FAILED'
@@ -138,15 +141,7 @@ class WorkDescription:
             raise ValueError('Expected persistence store')
 
         self.persistence_store = persistence_store
-
-        data = store_data[DATA]
-        self.message_key: str = store_data[DATA_KEY]
-        self.version: int = data[VERSION_KEY]
-        self.created_timestamp: str = data[CREATED_TIMESTAMP]
-        self.last_modified_timestamp: str = data[LATEST_TIMESTAMP]
-        self.inbound_status: MessageStatus = data.get(INBOUND_STATUS)
-        self.outbound_status: MessageStatus = data.get(OUTBOUND_STATUS)
-        self.workflow: str = data[WORKFLOW]
+        self._deserialize_data(store_data)
 
     async def publish(self):
         """
@@ -158,6 +153,7 @@ class WorkDescription:
         logger.info('012', 'Retrieving latest work description to check version')
 
         latest_data = await self.persistence_store.get(self.message_key)
+
         if latest_data is not None:
             logger.info('013', 'Retrieved previous version, comparing versions')
             latest_version = latest_data[DATA][VERSION_KEY]
@@ -226,10 +222,10 @@ class WorkDescription:
 
     def _deserialize_data(self, store_data):
         data_attribute = store_data[DATA]
-        self.message_key: str = store_data[DATA_KEY]
-        self.version: int = data_attribute[VERSION_KEY]
-        self.created_timestamp: str = data_attribute[CREATED_TIMESTAMP]
-        self.last_modified_timestamp: str = data_attribute[LATEST_TIMESTAMP]
-        self.inbound_status: MessageStatus = data_attribute[INBOUND_STATUS]
-        self.outbound_status: MessageStatus = data_attribute[OUTBOUND_STATUS]
-        self.workflow: str = data_attribute[WORKFLOW]
+        self.message_key: str = store_data.get(DATA_KEY)
+        self.version: int = data_attribute.get(VERSION_KEY)
+        self.created_timestamp: str = data_attribute.get(CREATED_TIMESTAMP)
+        self.last_modified_timestamp: str = data_attribute.get(LATEST_TIMESTAMP)
+        self.inbound_status: MessageStatus = data_attribute.get(INBOUND_STATUS)
+        self.outbound_status: MessageStatus = data_attribute.get(OUTBOUND_STATUS)
+        self.workflow: str = data_attribute.get(WORKFLOW)

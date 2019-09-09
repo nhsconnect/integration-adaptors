@@ -56,7 +56,6 @@ resource "aws_ecs_task_definition" "test-environment-mhs-inbound-task" {
           name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME",
           value = var.mhs_sync_async_state_table_name
         }
-
       ]
 
       portMappings = [
@@ -113,6 +112,18 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
         {
           name = "MHS_STATE_TABLE_NAME",
           value = var.mhs_state_table_name
+        },
+        {
+          name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME",
+          value = var.mhs_sync_async_state_table_name
+        },
+        {
+          name = "MHS_RESYNC_RETRIES",
+          value = var.mhs_resynchroniser_max_retries
+        },
+        {
+          name = "MHS_RESYNC_INTERVAL",
+          value = var.mhs_resynchroniser_interval
         },
         {
           name = "MHS_SPINE_ROUTE_LOOKUP_URL",

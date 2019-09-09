@@ -1,14 +1,13 @@
 """This module defines the outbound synchronous request handler component."""
 
 from typing import Dict, Any
-
 import tornado.locks
 import tornado.web
-
-
 import mhs_common.workflow as workflow
 from mhs_common.configuration import configuration_manager
 from utilities import integration_adaptors_logger as log, message_utilities, timing
+import mhs_common.state.work_description as wd
+
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
@@ -47,18 +46,33 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         reason=f'Unknown interaction ID: {interaction_id}')
 
         try:
-            workflow = self.workflows[interaction_details['workflow']]
+            wf = self.workflows[interaction_details['workflow']]
         except KeyError as e:
             logger.error('0008', "Weren't able to determine workflow for {InteractionId} . This likely is due to a "
                                  "misconfiguration in interactions.json", {"InteractionId": interaction_id})
             raise tornado.web.HTTPError(500,
                                         f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
                                         reason=f"Couldn't determine workflow to invoke for interaction ID: "
-                                               f"{interaction_id}") from e
+                                        f"{interaction_id}") from e
 
-        status, response = await workflow.handle_outbound_message(message_id, correlation_id, interaction_details, body)
+        if interaction_details.get('sync-async'):
+            sync_async_workflow: workflow.SyncAsyncWorkflow = self.workflows[workflow.SYNC_ASYNC]
+            status, response, wdo = await sync_async_workflow.handle_sync_async_outbound_message(message_id, correlation_id,
+                                                                                            interaction_details, body,
+                                                                                            wf)
+            await self.return_sync_async_response(status, response, wdo)
+        else:
+            status, response = await wf.handle_outbound_message(message_id, correlation_id, interaction_details, body,
+                                                                None)
+            self._write_response(status, response)
 
-        self._write_response(status, response)
+    async def return_sync_async_response(self, status: int, response: str, wdo: wd.WorkDescription):
+        try:
+            self._write_response(status, response)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+        except Exception as e:
+            logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
 
     def write_error(self, status_code: int, **kwargs: Any):
         self.set_header('Content-Type', 'text/plain')

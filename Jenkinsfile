@@ -68,6 +68,8 @@ pipeline {
                             -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
                             -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
                             -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
+                            -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                            -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                             -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT} \
                             -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_SDS_URL} \
                             -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
@@ -119,6 +121,8 @@ pipeline {
                         -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
                         -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
                         -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
+                        -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                        -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                         -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT} \
                         -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_SDS_URL} \
                         -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}

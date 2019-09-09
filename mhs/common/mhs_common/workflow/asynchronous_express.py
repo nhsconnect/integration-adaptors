@@ -1,7 +1,7 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
 from typing import Dict, List
-from typing import Tuple
+from typing import Tuple, Optional
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
@@ -51,14 +51,17 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                       message_id: str,
                                       correlation_id: str,
                                       interaction_details: dict,
-                                      payload: str) -> Tuple[int, str]:
+                                      payload: str,
+                                      wdo: Optional[wd.WorkDescription]) -> Tuple[int, str]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
-        wdo = wd.create_new_work_description(self.persistence_store,
-                                             message_id,
-                                             workflow.ASYNC_EXPRESS,
-                                             wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
-        await wdo.publish()
+        if not wdo:
+            wdo = wd.create_new_work_description(self.persistence_store,
+                                                 message_id,
+                                                 workflow.ASYNC_EXPRESS,
+                                                 wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
+                                                 )
+            await wdo.publish()
 
         try:
             url, to_party_key, cpa_id = await self._lookup_endpoint_details(interaction_details, wdo)
