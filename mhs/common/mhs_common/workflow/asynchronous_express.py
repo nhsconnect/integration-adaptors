@@ -1,6 +1,5 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
-from typing import Dict, List
 from typing import Tuple, Optional
 
 import utilities.integration_adaptors_logger as log
@@ -17,10 +16,6 @@ from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous
-
-MHS_END_POINT_KEY = 'nhsMHSEndPoint'
-MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
-MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -42,7 +37,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         self.store_retries = persistence_store_max_retries
         self.inbound_queue_max_retries = inbound_queue_max_retries
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
-        self.routing_reliability = routing
+        super().__init__(routing)
 
     @timing.time_function
     async def handle_outbound_message(self,
@@ -131,41 +126,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         logger.info('0003', 'Message serialised successfully')
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
-
-    async def _lookup_endpoint_details(self, interaction_details: Dict) -> Tuple[str, str, str]:
-        try:
-            service = interaction_details[ebxml_envelope.SERVICE]
-            action = interaction_details[ebxml_envelope.ACTION]
-            service_id = service + ":" + action
-
-            logger.info('0012', 'Looking up endpoint details for {service_id}.', {'service_id': service_id})
-            endpoint_details = await self.routing_reliability.get_end_point(service_id)
-
-            url = AsynchronousExpressWorkflow._extract_endpoint_url(endpoint_details)
-            to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
-            cpa_id = endpoint_details[MHS_CPA_ID_KEY]
-            logger.info('0013', 'Retrieved endpoint details for {service_id}. {url}, {to_party_key}, {cpa_id}',
-                        {'service_id': service_id, 'url': url, 'to_party_key': to_party_key, 'cpa_id': cpa_id})
-            return url, to_party_key, cpa_id
-        except Exception as e:
-            logger.warning('0014', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})
-            raise e
-
-    @staticmethod
-    def _extract_endpoint_url(endpoint_details: Dict[str, List[str]]) -> str:
-        endpoint_urls = endpoint_details[MHS_END_POINT_KEY]
-
-        if len(endpoint_urls) == 0:
-            logger.error('0015', 'Did not receive any endpoint URLs when looking up endpoint details.')
-            raise IndexError("Did not receive any endpoint URLs when looking up endpoint details.")
-
-        url = endpoint_urls[0]
-
-        if len(endpoint_urls) > 1:
-            logger.warning('0016', 'Received more than one URL when looking up endpoint details. Using {url}. '
-                                   '{urls_received}', {'url': url, 'urls_received': endpoint_urls})
-
-        return url
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,

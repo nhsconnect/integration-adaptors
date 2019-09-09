@@ -189,22 +189,6 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
-    @async_test
-    async def test_extract_endpoint_url_no_endpoints_returned(self):
-        endpoint_details = {MHS_END_POINT_KEY: []}
-
-        with self.assertRaises(IndexError):
-            async_express.AsynchronousExpressWorkflow._extract_endpoint_url(endpoint_details)
-
-    @async_test
-    async def test_extract_endpoint_url_multiple_endpoints_returned(self):
-        expected_url = "first_url"
-        endpoint_details = {MHS_END_POINT_KEY: [expected_url, "second-url"]}
-
-        actual_url = async_express.AsynchronousExpressWorkflow._extract_endpoint_url(endpoint_details)
-
-        self.assertEqual(expected_url, actual_url)
-
     @mock.patch.object(async_express, 'logger')
     @async_test
     async def test_handle_outbound_message_http_error_when_calling_outbound_transmission(self, log_mock):

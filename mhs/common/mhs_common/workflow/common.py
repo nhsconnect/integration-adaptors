@@ -1,11 +1,25 @@
 """This module defines the common base of all workflows."""
 import abc
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict, List
+
+import utilities.integration_adaptors_logger as log
+
 import mhs_common.state.work_description as wd
+from mhs_common.messages import ebxml_envelope
+from mhs_common.routing import routing_reliability
+
+MHS_END_POINT_KEY = 'nhsMHSEndPoint'
+MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
+MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+
+logger = log.IntegrationAdaptorsLogger('COMMON_WORKFLOW')
 
 
 class CommonWorkflow(abc.ABC):
     """Common functionality across all workflows."""
+
+    def __init__(self, routing: routing_reliability.RoutingAndReliability = None):
+        self.routing_reliability = routing
 
     @abc.abstractmethod
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
@@ -38,3 +52,38 @@ class CommonWorkflow(abc.ABC):
         :param payload: payload to handle
         """
         pass
+
+    async def _lookup_endpoint_details(self, interaction_details: Dict) -> Tuple[str, str, str]:
+        try:
+            service = interaction_details[ebxml_envelope.SERVICE]
+            action = interaction_details[ebxml_envelope.ACTION]
+            service_id = service + ":" + action
+
+            logger.info('0001', 'Looking up endpoint details for {service_id}.', {'service_id': service_id})
+            endpoint_details = await self.routing_reliability.get_end_point(service_id)
+
+            url = CommonWorkflow._extract_endpoint_url(endpoint_details)
+            to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
+            cpa_id = endpoint_details[MHS_CPA_ID_KEY]
+            logger.info('0002', 'Retrieved endpoint details for {service_id}. {url}, {to_party_key}, {cpa_id}',
+                        {'service_id': service_id, 'url': url, 'to_party_key': to_party_key, 'cpa_id': cpa_id})
+            return url, to_party_key, cpa_id
+        except Exception as e:
+            logger.warning('0003', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})
+            raise e
+
+    @staticmethod
+    def _extract_endpoint_url(endpoint_details: Dict[str, List[str]]) -> str:
+        endpoint_urls = endpoint_details[MHS_END_POINT_KEY]
+
+        if len(endpoint_urls) == 0:
+            logger.error('0004', 'Did not receive any endpoint URLs when looking up endpoint details.')
+            raise IndexError("Did not receive any endpoint URLs when looking up endpoint details.")
+
+        url = endpoint_urls[0]
+
+        if len(endpoint_urls) > 1:
+            logger.warning('0005', 'Received more than one URL when looking up endpoint details. Using {url}. '
+                                   '{urls_received}', {'url': url, 'urls_received': endpoint_urls})
+
+        return url
