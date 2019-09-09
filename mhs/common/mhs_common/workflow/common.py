@@ -1,6 +1,7 @@
 """This module defines the common base of all workflows."""
 import abc
 from typing import Tuple
+
 import mhs_common.state.work_description as wd
 
 
