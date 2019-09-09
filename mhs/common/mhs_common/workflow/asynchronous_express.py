@@ -22,6 +22,7 @@ from mhs_common.workflow import common_asynchronous
 ORG_CODE_CONFIG_KEY = "SPINE_ORG_CODE"
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
+MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -60,13 +61,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         await wdo.publish()
 
         try:
-            url, to_party_key = await self._lookup_endpoint_details(interaction_details, wdo)
+            url, to_party_key, cpa_id = await self._lookup_endpoint_details(interaction_details, wdo)
         except Exception:
             return 500, 'Error obtaining outbound URL'
 
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
                                                                               interaction_details,
-                                                                              payload, wdo, to_party_key)
+                                                                              payload, wdo, to_party_key, cpa_id)
         if error:
             return error
 
@@ -111,13 +112,14 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                       'Acknowledgment': acknowledgment})
 
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
-                                          to_party_key):
+                                          to_party_key, cpa_id):
         try:
             interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
             interaction_details[ebxml_request_envelope.MESSAGE] = payload
             interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
             interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
             interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
+            interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
         except Exception as e:
             logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
@@ -142,9 +144,10 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             # TODO: What if this isn't the right size?
             url = endpoint_details[MHS_END_POINT_KEY][0]
             to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
+            cpa_id = endpoint_details[MHS_CPA_ID_KEY]
             logger.info('0013', 'Retrieved endpoint details for {org_code} & {service_id}. {url}, {to_party_key}',
                         {'org_code': org_code, 'service_id': service_id, 'url': url, 'to_party_key': to_party_key})
-            return url, to_party_key
+            return url, to_party_key, cpa_id
         except Exception as e:
             logger.warning('0014', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})
             await wdo.set_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)

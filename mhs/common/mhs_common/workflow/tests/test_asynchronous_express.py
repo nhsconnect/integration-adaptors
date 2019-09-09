@@ -16,6 +16,7 @@ from mhs_common.state.work_description import MessageStatus
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
+CPA_ID = 'cpa-id'
 MESSAGE_ID = 'message-id'
 CORRELATION_ID = 'correlation-id'
 URL = 'a.a'
@@ -101,7 +102,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         expected_interaction_details = {ebxml_envelope.MESSAGE_ID: MESSAGE_ID, ebxml_request_envelope.MESSAGE: PAYLOAD,
                                         ebxml_envelope.FROM_PARTY_ID: FROM_PARTY_KEY,
                                         ebxml_envelope.CONVERSATION_ID: CORRELATION_ID,
-                                        ebxml_envelope.TO_PARTY_ID: TO_PARTY_KEY}
+                                        ebxml_envelope.TO_PARTY_ID: TO_PARTY_KEY,
+                                        ebxml_envelope.CPA_ID: CPA_ID}
         expected_interaction_details.update(INTERACTION_DETAILS)
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
@@ -224,7 +226,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     def _setup_routing_mocks(self):
         config.config[SPINE_ORG_CODE_CONFIG_KEY] = SPINE_ORG_CODE
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
-            'nhsMHSEndPoint': [URL], 'nhsMHSPartyKey': TO_PARTY_KEY})
+            'nhsMHSEndPoint': [URL], 'nhsMHSPartyKey': TO_PARTY_KEY, 'nhsMhsCPAId': CPA_ID})
 
     ############################
     # Inbound tests
