@@ -1,7 +1,7 @@
 {
   "QUPC_IN160101UK05": {
     "workflow": "async-express",
-    "url": "https://localhost:4001/sync-service",
+    "url": "https://msg.opentest.hscic.gov.uk/sync-service",
     "request_type": "POST",
     "service": "urn:nhs:names:services:psisquery",
     "action": "QUPC_IN160101UK05",
@@ -11,8 +11,7 @@
     "duplicate_elimination": false,
     "ack_requested": false,
     "ack_soap_actor": "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-    "sync_reply": true,
-    "sync_async": true
+    "sync_reply": true
   },
   "gp_summary_upload": {
     "url": "https://msg.opentest.hscic.gov.uk/reliablemessaging/reliablerequest",
