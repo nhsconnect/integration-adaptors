@@ -72,7 +72,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                 "max_retries": self._max_retries
                                 })
                 if retries_remaining <= 0:
-                    logger.warning("0004",
+                    logger.error("0004",
                                    "A request has exceeded the maximum number of retries, {max_retries} retries",
                                    {"max_retries": self._max_retries})
                     raise MaxRetriesExceeded("The max number of retries to make a request has been exceeded") from e
