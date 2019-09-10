@@ -63,7 +63,10 @@ pipeline {
                             -var scr_service_port=${SCR_SERVICE_PORT} \
                             -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
                             -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
-                            -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD}
+                            -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
+                            -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
+                            -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                            -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
                         """
                 }
             }
@@ -108,7 +111,10 @@ pipeline {
                         -var scr_service_port=${SCR_SERVICE_PORT} \
                         -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
                         -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
-                        -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD}
+                        -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
+                        -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
+                        -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                        -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
                      """
             }
         }
