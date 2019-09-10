@@ -1,16 +1,14 @@
 """This module defines the sync-async workflow."""
-
-import copy
 import asyncio
-from typing import Tuple, Dict
-from utilities import integration_adaptors_logger as log, message_utilities
-import mhs_common.messages.ebxml_envelope as ebxml_envelope
-import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
+from typing import Tuple
+from utilities import integration_adaptors_logger as log
 from mhs_common.state import work_description as wd
-from mhs_common.transmission import transmission_adaptor as ta
 from mhs_common.workflow import common_synchronous
 from mhs_common.state import persistence_adaptor as pa
 from exceptions import MaxRetriesExceeded
+from mhs_common.workflow import common
+from mhs_common import workflow
+from mhs_common.workflow import sync_async_resynchroniser
 
 logger = log.IntegrationAdaptorsLogger('MHS_SYNC_ASYNC_WORKFLOW')
 
@@ -23,34 +21,75 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
     """Handles the workflow for the sync-async messaging pattern."""
 
     def __init__(self,
-                 party_id: str,
-                 transmission: ta.TransmissionAdaptor = None,
                  sync_async_store: pa.PersistenceAdaptor = None,
+                 work_description_store: pa.PersistenceAdaptor = None,
+                 sync_async_store_retry_delay: int = None,
+                 resynchroniser: sync_async_resynchroniser.SyncAsyncResynchroniser = None,
                  persistence_store_max_retries: int = None,
-                 sync_async_store_retry_delay: int = None
                  ):
         """Create a new SyncAsyncWorkflow that uses the specified dependencies to load config, build a message and
         send it.
-        :param transmission: The component that can be used to send messages.
         :param sync_async_store: The resynchronisor state store
-        :param party_id: The party ID of this MHS. Sent in ebXML requests.
+        :param work_description_store: The persistence store instance that holds the work description data
+        :param sync_async_store_retry_delay: time between sync async store publish attempts
+        :param sync_async_store_max_retries: number of retries whilst publishing something to the sync-async store
         """
-
-        self.transmission = transmission
         self.sync_async_store = sync_async_store
-        self.party_id = party_id
-        self.sync_async_store_max_retries = persistence_store_max_retries
+        self.work_description_store = work_description_store
+        self.resynchroniser = resynchroniser
         self.sync_async_store_retry_delay = sync_async_store_retry_delay / 1000 if sync_async_store_retry_delay \
             else None
+        self.persistence_store_retries = persistence_store_max_retries
 
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
-                                      payload: str) -> Tuple[int, str]:
-        raise NotImplementedError()
+                                      payload: str,
+                                      work_description: wd.WorkDescription
+                                      ) -> Tuple[int, str]:
+        raise NotImplementedError("This method is not implemented for the sync-async workflow, consider using"
+                                  "`self.handle_sync_async_message` instead")
+
+    async def handle_sync_async_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+                                                 payload: str,
+                                                 async_workflow: common.CommonWorkflow
+                                                 ) -> Tuple[int, str, wd.WorkDescription]:
+
+        logger.info('0001', 'Entered sync-async workflow to handle outbound message')
+        wdo = wd.create_new_work_description(self.work_description_store, message_id,
+                                             workflow.SYNC_ASYNC,
+                                             outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
+                                             )
+
+        status_code, response = await async_workflow.handle_outbound_message(message_id, correlation_id,
+                                                                             interaction_details, payload, wdo)
+        if not (status_code == 202):
+            logger.warning('0002', 'No ACK received ')
+            return status_code, response, wdo
+
+        status_code, response = await self._retrieve_async_response(message_id, wdo)
+        return status_code, response, wdo
+
+    async def _retrieve_async_response(self, message_id, wdo: wd.WorkDescription):
+        logger.info('0005', 'Attempting to retrieve the async response from the async store')
+        try:
+            response = await self.resynchroniser.pause_request(message_id)
+            logger.info('0003', 'Retrieved async response from sync-async store')
+            await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
+                                                wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED,
+                                                self.persistence_store_retries
+                                                )
+            return 200, response[MESSAGE_DATA]
+        except sync_async_resynchroniser.SyncAsyncResponseException:
+            logger.error('0004', 'No async response placed on async store within timeout for {messageId}',
+                         {'messageId': message_id})
+            return 500, "No async response received from sync-async store"
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('001', 'Entered sync-async inbound workflow')
-        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
+        await wd.update_status_with_retries(work_description,
+                                            work_description.set_inbound_status,
+                                            wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
+                                            self.persistence_store_retries)
 
         try:
             await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: payload})
@@ -63,7 +102,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
     async def _add_to_sync_async_store(self, key, data):
         logger.info('002', 'Attempting to add inbound message to sync-async store')
-        retry = self.sync_async_store_max_retries
+        retry = self.persistence_store_retries
         while True:
             try:
                 await self.sync_async_store.add(key, data)
@@ -77,63 +116,5 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                     logger.warning('022', 'Final retry has been attempted for adding message to sync async store')
                     raise MaxRetriesExceeded('Max number of retries exceeded whilst attempting to put the message'
                                              'on the sync-async store') from e
-                
+
                 await asyncio.sleep(self.sync_async_store_retry_delay)
-
-    def prepare_message(self, interaction_details: dict, content: str, message_id: str) -> Tuple[bool, str]:
-        """Prepare a message to be sent for the specified interaction. Wraps the provided content if required.
-
-        :param interaction_details: The details of the interaction looked up from the config manager.
-        :param content: The message content to be sent.
-        :param message_id: message id to use in the message header.
-        :return: A tuple containing:
-        1. A flag indicating whether this message should be sent asynchronously
-        2. The message to send
-        """
-
-        interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
-
-        is_async = interaction_details[ASYNC_RESPONSE_EXPECTED]
-        if is_async:
-            message = self._wrap_message_in_ebxml(interaction_details, content)
-        else:
-            message = content
-
-        return is_async, message
-
-    def send_message(self, interaction_details: dict, message: str) -> str:
-        """Send the provided message for the interaction named. Returns the response received immediately, but note that
-        if the interaction will result in an asynchronous response, this will simply be the acknowledgement of the
-        request.
-
-        :param interaction_details: The details of the interaction looked up from the config manager.
-        :param message: A string representing the message to be sent.
-        :return: A string containing the immediate response to the message sent.
-        :raises: An UnknownInteractionError if the interaction_name specified was not found.
-        """
-
-        response = self.transmission.make_request(interaction_details, message)
-        logger.info("0001", "Message sent to Spine, and response received.")
-        return response
-
-    def _wrap_message_in_ebxml(self, interaction_details: Dict[str, str], content: str) -> str:
-        """Wrap the specified message in an ebXML wrapper.
-
-        :param interaction_details: The interaction configuration to use when building the ebXML wrapper.
-        :param content: The message content to be sent.
-        :return: A tuple of strings representing the ID and the content of the message wrapped in the generated ebXML
-        wrapper.
-        """
-        context = copy.deepcopy(interaction_details)
-        context[ebxml_envelope.FROM_PARTY_ID] = self.party_id
-
-        conversation_id = message_utilities.MessageUtilities.get_uuid()
-        context[ebxml_envelope.CONVERSATION_ID] = conversation_id
-
-        context[ebxml_request_envelope.MESSAGE] = content
-        request = ebxml_request_envelope.EbxmlRequestEnvelope(context)
-
-        _, _, message = request.serialize()
-
-        logger.info("0002", "Generated ebXML wrapper with {ConversationId}", {"ConversationId": conversation_id})
-        return message

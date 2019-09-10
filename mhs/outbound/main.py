@@ -11,9 +11,9 @@ import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
-
 import outbound.request.synchronous.handler as client_request_handler
 from outbound.transmission import outbound_transmission
+from mhs_common.workflow import sync_async_resynchroniser as resync
 
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
@@ -31,18 +31,28 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 
 
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
-                         persistence_store: persistence_adaptor.PersistenceAdaptor,
+                         work_description_store: persistence_adaptor.PersistenceAdaptor,
+                         sync_async_store: persistence_adaptor.PersistenceAdaptor,
                          persistence_store_retries: int) \
         -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
+    :param sync_async_store:
     :param transmission: The transmission object to be used to make requests to the spine endpoints
     :param party_key: The party key to use to identify this MHS.
-    :param persistence_store: The persistence adaptor for the state database
+    :param work_description_store: The persistence adaptor for the state database
     :return: The workflows that can be used to handle messages.
     """
 
-    return workflow.get_workflow_map(party_key, work_description_store=persistence_store, transmission=transmission,
-                                     persistence_store_max_retries=persistence_store_retries)
+    resynchroniser = resync.SyncAsyncResynchroniser(sync_async_store,
+                                                    int(config.get_config('RESYNC_RETRIES', '20')),
+                                                    float(config.get_config('RESYNC_INTERVAL', '1.0')))
+
+    return workflow.get_workflow_map(party_key,
+                                     work_description_store=work_description_store,
+                                     transmission=transmission,
+                                     resynchroniser=resynchroniser,
+                                     persistence_store_max_retries=persistence_store_retries
+                                     )
 
 
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:
@@ -78,13 +88,15 @@ def main():
     store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
 
     party_key = load_party_key(certs_dir)
-    persistence_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+    work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
+    sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+        table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
                                                               max_retries, retry_delay)
-    workflows = initialise_workflows(transmission, party_key, persistence_store, store_retries)
 
+    workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store, store_retries)
     start_tornado_server(data_dir, workflows)
 
 
