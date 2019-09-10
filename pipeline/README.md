@@ -28,7 +28,7 @@ of the same environment are performed. These tables must have a primary key name
   creating a task definition from the console, if available.
   - This role also needs a policy to allow it to fetch the required secrets from AWS secrets manager (see
   [below section](#global-variables) for details of the required secrets). This policy should look like:
-  ```
+```
   {
     "Version": "2012-10-17",
     "Statement": [
@@ -42,7 +42,7 @@ of the same environment are performed. These tables must have a primary key name
         }
     ]
 }
-  ```
+```
 - An IAM role for the MHS containers to use to run as (the `TASK_ROLE` mentioned [below](#global-variables)).
 This should have the policy:
 ```
