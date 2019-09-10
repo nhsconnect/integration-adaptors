@@ -23,9 +23,6 @@ RECEIVED_MESSAGE_ID = "received_message_id"
 
 EBXML_NAMESPACE = "eb"
 SOAP_NAMESPACE = "SOAP"
-SOAP_ENV_NAMESPACE = "SOAP-ENV"
-WSA_NAMESPACE = "wsa"
-HL7_NAMESPACE = "hl7"
 
 NAMESPACES = {SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
               EBXML_NAMESPACE: "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"}
@@ -80,16 +77,13 @@ class EbxmlEnvelope(envelope.Envelope):
         return message_id, http_headers, message
 
     @staticmethod
-    def _add_if_present(values_dict: Dict[str, Any], key: str, value: Any):
+    def _add_if_present(values_dict: Dict[str, Any], key: str, value: Optional[Any]):
         if value is not None:
             values_dict[key] = value
 
     @staticmethod
     def _add_flag(values_dict: Dict[str, Any], key: str, value: Optional[Any]):
-        if value is not None:
-            values_dict[key] = True
-        else:
-            values_dict[key] = False
+        values_dict[key] = True if value is not None else False
 
     @staticmethod
     def parse_message(xml_tree: Element) -> Dict[str, str]:

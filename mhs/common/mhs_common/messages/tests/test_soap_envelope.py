@@ -1,14 +1,14 @@
-import os
 from unittest import TestCase
 from unittest.mock import patch
 from pathlib import Path
 
 from builder import pystache_message_builder
+from definitions import ROOT_DIR
 from mhs_common.messages import soap_envelope
 from utilities import file_utilities
 from utilities import message_utilities
 
-EXPECTED_SOAP = "soap_request.xml"
+EXPECTED_SOAP = "soap_request.msg"
 
 SOAP_HEADERS = {'name': 'value'}
 EXPECTED_MESSAGE = '<QUPA_IN040000UK32 xmlns="urn:hl7-org:v3" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" ' \
@@ -58,9 +58,8 @@ def expected_values(message=None):
 class TestSoapRequestEnvelope(TestCase):
 
     def setUp(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.message_dir = Path(current_dir) / MESSAGE_DIR
-        expected_message_dir = Path(current_dir) / EXPECTED_MESSAGES_DIR
+        self.message_dir = Path(ROOT_DIR) / MESSAGE_DIR
+        expected_message_dir = Path(ROOT_DIR) / EXPECTED_MESSAGES_DIR
 
         expected_message = file_utilities.FileUtilities.get_file_string(str(expected_message_dir / EXPECTED_SOAP))
         # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
@@ -71,8 +70,6 @@ class TestSoapRequestEnvelope(TestCase):
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_serialize(self, mock_get_uuid, mock_get_timestamp):
-        mock_get_uuid.return_value = MOCK_UUID
-        mock_get_timestamp.return_value = MOCK_TIMESTAMP
 
         envelope = soap_envelope.SoapEnvelope(get_test_message_dictionary())
 
@@ -102,12 +99,7 @@ class TestSoapRequestEnvelope(TestCase):
         self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(self.normalized_expected_serialized_message, normalized_message)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_serialize_required_tags(self, mock_get_uuid, mock_get_timestamp):
-        mock_get_uuid.return_value = MOCK_UUID
-        mock_get_timestamp.return_value = MOCK_TIMESTAMP
-
+    def test_serialize_required_tags(self):
         for required_tag in get_test_message_dictionary().keys():
             with self.subTest(required_tag=required_tag):
                 if required_tag != soap_envelope.MESSAGE_ID:

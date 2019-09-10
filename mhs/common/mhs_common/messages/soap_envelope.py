@@ -1,11 +1,11 @@
 """This module defines the envelope used to wrap synchronous messages to be sent to a remote MHS."""
 import copy
 import json
-import os
 from xml import etree
 
 import lxml.etree as ET
 
+from definitions import ROOT_DIR
 from mhs_common.messages import envelope
 from typing import Dict, Tuple, Union
 from utilities import integration_adaptors_logger as log, message_utilities
@@ -17,23 +17,16 @@ CONTENT_TYPE_HEADER_NAME = "Content-Type"
 XSLT_DIR='xslt'
 SOAP_HEADER_XSLT='soap_header.xslt'
 SOAP_BODY_XSLT='soap_body.xslt'
-FROM_ASID = "from_asid"
-TO_ASID = "to_asid"
-SERVICE = "service"
-ACTION = "action"
-MESSAGE_ID = 'message_id'
-TIMESTAMP = 'timestamp'
-MESSAGE = 'hl7_message'
 
-REQUIRED_SOAP_ELEMENTS = [FROM_ASID, TO_ASID, MESSAGE_ID, SERVICE, ACTION, MESSAGE]
+REQUIRED_SOAP_ELEMENTS = [envelope.FROM_ASID, envelope.TO_ASID, envelope.MESSAGE_ID, envelope.SERVICE, envelope.ACTION,
+                          envelope.MESSAGE]
 
 SOAP_TEMPLATE = "soap_request"
 
 logger = log.IntegrationAdaptorsLogger('SOAP_ENVELOPE')
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-soap_header_transformer_path = str(Path(current_dir) / XSLT_DIR / SOAP_HEADER_XSLT)
-soap_body_transformer_path = str(Path(current_dir) / XSLT_DIR / SOAP_BODY_XSLT)
+soap_header_transformer_path = str(Path(ROOT_DIR) / XSLT_DIR / SOAP_HEADER_XSLT)
+soap_body_transformer_path = str(Path(ROOT_DIR) / XSLT_DIR / SOAP_BODY_XSLT)
 
 
 class SoapEnvelope(envelope.Envelope):
