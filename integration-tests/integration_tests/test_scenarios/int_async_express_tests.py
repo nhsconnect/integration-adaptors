@@ -81,12 +81,5 @@ class TestSyncAsyncWrapper(TestCase):
                         "Async Express outbound test failed")
 
         root = ET.ElementTree(ET.fromstring(outbound_response.text)).getroot()
-        self.assertTrue(self.does_contain_success_code(root))
-
-    def does_contain_success_code(self, root):
-        for child in root.iter():
-            if child.tag == '{urn:hl7-org:v3}queryResponseCode':
-                self.assertEqual(child.attrib['code'], 'OK')
-                return True
-
-        return False
+        element = list(root.iter('{urn:hl7-org:v3}queryResponseCode'))[0]
+        self.assertEqual('OK', element.attrib['code'])
