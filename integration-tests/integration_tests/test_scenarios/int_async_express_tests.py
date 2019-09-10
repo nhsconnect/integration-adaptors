@@ -81,5 +81,5 @@ class TestSyncAsyncWrapper(TestCase):
                         "Async Express outbound test failed")
 
         root = ET.ElementTree(ET.fromstring(outbound_response.text)).getroot()
-        element = list(root.iter('{urn:hl7-org:v3}queryResponseCode'))[0]
+        element = root.find('.//hl7:queryResponseCode', namespaces={'hl7': 'urn:hl7-org:v3'})
         self.assertEqual('OK', element.attrib['code'])
