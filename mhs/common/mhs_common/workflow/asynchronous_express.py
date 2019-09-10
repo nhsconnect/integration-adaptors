@@ -1,8 +1,6 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
 from typing import Tuple, Optional, AnyStr
-from xml.etree import ElementTree
-
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
