@@ -145,4 +145,4 @@ class InboundHandler(tornado.web.RequestHandler):
         return request_message
 
     def _is_async_request(self):
-        return self.request.headers[CONTENT_TYPE_HEADER_NAME] in ebxml_request_envelope.EBXML_CONTENT_TYPE_VALUE
+        return 'multipart/related' in self.request.headers[CONTENT_TYPE_HEADER_NAME]
