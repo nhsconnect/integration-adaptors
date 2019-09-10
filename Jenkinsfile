@@ -3,6 +3,10 @@ pipeline {
         label 'jenkins-workers'
     }
 
+    options {
+        lock('integration-test-environment')
+    }
+
     environment {
       BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
     }
@@ -64,7 +68,9 @@ pipeline {
                             -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
                             -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
                             -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
-                            -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME}
+                            -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
+                            -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                            -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
                         """
                 }
             }
@@ -110,7 +116,9 @@ pipeline {
                         -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
                         -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
                         -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
-                        -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME}
+                        -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
+                        -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                        -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
                      """
             }
         }
