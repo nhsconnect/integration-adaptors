@@ -37,6 +37,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
                                                                                  'payload',
                                                                                  async_workflow
                                                                                  )
+
         wd_mock.assert_called_with(self.work_description_store,
                                    'id123',
                                    workflow.SYNC_ASYNC,
