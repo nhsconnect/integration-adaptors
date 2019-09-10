@@ -35,7 +35,7 @@ class DummyCommonWorkflow(common.CommonWorkflow):
         pass
 
 
-class TestAsynchronousExpressWorkflow(unittest.TestCase):
+class TestCommonWorkflow(unittest.TestCase):
     def setUp(self):
         self.mock_routing_reliability = mock.MagicMock()
 
@@ -51,6 +51,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         url, to_party_key, cpa_id = await self.workflow._lookup_endpoint_details(INTERACTION_DETAILS)
 
+        self.mock_routing_reliability.get_end_point.assert_called_with(SERVICE_ID)
         self.assertEqual(url, MHS_END_POINT_VALUE)
         self.assertEqual(to_party_key, MHS_TO_PARTY_KEY_VALUE)
         self.assertEqual(cpa_id, MHS_CPA_ID_VALUE)

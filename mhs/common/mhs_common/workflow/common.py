@@ -55,9 +55,7 @@ class CommonWorkflow(abc.ABC):
 
     async def _lookup_endpoint_details(self, interaction_details: Dict) -> Tuple[str, str, str]:
         try:
-            service = interaction_details[ebxml_envelope.SERVICE]
-            action = interaction_details[ebxml_envelope.ACTION]
-            service_id = service + ":" + action
+            service_id = await self._build_service_id(interaction_details)
 
             logger.info('0001', 'Looking up endpoint details for {service_id}.', {'service_id': service_id})
             endpoint_details = await self.routing_reliability.get_end_point(service_id)
@@ -69,7 +67,8 @@ class CommonWorkflow(abc.ABC):
                         {'service_id': service_id, 'url': url, 'to_party_key': to_party_key, 'cpa_id': cpa_id})
             return url, to_party_key, cpa_id
         except Exception as e:
-            logger.warning('0003', 'Error encountered whilst obtaining outbound URL. {Exception}', {'Exception': e})
+            logger.warning('0003', 'Error encountered whilst retrieving endpoint details. {Exception}',
+                           {'Exception': e})
             raise e
 
     @staticmethod
@@ -87,3 +86,12 @@ class CommonWorkflow(abc.ABC):
                                    '{urls_received}', {'url': url, 'urls_received': endpoint_urls})
 
         return url
+
+    @staticmethod
+    async def _build_service_id(interaction_details):
+        service = interaction_details[ebxml_envelope.SERVICE]
+        action = interaction_details[ebxml_envelope.ACTION]
+
+        service_id = service + ":" + action
+
+        return service_id
