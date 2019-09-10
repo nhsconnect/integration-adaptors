@@ -14,12 +14,18 @@ from pathlib import Path
 SOAP_CONTENT_TYPE_VALUE = 'text/xml'
 CONTENT_TYPE_HEADER_NAME = "Content-Type"
 
-XSLT_DIR='xslt'
+XSLT_DIR='mhs_common/messages/xslt'
 SOAP_HEADER_XSLT='soap_header.xslt'
 SOAP_BODY_XSLT='soap_body.xslt'
+FROM_ASID = "from_asid"
+TO_ASID = "to_asid"
+SERVICE = "service"
+ACTION = "action"
+MESSAGE_ID = 'message_id'
+TIMESTAMP = 'timestamp'
+MESSAGE = 'hl7_message'
 
-REQUIRED_SOAP_ELEMENTS = [envelope.FROM_ASID, envelope.TO_ASID, envelope.MESSAGE_ID, envelope.SERVICE, envelope.ACTION,
-                          envelope.MESSAGE]
+REQUIRED_SOAP_ELEMENTS = [FROM_ASID, TO_ASID, MESSAGE_ID, SERVICE, ACTION, MESSAGE]
 
 SOAP_TEMPLATE = "soap_request"
 

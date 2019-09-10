@@ -8,7 +8,7 @@ from mhs_common.messages import soap_envelope
 from utilities import file_utilities
 from utilities import message_utilities
 
-EXPECTED_SOAP = "soap_request.msg"
+EXPECTED_SOAP = "soap_request.xml"
 
 SOAP_HEADERS = {'name': 'value'}
 EXPECTED_MESSAGE = '<QUPA_IN040000UK32 xmlns="urn:hl7-org:v3" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" ' \
@@ -25,8 +25,8 @@ EXPECTED_VALUES = {
     soap_envelope.SERVICE: "https://pds-sync.national.ncrs.nhs.uk/syncservice-pds/pds"
 }
 
-EXPECTED_MESSAGES_DIR = "expected_messages"
-MESSAGE_DIR = "test_messages"
+EXPECTED_MESSAGE_DIR = "mhs_common/messages/tests/expected_messages"
+TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
 
 EXPECTED_HTTP_HEADERS = {
     'charset': 'UTF-8',
@@ -58,10 +58,10 @@ def expected_values(message=None):
 class TestSoapRequestEnvelope(TestCase):
 
     def setUp(self):
-        self.message_dir = Path(ROOT_DIR) / MESSAGE_DIR
-        expected_message_dir = Path(ROOT_DIR) / EXPECTED_MESSAGES_DIR
+        self.expected_message_dir = Path(ROOT_DIR) / EXPECTED_MESSAGE_DIR
+        self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
-        expected_message = file_utilities.FileUtilities.get_file_string(str(expected_message_dir / EXPECTED_SOAP))
+        expected_message = file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_SOAP))
         # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
         # file, so normalize the line endings of the strings being compared
         self.normalized_expected_serialized_message = file_utilities.FileUtilities.normalize_line_endings(
@@ -70,6 +70,8 @@ class TestSoapRequestEnvelope(TestCase):
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_serialize(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_uuid.return_value = MOCK_UUID
+        mock_get_timestamp.return_value = MOCK_TIMESTAMP
 
         envelope = soap_envelope.SoapEnvelope(get_test_message_dictionary())
 
@@ -112,7 +114,7 @@ class TestSoapRequestEnvelope(TestCase):
 
     def test_from_string(self):
         with self.subTest("A valid request containing a payload"):
-            message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "soap_request.msg"))
+            message = file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_SOAP))
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
 
             parsed_message = soap_envelope.SoapEnvelope.from_string(SOAP_HEADERS, message)
@@ -121,7 +123,7 @@ class TestSoapRequestEnvelope(TestCase):
 
         with self.subTest("A soap message with missing message id"):
             message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "soap_request_with_defect.msg"))
+                str(self.test_message_dir / "soap_request_with_defect.msg"))
 
             with self.assertRaisesRegex(
                     soap_envelope.SoapParsingError, "Weren't able to find required element message_id "
