@@ -4,7 +4,7 @@ pipeline {
     }
 
     options {
-        disableConcurrentBuilds()
+        lock('integration-test-environment')
     }
 
     environment {
