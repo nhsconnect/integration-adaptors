@@ -3,6 +3,10 @@ pipeline {
         label 'jenkins-workers'
     }
 
+    options {
+        disableConcurrentBuilds()
+    }
+
     environment {
       BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
     }
@@ -46,73 +50,46 @@ pipeline {
             }
         }
 
-        lock('integration-test-environment') {
-            stage('Deploy') {
-                steps {
-                    dir('pipeline/terraform/test-environment') {
-                        sh label: 'Initialising Terraform', script: 'terraform init -input=false'
-                        sh label: 'Applying Terraform configuration', script: """
-                                terraform apply -auto-approve \
-                                -var cluster_id=${CLUSTER_ID} \
-                                -var ecr_address=${DOCKER_REPOSITORY} \
-                                -var scr_ecr_address=${SCR_REPOSITORY} \
-                                -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                                -var build_id=${BUILD_TAG} \
-                                -var mhs_log_level=DEBUG \
-                                -var mhs_state_table_name=mhs-state \
-                                -var scr_log_level=DEBUG \
-                                -var scr_service_port=${SCR_SERVICE_PORT} \
-                                -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
-                                -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
-                                -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
-                                -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
-                                -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
-                                -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
-                            """
-                    }
+        stage('Deploy') {
+            steps {
+                dir('pipeline/terraform/test-environment') {
+                    sh label: 'Initialising Terraform', script: 'terraform init -input=false'
+                    sh label: 'Applying Terraform configuration', script: """
+                            terraform apply -auto-approve \
+                            -var cluster_id=${CLUSTER_ID} \
+                            -var ecr_address=${DOCKER_REPOSITORY} \
+                            -var scr_ecr_address=${SCR_REPOSITORY} \
+                            -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                            -var build_id=${BUILD_TAG} \
+                            -var mhs_log_level=DEBUG \
+                            -var mhs_state_table_name=mhs-state \
+                            -var scr_log_level=DEBUG \
+                            -var scr_service_port=${SCR_SERVICE_PORT} \
+                            -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
+                            -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
+                            -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
+                            -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
+                            -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                            -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
+                        """
                 }
             }
+        }
 
-            stage('Integration Tests') {
-                steps {
-                    dir('integration-tests') {
-                        sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                        // Wait for MHS container to fully stand up
-                        timeout(2) {
-                            waitUntil {
-                               script {
-                                   def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
-                                   return (r == '405');
-                               }
-                            }
-                         }
-                         sh label: 'Running integration tests', script: 'pipenv run inttests'
-                    }
-                }
-            }
-
-            stage('Cleanup Services') {
-                steps {
-                    dir('pipeline/terraform/test-environment') {
-                    sh label: 'Destroying Terraform configuration', script: """
-                        terraform destroy -auto-approve \
-                        -var cluster_id=${CLUSTER_ID} \
-                        -var ecr_address=${DOCKER_REPOSITORY} \
-                        -var scr_ecr_address=${SCR_REPOSITORY} \
-                        -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                        -var build_id=${BUILD_TAG} \
-                        -var mhs_log_level=DEBUG \
-                        -var mhs_state_table_name=mhs-state \
-                        -var scr_log_level=DEBUG \
-                        -var scr_service_port=${SCR_SERVICE_PORT} \
-                        -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
-                        -var mhs_inbound_queue_username=${MHS_INBOUND_QUEUE_USERNAME} \
-                        -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
-                        -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
-                        -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
-                        -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
-                     """
-                    }
+        stage('Integration Tests') {
+            steps {
+                dir('integration-tests') {
+                    sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                    // Wait for MHS container to fully stand up
+                    timeout(2) {
+                        waitUntil {
+                           script {
+                               def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
+                               return (r == '405');
+                           }
+                        }
+                     }
+                     sh label: 'Running integration tests', script: 'pipenv run inttests'
                 }
             }
         }
