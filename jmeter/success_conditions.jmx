@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.0 r1840935">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="RT_success_conditions" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
@@ -12,133 +12,10 @@
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
     <hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-      </ThreadGroup>
-      <hashTree>
-        <TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="Test Fragment" enabled="false"/>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="MHS_to_Spine_soap_envelop_sample" enabled="false">
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">----=_MIME-Boundary&#xd;
-Content-Id: &lt;ebXMLHeader@spine.nhs.uk&gt;&#xd;
-Content-Type: text/xml; charset=UTF-8&#xd;
-Content-Transfer-Encoding: 8bit&#xd;
-&#xd;
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
-&lt;SOAP:Envelope xmlns:xsi=&quot;http://www.w3c.org/2001/XML-Schema-Instance&quot; xmlns:SOAP=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:eb=&quot;http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd&quot; xmlns:hl7ebxml=&quot;urn:hl7-org:transport/ebXML/DSTUv1.0&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;&#xd;
-&lt;SOAP:Header&gt;&#xd;
-	&lt;eb:MessageHeader SOAP:mustUnderstand=&quot;1&quot; eb:version=&quot;2.0&quot;&gt;&#xd;
-		&lt;eb:From&gt;&#xd;
-			&lt;eb:PartyId eb:type=&quot;urn:nhs:names:partyType:ocs+serviceInstance&quot;&gt;${from_party_id}&lt;/eb:PartyId&gt;&#xd;
-		&lt;/eb:From&gt;&#xd;
-		&lt;eb:To&gt;&#xd;
-			&lt;eb:PartyId eb:type=&quot;urn:nhs:names:partyType:ocs+serviceInstance&quot;&gt;${to_party_id}&lt;/eb:PartyId&gt;&#xd;
-		&lt;/eb:To&gt;&#xd;
-		&lt;eb:CPAId&gt;${cpa_id}&lt;/eb:CPAId&gt;&#xd;
-		&lt;eb:ConversationId&gt;${conversation_id}&lt;/eb:ConversationId&gt;&#xd;
-		&lt;eb:Service&gt;${service}&lt;/eb:Service&gt;&#xd;
-		&lt;eb:Action&gt;${action}&lt;/eb:Action&gt;&#xd;
-		&lt;eb:MessageData&gt;&#xd;
-			&lt;eb:MessageId&gt;${message_id}&lt;/eb:MessageId&gt;&#xd;
-			&lt;eb:Timestamp&gt;${timestamp}&lt;/eb:Timestamp&gt;&#xd;
-		&lt;/eb:MessageData&gt;&#xd;
-        {{#duplicate_elimination}}&#xd;
-        &lt;eb:DuplicateElimination/&gt;&#xd;
-        {{/duplicate_elimination}}&#xd;
-    &lt;/eb:MessageHeader&gt;&#xd;
-    {{#ack_requested}}&#xd;
-    &lt;eb:AckRequested SOAP:mustUnderstand=&quot;1&quot; eb:version=&quot;2.0&quot; eb:signed=&quot;false&quot; SOAP:actor=&quot;{{ack_soap_actor}}&quot;/&gt;&#xd;
-    {{/ack_requested}}&#xd;
-    {{#sync_reply}}&#xd;
-    &lt;eb:SyncReply SOAP:mustUnderstand=&quot;1&quot; eb:version=&quot;2.0&quot; SOAP:actor=&quot;http://schemas.xmlsoap.org/soap/actor/next&quot;/&gt;&#xd;
-    {{/sync_reply}}&#xd;
-&lt;/SOAP:Header&gt;&#xd;
-&lt;SOAP:Body&gt;&#xd;
-	&lt;eb:Manifest SOAP:mustUnderstand=&quot;1&quot; eb:version=&quot;2.0&quot;&gt;&#xd;
-		&lt;eb:Reference xlink:href=&quot;cid:${message_id}@spine.nhs.uk&quot;&gt;&#xd;
-			&lt;eb:Schema eb:location=&quot;http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd&quot; eb:version=&quot;1.0&quot;/&gt;&#xd;
-			&lt;eb:Description xml:lang=&quot;en&quot;&gt;HL7 payload&lt;/eb:Description&gt;&#xd;
-			&lt;hl7ebxml:Payload style=&quot;HL7&quot; encoding=&quot;XML&quot; version=&quot;3.0&quot;/&gt;&#xd;
-		&lt;/eb:Reference&gt;&#xd;
-	&lt;/eb:Manifest&gt;&#xd;
-&lt;/SOAP:Body&gt;&#xd;
-&lt;/SOAP:Envelope&gt;&#xd;
-&#xd;
-----=_MIME-Boundary&#xd;
-Content-Id: &lt;{{message_id}}@spine.nhs.uk&gt;&#xd;
-Content-Type: text/xml; charset=UTF-8&#xd;
-Content-Transfer-Encoding: 8bit&#xd;
-&#xd;
-{{{hl7_message}}}&#xd;
-----=_MIME-Boundary--</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">8080</stringProp>
-          <stringProp name="HTTPSampler.protocol"></stringProp>
-          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path"></stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout"></stringProp>
-        </HTTPSamplerProxy>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TEST_SANDPIT" enabled="false">
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">${test}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-          <stringProp name="HTTPSampler.domain"></stringProp>
-          <stringProp name="HTTPSampler.port"></stringProp>
-          <stringProp name="HTTPSampler.protocol"></stringProp>
-          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path"></stringProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-          <stringProp name="HTTPSampler.response_timeout"></stringProp>
-        </HTTPSamplerProxy>
-        <hashTree/>
-      </hashTree>
       <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Uniform Random Timer" enabled="true">
         <stringProp name="ConstantTimer.delay">100</stringProp>
         <stringProp name="RandomTimer.range">1000</stringProp>
       </UniformRandomTimer>
-      <hashTree/>
-      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-        <collectionProp name="HeaderManager.headers"/>
-      </HeaderManager>
       <hashTree/>
       <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
@@ -229,14 +106,6 @@ Content-Transfer-Encoding: 8bit&#xd;
         <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
           <collectionProp name="HeaderManager.headers">
             <elementProp name="" elementType="Header">
-              <stringProp name="Header.name">message_id</stringProp>
-              <stringProp name="Header.value"></stringProp>
-            </elementProp>
-            <elementProp name="" elementType="Header">
-              <stringProp name="Header.name">correlation_id</stringProp>
-              <stringProp name="Header.value"></stringProp>
-            </elementProp>
-            <elementProp name="" elementType="Header">
               <stringProp name="Header.name">Interaction-Id</stringProp>
               <stringProp name="Header.value">QUPC_IN160101UK05</stringProp>
             </elementProp>
@@ -323,30 +192,7 @@ Content-Transfer-Encoding: 8bit&#xd;
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="false">
-          <collectionProp name="Asserion.test_strings">
-            <stringProp name="49586">200</stringProp>
-          </collectionProp>
-          <stringProp name="Assertion.test_field">Assertion.response_message</stringProp>
-          <boolProp name="Assertion.assume_success">false</boolProp>
-          <intProp name="Assertion.test_type">2</intProp>
-          <stringProp name="Assertion.custom_message"></stringProp>
-        </ResponseAssertion>
-        <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Inbound Message Samples" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-      </ThreadGroup>
-      <hashTree/>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Forward_Reliable_Pattern" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
@@ -360,7 +206,16 @@ Content-Transfer-Encoding: 8bit&#xd;
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP2GP_Common_Content_Large_Messageing_Fwrd_Reliable" enabled="false">
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Interaction-Id</stringProp>
+              <stringProp name="Header.value">COPC_IN000001UK01</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP2GP_Common_Content_Large_Messageing_Fwrd_Reliable" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -456,7 +311,16 @@ Content-Transfer-Encoding: 8bit&#xd;
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP_Summary_Async_Reliable" enabled="false">
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Interaction-Id</stringProp>
+              <stringProp name="Header.value">REPC_IN150016UK05</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GP_Summary_Async_Reliable" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -566,7 +430,7 @@ Content-Transfer-Encoding: 8bit&#xd;
           <stringProp name="HTTPSampler.port">80</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/gp_summary_upload</stringProp>
+          <stringProp name="HTTPSampler.path"></stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -591,7 +455,16 @@ Content-Transfer-Encoding: 8bit&#xd;
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PDS_Retrieval_Query_Synch" enabled="false">
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Interaction-Id</stringProp>
+              <stringProp name="Header.value">QUPA_IN040000UK32</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PDS_Retrieval_Query_Synch" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -650,7 +523,7 @@ Content-Transfer-Encoding: 8bit&#xd;
           <stringProp name="HTTPSampler.port">80</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/pds_retrieval</stringProp>
+          <stringProp name="HTTPSampler.path"></stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
