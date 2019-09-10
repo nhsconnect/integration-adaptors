@@ -3,6 +3,10 @@ pipeline {
         label 'jenkins-workers'
     }
 
+    options {
+        lock('integration-test-environment')
+    }
+
     environment {
       BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
       ENVIRONMENT_ID = "build"
