@@ -7,6 +7,10 @@ import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs_common.workflow as workflow
 import tornado.web
+from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID, \
+    CONTENT_TYPE_HEADER_NAME
+from mhs_common.messages.soap_envelope import SoapEnvelope, SoapParsingError
+
 from mhs_common.state import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.state.persistence_adaptor import PersistenceAdaptor
@@ -37,17 +41,16 @@ class InboundHandler(tornado.web.RequestHandler):
     async def post(self):
         logger.info('001', 'Inbound POST received: {request}', {'request': self.request})
 
-        try:
-            request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
-                                                                                      self.request.body.decode())
-        except ebxml_envelope.EbXmlParsingError as e:
-            logger.error('020', 'Failed to parse response: {exception}', {'exception': e})
-            raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
-                                        reason=f'Exception during inbound message parsing {e}') from e
+        if self._is_async_request():
+            request_message = self._extract_incoming_async_request_message()
+        else:
+            request_message = self._extract_incoming_sync_request_message()
 
-        ref_to_message_id = self.extract_ref_message(request_message)
+        ref_to_message_id = self._extract_ref_message(request_message)
         correlation_id = self._extract_correlation_id(request_message)
         self._extract_message_id(request_message)
+
+        received_message = request_message.message_dictionary[MESSAGE]
 
         try:
             work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
@@ -61,7 +64,7 @@ class InboundHandler(tornado.web.RequestHandler):
         message_workflow = self.workflows[work_description.workflow]
         logger.info('004', 'Retrieved work description from state store, forwarding message to {workflow}',
                     {'workflow': message_workflow})
-        received_message = request_message.message_dictionary[ebxml_request_envelope.MESSAGE]
+
         try:
             await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
                                                           received_message)
@@ -93,7 +96,7 @@ class InboundHandler(tornado.web.RequestHandler):
         self.write(serialized_message)
 
     def _extract_correlation_id(self, message):
-        correlation_id = message.message_dictionary[ebxml_envelope.CONVERSATION_ID]
+        correlation_id = message.message_dictionary[CONVERSATION_ID]
         log.correlation_id.set(correlation_id)
         logger.info('007', 'Set correlation id from inbound request.')
         return correlation_id
@@ -104,17 +107,42 @@ class InboundHandler(tornado.web.RequestHandler):
         :param message:
         :return:
         """
-        message_id = message.message_dictionary[ebxml_envelope.MESSAGE_ID]
+        message_id = message.message_dictionary[MESSAGE_ID]
         log.inbound_message_id.set(message_id)
         logger.info('009', 'Found inbound message id on request.')
 
-    def extract_ref_message(self, message):
+    def _extract_ref_message(self, message):
         """
         Extracts the reference-to message id and assigns it as the message Id in logging
         :param message:
         :return: the message id the inbound message is a response to
         """
-        message_id = message.message_dictionary[ebxml_envelope.RECEIVED_MESSAGE_ID]
+        message_id = message.message_dictionary[RECEIVED_MESSAGE_ID]
         log.message_id.set(message_id)
         logger.info('010', 'Found message id on inbound message.')
         return message_id
+
+    def _extract_incoming_async_request_message(self):
+        try:
+            request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
+                                                                                      self.request.body.decode())
+        except ebxml_envelope.EbXmlParsingError as e:
+            logger.error('020', 'Failed to parse response: {exception}', {'exception': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
+                                        reason=f'Exception during inbound message parsing {e}') from e
+
+        return request_message
+
+    def _extract_incoming_sync_request_message(self):
+        try:
+            request_message = SoapEnvelope.from_string(self.request.headers,
+                                                                     self.request.body.decode())
+        except SoapParsingError as e:
+            logger.error('020', 'Failed to parse response: {exception}', {'exception': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
+                                        reason=f'Exception during inbound message parsing {e}') from e
+
+        return request_message
+
+    def _is_async_request(self):
+        return self.request.headers[CONTENT_TYPE_HEADER_NAME] in ebxml_request_envelope.EBXML_CONTENT_TYPE_VALUE
