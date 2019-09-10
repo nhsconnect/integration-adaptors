@@ -43,10 +43,7 @@ def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_i
     if pass_correlation_id:
         headers['Correlation-Id'] = correlation_id
 
-    if sync_async:
-        headers['sync-async'] = 'true'
-    else:
-        headers['sync-async'] = 'false'
+    headers['sync-async'] = 'true' if sync_async else 'false'
 
     return requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
 

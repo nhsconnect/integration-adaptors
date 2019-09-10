@@ -72,7 +72,6 @@ class FunctionalTest(TestCase):
 class TestSyncAsyncWrapper(TestCase):
 
     def test_async_express_sync_async_wrap(self):
-        # the response is just an acknowledgement from spine...
         outbound_response, _, _ = methods.get_interaction_from_template('async express',
                                                                         'QUPC_IN160101UK05',
                                                                         '9689177621',
@@ -82,7 +81,6 @@ class TestSyncAsyncWrapper(TestCase):
                         "Async Express outbound test failed")
 
         root = ET.ElementTree(ET.fromstring(outbound_response.text)).getroot()
-
         self.assertTrue(self.does_contain_success_code(root))
 
     def does_contain_success_code(self, root):
