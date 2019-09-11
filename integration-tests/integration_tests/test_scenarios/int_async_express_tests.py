@@ -99,4 +99,4 @@ class TestSyncAsyncWrapper(TestCase):
                                                              nhs_id,
                                                              'Asynchronous Express test',
                                                              sync_async=True)
-        assert (result.status_code == 200)
+        self.assertEqual(result.status_code, 200)
