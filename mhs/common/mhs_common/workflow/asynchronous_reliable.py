@@ -11,6 +11,7 @@ from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous
+from mhs_common.routing import routing_reliability
 from exceptions import MaxRetriesExceeded
 import asyncio
 
@@ -23,11 +24,14 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
                  inbound_queue_max_retries: int = None,
-                 inbound_queue_retry_delay: int = None):
+                 inbound_queue_retry_delay: int = None,
+                 persistence_store_max_retries: int = None,
+                 routing: routing_reliability.RoutingAndReliability = None):
 
         super(AsynchronousReliableWorkflow, self).__init__(party_key, persistence_store, transmission,
                                                            queue_adaptor, inbound_queue_max_retries,
-                                                           inbound_queue_retry_delay)
+                                                           inbound_queue_retry_delay, persistence_store_max_retries,
+                                                           routing)
 
     @timing.time_function
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,

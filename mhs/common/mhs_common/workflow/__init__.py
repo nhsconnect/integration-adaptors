@@ -3,16 +3,16 @@ from typing import Dict
 
 from comms import queue_adaptor
 
+from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.asynchronous_express import AsynchronousExpressWorkflow
 from mhs_common.workflow.asynchronous_reliable import AsynchronousReliableWorkflow
 from mhs_common.workflow.common import CommonWorkflow
 from mhs_common.workflow.intermediary_reliable import IntermediaryReliableWorkflow
-from mhs_common.workflow.synchronous import SynchronousWorkflow
 from mhs_common.workflow.sync_async import SyncAsyncWorkflow
-from mhs_common.workflow.sync_async_resynchroniser import  SyncAsyncResynchroniser
-
+from mhs_common.workflow.sync_async_resynchroniser import SyncAsyncResynchroniser
+from mhs_common.workflow.synchronous import SynchronousWorkflow
 
 ASYNC_EXPRESS = 'async-express'
 ASYNC_RELIABLE = 'async-reliable'
@@ -30,7 +30,8 @@ def get_workflow_map(party_key: str = None,
                      sync_async_store_retry_delay: int = None,
                      inbound_queue_max_retries: int = None,
                      inbound_queue_retry_delay: int = None,
-                     resynchroniser: SyncAsyncResynchroniser = None
+                     resynchroniser: SyncAsyncResynchroniser = None,
+                     routing: routing_reliability.RoutingAndReliability = None
                      ) -> Dict[str, CommonWorkflow]:
     """
     Get a map of workflows. Keys for each workflow should correspond with keys used in interactions.json
@@ -45,7 +46,8 @@ def get_workflow_map(party_key: str = None,
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(party_key, work_description_store, transmission,
                                                    inbound_async_queue, inbound_queue_max_retries,
                                                    inbound_queue_retry_delay,
-                                                   persistence_store_max_retries=persistence_store_max_retries),
+                                                   persistence_store_max_retries=persistence_store_max_retries,
+                                                   routing=routing),
         FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
 
         SYNC_ASYNC: SyncAsyncWorkflow(sync_async_store=sync_async_store,

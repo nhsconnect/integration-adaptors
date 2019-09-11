@@ -30,6 +30,16 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - MHS_RESYNC_INTERVAL=1
       - MAX_RESYNC_RETRIES=20
+      - MHS_SPINE_ROUTE_LOOKUP_URL=http://spineroutelookup:80
+      - MHS_SPINE_ORG_CODE=YES
+  spineroutelookup:
+    image: local/mhs-spineroutelookup
+    ports:
+      - "8080:80"
+    environment:
+      - MHS_LOG_LEVEL=NOTSET
+      - MHS_SDS_URL=ldap://msg.opentest.hscic.gov.uk
+      - MHS_DISABLE_SDS_TLS=True
   dynamodb:
     build: ./common/local-env/dynamodb-local
     ports:

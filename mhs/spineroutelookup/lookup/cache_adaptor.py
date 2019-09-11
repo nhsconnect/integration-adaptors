@@ -1,10 +1,14 @@
 """This module defines the cache adaptor interface, used to allow support for multiple message configuration caching
 implementations."""
 
+from __future__ import annotations
+
 import abc
-from typing import Optional, Dict
+from typing import Optional, Dict, Type
 
 FIFTEEN_MINUTES_IN_SECONDS = 900
+
+implementations: Dict[str, Type[CacheAdaptor]] = {}
 
 
 class CacheAdaptor(abc.ABC):

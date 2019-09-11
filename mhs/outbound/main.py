@@ -10,10 +10,12 @@ import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
+from mhs_common.routing import routing_reliability
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
+from mhs_common.workflow import sync_async_resynchroniser as resync
+
 import outbound.request.synchronous.handler as client_request_handler
 from outbound.transmission import outbound_transmission
-from mhs_common.workflow import sync_async_resynchroniser as resync
 
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
@@ -33,13 +35,18 @@ def load_party_key(data_dir: pathlib.Path) -> str:
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
                          work_description_store: persistence_adaptor.PersistenceAdaptor,
                          sync_async_store: persistence_adaptor.PersistenceAdaptor,
-                         persistence_store_retries: int) \
+                         persistence_store_retries: int,
+                         routing: routing_reliability.RoutingAndReliability) \
         -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
-    :param sync_async_store:
     :param transmission: The transmission object to be used to make requests to the spine endpoints
     :param party_key: The party key to use to identify this MHS.
-    :param work_description_store: The persistence adaptor for the state database
+    :param work_description_store: The persistence adaptor for the state database.
+    :param sync_async_store: The persistence adaptor for the sync-async database.
+    :param persistence_store_retries The number of times to retry storing values in the work description or sync-async
+    databases.
+    :param routing: The routing and reliability component to use to request routing/reliability details
+    from.
     :return: The workflows that can be used to handle messages.
     """
 
@@ -51,7 +58,8 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
                                      work_description_store=work_description_store,
                                      transmission=transmission,
                                      resynchroniser=resynchroniser,
-                                     persistence_store_max_retries=persistence_store_retries
+                                     persistence_store_max_retries=persistence_store_retries,
+                                     routing=routing
                                      )
 
 
@@ -93,10 +101,15 @@ def main():
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
+    spine_route_lookup_url = config.get_config('SPINE_ROUTE_LOOKUP_URL')
+    spine_org_code = config.get_config('SPINE_ORG_CODE')
+    routing = routing_reliability.RoutingAndReliability(spine_route_lookup_url, spine_org_code)
+
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
                                                               max_retries, retry_delay)
 
-    workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store, store_retries)
+    workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store, store_retries,
+                                     routing)
     start_tornado_server(data_dir, workflows)
 
 

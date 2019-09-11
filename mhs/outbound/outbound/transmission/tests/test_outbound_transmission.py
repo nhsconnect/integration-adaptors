@@ -63,7 +63,11 @@ class TestOutboundTransmission(TestCase):
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
-                                          validate_cert=True
+                                          # ****************************************************************************
+                                          # This SHOULD be true, but we must temporarily set it to false due to Opentest
+                                          # limitations.
+                                          # ****************************************************************************
+                                          validate_cert=False
                                           )
 
             self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")

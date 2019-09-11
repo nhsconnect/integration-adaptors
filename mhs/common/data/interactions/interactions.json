@@ -1,13 +1,8 @@
 {
   "QUPC_IN160101UK05": {
     "workflow": "async-express",
-    "url": "https://msg.opentest.hscic.gov.uk/sync-service",
-    "request_type": "POST",
     "service": "urn:nhs:names:services:psisquery",
     "action": "QUPC_IN160101UK05",
-    "async_response_expected": true,
-    "to_party_id": "YES-0000806",
-    "cpa_id": "S20001A000182",
     "duplicate_elimination": false,
     "ack_requested": false,
     "ack_soap_actor": "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
@@ -29,13 +24,9 @@
     "sync_reply": true
   },
   "gp_summary_upload": {
-    "url": "https://msg.opentest.hscic.gov.uk/reliablemessaging/reliablerequest",
-    "request_type": "POST",
     "service": "urn:nhs:names:services:psis",
     "action": "REPC_IN150016UK05",
     "async_response_expected": true,
-    "to_party_id": "YES-0000806",
-    "cpa_id": "S20001A000182",
     "duplicate_elimination": true,
     "ack_requested": true,
     "ack_soap_actor": "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
