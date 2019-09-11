@@ -81,6 +81,7 @@ resource "aws_lb" "inbound_nlb" {
   internal = true
   load_balancer_type = "network"
   subnets = aws_subnet.mhs_subnet.*.id
+  enable_cross_zone_load_balancing = true
 
   tags = {
     Name = "${var.environment_id}-mhs-inbound-nlb"
