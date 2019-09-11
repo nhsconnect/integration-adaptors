@@ -3,11 +3,41 @@
 from __future__ import annotations
 
 import abc
-from typing import Dict, Tuple
+import pathlib
+from typing import Dict, Tuple, Any
+from definitions import ROOT_DIR
+
+from builder import pystache_message_builder
+
+FROM_PARTY_ID = "from_party_id"
+TO_PARTY_ID = "to_party_id"
+CPA_ID = "cpa_id"
+CONVERSATION_ID = 'conversation_id'
+SERVICE = "service"
+ACTION = "action"
+MESSAGE_ID = 'message_id'
+TIMESTAMP = 'timestamp'
+TO_ASID = 'to_asid'
+FROM_ASID = 'from_asid'
+RECEIVED_MESSAGE_ID = "received_message_id"
+MESSAGE = "hl7_message"
+CONTENT_TYPE_HEADER_NAME = "Content-Type"
+TEMPLATES_DIR = "data/templates"
 
 
 class Envelope(abc.ABC):
     """An envelope that contains a message to be sent to a remote MHS."""
+
+    def __init__(self, template_file: str, message_dictionary: Dict[str, Any]):
+        """Create a new EbxmlEnvelope that populates the specified template file with the provided dictionary.
+
+        :param template_file: The template file to populate with values.
+        :param message_dictionary: The dictionary of values to use when populating the template.
+        """
+        self.message_dictionary = message_dictionary
+
+        ebxml_template_dir = str(pathlib.Path(ROOT_DIR) / TEMPLATES_DIR)
+        self.message_builder = pystache_message_builder.PystacheMessageBuilder(ebxml_template_dir, template_file)
 
     @abc.abstractmethod
     def serialize(self) -> Tuple[str, Dict[str, str], str]:

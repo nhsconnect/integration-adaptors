@@ -1,6 +1,7 @@
 import os
 import pathlib
 import unittest.mock
+from unittest import skip
 
 import mhs_common.workflow as workflow
 import tornado.testing
@@ -10,17 +11,19 @@ import utilities.integration_adaptors_logger as log
 import utilities.message_utilities as message_utilities
 import utilities.test_utilities as test_utilities
 import utilities.xml_utilities as xml_utilities
-from mhs_common.state import work_description as wd
-
 import inbound.request.handler as handler
+
+from mhs_common.state import work_description as wd
 
 MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
-EXPECTED_RESPONSE_FILE = "ebxml_ack.xml"
+EXPECTED_ASYNC_RESPONSE_FILE = "ebxml_ack.xml"
+EXPECTED_SYNC_RESPONSE_FILE = "sync_message.xml"
 UNSOLICITED_REQUEST_FILE = "ebxml_unsolicited.msg"
 NO_REF_FILE = "ebxml_no_reference.msg"
 FROM_PARTY_ID = "FROM-PARTY-ID"
-CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
+ASYNC_CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
+SYNC_CONTENT_TYPE_HEADERS = {"Content-Type": 'text/xml'}
 REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
 CORRELATION_ID = '10F5A436-1913-43F0-9F18-95EA0E43E61A'
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
@@ -82,10 +85,10 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
         expected_ack_response = file_utilities.FileUtilities.get_file_string(
-            str(self.message_dir / EXPECTED_RESPONSE_FILE))
+            str(self.message_dir / EXPECTED_ASYNC_RESPONSE_FILE))
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
@@ -95,7 +98,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     def test_post_unsolicited_message(self):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / UNSOLICITED_REQUEST_FILE))
 
-        response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
         self.assertEqual(response.code, 500)
         message = response.body.decode('utf-8')
@@ -106,7 +109,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     def test_correct_workflow(self):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
         self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
 
         self.assertEqual(ack_response.code, 200)
@@ -115,7 +118,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.mock_workflow.handle_inbound_message.side_effect = Exception("what a failure")
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
-        response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
         self.assertEqual(response.code, 500)
         expected = '<html><title>500: Exception in workflow</title><body>500: Exception in workflow</body></html>'
@@ -124,7 +127,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     def test_no_reference_to_id(self):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / NO_REF_FILE))
 
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
         self.assertEqual(ack_response.code, 500)
 
@@ -134,10 +137,29 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     def test_logging_context_variables_are_set(self, mock_message_id, mock_correlation_id, mock_inbound_message_id):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=CONTENT_TYPE_HEADERS)
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
         self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
 
         self.assertEqual(ack_response.code, 200)
         mock_correlation_id.set.assert_called_with(CORRELATION_ID)
         log.inbound_message_id.set.assert_called_with('C614484E-4B10-499A-9ACD-5D645CFACF61')
         mock_message_id.set.assert_called_with(REF_TO_MESSAGE_ID)
+
+    @skip('Unskip once sync workflow works')
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_receive_sync_message(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+        mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
+        expected_sync_response = file_utilities.FileUtilities.get_file_string(
+            str(self.message_dir / EXPECTED_SYNC_RESPONSE_FILE))
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+
+        sync_response = self.fetch("/", method="POST", body=request_body, headers=SYNC_CONTENT_TYPE_HEADERS)
+
+        self.assertEqual(sync_response.code, 200)
+        self.assertEqual(sync_response.headers["Content-Type"], "text/xml")
+        xml_utilities.XmlUtilities.assert_xml_equal(expected_sync_response, sync_response.body)
+        self.mock_workflow.handle_inbound_message.assert_called_once_with(REF_TO_MESSAGE_ID, CORRELATION_ID,
+                                                                          unittest.mock.ANY, EXPECTED_MESSAGE)
+
