@@ -51,5 +51,16 @@ variable "mhs_inbound_queue_username" {
 variable "mhs_inbound_queue_password" {
   type = string
   description = "The password for the async inbound queue"
-
+}
+variable "mhs_sync_async_state_table_name" {
+  type = string
+  description = "The name of the sync async store table"
+}
+variable "mhs_resynchroniser_max_retries" {
+  type = string
+  description = "The number of retry attempts to the sync-async state store that should be made whilst attempting to resynchronise a sync-async message"
+}
+variable "mhs_resynchroniser_interval"{
+  type = string
+  description = "Time between calls to the sync-async store during resynchronisation"
 }
