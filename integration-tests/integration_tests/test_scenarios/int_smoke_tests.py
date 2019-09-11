@@ -30,7 +30,6 @@ class FunctionalTest(TestCase):
 
     # Message Pattern Type: Synchronous
     # Interaction: PDS Retrieval Query (QUPA_IN040000UK32)
-    @skip('waiting for RT-15 - Implement MHS Synchronous Message Pattern')
     def test_mhs_synchronous(self):
         mhs_response, _, _ = methods.get_interaction_from_template('synchronous',
                                                                    'QUPA_IN040000UK32',

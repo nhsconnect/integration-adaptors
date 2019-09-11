@@ -44,49 +44,54 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         try:
             headers, message = await self._prepare_outbound_message()
-        except Exception as e:
-            # Failed to prepare message
-            logger.warning('002', 'Failed to prepare outbound message')
+        except Exception:
+            logger.error('002', 'Failed to prepare outbound message')
             return 500, 'Failed message preparation'
 
-        logger.info('003', 'About to make outbound request')
-        start_time = timing.get_time()
         try:
-            url = interaction_details['url']
-            response = await self.transmission.make_request(url, headers, message)
-            end_time = timing.get_time()
-        except httpclient.HTTPClientError as e:
-            logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
-                           {'HTTPStatus': e.code, 'Exception': e})
-            self._record_outbound_audit_log(timing.get_time(), start_time,
-                                            wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-
+            url, to_party_key, cpa_id = await self._lookup_endpoint_details(interaction_details)
+        except Exception:
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            return 500, 'Error obtaining outbound URL'
 
-            if e.response:
-                return handle_soap_error(e.response.code, e.response.headers, e.response.body)
-
-            return 500, f'Error(s) received from Spine: {e}'
-        except Exception as e:
-            logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            return 500, 'Error making outbound request'
-
-        if response.code == 200:
-            self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_RES)
-            await wd.update_status_with_retries(wdo,
-                                                wdo.set_outbound_status,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED,
-                                                self.persistence_store_retries)
-            return 202, ''
-        else:
-            logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
-                           {'HTTPStatus': response.code})
-            self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            return 500, "Didn't get expected success response from Spine"
-
-        return (200, "qwe")
+        print(url)
+        return 200, "qwe"
+        # logger.info('003', 'About to make outbound request')
+        # start_time = timing.get_time()
+        # try:
+        #     url = interaction_details['url']
+        #     response = await self.transmission.make_request(url, headers, message)
+        #     end_time = timing.get_time()
+        # except httpclient.HTTPClientError as e:
+        #     logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
+        #                    {'HTTPStatus': e.code, 'Exception': e})
+        #     self._record_outbound_audit_log(timing.get_time(), start_time,
+        #                                     wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+        #
+        #     await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+        #
+        #     if e.response:
+        #         return handle_soap_error(e.response.code, e.response.headers, e.response.body)
+        #
+        #     return 500, f'Error(s) received from Spine: {e}'
+        # except Exception as e:
+        #     logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+        #     await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+        #     return 500, 'Error making outbound request'
+        #
+        # if response.code == 200:
+        #     self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_RES)
+        #     await wd.update_status_with_retries(wdo,
+        #                                         wdo.set_outbound_status,
+        #                                         wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED,
+        #                                         self.persistence_store_retries)
+        #     return 202, ''
+        # else:
+        #     logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
+        #                    {'HTTPStatus': response.code})
+        #     self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        #     await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        #     return 500, "Didn't get expected success response from Spine"
 
     async def _prepare_outbound_message(self):
         return {}, "empty"
