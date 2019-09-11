@@ -113,7 +113,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                {'exception': e, 'retry': retry})
                 retry -= 1
                 if retry == 0:
-                    logger.warning('022', 'Final retry has been attempted for adding message to sync async store')
+                    logger.error('022', 'Final retry has been attempted for adding message to sync async store')
                     raise MaxRetriesExceeded('Max number of retries exceeded whilst attempting to put the message'
                                              'on the sync-async store') from e
 

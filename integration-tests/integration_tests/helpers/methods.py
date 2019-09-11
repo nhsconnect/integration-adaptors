@@ -59,7 +59,7 @@ def get_scr_adaptor_hostname():
 
 
 def get_interaction_from_template(type, template, nhs_number, payload,
-                                  pass_message_id=False, pass_correlation_id=False):
+                                  pass_message_id=False, pass_correlation_id=False, sync_async=False):
     """ Sends the template to be rendered and passed on to the the MHS
 
     :param type: the message type (one of 'async express', 'async reliable', 'synchronous' or 'forward_reliable'
@@ -68,9 +68,11 @@ def get_interaction_from_template(type, template, nhs_number, payload,
     :param payload: the text to be sent on to SPINE
     :param pass_message_id: flag to indicate if we need to pass on the message ID
     :param pass_correlation_id: flag to indicate if we need to pass on the correlation ID
+    :param sync_async: What the sync-async flag of the header should be set to
     :return: the response from the MHS
     """
-    return interactions.process_request(template, get_asid(), nhs_number, payload, pass_message_id, pass_correlation_id)
+    return interactions.process_request(template, get_asid(), nhs_number, payload, pass_message_id, pass_correlation_id,
+                                        sync_async)
 
 
 def get_json(template, patient_nhs_number, payload):
