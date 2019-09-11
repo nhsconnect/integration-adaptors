@@ -6,7 +6,7 @@ from builder.pystache_message_builder import PystacheMessageBuilder
 from scr_definitions import ROOT_DIR
 
 
-class SummaryCareRecord:
+class SummaryCareRecord(object):
     summaryCareRecordPath = Path(ROOT_DIR) / "data/templates"
 
     def __init__(self):

@@ -7,7 +7,7 @@ from utilities import integration_adaptors_logger as log
 logger = log.IntegrationAdaptorsLogger("COMMON_HTTPS")
 
 
-class CommonHttps:
+class CommonHttps(object):
 
     @staticmethod
     async def make_request(url: str, method: str, headers: Dict[str, str], body: str, client_cert: str = None,

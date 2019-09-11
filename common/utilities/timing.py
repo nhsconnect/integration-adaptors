@@ -8,7 +8,7 @@ import utilities.integration_adaptors_logger as log
 logger = log.IntegrationAdaptorsLogger('TIMING')
 
 
-class Stopwatch:
+class Stopwatch(object):
 
     start_time = None
 
