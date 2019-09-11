@@ -1,4 +1,5 @@
 import json
+import unittest.mock
 
 import tornado.testing
 import tornado.web
@@ -12,16 +13,19 @@ RELIABILITY_DETAILS = {"retries": 7}
 COMBINED_DETAILS = {"end_point": "http://www.example.com", "retries": 7}
 
 
-class TestRoutingReliabilityRequestHandler(test_request_handler
-                                           .TestRequestHandler, tornado.testing.AsyncHTTPTestCase):
+class TestRoutingReliabilityRequestHandler(tornado.testing.AsyncHTTPTestCase):
     def get_app(self):
-        return self._build_app(routing_reliability_handler.RoutingReliabilityRequestHandler)
+        self.routing = unittest.mock.Mock()
+
+        return tornado.web.Application([
+            (r"/", routing_reliability_handler.RoutingReliabilityRequestHandler, {"routing": self.routing})
+        ])
 
     def test_get(self):
         self.routing.get_end_point.return_value = test_utilities.awaitable(END_POINT_DETAILS)
         self.routing.get_reliability.return_value = test_utilities.awaitable(RELIABILITY_DETAILS)
 
-        response = self.fetch(test_request_handler.TestRequestHandler.build_url(), method="GET")
+        response = self.fetch(test_request_handler.build_url(), method="GET")
 
         self.assertEqual(response.code, 200)
         self.assertEqual(COMBINED_DETAILS, json.loads(response.body))
@@ -32,13 +36,31 @@ class TestRoutingReliabilityRequestHandler(test_request_handler
         with self.subTest("Routing lookup error"):
             self.routing.get_end_point.side_effect = Exception
 
-            response = self.fetch(test_request_handler.TestRequestHandler.build_url(), method="GET")
+            response = self.fetch(test_request_handler.build_url(), method="GET")
 
             self.assertEqual(response.code, 500)
 
         with self.subTest("Reliability lookup error"):
             self.routing.get_reliability.side_effect = Exception
 
-            response = self.fetch(test_request_handler.TestRequestHandler.build_url(), method="GET")
+            response = self.fetch(test_request_handler.build_url(), method="GET")
 
             self.assertEqual(response.code, 500)
+
+    def test_get_handles_missing_params(self):
+        with self.subTest("Missing Org Code"):
+            response = self.fetch(
+                test_request_handler.build_url(org_code=None, service_id=test_request_handler.SERVICE_ID), method="GET")
+
+            self.assertEqual(response.code, 400)
+
+        with self.subTest("Missing Service ID"):
+            response = self.fetch(
+                test_request_handler.build_url(org_code=test_request_handler.ORG_CODE, service_id=None), method="GET")
+
+            self.assertEqual(response.code, 400)
+
+        with self.subTest("Missing Org Code & Service ID"):
+            response = self.fetch(test_request_handler.build_url(org_code=None, service_id=None), method="GET")
+
+            self.assertEqual(response.code, 400)
