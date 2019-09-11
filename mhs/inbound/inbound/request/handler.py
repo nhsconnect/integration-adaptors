@@ -138,7 +138,7 @@ class InboundHandler(tornado.web.RequestHandler):
             request_message = SoapEnvelope.from_string(self.request.headers,
                                                                      self.request.body.decode())
         except SoapParsingError as e:
-            logger.error('020', 'Failed to parse response: {exception}', {'exception': e})
+            logger.error('021', 'Failed to parse response: {exception}', {'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
                                         reason=f'Exception during inbound message parsing {e}') from e
 
