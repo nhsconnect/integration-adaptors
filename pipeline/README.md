@@ -23,6 +23,11 @@ of the same environment are performed. These tables must have a primary key name
     - `/ecs/jenkins-workers-jenkins-worker`
     - `/ecs/scr-service-environment`
     - `/ecs/sonarqube`
+- ECR repositories with the following names:
+    - `mhs/inbound`
+    - `mhs/outbound`
+    - `mhs/route`
+    - `scr-web-service`
 - An IAM role for the 'Elastic Container Service Task' trusted entity with the built-in
   `AmazonECSTaskExecutionRolePolicy`. You can use the `ecsTaskExecutionRole` created for you automatically by AWS when
   creating a task definition from the console, if available.
@@ -171,3 +176,8 @@ queue.
 `CLIENT_CERT_ARN`
 - CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented by
 incoming connections to the MHS.
+- SPINE_ORG_CODE: The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
+- SPINEROUTELOOKUP_SERVICE_LDAP_URL: The URL the Spine Route Lookup service should use to communicate with SDS.
+e.g. `ldaps://example.com`
+- SPINEROUTELOOKUP_SERVICE_DISABLE_TLS: An optional flag. If set to exactly `True`, TLS will be disabled for SDS
+requests.

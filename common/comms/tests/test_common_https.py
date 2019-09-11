@@ -27,7 +27,8 @@ class TestCommonHttps(TestCase):
 
             actual_response = await CommonHttps.make_request(url=URL, method=METHOD, headers=HEADERS, body=BODY,
                                                              client_cert=CLIENT_CERT, client_key=CLIENT_KEY,
-                                                             ca_certs=CA_CERTS, http_proxy_host=HTTP_PROXY_HOST,
+                                                             ca_certs=CA_CERTS, validate_cert=False,
+                                                             http_proxy_host=HTTP_PROXY_HOST,
                                                              http_proxy_port=HTTP_PROXY_PORT)
 
             mock_fetch.assert_called_with(URL,
@@ -37,7 +38,7 @@ class TestCommonHttps(TestCase):
                                           client_cert=CLIENT_CERT,
                                           client_key=CLIENT_KEY,
                                           ca_certs=CA_CERTS,
-                                          validate_cert=True,
+                                          validate_cert=False,
                                           proxy_host=HTTP_PROXY_HOST,
                                           proxy_port=HTTP_PROXY_PORT)
 

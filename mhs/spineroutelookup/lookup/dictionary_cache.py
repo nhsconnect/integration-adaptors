@@ -1,6 +1,9 @@
 import time
 from typing import Dict, Optional
-import lookup.cache_adaptor as cache_adaptor
+
+from lookup import cache_adaptor
+
+IMPLEMENTATION_DICTIONARY_KEY = "DICTIONARY_CACHE"
 
 FIFTEEN_MINUTES_IN_SECONDS = 900
 
@@ -57,3 +60,6 @@ class DictionaryCache(cache_adaptor.CacheAdaptor):
             'time': insert_time,
             'value': value
         }
+
+
+cache_adaptor.implementations[IMPLEMENTATION_DICTIONARY_KEY] = DictionaryCache

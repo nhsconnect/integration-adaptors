@@ -55,9 +55,15 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                     "{message}",
                             {"headers": headers, "url": url, "proxy_host": self._proxy_host,
                              "proxy_port": self._proxy_port, "message": message})
+                # ******************************************************************************************************
+                # TLS CERTIFICATE VALIDATION HAS BEEN TEMPORARILY DISABLED! This is required because Opentest's SDS
+                # instance currently returns endpoints as IP addresses. This MUST be changed before this code is used in
+                # a production environment
+                # ******************************************************************************************************
                 response = await CommonHttps.make_request(url=url, method=request_method, headers=headers, body=message,
                                                           client_cert=self._client_cert, client_key=self._client_key,
-                                                          ca_certs=self._ca_certs, http_proxy_host=self._proxy_host,
+                                                          ca_certs=self._ca_certs, validate_cert=False,
+                                                          http_proxy_host=self._proxy_host,
                                                           http_proxy_port=self._proxy_port)
                 logger.info("0002", "Sent message: {message}, with {headers} to {url} using {proxy_host} & {proxy_port}"
                                     " and received status code {code}",
@@ -77,8 +83,8 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                 })
                 if retries_remaining <= 0:
                     logger.error("0004",
-                                   "A request has exceeded the maximum number of retries, {max_retries} retries",
-                                   {"max_retries": self._max_retries})
+                                 "A request has exceeded the maximum number of retries, {max_retries} retries",
+                                 {"max_retries": self._max_retries})
                     raise MaxRetriesExceeded("The max number of retries to make a request has been exceeded") from e
 
                 logger.info("0005", "Waiting for {retry_delay} milliseconds before next request attempt.",

@@ -38,6 +38,11 @@ variable "mhs_inbound_service_instance_count" {
   description = "The desired number of instances of MHS inbound to run."
 }
 
+variable "mhs_route_service_instance_count" {
+  type = number
+  description = "The desired number of instances of MHS route service to run."
+}
+
 variable "task_role_arn" {
   type = string
   description = "ARN of the IAM role for MHS containers to use other AWS services."
@@ -62,7 +67,8 @@ variable "mhs_resynchroniser_max_retries" {
   type = string
   description = "The number of retry attempts to the sync-async state store that should be made whilst attempting to resynchronise a sync-async message"
 }
-variable "mhs_resynchroniser_interval"{
+
+variable "mhs_resynchroniser_interval" {
   type = string
   description = "Time between calls to the sync-async store during resynchronisation"
 }
@@ -91,6 +97,11 @@ variable "mhs_sync_async_table_read_capacity" {
 variable "mhs_sync_async_table_write_capacity" {
   type = number
   description = "Write capacity of the DynamoDB sync-async table used by the MHS application."
+}
+
+variable "mhs_spine_org_code" {
+  type = string
+  description = "The organisation code for the Spine instance that your MHS is communicating with."
 }
 
 variable "inbound_queue_host" {
@@ -126,4 +137,15 @@ variable "client_key_arn" {
 variable "ca_certs_arn" {
   type = string
   description = "ARN of the secrets manager secret of the endpoint certificate, endpoint issuing subCA certificate, root CA Certificate (all in that order)."
+}
+
+variable "spineroutelookup_service_sds_url" {
+  type = string
+  description = "The SDS URL the Spine Route Lookup service should communicate with."
+}
+
+variable "spineroutelookup_service_disable_sds_tls" {
+  type = string
+  description = "Whether TLS should be disabled for connections to SDS."
+  default = "False"
 }

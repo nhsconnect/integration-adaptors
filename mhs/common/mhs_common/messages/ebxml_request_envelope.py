@@ -26,6 +26,9 @@ ACK_REQUESTED = "ack_requested"
 ACK_SOAP_ACTOR = "ack_soap_actor"
 SYNC_REPLY = "sync_reply"
 
+EBXML_CONTENT_TYPE_VALUE = 'multipart/related; boundary="--=_MIME-Boundary"; type=text/xml; ' \
+                           'start=ebXMLHeader@spine.nhs.uk'
+
 
 class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     """An envelope that contains a request to be sent asynchronously to a remote MHS."""
@@ -39,8 +42,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
     def serialize(self) -> Tuple[str, Dict[str, str], str]:
         message_id, http_headers, message = super().serialize()
-        http_headers['Content-Type'] = 'multipart/related; boundary="--=_MIME-Boundary"; type=text/xml; ' \
-                                       'start=ebXMLHeader@spine.nhs.uk'
+        http_headers[CONTENT_TYPE_HEADER_NAME] = EBXML_CONTENT_TYPE_VALUE
         return message_id, http_headers, message
 
     @classmethod

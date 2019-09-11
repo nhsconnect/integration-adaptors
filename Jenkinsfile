@@ -44,6 +44,7 @@ pipeline {
             steps {
                 sh label: 'Running Inbound Packer build', script: 'packer build pipeline/packer/inbound.json'
                 sh label: 'Running Outbound Packer build', script: 'packer build pipeline/packer/outbound.json'
+                sh label: 'Running Spine Route Lookup Packer build', script: 'packer build pipeline/packer/spineroutelookup.json'
                 sh label: 'Running SCR service Packer build', script: 'packer build pipeline/packer/scr-web-service.json'
             }
         }
@@ -75,6 +76,7 @@ pipeline {
                                     -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
                                     -var mhs_outbound_service_instance_count=3 \
                                     -var mhs_inbound_service_instance_count=3 \
+                                    -var mhs_route_service_instance_count=3 \
                                     -var task_role_arn=${TASK_ROLE} \
                                     -var execution_role_arn=${TASK_EXECUTION_ROLE} \
                                     -var ecr_address=${DOCKER_REGISTRY} \
@@ -84,6 +86,7 @@ pipeline {
                                     -var mhs_state_table_write_capacity=5 \
                                     -var mhs_sync_async_table_read_capacity=5 \
                                     -var mhs_sync_async_table_write_capacity=5 \
+                                    -var mhs_spine_org_code=${SPINE_ORG_CODE} \
                                     -var inbound_queue_host="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
                                     -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                                     -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
@@ -92,7 +95,9 @@ pipeline {
                                     -var client_key_arn=${CLIENT_KEY_ARN} \
                                     -var ca_certs_arn=${CA_CERTS_ARN} \
                                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
-                                    -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
+                                    -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
+                                    -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
+                                    -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
                                 """
                             sh label: 'Applying Terraform configuration', script: """
                                     terraform apply -auto-approve \
@@ -103,6 +108,7 @@ pipeline {
                                     -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
                                     -var mhs_outbound_service_instance_count=3 \
                                     -var mhs_inbound_service_instance_count=3 \
+                                    -var mhs_route_service_instance_count=3 \
                                     -var task_role_arn=${TASK_ROLE} \
                                     -var execution_role_arn=${TASK_EXECUTION_ROLE} \
                                     -var ecr_address=${DOCKER_REGISTRY} \
@@ -112,6 +118,7 @@ pipeline {
                                     -var mhs_state_table_write_capacity=5 \
                                     -var mhs_sync_async_table_read_capacity=5 \
                                     -var mhs_sync_async_table_write_capacity=5 \
+                                    -var mhs_spine_org_code=${SPINE_ORG_CODE} \
                                     -var inbound_queue_host="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
                                     -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                                     -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
@@ -120,7 +127,9 @@ pipeline {
                                     -var client_key_arn=${CLIENT_KEY_ARN} \
                                     -var ca_certs_arn=${CA_CERTS_ARN} \
                                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
-                                    -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
+                                    -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
+                                    -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
+                                    -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
                                 """
                             script {
                                 env.MHS_ADDRESS = sh (
