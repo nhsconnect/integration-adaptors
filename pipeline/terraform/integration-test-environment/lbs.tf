@@ -29,6 +29,11 @@ resource "aws_lb_target_group" "outbound_alb_target_group" {
   }
 }
 
+output "outbound_lb_target_group_arn" {
+  value       = aws_lb_target_group.outbound_alb_target_group.arn
+  description = "The ARN of the MHS outbound service load balancers's target group."
+}
+
 resource "aws_lb_listener" "outbound_alb_listener" {
   load_balancer_arn = aws_lb.outbound_alb.arn
   port = "80"
@@ -66,6 +71,11 @@ resource "aws_lb_target_group" "route_alb_target_group" {
   }
 }
 
+output "route_lb_target_group_arn" {
+  value       = aws_lb_target_group.route_alb_target_group.arn
+  description = "The ARN of the MHS Spine route lookup service load balancers's target group."
+}
+
 resource "aws_lb_listener" "route_alb_listener" {
   load_balancer_arn = aws_lb.route_alb.arn
   port = "80"
@@ -99,6 +109,11 @@ resource "aws_lb_target_group" "inbound_nlb_target_group" {
     Name = "${var.environment_id}-mhs-inbound-nlb-target-group"
     EnvironmentId = var.environment_id
   }
+}
+
+output "inbound_lb_target_group_arn" {
+  value       = aws_lb_target_group.inbound_nlb_target_group.arn
+  description = "The ARN of the MHS inbound service load balancers's target group."
 }
 
 resource "aws_lb_listener" "inbound_nlb_listener" {

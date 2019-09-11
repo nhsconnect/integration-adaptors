@@ -128,6 +128,16 @@ pipeline {
                                     returnStdout: true,
                                     script: "terraform output outbound_lb_domain_name"
                                 ).trim()
+                                env.MHS_OUTBOUND_TARGET_GROUP = sh (
+                                    label: 'Obtaining outbound LB target group ARN',
+                                    returnStdout: true,
+                                    script: "terraform output outbound_lb_target_group_arn"
+                                ).trim()
+                                env.MHS_INBOUND_TARGET_GROUP = sh (
+                                    label: 'Obtaining inbound LB target group ARN',
+                                    returnStdout: true,
+                                    script: "terraform output inbound_lb_target_group_arn"
+                                ).trim()
                             }
                         }
                     }
@@ -169,8 +179,21 @@ pipeline {
                                        return (r == '405');
                                    }
                                 }
-                             }
-                             sh label: 'Running integration tests', script: 'pipenv run inttests'
+                            }
+
+                            // Wait for MHS load balancers to have healthy targets
+                            dir('../pipeline/scripts/check-target-group-health') {
+                                sh script: 'pipenv install'
+                                timeout(5) {
+                                    waitUntil {
+                                        script {
+                                            def r = sh script: 'sleep 10; pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}; echo $?', returnStdout: true
+                                            return (r == '0');
+                                        }
+                                    }
+                                }
+                            }
+                            sh label: 'Running integration tests', script: 'pipenv run inttests'
                         }
                     }
                 }
