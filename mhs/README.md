@@ -3,8 +3,13 @@
 This package contains a pre-assured implementation of a Message Handling Service (MHS), intended to encapsulate the
 details of Spine messaging and provide a simple interface to allow HL7 messages to be sent to a remote MHS.
 
+**WARNING: Verification of the server certificate received when making a connection to a remote MHS is currently
+DISABLED (see the [OutboundTransmission](./outbound/outbound/transmission/outbound_transmission.py) class'
+`make_request` method).** This MHS should not be used in a production environment unless this certificate verification
+is re-enabled.
+
 ## Setup
-A `data/certs` directory should be created with the following files (containing the certificates & keys required to
+A `common/data/certs` directory should be created with the following files (containing the certificates & keys required to
 perform client authentication to the Spine instance you are using. For Openttest, these will have been provided when you
 were granted access):
 - `client.cert` - Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate,
@@ -50,7 +55,17 @@ MHS takes a number of environment variables when it is run. These are:
 * `MHS_SYNC_ASYNC_STORE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying placing a message on the sysnc-async store. Defaults to 100ms
 * `MHS_RESYNC_RETRIES` (outbound only) The total number of attempts made to the sync-async store during resynchronisation, defaults to 20
 * `MHS_RESYNC_INTERVAL` The time in between polls of the sync-async store, the interval is in seconds and defaults to 1
-
+* `MHS_SPINE_ROUTE_LOOKUP_URL` (outbound only) The URL of the Spine route lookup service. E.g `https://example.com`. This URL should not contain path or query parameter parts.
+* `MHS_SPINE_ORG_CODE` (outbound only) The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
+* `MHS_SDS_URL` (Spine Route Lookup service only) The URL to communicate with SDS on. e.g. `ldaps://example.com`
+* `MHS_DISABLE_SDS_TLS` (Spine Route Lookup service only) A flag that can be set to disable TLS for SDS connections.
+*Must* be set to exactly `True` for TLS to be disabled.
+* `MHS_SDS_CACHE_IMPLEMENTATION` (Spine Route Lookup service only) Identifies the caching implementation to use when
+caching values retrieved from SDS. This value is optional. Possible values are:
+    * `DICTIONARY_CACHE` - An in-memory cache using a Python dictionary. Not suitable for production use. If no
+    implementation is specified, this is the default.
+* `MHS_SDS_CACHE_EXPIRY_TIME` (Spine Route Lookup service only). An optional value that specifies the time (in seconds)
+that a value should be held in the SDS cache. Defaults to `900` (fifteen minutes)
 
 ## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.

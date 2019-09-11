@@ -124,6 +124,14 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
         {
           name = "MHS_RESYNC_INTERVAL",
           value = var.mhs_resynchroniser_interval
+        },
+        {
+          name = "MHS_SPINE_ROUTE_LOOKUP_URL",
+          value = var.mhs_spine_route_lookup_url
+        },
+        {
+          name = "MHS_SPINE_ORG_CODE",
+          value = var.mhs_spine_org_code
         }
       ]
 
@@ -131,6 +139,67 @@ resource "aws_ecs_task_definition" "test-environment-mhs-outbound-task" {
         {
           containerPort = 80
           hostPort = 80
+          protocol = "tcp"
+        }
+      ]
+    }
+  ]
+  )
+  cpu = "128"
+  memory = "256"
+  requires_compatibilities = [
+    "EC2"
+  ]
+  execution_role_arn = var.task_execution_role
+}
+
+resource "aws_ecs_task_definition" "test-environment-mhs-spineroutelookup-task" {
+  family = "mhs-spineroutelookup-task-${var.build_id}"
+
+  volume {
+    name = "certs-volume"
+    host_path = "/home/ec2-user/certs"
+  }
+
+  container_definitions = jsonencode(
+  [
+    {
+      name = "spineroutelookup"
+      image = "${var.ecr_address}:spineroutelookup-${var.build_id}"
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group = "/ecs/spineroutelookup-test-environment"
+          awslogs-region = var.region
+          awslogs-stream-prefix = var.build_id
+        }
+      }
+
+      mountPoints = [{
+        sourceVolume = "certs-volume"
+        containerPath = "/usr/src/app/mhs/common/data/certs/"
+      }]
+
+      environment = [
+        {
+          name = "MHS_LOG_LEVEL"
+          value = var.mhs_log_level
+        },
+        {
+          name = "MHS_SDS_URL"
+          value = var.spineroutelookup_service_sds_url
+        },
+        {
+          name = "MHS_DISABLE_SDS_TLS"
+          value = var.spineroutelookup_service_disable_sds_tls
+        }
+      ]
+
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort = var.spineroutelookup_service_port
           protocol = "tcp"
         }
       ]
@@ -200,6 +269,14 @@ resource "aws_ecs_service" "test-inbound-mhs-environment-service" {
   name = "${var.build_id}-inbound-service"
   cluster = var.cluster_id
   task_definition = aws_ecs_task_definition.test-environment-mhs-inbound-task.arn
+  desired_count = 1
+  launch_type = "EC2"
+}
+
+resource "aws_ecs_service" "test-spineroutelookup-mhs-environment-service" {
+  name = "${var.build_id}-spineroutelookup-service"
+  cluster = var.cluster_id
+  task_definition = aws_ecs_task_definition.test-environment-mhs-spineroutelookup-task.arn
   desired_count = 1
   launch_type = "EC2"
 }

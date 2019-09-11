@@ -11,7 +11,7 @@ RELIABILITY_KEYS = [
     'nhsMHSAckRequested'
 ]
 
-ROUTING_KEYS = ['nhsMhsFQDN', 'nhsMHSEndPoint']
+ROUTING_KEYS = ['nhsMhsFQDN', 'nhsMHSEndPoint', 'nhsMHSPartyKey', 'nhsMhsCPAId']
 
 
 class RoutingAndReliability:

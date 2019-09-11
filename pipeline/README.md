@@ -67,7 +67,14 @@ Several global variables must be set within Jenkins for the scripts to work as p
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
 - SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
-
+- SPINEROUTELOOKUP_SERVICE_URL: The URL for the MHS to make requests to the Spine route lookup service on. E.g
+`https://example.com:8080`. This URL should not contain path or query parameter parts.
+- SPINE_ORG_CODE: The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
+- SPINEROUTELOOKUP_SERVICE_PORT: The port the Spine Route Lookup service should listen on
+- SPINEROUTELOOKUP_SERVICE_SDS_URL: The URL the Spine Route Lookup service should use to communicate with SDS.
+e.g. `ldaps://example.com`
+- SPINEROUTELOOKUP_SERVICE_DISABLE_TLS: An optional flag. If set to exactly `True`, TLS will be disabled for SDS
+requests.
 
 The Jenkins worker EC2 instance will have to have the following permission in order to publish the builds to 
 ECR and start the tasks in ECS with terraform:
@@ -100,4 +107,6 @@ There must also be log groups in Cloudwatch under the following names - these gr
 - `/ecs/jenkins-workers-jenkins-worker`
 - `/ecs/scr-service-environment`
 - `/ecs/sonarqube`
-- `/ecs/test-environment`
+- `/ecs/outbound-test-environment`
+- `/ecs/inbound-test-environment`
+- `/ecs/spineroutelookup-test-environment`

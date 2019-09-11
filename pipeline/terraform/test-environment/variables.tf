@@ -28,6 +28,14 @@ variable "mhs_state_table_name" {
   type = string
   description = "Name of the DynamoDB state table used by the MHS application."
 }
+variable "mhs_spine_route_lookup_url" {
+  type = string
+  description = "The URL of the Spine route lookup service."
+}
+variable "mhs_spine_org_code" {
+  type = string
+  description = "The organisation code for the Spine instance that your MHS is communicating with."
+}
 variable "scr_log_level" {
   type = string
   description = "Log Level for the SCR Web Service"
@@ -60,7 +68,20 @@ variable "mhs_resynchroniser_max_retries" {
   type = string
   description = "The number of retry attempts to the sync-async state store that should be made whilst attempting to resynchronise a sync-async message"
 }
-variable "mhs_resynchroniser_interval"{
+variable "mhs_resynchroniser_interval" {
   type = string
   description = "Time between calls to the sync-async store during resynchronisation"
+}
+variable "spineroutelookup_service_port" {
+  type = number
+  description = "The port to be exposed for the Spine Route Lookup service."
+}
+variable "spineroutelookup_service_sds_url" {
+  type = string
+  description = "The SDS URL the Spine Route Lookup service should communicate with."
+}
+variable "spineroutelookup_service_disable_sds_tls" {
+  type = string
+  description = "Whether TLS should be disabled for connections to SDS."
+  default = "False"
 }
