@@ -3,6 +3,11 @@
 This package contains a pre-assured implementation of a Message Handling Service (MHS), intended to encapsulate the
 details of Spine messaging and provide a simple interface to allow HL7 messages to be sent to a remote MHS.
 
+**WARNING: Verification of the server certificate received when making a connection to a remote MHS is currently
+DISABLED (see the [OutboundTransmission](./outbound/outbound/transmission/outbound_transmission.py) class'
+`make_request` method).** This MHS should not be used in a production environment unless this certificate verification
+is re-enabled.
+
 ## Setup
 A `common/data/certs` directory should be created with the following files (containing the certificates & keys required to
 perform client authentication to the Spine instance you are using. For Openttest, these will have been provided when you
