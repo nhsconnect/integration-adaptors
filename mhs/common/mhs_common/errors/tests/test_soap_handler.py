@@ -39,4 +39,4 @@ class TestOutboundSOAPHandler(unittest.TestCase):
 
     def test_non_xml_content_type(self):
         with self.assertRaises(ValueError):
-            self.assertRaises(ValueError, handle_soap_error(500, {'Content-Type': 'text/html'}, 'Some body'))
+            handle_soap_error(500, {'Content-Type': 'text/html'}, 'Some body')

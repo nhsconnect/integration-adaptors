@@ -10,7 +10,7 @@ from tornado import httpclient
 from utilities import timing
 
 from mhs_common import workflow
-from mhs_common.errors.ebxml_handler import handle_ebxml_error
+from mhs_common.errors import ebxml_handler
 from mhs_common.errors.soap_handler import handle_soap_error
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor
@@ -66,7 +66,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         try:
             url = interaction_details['url']
             response = await self.transmission.make_request(url, http_headers, message)
-            handle_ebxml_error(response.code, response.headers, response.body)
+            ebxml_handler.handle_ebxml_error(response.code, response.headers, response.body)
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
             logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
