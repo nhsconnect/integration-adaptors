@@ -3,6 +3,10 @@ pipeline {
         label 'jenkins-workers'
     }
 
+    options {
+        lock('integration-test-environment')
+    }
+
     environment {
       BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
     }
@@ -42,6 +46,7 @@ pipeline {
             steps {
                 sh label: 'Running Inbound Packer build', script: 'packer build pipeline/packer/inbound.json'
                 sh label: 'Running Outbound Packer build', script: 'packer build pipeline/packer/outbound.json'
+                sh label: 'Running Spine Route Lookup Packer build', script: 'packer build pipeline/packer/spineroutelookup.json'
                 sh label: 'Running SCR service Packer build', script: 'packer build pipeline/packer/scr-web-service.json'
             }
         }
@@ -59,6 +64,8 @@ pipeline {
                             -var build_id=${BUILD_TAG} \
                             -var mhs_log_level=DEBUG \
                             -var mhs_state_table_name=mhs-state \
+                            -var mhs_spine_route_lookup_url=${SPINEROUTELOOKUP_SERVICE_URL} \
+                            -var mhs_spine_org_code=${SPINE_ORG_CODE} \
                             -var scr_log_level=DEBUG \
                             -var scr_service_port=${SCR_SERVICE_PORT} \
                             -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
@@ -66,7 +73,10 @@ pipeline {
                             -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
                             -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
                             -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
-                            -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
+                            -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
+                            -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT} \
+                            -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_SDS_URL} \
+                            -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
                         """
                 }
             }
@@ -107,6 +117,8 @@ pipeline {
                         -var build_id=${BUILD_TAG} \
                         -var mhs_log_level=DEBUG \
                         -var mhs_state_table_name=mhs-state \
+                        -var mhs_spine_route_lookup_url=${SPINEROUTELOOKUP_SERVICE_URL} \
+                        -var mhs_spine_org_code=${SPINE_ORG_CODE} \
                         -var scr_log_level=DEBUG \
                         -var scr_service_port=${SCR_SERVICE_PORT} \
                         -var mhs_inbound_queue_host=${MHS_INBOUND_QUEUE_HOST} \
@@ -114,7 +126,10 @@ pipeline {
                         -var mhs_inbound_queue_password=${MHS_INBOUND_QUEUE_PASSWORD} \
                         -var mhs_sync_async_state_table_name=${MHS_SYNC_ASYNC_STATE_TABLE_NAME} \
                         -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
-                        -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL}
+                        -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
+                        -var spineroutelookup_service_port=${SPINEROUTELOOKUP_SERVICE_PORT} \
+                        -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_SDS_URL} \
+                        -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
                      """
             }
         }

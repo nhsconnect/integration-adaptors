@@ -1,10 +1,10 @@
 {
-  "_description": "This packer file produces an outbound image and has the capability to publish to a given repository",
+  "_description": "This packer file produces a Spine Route Lookup image and has the capability to publish to a given repository",
   "variables": {
     "app_dir": "/usr/src/app",
     "common_dir": "common",
-    "outbound_dir": "mhs/outbound",
     "mhs_common_dir": "mhs/common",
+    "spineroutelookup_dir": "mhs/spineroutelookup",
     "repository": "{{env `DOCKER_REPOSITORY`}}",
     "tag": "{{env `BUILD_TAG`}}",
     "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
@@ -13,12 +13,11 @@
     {
       "type": "docker",
       "image": "python:3-slim",
-      "container_dir": "/packer-files",
       "commit": true,
       "changes": [
         "EXPOSE 80",
-        "WORKDIR {{user `app_dir`}}/{{user `outbound_dir`}}",
-        "ENTRYPOINT pipenv run start-outbound"
+        "WORKDIR {{user `app_dir`}}/{{user `spineroutelookup_dir`}}",
+        "ENTRYPOINT pipenv run start"
       ]
     }
   ],
@@ -43,20 +42,14 @@
     },
     {
       "type": "file",
-      "source": "{{user `outbound_dir`}}",
-      "destination": "{{user `app_dir`}}/{{user `outbound_dir`}}"
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
-      ]
+      "source": "{{user `spineroutelookup_dir`}}",
+      "destination": "{{user `app_dir`}}/{{user `spineroutelookup_dir`}}"
     },
     {
       "type": "shell",
       "inline": [
         "pip install pipenv",
-        "cd {{user `app_dir`}}/{{user `outbound_dir`}}",
+        "cd {{user `app_dir`}}/{{user `spineroutelookup_dir`}}",
         "pipenv install --deploy --ignore-pipfile"
       ]
     }
@@ -67,7 +60,7 @@
         "name": "publish",
         "type": "docker-tag",
         "repository": "{{user `repository`}}",
-        "tag": "outbound-{{user `tag`}}"
+        "tag": "spineroutelookup-{{user `tag`}}"
       },
       {
         "name": "publish",
@@ -77,7 +70,7 @@
       },
       {
         "type": "docker-tag",
-        "repository": "local/mhs-outbound"
+        "repository": "local/mhs-spineroutelookup"
       }
     ]
   ]
