@@ -30,7 +30,7 @@ resource "aws_lb_target_group" "outbound_alb_target_group" {
 }
 
 output "outbound_lb_target_group_arn" {
-  value       = aws_lb_target_group.outbound_alb_target_group.arn
+  value = aws_lb_target_group.outbound_alb_target_group.arn
   description = "The ARN of the MHS outbound service load balancers's target group."
 }
 
@@ -72,7 +72,7 @@ resource "aws_lb_target_group" "route_alb_target_group" {
 }
 
 output "route_lb_target_group_arn" {
-  value       = aws_lb_target_group.route_alb_target_group.arn
+  value = aws_lb_target_group.route_alb_target_group.arn
   description = "The ARN of the MHS Spine route lookup service load balancers's target group."
 }
 
@@ -112,7 +112,7 @@ resource "aws_lb_target_group" "inbound_nlb_target_group" {
 }
 
 output "inbound_lb_target_group_arn" {
-  value       = aws_lb_target_group.inbound_nlb_target_group.arn
+  value = aws_lb_target_group.inbound_nlb_target_group.arn
   description = "The ARN of the MHS inbound service load balancers's target group."
 }
 

@@ -62,7 +62,7 @@ variable "mhs_resynchroniser_max_retries" {
   type = string
   description = "The number of retry attempts to the sync-async state store that should be made whilst attempting to resynchronise a sync-async message"
 }
-variable "mhs_resynchroniser_interval"{
+variable "mhs_resynchroniser_interval" {
   type = string
   description = "Time between calls to the sync-async store during resynchronisation"
 }
