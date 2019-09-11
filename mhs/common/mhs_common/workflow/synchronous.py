@@ -2,15 +2,14 @@
 from typing import Tuple, Optional
 import utilities.integration_adaptors_logger as log
 from utilities import timing
-
 from mhs_common import workflow
 from mhs_common.errors.soap_handler import handle_soap_error
 from tornado import httpclient
-
 from mhs_common.state import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_synchronous
+from mhs_common.routing import routing_reliability
 
 logger = log.IntegrationAdaptorsLogger('SYNC_WORKFLOW')
 
@@ -22,11 +21,13 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                  party_key: str = None,
                  work_description_store: pa.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
-                 persistence_store_max_retries: int = None):
+                 persistence_store_max_retries: int = None,
+                 routing: routing_reliability.RoutingAndReliability = None):
         self.party_key = party_key
         self.wd_store = work_description_store
         self.transmission = transmission
         self.persistence_store_retries = persistence_store_max_retries
+        super().__init__(routing)
 
     async def handle_outbound_message(self,
                                       message_id: str,
@@ -54,7 +55,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error obtaining outbound URL'
 
-        print(url)
+        print("URL: "+ url)
         return 200, "qwe"
         # logger.info('003', 'About to make outbound request')
         # start_time = timing.get_time()

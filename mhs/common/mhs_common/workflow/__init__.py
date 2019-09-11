@@ -53,5 +53,10 @@ def get_workflow_map(party_key: str = None,
                                       work_description_store=work_description_store,
                                       persistence_store_max_retries=persistence_store_max_retries,
                                       ),
-        SYNC: SynchronousWorkflow()
+        SYNC: SynchronousWorkflow(party_key=party_key,
+                                  work_description_store=work_description_store,
+                                  transmission=transmission,
+                                  persistence_store_max_retries=persistence_store_max_retries,
+                                  routing=routing
+                                  )
     }
