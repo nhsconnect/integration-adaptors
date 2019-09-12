@@ -5,6 +5,7 @@ terraform {
 }
 
 provider "aws" {
+  version = "~> 2.27"
   profile = "default"
   region = var.region
 }
