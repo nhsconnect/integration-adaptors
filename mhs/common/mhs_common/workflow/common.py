@@ -11,6 +11,7 @@ from mhs_common.routing import routing_reliability
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+MHS_TO_ASID_KEY = 'uniqueIdentifier'
 
 logger = log.IntegrationAdaptorsLogger('COMMON_WORKFLOW')
 
@@ -71,6 +72,24 @@ class CommonWorkflow(abc.ABC):
                            {'Exception': e})
             raise e
 
+    async def _lookup_to_asid_details(self, interaction_details: Dict):
+        try:
+            service_id = await self._build_service_id(interaction_details)
+
+            logger.info('0011', 'Looking up ASID details for {service_id}.', {'service_id': service_id})
+            endpoint_details = await self.routing_reliability.get_end_point(service_id)
+
+            url = CommonWorkflow._extract_endpoint_url(endpoint_details)
+            to_asid = self._extract_asid(endpoint_details)
+            logger.info('0002', 'Retrieved endpoint details for {url}, {to_asid}',
+                        {'url': url, 'to_asid': to_asid})
+
+            return url, to_asid
+        except Exception as e:
+            logger.warning('0003', 'Error encountered whilst retrieving endpoint details. {Exception}',
+                           {'Exception': e})
+            raise e
+
     @staticmethod
     def _extract_endpoint_url(endpoint_details: Dict[str, List[str]]) -> str:
         endpoint_urls = endpoint_details[MHS_END_POINT_KEY]
@@ -86,6 +105,20 @@ class CommonWorkflow(abc.ABC):
                                    '{urls_received}', {'url': url, 'urls_received': endpoint_urls})
 
         return url
+
+    def _extract_asid(self, endpoint_details: Dict[str, List[str]]) -> str:
+        unique_identifiers = endpoint_details[MHS_TO_ASID_KEY]
+
+        if len(unique_identifiers) == 0:
+            logger.error('0024', 'Did not retrieve any unique identifiers from endpoint details')
+            raise IndexError('Did not retrieve any unique identifiers from endpoint details')
+
+        asid = unique_identifiers[0]
+
+        if len(unique_identifiers) > 1:
+            logger.warning('0005', 'Received more than one ASID during endpoint lookup')
+
+        return asid
 
     @staticmethod
     async def _build_service_id(interaction_details):

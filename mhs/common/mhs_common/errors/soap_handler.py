@@ -24,7 +24,7 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
     if 'Content-Type' not in headers:
         raise ValueError('No Content-Type header in Spine response, response cannot be handled!')
 
-    if headers['Content-Type'] == 'text/xml':
+    if headers['Content-Type'] != 'text/xml':
         raise ValueError('Unexpected Content-Type {}!'.format(headers['Content-Type']))
 
     parsed_body = ElementTree.fromstring(body)

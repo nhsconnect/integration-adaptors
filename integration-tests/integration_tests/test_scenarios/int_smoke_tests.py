@@ -12,8 +12,10 @@ class FunctionalTest(TestCase):
                                               'QUPC_IN160101UK05',
                                               '9689174746',
                                               'Asynchronous Express test')
+
         # then retrieve the response from the queue...
         _, _, inbound_response = message_retriever.get_inbound_response()
+
         self.assertTrue(methods.check_response(inbound_response, 'queryResponseCode'),
                         "Asynchronous Express smoke test failed")
 
@@ -25,7 +27,7 @@ class FunctionalTest(TestCase):
                                                                    'REPC_IN150016UK05',
                                                                    '9446245796',
                                                                    'Asynchronous Reliable test')
-        self.assertTrue(methods.check_response(mhs_response,'requestSuccessDetail'),
+        self.assertTrue(methods.check_response(mhs_response, 'requestSuccessDetail'),
                         "Asynchronous Reliable smoke test failed")
 
     # Message Pattern Type: Synchronous
@@ -35,6 +37,7 @@ class FunctionalTest(TestCase):
                                                                    'QUPA_IN040000UK32',
                                                                    '9689174606',
                                                                    'Synchronous test')
+        print(mhs_response.text)
         self.assertTrue(methods.check_response(mhs_response, 'requestSuccessDetail'),
                         "Synchronous smoke test failed")
 
