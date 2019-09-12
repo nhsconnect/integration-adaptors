@@ -10,6 +10,7 @@ import tornado.web
 import utilities.config as config
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
+from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
@@ -69,7 +70,8 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
 
     supplier_application = tornado.web.Application(
         [(r"/", client_request_handler.SynchronousHandler,
-          dict(config_manager=config_manager, workflows=workflows))])
+          dict(config_manager=config_manager, workflows=workflows)),
+         (r"/healthcheck", healthcheck_handler.HealthcheckHandler)])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
     supplier_server.listen(80)
 

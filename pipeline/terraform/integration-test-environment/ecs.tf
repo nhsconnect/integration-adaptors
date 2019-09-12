@@ -2,7 +2,7 @@ resource "aws_ecs_cluster" "mhs_cluster" {
   name = "${var.environment_id}-mhs-cluster"
 
   tags = {
-    Name          = "${var.environment_id}-mhs-cluster"
+    Name = "${var.environment_id}-mhs-cluster"
     EnvironmentId = var.environment_id
   }
 }
@@ -10,7 +10,7 @@ resource "aws_ecs_cluster" "mhs_cluster" {
 resource "aws_cloudwatch_log_group" "mhs_outbound_log_group" {
   name = "/ecs/${var.environment_id}-mhs-outbound"
   tags = {
-    Name          = "${var.environment_id}-mhs-outbound-log-group"
+    Name = "${var.environment_id}-mhs-outbound-log-group"
     EnvironmentId = var.environment_id
   }
 }
@@ -18,7 +18,7 @@ resource "aws_cloudwatch_log_group" "mhs_outbound_log_group" {
 resource "aws_cloudwatch_log_group" "mhs_inbound_log_group" {
   name = "/ecs/${var.environment_id}-mhs-inbound"
   tags = {
-    Name          = "${var.environment_id}-mhs-inbound-log-group"
+    Name = "${var.environment_id}-mhs-inbound-log-group"
     EnvironmentId = var.environment_id
   }
 }
@@ -34,23 +34,23 @@ resource "aws_cloudwatch_log_group" "mhs_route_log_group" {
 locals {
   mhs_outbound_base_environment_vars = [
     {
-      name  = "MHS_LOG_LEVEL"
+      name = "MHS_LOG_LEVEL"
       value = var.mhs_log_level
     },
     {
-      name  = "MHS_STATE_TABLE_NAME"
+      name = "MHS_STATE_TABLE_NAME"
       value = aws_dynamodb_table.mhs_state_table.name
     },
     {
-      name  = "MHS_SYNC_ASYNC_STATE_TABLE_NAME",
+      name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME",
       value = aws_dynamodb_table.mhs_sync_async_table.name
     },
     {
-      name  = "MHS_RESYNC_RETRIES",
+      name = "MHS_RESYNC_RETRIES",
       value = var.mhs_resynchroniser_max_retries
     },
     {
-      name  = "MHS_RESYNC_INTERVAL",
+      name = "MHS_RESYNC_INTERVAL",
       value = var.mhs_resynchroniser_interval
     },
     {
@@ -67,144 +67,144 @@ locals {
 resource "aws_ecs_task_definition" "mhs_outbound_task" {
   family = "${var.environment_id}-mhs-outbound"
   container_definitions = jsonencode(
-    [
-      {
-        name  = "mhs-outbound"
-        image = "${var.ecr_address}/mhs/outbound:outbound-${var.build_id}"
-        environment = var.mhs_outbound_http_proxy == "" ? local.mhs_outbound_base_environment_vars : concat(local.mhs_outbound_base_environment_vars, [
-          {
-            name  = "MHS_OUTBOUND_HTTP_PROXY"
-            value = var.mhs_outbound_http_proxy
-          }
-        ])
-        secrets = [
-          {
-            name      = "MHS_PARTY_KEY"
-            valueFrom = var.party_key_arn
-          },
-          {
-            name      = "MHS_CLIENT_CERT"
-            valueFrom = var.client_cert_arn
-          },
-          {
-            name      = "MHS_CLIENT_KEY"
-            valueFrom = var.client_key_arn
-          },
-          {
-            name      = "MHS_CA_CERTS"
-            valueFrom = var.ca_certs_arn
-          }
-        ]
-        essential = true
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = aws_cloudwatch_log_group.mhs_outbound_log_group.name
-            awslogs-region        = var.region
-            awslogs-stream-prefix = var.build_id
-          }
+  [
+    {
+      name = "mhs-outbound"
+      image = "${var.ecr_address}/mhs/outbound:outbound-${var.build_id}"
+      environment = var.mhs_outbound_http_proxy == "" ? local.mhs_outbound_base_environment_vars : concat(local.mhs_outbound_base_environment_vars, [
+        {
+          name = "MHS_OUTBOUND_HTTP_PROXY"
+          value = var.mhs_outbound_http_proxy
         }
-        portMappings = [
-          {
-            containerPort = 80
-            hostPort      = 80
-            protocol      = "tcp"
-          }
-        ]
+      ])
+      secrets = [
+        {
+          name = "MHS_PARTY_KEY"
+          valueFrom = var.party_key_arn
+        },
+        {
+          name = "MHS_CLIENT_CERT"
+          valueFrom = var.client_cert_arn
+        },
+        {
+          name = "MHS_CLIENT_KEY"
+          valueFrom = var.client_key_arn
+        },
+        {
+          name = "MHS_CA_CERTS"
+          valueFrom = var.ca_certs_arn
+        }
+      ]
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group = aws_cloudwatch_log_group.mhs_outbound_log_group.name
+          awslogs-region = var.region
+          awslogs-stream-prefix = var.build_id
+        }
       }
-    ]
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort = 80
+          protocol = "tcp"
+        }
+      ]
+    }
+  ]
   )
-  cpu          = "512"
-  memory       = "1024"
+  cpu = "512"
+  memory = "1024"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE"
   ]
   tags = {
-    Name          = "${var.environment_id}-mhs-outbound-task"
+    Name = "${var.environment_id}-mhs-outbound-task"
     EnvironmentId = var.environment_id
   }
-  task_role_arn      = var.task_role_arn
+  task_role_arn = var.task_role_arn
   execution_role_arn = var.execution_role_arn
 }
 
 resource "aws_ecs_task_definition" "mhs_inbound_task" {
   family = "${var.environment_id}-mhs-inbound"
   container_definitions = jsonencode(
-    [
-      {
-        name  = "mhs-inbound"
-        image = "${var.ecr_address}/mhs/inbound:inbound-${var.build_id}"
-        environment = [
-          {
-            name  = "MHS_LOG_LEVEL"
-            value = var.mhs_log_level
-          },
-          {
-            name  = "MHS_STATE_TABLE_NAME"
-            value = aws_dynamodb_table.mhs_state_table.name
-          },
-          {
-            name  = "MHS_SYNC_ASYNC_STATE_TABLE_NAME"
-            value = aws_dynamodb_table.mhs_sync_async_table.name
-          },
-          {
-            name  = "MHS_INBOUND_QUEUE_URL"
-            value = var.inbound_queue_host
-          }
-        ]
-        secrets = [
-          {
-            name      = "MHS_INBOUND_QUEUE_USERNAME"
-            valueFrom = var.inbound_queue_username_arn
-          },
-          {
-            name      = "MHS_INBOUND_QUEUE_PASSWORD"
-            valueFrom = var.inbound_queue_password_arn
-          },
-          {
-            name      = "MHS_PARTY_KEY"
-            valueFrom = var.party_key_arn
-          },
-          {
-            name      = "MHS_CLIENT_KEY"
-            valueFrom = var.client_key_arn
-          },
-          {
-            name      = "MHS_CA_CERTS"
-            valueFrom = var.ca_certs_arn
-          }
-        ]
-        essential = true
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = aws_cloudwatch_log_group.mhs_inbound_log_group.name
-            awslogs-region        = var.region
-            awslogs-stream-prefix = var.build_id
-          }
+  [
+    {
+      name = "mhs-inbound"
+      image = "${var.ecr_address}/mhs/inbound:inbound-${var.build_id}"
+      environment = [
+        {
+          name = "MHS_LOG_LEVEL"
+          value = var.mhs_log_level
+        },
+        {
+          name = "MHS_STATE_TABLE_NAME"
+          value = aws_dynamodb_table.mhs_state_table.name
+        },
+        {
+          name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME"
+          value = aws_dynamodb_table.mhs_sync_async_table.name
+        },
+        {
+          name = "MHS_INBOUND_QUEUE_URL"
+          value = var.inbound_queue_host
         }
-        portMappings = [
-          {
-            containerPort = 443
-            hostPort      = 443
-            protocol      = "tcp"
-          }
-        ]
+      ]
+      secrets = [
+        {
+          name = "MHS_INBOUND_QUEUE_USERNAME"
+          valueFrom = var.inbound_queue_username_arn
+        },
+        {
+          name = "MHS_INBOUND_QUEUE_PASSWORD"
+          valueFrom = var.inbound_queue_password_arn
+        },
+        {
+          name = "MHS_PARTY_KEY"
+          valueFrom = var.party_key_arn
+        },
+        {
+          name = "MHS_CLIENT_KEY"
+          valueFrom = var.client_key_arn
+        },
+        {
+          name = "MHS_CA_CERTS"
+          valueFrom = var.ca_certs_arn
+        }
+      ]
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group = aws_cloudwatch_log_group.mhs_inbound_log_group.name
+          awslogs-region = var.region
+          awslogs-stream-prefix = var.build_id
+        }
       }
-    ]
+      portMappings = [
+        {
+          containerPort = 443
+          hostPort = 443
+          protocol = "tcp"
+        }
+      ]
+    }
+  ]
   )
-  cpu          = "512"
-  memory       = "1024"
+  cpu = "512"
+  memory = "1024"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE"
   ]
   tags = {
-    Name          = "${var.environment_id}-mhs-inbound-task"
+    Name = "${var.environment_id}-mhs-inbound-task"
     EnvironmentId = var.environment_id
   }
-  task_role_arn      = var.task_role_arn
+  task_role_arn = var.task_role_arn
   execution_role_arn = var.execution_role_arn
 }
 
@@ -278,14 +278,14 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
 }
 
 resource "aws_ecs_service" "mhs_outbound_service" {
-  name                               = "${var.environment_id}-mhs-outbound"
-  cluster                            = aws_ecs_cluster.mhs_cluster.id
-  deployment_maximum_percent         = 200
+  name = "${var.environment_id}-mhs-outbound"
+  cluster = aws_ecs_cluster.mhs_cluster.id
+  deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
-  desired_count                      = var.mhs_outbound_service_instance_count
-  launch_type                        = "FARGATE"
-  scheduling_strategy                = "REPLICA"
-  task_definition                    = aws_ecs_task_definition.mhs_outbound_task.arn
+  desired_count = var.mhs_outbound_service_instance_count
+  launch_type = "FARGATE"
+  scheduling_strategy = "REPLICA"
+  task_definition = aws_ecs_task_definition.mhs_outbound_task.arn
 
   network_configuration {
     assign_public_ip = false
@@ -296,8 +296,8 @@ resource "aws_ecs_service" "mhs_outbound_service" {
   }
 
   load_balancer {
-    container_name   = jsondecode(aws_ecs_task_definition.mhs_outbound_task.container_definitions)[0].name
-    container_port   = jsondecode(aws_ecs_task_definition.mhs_outbound_task.container_definitions)[0].portMappings[0].hostPort
+    container_name = jsondecode(aws_ecs_task_definition.mhs_outbound_task.container_definitions)[0].name
+    container_port = jsondecode(aws_ecs_task_definition.mhs_outbound_task.container_definitions)[0].portMappings[0].hostPort
     target_group_arn = aws_lb_target_group.outbound_alb_target_group.arn
   }
 
@@ -307,14 +307,14 @@ resource "aws_ecs_service" "mhs_outbound_service" {
 }
 
 resource "aws_ecs_service" "mhs_inbound_service" {
-  name                               = "${var.environment_id}-mhs-inbound"
-  cluster                            = aws_ecs_cluster.mhs_cluster.id
-  deployment_maximum_percent         = 200
+  name = "${var.environment_id}-mhs-inbound"
+  cluster = aws_ecs_cluster.mhs_cluster.id
+  deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
-  desired_count                      = var.mhs_inbound_service_instance_count
-  launch_type                        = "FARGATE"
-  scheduling_strategy                = "REPLICA"
-  task_definition                    = aws_ecs_task_definition.mhs_inbound_task.arn
+  desired_count = var.mhs_inbound_service_instance_count
+  launch_type = "FARGATE"
+  scheduling_strategy = "REPLICA"
+  task_definition = aws_ecs_task_definition.mhs_inbound_task.arn
 
   network_configuration {
     assign_public_ip = false
@@ -325,8 +325,8 @@ resource "aws_ecs_service" "mhs_inbound_service" {
   }
 
   load_balancer {
-    container_name   = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].name
-    container_port   = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].portMappings[0].hostPort
+    container_name = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].name
+    container_port = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].portMappings[0].hostPort
     target_group_arn = aws_lb_target_group.inbound_nlb_target_group.arn
   }
 

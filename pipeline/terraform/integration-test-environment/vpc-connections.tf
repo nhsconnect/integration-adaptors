@@ -31,7 +31,7 @@ resource "aws_route" "mhs_to_supplier_route" {
 
 resource "aws_route53_zone_association" "supplier_hosted_zone_mhs_vpc_association" {
   zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
-  vpc_id  = data.aws_vpc.supplier_vpc.id
+  vpc_id = data.aws_vpc.supplier_vpc.id
 }
 
 resource "aws_security_group_rule" "mhs_inbound_security_group_amazon_mq_egress_rule" {
@@ -40,7 +40,8 @@ resource "aws_security_group_rule" "mhs_inbound_security_group_amazon_mq_egress_
   from_port = 5671
   to_port = 5671
   protocol = "tcp"
-  cidr_blocks = [data.aws_vpc.supplier_vpc.cidr_block]
+  cidr_blocks = [
+    data.aws_vpc.supplier_vpc.cidr_block]
   description = "Amazon MQ connection"
 }
 
@@ -81,7 +82,7 @@ resource "aws_route" "opentest_to_mhs_route" {
 
 resource "aws_route53_zone_association" "opentest_hosted_zone_mhs_vpc_association" {
   zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
-  vpc_id  = data.aws_vpc.opentest_vpc.id
+  vpc_id = data.aws_vpc.opentest_vpc.id
 }
 
 resource "aws_security_group_rule" "mhs_outbound_security_group_opentest_http_proxy_egress_rule" {
@@ -90,7 +91,8 @@ resource "aws_security_group_rule" "mhs_outbound_security_group_opentest_http_pr
   from_port = 3128
   to_port = 3128
   protocol = "tcp"
-  cidr_blocks = [data.aws_vpc.opentest_vpc.cidr_block]
+  cidr_blocks = [
+    data.aws_vpc.opentest_vpc.cidr_block]
   description = "HTTP proxy to Opentest"
 }
 
@@ -100,6 +102,7 @@ resource "aws_security_group_rule" "mhs_route_security_group_opentest_ldap_proxy
   from_port = 389
   to_port = 389
   protocol = "tcp"
-  cidr_blocks = [data.aws_vpc.opentest_vpc.cidr_block]
+  cidr_blocks = [
+    data.aws_vpc.opentest_vpc.cidr_block]
   description = "HTTP proxy to Opentest"
 }
