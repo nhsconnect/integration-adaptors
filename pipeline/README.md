@@ -90,6 +90,15 @@ containers to be published to ECR and the integration test environment to be sto
     - CloudWatchLogsFullAccess
     - AmazonRoute53FullAccess
 - An ECS Cluster for the SCR application to be deployed into. This must be an EC2 Linux cluster.
+- Entries in AWS Secrets Manager for all sensitive data. These entries should be created by following the AWS, selecting
+to store the secret as "Other type of secrets" and entering the required value using the plaintext tab (these values
+should not be specified as JSON). The following secrets are required:
+    - The username to use when connecting to the AMQP inbound queue
+    - The password to use when connecting to the AMQP inbound queue
+    - The party key associated with your MHS
+    - The client certificate the outbound MHS component should present to other MHS instances
+    - The private key for the client certificate the outbound MHS component should present to other MHS instances
+    - The CA certificates used to validate the certificates presented by incoming connections to the MHS.
 
 # Jenkins
 
