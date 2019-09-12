@@ -1,11 +1,8 @@
 """This module defines the envelope used to wrap asynchronous messages to be sent to a remote MHS."""
 import copy
-import pathlib
 from typing import Dict, Tuple, Any, Optional, NamedTuple
 from xml.etree.ElementTree import Element
 
-import builder.pystache_message_builder as pystache_message_builder
-from definitions import ROOT_DIR
 from mhs_common.messages import envelope
 import utilities.message_utilities as message_utilities
 from utilities import integration_adaptors_logger as log
@@ -26,6 +23,7 @@ RECEIVED_MESSAGE_ID = "received_message_id"
 
 EBXML_NAMESPACE = "eb"
 SOAP_NAMESPACE = "SOAP"
+
 NAMESPACES = {SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
               EBXML_NAMESPACE: "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"}
 
@@ -51,15 +49,7 @@ class EbxmlEnvelope(envelope.Envelope):
     ]
 
     def __init__(self, template_file: str, message_dictionary: Dict[str, Any]):
-        """Create a new EbxmlEnvelope that populates the specified template file with the provided dictionary.
-
-        :param template_file: The template file to populate with values.
-        :param message_dictionary: The dictionary of values to use when populating the template.
-        """
-        self.message_dictionary = message_dictionary
-
-        ebxml_template_dir = str(pathlib.Path(ROOT_DIR) / TEMPLATES_DIR)
-        self.message_builder = pystache_message_builder.PystacheMessageBuilder(ebxml_template_dir, template_file)
+        super().__init__(template_file, message_dictionary)
 
     def serialize(self) -> Tuple[str, Dict[str, str], str]:
         """Produce a serialised representation of this ebXML message by populating a Mustache template with this
@@ -85,6 +75,15 @@ class EbxmlEnvelope(envelope.Envelope):
             'SOAPAction': f'{ebxml_message_dictionary[SERVICE]}/{ebxml_message_dictionary[ACTION]}'
         }
         return message_id, http_headers, message
+
+    @staticmethod
+    def _add_if_present(values_dict: Dict[str, Any], key: str, value: Optional[Any]):
+        if value is not None:
+            values_dict[key] = value
+
+    @staticmethod
+    def _add_flag(values_dict: Dict[str, Any], key: str, value: Optional[Any]):
+        values_dict[key] = True if value is not None else False
 
     @staticmethod
     def parse_message(xml_tree: Element) -> Dict[str, str]:
@@ -150,19 +149,6 @@ class EbxmlEnvelope(envelope.Envelope):
                                      "EbXML message.", {'attribute_name': attribute_name, 'xpath': xpath})
                 raise EbXmlParsingError(f"Weren't able to find required attribute {attribute_name} during parsing of "
                                         f"EbXML message") from e
-
-    @staticmethod
-    def _add_if_present(values_dict: Dict[str, Any], key: str, value: Any):
-        if value is not None:
-            values_dict[key] = value
-
-    @staticmethod
-    def _add_flag(values_dict: Dict[str, Any], key: str, value: Optional[Any]):
-        if value is not None:
-            values_dict[key] = True
-        else:
-            values_dict[key] = False
-
 
 class EbXmlParsingError(Exception):
     """Raised when an error was encountered during parsing of an ebXML message."""
