@@ -195,3 +195,11 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                    'SOAPAction': 'service/action',
                                    'charset': 'UTF-8',
                                    'type': 'text/xml'})
+
+    @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope.serialize')
+    @async_test
+    async def test_prepare_message_raises_exception(self, serialize_mock):
+        serialize_mock.side_effect = Exception()
+        with self.assertRaises(Exception):
+            await self.wf._prepare_outbound_message("message_id", "to_asid", "from_asid", "mesasge",
+                                                    {'service': 'service', 'action': 'action'})
