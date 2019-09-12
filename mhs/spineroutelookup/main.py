@@ -3,6 +3,7 @@ import pathlib
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+from mhs_common.request import healthcheck_handler
 from utilities import config
 from utilities import integration_adaptors_logger as log
 
@@ -66,7 +67,8 @@ def start_tornado_server(routing: routing_reliability.RoutingAndReliability) -> 
     application = tornado.web.Application([
         ("/routing", routing_handler.RoutingRequestHandler, handler_dependencies),
         ("/reliability", reliability_handler.ReliabilityRequestHandler, handler_dependencies),
-        ("/routing-reliability", routing_reliability_handler.RoutingReliabilityRequestHandler, handler_dependencies)
+        ("/routing-reliability", routing_reliability_handler.RoutingReliabilityRequestHandler, handler_dependencies),
+        ("/healthcheck", healthcheck_handler.HealthcheckHandler)
     ])
     server = tornado.httpserver.HTTPServer(application)
     server.listen(80)

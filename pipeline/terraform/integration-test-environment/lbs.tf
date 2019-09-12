@@ -65,6 +65,11 @@ resource "aws_lb_target_group" "route_alb_target_group" {
   target_type = "ip"
   vpc_id = aws_vpc.mhs_vpc.id
 
+  health_check {
+    path = "/healthcheck"
+    matcher = "200"
+  }
+
   tags = {
     Name = "${var.environment_id}-mhs-route-alb-target-group"
     EnvironmentId = var.environment_id
