@@ -106,7 +106,8 @@ class CommonWorkflow(abc.ABC):
 
         return url
 
-    def _extract_asid(self, endpoint_details: Dict[str, List[str]]) -> str:
+    @staticmethod
+    def _extract_asid(endpoint_details: Dict[str, List[str]]) -> str:
         unique_identifiers = endpoint_details[MHS_TO_ASID_KEY]
 
         if len(unique_identifiers) == 0:

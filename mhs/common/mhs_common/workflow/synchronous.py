@@ -35,7 +35,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                       correlation_id: str,
                                       interaction_details: dict,
                                       payload: str,
-                                      work_description_object: Optional[wd.WorkDescription]) -> Tuple[int, str]:
+                                      work_description_object: Optional[wd.WorkDescription]) \
+            -> Tuple[int, str, Optional[wd.WorkDescription]]:
         logger.info('001', 'Entered sync workflow for outbound message')
         wdo = wd.create_new_work_description(self.wd_store,
                                              message_id,
@@ -49,7 +50,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         except Exception:
             logger.error('009', 'Failed to retrieve details from spine route lookup')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
-            return 500, 'Error obtaining outbound URL'
+            return 500, 'Error obtaining outbound URL', None
 
         try:
             message_id, headers, message = await self._prepare_outbound_message(message_id,
@@ -60,7 +61,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         except Exception:
             logger.error('002', 'Failed to prepare outbound message')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
-            return 500, 'Failed message preparation'
+            return 500, 'Failed message preparation', None
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
 
@@ -76,18 +77,19 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
 
             if e.response:
-                return handle_soap_error(e.response.code, e.response.headers, e.response.body)
+                code, response = handle_soap_error(e.response.code, e.response.headers, e.response.body)
+                return  code, response, None
 
-            return 500, f'Error(s) received from Spine: {e}'
+            return 500, f'Error(s) received from Spine: {e}', None
         except Exception as e:
             logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            return 500, 'Error making outbound request'
+            return 500, 'Error making outbound request', None
 
         logger.info('0021', 'Response received from spine {startTime} {endTime}',
                     {'startTime': start_time, 'endTime': end_time})
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
-        return response.code, response.body.decode()
+        return response.code, response.body.decode(), wdo
 
     async def _prepare_outbound_message(self, message_id: Optional[str], to_asid: str, from_asid: str,
                                         message: str,

@@ -19,7 +19,9 @@ INTERACTION_DETAILS = {
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_END_POINT_VALUE = "example.com"
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
+MHS_TO_ASID = 'uniqueIdentifier'
 MHS_TO_PARTY_KEY_VALUE = 'to-party-key'
+MHS_TO_ASID_VALUE = ['to-asid']
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_CPA_ID_VALUE = 'cpa-id'
 
@@ -78,3 +80,42 @@ class TestCommonWorkflow(unittest.TestCase):
         actual_url = common.CommonWorkflow._extract_endpoint_url(endpoint_details)
 
         self.assertEqual(expected_url, actual_url)
+
+
+######
+
+    @async_test
+    async def test_lookup_asid_details(self):
+        self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
+            MHS_END_POINT_KEY: [MHS_END_POINT_VALUE],
+            MHS_TO_ASID: MHS_TO_ASID_VALUE
+        })
+
+        url, to_asid = await self.workflow._lookup_to_asid_details(INTERACTION_DETAILS)
+
+        self.mock_routing_reliability.get_end_point.assert_called_with(SERVICE_ID)
+        self.assertEqual(url, MHS_END_POINT_VALUE)
+        self.assertEqual(to_asid, MHS_TO_ASID_VALUE[0])
+
+    @async_test
+    async def test_lookup_asid_details_error(self):
+        self.mock_routing_reliability.get_end_point.side_effect = Exception()
+
+        with self.assertRaises(Exception):
+            await self.workflow._lookup_to_asid_details(INTERACTION_DETAILS)
+
+    @async_test
+    async def test_extract_no_to_asid_returned(self):
+        endpoint_details = {MHS_TO_ASID: []}
+
+        with self.assertRaises(IndexError):
+            common.CommonWorkflow._extract_asid(endpoint_details)
+
+    @async_test
+    async def test_extract_asid_multiple_returned(self):
+        expected_asid = "asid 1"
+        endpoint_details = {MHS_TO_ASID: [expected_asid, "asid 2"]}
+
+        actual_asid = common.CommonWorkflow._extract_asid(endpoint_details)
+
+        self.assertEqual(expected_asid, actual_asid)

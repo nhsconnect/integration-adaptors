@@ -53,10 +53,11 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.wf._lookup_to_asid_details.side_effect = Exception()
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
 
-        error, text = await self.wf.handle_outbound_message(message_id="123",
-                                                            correlation_id="qwe",
-                                                            interaction_details={},
-                                                            payload="nice message", work_description_object=None)
+        error, text, work_description_response = await self.wf.handle_outbound_message(message_id="123",
+                                                                                       correlation_id="qwe",
+                                                                                       interaction_details={},
+                                                                                       payload="nice message",
+                                                                                       work_description_object=None)
 
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
         self.assertEqual(error, 500)
@@ -76,10 +77,11 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.wf._prepare_outbound_message.side_effect = Exception()
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
 
-        error, text = await self.wf.handle_outbound_message(message_id="123",
-                                                            correlation_id="qwe",
-                                                            interaction_details={},
-                                                            payload="nice message", work_description_object=None)
+        error, text, work_description_response = await self.wf.handle_outbound_message(message_id="123",
+                                                                                       correlation_id="qwe",
+                                                                                       interaction_details={},
+                                                                                       payload="nice message",
+                                                                                       work_description_object=None)
 
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
         self.assertEqual(error, 500)
@@ -98,10 +100,11 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
 
-        error, text = await self.wf.handle_outbound_message(message_id="123",
-                                                            correlation_id="qwe",
-                                                            interaction_details={},
-                                                            payload="nice message", work_description_object=None)
+        error, text, work_description_response = await self.wf.handle_outbound_message(message_id="123",
+                                                                                       correlation_id="qwe",
+                                                                                       interaction_details={},
+                                                                                       payload="nice message",
+                                                                                       work_description_object=None)
 
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
         self.assertEqual(error, 500)
@@ -122,10 +125,11 @@ class TestSynchronousWorkflow(unittest.TestCase):
         future.set_exception(httpclient.HTTPClientError(code=409))
         self.transmission.make_request.return_value = future
 
-        error, text = await self.wf.handle_outbound_message(message_id="123",
-                                                            correlation_id="qwe",
-                                                            interaction_details={},
-                                                            payload="nice message", work_description_object=None)
+        error, text, work_description_response = await self.wf.handle_outbound_message(message_id="123",
+                                                                                       correlation_id="qwe",
+                                                                                       interaction_details={},
+                                                                                       payload="nice message",
+                                                                                       work_description_object=None)
 
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
         self.assertEqual(error, 500)
@@ -134,23 +138,21 @@ class TestSynchronousWorkflow(unittest.TestCase):
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
     async def test_send_message_http_status_code_err(self, wd_mock):
+        self._setup_success_workflow()
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
-        self.wf._prepare_outbound_message = mock.MagicMock()
-        self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
         response = mock.MagicMock()
         response.code = 400
         response.body = b'err response body'
         self.transmission.make_request.return_value = test_utilities.awaitable(response)
 
-        error, text = await self.wf.handle_outbound_message(message_id="123",
-                                                            correlation_id="qwe",
-                                                            interaction_details={},
-                                                            payload="nice message", work_description_object=None)
+        error, text, work_description_response = await self.wf.handle_outbound_message(message_id="123",
+                                                                                       correlation_id="qwe",
+                                                                                       interaction_details={},
+                                                                                       payload="nice message",
+                                                                                       work_description_object=None)
 
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         self.assertEqual(error, 400)
@@ -159,23 +161,17 @@ class TestSynchronousWorkflow(unittest.TestCase):
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
     async def test_send_message_success_message(self, wd_mock):
+        self._setup_success_workflow()
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
-        self.wf._prepare_outbound_message = mock.MagicMock()
-        self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
-        response = mock.MagicMock()
-        response.code = 200
-        response.body = b'response body'
-        self.transmission.make_request.return_value = test_utilities.awaitable(response)
 
-        error, text = await self.wf.handle_outbound_message(message_id="123",
-                                                            correlation_id="qwe",
-                                                            interaction_details={},
-                                                            payload="nice message", work_description_object=None)
+        error, text, work_description_response = await self.wf.handle_outbound_message(message_id="123",
+                                                                                       correlation_id="qwe",
+                                                                                       interaction_details={},
+                                                                                       payload="nice message",
+                                                                                       work_description_object=None)
 
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         self.assertEqual(error, 200)
@@ -203,3 +199,13 @@ class TestSynchronousWorkflow(unittest.TestCase):
         with self.assertRaises(Exception):
             await self.wf._prepare_outbound_message("message_id", "to_asid", "from_asid", "mesasge",
                                                     {'service': 'service', 'action': 'action'})
+
+    def _setup_success_workflow(self):
+        self.wf._lookup_to_asid_details = mock.MagicMock()
+        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._prepare_outbound_message = mock.MagicMock()
+        self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
+        response = mock.MagicMock()
+        response.code = 200
+        response.body = b'response body'
+        self.transmission.make_request.return_value = test_utilities.awaitable(response)
