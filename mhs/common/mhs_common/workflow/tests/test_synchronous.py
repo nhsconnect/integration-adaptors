@@ -183,6 +183,25 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.assertEqual(error, 200)
         self.assertEqual(text, 'response body')
 
+    @mock.patch('mhs_common.state.work_description.create_new_work_description')
+    @async_test
+    async def test_handle_outbound_errors_when_no_asid_provided(self, wd_mock):
+        wdo = mock.MagicMock()
+        wdo.publish.return_value = test_utilities.awaitable(None)
+        wd_mock.return_value = wdo
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
+
+        error, text, work_description_response = await self.wf.handle_outbound_message(from_asid=None,
+                                                                                       message_id="123",
+                                                                                       correlation_id="qwe",
+                                                                                       interaction_details={},
+                                                                                       payload="nice message",
+                                                                                       work_description_object=None)
+
+        self.assertEqual(error, 400)
+        self.assertEqual(text, '`from_asid` header field required for sync messages')
+
+
     @async_test
     async def test_no_inbound(self):
         with self.assertRaises(NotImplementedError):
