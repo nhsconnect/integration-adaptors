@@ -62,6 +62,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Failed message preparation'
 
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
+
         logger.info('003', 'About to make outbound request')
         start_time = timing.get_time()
         try:
@@ -70,8 +72,6 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         except httpclient.HTTPClientError as e:
             logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                            {'HTTPStatus': e.code, 'Exception': e})
-            self._record_outbound_audit_log(timing.get_time(), start_time,
-                                            wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
 
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
 
@@ -84,19 +84,10 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request'
 
-        if response.code == 200:
-            self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
-            await wd.update_status_with_retries(wdo,
-                                                wdo.set_outbound_status,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED,
-                                                self.persistence_store_retries)
-            return 200, response.body
-        else:
-            logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
-                           {'HTTPStatus': response.code})
-            self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            return 500, "Didn't get expected success response from Spine"
+        logger.info('0021', 'Response received from spine {startTime} {endTime}',
+                    {'startTime': start_time, 'endTime': end_time})
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
+        return response.code, response.body.decode()
 
     async def _prepare_outbound_message(self, message_id: Optional[str], to_asid: str, from_asid: str,
                                         message: str,
@@ -113,12 +104,6 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         envelope = soap_envelope.SoapEnvelope(message_details)
         return envelope.serialize()
-
-    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0007', 'Synchronous workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
-                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment})
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
