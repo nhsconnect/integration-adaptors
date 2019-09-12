@@ -28,19 +28,67 @@ variable "internal_root_domain" {
   description = "Domain name to be used internally to refer to parts of the MHS (subdomains will be created off of this root domain). This domain name should not clash with any domain name on the internet. e.g. internal.somedomainyoucontrol.com"
 }
 
-variable "mhs_outbound_service_instance_count" {
+variable "mhs_outbound_service_minimum_instance_count" {
   type = number
-  description = "The desired number of instances of MHS outbound to run."
+  description = "The minimum number of instances of MHS outbound to run."
 }
 
-variable "mhs_inbound_service_instance_count" {
+variable "mhs_outbound_service_initial_instance_count" {
   type = number
-  description = "The desired number of instances of MHS inbound to run."
+  description = "The number of instances of MHS outbound to run initially (before autoscaling is applied)."
 }
 
-variable "mhs_route_service_instance_count" {
+variable "mhs_outbound_service_maximum_instance_count" {
   type = number
-  description = "The desired number of instances of MHS route service to run."
+  description = "The maximum number of instances of MHS outbound to run."
+}
+
+variable "mhs_outbound_service_target_request_count" {
+  type = number
+  description = "The target number of requests per minute that an MHS outbound service should handle. The number of services will be autoscaled so each instance handles this number of requests."
+  default = 20
+}
+
+variable "mhs_inbound_service_minimum_instance_count" {
+  type = number
+  description = "The minimum number of instances of MHS inbound to run."
+}
+
+variable "mhs_inbound_service_initial_instance_count" {
+  type = number
+  description = "The desired number of instances of MHS inbound to run initially (before autoscaling is applied)."
+}
+
+variable "mhs_inbound_service_maximum_instance_count" {
+  type = number
+  description = "The maximum number of instances of MHS inbound to run."
+}
+
+variable "mhs_inbound_service_target_cpu_utilization" {
+  type = number
+  description = "The target CPU utilization (in percent) that an MHS inbound service should have. The number of services will be autoscaled so each instance achieves this level of utilization."
+  default = 80
+}
+
+variable "mhs_route_service_minimum_instance_count" {
+  type = number
+  description = "The minimum number of instances of MHS route service to run."
+}
+
+variable "mhs_route_service_initial_instance_count" {
+  type = number
+  description = "The desired number of instances of MHS route service to run initially (before autoscaling is applied)."
+}
+
+variable "mhs_route_service_maximum_instance_count" {
+  type = number
+  description = "The maximum number of instances of MHS route service to run."
+}
+
+variable "mhs_route_service_target_request_count" {
+  type = number
+  description = "The target number of requests per minute that an MHS route service should handle. The number of services will be autoscaled so each instance handles this number of requests."
+  default = 20
 }
 
 variable "task_role_arn" {
@@ -51,6 +99,11 @@ variable "task_role_arn" {
 variable "execution_role_arn" {
   type = string
   description = "ARN of the IAM role for MHS containers to pull from ECR and put logs in Cloudwatch."
+}
+
+variable "task_scaling_role_arn" {
+  type = string
+  description = "ARN of the IAM role for ECS to use when auto-scaling services"
 }
 
 variable "ecr_address" {

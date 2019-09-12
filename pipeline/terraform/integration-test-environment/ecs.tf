@@ -304,7 +304,7 @@ resource "aws_ecs_service" "mhs_outbound_service" {
   cluster = aws_ecs_cluster.mhs_cluster.id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
-  desired_count = var.mhs_outbound_service_instance_count
+  desired_count = var.mhs_outbound_service_initial_instance_count
   launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.mhs_outbound_task.arn
@@ -328,6 +328,39 @@ resource "aws_ecs_service" "mhs_outbound_service" {
   depends_on = [
     aws_lb.outbound_alb
   ]
+
+  # Preserve the autoscaled instance count when this service is updated
+  lifecycle {
+    ignore_changes = ["desired_count"]
+  }
+}
+
+# The autoscaling target that configures autoscaling for the MHS outbound ECS service.
+resource "aws_appautoscaling_target" "mhs_outbound_autoscaling_target" {
+  max_capacity       = var.mhs_outbound_service_maximum_instance_count
+  min_capacity       = var.mhs_outbound_service_minimum_instance_count
+  resource_id        = "service/${aws_ecs_cluster.mhs_cluster.name}/${aws_ecs_service.mhs_outbound_service.name}"
+  role_arn           = var.task_scaling_role_arn
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+# An autoscaling policy for the MHS outbound ECS service that scales services so that each instance handles the desired
+# number of requests per minute.
+resource "aws_appautoscaling_policy" "mhs_outbound_autoscaling_policy" {
+  name               = "${var.environment_id}-mhs-outbound-autoscaling-policy"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.mhs_outbound_autoscaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.mhs_outbound_autoscaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.mhs_outbound_autoscaling_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = var.mhs_outbound_service_target_request_count
+    predefined_metric_specification {
+      predefined_metric_type = "ALBRequestCountPerTarget"
+      resource_label = "${aws_lb.outbound_alb.arn_suffix}/${aws_lb_target_group.outbound_alb_target_group.arn_suffix}"
+    }
+  }
 }
 
 # MHS inbound service that runs multiple of the MHS outbound task definition
@@ -337,7 +370,7 @@ resource "aws_ecs_service" "mhs_inbound_service" {
   cluster = aws_ecs_cluster.mhs_cluster.id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
-  desired_count = var.mhs_inbound_service_instance_count
+  desired_count = var.mhs_inbound_service_initial_instance_count
   launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.mhs_inbound_task.arn
@@ -363,6 +396,38 @@ resource "aws_ecs_service" "mhs_inbound_service" {
   depends_on = [
     aws_lb.inbound_nlb
   ]
+
+  # Preserve the autoscaled instance count when this service is updated
+  lifecycle {
+    ignore_changes = ["desired_count"]
+  }
+}
+
+# The autoscaling target that configures autoscaling for the MHS inbound ECS service.
+resource "aws_appautoscaling_target" "mhs_inbound_autoscaling_target" {
+  max_capacity       = var.mhs_inbound_service_maximum_instance_count
+  min_capacity       = var.mhs_inbound_service_minimum_instance_count
+  resource_id        = "service/${aws_ecs_cluster.mhs_cluster.name}/${aws_ecs_service.mhs_inbound_service.name}"
+  role_arn           = var.task_scaling_role_arn
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+# An autoscaling policy for the MHS inbound ECS service that scales services so that each instance handles the desired
+# number of requests per minute.
+resource "aws_appautoscaling_policy" "mhs_inbound_autoscaling_policy" {
+  name               = "${var.environment_id}-mhs-inbound-autoscaling-policy"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.mhs_inbound_autoscaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.mhs_inbound_autoscaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.mhs_inbound_autoscaling_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = var.mhs_inbound_service_target_cpu_utilization
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+  }
 }
 
 # Create an ECS service that runs a configurable number of instances of the route service container across all of the
@@ -372,7 +437,7 @@ resource "aws_ecs_service" "mhs_route_service" {
   cluster                            = aws_ecs_cluster.mhs_cluster.id
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-  desired_count                      = var.mhs_route_service_instance_count
+  desired_count                      = var.mhs_route_service_initial_instance_count
   launch_type                        = "FARGATE"
   scheduling_strategy                = "REPLICA"
   task_definition                    = aws_ecs_task_definition.mhs_route_task.arn
@@ -394,4 +459,37 @@ resource "aws_ecs_service" "mhs_route_service" {
   depends_on = [
     aws_lb.route_alb
   ]
+
+  # Preserve the autoscaled instance count when this service is updated
+  lifecycle {
+    ignore_changes = ["desired_count"]
+  }
+}
+
+# The autoscaling target that configures autoscaling for the MHS route ECS service.
+resource "aws_appautoscaling_target" "mhs_route_autoscaling_target" {
+  max_capacity       = var.mhs_route_service_maximum_instance_count
+  min_capacity       = var.mhs_route_service_minimum_instance_count
+  resource_id        = "service/${aws_ecs_cluster.mhs_cluster.name}/${aws_ecs_service.mhs_route_service.name}"
+  role_arn           = var.task_scaling_role_arn
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+# An autoscaling policy for the MHS route ECS service that scales services so that each instance handles the desired
+# number of requests per minute.
+resource "aws_appautoscaling_policy" "mhs_route_autoscaling_policy" {
+  name               = "${var.environment_id}-mhs-route-autoscaling-policy"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.mhs_route_autoscaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.mhs_route_autoscaling_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.mhs_route_autoscaling_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = var.mhs_route_service_target_request_count
+    predefined_metric_specification {
+      predefined_metric_type = "ALBRequestCountPerTarget"
+      resource_label = "${aws_lb.route_alb.arn_suffix}/${aws_lb_target_group.route_alb_target_group.arn_suffix}"
+    }
+  }
 }

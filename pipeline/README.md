@@ -50,6 +50,11 @@ console, if available.
     ]
 }
 ```
+- An IAM role to allow the ECS service to auto-scale ECS tasks. This must be a service role (see the
+[AWS documentation on creating roles for AWS services](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html))
+with the trusted entity set to 'Elastic Container Service Autoscale' which has the AWS managed
+'AmazonEC2ContainerServiceAutoscaleRole' policy assigned to it. This can be created by following the AWS documentation
+on the [Amazon ECS Service Auto Scaling IAM Role](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/autoscale_IAM_role.html)
 - An IAM role for the MHS containers to use to run as (the `TASK_ROLE` mentioned [below](#global-variables)).
 This must be a service role (see the
 [AWS documentation on creating roles for AWS services](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html))
@@ -150,8 +155,12 @@ Several global environment variables must be set within Jenkins for the scripts 
 - CLUSTER_ID: The arn of the ecs cluster the SCR application should be deployed into (as described in
 [Pre-Requisites](#pre-requisites))
 - DOCKER_REGISTRY: The address of the Docker registry to publish built containers to. e.g. `randomid.dkr.ecr.eu-west-2.amazonaws.com` This should not include an `http://` prefix, or repository names/paths.
-- TASK_ROLE: The IAM role that will be applied to the running MHS container tasks
-- TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it
+- TASK_ROLE: The IAM role that will be applied to the running MHS container tasks (as described in
+[Pre-Requisites](#pre-requisites)).
+- TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it (as described in
+[Pre-Requisites](#pre-requisites)).
+- TASK_SCALING_ROLE: The IAM role to grant ECS permissions to auto-scale services (as described in
+[Pre-Requisites](#pre-requisites)).
 - SCR_SERVICE_ADDRESS: The endpoint address the SCRWebService can be reached on e.g `http://192.168.41.129:9000`
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
