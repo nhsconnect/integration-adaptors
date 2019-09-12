@@ -11,6 +11,7 @@ import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from comms import proton_queue_adaptor
 from mhs_common import workflow
+from mhs_common.request import healthcheck_handler
 from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
 
 import inbound.request.handler as async_request_handler
@@ -101,6 +102,11 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
 
     inbound_server = tornado.httpserver.HTTPServer(inbound_application, ssl_options=ssl_ctx)
     inbound_server.listen(443)
+
+    healthcheck_application = tornado.web.Application([
+        ("/healthcheck", healthcheck_handler.HealthcheckHandler)
+    ])
+    healthcheck_application.listen(80)
 
     logger.info('011', 'Starting inbound server')
     tornado.ioloop.IOLoop.current().start()

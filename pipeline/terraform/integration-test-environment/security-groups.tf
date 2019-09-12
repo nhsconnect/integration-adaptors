@@ -135,6 +135,16 @@ resource "aws_security_group_rule" "mhs_inbound_security_group_ingress_rule" {
   description = "HTTPS"
 }
 
+resource "aws_security_group_rule" "mhs_inbound_security_group_healthcheck_ingress_rule" {
+  security_group_id = aws_security_group.mhs_inbound_security_group.id
+  type = "ingress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  description = "Allow an HTTP connection from the inbound NLB to the inbound service. For LB healthchecks."
+}
+
 resource "aws_security_group_rule" "mhs_inbound_security_group_egress_rule" {
   security_group_id = aws_security_group.mhs_inbound_security_group.id
   type = "egress"

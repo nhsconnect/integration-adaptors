@@ -110,6 +110,12 @@ resource "aws_lb_target_group" "inbound_nlb_target_group" {
   target_type = "ip"
   vpc_id = aws_vpc.mhs_vpc.id
 
+  health_check {
+    protocol = "HTTP"
+    port = 80
+    path = "/healthcheck"
+  }
+
   tags = {
     Name = "${var.environment_id}-mhs-inbound-nlb-target-group"
     EnvironmentId = var.environment_id

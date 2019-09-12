@@ -16,7 +16,7 @@
       "container_dir": "/packer-files",
       "commit": true,
       "changes": [
-        "EXPOSE 443",
+        "EXPOSE 443 80",
         "WORKDIR {{user `app_dir`}}/{{user `inbound_dir`}}",
         "ENTRYPOINT pipenv run start-inbound"
       ]
