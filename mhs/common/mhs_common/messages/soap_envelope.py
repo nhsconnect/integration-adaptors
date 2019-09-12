@@ -60,7 +60,7 @@ class SoapEnvelope(envelope.Envelope):
             soap_message_dictionary[MESSAGE_ID] = message_id
         timestamp = message_utilities.MessageUtilities.get_timestamp()
         soap_message_dictionary[TIMESTAMP] = timestamp
-        soap_message_dictionary[ACTION] = f'{soap_message_dictionary[SERVICE]}/{soap_message_dictionary[ACTION]}'
+
         logger.info('0001', 'Creating SOAP message with {MessageId} and {Timestamp}',
                     {'MessageId': message_id, 'Timestamp': timestamp})
 

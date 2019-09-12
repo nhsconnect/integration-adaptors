@@ -8,7 +8,6 @@ from mhs_common.configuration import configuration_manager
 from utilities import integration_adaptors_logger as log, message_utilities, timing
 import mhs_common.state.work_description as wd
 
-
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
 
@@ -51,7 +50,6 @@ class SynchronousHandler(tornado.web.RequestHandler):
             logger.error('0009', 'Body missing from request')
             raise tornado.web.HTTPError(400, 'Body missing from request', reason='Body missing from request')
         return body
-
 
     def write_error(self, status_code: int, **kwargs: Any):
         self.set_header('Content-Type', 'text/plain')
@@ -139,9 +137,9 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                                                                              interaction_details,
                                                                                              body,
                                                                                              async_workflow)
-        await self.return_sync_async_response(status, response, wdo)
+        await self.write_response_with_store_updates(status, response, wdo)
 
-    async def return_sync_async_response(self, status: int, response: str, wdo: wd.WorkDescription):
+    async def write_response_with_store_updates(self, status: int, response: str, wdo: wd.WorkDescription):
         try:
             self._write_response(status, response)
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
@@ -149,13 +147,21 @@ class SynchronousHandler(tornado.web.RequestHandler):
             logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
 
-    async def invoke_default_workflow(self, message_id, correlation_id, interaction_details, body, workflow):
-        status, response = await workflow.handle_outbound_message(message_id,
-                                                                  correlation_id,
-                                                                  interaction_details,
-                                                                  body,
-                                                                  None)
-        self._write_response(status, response)
+    async def invoke_default_workflow(self, message_id, correlation_id, interaction_details, body, wf):
+        if isinstance(wf, workflow.SynchronousWorkflow):
+            status, response, work_description_response = await wf.handle_outbound_message(message_id,
+                                                                                           correlation_id,
+                                                                                           interaction_details,
+                                                                                           body,
+                                                                                           None)
+            await self.write_response_with_store_updates(status, response, work_description_response)
+        else:
+            status, response = await wf.handle_outbound_message(message_id,
+                                                                correlation_id,
+                                                                interaction_details,
+                                                                body,
+                                                                None)
+            self._write_response(status, response)
 
     def _write_response(self, status: int, message: str) -> None:
         """Write the given message to the response.

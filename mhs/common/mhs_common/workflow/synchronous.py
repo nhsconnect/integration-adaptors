@@ -94,13 +94,13 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
     async def _prepare_outbound_message(self, message_id: Optional[str], to_asid: str, from_asid: str,
                                         message: str,
                                         interaction_details: dict):
-
+        action = f'{interaction_details[soap_envelope.SERVICE]}/{interaction_details[soap_envelope.ACTION]}'
         message_details = {
             soap_envelope.MESSAGE_ID: message_id,
             soap_envelope.TO_ASID: to_asid,
             soap_envelope.FROM_ASID: from_asid,
             soap_envelope.SERVICE: interaction_details[soap_envelope.SERVICE],
-            soap_envelope.ACTION: interaction_details[soap_envelope.ACTION],
+            soap_envelope.ACTION: action,
             soap_envelope.MESSAGE: message
         }
 

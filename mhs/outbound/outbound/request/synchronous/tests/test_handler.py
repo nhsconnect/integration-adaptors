@@ -8,6 +8,8 @@ from utilities import integration_adaptors_logger as log, test_utilities
 from utilities import message_utilities
 import mhs_common.state.work_description as wd
 from outbound.request.synchronous import handler
+from mhs_common.workflow import synchronous
+
 
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
@@ -81,31 +83,6 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
 
         mock_message_id.set.assert_called_with(message_id)
         mock_correlation_id.set.assert_called_with(MOCK_UUID)
-
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    @patch.object(log, "correlation_id")
-    @patch.object(log, "message_id")
-    def test_post_message_with_correlation_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
-        correlation_id = "correlation-id"
-        expected_response = "Hello world!"
-        self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, expected_response))
-        mock_get_uuid.return_value = MOCK_UUID
-        self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
-
-        response = self.fetch("/", method="POST",
-                              headers={"Interaction-Id": INTERACTION_NAME, "Correlation-Id": correlation_id,
-                                       'sync-async': 'false'},
-                              body=REQUEST_BODY)
-
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response.body.decode(), expected_response)
-        mock_get_uuid.assert_called_once()
-
-        self.workflow.handle_outbound_message.assert_called_with(MOCK_UUID, correlation_id, INTERACTION_DETAILS,
-                                                                 REQUEST_BODY, None)
-
-        mock_message_id.set.assert_called_with(MOCK_UUID)
-        mock_correlation_id.set.assert_called_with(correlation_id)
 
     def test_post_message_where_workflow_returns_error_response(self):
         for http_status in [400, 409, 500, 503]:
@@ -309,3 +286,49 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.sync_async_workflow.handle_sync_async_outbound_message.return_value = result
         self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, "Success"))
+
+
+class TestSynchronousHandlerSyncMessage(tornado.testing.AsyncHTTPTestCase):
+
+    def get_app(self):
+        self.workflow = unittest.mock.Mock(spec=synchronous.SynchronousWorkflow)
+        self.sync_async_workflow = unittest.mock.MagicMock()
+        self.config_manager = unittest.mock.Mock()
+        return tornado.web.Application([
+            (r"/", handler.SynchronousHandler,
+             dict(config_manager=self.config_manager, workflows={WORKFLOW_NAME: self.workflow,
+                                                                 SYNC_ASYNC_WORKFLOW: self.sync_async_workflow}))
+        ])
+
+    def tearDown(self):
+        log.message_id.set(None)
+        log.correlation_id.set(None)
+
+    def test_invoke_default_workflows_updates_state_for_sync(self):
+        self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
+
+        wdo_mock = unittest.mock.MagicMock()
+        wdo_mock.set_outbound_status.return_value = test_utilities.awaitable(True)
+        self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, "Success", wdo_mock))
+
+        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME, 'sync-async': 'false'},
+                   body=REQUEST_BODY)
+
+        wdo_mock.set_outbound_status.assert_called_with(
+            wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+
+    @patch('outbound.request.synchronous.handler.SynchronousHandler._write_response')
+    def test_handler_updates_store_for_sync_async_failure_response(self, write_mock):
+        write_mock.side_effect = Exception('Dam the connection was closed')
+        expected_response = "Hello world!"
+        wdo = unittest.mock.MagicMock()
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
+        result = test_utilities.awaitable((200, expected_response, wdo))
+
+        self.workflow.handle_outbound_message.return_value = result
+
+        self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
+        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME, 'sync-async': 'false'},
+                   body=REQUEST_BODY)
+
+        wdo.set_outbound_status.assert_called_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
