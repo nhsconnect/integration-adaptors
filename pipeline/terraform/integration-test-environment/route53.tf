@@ -1,3 +1,15 @@
+########################################################
+# Fixed domain names for MHS load balancers
+#
+# In lbs.tf, load balancers are defined for the MHS.
+# These load balancers are given domain names, but these
+# are auto-generated. This file defines Route53 domain
+# names that are fixed and are used to make requests to
+# MHS load balancers.
+########################################################
+
+# The Route53 hosted zone under which we have subdomains pointing to different
+# bits of the MHS
 resource "aws_route53_zone" "mhs_hosted_zone" {
   name = "${var.environment_id}.${var.internal_root_domain}"
   vpc {
@@ -21,6 +33,7 @@ resource "aws_route53_zone" "mhs_hosted_zone" {
   }
 }
 
+# Route53 DNS record that is a domain name pointing to the MHS outbound load balancer
 resource "aws_route53_record" "mhs_outbound_load_balancer_record" {
   zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
   name = "mhs-outbound.${aws_route53_zone.mhs_hosted_zone.name}"
@@ -33,11 +46,13 @@ resource "aws_route53_record" "mhs_outbound_load_balancer_record" {
   }
 }
 
+# Terraform output variable of the MHS outbound load balancer Route53 domain name
 output "outbound_lb_domain_name" {
   value = aws_route53_record.mhs_outbound_load_balancer_record.name
   description = "The DNS name of the Route53 record pointing to the MHS outbound service's load balancer."
 }
 
+# Route53 DNS record that is a domain name pointing to the MHS route service load balancer
 resource "aws_route53_record" "mhs_route_load_balancer_record" {
   zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
   name = "mhs-route.${aws_route53_zone.mhs_hosted_zone.name}"
@@ -50,11 +65,13 @@ resource "aws_route53_record" "mhs_route_load_balancer_record" {
   }
 }
 
+# Terraform output variable of the MHS route service load balancer Route53 domain name
 output "route_lb_domain_name" {
   value = aws_route53_record.mhs_route_load_balancer_record.name
   description = "The DNS name of the Route53 record pointing to the MHS Spine route lookup service's load balancer."
 }
 
+# Route53 DNS record that is a domain name pointing to the MHS inbound load balancer
 resource "aws_route53_record" "mhs_inbound_load_balancer_record" {
   zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
   name = "mhs-inbound.${aws_route53_zone.mhs_hosted_zone.name}"
@@ -67,6 +84,7 @@ resource "aws_route53_record" "mhs_inbound_load_balancer_record" {
   }
 }
 
+# Terraform output variable of the MHS inbound load balancer Route53 domain name
 output "inbound_lb_domain_name" {
   value = aws_route53_record.mhs_inbound_load_balancer_record.name
   description = "The DNS name of the Route53 record pointing to the MHS inbound service's load balancer."

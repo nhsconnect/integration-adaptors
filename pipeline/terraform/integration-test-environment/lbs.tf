@@ -1,3 +1,8 @@
+#####################
+# Load balancers for MHS ECS services
+#####################
+
+# Application load balancer for MHS outbound
 resource "aws_lb" "outbound_alb" {
   internal = true
   load_balancer_type = "application"
@@ -12,6 +17,8 @@ resource "aws_lb" "outbound_alb" {
   }
 }
 
+# Target group for the application load balancer for MHS outbound
+# The MHS outbound ECS service registers it's tasks here.
 resource "aws_lb_target_group" "outbound_alb_target_group" {
   port = 80
   protocol = "HTTP"
@@ -29,11 +36,13 @@ resource "aws_lb_target_group" "outbound_alb_target_group" {
   }
 }
 
+# Terraform output variable of the MHS outbound load balancer's target group ARN
 output "outbound_lb_target_group_arn" {
   value = aws_lb_target_group.outbound_alb_target_group.arn
   description = "The ARN of the MHS outbound service load balancers's target group."
 }
 
+# Listener for MHS outbound load balancer that forwards requests to the correct target group
 resource "aws_lb_listener" "outbound_alb_listener" {
   load_balancer_arn = aws_lb.outbound_alb.arn
   port = 80
@@ -45,6 +54,7 @@ resource "aws_lb_listener" "outbound_alb_listener" {
   }
 }
 
+# Application load balancer for MHS route service
 resource "aws_lb" "route_alb" {
   internal = true
   load_balancer_type = "application"
@@ -59,6 +69,8 @@ resource "aws_lb" "route_alb" {
   }
 }
 
+# Target group for the application load balancer for MHS route service
+# The MHS route ECS service registers it's tasks here.
 resource "aws_lb_target_group" "route_alb_target_group" {
   port = 80
   protocol = "HTTP"
@@ -76,11 +88,13 @@ resource "aws_lb_target_group" "route_alb_target_group" {
   }
 }
 
+# Terraform output variable of the MHS route service's load balancer's target group ARN
 output "route_lb_target_group_arn" {
   value = aws_lb_target_group.route_alb_target_group.arn
   description = "The ARN of the MHS Spine route lookup service load balancers's target group."
 }
 
+# Listener for MHS route service's load balancer that forwards requests to the correct target group
 resource "aws_lb_listener" "route_alb_listener" {
   load_balancer_arn = aws_lb.route_alb.arn
   port = 80
@@ -92,6 +106,10 @@ resource "aws_lb_listener" "route_alb_listener" {
   }
 }
 
+# Network load balancer for MHS inbound.
+# MHS inbound tasks handle the TLS termination as they do TLS MA. This is why we
+# have to use a network load balancer here and not an application load balancer,
+# to passthrough the SSL traffic.
 resource "aws_lb" "inbound_nlb" {
   internal = true
   load_balancer_type = "network"
@@ -104,6 +122,8 @@ resource "aws_lb" "inbound_nlb" {
   }
 }
 
+# Target group for the network load balancer for MHS inbound
+# The MHS inbound ECS service registers it's tasks here.
 resource "aws_lb_target_group" "inbound_nlb_target_group" {
   port = 443
   protocol = "TCP"
@@ -122,11 +142,13 @@ resource "aws_lb_target_group" "inbound_nlb_target_group" {
   }
 }
 
+# Terraform output variable of the MHS inbound load balancer's target group ARN
 output "inbound_lb_target_group_arn" {
   value = aws_lb_target_group.inbound_nlb_target_group.arn
   description = "The ARN of the MHS inbound service load balancers's target group."
 }
 
+# Listener for MHS inbound load balancer that forwards requests to the correct target group
 resource "aws_lb_listener" "inbound_nlb_listener" {
   load_balancer_arn = aws_lb.inbound_nlb.arn
   port = 443

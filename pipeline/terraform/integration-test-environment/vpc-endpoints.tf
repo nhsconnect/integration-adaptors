@@ -1,3 +1,13 @@
+###################
+# VPC endpoints
+#
+# The MHS VPC does not have public ip addresses,
+# so in order to access various AWS services, we
+# need to have some VPC endpoints. This keeps
+# traffic to AWS services within the AWS network.
+###################
+
+# DynamoDB VPC endpoint
 resource "aws_vpc_endpoint" "dynamodb_endpoint" {
   vpc_id = aws_vpc.mhs_vpc.id
   service_name = "com.amazonaws.${var.region}.dynamodb"
@@ -11,6 +21,7 @@ resource "aws_vpc_endpoint" "dynamodb_endpoint" {
   }
 }
 
+# ECR VPC endpoint
 resource "aws_vpc_endpoint" "ecr_endpoint" {
   vpc_id = aws_vpc.mhs_vpc.id
   service_name = "com.amazonaws.${var.region}.ecr.dkr"
@@ -30,6 +41,7 @@ resource "aws_vpc_endpoint" "ecr_endpoint" {
   }
 }
 
+# S3 VPC endpoint
 resource "aws_vpc_endpoint" "s3_endpoint" {
   vpc_id = aws_vpc.mhs_vpc.id
   service_name = "com.amazonaws.${var.region}.s3"
@@ -43,6 +55,7 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   }
 }
 
+# Cloudwatch VPC endpoint
 resource "aws_vpc_endpoint" "cloudwatch_endpoint" {
   vpc_id = aws_vpc.mhs_vpc.id
   service_name = "com.amazonaws.${var.region}.logs"

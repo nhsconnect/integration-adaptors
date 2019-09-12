@@ -1,15 +1,18 @@
 terraform {
+  # Store the Terraform state in an S3 bucket
   backend "s3" {
     key = "scr.tfstate"
   }
 }
 
+# Setup AWS provider
 provider "aws" {
   version = "~> 2.27"
   profile = "default"
   region = var.region
 }
 
+# SCR ECS task definition
 resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
   family = "scr-service-task-${var.build_id}"
 
@@ -57,6 +60,7 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
   }
 }
 
+# SCR ECS service
 resource "aws_ecs_service" "test-scr-service-environment" {
   name = "${var.build_id}-scr-service"
   cluster = var.cluster_id

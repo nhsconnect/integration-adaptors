@@ -1,22 +1,38 @@
+##################
+# Main Terraform file
+#
+# - Setup Terraform backend
+# - configure AWS provider
+# - Setup MHS VPC
+# - Setup private subnets
+##################
+
 terraform {
+  # Store the Terraform state in an S3 bucket
   backend "s3" {
     key = "mhs.tfstate"
   }
 }
 
+# Setup AWS provider
 provider "aws" {
   profile = "default"
   version = "~> 2.27"
   region = var.region
 }
 
+# Get the list of availability zones for the selected AWS region
 data "aws_availability_zones" "all" {}
 
+# Get details of the supplier VPC the MHS VPC will have a peering connection with
 data "aws_vpc" "supplier_vpc" {
   id = var.supplier_vpc_id
 }
 
+# The MHS VPC that contains the running MHS
 resource "aws_vpc" "mhs_vpc" {
+  # Note that this cidr block must not overlap with the cidr blocks of the VPCs
+  # that the MHS VPC is peered with.
   cidr_block = "10.0.0.0/16"
   enable_dns_hostnames = true
 
@@ -26,7 +42,7 @@ resource "aws_vpc" "mhs_vpc" {
   }
 }
 
-# Create a subnet in each availability zone in the region.
+# Create a private subnet in each availability zone in the region.
 resource "aws_subnet" "mhs_subnet" {
   count = length(data.aws_availability_zones.all.names)
 

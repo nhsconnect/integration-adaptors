@@ -1,3 +1,14 @@
+#########################
+# DynamoDB tables
+#
+# Note that AWS by default encrypts DynamoDB tables at rest using an
+# AWS-owned customer master key. This can be changed later to an
+# AWS-managed customer master key.
+# See https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html
+# for more details.
+#########################
+
+# The MHS DynamoDB state table, for storing state for each message handled
 resource "aws_dynamodb_table" "mhs_state_table" {
   name = "${var.environment_id}-mhs-state"
   hash_key = "key"
@@ -15,6 +26,7 @@ resource "aws_dynamodb_table" "mhs_state_table" {
   }
 }
 
+# The MHS DynamoDB sync-async table, used as a queue for the sync-async workflow
 resource "aws_dynamodb_table" "mhs_sync_async_table" {
   name = "${var.environment_id}-mhs-sync-async-state"
   hash_key = "key"

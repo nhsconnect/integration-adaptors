@@ -1,3 +1,8 @@
+######################
+# AWS ECS MHS cluster and MHS services/tasks to run in it
+######################
+
+# The ECS cluster within which all MHS tasks will run
 resource "aws_ecs_cluster" "mhs_cluster" {
   name = "${var.environment_id}-mhs-cluster"
 
@@ -7,6 +12,7 @@ resource "aws_ecs_cluster" "mhs_cluster" {
   }
 }
 
+# Cloudwatch log group for MHS outbound to log to
 resource "aws_cloudwatch_log_group" "mhs_outbound_log_group" {
   name = "/ecs/${var.environment_id}-mhs-outbound"
   tags = {
@@ -15,6 +21,7 @@ resource "aws_cloudwatch_log_group" "mhs_outbound_log_group" {
   }
 }
 
+# Cloudwatch log group for MHS inbound to log to
 resource "aws_cloudwatch_log_group" "mhs_inbound_log_group" {
   name = "/ecs/${var.environment_id}-mhs-inbound"
   tags = {
@@ -23,6 +30,7 @@ resource "aws_cloudwatch_log_group" "mhs_inbound_log_group" {
   }
 }
 
+# Cloudwatch log group for MHS route service to log to
 resource "aws_cloudwatch_log_group" "mhs_route_log_group" {
   name = "/ecs/${var.environment_id}-mhs-route"
   tags = {
@@ -31,6 +39,8 @@ resource "aws_cloudwatch_log_group" "mhs_route_log_group" {
   }
 }
 
+# This locals block is used in mhs_outbound_task below to define the
+# environment variables
 locals {
   mhs_outbound_base_environment_vars = [
     {
@@ -64,6 +74,7 @@ locals {
   ]
 }
 
+# MHS outbound ECS task definition
 resource "aws_ecs_task_definition" "mhs_outbound_task" {
   family = "${var.environment_id}-mhs-outbound"
   container_definitions = jsonencode(
@@ -128,6 +139,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
   execution_role_arn = var.execution_role_arn
 }
 
+# MHS inbound ECS task definition
 resource "aws_ecs_task_definition" "mhs_inbound_task" {
   family = "${var.environment_id}-mhs-inbound"
   container_definitions = jsonencode(
@@ -185,11 +197,13 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
         }
       }
       portMappings = [
+        # Port 443 is the port for inbound requests from Spine
         {
           containerPort = 443
           hostPort = 443
           protocol = "tcp"
         },
+        # Port 80 is the port for healthcheck requests from the MHS inbound load balancer
         {
             containerPort = 80
             hostPort      = 80
@@ -213,7 +227,7 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
   execution_role_arn = var.execution_role_arn
 }
 
-# Create an ECS task definition for the route service container image.
+# Create an ECS task definition for the MHS route service container image.
 resource "aws_ecs_task_definition" "mhs_route_task" {
   family = "${var.environment_id}-mhs-route"
   container_definitions = jsonencode(
@@ -282,6 +296,9 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
   execution_role_arn = var.execution_role_arn
 }
 
+
+# MHS outbound service that runs multiple of the MHS outbound task definition
+# defined above
 resource "aws_ecs_service" "mhs_outbound_service" {
   name = "${var.environment_id}-mhs-outbound"
   cluster = aws_ecs_cluster.mhs_cluster.id
@@ -301,6 +318,8 @@ resource "aws_ecs_service" "mhs_outbound_service" {
   }
 
   load_balancer {
+    # In the MHS outbound task definition, we define only 1 container, and for that container, we expose only 1 port
+    # That is why in these 2 lines below we do "[0]" to reference that one container and port definition.
     container_name = jsondecode(aws_ecs_task_definition.mhs_outbound_task.container_definitions)[0].name
     container_port = jsondecode(aws_ecs_task_definition.mhs_outbound_task.container_definitions)[0].portMappings[0].hostPort
     target_group_arn = aws_lb_target_group.outbound_alb_target_group.arn
@@ -311,6 +330,8 @@ resource "aws_ecs_service" "mhs_outbound_service" {
   ]
 }
 
+# MHS inbound service that runs multiple of the MHS outbound task definition
+# defined above
 resource "aws_ecs_service" "mhs_inbound_service" {
   name = "${var.environment_id}-mhs-inbound"
   cluster = aws_ecs_cluster.mhs_cluster.id
@@ -330,6 +351,10 @@ resource "aws_ecs_service" "mhs_inbound_service" {
   }
 
   load_balancer {
+    # In the MHS inbound task definition, we define only 1 container, and for that container, we expose 2 ports.
+    # The first of these ports is 443, the port that we want to expose as it handles inbound requests from Spine.
+    # The other port is for doing healthchecks, only the load balancer will be making requests to that port.
+    # That is why in these 2 lines below we do "[0]" to reference that one container and the first port definition.
     container_name = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].name
     container_port = jsondecode(aws_ecs_task_definition.mhs_inbound_task.container_definitions)[0].portMappings[0].hostPort
     target_group_arn = aws_lb_target_group.inbound_nlb_target_group.arn
