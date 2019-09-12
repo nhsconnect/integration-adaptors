@@ -37,8 +37,8 @@ class FunctionalTest(TestCase):
                                                                    'QUPA_IN040000UK32',
                                                                    '9689174606',
                                                                    'Synchronous test')
-        print(mhs_response.text)
-        self.assertTrue(methods.check_response(mhs_response, 'requestSuccessDetail'),
+
+        self.assertTrue(methods.check_response(mhs_response.text, 'PdsSuccessfulRetrieval'),
                         "Synchronous smoke test failed")
 
     # Message Pattern Type: Forward Reliable
