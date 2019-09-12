@@ -36,7 +36,7 @@ output "outbound_lb_target_group_arn" {
 
 resource "aws_lb_listener" "outbound_alb_listener" {
   load_balancer_arn = aws_lb.outbound_alb.arn
-  port = "80"
+  port = 80
   protocol = "HTTP"
 
   default_action {
@@ -83,7 +83,7 @@ output "route_lb_target_group_arn" {
 
 resource "aws_lb_listener" "route_alb_listener" {
   load_balancer_arn = aws_lb.route_alb.arn
-  port = "80"
+  port = 80
   protocol = "HTTP"
 
   default_action {
@@ -129,7 +129,7 @@ output "inbound_lb_target_group_arn" {
 
 resource "aws_lb_listener" "inbound_nlb_listener" {
   load_balancer_arn = aws_lb.inbound_nlb.arn
-  port = "443"
+  port = 443
   protocol = "TCP"
 
   default_action {
