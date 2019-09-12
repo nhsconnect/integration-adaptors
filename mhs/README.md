@@ -29,7 +29,10 @@ MHS is made up of multiple components, and running them all separately can be te
 
 ### Environment Variables
 MHS takes a number of environment variables when it is run. These are:
-* `MHS_LOG_LEVEL` This is required to be set to one of: `NOTSET`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`. Where `NOTSET` displays the most logs and `CRITICAL` displays the least.
+* `MHS_LOG_LEVEL` This is required to be set to one of: `INFO`, `WARNING`, `ERROR` or `CRITICAL`, where `INFO` displays
+the most logs and `CRITICAL` displays the least. Note: Setting this value to one of the more detailed 'standard' Python
+log levels (such as `DEBUG` or `NOTSET`) may result in the libraries used by this application logging details that
+contain sensitive information such as the content of messages being sent.
 * `MHS_PARTY_KEY` The party key associated with your MHS.
 * `MHS_CLIENT_CERT` (outbound only) Your endpoint certificate
 * `MHS_CLIENT_KEY` Your endpoint private key

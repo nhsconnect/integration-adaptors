@@ -51,10 +51,9 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         retries_remaining = self._max_retries
         while True:
             try:
-                logger.info("0001", "About to send message with {headers} to {url} using {proxy_host} & {proxy_port}: "
-                                    "{message}",
+                logger.info("0001", "About to send message with {headers} to {url} using {proxy_host} & {proxy_port}",
                             {"headers": headers, "url": url, "proxy_host": self._proxy_host,
-                             "proxy_port": self._proxy_port, "message": message})
+                             "proxy_port": self._proxy_port})
                 # ******************************************************************************************************
                 # TLS CERTIFICATE VALIDATION HAS BEEN TEMPORARILY DISABLED! This is required because Opentest's SDS
                 # instance currently returns endpoints as IP addresses. This MUST be changed before this code is used in
@@ -65,10 +64,10 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                                           ca_certs=self._ca_certs, validate_cert=False,
                                                           http_proxy_host=self._proxy_host,
                                                           http_proxy_port=self._proxy_port)
-                logger.info("0002", "Sent message: {message}, with {headers} to {url} using {proxy_host} & {proxy_port}"
-                                    " and received status code {code}",
+                logger.info("0002", "Sent message with {headers} to {url} using {proxy_host} & {proxy_port} and "
+                                    "received status code {code}",
                             {"headers": headers, "url": url, "proxy_host": self._proxy_host,
-                             "proxy_port": self._proxy_port, "message": message, "code": response.code})
+                             "proxy_port": self._proxy_port, "code": response.code})
                 return response
             except Exception as e:
                 if not self._is_retriable(e):

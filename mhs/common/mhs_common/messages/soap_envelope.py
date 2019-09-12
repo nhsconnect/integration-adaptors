@@ -1,22 +1,22 @@
 """This module defines the envelope used to wrap synchronous messages to be sent to a remote MHS."""
 import copy
 import json
+from pathlib import Path
+from typing import Dict, Tuple, Union
 from xml import etree
 
 import lxml.etree as ET
+from utilities import integration_adaptors_logger as log, message_utilities
 
 from definitions import ROOT_DIR
 from mhs_common.messages import envelope
-from typing import Dict, Tuple, Union
-from utilities import integration_adaptors_logger as log, message_utilities
-from pathlib import Path
 
 SOAP_CONTENT_TYPE_VALUE = 'text/xml'
 CONTENT_TYPE_HEADER_NAME = "Content-Type"
 
-XSLT_DIR='mhs_common/messages/xslt'
-SOAP_HEADER_XSLT='soap_header.xslt'
-SOAP_BODY_XSLT='soap_body.xslt'
+XSLT_DIR = 'mhs_common/messages/xslt'
+SOAP_HEADER_XSLT = 'soap_header.xslt'
+SOAP_BODY_XSLT = 'soap_body.xslt'
 FROM_ASID = "from_asid"
 TO_ASID = "to_asid"
 SERVICE = "service"
@@ -97,6 +97,7 @@ class SoapEnvelope(envelope.Envelope):
             raise SoapParsingError(f"An unexpected error occurred when applying an XSLT to SOAP XML message") from e
 
         extracted_values = json.loads(soap_headers)
+        logger.info('0001', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
         extracted_values[MESSAGE] = soap_body
 
         for required_element in REQUIRED_SOAP_ELEMENTS:
@@ -106,8 +107,6 @@ class SoapEnvelope(envelope.Envelope):
                 raise SoapParsingError(
                     f"Weren't able to find required element {required_element} during parsing of SOAP message")
 
-        logger.info('0001', 'Extracted {extracted_values} from {message}',
-                    {'extracted_values': extracted_values, 'message': message})
         return SoapEnvelope(extracted_values)
 
 

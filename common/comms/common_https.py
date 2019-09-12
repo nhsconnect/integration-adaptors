@@ -26,9 +26,8 @@ class CommonHttps:
         :param http_proxy_port The port of the HTTP proxy to be used.
         """
 
-        logger.info("0001", "About to send {method} request with {headers} to {url} using {proxy_host} & {proxy_port}:"
-                            " {body}",
-                    {"method": method, "headers": headers, "url": url, "body": body, "proxy_host": http_proxy_host,
+        logger.info("0001", "About to send {method} request with {headers} to {url} using {proxy_host} & {proxy_port}",
+                    {"method": method, "headers": headers, "url": url, "proxy_host": http_proxy_host,
                      "proxy_port": http_proxy_port})
 
         if not validate_cert:
@@ -45,8 +44,8 @@ class CommonHttps:
                                                             proxy_host=http_proxy_host,
                                                             proxy_port=http_proxy_port)
         logger.info("0002",
-                    "Sent {method} request with {headers} to {url} using {proxy_host} & {proxy_port} with {body}, and "
+                    "Sent {method} request with {headers} to {url} using {proxy_host} & {proxy_port}, and "
                     "received status code {code}",
                     {"method": method, "headers": headers, "url": url, "proxy_host": http_proxy_host,
-                     "proxy_port": http_proxy_port, "body": body, "code": response.code})
+                     "proxy_port": http_proxy_port, "code": response.code})
         return response
