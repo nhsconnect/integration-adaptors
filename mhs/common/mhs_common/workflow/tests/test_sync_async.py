@@ -33,7 +33,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         result = (202, {})
         async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
-        code, body, wdo = await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
+        code, body, wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
                                                                                  'payload',
                                                                                  async_workflow
                                                                                  )
@@ -44,7 +44,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
                                    outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
 
         async_workflow.handle_outbound_message.assert_called_once()
-        async_workflow.handle_outbound_message.assert_called_with('id123', 'cor123', {}, 'payload',
+        async_workflow.handle_outbound_message.assert_called_with(None, 'id123', 'cor123', {}, 'payload',
                                                                   wd_mock.return_value)
         update_mock.assert_called_with(wd_mock.return_value,
                                        wd_mock.return_value.set_outbound_status,
@@ -63,7 +63,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         result = (500, "Failed to reach spine")
         async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
-        status, response, wdo = await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
+        status, response, wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
                                                                                        'payload',
                                                                                        async_workflow
                                                                                        )
@@ -82,7 +82,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
             result = (202, "Huge success")
             async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
-            status, response, wdo = await self.workflow.handle_sync_async_outbound_message('id123', 'cor123', {},
+            status, response, wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
                                                                                            'payload',
                                                                                            async_workflow
                                                                                            )

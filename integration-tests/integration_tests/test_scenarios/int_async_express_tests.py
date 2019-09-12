@@ -77,7 +77,8 @@ class TestSyncAsyncWrapper(TestCase):
                                                                         '9689177621',
                                                                         'Asynchronous Express test',
                                                                         sync_async=True)
-        print(outbound_response)
+
+        print(outbound_response.text)
         self.assertTrue(methods.check_status_code(outbound_response, 200),
                         "Async Express outbound test failed")
 

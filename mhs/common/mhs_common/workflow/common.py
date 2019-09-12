@@ -23,7 +23,8 @@ class CommonWorkflow(abc.ABC):
         self.routing_reliability = routing
 
     @abc.abstractmethod
-    async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+    async def handle_outbound_message(self, from_asid: Optional[str],
+                                      message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str,
                                       work_description_object: Optional[wd.WorkDescription]
                                       ) -> Tuple[int, str]:
@@ -31,6 +32,7 @@ class CommonWorkflow(abc.ABC):
         Handle a message from the supplier system (or a message from an adaptor that the supplier system speaks to)
         that is to be sent outbound.
 
+        :param from_asid: Optional asid of the supplier system
         :param work_description_object: A potentially null value for the work description object for this message, if
                 not present the child implementation is expected to generate this work description instance
         :param message_id: ID of the message to send

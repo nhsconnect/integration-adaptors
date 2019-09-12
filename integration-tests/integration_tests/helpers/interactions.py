@@ -20,12 +20,14 @@ def process_request(template, asid, nhs_number, human_readable, pass_message_id,
     """
     scr, message_id = build_message(template, asid, nhs_number, human_readable)
     correlation_id = message_utilities.MessageUtilities.get_uuid()
-    response = call_mhs(template, scr, message_id, pass_message_id, correlation_id, pass_correlation_id, sync_async)
+    response = call_mhs(template, scr, message_id, pass_message_id, correlation_id, pass_correlation_id, sync_async,
+                        asid)
 
     return response, message_id, correlation_id
 
 
-def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_id, pass_correlation_id, sync_async):
+def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_id, pass_correlation_id, sync_async,
+             from_asid):
     """Call the MHS with the provided details.
 
     :param mhs_command: The command/interaction name to call the MHS with.
@@ -44,6 +46,7 @@ def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_i
         headers['Correlation-Id'] = correlation_id
 
     headers['sync-async'] = 'true' if sync_async else 'false'
+    headers['from_asid'] = f'{from_asid}'
 
     return requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
 

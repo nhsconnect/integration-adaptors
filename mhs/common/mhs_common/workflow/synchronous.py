@@ -31,6 +31,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         super().__init__(routing)
 
     async def handle_outbound_message(self,
+                                      from_asid: str,
                                       message_id: str,
                                       correlation_id: str,
                                       interaction_details: dict,
@@ -44,6 +45,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                              wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
                                              )
         await wdo.publish()
+        if not from_asid:
+            return 400, '`from_asid` header field required for sync messages', None
 
         try:
             url, to_asid = await self._lookup_to_asid_details(interaction_details)
@@ -55,7 +58,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         try:
             message_id, headers, message = await self._prepare_outbound_message(message_id,
                                                                                 to_asid,
-                                                                                from_asid="918999199084",
+                                                                                from_asid=from_asid,
                                                                                 interaction_details=interaction_details,
                                                                                 message=payload)
         except Exception:

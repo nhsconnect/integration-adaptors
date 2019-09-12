@@ -41,6 +41,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
     @timing.time_function
     async def handle_outbound_message(self,
+                                      from_asid: Optional[str],
                                       message_id: str,
                                       correlation_id: str,
                                       interaction_details: dict,

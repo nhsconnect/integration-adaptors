@@ -108,7 +108,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                         ebxml_envelope.CPA_ID: CPA_ID}
         expected_interaction_details.update(INTERACTION_DETAILS)
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+        status, message = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                       PAYLOAD, None)
 
         self.assertEqual(202, status)
@@ -150,7 +150,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         wdo.workflow = 'This should not change'
         wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
         wdo.update.return_value = test_utilities.awaitable(True)
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+        status, message = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                       PAYLOAD, wdo)
 
         self.assertEqual(202, status)
@@ -164,7 +164,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.side_effect = Exception()
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+        status, message = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                       PAYLOAD, None)
 
         self.assertEqual(500, status)
@@ -179,7 +179,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.setup_mock_work_description()
         self.mock_routing_reliability.get_end_point.side_effect = Exception()
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+        status, message = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                       PAYLOAD, None)
 
         self.assertEqual(500, status)
@@ -201,7 +201,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         future.set_exception(httpclient.HTTPClientError(code=409))
         self.mock_transmission_adaptor.make_request.return_value = future
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+        status, message = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                       PAYLOAD, None)
 
         self.assertEqual(500, status)
@@ -223,7 +223,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         future.set_exception(Exception())
         self.mock_transmission_adaptor.make_request.return_value = future
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+        status, message = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                       PAYLOAD, None)
 
         self.assertEqual(500, status)
@@ -246,7 +246,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         response.code = 200
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+        status, message = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                       PAYLOAD, None)
 
         self.assertEqual(500, status)
