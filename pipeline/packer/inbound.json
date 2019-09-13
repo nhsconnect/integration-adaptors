@@ -5,9 +5,9 @@
     "common_dir": "common",
     "inbound_dir": "mhs/inbound",
     "mhs_common_dir": "mhs/common",
-    "repository": "{{env `DOCKER_REPOSITORY`}}",
-    "tag": "{{env `BUILD_TAG`}}",
-    "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/mhs/inbound",
+    "tag": "{{env `BUILD_TAG`}}"
   },
   "builders": [
     {
@@ -16,7 +16,7 @@
       "container_dir": "/packer-files",
       "commit": true,
       "changes": [
-        "EXPOSE 443",
+        "EXPOSE 443 80",
         "WORKDIR {{user `app_dir`}}/{{user `inbound_dir`}}",
         "ENTRYPOINT pipenv run start-inbound"
       ]
@@ -66,14 +66,14 @@
       {
         "name": "publish",
         "type": "docker-tag",
-        "repository": "{{user `repository`}}",
+        "repository": "{{user `registry`}}{{user `repository`}}",
         "tag": "inbound-{{user `tag`}}"
       },
       {
         "name": "publish",
         "type": "docker-push",
         "ecr_login": true,
-        "login_server": "{{user `docker_registry_url`}}"
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
       },
       {
         "type": "docker-tag",

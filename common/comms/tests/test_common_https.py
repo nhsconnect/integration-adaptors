@@ -13,6 +13,8 @@ BODY = "hello"
 CLIENT_CERT = "client.cert"
 CLIENT_KEY = "client.key"
 CA_CERTS = "ca.certs"
+HTTP_PROXY_HOST = "http_proxy"
+HTTP_PROXY_PORT = 3128
 
 
 class TestCommonHttps(TestCase):
@@ -25,7 +27,9 @@ class TestCommonHttps(TestCase):
 
             actual_response = await CommonHttps.make_request(url=URL, method=METHOD, headers=HEADERS, body=BODY,
                                                              client_cert=CLIENT_CERT, client_key=CLIENT_KEY,
-                                                             ca_certs=CA_CERTS, validate_cert=False)
+                                                             ca_certs=CA_CERTS, validate_cert=False,
+                                                             http_proxy_host=HTTP_PROXY_HOST,
+                                                             http_proxy_port=HTTP_PROXY_PORT)
 
             mock_fetch.assert_called_with(URL,
                                           method=METHOD,
@@ -34,7 +38,9 @@ class TestCommonHttps(TestCase):
                                           client_cert=CLIENT_CERT,
                                           client_key=CLIENT_KEY,
                                           ca_certs=CA_CERTS,
-                                          validate_cert=False)
+                                          validate_cert=False,
+                                          proxy_host=HTTP_PROXY_HOST,
+                                          proxy_port=HTTP_PROXY_PORT)
 
             self.assertIs(actual_response, return_value, "Expected content should be returned.")
 
@@ -53,6 +59,8 @@ class TestCommonHttps(TestCase):
                                           client_cert=None,
                                           client_key=None,
                                           ca_certs=None,
-                                          validate_cert=True)
+                                          validate_cert=True,
+                                          proxy_host=None,
+                                          proxy_port=None)
 
             self.assertIs(actual_response, return_value, "Expected content should be returned.")

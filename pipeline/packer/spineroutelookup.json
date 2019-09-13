@@ -5,9 +5,9 @@
     "common_dir": "common",
     "mhs_common_dir": "mhs/common",
     "spineroutelookup_dir": "mhs/spineroutelookup",
-    "repository": "{{env `DOCKER_REPOSITORY`}}",
-    "tag": "{{env `BUILD_TAG`}}",
-    "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/mhs/route",
+    "tag": "{{env `BUILD_TAG`}}"
   },
   "builders": [
     {
@@ -59,18 +59,18 @@
       {
         "name": "publish",
         "type": "docker-tag",
-        "repository": "{{user `repository`}}",
-        "tag": "spineroutelookup-{{user `tag`}}"
+        "repository": "{{user `registry`}}{{user `repository`}}",
+        "tag": "route-{{user `tag`}}"
       },
       {
         "name": "publish",
         "type": "docker-push",
         "ecr_login": true,
-        "login_server": "{{user `docker_registry_url`}}"
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
       },
       {
         "type": "docker-tag",
-        "repository": "local/mhs-spineroutelookup"
+        "repository": "local/mhs-route"
       }
     ]
   ]
