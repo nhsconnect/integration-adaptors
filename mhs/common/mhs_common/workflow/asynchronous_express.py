@@ -58,7 +58,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.publish()
 
         try:
-            url, to_party_key, cpa_id = await self._lookup_endpoint_details(interaction_details)
+
+            details = await self._lookup_endpoint_details(interaction_details)
+            url = details[self.ENDPOINT_URL]
+            to_party_key = details[self.ENDPOINT_PARTY_KEY]
+            cpa_id = details[self.ENDPOINT_CPA_ID]
         except Exception:
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error obtaining outbound URL'

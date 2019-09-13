@@ -49,7 +49,9 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return 400, '`from_asid` header field required for sync messages', None
 
         try:
-            url, to_asid = await self._lookup_to_asid_details(interaction_details)
+            endpoint_details = await self._lookup_endpoint_details(interaction_details)
+            url = endpoint_details[self.ENDPOINT_URL]
+            to_asid = endpoint_details[self.ENDPOINT_TO_ASID]
         except Exception:
             logger.error('009', 'Failed to retrieve details from spine route lookup')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)

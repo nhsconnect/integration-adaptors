@@ -19,6 +19,12 @@ logger = log.IntegrationAdaptorsLogger('COMMON_WORKFLOW')
 class CommonWorkflow(abc.ABC):
     """Common functionality across all workflows."""
 
+    ENDPOINT_URL = 'url'
+    ENDPOINT_PARTY_KEY = 'party_key'
+    ENDPOINT_TO_ASID = 'to_asid'
+    ENDPOINT_SERVICE_ID = 'service_id'
+    ENDPOINT_CPA_ID = 'cpa_id'
+
     def __init__(self, routing: routing_reliability.RoutingAndReliability = None):
         self.routing_reliability = routing
 
@@ -56,7 +62,7 @@ class CommonWorkflow(abc.ABC):
         """
         pass
 
-    async def _lookup_endpoint_details(self, interaction_details: Dict) -> Tuple[str, str, str]:
+    async def _lookup_endpoint_details(self, interaction_details: Dict) -> Dict:
         try:
             service_id = await self._build_service_id(interaction_details)
 
@@ -66,29 +72,19 @@ class CommonWorkflow(abc.ABC):
             url = CommonWorkflow._extract_endpoint_url(endpoint_details)
             to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
             cpa_id = endpoint_details[MHS_CPA_ID_KEY]
-            logger.info('0002', 'Retrieved endpoint details for {service_id}. {url}, {to_party_key}, {cpa_id}',
-                        {'service_id': service_id, 'url': url, 'to_party_key': to_party_key, 'cpa_id': cpa_id})
-            return url, to_party_key, cpa_id
+            to_asid = self._extract_asid(endpoint_details)
+            details = {self.ENDPOINT_SERVICE_ID: service_id,
+                       self.ENDPOINT_URL: url,
+                       self.ENDPOINT_PARTY_KEY: to_party_key,
+                       self.ENDPOINT_CPA_ID: cpa_id,
+                       self.ENDPOINT_TO_ASID: to_asid
+                       }
+            logger.info('0002',
+                        'Retrieved endpoint details for {service_id}. {url}, {party_key}, {cpa_id} {to_asid}',
+                        details)
+            return details
         except Exception as e:
             logger.warning('0003', 'Error encountered whilst retrieving endpoint details. {Exception}',
-                           {'Exception': e})
-            raise e
-
-    async def _lookup_to_asid_details(self, interaction_details: Dict):
-        try:
-            service_id = await self._build_service_id(interaction_details)
-
-            logger.info('0011', 'Looking up ASID details for {service_id}.', {'service_id': service_id})
-            endpoint_details = await self.routing_reliability.get_end_point(service_id)
-            print(f"deets: {endpoint_details}")
-            url = CommonWorkflow._extract_endpoint_url(endpoint_details)
-            to_asid = self._extract_asid(endpoint_details)
-            logger.info('0012', 'Retrieved endpoint details for {url}, {to_asid}',
-                        {'url': url, 'to_asid': to_asid})
-
-            return url, to_asid
-        except Exception as e:
-            logger.warning('0013', 'Error encountered whilst retrieving endpoint details. {Exception}',
                            {'Exception': e})
             raise e
 
