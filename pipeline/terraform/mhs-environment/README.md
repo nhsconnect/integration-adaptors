@@ -104,3 +104,15 @@ In practice, this means that:
 Also note that the MHS VPC uses the private ip address cidr block 10.0.0.0/16. The supplier
 and Opentest VPCs will need to use non-overlapping cidr blocks in order for the VPC
 peering connections to successfully be created.
+
+### HTTPS on load balancers
+The MHS inbound load balancer passes through TLS traffic down to the Fargate tasks which
+terminate the TLS connection. The MHS outbound and MHS route load balancers, however, are
+HTTP load balancers and don't by default do any TLS termination. This can be configured in
+AWS. To do this requires:
+- configuring certificates to use in AWS ACM
+- modifying the load balancers to use these certificates to do SSL termination
+- configuring the supplier system and MHS outbound to validate these certificates as
+  appropriate when making requests to these load balancers (this is only required if the
+  certificates aren't trusted by default ie if the certificates are not issued by a publicly
+  trusted CA).
