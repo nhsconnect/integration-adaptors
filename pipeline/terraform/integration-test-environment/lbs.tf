@@ -2,6 +2,10 @@
 # Load balancers for MHS ECS services
 #####################
 
+##############
+# MHS outbound load balancer
+##############
+
 # Application load balancer for MHS outbound
 resource "aws_lb" "outbound_alb" {
   internal = true
@@ -10,6 +14,12 @@ resource "aws_lb" "outbound_alb" {
   security_groups = [
     aws_security_group.alb_outbound_security_group.id
   ]
+
+  access_logs {
+    bucket = aws_s3_bucket.mhs_access_logs_bucket.bucket
+    prefix = "mhs_outbound-${var.build_id}"
+    enabled = true
+  }
 
   tags = {
     Name = "${var.environment_id}-mhs-outbound-alb"
@@ -54,6 +64,10 @@ resource "aws_lb_listener" "outbound_alb_listener" {
   }
 }
 
+##############
+# MHS route load balancer
+##############
+
 # Application load balancer for MHS route service
 resource "aws_lb" "route_alb" {
   internal = true
@@ -62,6 +76,12 @@ resource "aws_lb" "route_alb" {
   security_groups = [
     aws_security_group.alb_route_security_group.id
   ]
+
+  access_logs {
+    bucket = aws_s3_bucket.mhs_access_logs_bucket.bucket
+    prefix = "mhs_route-${var.build_id}"
+    enabled = true
+  }
 
   tags = {
     Name = "${var.environment_id}-mhs-route-alb"
@@ -106,6 +126,10 @@ resource "aws_lb_listener" "route_alb_listener" {
   }
 }
 
+##############
+# MHS inbound load balancer
+##############
+
 # Network load balancer for MHS inbound.
 # MHS inbound tasks handle the TLS termination as they do TLS MA. This is why we
 # have to use a network load balancer here and not an application load balancer,
@@ -115,6 +139,12 @@ resource "aws_lb" "inbound_nlb" {
   load_balancer_type = "network"
   subnets = aws_subnet.mhs_subnet.*.id
   enable_cross_zone_load_balancing = true
+
+  access_logs {
+    bucket = aws_s3_bucket.mhs_access_logs_bucket.bucket
+    prefix = "mhs_inbound-${var.build_id}"
+    enabled = true
+  }
 
   tags = {
     Name = "${var.environment_id}-mhs-inbound-nlb"
