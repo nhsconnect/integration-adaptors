@@ -110,7 +110,7 @@ The MHS inbound load balancer passes through TLS traffic down to the Fargate tas
 terminate the TLS connection. The MHS outbound and MHS route load balancers, however, are
 HTTP load balancers and don't by default do any TLS termination. This can be configured in
 AWS. To do this requires:
-- configuring certificates to use in AWS ACM
+- configuring certificates to use in [AWS ACM](https://aws.amazon.com/certificate-manager/)
 - modifying the load balancers to use these certificates to do SSL termination
 - configuring the supplier system and MHS outbound to validate these certificates as
   appropriate when making requests to these load balancers (this is only required if the
