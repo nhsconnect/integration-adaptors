@@ -117,6 +117,8 @@ AWS. To do this requires:
   certificates aren't trusted by default ie if the certificates are not issued by a publicly
   trusted CA).
 - Altering the following security groups for the load balancers to allow HTTPS traffic
-  instead of HTTP:
+  instead of HTTP, and for MHS outbound to allow downstream HTTPS requests to the MHS route
+  load balancer:
   - `aws_security_group.alb_outbound_security_group`
   - `aws_security_group.alb_route_security_group`
+  - `aws_security_group_rule.mhs_outbound_security_group_route_egress_rule`
