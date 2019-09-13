@@ -168,7 +168,7 @@ pipeline {
                             // Wait for MHS load balancers to have healthy targets
                             dir('../pipeline/scripts/check-target-group-health') {
                                 sh script: 'pipenv install'
-                                timeout(10) {
+                                timeout(13) {
                                     waitUntil {
                                         script {
                                             def r = sh script: 'sleep 10; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
