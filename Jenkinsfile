@@ -57,7 +57,7 @@ pipeline {
             stages {
                 stage('Deploy MHS') {
                     steps {
-                        dir('pipeline/terraform/integration-test-environment') {
+                        dir('pipeline/terraform/mhs-environment') {
                             sh label: 'Initialising Terraform', script: """
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
@@ -168,7 +168,7 @@ pipeline {
 
                 stage('Deploy SCR') {
                     steps {
-                        dir('pipeline/terraform/scr-test-environment') {
+                        dir('pipeline/terraform/scr-environment') {
                             sh label: 'Initialising Terraform', script: """
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
