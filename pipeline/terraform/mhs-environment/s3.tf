@@ -5,7 +5,7 @@
 # Get the elastic load balancing account ID for the current AWS region.
 # This account is the one that AWS elastic load balancing uses to publish
 # access logs into S3.
-# See https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy
+# See https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
 # for more info.
 data "aws_elb_service_account" "main" {}
 
@@ -26,7 +26,10 @@ resource "aws_s3_bucket" "mhs_access_logs_bucket" {
   }
 }
 
-# S3 bucket policy for MHS access logs bucket
+# S3 bucket policy for MHS access logs bucket.
+# This policy is based on the AWS documentation
+# https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
+# and https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-access-logs.html
 resource "aws_s3_bucket_policy" "mhs_access_logs_bucket_policy" {
   bucket = aws_s3_bucket.mhs_access_logs_bucket.id
 
