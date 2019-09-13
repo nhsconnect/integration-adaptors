@@ -116,3 +116,7 @@ AWS. To do this requires:
   appropriate when making requests to these load balancers (this is only required if the
   certificates aren't trusted by default ie if the certificates are not issued by a publicly
   trusted CA).
+- Altering the following security groups for the load balancers to allow HTTPS traffic
+  instead of HTTP:
+  - `aws_security_group.alb_outbound_security_group`
+  - `aws_security_group.alb_route_security_group`
