@@ -63,10 +63,10 @@ pipeline {
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
                                     -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
-                                    -input=false
+                                    -input=false -no-color
                                 """
                             sh label: 'Applying Terraform configuration', script: """
-                                    terraform apply -auto-approve \
+                                    terraform apply -no-color -auto-approve \
                                     -var environment_id=${ENVIRONMENT_ID} \
                                     -var build_id=${BUILD_TAG} \
                                     -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
@@ -135,10 +135,10 @@ pipeline {
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
                                     -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
-                                    -input=false
+                                    -input=false -no-color
                                 """
                             sh label: 'Applying Terraform configuration', script: """
-                                    terraform apply -auto-approve \
+                                    terraform apply -no-color -auto-approve \
                                     -var environment_id=${ENVIRONMENT_ID} \
                                     -var build_id=${BUILD_TAG} \
                                     -var cluster_id=${CLUSTER_ID} \
