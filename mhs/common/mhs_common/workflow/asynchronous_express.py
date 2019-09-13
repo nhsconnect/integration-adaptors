@@ -59,7 +59,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.publish()
 
         try:
-
             details = await self._lookup_endpoint_details(interaction_details)
             url = details[self.ENDPOINT_URL]
             to_party_key = details[self.ENDPOINT_PARTY_KEY]

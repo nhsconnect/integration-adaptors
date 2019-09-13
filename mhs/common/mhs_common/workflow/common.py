@@ -124,11 +124,11 @@ class CommonWorkflow(abc.ABC):
 
     @staticmethod
     def _extract_asid(endpoint_details: Dict[str, List[str]]) -> str:
-        unique_identifiers = endpoint_details[MHS_TO_ASID_KEY]
+        unique_identifiers = endpoint_details.get(MHS_TO_ASID_KEY)
 
-        if len(unique_identifiers) == 0:
+        if not unique_identifiers:
             logger.error('0024', 'Did not retrieve any unique identifiers from endpoint details')
-            raise IndexError('Did not retrieve any unique identifiers from endpoint details')
+            return None
 
         asid = unique_identifiers[0]
 
