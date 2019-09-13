@@ -30,12 +30,7 @@ variable "internal_root_domain" {
 
 variable "mhs_outbound_service_minimum_instance_count" {
   type = number
-  description = "The minimum number of instances of MHS outbound to run."
-}
-
-variable "mhs_outbound_service_initial_instance_count" {
-  type = number
-  description = "The number of instances of MHS outbound to run initially (before autoscaling is applied)."
+  description = "The minimum number of instances of MHS outbound to run. This will be the number of instances deployed initially."
 }
 
 variable "mhs_outbound_service_maximum_instance_count" {
@@ -51,12 +46,7 @@ variable "mhs_outbound_service_target_request_count" {
 
 variable "mhs_inbound_service_minimum_instance_count" {
   type = number
-  description = "The minimum number of instances of MHS inbound to run."
-}
-
-variable "mhs_inbound_service_initial_instance_count" {
-  type = number
-  description = "The desired number of instances of MHS inbound to run initially (before autoscaling is applied)."
+  description = "The minimum number of instances of MHS inbound to run. This will be the number of instances deployed initially."
 }
 
 variable "mhs_inbound_service_maximum_instance_count" {
@@ -72,12 +62,7 @@ variable "mhs_inbound_service_target_cpu_utilization" {
 
 variable "mhs_route_service_minimum_instance_count" {
   type = number
-  description = "The minimum number of instances of MHS route service to run."
-}
-
-variable "mhs_route_service_initial_instance_count" {
-  type = number
-  description = "The desired number of instances of MHS route service to run initially (before autoscaling is applied)."
+  description = "The minimum number of instances of MHS route service to run. This will be the number of instances deployed initially."
 }
 
 variable "mhs_route_service_maximum_instance_count" {

@@ -304,7 +304,7 @@ resource "aws_ecs_service" "mhs_outbound_service" {
   cluster = aws_ecs_cluster.mhs_cluster.id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
-  desired_count = var.mhs_outbound_service_initial_instance_count
+  desired_count = var.mhs_outbound_service_minimum_instance_count
   launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.mhs_outbound_task.arn
@@ -372,7 +372,7 @@ resource "aws_ecs_service" "mhs_inbound_service" {
   cluster = aws_ecs_cluster.mhs_cluster.id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
-  desired_count = var.mhs_inbound_service_initial_instance_count
+  desired_count = var.mhs_inbound_service_minimum_instance_count
   launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.mhs_inbound_task.arn
@@ -441,7 +441,7 @@ resource "aws_ecs_service" "mhs_route_service" {
   cluster = aws_ecs_cluster.mhs_cluster.id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
-  desired_count = var.mhs_route_service_initial_instance_count
+  desired_count = var.mhs_route_service_minimum_instance_count
   launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.mhs_route_task.arn
