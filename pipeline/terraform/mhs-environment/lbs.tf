@@ -21,6 +21,12 @@ resource "aws_lb" "outbound_alb" {
     enabled = true
   }
 
+  # We need the S3 bucket to have the policy set in order for the
+  # load balancer to have access to store access logs
+  depends_on = [
+    aws_s3_bucket_policy.mhs_access_logs_bucket_policy
+  ]
+
   tags = {
     Name = "${var.environment_id}-mhs-outbound-alb"
     EnvironmentId = var.environment_id
@@ -82,6 +88,12 @@ resource "aws_lb" "route_alb" {
     prefix = "mhs_route-${var.build_id}"
     enabled = true
   }
+
+  # We need the S3 bucket to have the policy set in order for the
+  # load balancer to have access to store access logs
+  depends_on = [
+    aws_s3_bucket_policy.mhs_access_logs_bucket_policy
+  ]
 
   tags = {
     Name = "${var.environment_id}-mhs-route-alb"
@@ -145,6 +157,12 @@ resource "aws_lb" "inbound_nlb" {
     prefix = "mhs_inbound-${var.build_id}"
     enabled = true
   }
+
+  # We need the S3 bucket to have the policy set in order for the
+  # load balancer to have access to store access logs
+  depends_on = [
+    aws_s3_bucket_policy.mhs_access_logs_bucket_policy
+  ]
 
   tags = {
     Name = "${var.environment_id}-mhs-inbound-nlb"
