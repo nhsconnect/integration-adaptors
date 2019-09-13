@@ -45,8 +45,8 @@ variable "mhs_outbound_service_maximum_instance_count" {
 
 variable "mhs_outbound_service_target_request_count" {
   type = number
-  description = "The target number of requests per minute that an MHS outbound service should handle. The number of services will be autoscaled so each instance handles this number of requests."
-  default = 20
+  description = "The target number of requests per minute that an MHS outbound service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
+  default = 1200
 }
 
 variable "mhs_inbound_service_minimum_instance_count" {
@@ -66,7 +66,7 @@ variable "mhs_inbound_service_maximum_instance_count" {
 
 variable "mhs_inbound_service_target_cpu_utilization" {
   type = number
-  description = "The target CPU utilization (in percent) that an MHS inbound service should have. The number of services will be autoscaled so each instance achieves this level of utilization."
+  description = "The target CPU utilization (in percent) that an MHS inbound service should have. The number of services will be autoscaled so each instance achieves this level of utilization. This value should be tuned based on the results of performance testing."
   default = 80
 }
 
@@ -87,8 +87,8 @@ variable "mhs_route_service_maximum_instance_count" {
 
 variable "mhs_route_service_target_request_count" {
   type = number
-  description = "The target number of requests per minute that an MHS route service should handle. The number of services will be autoscaled so each instance handles this number of requests."
-  default = 20
+  description = "The target number of requests per minute that an MHS route service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
+  default = 1200
 }
 
 variable "task_role_arn" {
