@@ -307,6 +307,8 @@ resource "aws_security_group" "alb_outbound_security_group" {
   # Allow inbound traffic from the supplier VPC. We don't make any
   # assumptions here about the internal structure of the supplier VPC,
   # instead just allowing inbound requests from the whole VPC.
+  # A supplier could restrict this rule further by limiting access, for
+  # example to a specific Security Group
   ingress {
     from_port = 80
     to_port = 80
