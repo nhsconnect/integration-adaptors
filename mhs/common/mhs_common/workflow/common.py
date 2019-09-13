@@ -80,7 +80,7 @@ class CommonWorkflow(abc.ABC):
 
             logger.info('0011', 'Looking up ASID details for {service_id}.', {'service_id': service_id})
             endpoint_details = await self.routing_reliability.get_end_point(service_id)
-
+            print(f"deets: {endpoint_details}")
             url = CommonWorkflow._extract_endpoint_url(endpoint_details)
             to_asid = self._extract_asid(endpoint_details)
             logger.info('0012', 'Retrieved endpoint details for {url}, {to_asid}',

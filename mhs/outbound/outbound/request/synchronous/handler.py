@@ -67,7 +67,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
             return False
 
     def _extract_from_asid(self):
-        return self.request.headers.get('from_asid', None)
+        return self.request.headers.get('from-asid', None)
 
     def _extract_message_id(self):
         message_id = self.request.headers.get('Message-Id', None)

@@ -40,7 +40,7 @@ def build_message(template, asid, patient_nhs_number, payload):
         UUID: uuid,
         TIMESTAMP: timestamp,
         ASID: asid,
-        TO_ASID: 'S20001A000168',
+        TO_ASID: '928942012545',
         PAYLOAD: payload,
         PATIENT_NHS_NUMBER: patient_nhs_number,
         TO_PARTY_ID: to_party_id,

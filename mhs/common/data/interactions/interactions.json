@@ -26,10 +26,6 @@
     "workflow": "sync",
     "service": "urn:nhs:names:services:pdsquery",
     "action": "QUPA_IN040000UK32",
-    "duplicate_elimination": false,
-    "ack_requested": false,
-    "ack_soap_actor": "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-    "sync_reply": true,
     "sync_async": false
   }
 }
