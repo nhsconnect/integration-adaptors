@@ -66,7 +66,12 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         try:
             url = interaction_details['url']
             response = await self.transmission.make_request(url, http_headers, message)
-            ebxml_handler.handle_ebxml_error(response.code, response.headers, response.body)
+
+            code, body = ebxml_handler.handle_ebxml_error(response.code, response.headers, str(response.body))
+            if code == 500:
+                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+                return code, body
+
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
             logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',

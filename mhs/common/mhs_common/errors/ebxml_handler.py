@@ -48,4 +48,4 @@ def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Option
                      'ebXML error returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
                      all_fields)
 
-    return code, f'Error(s) received from Spine. Contact system administrator.\n{errors_text}'
+    return 500, f'Error(s) received from Spine. Contact system administrator.\n{errors_text}'
