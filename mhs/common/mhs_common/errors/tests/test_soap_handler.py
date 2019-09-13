@@ -23,15 +23,16 @@ class TestOutboundSOAPHandler(unittest.TestCase):
 
     def test_single_error(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml' )
-        self.assertTrue('System failure to process message - default' in
-                        handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
+        self.assertIn('System failure to process message - default',
+                      handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
 
     def test_multiple_errors(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
         response = handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1]
 
-        self.assertTrue('System failure to process message - default' in response)
-        self.assertTrue('The message is not well formed' in response)
+        self.assertIn('System failure to process message - default', response)
+        self.assertIn('The message is not well formed', response)
+        self.assertIn('errorType=soap_fault', response)
 
     def test_no_content_type(self):
         with self.assertRaises(ValueError):

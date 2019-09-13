@@ -69,12 +69,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
             code, body = ebxml_handler.handle_ebxml_error(response.code, response.headers, str(response.body))
             if code == 500:
+                logger.warning('0005', 'Error encountered whilst making outbound request. {Body}', {'Body': body})
                 await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
                 return code, body
 
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
-            logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
+            logger.warning('0006', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                            {'HTTPStatus': e.code, 'Exception': e})
             self._record_outbound_audit_log(timing.get_time(), start_time,
                                             wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
@@ -86,7 +87,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
             return 500, f'Error(s) received from Spine: {e}'
         except Exception as e:
-            logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            logger.warning('0007', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request'
 
