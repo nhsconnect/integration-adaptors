@@ -83,12 +83,12 @@ class CommonWorkflow(abc.ABC):
 
             url = CommonWorkflow._extract_endpoint_url(endpoint_details)
             to_asid = self._extract_asid(endpoint_details)
-            logger.info('0002', 'Retrieved endpoint details for {url}, {to_asid}',
+            logger.info('0012', 'Retrieved endpoint details for {url}, {to_asid}',
                         {'url': url, 'to_asid': to_asid})
 
             return url, to_asid
         except Exception as e:
-            logger.warning('0003', 'Error encountered whilst retrieving endpoint details. {Exception}',
+            logger.warning('0013', 'Error encountered whilst retrieving endpoint details. {Exception}',
                            {'Exception': e})
             raise e
 
@@ -119,7 +119,7 @@ class CommonWorkflow(abc.ABC):
         asid = unique_identifiers[0]
 
         if len(unique_identifiers) > 1:
-            logger.warning('0005', 'Received more than one ASID during endpoint lookup')
+            logger.warning('0025', 'Received more than one ASID during endpoint lookup')
 
         return asid
 

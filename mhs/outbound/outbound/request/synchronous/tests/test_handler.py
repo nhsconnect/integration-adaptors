@@ -84,6 +84,31 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         mock_message_id.set.assert_called_with(message_id)
         mock_correlation_id.set.assert_called_with(MOCK_UUID)
 
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(log, "correlation_id")
+    @patch.object(log, "message_id")
+    def test_post_message_with_correlation_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
+        correlation_id = "correlation-id"
+        expected_response = "Hello world!"
+        self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, expected_response))
+        mock_get_uuid.return_value = MOCK_UUID
+        self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
+
+        response = self.fetch("/", method="POST",
+                              headers={"Interaction-Id": INTERACTION_NAME, "Correlation-Id": correlation_id,
+                                       'sync-async': 'false'},
+                              body=REQUEST_BODY)
+
+        self.assertEqual(response.code, 200)
+        self.assertEqual(response.body.decode(), expected_response)
+        mock_get_uuid.assert_called_once()
+
+        self.workflow.handle_outbound_message.assert_called_with(None, MOCK_UUID, correlation_id, INTERACTION_DETAILS,
+                                                                 REQUEST_BODY, None)
+
+        mock_message_id.set.assert_called_with(MOCK_UUID)
+        mock_correlation_id.set.assert_called_with(correlation_id)
+
     def test_post_message_where_workflow_returns_error_response(self):
         for http_status in [400, 409, 500, 503]:
             with self.subTest(http_status=http_status):
@@ -315,10 +340,10 @@ class TestSynchronousHandlerSyncMessage(tornado.testing.AsyncHTTPTestCase):
                    body=REQUEST_BODY)
 
         wdo_mock.set_outbound_status.assert_called_with(
-            wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+            wd.MessageStatus.SYNC_RESPONSE_SUCCESSFUL)
 
     @patch('outbound.request.synchronous.handler.SynchronousHandler._write_response')
-    def test_handler_updates_store_for_sync_async_failure_response(self, write_mock):
+    def test_handler_updates_store_for_sync_failure_response(self, write_mock):
         write_mock.side_effect = Exception('Dam the connection was closed')
         expected_response = "Hello world!"
         wdo = unittest.mock.MagicMock()
@@ -331,4 +356,4 @@ class TestSynchronousHandlerSyncMessage(tornado.testing.AsyncHTTPTestCase):
         self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME, 'sync-async': 'false'},
                    body=REQUEST_BODY)
 
-        wdo.set_outbound_status.assert_called_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
+        wdo.set_outbound_status.assert_called_with(wd.MessageStatus.SYNC_RESPONSE_FAILED)

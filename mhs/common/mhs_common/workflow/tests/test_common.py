@@ -81,9 +81,6 @@ class TestCommonWorkflow(unittest.TestCase):
 
         self.assertEqual(expected_url, actual_url)
 
-
-######
-
     @async_test
     async def test_lookup_asid_details(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({

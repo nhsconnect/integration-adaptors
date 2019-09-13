@@ -142,17 +142,20 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                                                                              interaction_details,
                                                                                              body,
                                                                                              async_workflow)
-        await self.write_response_with_store_updates(status, response, wdo)
+        await self.write_response_with_store_updates(status, response, wdo,
+                                                     wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED,
+                                                     wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
 
-    async def write_response_with_store_updates(self, status: int, response: str, wdo: wd.WorkDescription):
+    async def write_response_with_store_updates(self, status: int, response: str, wdo: wd.WorkDescription,
+                                                success, failure):
         try:
             self._write_response(status, response)
             if wdo:
-                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+                await wdo.set_outbound_status(success)
         except Exception as e:
             logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
             if wdo:
-                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
+                await wdo.set_outbound_status(failure)
 
     async def invoke_default_workflow(self, from_asid, message_id, correlation_id, interaction_details, body, wf):
         if isinstance(wf, workflow.SynchronousWorkflow):
@@ -161,7 +164,9 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                                                                            interaction_details,
                                                                                            body,
                                                                                            None)
-            await self.write_response_with_store_updates(status, response, work_description_response)
+            await self.write_response_with_store_updates(status, response, work_description_response,
+                                                         wd.MessageStatus.SYNC_RESPONSE_SUCCESSFUL,
+                                                         wd.MessageStatus.SYNC_RESPONSE_FAILED)
         else:
             status, response = await wf.handle_outbound_message(from_asid,
                                                                 message_id,
