@@ -16,3 +16,9 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         raise NotImplementedError()
+
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        raise NotImplementedError()
+
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        raise NotImplementedError()

@@ -62,6 +62,24 @@ class CommonWorkflow(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        """
+        Sets the work description status value to be a value that indicates the final message to the supplier was
+        sent successfully
+        :param wdo: The work description object
+        """
+        pass
+
+    @abc.abstractmethod
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        """
+        Sets the work description status value to be a value that indicates the final message to the supplier was
+        sent successfully
+        :param wdo: The work description object
+        """
+        pass
+
     async def _lookup_endpoint_details(self, interaction_details: Dict) -> Dict:
         try:
             service_id = await self._build_service_id(interaction_details)

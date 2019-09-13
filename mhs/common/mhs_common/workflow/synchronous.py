@@ -123,3 +123,9 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                      payload: str):
         raise NotImplementedError('This method is not supported for the synchronous message workflow as there is no '
                                   'inbound message')
+
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        await wdo.set_outbound_status(wd.MessageStatus.SYNC_RESPONSE_SUCCESSFUL)
+
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        await wdo.set_outbound_status(wd.MessageStatus.SYNC_RESPONSE_FAILED)

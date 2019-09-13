@@ -46,7 +46,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                       correlation_id: str,
                                       interaction_details: dict,
                                       payload: str,
-                                      wdo: Optional[wd.WorkDescription]) -> Tuple[int, str]:
+                                      wdo: Optional[wd.WorkDescription])\
+            -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
         if not wdo:
@@ -65,7 +66,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             cpa_id = details[self.ENDPOINT_CPA_ID]
         except Exception:
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            return 500, 'Error obtaining outbound URL'
+            return 500, 'Error obtaining outbound URL', None
 
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
                                                                               interaction_details,
@@ -87,25 +88,26 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
             if e.response:
-                return handle_soap_error(e.response.code, e.response.headers, e.response.body)
+                status, response = handle_soap_error(e.response.code, e.response.headers, e.response.body)
+                return status, response, None
 
-            return 500, f'Error(s) received from Spine: {e}'
+            return 500, f'Error(s) received from Spine: {e}', None
         except Exception as e:
             logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            return 500, 'Error making outbound request'
+            return 500, 'Error making outbound request', None
 
         if response.code == 202:
             self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
                                                 self.store_retries)
-            return 202, ''
+            return 202, '', None
         else:
             logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
                            {'HTTPStatus': response.code})
             self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            return 500, "Didn't get expected success response from Spine"
+            return 500, "Didn't get expected success response from Spine", None
 
     def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
         logger.audit('0007', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
@@ -164,3 +166,9 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
         logger.info('0011', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        pass
+
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        pass
