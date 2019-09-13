@@ -43,7 +43,30 @@ resource "aws_s3_bucket_policy" "mhs_access_logs_bucket_policy" {
         Principal = {
           AWS = data.aws_elb_service_account.main.arn
         }
+      },
+      {
+      Sid = "AWSLogDeliveryWrite"
+      Action= "s3:PutObject"
+      Effect = "Allow"
+      Principal= {
+        Service= "delivery.logs.amazonaws.com"
       }
+      Resource= "arn:aws:s3:::${aws_s3_bucket.mhs_access_logs_bucket.bucket}/*"
+      Condition= {
+        StringEquals= {
+          "s3:x-amz-acl" = "bucket-owner-full-control"
+        }
+      }
+    },
+    {
+      Sid= "AWSLogDeliveryAclCheck"
+      Action= "s3:GetBucketAcl"
+      Effect= "Allow"
+      Principal= {
+        Service= "delivery.logs.amazonaws.com"
+      }
+      Resource= "arn:aws:s3:::${aws_s3_bucket.mhs_access_logs_bucket.bucket}"
+    }
     ]
   }
   )
