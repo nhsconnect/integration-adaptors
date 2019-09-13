@@ -34,7 +34,7 @@ the most logs and `CRITICAL` displays the least. Note: Setting this value to one
 log levels (such as `DEBUG` or `NOTSET`) may result in the libraries used by this application logging details that
 contain sensitive information such as the content of messages being sent.
 * `MHS_PARTY_KEY` The party key associated with your MHS.
-* `MHS_CLIENT_CERT` (outbound only) Your endpoint certificate
+* `MHS_CLIENT_CERT` (outbound & Spine Route Lookup service only) Your endpoint certificate
 * `MHS_CLIENT_KEY` Your endpoint private key
 * `MHS_CA_CERTS` Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate, root CA Certificate.
 * `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.

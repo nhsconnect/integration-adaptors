@@ -251,8 +251,8 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
         ]
         secrets = [
           {
-            name      = "MHS_PARTY_KEY"
-            valueFrom = var.party_key_arn
+            name = "MHS_CLIENT_CERT"
+            valueFrom = var.client_cert_arn
           },
           {
             name      = "MHS_CLIENT_KEY"
