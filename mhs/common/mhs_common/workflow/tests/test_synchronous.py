@@ -90,9 +90,10 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.assertEqual(text, 'Failed message preparation')
         log_mock.error.assert_called_with('002', 'Failed to prepare outbound message')
 
+    @mock.patch.object(sync, 'logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
-    async def test_send_message_failure(self, wd_mock):
+    async def test_send_message_failure(self, wd_mock, log_mock):
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
@@ -100,6 +101,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
+        self.wf.transmission.make_request.side_effect = Exception("failed")
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
 
         error, text, work_description_response = await self.wf.handle_outbound_message(from_asid="202020",
@@ -113,9 +115,14 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error making outbound request')
 
+        log_call = log_mock.warning.call_args
+        self.assertEqual(log_call[0][0], '0006')
+        self.assertEqual(log_call[0][1], 'Error encountered whilst making outbound request. {Exception}')
+
+    @mock.patch.object(sync, 'logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
-    async def test_send_message_http_error(self, wd_mock):
+    async def test_send_message_http_error(self, wd_mock, log_mock):
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
@@ -138,6 +145,11 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error(s) received from Spine: HTTP 409: Conflict')
+        
+        log_call = log_mock.warning.call_args
+        self.assertEqual(log_call[0][0], '0005')
+        self.assertEqual(log_call[0][1], 'Received HTTP errors from Spine. {HTTPStatus} {Exception}')
+        self.assertEqual(log_call[0][2]['HTTPStatus'], 409)
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
@@ -200,7 +212,6 @@ class TestSynchronousWorkflow(unittest.TestCase):
 
         self.assertEqual(error, 400)
         self.assertEqual(text, '`from_asid` header field required for sync messages')
-
 
     @async_test
     async def test_no_inbound(self):

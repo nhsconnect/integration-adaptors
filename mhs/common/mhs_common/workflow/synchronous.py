@@ -74,16 +74,9 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             response = await self.transmission.make_request(url, headers, message)
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
-            logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
-                           {'HTTPStatus': e.code, 'Exception': e})
+            code, error = await self._handle_http_exception(e, wdo)
+            return code, error, None
 
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-
-            if e.response:
-                code, response = handle_soap_error(e.response.code, e.response.headers, e.response.body)
-                return  code, response, None
-
-            return 500, f'Error(s) received from Spine: {e}', None
         except Exception as e:
             logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
@@ -93,6 +86,20 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                     {'startTime': start_time, 'endTime': end_time})
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         return response.code, response.body.decode(), wdo
+
+    async def _handle_http_exception(self, exception, wdo):
+        logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
+                       {'HTTPStatus': exception.code, 'Exception': exception})
+
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+
+        if exception.response:
+            code, response = handle_soap_error(exception.response.code,
+                                               exception.response.headers,
+                                               exception.response.body)
+            return code, response
+
+        return 500, f'Error(s) received from Spine: {exception}'
 
     async def _prepare_outbound_message(self, message_id: Optional[str], to_asid: str, from_asid: str,
                                         message: str,
