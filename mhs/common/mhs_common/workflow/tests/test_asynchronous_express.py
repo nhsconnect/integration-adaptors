@@ -9,6 +9,7 @@ from utilities import test_utilities
 from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_express as async_express
+import mhs_common.workflow.common_asynchronous as common_async
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
@@ -88,7 +89,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     # Outbound tests
     ############################
 
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_handle_outbound_message(self, log_mock):
         response = mock.MagicMock()
@@ -189,7 +190,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_handle_outbound_message_http_error_when_calling_outbound_transmission(self, log_mock):
         self.setup_mock_work_description()
@@ -234,7 +235,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
              mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
             self.mock_work_description.set_outbound_status.call_args_list)
 
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_handle_outbound_message_non_http_202_success_response_received(self, log_mock):
         self.setup_mock_work_description()

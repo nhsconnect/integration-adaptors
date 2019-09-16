@@ -1,39 +1,487 @@
 {
+  "QUPA_IN040000UK32": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "GET_RESOURCE_PERMISSIONS_INUK01": {
+    "service": "urn:nhs:names:services:lrsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
   "QUPC_IN160101UK05": {
-    "workflow": "async-express",
     "service": "urn:nhs:names:services:psisquery",
-    "action": "QUPC_IN160101UK05",
-    "duplicate_elimination": false,
-    "ack_requested": false,
-    "ack_soap_actor": "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-    "sync_reply": true,
+    "workflow": "async-express",
     "sync_async": true
   },
   "REPC_IN150016UK05": {
+    "service": "urn:nhs:names:services:psis",
     "workflow": "async-reliable",
-    "url": "https://msg.opentest.hscic.gov.uk/reliablemessaging/reliablerequest",
-    "request_type": "POST",
-    "service": "urn:nhs:names:services:psis",
-    "action": "REPC_IN150016UK05",
-    "async_response_expected": true,
-    "to_party_id": "YES-0000806",
-    "cpa_id": "S20001A000182",
-    "duplicate_elimination": true,
-    "ack_requested": true,
-    "ack_soap_actor": "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-    "sync_reply": true
+    "sync_async": true
   },
-  "gp_summary_upload": {
-    "service": "urn:nhs:names:services:psis",
-    "action": "REPC_IN150016UK05",
-    "async_response_expected": true,
-    "duplicate_elimination": true,
-    "ack_requested": true,
-    "ack_soap_actor": "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-    "sync_reply": true
+  "PORX_IN080101UK31": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
   },
-  "get_nhs_number": {
-    "url": "https://msg.opentest.hscic.gov.uk/smsp/pds",
-    "async_response_expected": false
+  "PORX_IN090101UK31": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PORX_IN020102UK31": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QUPC_IN180000UK04": {
+    "service": "urn:nhs:names:services:psisquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPA_IN040000UK14": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPA_IN000008UK02": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PORX_IN060102UK30": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PORX_IN020101UK31": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QUPA_IN000006UK02": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "PORX_IN020101UK04": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "HAS_SCRA_PERMISSIONS_INSM01": {
+    "service": "",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PRPA_IN160000UK30": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QUPA_IN000008UK05": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PORX_IN020102UK04": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QUPA_IN000005UK01": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPA_IN020000UK31": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "FGMQuery_1_0": {
+    "service": "urn:nhs:names:services:clinicals-sync",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPA_IN010000UK32": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPA_IN000014UK01": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "COPC_IN000001UK01": {
+    "service": "urn:nhs:names:services:gp2gp",
+    "workflow": "forward-reliable",
+    "sync_async": false
+  },
+  "QUPA_IN000008SM13": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPC_IN190000UK04": {
+    "service": "urn:nhs:names:services:psisquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PRSC_IN040000UK08": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN080000UK07": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "PRPA_IN010000UK07": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": false
+  },
+  "PRPA_IN020000UK06": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN050000UK06": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN090000UK09": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": false
+  },
+  "PRPA_IN030000UK08": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "REPC_IN040000UK15": {
+    "service": "urn:nhs:names:services:lrs",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN100000UK06": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "PORX_IN100101UK31": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QUPC_IN000006GB01": {
+    "service": "urn:nhs:names:services:cpisquery",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRPA_IN000204SM13": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QUPA_IN060000UK30": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPC_IN010000UK32": {
+    "service": "",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "REPC_IN010000UK15": {
+    "service": "urn:nhs:names:services:lrs",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRPA_IN160000UK01": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QURX_IN000005UK99": {
+    "service": "urn:nhs:names:services:mmquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PORX_IN030101UK32": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN070000UK08": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "PRPA_IN000203UK03": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN140000UK06": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "GET_NHS_NUMBER_REQUEST": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PORX_IN510101UK31": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "RCMR_IN010000UK05": {
+    "service": "urn:nhs:names:services:gp2gp",
+    "workflow": "forward-reliable",
+    "sync_async": false
+  },
+  "RCMR_IN030000UK06": {
+    "service": "urn:nhs:names:services:gp2gp",
+    "workflow": "forward-reliable",
+    "sync_async": false
+  },
+  "QUPC_IN160103UK05": {
+    "service": "urn:nhs:names:services:psisquery",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "DBS_GETFILELIST_INUK01": {
+    "service": "urn:nhs:names:services:dbs",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "GetConsent01": {
+    "service": "urn:nhs:names:services:lrsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PORX_IN540101UK31": {
+    "service": "urn:nhs:names:services:mm",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN130000UK07": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "QUPA_IN000014SM03": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPA_IN000005UK03": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "HAS_RESOURCE_PERMISSIONS_INUK01": {
+    "service": "urn:nhs:names:services:lrsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "QUPA_IN020000UK14": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "PRPA_IN000203UK06": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN110000UK08": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "QUPA_IN010000UK13": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PRPA_IN000205UK03": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QUPA_IN000006UK05": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "PRSC_IN060000UK06": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "PRPA_IN000200SM13": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "ACCESS_TO_SERVICE": {
+    "service": "urn:nhs:names:services:cpisquery",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "INACTIVE_NHS_NUMBERS": {
+    "service": "urn:nhs:names:services:cpisquery",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "QUPA_IN000016UK02": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "COMT_IN000001UK01": {
+    "service": "urn:nhs:names:services:alerts",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "SetConsent01": {
+    "service": "urn:nhs:names:services:lrs",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "QUPA_IN000014UK03": {
+    "service": "urn:nhs:names:services:pdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "SCRA_GET_REASONABLE_ADJUSTMENTS": {
+    "service": "",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PRSC_IN150000UK06": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "forward-reliable",
+    "sync_async": true
+  },
+  "DBS_SEND_FILE_UK01": {
+    "service": "urn:nhs:names:services:dbs",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "DBS_DOWNLOADFILE_INUK01": {
+    "service": "urn:nhs:names:services:dbs",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "DBS_ACKNOWLEDGEDOWNLOAD_INUK01": {
+    "service": "urn:nhs:names:services:dbs",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "PRPA_IN000205UK05": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "POLB_IN020006UK01": {
+    "service": "urn:nhs:names:services:pat",
+    "workflow": "forward-reliable",
+    "sync_async": false
+  },
+  "POLB_IN020005UK01": {
+    "service": "urn:nhs:names:services:pat",
+    "workflow": "forward-reliable",
+    "sync_async": false
+  },
+  "MCCI_IN200001UK02": {
+    "service": "urn:nhs:names:services:tms",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "AccreditedSystemSearchRequest_1_0": {
+    "service": "urn:nhs:names:services:sdsquery",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "CLINICALS_REPORT_RETRIEVAL": {
+    "service": "",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "QURX_IN000005UK98": {
+    "service": "",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "COMT_IN000004GB01": {
+    "service": "urn:nhs:names:services:gpes",
+    "workflow": "forward-reliable",
+    "sync_async": false
+  },
+  "PRSC_IN080000UK03": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "Forward Express",
+    "sync_async": true
+  },
+  "DEMOGRAPHICS_REPORT_RETRIEVAL": {
+    "service": "",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "PRPA_IN040000UK15": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRPA_IN040000UK30": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "REPORT_RETRIEVAL": {
+    "service": "",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "QUPC_IN020000UK17": {
+    "service": "",
+    "workflow": "async-express",
+    "sync_async": true
+  },
+  "PRPA_IN000200UK03": {
+    "service": "urn:nhs:names:services:pds",
+    "workflow": "async-reliable",
+    "sync_async": true
+  },
+  "PRSC_IN040000UK03": {
+    "service": "urn:nhs:names:services:ebs",
+    "workflow": "Forward Express",
+    "sync_async": true
+  },
+  "REPC_IN150018UK02": {
+    "service": "urn:nhs:names:services:psis",
+    "workflow": "async-reliable",
+    "sync_async": false
+  },
+  "GET_PRESCRIPTION_DOCUMENT_INUK01": {
+    "service": "",
+    "workflow": "sync",
+    "sync_async": false
+  },
+  "REPC_IN150017UK02": {
+    "service": "urn:nhs:names:services:psis",
+    "workflow": "async-reliable",
+    "sync_async": false
   }
 }

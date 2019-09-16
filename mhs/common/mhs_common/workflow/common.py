@@ -20,6 +20,7 @@ class CommonWorkflow(abc.ABC):
 
     def __init__(self, routing: routing_reliability.RoutingAndReliability = None):
         self.routing_reliability = routing
+        self.workflow_specific_interaction_details = dict()
 
     @abc.abstractmethod
     async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,

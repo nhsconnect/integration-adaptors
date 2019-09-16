@@ -10,7 +10,6 @@ from utilities import timing
 
 from mhs_common import workflow
 from mhs_common.errors.soap_handler import handle_soap_error
-from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
@@ -31,9 +30,14 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
         super(AsynchronousExpressWorkflow, self).__init__(party_key, persistence_store, transmission,
-                                                           queue_adaptor, inbound_queue_max_retries,
-                                                           inbound_queue_retry_delay, persistence_store_max_retries,
-                                                           routing)
+                                                          queue_adaptor, inbound_queue_max_retries,
+                                                          inbound_queue_retry_delay, persistence_store_max_retries,
+                                                          routing)
+
+        self.workflow_specific_interaction_details = dict(duplicate_elimination=False,
+                                                          ack_requested=False,
+                                                          ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
+                                                          sync_reply=True)
 
     @timing.time_function
     async def handle_outbound_message(self,
@@ -72,7 +76,9 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         except httpclient.HTTPClientError as e:
             logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                            {'HTTPStatus': e.code, 'Exception': e})
-            self._record_outbound_audit_log(timing.get_time(), start_time,
+            self._record_outbound_audit_log(workflow.ASYNC_EXPRESS,
+                                            timing.get_time(),
+                                            start_time,
                                             wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
@@ -87,41 +93,22 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             return 500, 'Error making outbound request'
 
         if response.code == 202:
-            self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+            self._record_outbound_audit_log(workflow.ASYNC_EXPRESS,
+                                            end_time,
+                                            start_time,
+                                            wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
                                                 self.store_retries)
             return 202, ''
         else:
             logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
                            {'HTTPStatus': response.code})
-            self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+            self._record_outbound_audit_log(workflow.ASYNC_EXPRESS,
+                                            end_time,
+                                            start_time,
+                                            wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             return 500, "Didn't get expected success response from Spine"
-
-    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0007', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
-                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment})
-
-    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
-                                          to_party_key, cpa_id):
-        try:
-            interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
-            interaction_details[ebxml_request_envelope.MESSAGE] = payload
-            interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
-            interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
-            interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
-            interaction_details[ebxml_envelope.CPA_ID] = cpa_id
-            _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
-        except Exception as e:
-            logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
-            return (500, 'Error serialising outbound message'), None, None
-
-        logger.info('0003', 'Message serialised successfully')
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
-        return None, http_headers, message
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
