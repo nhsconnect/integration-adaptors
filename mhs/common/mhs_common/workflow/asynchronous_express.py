@@ -111,7 +111,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             return 500, "Didn't get expected success response from Spine"
 
     def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0007', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
+        logger.audit('0009', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
                              '{RequestSentTime} {AcknowledgmentReceivedTime}',
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment})
@@ -138,7 +138,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
-        logger.info('0009', 'Entered async express workflow to handle inbound message')
+        logger.info('0010', 'Entered async express workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
@@ -151,7 +151,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                                          'correlation-id': correlation_id})
                 break
             except Exception as e:
-                logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
+                logger.warning('0011', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
                 retries_remaining -= 1
                 if retries_remaining <= 0:
                     logger.error("0012",
@@ -165,5 +165,5 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                     "queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
-        logger.info('0011', 'Placed message onto inbound queue successfully')
+        logger.info('0014', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
