@@ -455,6 +455,8 @@ resource "aws_ecs_service" "mhs_route_service" {
   }
 
   load_balancer {
+    # In the MHS route task definition, we define only 1 container, and for that container, we expose only 1 port
+    # That is why in these 2 lines below we do "[0]" to reference that one container and port definition.
     container_name = jsondecode(aws_ecs_task_definition.mhs_route_task.container_definitions)[0].name
     container_port = jsondecode(aws_ecs_task_definition.mhs_route_task.container_definitions)[0].portMappings[0].hostPort
     target_group_arn = aws_lb_target_group.route_alb_target_group.arn
