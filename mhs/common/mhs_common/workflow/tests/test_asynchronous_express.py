@@ -259,9 +259,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
-    @mock.patch.object(async_express, 'logger')
     @async_test
-    async def test_handle_outbound_message_non_http_202_success_response_ebxml_error(self, log_mock):
+    async def test_handle_outbound_message_non_http_202_success_response_ebxml_error(self):
         self.setup_mock_work_description()
         self._setup_routing_mock()
 
