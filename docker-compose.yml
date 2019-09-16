@@ -5,9 +5,13 @@ services:
     image: local/mhs-inbound
     ports:
       - "443:443"
+      - "8079:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
-      - MHS_INBOUND_QUEUE_HOST=rabbitmq:5672/inbound
+      - MHS_PARTY_KEY
+      - MHS_CLIENT_KEY
+      - MHS_CA_CERTS
+      - MHS_INBOUND_QUEUE_URL=rabbitmq:5672/inbound
       - MHS_INBOUND_QUEUE_USERNAME=guest
       - MHS_INBOUND_QUEUE_PASSWORD=guest
       - MHS_STATE_TABLE_NAME=mhs_state
@@ -23,6 +27,10 @@ services:
       - "80:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
+      - MHS_PARTY_KEY
+      - MHS_CLIENT_CERT
+      - MHS_CLIENT_KEY
+      - MHS_CA_CERTS
       - MHS_STATE_TABLE_NAME=mhs_state
       - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
       - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state
@@ -30,6 +38,16 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - MHS_RESYNC_INTERVAL=1
       - MAX_RESYNC_RETRIES=20
+      - MHS_SPINE_ROUTE_LOOKUP_URL=http://route:80
+      - MHS_SPINE_ORG_CODE=YES
+  route:
+    image: local/mhs-route
+    ports:
+      - "8080:80"
+    environment:
+      - MHS_LOG_LEVEL=NOTSET
+      - MHS_SDS_URL=ldap://msg.opentest.hscic.gov.uk
+      - MHS_DISABLE_SDS_TLS=True
   dynamodb:
     build: ./common/local-env/dynamodb-local
     ports:

@@ -14,7 +14,9 @@ from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
 
-PARTY_KEY = 'party-key'
+FROM_PARTY_KEY = 'from-party-key'
+TO_PARTY_KEY = 'to-party-key'
+CPA_ID = 'cpa-id'
 MESSAGE_ID = 'message-id'
 CORRELATION_ID = 'correlation-id'
 URL = 'a.a'
@@ -25,9 +27,13 @@ HTTP_HEADERS = {
     "SOAPAction": "d",
     'start': "e"
 }
+SERVICE = 'service'
+ACTION = 'action'
+SERVICE_ID = SERVICE + ":" + ACTION
 INTERACTION_DETAILS = {
     'workflow': 'async-express',
-    'url': URL
+    'service': SERVICE,
+    'action': ACTION
 }
 PAYLOAD = 'payload'
 SERIALIZED_MESSAGE = 'serialized-message'
@@ -35,12 +41,17 @@ INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
 INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
 
+MHS_END_POINT_KEY = 'nhsMHSEndPoint'
+MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
+MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+
 
 class TestAsynchronousExpressWorkflow(unittest.TestCase):
     def setUp(self):
         self.mock_persistence_store = mock.MagicMock()
         self.mock_transmission_adaptor = mock.MagicMock()
         self.mock_queue_adaptor = mock.MagicMock()
+        self.mock_routing_reliability = mock.MagicMock()
 
         patcher = mock.patch.object(work_description, 'create_new_work_description')
         self.mock_create_new_work_description = patcher.start()
@@ -50,18 +61,20 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.workflow = async_express.AsynchronousExpressWorkflow(party_key=PARTY_KEY,
+        self.workflow = async_express.AsynchronousExpressWorkflow(party_key=FROM_PARTY_KEY,
                                                                   persistence_store=self.mock_persistence_store,
                                                                   transmission=self.mock_transmission_adaptor,
                                                                   queue_adaptor=self.mock_queue_adaptor,
                                                                   inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
                                                                   inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
-                                                                  persistence_store_max_retries=3)
+                                                                  persistence_store_max_retries=3,
+                                                                  routing=self.mock_routing_reliability)
 
     def test_construct_workflow_with_only_outbound_params(self):
         workflow = async_express.AsynchronousExpressWorkflow(party_key=mock.sentinel.party_key,
                                                              persistence_store=mock.sentinel.persistence_store,
-                                                             transmission=mock.sentinel.transmission)
+                                                             transmission=mock.sentinel.transmission,
+                                                             routing=self.mock_routing_reliability)
         self.assertIsNotNone(workflow)
 
     def test_construct_workflow_with_only_inbound_params(self):
@@ -83,12 +96,16 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.setup_mock_work_description()
 
-        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, HTTP_HEADERS, SERIALIZED_MESSAGE)
+        self._setup_routing_mock()
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (
+            MESSAGE_ID, HTTP_HEADERS, SERIALIZED_MESSAGE)
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
         expected_interaction_details = {ebxml_envelope.MESSAGE_ID: MESSAGE_ID, ebxml_request_envelope.MESSAGE: PAYLOAD,
-                                        ebxml_envelope.FROM_PARTY_ID: PARTY_KEY,
-                                        ebxml_envelope.CONVERSATION_ID: CORRELATION_ID}
+                                        ebxml_envelope.FROM_PARTY_ID: FROM_PARTY_KEY,
+                                        ebxml_envelope.CONVERSATION_ID: CORRELATION_ID,
+                                        ebxml_envelope.TO_PARTY_ID: TO_PARTY_KEY,
+                                        ebxml_envelope.CPA_ID: CPA_ID}
         expected_interaction_details.update(INTERACTION_DETAILS)
 
         status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
@@ -103,6 +120,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
+        self.mock_routing_reliability.get_end_point.assert_called_once_with(SERVICE_ID)
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
@@ -116,12 +134,16 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.setup_mock_work_description()
 
-        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, HTTP_HEADERS, SERIALIZED_MESSAGE)
+        self._setup_routing_mock()
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (
+            MESSAGE_ID, HTTP_HEADERS, SERIALIZED_MESSAGE)
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
         expected_interaction_details = {ebxml_envelope.MESSAGE_ID: MESSAGE_ID, ebxml_request_envelope.MESSAGE: PAYLOAD,
-                                        ebxml_envelope.FROM_PARTY_ID: PARTY_KEY,
-                                        ebxml_envelope.CONVERSATION_ID: CORRELATION_ID}
+                                        ebxml_envelope.FROM_PARTY_ID: FROM_PARTY_KEY,
+                                        ebxml_envelope.CONVERSATION_ID: CORRELATION_ID,
+                                        ebxml_envelope.TO_PARTY_ID: TO_PARTY_KEY,
+                                        ebxml_envelope.CPA_ID: CPA_ID}
         expected_interaction_details.update(INTERACTION_DETAILS)
 
         wdo = mock.MagicMock()
@@ -138,6 +160,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     @async_test
     async def test_handle_outbound_message_serialisation_fails(self):
         self.setup_mock_work_description()
+        self._setup_routing_mock()
 
         self.mock_ebxml_request_envelope.return_value.serialize.side_effect = Exception()
 
@@ -151,10 +174,26 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
+    @async_test
+    async def test_handle_outbound_message_error_when_looking_up_url(self):
+        self.setup_mock_work_description()
+        self.mock_routing_reliability.get_end_point.side_effect = Exception()
+
+        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
+                                                                      PAYLOAD, None)
+
+        self.assertEqual(500, status)
+        self.assertEqual('Error obtaining outbound URL', message)
+        self.mock_work_description.publish.assert_called_once()
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+                         self.mock_work_description.set_outbound_status.call_args_list)
+        self.mock_transmission_adaptor.make_request.assert_not_called()
+
     @mock.patch.object(async_express, 'logger')
     @async_test
     async def test_handle_outbound_message_http_error_when_calling_outbound_transmission(self, log_mock):
         self.setup_mock_work_description()
+        self._setup_routing_mock()
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
@@ -176,6 +215,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     @async_test
     async def test_handle_outbound_message_error_when_calling_outbound_transmission(self):
         self.setup_mock_work_description()
+        self._setup_routing_mock()
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
@@ -198,6 +238,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     @async_test
     async def test_handle_outbound_message_non_http_202_success_response_received(self, log_mock):
         self.setup_mock_work_description()
+        self._setup_routing_mock()
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
@@ -222,6 +263,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     @async_test
     async def test_handle_outbound_message_non_http_202_success_response_ebxml_error(self, log_mock):
         self.setup_mock_work_description()
+        self._setup_routing_mock()
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
@@ -268,6 +310,10 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
             self.mock_work_description.set_outbound_status.call_args_list)
+
+    def _setup_routing_mock(self):
+        self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
+            MHS_END_POINT_KEY: [URL], MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY, MHS_CPA_ID_KEY: CPA_ID})
 
     ############################
     # Inbound tests

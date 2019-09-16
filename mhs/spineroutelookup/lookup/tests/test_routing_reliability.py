@@ -14,7 +14,9 @@ ODS_CODE = "ODSCODE1"
 
 EXPECTED_ROUTING = {
     'nhsMhsFQDN': 'vpn-client-1411.opentest.hscic.gov.uk',
-    'nhsMHSEndPoint': ['https://vpn-client-1411.opentest.hscic.gov.uk/']
+    'nhsMHSEndPoint': ['https://vpn-client-1411.opentest.hscic.gov.uk/'],
+    'nhsMHSPartyKey': 'AP4RTY-K33Y',
+    'nhsMhsCPAId': 'S918999410559'
 }
 
 EXPECTED_RELIABILITY = {

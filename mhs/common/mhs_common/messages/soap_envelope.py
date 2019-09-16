@@ -1,8 +1,115 @@
 """This module defines the envelope used to wrap synchronous messages to be sent to a remote MHS."""
+import copy
+import json
+from pathlib import Path
+from typing import Dict, Tuple, Union
+from xml import etree
 
+import lxml.etree as ET
+from utilities import integration_adaptors_logger as log, message_utilities
+
+from definitions import ROOT_DIR
 from mhs_common.messages import envelope
+
+SOAP_CONTENT_TYPE_VALUE = 'text/xml'
+CONTENT_TYPE_HEADER_NAME = "Content-Type"
+
+XSLT_DIR = 'mhs_common/messages/xslt'
+SOAP_HEADER_XSLT = 'soap_header.xslt'
+SOAP_BODY_XSLT = 'soap_body.xslt'
+FROM_ASID = "from_asid"
+TO_ASID = "to_asid"
+SERVICE = "service"
+ACTION = "action"
+MESSAGE_ID = 'message_id'
+TIMESTAMP = 'timestamp'
+MESSAGE = 'hl7_message'
+
+REQUIRED_SOAP_ELEMENTS = [FROM_ASID, TO_ASID, MESSAGE_ID, SERVICE, ACTION, MESSAGE]
+
+SOAP_TEMPLATE = "soap_request"
+
+logger = log.IntegrationAdaptorsLogger('SOAP_ENVELOPE')
+
+soap_header_transformer_path = str(Path(ROOT_DIR) / XSLT_DIR / SOAP_HEADER_XSLT)
+soap_body_transformer_path = str(Path(ROOT_DIR) / XSLT_DIR / SOAP_BODY_XSLT)
 
 
 class SoapEnvelope(envelope.Envelope):
     """An envelope that contains a message to be sent synchronously to a remote MHS."""
+
+    def __init__(self, message_dictionary: Dict[str, Union[str, bool]]):
+        """Create a new SoapEnvelope that populates the message with the provided dictionary.
+
+        :param message_dictionary: The dictionary of values to use when populating the template.
+        """
+        super().__init__(SOAP_TEMPLATE, message_dictionary)
+
+    def serialize(self) -> Tuple[str, Dict[str, str], str]:
+        """Produce a serialised representation of this SOAP message by populating a Mustache template with this
+        object's properties.
+
+        :return: A tuple string containing the message ID, HTTP headers to be sent with the message and the message
+        itself.
+        """
+        soap_message_dictionary = copy.deepcopy(self.message_dictionary)
+
+        message_id = soap_message_dictionary.get(MESSAGE_ID)
+        if not message_id:
+            message_id = message_utilities.MessageUtilities.get_uuid()
+            soap_message_dictionary[MESSAGE_ID] = message_id
+        timestamp = message_utilities.MessageUtilities.get_timestamp()
+        soap_message_dictionary[TIMESTAMP] = timestamp
+        logger.info('0001', 'Creating SOAP message with {MessageId} and {Timestamp}',
+                    {'MessageId': message_id, 'Timestamp': timestamp})
+
+        message = self.message_builder.build_message(soap_message_dictionary)
+        http_headers = {
+            'charset': 'UTF-8',
+            'SOAPAction': f'{soap_message_dictionary[ACTION]}'
+        }
+
+        http_headers['Content-Type'] = SOAP_CONTENT_TYPE_VALUE
+        http_headers['type'] = SOAP_CONTENT_TYPE_VALUE
+
+        return message_id, http_headers, message
+
+    @classmethod
+    def from_string(cls, headers: Dict[str, str], message: str):
+        """Parse the provided message string and create an instance of an SoapEnvelope.
+
+        :param headers A dictionary of headers received with the message.
+        :param message: The message to be parsed.
+        :return: An instance of an SoapEnvelope constructed from the message.
+        """
+        xml_message = ET.fromstring(bytes(bytearray(message, encoding='utf-8')))
+        soap_header_transformer = ET.XSLT(ET.parse(soap_header_transformer_path))
+        soap_body_transformer = ET.XSLT(ET.parse(soap_body_transformer_path))
+
+        try:
+            soap_headers = str(soap_header_transformer(xml_message, **headers))
+            soap_body = str(soap_body_transformer(xml_message, **headers))
+        except etree.XSLTApplyError as ae:
+            logger.error('0002', "An error occurred when transforming the SOAP XML message")
+            raise SoapParsingError(f"An error occurred when transforming the SOAP XML message") from ae
+        except Exception as e:
+            logger.error('0003', "An unexpected error occurred when applying an XSLT to SOAP XML message")
+            raise SoapParsingError(f"An unexpected error occurred when applying an XSLT to SOAP XML message") from e
+
+        extracted_values = json.loads(soap_headers)
+        logger.info('0001', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
+        extracted_values[MESSAGE] = soap_body
+
+        for required_element in REQUIRED_SOAP_ELEMENTS:
+            if not extracted_values[required_element]:
+                logger.error('0004', "Weren't able to find required element {required_param} during parsing of SOAP "
+                                     "message.", {'required_param': required_element})
+                raise SoapParsingError(
+                    f"Weren't able to find required element {required_element} during parsing of SOAP message")
+
+        return SoapEnvelope(extracted_values)
+
+
+class SoapParsingError(Exception):
+    """Raised when an error was encountered during parsing of a SOAP message."""
     pass

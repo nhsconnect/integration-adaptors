@@ -1,7 +1,6 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
-from typing import Tuple, Optional, AnyStr
-from xml.etree import ElementTree
+from typing import Tuple, Optional
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
@@ -13,6 +12,7 @@ from mhs_common import workflow
 from mhs_common.errors import ebxml_handler
 from mhs_common.errors.soap_handler import handle_soap_error
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
+from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
@@ -29,7 +29,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
                  inbound_queue_max_retries: int = None,
                  inbound_queue_retry_delay: int = None,
-                 persistence_store_max_retries: int = None):
+                 persistence_store_max_retries: int = None,
+                 routing: routing_reliability.RoutingAndReliability = None):
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key
@@ -37,6 +38,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         self.store_retries = persistence_store_max_retries
         self.inbound_queue_max_retries = inbound_queue_max_retries
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
+        super().__init__(routing)
 
     @timing.time_function
     async def handle_outbound_message(self,
@@ -55,16 +57,21 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                  )
             await wdo.publish()
 
+        try:
+            url, to_party_key, cpa_id = await self._lookup_endpoint_details(interaction_details)
+        except Exception:
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            return 500, 'Error obtaining outbound URL'
+
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
                                                                               interaction_details,
-                                                                              payload, wdo)
+                                                                              payload, wdo, to_party_key, cpa_id)
         if error:
             return error
 
         logger.info('0004', 'About to make outbound request')
         start_time = timing.get_time()
         try:
-            url = interaction_details['url']
             response = await self.transmission.make_request(url, http_headers, message)
 
             code, body = ebxml_handler.handle_ebxml_error(response.code, response.headers, str(response.body))
@@ -109,12 +116,15 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment})
 
-    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo):
+    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
+                                          to_party_key, cpa_id):
         try:
             interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
             interaction_details[ebxml_request_envelope.MESSAGE] = payload
             interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
             interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
+            interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
+            interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
         except Exception as e:
             logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
@@ -144,9 +154,9 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                 logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
                 retries_remaining -= 1
                 if retries_remaining <= 0:
-                    logger.warning("0012",
-                                   "Exceeded the maximum number of retries, {max_retries} retries, when putting "
-                                   "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
+                    logger.error("0012",
+                                 "Exceeded the maximum number of retries, {max_retries} retries, when putting "
+                                 "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
                     await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
                     raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
                                              'been exceeded') from e

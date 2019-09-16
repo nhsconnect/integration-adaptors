@@ -1,13 +1,13 @@
 {
-  "_description": "This packer file produces a inbound image and has the capability to publish to a given repository",
+  "_description": "This packer file produces an outbound image and has the capability to publish to a given repository",
   "variables": {
     "app_dir": "/usr/src/app",
     "common_dir": "common",
     "outbound_dir": "mhs/outbound",
     "mhs_common_dir": "mhs/common",
-    "repository": "{{env `DOCKER_REPOSITORY`}}",
-    "tag": "{{env `BUILD_TAG`}}",
-    "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/mhs/outbound",
+    "tag": "{{env `BUILD_TAG`}}"
   },
   "builders": [
     {
@@ -27,7 +27,7 @@
       "type": "shell",
       "inline": [
         "apt-get update",
-        "apt-get install build-essential -y",
+        "apt-get install build-essential libcurl4-openssl-dev libssl-dev -y",
         "mkdir -p {{user `app_dir`}}/mhs"
       ]
     },
@@ -66,14 +66,14 @@
       {
         "name": "publish",
         "type": "docker-tag",
-        "repository": "{{user `repository`}}",
+        "repository": "{{user `registry`}}{{user `repository`}}",
         "tag": "outbound-{{user `tag`}}"
       },
       {
         "name": "publish",
         "type": "docker-push",
         "ecr_login": true,
-        "login_server": "{{user `docker_registry_url`}}"
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
       },
       {
         "type": "docker-tag",

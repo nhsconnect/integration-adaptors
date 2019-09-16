@@ -1,7 +1,11 @@
 from unittest import TestCase
 
 from integration_tests.helpers import methods, message_retriever
-
+import xml.etree.ElementTree as ET
+import asyncio
+import concurrent
+from concurrent.futures import ProcessPoolExecutor
+from utilities.test_utilities import async_test
 
 class FunctionalTest(TestCase):
 
@@ -10,7 +14,8 @@ class FunctionalTest(TestCase):
         outbound_response, _, _ = methods.get_interaction_from_template('async express',
                                                                         'QUPC_IN160101UK05',
                                                                         '9689177621',
-                                                                        'Asynchronous Express test')
+                                                                        'Asynchronous Express test',
+                                                                        sync_async=False)
 
         # we need to 'accept' the message in the queue, so it is removed and doesn't impact on subsequent tests
         message_retriever.get_inbound_response()
@@ -65,3 +70,33 @@ class FunctionalTest(TestCase):
         patient_number = methods.get_section(inbound_response, 'extension', 'id', 'patient')
         self.assertEqual(patient_number, '9689177923',
                          "Async Express inbound response test failed")
+
+
+class TestSyncAsyncWrapper(TestCase):
+
+    def test_async_express_sync_async_wrap(self):
+        outbound_response, _, _ = methods.get_interaction_from_template('async express',
+                                                                        'QUPC_IN160101UK05',
+                                                                        '9689177621',
+                                                                        'Asynchronous Express test',
+                                                                        sync_async=True)
+        self.assertTrue(methods.check_status_code(outbound_response, 200),
+                        "Async Express outbound test failed")
+
+        root = ET.ElementTree(ET.fromstring(outbound_response.text)).getroot()
+        element = root.find('.//hl7:queryResponseCode', namespaces={'hl7': 'urn:hl7-org:v3'})
+        self.assertEqual('OK', element.attrib['code'])
+
+    @async_test
+    async def test_async_small_soak(self):
+        loop = asyncio.get_event_loop()
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
+        await asyncio.gather(*[loop.run_in_executor(executor, self._make_call_assert_response, f'968917762{i}') for i in range(5)])
+
+    def _make_call_assert_response(self, nhs_id):
+        result, _, _ = methods.get_interaction_from_template('async express',
+                                                             'QUPC_IN160101UK05',
+                                                             nhs_id,
+                                                             'Asynchronous Express test',
+                                                             sync_async=True)
+        self.assertEqual(result.status_code, 200)

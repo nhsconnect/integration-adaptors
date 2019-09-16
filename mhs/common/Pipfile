@@ -5,10 +5,10 @@ verify_ssl = true
 
 [dev-packages]
 coverage = "~=4.5"
-tornado = "*"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
+tornado = "*"
 defusedxml = "~=0.6"
 integration-adaptors-common = {editable = true,path = "./../../common"}
 aioboto3 = "*"
