@@ -12,6 +12,7 @@ NHS_SERVICES_BASE = "ou=services, o=nhs"
 MHS_OBJECT_CLASS = "nhsMhs"
 
 PARTY_KEY = "AP4RTY-K33Y"
+ASID = "123456789"
 INTERACTION_ID = "urn:nhs:names:services:psis:MCCI_IN010000UK13"
 ODS_CODE = "ODSCODE1"
 
@@ -61,7 +62,8 @@ class TestSDSClient(TestCase):
         result = await client._accredited_system_lookup(ODS_CODE, INTERACTION_ID)
 
         self.assertIsNotNone(result)
-        self.assertIsNotNone(result[0]['attributes']['nhsMHSPartyKey'] == 'A91461-9199084')
+        self.assertEqual(result[0]['attributes']['nhsMHSPartyKey'], PARTY_KEY)
+        self.assertEqual(result[0]['attributes']['uniqueIdentifier'][0], ASID)
         self.assertEqual(len(result[0]['attributes']), 2)
 
     @async_test
