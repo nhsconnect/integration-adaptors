@@ -13,6 +13,7 @@ from comms import proton_queue_adaptor
 from mhs_common import workflow
 from mhs_common.request import healthcheck_handler
 from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
+from utilities import secrets
 
 import inbound.request.handler as async_request_handler
 
@@ -28,8 +29,8 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
 
     queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
         host=config.get_config('INBOUND_QUEUE_URL'),
-        username=config.get_config('INBOUND_QUEUE_USERNAME'),
-        password=config.get_config('INBOUND_QUEUE_PASSWORD'))
+        username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME'),
+        password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD'))
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
@@ -57,8 +58,8 @@ def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
     key_file = certs_dir / "client.key"
 
     certs_dir.mkdir(parents=True, exist_ok=True)
-    certs_file.write_text(config.get_config('CA_CERTS'))
-    key_file.write_text(config.get_config('CLIENT_KEY'))
+    certs_file.write_text(secrets.get_secret_config('CA_CERTS'))
+    key_file.write_text(secrets.get_secret_config('CLIENT_KEY'))
 
     return str(certs_file), str(key_file)
 
@@ -119,7 +120,7 @@ def main():
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
     certs_file, key_file = load_certs(certs_dir)
-    party_key = config.get_config('PARTY_KEY')
+    party_key = secrets.get_secret_config('PARTY_KEY')
 
     workflows = initialise_workflows()
     store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))

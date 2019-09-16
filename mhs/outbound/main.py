@@ -14,6 +14,7 @@ from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
+from utilities import secrets
 
 import outbound.request.synchronous.handler as client_request_handler
 from outbound.transmission import outbound_transmission
@@ -92,15 +93,15 @@ def main():
     ca_certs = "client.pem"
 
     certs_dir.mkdir(parents=True, exist_ok=True)
-    (certs_dir / client_cert).write_text(config.get_config('CLIENT_CERT'))
-    (certs_dir / client_key).write_text(config.get_config('CLIENT_KEY'))
-    (certs_dir / ca_certs).write_text(config.get_config('CA_CERTS'))
+    (certs_dir / client_cert).write_text(secrets.get_secret_config('CLIENT_CERT'))
+    (certs_dir / client_key).write_text(secrets.get_secret_config('CLIENT_KEY'))
+    (certs_dir / ca_certs).write_text(secrets.get_secret_config('CA_CERTS'))
 
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
     store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
 
-    party_key = config.get_config('PARTY_KEY')
+    party_key = secrets.get_secret_config('PARTY_KEY')
     work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(

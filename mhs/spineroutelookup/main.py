@@ -2,7 +2,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 from mhs_common.request import healthcheck_handler
-from utilities import config
+from utilities import config, secrets
 from utilities import integration_adaptors_logger as log
 
 from lookup import cache_adaptor, dictionary_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, \
@@ -38,9 +38,9 @@ def initialise_routing(sds_url: str, tls: bool = True) -> routing_reliability.Ro
     cache = load_cache_implementation()
 
     if tls:
-        client_key = config.get_config('CLIENT_KEY')
-        client_cert = config.get_config('CLIENT_CERT')
-        ca_certs = config.get_config('CA_CERTS')
+        client_key = secrets.get_secret_config('CLIENT_KEY')
+        client_cert = secrets.get_secret_config('CLIENT_CERT')
+        ca_certs = secrets.get_secret_config('CA_CERTS')
 
         sds_connection = sds_connection_factory.build_sds_connection_tls(ldap_address=sds_url,
                                                                          private_key=client_key,
