@@ -3,13 +3,14 @@ from typing import Dict
 
 import definitions
 import mhs_common.configuration.configuration_manager as configuration_manager
+import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import utilities.config as config
-import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
+from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
@@ -20,16 +21,11 @@ from outbound.transmission import outbound_transmission
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
 
-def load_party_key(data_dir: pathlib.Path) -> str:
-    """Load this MHS's party key from the specified directory.
-    :param data_dir: The directory to load the party key from.
-    :return: The party key to use to identify this MHS.
+def configure_http_client():
     """
-    party_key_file = str(data_dir / "party_key.txt")
-    party_key = file_utilities.FileUtilities.get_file_string(party_key_file)
-
-    assert party_key
-    return party_key
+    Configure Tornado to use the curl HTTP client.
+    """
+    tornado.httpclient.AsyncHTTPClient.configure('tornado.curl_httpclient.CurlAsyncHTTPClient')
 
 
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
@@ -74,7 +70,8 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
 
     supplier_application = tornado.web.Application(
         [(r"/", client_request_handler.SynchronousHandler,
-          dict(config_manager=config_manager, workflows=workflows))])
+          dict(config_manager=config_manager, workflows=workflows)),
+         (r"/healthcheck", healthcheck_handler.HealthcheckHandler)])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
     supplier_server.listen(80)
 
@@ -86,16 +83,24 @@ def main():
     config.setup_config("MHS")
     log.configure_logging()
 
+    configure_http_client()
+
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
     client_cert = "client.cert"
     client_key = "client.key"
     ca_certs = "client.pem"
-    max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default='3'))
-    retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default='100'))
+
+    certs_dir.mkdir(parents=True, exist_ok=True)
+    (certs_dir / client_cert).write_text(config.get_config('CLIENT_CERT'))
+    (certs_dir / client_key).write_text(config.get_config('CLIENT_KEY'))
+    (certs_dir / ca_certs).write_text(config.get_config('CA_CERTS'))
+
+    max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
+    retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
     store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
 
-    party_key = load_party_key(certs_dir)
+    party_key = config.get_config('PARTY_KEY')
     work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
@@ -105,8 +110,13 @@ def main():
     spine_org_code = config.get_config('SPINE_ORG_CODE')
     routing = routing_reliability.RoutingAndReliability(spine_route_lookup_url, spine_org_code)
 
+    http_proxy_host = config.get_config('OUTBOUND_HTTP_PROXY', default=None)
+    http_proxy_port = None
+    if http_proxy_host is not None:
+        http_proxy_port = int(config.get_config('OUTBOUND_HTTP_PROXY_PORT', default="3128"))
     transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
-                                                              max_retries, retry_delay)
+                                                              max_retries, retry_delay, http_proxy_host,
+                                                              http_proxy_port)
 
     workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store, store_retries,
                                      routing)
