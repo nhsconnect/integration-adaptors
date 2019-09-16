@@ -37,6 +37,13 @@ class DummyCommonWorkflow(common.CommonWorkflow):
                                      payload: str):
         pass
 
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        pass
+
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        pass
+
+
 
 class TestCommonWorkflow(unittest.TestCase):
     def setUp(self):

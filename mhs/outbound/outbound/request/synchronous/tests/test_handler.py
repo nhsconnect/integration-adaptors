@@ -343,7 +343,11 @@ class TestSynchronousHandlerSyncMessage(tornado.testing.AsyncHTTPTestCase):
             wd.MessageStatus.SYNC_RESPONSE_SUCCESSFUL)
 
     @patch('outbound.request.synchronous.handler.SynchronousHandler._write_response')
-    def test_handler_updates_store_for_sync_failure_response(self, write_mock):
+    @patch('mhs_common.workflow.synchronous.SynchronousWorkflow')
+    def test_handler_updates_store_for_sync_failure_response(self, sync_mock, write_mock):
+        sync_mock.set_failure_message_response.return_value = test_utilities.awaitable(True)
+        # self.workflow.set_failure_message_response.return_value = 5
+        # self.workflow.set_success_message_response.return_value = 5
         write_mock.side_effect = Exception('Dam the connection was closed')
         expected_response = "Hello world!"
         wdo = unittest.mock.MagicMock()
