@@ -72,7 +72,7 @@ class TestSDSClient(TestCase):
 
         attributes = await client.get_mhs_details(ODS_CODE, INTERACTION_ID)
         expected = copy(expected_mhs_attributes)
-        expected['uniqueIdentifier'] = ['918999199084']
+        expected['uniqueIdentifier'] = ['123456789']
         # check values present
         for key, value in expected.items():
             self.assertEqual(value, attributes[key])

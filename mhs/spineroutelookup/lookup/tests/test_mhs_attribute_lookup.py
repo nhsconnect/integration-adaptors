@@ -35,7 +35,7 @@ expected_mhs_attributes = {
     'nhsMhsFQDN': 'vpn-client-1411.opentest.hscic.gov.uk',
     'nhsMhsSvcIA': 'urn:nhs:names:services:psis:MCCI_IN010000UK13',
     'nhsProductKey': '7374',
-    'uniqueIdentifier': ['918999199084']
+    'uniqueIdentifier': ['123456789']
 }
 
 

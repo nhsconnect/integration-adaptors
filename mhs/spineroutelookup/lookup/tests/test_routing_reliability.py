@@ -17,7 +17,7 @@ EXPECTED_ROUTING = {
     'nhsMHSEndPoint': ['https://vpn-client-1411.opentest.hscic.gov.uk/'],
     'nhsMHSPartyKey': 'AP4RTY-K33Y',
     'nhsMhsCPAId': 'S918999410559',
-    'uniqueIdentifier': ['918999199084']
+    'uniqueIdentifier': ['123456789']
 }
 
 EXPECTED_RELIABILITY = {
