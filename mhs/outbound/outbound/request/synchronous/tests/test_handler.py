@@ -10,7 +10,6 @@ import mhs_common.state.work_description as wd
 from outbound.request.synchronous import handler
 from mhs_common.workflow import synchronous
 
-
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
 INTERACTION_NAME = "interaction"
@@ -357,3 +356,14 @@ class TestSynchronousHandlerSyncMessage(tornado.testing.AsyncHTTPTestCase):
                    body=REQUEST_BODY)
 
         wdo.set_outbound_status.assert_called_with(wd.MessageStatus.SYNC_RESPONSE_FAILED)
+
+    def test_null_wdo_doesnt_error(self):
+        expected_response = "Hello world!"
+        result = test_utilities.awaitable((200, expected_response, None))
+
+        self.workflow.handle_outbound_message.return_value = result
+        self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
+        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME, 'sync-async': 'false'},
+                              body=REQUEST_BODY)
+
+        self.assertEqual(response.code, 200)

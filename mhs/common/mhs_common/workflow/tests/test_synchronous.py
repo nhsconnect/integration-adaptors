@@ -11,6 +11,10 @@ from utilities import test_utilities
 from utilities.test_utilities import async_test
 
 PARTY_KEY = "313"
+LOOKUP_RESPONSE = {
+            'url': 'url123',
+            'to_asid': 'asid'
+        }
 
 
 class TestSynchronousWorkflow(unittest.TestCase):
@@ -30,6 +34,9 @@ class TestSynchronousWorkflow(unittest.TestCase):
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
     async def test_store_status_set_to_received(self, wd_mock):
+        wdo_mock = mock.MagicMock()
+        wd_mock.return_value = wdo_mock
+
         try:
             await self.wf.handle_outbound_message(from_asid="202020", message_id="123",
                                                   correlation_id="qwe",
@@ -41,6 +48,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
 
         wd_mock.assert_called_with(self.wd_store, "123", workflow.SYNC,
                                    work_description.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+        wdo_mock.publish.assert_called_once()
 
     @mock.patch.object(sync, 'logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -60,7 +68,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                                                                        payload="nice message",
                                                                                        work_description_object=None)
 
-        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error obtaining outbound URL')
         log_mock.error.assert_called_with('009', 'Failed to retrieve details from spine route lookup')
@@ -72,8 +80,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.side_effect = Exception()
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
@@ -97,8 +105,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         self.wf.transmission.make_request.side_effect = Exception("failed")
@@ -126,8 +134,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
@@ -237,8 +245,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                                     {'service': 'service', 'action': 'action'})
 
     def _setup_success_workflow(self):
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         response = mock.MagicMock()
