@@ -115,6 +115,7 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
 
 def main():
     config.setup_config("MHS")
+    secrets.setup_secret_config("MHS")
     log.configure_logging()
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
