@@ -4,6 +4,7 @@ from unittest import mock
 
 from tornado import httpclient
 
+from mhs_common.messages import soap_envelope
 from mhs_common.workflow import synchronous as sync
 from mhs_common import workflow
 from mhs_common.state import work_description
@@ -235,6 +236,25 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                    'SOAPAction': 'service/action',
                                    'charset': 'UTF-8',
                                    'type': 'text/xml'})
+
+    @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope')
+    @async_test
+    async def test_prepare_message_correct_constructor_call(self, envelope_patch):
+        envelope = mock.MagicMock()
+        envelope_patch.return_value = envelope
+        await self.wf._prepare_outbound_message("message_id", "to_asid", "from_asid", "Message123",
+                                                                       {'service': 'service', 'action': 'action'})
+        message_details = {
+            soap_envelope.MESSAGE_ID: "message_id",
+            soap_envelope.TO_ASID: 'to_asid',
+            soap_envelope.FROM_ASID: 'from_asid',
+            soap_envelope.SERVICE: 'service',
+            soap_envelope.ACTION: 'service/action',
+            soap_envelope.MESSAGE: 'Message123'
+        }
+
+        envelope_patch.assert_called_with(message_details)
+        envelope.serialize.assert_called_once()
 
     @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope.serialize')
     @async_test
