@@ -167,10 +167,10 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
-        response = mock.MagicMock()
-        response.code = 400
-        response.body = b'err response body'
-        self.transmission.make_request.return_value = test_utilities.awaitable(response)
+
+        future = asyncio.Future()
+        future.set_exception(httpclient.HTTPClientError(code=451))
+        self.transmission.make_request.return_value = future
 
         error, text, work_description_response = await self.wf.handle_outbound_message(from_asid="202020",
                                                                                        message_id="123",
@@ -179,9 +179,9 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                                                                        payload="nice message",
                                                                                        work_description_object=None)
 
-        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
-        self.assertEqual(error, 400)
-        self.assertEqual(text, 'err response body')
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+        self.assertEqual(error, 500)
+        self.assertEqual(text, 'Error(s) received from Spine: HTTP 451: Unknown')
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
