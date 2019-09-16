@@ -64,5 +64,5 @@ class TestConfig(unittest.TestCase):
             config.get_config("BLAH")
 
         output = mock_stdout.getvalue()
-        self.assertIn('Failed to get config ConfigName:"BLAH" ProcessKey=CONFIG001', output)
+        self.assertIn('Failed to get config ConfigName:"BLAH" ProcessKey=CONFIG003', output)
         self.assertIn("LogLevel=ERROR", output)
