@@ -12,7 +12,7 @@ from typing import Dict, Optional
 secret_config: Dict[str, str] = {}
 
 
-def setup_secret_config(component_name: str): # TODO-add tests for this file
+def setup_secret_config(component_name: str):
     """
     Populate the `secret_config` variable in this module
 
