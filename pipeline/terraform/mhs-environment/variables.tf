@@ -174,7 +174,7 @@ variable "client_key_arn" {
 
 variable "ca_certs_arn" {
   type = string
-  description = "ARN of the secrets manager secret of the endpoint certificate, endpoint issuing subCA certificate, root CA Certificate (all in that order)."
+  description = "ARN of the secrets manager secret of the endpoint issuing subCA certificate and root CA Certificate (in that order)."
 }
 
 variable "spineroutelookup_service_sds_url" {

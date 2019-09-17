@@ -60,15 +60,17 @@ def load_party_key(data_dir: pathlib.Path) -> str:
     return party_key
 
 
-def start_inbound_server(certs_file: str, key_file: str, party_key: str,
+def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: str, party_key: str,
                          workflows: Dict[str, workflow.CommonWorkflow],
                          persistence_store: persistence_adaptor.PersistenceAdaptor
                          ) -> None:
     """
 
     :param persistence_store: persistence store adaptor for message information
-    :param certs_file: The filename of the certificate to be used to identify this MHS to a remote MHS.
-    :param key_file: The filename of the private key for the certificate identified by certs_file.
+    :param local_certs_file: The filename of the certificate to present for authentication.
+    :param ca_certs_file: The filename of the CA certificates that form the certificate chain for the certificate
+    identified by local_certs_file.
+    :param key_file: The filename of the private key for the certificate identified by local_certs_file.
     :param workflows: The workflows to be used to handle messages.
     :param party_key: The party key to use to identify this MHS.
     """
@@ -79,10 +81,10 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
 
     # Ensure Client authentication
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    ssl_ctx.load_cert_chain(certs_file, key_file)
+    ssl_ctx.load_cert_chain(local_certs_file, key_file)
     # The docs suggest we have to specify both that we must verify the client cert and the locations
     ssl_ctx.verify_mode = ssl.CERT_REQUIRED
-    ssl_ctx.load_verify_locations(certs_file)
+    ssl_ctx.load_verify_locations(ca_certs_file)
 
     inbound_server = tornado.httpserver.HTTPServer(inbound_application, ssl_options=ssl_ctx)
     inbound_server.listen(443)
@@ -101,15 +103,16 @@ def main():
     secrets.setup_secret_config("MHS")
     log.configure_logging()
 
-    key_file, certs_file = certs.create_certs_files(definitions.ROOT_DIR,
+    key_file, local_cert_file, ca_certs_file = certs.create_certs_files(definitions.ROOT_DIR,
                                                     private_key=secrets.get_secret_config('CLIENT_KEY'),
+                                                    local_cert=secrets.get_secret_config('CLIENT_CERT'),
                                                     ca_certs=secrets.get_secret_config('CA_CERTS'))
     party_key = secrets.get_secret_config('PARTY_KEY')
 
     workflows = initialise_workflows()
     store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))
 
-    start_inbound_server(certs_file, key_file, party_key, workflows, store)
+    start_inbound_server(local_cert_file, ca_certs_file, key_file, party_key, workflows, store)
 
 
 if __name__ == "__main__":

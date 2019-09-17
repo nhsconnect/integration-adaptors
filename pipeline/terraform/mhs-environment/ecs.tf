@@ -179,6 +179,10 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
           valueFrom = var.party_key_arn
         },
         {
+          name = "MHS_SECRET_CLIENT_CERT"
+          valueFrom = var.client_cert_arn
+        },
+        {
           name = "MHS_SECRET_CLIENT_KEY"
           valueFrom = var.client_key_arn
         },

@@ -34,9 +34,9 @@ the most logs and `CRITICAL` displays the least. Note: Setting this value to one
 log levels (such as `DEBUG` or `NOTSET`) may result in the libraries used by this application logging details that
 contain sensitive information such as the content of messages being sent.
 * `MHS_SECRET_PARTY_KEY` (inbound & outbound only) The party key associated with your MHS.
-* `MHS_SECRET_CLIENT_CERT` (outbound & Spine Route Lookup service only) Your endpoint certificate
+* `MHS_SECRET_CLIENT_CERT` Your endpoint certificate
 * `MHS_SECRET_CLIENT_KEY` Your endpoint private key
-* `MHS_SECRET_CA_CERTS` Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate, root CA Certificate.
+* `MHS_SECRET_CA_CERTS` Should include the following in this order: endpoint issuing subCA certificate, root CA Certificate.
 * `MHS_STATE_TABLE_NAME` (inbound & outbound only) The name of the DynamoDB table used to store MHS state.
 * `MHS_SYNC_ASYNC_STATE_TABLE_NAME` (inbound & outbound only) The table name used to store sync async responses
 * `MHS_STATE_STORE_MAX_RETRIES'` (inbound & outbound only) The max number of retries when attempting to interact with either the work description or sync-async store. Defaults to `3`
