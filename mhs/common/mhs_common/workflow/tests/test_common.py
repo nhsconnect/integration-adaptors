@@ -19,13 +19,16 @@ INTERACTION_DETAILS = {
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_END_POINT_VALUE = "example.com"
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
+MHS_TO_ASID = 'uniqueIdentifier'
 MHS_TO_PARTY_KEY_VALUE = 'to-party-key'
+MHS_TO_ASID_VALUE = ['to-asid']
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_CPA_ID_VALUE = 'cpa-id'
+MHS_ASID_VALUE = "1123"
 
 
 class DummyCommonWorkflow(common.CommonWorkflow):
-    async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+    async def handle_outbound_message(self, asid: str, message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str, work_description_object: Optional[wd.WorkDescription]
                                       ) -> Tuple[int, str]:
         pass
@@ -33,6 +36,13 @@ class DummyCommonWorkflow(common.CommonWorkflow):
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         pass
+
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        pass
+
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        pass
+
 
 
 class TestCommonWorkflow(unittest.TestCase):
@@ -46,15 +56,17 @@ class TestCommonWorkflow(unittest.TestCase):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
             MHS_END_POINT_KEY: [MHS_END_POINT_VALUE],
             MHS_TO_PARTY_KEY_KEY: MHS_TO_PARTY_KEY_VALUE,
-            MHS_CPA_ID_KEY: MHS_CPA_ID_VALUE
+            MHS_CPA_ID_KEY: MHS_CPA_ID_VALUE,
+            MHS_TO_ASID: [MHS_ASID_VALUE]
         })
 
-        url, to_party_key, cpa_id = await self.workflow._lookup_endpoint_details(INTERACTION_DETAILS)
+        details = await self.workflow._lookup_endpoint_details(INTERACTION_DETAILS)
 
         self.mock_routing_reliability.get_end_point.assert_called_with(SERVICE_ID)
-        self.assertEqual(url, MHS_END_POINT_VALUE)
-        self.assertEqual(to_party_key, MHS_TO_PARTY_KEY_VALUE)
-        self.assertEqual(cpa_id, MHS_CPA_ID_VALUE)
+        self.assertEqual(details['url'], MHS_END_POINT_VALUE)
+        self.assertEqual(details['party_key'], MHS_TO_PARTY_KEY_VALUE)
+        self.assertEqual(details['cpa_id'], MHS_CPA_ID_VALUE)
+        self.assertEqual(details['to_asid'], MHS_ASID_VALUE)
 
     @async_test
     async def test_lookup_endpoint_details_error(self):
@@ -78,3 +90,19 @@ class TestCommonWorkflow(unittest.TestCase):
         actual_url = common.CommonWorkflow._extract_endpoint_url(endpoint_details)
 
         self.assertEqual(expected_url, actual_url)
+
+    @async_test
+    async def test_extract_no_to_asid_returned(self):
+        endpoint_details = {MHS_TO_ASID: []}
+
+        with self.assertRaises(IndexError):
+            common.CommonWorkflow._extract_asid(endpoint_details)
+
+    @async_test
+    async def test_extract_asid_multiple_returned(self):
+        expected_asid = "asid 1"
+        endpoint_details = {MHS_TO_ASID: [expected_asid, "asid 2"]}
+
+        actual_asid = common.CommonWorkflow._extract_asid(endpoint_details)
+
+        self.assertEqual(expected_asid, actual_asid)
