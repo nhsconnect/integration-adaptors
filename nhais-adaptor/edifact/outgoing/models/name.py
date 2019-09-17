@@ -1,7 +1,7 @@
 from edifact.outgoing.models.segment import Segment
 
 
-class Name:
+class Name(object):
     """
     A class to encapsulate the name attributes required for an edifact message
     """

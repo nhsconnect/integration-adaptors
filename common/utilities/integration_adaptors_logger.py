@@ -12,6 +12,7 @@ message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', d
 correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default=None)
 inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
 
+
 # Set the logging info globally, make each module get a new logger based on that log ref we provide
 def configure_logging():
     """
@@ -45,7 +46,7 @@ def configure_logging():
     logger.addHandler(handler)
 
 
-class IntegrationAdaptorsLogger:
+class IntegrationAdaptorsLogger(object):
     """
     To log exceptions correctly, key them with 'exception'
     """

@@ -28,7 +28,8 @@ class TestDictionaryCache(unittest.TestCase):
 
     @async_test
     async def test_cache_entry_not_expired(self):
-        cache = dictionary_cache.DictionaryCache(1)  # Set timeout to 1s
+        # Set timeout to 1s
+        cache = dictionary_cache.DictionaryCache(1)
         await cache.add_cache_value("code", "int", "check123")
 
         value = await cache.retrieve_mhs_attributes_value("code", "int")
@@ -61,9 +62,11 @@ class TestDictionaryCache(unittest.TestCase):
         patched_time.return_value = 2
 
         value = await cache.retrieve_mhs_attributes_value("code", "int")
-        self.assertEqual(value, "check123")  # Check value in cache
+        # Check value in cache
+        self.assertEqual(value, "check123")
 
-        patched_time.return_value = 3.5  # value should expire in cache
+        # value should expire in cache
+        patched_time.return_value = 3.5
 
         value = await cache.retrieve_mhs_attributes_value("code", "int")
         self.assertIsNone(value)
