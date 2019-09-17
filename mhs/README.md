@@ -33,13 +33,13 @@ MHS takes a number of environment variables when it is run. These are:
 the most logs and `CRITICAL` displays the least. Note: Setting this value to one of the more detailed 'standard' Python
 log levels (such as `DEBUG` or `NOTSET`) may result in the libraries used by this application logging details that
 contain sensitive information such as the content of messages being sent.
-* `MHS_SECRET_PARTY_KEY` The party key associated with your MHS.
+* `MHS_SECRET_PARTY_KEY` (inbound & outbound only) The party key associated with your MHS.
 * `MHS_SECRET_CLIENT_CERT` (outbound & Spine Route Lookup service only) Your endpoint certificate
 * `MHS_SECRET_CLIENT_KEY` Your endpoint private key
 * `MHS_SECRET_CA_CERTS` Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate, root CA Certificate.
-* `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
-* `MHS_SYNC_ASYNC_STATE_TABLE_NAME` The table name used to store sync async responses
-* `MHS_STATE_STORE_RETRIES'` The max number of retries when attempting to interact with either the work description or sync-async store. Defaults to `3`
+* `MHS_STATE_TABLE_NAME` (inbound & outbound only) The name of the DynamoDB table used to store MHS state.
+* `MHS_SYNC_ASYNC_STATE_TABLE_NAME` (inbound & outbound only) The table name used to store sync async responses
+* `MHS_STATE_STORE_RETRIES'` (inbound & outbound only) The max number of retries when attempting to interact with either the work description or sync-async store. Defaults to `3`
 * `MHS_OUTBOUND_TRANSMISSION_MAX_RETRIES` (outbound only) This is the maximum number of retries for outbound requests. If no value is given a default of `3` is used.
 * `MHS_OUTBOUND_TRANSMISSION_RETRY_DELAY` (outbound only) The delay between retries of outbound requests in milliseconds. If no value is given, a default of `100` is used.
 * `MHS_OUTBOUND_HTTP_PROXY` (outbound only) An optional http(s) proxy to route downstream requests via. Note that the proxy must passthrough https requests transparently.
