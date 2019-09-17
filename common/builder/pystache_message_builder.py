@@ -8,7 +8,7 @@ import utilities.integration_adaptors_logger as log
 logger = log.IntegrationAdaptorsLogger('COMMON_MSG_BUILDER')
 
 
-class PystacheMessageBuilder:
+class PystacheMessageBuilder(object):
     """A component that uses Pystache to populate a Mustache template in order to build a message."""
 
     def __init__(self, template_dir, template_file):

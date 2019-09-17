@@ -61,7 +61,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         status_code, response = await async_workflow.handle_outbound_message(message_id, correlation_id,
                                                                              interaction_details, payload, wdo)
-        if not (status_code == 202):
+        if not status_code == 202:
             logger.warning('0002', 'No ACK received ')
             return status_code, response, wdo
 
