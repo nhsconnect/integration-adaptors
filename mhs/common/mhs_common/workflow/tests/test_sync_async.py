@@ -31,13 +31,13 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         update_mock.return_value = test_utilities.awaitable(True)
         async_workflow = MagicMock()
         self.resync.pause_request.return_value = test_utilities.awaitable({sync_async.MESSAGE_DATA: 'data'})
-        result = (202, {}, wdo)
+        result = (202, {}, None)
         async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
-        code, body, wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
-                                                                                 'payload',
-                                                                                 async_workflow
-                                                                                 )
+        code, body, actual_wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
+                                                                                        'payload',
+                                                                                        async_workflow
+                                                                                        )
 
         wd_mock.assert_called_with(self.work_description_store,
                                    'id123',
@@ -54,20 +54,20 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
 
         self.assertEqual(code, 200)
         self.assertEqual(body, 'data')
-        self.assertEqual(wdo, wd_mock.return_value)
+        self.assertEqual(actual_wdo, wdo)
 
     @patch('mhs_common.state.work_description.create_new_work_description')
     @test_utilities.async_test
     async def test_async_workflow_return_error_code(self, wd_mock):
         wd_mock.return_value = MagicMock()
         async_workflow = MagicMock()
-        result = (500, "Failed to reach spine", wd_mock)
+        result = (500, "Failed to reach spine", None)
         async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
-        status, response, wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
-                                                                                       'payload',
-                                                                                       async_workflow
-                                                                                       )
+        status, response, _ = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
+                                                                                     'payload',
+                                                                                     async_workflow
+                                                                                     )
         self.assertEqual(status, 500)
         self.assertEqual("Failed to reach spine", response)
 
@@ -97,7 +97,8 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
 
         await self.workflow.set_successful_message_response(wdo)
-        wdo.set_outbound_status.assert_called_once_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+        wdo.set_outbound_status.assert_called_once_with(
+            wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
 
     @test_utilities.async_test
     async def test_failure_response(self):
