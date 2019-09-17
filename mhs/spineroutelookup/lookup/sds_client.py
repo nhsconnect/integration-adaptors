@@ -61,7 +61,6 @@ class SDSClient:
         response = accredited_system_lookup[0]
         party_key = response['attributes'][MHS_PARTY_KEY]
 
-        print(f"SDS_RESPONSE: {response}")
         asid = response['attributes'].get(MHS_ASID)
 
         details = await self._mhs_details_lookup(party_key, interaction_id)

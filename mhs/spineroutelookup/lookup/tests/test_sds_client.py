@@ -1,3 +1,4 @@
+from copy import copy
 from unittest import TestCase
 
 from utilities.test_utilities import async_test
@@ -11,6 +12,7 @@ NHS_SERVICES_BASE = "ou=services, o=nhs"
 MHS_OBJECT_CLASS = "nhsMhs"
 
 PARTY_KEY = "AP4RTY-K33Y"
+ASID = "123456789"
 INTERACTION_ID = "urn:nhs:names:services:psis:MCCI_IN010000UK13"
 ODS_CODE = "ODSCODE1"
 
@@ -33,7 +35,7 @@ expected_mhs_attributes = {
     'nhsMhsFQDN': 'vpn-client-1411.opentest.hscic.gov.uk',
     'nhsMhsSvcIA': 'urn:nhs:names:services:psis:MCCI_IN010000UK13',
     'nhsProductKey': '7374',
-    'uniqueIdentifier': ['S918999410559']
+    'uniqueIdentifier': ['S918999410559'],
 }
 
 
@@ -58,18 +60,21 @@ class TestSDSClient(TestCase):
         client = mocks.mocked_sds_client()
 
         result = await client._accredited_system_lookup(ODS_CODE, INTERACTION_ID)
+
         self.assertIsNotNone(result)
-        self.assertIsNotNone(result[0]['attributes']['nhsMHSPartyKey'] == 'A91461-9199084')
-        self.assertEqual(len(result[0]['attributes']), 1)
+        self.assertEqual(result[0]['attributes']['nhsMHSPartyKey'], PARTY_KEY)
+        self.assertEqual(result[0]['attributes']['uniqueIdentifier'][0], ASID)
+        self.assertEqual(len(result[0]['attributes']), 2)
 
     @async_test
     async def test_get_mhs_lookup(self):
         client = mocks.mocked_sds_client()
 
         attributes = await client.get_mhs_details(ODS_CODE, INTERACTION_ID)
-
+        expected = copy(expected_mhs_attributes)
+        expected['uniqueIdentifier'] = ['123456789']
         # check values present
-        for key, value in expected_mhs_attributes.items():
+        for key, value in expected.items():
             self.assertEqual(value, attributes[key])
 
         # Assert exact number of attributes, minus the unique values

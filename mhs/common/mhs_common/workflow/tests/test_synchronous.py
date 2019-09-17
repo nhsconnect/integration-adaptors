@@ -4,6 +4,7 @@ from unittest import mock
 
 from tornado import httpclient
 
+from mhs_common.messages import soap_envelope
 from mhs_common.workflow import synchronous as sync
 from mhs_common import workflow
 from mhs_common.state import work_description
@@ -11,34 +12,10 @@ from utilities import test_utilities
 from utilities.test_utilities import async_test
 
 PARTY_KEY = "313"
-FROM_PARTY_KEY = 'from-party-key'
-TO_PARTY_KEY = 'to-party-key'
-CPA_ID = 'cpa-id'
-MESSAGE_ID = 'message-id'
-CORRELATION_ID = 'correlation-id'
-URL = 'a.a'
-ASID = '123456'
-HTTP_HEADERS = {
-    "type": "a",
-    "Content-Type": "b",
-    "charset": "c",
-    "SOAPAction": "d",
-    'start': "e"
-}
-SERVICE = 'service'
-ACTION = 'action'
-SERVICE_ID = SERVICE + ":" + ACTION
-INTERACTION_DETAILS = {
-    'workflow': 'async-express',
-    'service': SERVICE,
-    'action': ACTION,
-    'uniqueIdentifier': "31312"
-}
-
-MHS_END_POINT_KEY = 'nhsMHSEndPoint'
-MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
-MHS_CPA_ID_KEY = 'nhsMhsCPAId'
-MHS_ASID = 'to_asid'
+LOOKUP_RESPONSE = {
+            'url': 'url123',
+            'to_asid': 'asid'
+        }
 
 
 class TestSynchronousWorkflow(unittest.TestCase):
@@ -58,6 +35,9 @@ class TestSynchronousWorkflow(unittest.TestCase):
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
     async def test_store_status_set_to_received(self, wd_mock):
+        wdo_mock = mock.MagicMock()
+        wd_mock.return_value = wdo_mock
+
         try:
             await self.wf.handle_outbound_message(from_asid="202020", message_id="123",
                                                   correlation_id="qwe",
@@ -69,6 +49,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
 
         wd_mock.assert_called_with(self.wd_store, "123", workflow.SYNC,
                                    work_description.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+        wdo_mock.publish.assert_called_once()
 
     @mock.patch.object(sync, 'logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -88,7 +69,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                                                                        payload="nice message",
                                                                                        work_description_object=None)
 
-        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error obtaining outbound URL')
         log_mock.error.assert_called_with('009', 'Failed to retrieve details from spine route lookup')
@@ -101,13 +82,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
         self.wf._lookup_endpoint_details = mock.MagicMock()
-        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable({
-            'url': URL,
-            MHS_END_POINT_KEY: [URL],
-            MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY,
-            MHS_CPA_ID_KEY: CPA_ID,
-            MHS_ASID: [ASID]
-        })
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.side_effect = Exception()
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
@@ -131,8 +106,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         self.wf.transmission.make_request.side_effect = Exception("failed")
@@ -160,8 +135,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
@@ -193,10 +168,10 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
-        response = mock.MagicMock()
-        response.code = 400
-        response.body = b'err response body'
-        self.transmission.make_request.return_value = test_utilities.awaitable(response)
+
+        future = asyncio.Future()
+        future.set_exception(httpclient.HTTPClientError(code=451))
+        self.transmission.make_request.return_value = future
 
         error, text, work_description_response = await self.wf.handle_outbound_message(from_asid="202020",
                                                                                        message_id="123",
@@ -205,9 +180,9 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                                                                        payload="nice message",
                                                                                        work_description_object=None)
 
-        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
-        self.assertEqual(error, 400)
-        self.assertEqual(text, 'err response body')
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+        self.assertEqual(error, 500)
+        self.assertEqual(text, 'Error(s) received from Spine: HTTP 451: Unknown')
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
@@ -262,6 +237,25 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                    'charset': 'UTF-8',
                                    'type': 'text/xml'})
 
+    @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope')
+    @async_test
+    async def test_prepare_message_correct_constructor_call(self, envelope_patch):
+        envelope = mock.MagicMock()
+        envelope_patch.return_value = envelope
+        await self.wf._prepare_outbound_message("message_id", "to_asid", "from_asid", "Message123",
+                                                                       {'service': 'service', 'action': 'action'})
+        message_details = {
+            soap_envelope.MESSAGE_ID: "message_id",
+            soap_envelope.TO_ASID: 'to_asid',
+            soap_envelope.FROM_ASID: 'from_asid',
+            soap_envelope.SERVICE: 'service',
+            soap_envelope.ACTION: 'service/action',
+            soap_envelope.MESSAGE: 'Message123'
+        }
+
+        envelope_patch.assert_called_with(message_details)
+        envelope.serialize.assert_called_once()
+
     @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope.serialize')
     @async_test
     async def test_prepare_message_raises_exception(self, serialize_mock):
@@ -271,8 +265,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                                     {'service': 'service', 'action': 'action'})
 
     def _setup_success_workflow(self):
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.return_value = test_utilities.awaitable(("123", {"qwe": "qwe"}, "message"))
         response = mock.MagicMock()

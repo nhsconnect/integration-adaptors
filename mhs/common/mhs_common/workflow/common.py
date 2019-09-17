@@ -97,9 +97,7 @@ class CommonWorkflow(abc.ABC):
                        self.ENDPOINT_CPA_ID: cpa_id,
                        self.ENDPOINT_TO_ASID: to_asid
                        }
-            logger.info('0002',
-                        'Retrieved endpoint details for {service_id}. {url}, {party_key}, {cpa_id} {to_asid}',
-                        details)
+            logger.info('0002','Retrieved endpoint details for {details}', {'details': details})
             return details
         except Exception as e:
             logger.warning('0003', 'Error encountered whilst retrieving endpoint details. {Exception}',

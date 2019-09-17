@@ -1,12 +1,10 @@
-import pathlib
-
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+from mhs_common.request import healthcheck_handler
 from utilities import config
 from utilities import integration_adaptors_logger as log
 
-import definitions
 from lookup import cache_adaptor, dictionary_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, \
     routing_reliability
 from request import routing_handler, reliability_handler, routing_reliability_handler
@@ -40,14 +38,14 @@ def initialise_routing(sds_url: str, tls: bool = True) -> routing_reliability.Ro
     cache = load_cache_implementation()
 
     if tls:
-        certs_dir = pathlib.Path(definitions.ROOT_DIR) / "data" / "certs"
-        private_key_path = str(certs_dir / "client.key")
-        cert_path = str(certs_dir / "client.pem")
-        ca_certs_path = str(certs_dir / "ca_certs.pem")
+        client_key = config.get_config('CLIENT_KEY')
+        client_cert = config.get_config('CLIENT_CERT')
+        ca_certs = config.get_config('CA_CERTS')
+
         sds_connection = sds_connection_factory.build_sds_connection_tls(ldap_address=sds_url,
-                                                                         private_key_path=private_key_path,
-                                                                         local_cert_path=cert_path,
-                                                                         ca_certs_file=ca_certs_path)
+                                                                         private_key=client_key,
+                                                                         local_cert=client_cert,
+                                                                         ca_certs=ca_certs)
     else:
         sds_connection = sds_connection_factory.build_sds_connection(ldap_address=sds_url)
 
@@ -66,7 +64,8 @@ def start_tornado_server(routing: routing_reliability.RoutingAndReliability) -> 
     application = tornado.web.Application([
         ("/routing", routing_handler.RoutingRequestHandler, handler_dependencies),
         ("/reliability", reliability_handler.ReliabilityRequestHandler, handler_dependencies),
-        ("/routing-reliability", routing_reliability_handler.RoutingReliabilityRequestHandler, handler_dependencies)
+        ("/routing-reliability", routing_reliability_handler.RoutingReliabilityRequestHandler, handler_dependencies),
+        ("/healthcheck", healthcheck_handler.HealthcheckHandler)
     ])
     server = tornado.httpserver.HTTPServer(application)
     server.listen(80)

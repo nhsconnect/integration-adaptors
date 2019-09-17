@@ -71,7 +71,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                                               interaction_details,
                                                                               payload, wdo, to_party_key, cpa_id)
         if error:
-            return error, None
+            return error[0], error[1], None
 
         logger.info('0004', 'About to make outbound request')
         start_time = timing.get_time()

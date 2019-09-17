@@ -129,3 +129,4 @@ mhs-reference-implementation/selenium_tests/data/local_asid
 # Sonar-Scanner
 .scannerwork
 
+/configure-env-vars.sh

@@ -1,10 +1,11 @@
 import os
 from pathlib import Path
-from test_definitions import ROOT_DIR
 
 from utilities.file_utilities import FileUtilities
+
 from integration_tests.helpers import interactions, xml_parser
 from integration_tests.helpers.build_message import build_message
+from test_definitions import ROOT_DIR
 
 
 def get_asid():
@@ -18,20 +19,31 @@ def get_asid():
         asid_file = str(Path(ROOT_DIR) / "integration_tests/data/certs/asid.txt")
         asid = FileUtilities.get_file_string(asid_file)
     except:
-        asid = 918999199084
+        asid = None
 
-    return os.environ.get('ASID', os.environ.get('ASID', asid))
+    return os.environ.get('INTEGRATION_TEST_ASID', asid)
 
 
-def get_mhs_inbound_queue():
-    """ Looks up the mhs inbound hostname from the environment settings
+def get_mhs_inbound_queue_url():
+    """ Looks up the mhs inbound host URL from the environment settings.
 
-    :return: the mhs inbound hostname
+    :return: the mhs inbound host URL
 
     The mhs inbound hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'localhost:5672'
     """
-    return os.environ.get('MHS_INBOUND_QUEUE_HOST', 'http://localhost:5672/')
+    return os.environ.get('MHS_INBOUND_QUEUE_URL', 'http://localhost:5672')
+
+
+def get_mhs_inbound_queue_name():
+    """ Looks up the mhs inbound queue name from the environment settings.
+
+    :return: the mhs inbound queue name
+
+    The mhs inbound queue name should be set in the 'Environment variables' section of the Run/Debug Configurations
+        if this is not set, it will default to 'inbound'
+    """
+    return os.environ.get('MHS_INBOUND_QUEUE_NAME', 'inbound')
 
 
 def get_mhs_inbound_queue_certs():
@@ -39,7 +51,7 @@ def get_mhs_inbound_queue_certs():
     password = os.environ.get('MHS_INBOUND_QUEUE_PASSWORD', None)
     return username, password
 
-    
+
 def get_mhs_hostname():
     """ Looks up the mhs hostname from the environment settings
 
@@ -101,7 +113,7 @@ def check_response(returned_xml, section_name):
 
 def get_section(xml, attribute, section_name, parent=None):
     """ Extracts the data from an XML section
-    
+
     :param xml: the message that we're checking
     :param attribute: the attribute we want
     :param section_name: the section we're looking for

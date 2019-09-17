@@ -5,9 +5,9 @@
     "common_dir": "common",
     "scr_dir": "SCR",
     "scr_service_dir": "SCRWebService",
-    "repository": "{{env `SCR_REPOSITORY`}}",
-    "tag": "{{env `BUILD_TAG`}}",
-    "docker_registry_url": "{{env `SCR_REPOSITORY`}}"
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/scr-web-service",
+    "tag": "{{env `BUILD_TAG`}}"
   },
   "builders": [
     {
@@ -62,13 +62,13 @@
     [
       {
         "type": "docker-tag",
-        "repository": "{{user `repository`}}",
-        "tag": "{{user `tag`}}"
+        "repository": "{{user `registry`}}{{user `repository`}}",
+        "tag": "scr-{{user `tag`}}"
       },
       {
         "type": "docker-push",
         "ecr_login": true,
-        "login_server": "{{user `docker_registry_url`}}"
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
       }
     ]
   ]

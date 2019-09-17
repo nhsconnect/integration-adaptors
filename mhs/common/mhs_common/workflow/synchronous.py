@@ -30,6 +30,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.persistence_store_retries = persistence_store_max_retries
         super().__init__(routing)
 
+    @timing.time_function
     async def handle_outbound_message(self,
                                       from_asid: str,
                                       message_id: str,
@@ -54,7 +55,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             to_asid = endpoint_details[self.ENDPOINT_TO_ASID]
         except Exception:
             logger.error('009', 'Failed to retrieve details from spine route lookup')
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error obtaining outbound URL', None
 
         try:

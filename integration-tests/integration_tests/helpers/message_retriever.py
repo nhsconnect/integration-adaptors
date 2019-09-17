@@ -11,8 +11,8 @@ def get_inbound_response():
     :return: A tuple of the message-id, correlation-id and the message body.
     """
     user, password = methods.get_mhs_inbound_queue_certs()
-    connection = BlockingConnection(methods.get_mhs_inbound_queue(), user= user, password=password)
-    receiver = connection.create_receiver("inbound")
+    connection = BlockingConnection(methods.get_mhs_inbound_queue_url(), user=user, password=password)
+    receiver = connection.create_receiver(methods.get_mhs_inbound_queue_name())
     message = receiver.receive(timeout=30)
     receiver.accept()
     connection.close()
