@@ -4,7 +4,7 @@ from fhirclient.models.operationdefinition import OperationDefinition
 from adaptor.outgoing.interchange_adaptor import InterchangeAdaptor
 
 
-class OutgoingAdaptor:
+class OutgoingAdaptor(object):
     def __init__(self, operation_dict):
         self.operation_dict = operation_dict
 

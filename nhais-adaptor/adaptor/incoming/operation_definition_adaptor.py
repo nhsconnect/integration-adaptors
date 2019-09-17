@@ -5,7 +5,7 @@ import adaptor.incoming.common.date_formatter as date_formatter
 from edifact.incoming.models.interchange import Interchange
 
 
-class OperationDefinitionAdaptor:
+class OperationDefinitionAdaptor(object):
 
     def __init__(self, reference_dict):
         self.reference_dict = reference_dict

@@ -16,11 +16,11 @@ class GpSummaryUpload(tornado.web.RequestHandler):
 
     def post(self):
         """
-        Receives a json payload and attempts to populate a gp summary upload message, for testing purposes 
-        this end point currently returns the data provided  
+        Receives a json payload and attempts to populate a gp summary upload message, for testing purposes
+        this end point currently returns the data provided
         :return:
         """
-        
+
         try:
             scr_input_json = json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:

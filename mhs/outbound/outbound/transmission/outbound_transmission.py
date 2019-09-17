@@ -90,11 +90,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                 await asyncio.sleep(self._retry_delay / 1000)
 
     def _is_tornado_network_error(self, e):
-        if isinstance(e, httpclient.HTTPClientError):
-            if e.code == 599:
-                return True
-
-        return False
+        return isinstance(e, httpclient.HTTPClientError) and e.code == 599
 
     def _is_retriable(self, e):
         if self._is_tornado_network_error(e):

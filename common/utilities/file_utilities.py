@@ -3,7 +3,7 @@ import json
 LF = "\n"
 
 
-class FileUtilities:
+class FileUtilities(object):
     @staticmethod
     def get_file_string(file_path):
         """Gets the contents of a string from a file.

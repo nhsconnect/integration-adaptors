@@ -4,6 +4,6 @@ It allows storage of application state using an external storage mechanism.
 """
 
 
-class StateManager:
+class StateManager(object):
     """A component used to store application state."""
     pass

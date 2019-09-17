@@ -1,5 +1,3 @@
-import tornado
-import tornado.gen
 from mhs_common.state import persistence_adaptor
 from utilities import integration_adaptors_logger as log
 import asyncio
@@ -11,7 +9,7 @@ class SyncAsyncResponseException(Exception):
     pass
 
 
-class SyncAsyncResynchroniser:
+class SyncAsyncResynchroniser(object):
 
     def __init__(self, sync_async_store: persistence_adaptor.PersistenceAdaptor,
                  max_retries: int,
@@ -37,7 +35,7 @@ class SyncAsyncResynchroniser:
             logger.warning('003', f'Failed to find async response after {retries} of {self.max_retries}')
             retries += 1
 
-            if not (retries == self.max_retries):
+            if not retries == self.max_retries:
                 await asyncio.sleep(self.retry_interval)
 
         logger.error('004', 'Resync retries exceeded, attempted {retries}', {'retries': retries})
