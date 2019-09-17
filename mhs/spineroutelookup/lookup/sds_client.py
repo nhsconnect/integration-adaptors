@@ -16,6 +16,7 @@ NHS_SERVICES_BASE = "ou=services, o=nhs"
 MHS_OBJECT_CLASS = "nhsMhs"
 AS_OBJECT_CLASS = "nhsAs"
 MHS_PARTY_KEY = 'nhsMHSPartyKey'
+MHS_ASID = 'uniqueIdentifier'
 
 mhs_attributes = [
     'nhsEPInteractionType', 'nhsIDCode', 'nhsMhsCPAId', 'nhsMHSEndPoint', 'nhsMhsFQDN',
@@ -60,6 +61,8 @@ class SDSClient(object):
         response = accredited_system_lookup[0]
         party_key = response['attributes'][MHS_PARTY_KEY]
 
+        asid = response['attributes'].get(MHS_ASID)
+
         details = await self._mhs_details_lookup(party_key, interaction_id)
 
         if not details:
@@ -70,6 +73,8 @@ class SDSClient(object):
         if len(details) > 1:
             logger.warning("0004", "More than one mhs details returned on inputs: {ods_code} & {interaction_id}",
                            {"ods_code": ods_code, "interaction_id": interaction_id})
+
+        details[0]['attributes'][MHS_ASID] = asid
         return details[0]['attributes']
 
     async def _accredited_system_lookup(self, ods_code: str, interaction_id: str) -> List:
@@ -83,7 +88,7 @@ class SDSClient(object):
 
         message_id = self.connection.search(search_base=NHS_SERVICES_BASE,
                                             search_filter=search_filter,
-                                            attributes=MHS_PARTY_KEY)
+                                            attributes=[MHS_PARTY_KEY, MHS_ASID])
         logger.info("0005", "{message_id} - for query: {ods_code} {interaction_id}",
                     {"message_id": message_id, "ods_code": ods_code, "interaction_id": interaction_id})
 

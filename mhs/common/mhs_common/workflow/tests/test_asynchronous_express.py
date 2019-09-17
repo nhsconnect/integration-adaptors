@@ -17,9 +17,11 @@ from mhs_common.state.work_description import MessageStatus
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
 CPA_ID = 'cpa-id'
+ASID = 'asid-123'
 MESSAGE_ID = 'message-id'
 CORRELATION_ID = 'correlation-id'
 URL = 'a.a'
+ASID = '123456'
 HTTP_HEADERS = {
     "type": "a",
     "Content-Type": "b",
@@ -33,7 +35,8 @@ SERVICE_ID = SERVICE + ":" + ACTION
 INTERACTION_DETAILS = {
     'workflow': 'async-express',
     'service': SERVICE,
-    'action': ACTION
+    'action': ACTION,
+    'uniqueIdentifier': "31312"
 }
 PAYLOAD = 'payload'
 SERIALIZED_MESSAGE = 'serialized-message'
@@ -44,6 +47,7 @@ INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+MHS_ASID = 'uniqueIdentifier'
 
 
 class TestAsynchronousExpressWorkflow(unittest.TestCase):
@@ -108,8 +112,12 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                         ebxml_envelope.CPA_ID: CPA_ID}
         expected_interaction_details.update(INTERACTION_DETAILS)
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None,
+                                                                         MESSAGE_ID,
+                                                                         CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD,
+                                                                         None)
 
         self.assertEqual(202, status)
         self.assertEqual('', message)
@@ -150,8 +158,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         wdo.workflow = 'This should not change'
         wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
         wdo.update.return_value = test_utilities.awaitable(True)
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, wdo)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, wdo)
 
         self.assertEqual(202, status)
         wdo_mock.assert_not_called()
@@ -164,8 +173,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.side_effect = Exception()
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
@@ -179,8 +189,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.setup_mock_work_description()
         self.mock_routing_reliability.get_end_point.side_effect = Exception()
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error obtaining outbound URL', message)
@@ -201,8 +212,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         future.set_exception(httpclient.HTTPClientError(code=409))
         self.mock_transmission_adaptor.make_request.return_value = future
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertTrue('Error(s) received from Spine' in message)
@@ -223,8 +235,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         future.set_exception(Exception())
         self.mock_transmission_adaptor.make_request.return_value = future
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error making outbound request', message)
@@ -246,8 +259,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         response.code = 200
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual("Didn't get expected success response from Spine", message)
@@ -259,7 +273,11 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
-            MHS_END_POINT_KEY: [URL], MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY, MHS_CPA_ID_KEY: CPA_ID})
+            MHS_END_POINT_KEY: [URL],
+            MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY,
+            MHS_CPA_ID_KEY: CPA_ID,
+            MHS_ASID: [ASID]
+        })
 
     ############################
     # Inbound tests
