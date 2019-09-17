@@ -45,7 +45,9 @@ class CommonWorkflow(abc.ABC):
         :param correlation_id: correlation ID of the request
         :param interaction_details: interaction details used to construct the message to send outbound
         :param payload: payload to send outbound
-        :return: the HTTP status and body to return as a response
+        :return: the HTTP status, body to return as a response, and optionally the work description.
+        The work description only needs to be returned if set_successful_message_response and/or
+        set_failure_message_response are implemented for the workflow.
         """
         pass
 
