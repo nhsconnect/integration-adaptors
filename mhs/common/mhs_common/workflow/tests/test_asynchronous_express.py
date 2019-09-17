@@ -314,14 +314,15 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         """
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS, PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertIn("Error(s) received from Spine. Contact system administrator", message)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
-            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
+             mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
             self.mock_work_description.set_outbound_status.call_args_list)
 
     def _setup_routing_mock(self):

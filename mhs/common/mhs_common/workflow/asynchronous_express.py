@@ -83,7 +83,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             if code == 500:
                 logger.warning('0005', 'Error encountered whilst making outbound request. {Body}', {'Body': body})
                 await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-                return code, body
+                return code, body, None
 
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
