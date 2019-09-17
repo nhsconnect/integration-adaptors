@@ -47,19 +47,6 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
                                      )
 
 
-def load_party_key(data_dir: pathlib.Path) -> str:
-    """Load this MHS's party key from the specified directory.
-
-    :param data_dir: The directory to load the party key from.
-    :return: The party key to use to identify this MHS.
-    """
-    party_key_file = str(data_dir / "party_key.txt")
-    party_key = file_utilities.FileUtilities.get_file_string(party_key_file)
-
-    assert party_key
-    return party_key
-
-
 def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: str, party_key: str,
                          workflows: Dict[str, workflow.CommonWorkflow],
                          persistence_store: persistence_adaptor.PersistenceAdaptor
