@@ -4,11 +4,9 @@ implementations."""
 from __future__ import annotations
 
 import abc
-from typing import Optional, Dict, Type
+from typing import Optional, Dict
 
 FIFTEEN_MINUTES_IN_SECONDS = 900
-
-implementations: Dict[str, Type[CacheAdaptor]] = {}
 
 
 class CacheAdaptor(abc.ABC):

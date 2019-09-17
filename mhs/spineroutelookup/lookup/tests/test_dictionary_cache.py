@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from utilities.test_utilities import async_test
 
-from lookup import dictionary_cache, cache_adaptor
+from lookup import dictionary_cache
 
 
 class TestDictionaryCache(unittest.TestCase):
@@ -87,8 +87,3 @@ class TestDictionaryCache(unittest.TestCase):
     async def test_invalid_timeout(self):
         with self.assertRaises(ValueError):
             dictionary_cache.DictionaryCache(-1)
-
-    def test_cache_registered(self):
-        registered_impl = cache_adaptor.implementations[dictionary_cache.IMPLEMENTATION_DICTIONARY_KEY]
-
-        self.assertEqual(registered_impl, dictionary_cache.DictionaryCache)

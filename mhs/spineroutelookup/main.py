@@ -13,17 +13,10 @@ logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_MAIN')
 
 
 def load_cache_implementation():
-    cache_implementation_key = config.get_config("SDS_CACHE_IMPLEMENTATION",
-                                                 dictionary_cache.IMPLEMENTATION_DICTIONARY_KEY)
-    cache = cache_adaptor.implementations[cache_implementation_key]
+    cache_expiry_time = int(config.get_config("SDS_CACHE_EXPIRY_TIME", cache_adaptor.FIFTEEN_MINUTES_IN_SECONDS))
 
-    cache_expiry_time = config.get_config("SDS_CACHE_EXPIRY_TIME", cache_adaptor.FIFTEEN_MINUTES_IN_SECONDS)
-
-    logger.info('005',
-                'Using the dictionary cache {cache} identified by {cache_implementation_key} with {cache_expiry_time}',
-                {'cache': cache, 'cache_implementation_key': cache_implementation_key,
-                 'cache_expiry_time': cache_expiry_time})
-    return cache(cache_expiry_time)
+    logger.info('005', 'Using the dictionary cache with {cache_expiry_time}', {'cache_expiry_time': cache_expiry_time})
+    return dictionary_cache.DictionaryCache(cache_expiry_time)
 
 
 def initialise_routing(sds_url: str, tls: bool = True) -> routing_reliability.RoutingAndReliability:

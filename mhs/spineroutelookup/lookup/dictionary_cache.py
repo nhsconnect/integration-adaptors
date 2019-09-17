@@ -3,8 +3,6 @@ from typing import Dict, Optional
 
 from lookup import cache_adaptor
 
-IMPLEMENTATION_DICTIONARY_KEY = "DICTIONARY_CACHE"
-
 FIFTEEN_MINUTES_IN_SECONDS = 900
 
 
@@ -14,7 +12,7 @@ def _generate_key(ods_code: str, interaction_id: str) -> str:
 
 class DictionaryCache(cache_adaptor.CacheAdaptor):
 
-    def __init__(self, expiry_time: float = FIFTEEN_MINUTES_IN_SECONDS):
+    def __init__(self, expiry_time: int = FIFTEEN_MINUTES_IN_SECONDS):
         if expiry_time < 0:
             raise ValueError('Invalid expiry time, must be non-negative')
         self.cache = {}
@@ -46,7 +44,7 @@ class DictionaryCache(cache_adaptor.CacheAdaptor):
             return True
         return False
 
-    async def add_cache_value(self, ods_code: str, interaction_id: str, value) -> None:
+    async def add_cache_value(self, ods_code: str, interaction_id: str, value: Dict) -> None:
         """
         Adds a value to the cache, recording the time the value was added
         :param ods_code:
@@ -60,6 +58,3 @@ class DictionaryCache(cache_adaptor.CacheAdaptor):
             'time': insert_time,
             'value': value
         }
-
-
-cache_adaptor.implementations[IMPLEMENTATION_DICTIONARY_KEY] = DictionaryCache
