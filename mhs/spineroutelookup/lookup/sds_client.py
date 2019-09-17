@@ -26,7 +26,7 @@ mhs_attributes = [
 ]
 
 
-class SDSClient:
+class SDSClient(object):
     """A client that can be used to query SDS."""
 
     def __init__(self, sds_connection: ldap3.Connection, timeout: int = 3):

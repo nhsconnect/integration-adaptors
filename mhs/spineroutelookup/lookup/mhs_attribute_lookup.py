@@ -11,7 +11,7 @@ import lookup.sds_client as sds_client
 logger = log.IntegrationAdaptorsLogger('SRL_ATTRIBUTE_LOOKUP')
 
 
-class MHSAttributeLookup:
+class MHSAttributeLookup(object):
     """A tool that allows the routing and reliability information for a remote MHS to be retrieved."""
 
     def __init__(self, client: sds_client.SDSClient, cache: cache_adaptor.CacheAdaptor):

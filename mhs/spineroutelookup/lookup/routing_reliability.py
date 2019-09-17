@@ -14,7 +14,7 @@ RELIABILITY_KEYS = [
 ROUTING_KEYS = ['nhsMhsFQDN', 'nhsMHSEndPoint', 'nhsMHSPartyKey', 'nhsMhsCPAId', 'uniqueIdentifier']
 
 
-class RoutingAndReliability:
+class RoutingAndReliability(object):
     """A tool that allows the routing and reliability information for a remote MHS to be retrieved."""
 
     def __init__(self, lookup_handler: mhs_attribute_lookup.MHSAttributeLookup):

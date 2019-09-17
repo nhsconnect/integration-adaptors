@@ -4,7 +4,7 @@ import copy
 from utilities.file_utilities import FileUtilities
 
 
-class ConfigurationManager:
+class ConfigurationManager(object):
     """A utility used to obtain configuration details for the current application."""
 
     def __init__(self, interactions_file_name: str):

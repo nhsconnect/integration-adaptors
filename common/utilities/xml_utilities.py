@@ -4,7 +4,7 @@ from lxml import etree
 from lxml import objectify
 
 
-class XmlUtilities:
+class XmlUtilities(object):
 
     @staticmethod
     def assert_xml_equal(expected, actual):

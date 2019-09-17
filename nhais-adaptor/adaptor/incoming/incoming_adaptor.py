@@ -4,7 +4,7 @@ import edifact.incoming.parser.deserialiser as deserialiser
 from adaptor.incoming.operation_definition_adaptor import OperationDefinitionAdaptor
 
 
-class IncomingAdaptor:
+class IncomingAdaptor(object):
     def __init__(self, reference_dict):
         self.reference_dict = reference_dict
 
