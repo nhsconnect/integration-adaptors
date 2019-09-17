@@ -41,6 +41,8 @@ CA_CERTS_PATH = str(Path(CERTS_DIR) / CA_CERTS)
 MAX_RETRIES = 3
 RETRY_DELAY = 100
 RETRY_DELAY_IN_SECONDS = RETRY_DELAY / 1000
+HTTP_PROXY_HOST = "proxy_host"
+HTTP_PROXY_PORT = 3128
 
 
 class TestOutboundTransmission(TestCase):
@@ -67,8 +69,39 @@ class TestOutboundTransmission(TestCase):
                                           # This SHOULD be true, but we must temporarily set it to false due to Opentest
                                           # limitations.
                                           # ****************************************************************************
-                                          validate_cert=False
+                                          validate_cert=False,
+                                          proxy_host=None,
+                                          proxy_port=None
                                           )
+
+            self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
+
+    @async_test
+    async def test_make_request_with_proxy(self):
+        self.transmission = outbound_transmission.OutboundTransmission(CERTS_DIR, CLIENT_CERT, CLIENT_KEY, CA_CERTS,
+                                                                       MAX_RETRIES, RETRY_DELAY, HTTP_PROXY_HOST,
+                                                                       HTTP_PROXY_PORT)
+
+        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
+            sentinel.result.code = 200
+            mock_fetch.return_value = awaitable(sentinel.result)
+
+            actual_response = await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
+
+            mock_fetch.assert_called_with(URL_VALUE,
+                                          method="POST",
+                                          body=MESSAGE,
+                                          headers=HEADERS,
+                                          client_cert=CLIENT_CERT_PATH,
+                                          client_key=CLIENT_KEY_PATH,
+                                          ca_certs=CA_CERTS_PATH,
+                                          # ****************************************************************************
+                                          # This SHOULD be true, but we must temporarily set it to false due to Opentest
+                                          # limitations.
+                                          # ****************************************************************************
+                                          validate_cert=False,
+                                          proxy_host=HTTP_PROXY_HOST,
+                                          proxy_port=HTTP_PROXY_PORT)
 
             self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
 

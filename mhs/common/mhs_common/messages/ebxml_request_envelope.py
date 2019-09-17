@@ -9,9 +9,9 @@ from typing import Dict, Tuple, Union
 from xml.etree.ElementTree import Element
 
 from defusedxml import ElementTree
+from utilities import integration_adaptors_logger as log
 
 from mhs_common.messages import ebxml_envelope
-from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger('COMMON_EBXML_REQUEST_ENVELOPE')
 
@@ -60,11 +60,11 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         cls._extract_more_values_from_xml_tree(xml_tree, extracted_values)
 
+        logger.info('0001', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
+
         if payload_part:
             extracted_values[MESSAGE] = payload_part
 
-        logger.info('0001', 'Extracted {extracted_values} from {message}',
-                    {'extracted_values': extracted_values, 'message': message})
         return EbxmlRequestEnvelope(extracted_values)
 
     @classmethod

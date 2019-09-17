@@ -11,6 +11,7 @@ import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from comms import proton_queue_adaptor
 from mhs_common import workflow
+from mhs_common.request import healthcheck_handler
 from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
 
 import inbound.request.handler as async_request_handler
@@ -26,7 +27,7 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     """
 
     queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
-        host=config.get_config('INBOUND_QUEUE_HOST'),
+        host=config.get_config('INBOUND_QUEUE_URL'),
         username=config.get_config('INBOUND_QUEUE_USERNAME'),
         password=config.get_config('INBOUND_QUEUE_PASSWORD'))
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
@@ -46,15 +47,20 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
 
 
 def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
-    """Load the necessary TLS certificates from the specified directory.
+    """Load the necessary TLS certificates from config into the specified directory.
 
     :param certs_dir: The directory to load certificates from.
     :return: A tuple consisting of the file names of the client's certificates file, and the client's key.
     """
-    certs_file = str(certs_dir / "client.pem")
-    key_file = str(certs_dir / "client.key")
 
-    return certs_file, key_file
+    certs_file = certs_dir / "client.pem"
+    key_file = certs_dir / "client.key"
+
+    certs_dir.mkdir(parents=True, exist_ok=True)
+    certs_file.write_text(config.get_config('CA_CERTS'))
+    key_file.write_text(config.get_config('CLIENT_KEY'))
+
+    return str(certs_file), str(key_file)
 
 
 def load_party_key(data_dir: pathlib.Path) -> str:
@@ -97,6 +103,11 @@ def start_inbound_server(certs_file: str, key_file: str, party_key: str,
     inbound_server = tornado.httpserver.HTTPServer(inbound_application, ssl_options=ssl_ctx)
     inbound_server.listen(443)
 
+    healthcheck_application = tornado.web.Application([
+        ("/healthcheck", healthcheck_handler.HealthcheckHandler)
+    ])
+    healthcheck_application.listen(80)
+
     logger.info('011', 'Starting inbound server')
     tornado.ioloop.IOLoop.current().start()
 
@@ -108,7 +119,7 @@ def main():
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
     certs_dir = data_dir / "certs"
     certs_file, key_file = load_certs(certs_dir)
-    party_key = load_party_key(certs_dir)
+    party_key = config.get_config('PARTY_KEY')
 
     workflows = initialise_workflows()
     store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))

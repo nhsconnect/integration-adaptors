@@ -1,9 +1,9 @@
 {
   "_description": "This template produces a Jenkins worker.",
- "variables": {
-    "repository": "{{env `DOCKER_REPOSITORY`}}",
-    "tag": "{{env `BUILD_TAG`}}",
-    "docker_registry_url": "{{env `DOCKER_REGISTRY_URL`}}"
+  "variables": {
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/jenkins-worker",
+    "tag": "{{env `BUILD_TAG`}}"
   },
   "builders": [
     {
@@ -22,13 +22,13 @@
     [
       {
         "type": "docker-tag",
-        "repository": "{{user `repository`}}",
+        "repository": "{{user `registry`}}{{user `repository`}}",
         "tag": "{{user `tag`}}"
       },
       {
         "type": "docker-push",
         "ecr_login": true,
-        "login_server": "{{user `docker_registry_url`}}"
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
       }
     ]
   ]

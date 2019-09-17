@@ -61,8 +61,8 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         :return: The Message in the correct format with generated uuid.
         """
         message_id = utilities.message_utilities.MessageUtilities.get_uuid()
-        logger.info('001', 'Constructing message with {id} for {body} and {applicationProperties}',
-                    {'id': message_id, 'body': message, 'applicationProperties': properties})
+        logger.info('001', 'Constructing message with {id} and {applicationProperties}',
+                    {'id': message_id, 'applicationProperties': properties})
         return proton.Message(id=message_id, body=message, properties=properties)
 
     def __send(self, message: proton.Message) -> None:

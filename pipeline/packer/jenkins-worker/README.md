@@ -7,5 +7,5 @@ Usage:
 2. Run these commands:
 ```bash
 docker build -t temporary/jenkins-worker:latest .
-DOCKER_REPOSITORY=urlOfDockerRegistry DOCKER_REGISTRY_URL=urlOfDockerRegistry BUILD_TAG=buildTag packer build jenkins-worker.json
+DOCKER_REGISTRY=nameOfDockerRegistry BUILD_TAG=buildTag packer build jenkins-worker.json
 ```
