@@ -51,11 +51,7 @@ class TestSecrets(unittest.TestCase):
 
         self.assertEqual("111", secrets.get_secret_config("LOG_LEVEL", default="111"))
 
-    def test_get_secret_config_default_none(self, mock_environ):
-        mock_environ["PREFIX_SECRET_TEST"] = "123"
-
-        secrets.setup_secret_config("PREFIX")
-
+    def test_get_secret_config_default_none(self, unused):
         self.assertIsNone(secrets.get_secret_config("LOG_LEVEL", default=None))
 
     @patch.dict(config.config)
