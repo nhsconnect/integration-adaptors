@@ -49,7 +49,8 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         raise NotImplementedError("This method is not implemented for the sync-async workflow, consider using"
                                   "`self.handle_sync_async_message` instead")
 
-    async def handle_sync_async_outbound_message(self, from_asid: Optional[str], message_id: str, correlation_id: str, interaction_details: dict,
+    async def handle_sync_async_outbound_message(self, from_asid: Optional[str], message_id: str, correlation_id: str,
+                                                 interaction_details: dict,
                                                  payload: str,
                                                  async_workflow: common.CommonWorkflow
                                                  ) -> Tuple[int, str, wd.WorkDescription]:
@@ -60,8 +61,8 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                              outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                                              )
 
-        status_code, response = await async_workflow.handle_outbound_message(from_asid, message_id, correlation_id,
-                                                                             interaction_details, payload, wdo)
+        status_code, response, _ = await async_workflow.handle_outbound_message(from_asid, message_id, correlation_id,
+                                                                                  interaction_details, payload, wdo)
         if not status_code == 202:
             logger.warning('0002', 'No ACK received ')
             return status_code, response, wdo

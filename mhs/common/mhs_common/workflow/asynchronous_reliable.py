@@ -10,7 +10,9 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
     async def handle_outbound_message(self, from_asid: Optional[str],
                                       message_id: str, correlation_id: str, interaction_details: dict,
-                                      payload: str) -> Tuple[int, str]:
+                                      payload: str,
+                                      work_description_object: Optional[wd.WorkDescription])\
+            -> Tuple[int, str, Optional[wd.WorkDescription]]:
         raise NotImplementedError()
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,

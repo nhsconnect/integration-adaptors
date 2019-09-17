@@ -26,11 +26,12 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
     @patch('mhs_common.state.work_description.create_new_work_description')
     @test_utilities.async_test
     async def test_sync_async_happy_path(self, wd_mock, update_mock):
-        wd_mock.return_value = MagicMock()
+        wdo = MagicMock()
+        wd_mock.return_value = wdo
         update_mock.return_value = test_utilities.awaitable(True)
         async_workflow = MagicMock()
         self.resync.pause_request.return_value = test_utilities.awaitable({sync_async.MESSAGE_DATA: 'data'})
-        result = (202, {})
+        result = (202, {}, wdo)
         async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
         code, body, wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
@@ -60,7 +61,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
     async def test_async_workflow_return_error_code(self, wd_mock):
         wd_mock.return_value = MagicMock()
         async_workflow = MagicMock()
-        result = (500, "Failed to reach spine")
+        result = (500, "Failed to reach spine", wd_mock)
         async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
         status, response, wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},
@@ -79,7 +80,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
             async_workflow = MagicMock()
 
             self.resync.pause_request.side_effect = resync_raises_exception
-            result = (202, "Huge success")
+            result = (202, "Huge success", None)
             async_workflow.handle_outbound_message.return_value = test_utilities.awaitable(result)
 
             status, response, wdo = await self.workflow.handle_sync_async_outbound_message(None, 'id123', 'cor123', {},

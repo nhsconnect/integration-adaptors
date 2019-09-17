@@ -33,7 +33,7 @@ class CommonWorkflow(abc.ABC):
                                       message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str,
                                       work_description_object: Optional[wd.WorkDescription]
-                                      ) -> Tuple[int, str]:
+                                      ) -> Tuple[int, str, Optional[wd.WorkDescription]]:
         """
         Handle a message from the supplier system (or a message from an adaptor that the supplier system speaks to)
         that is to be sent outbound.
