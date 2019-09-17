@@ -1,6 +1,8 @@
 import unittest
 from pathlib import Path
 
+from builder.pystache_message_builder import MessageGenerationError
+from pystache.context import KeyNotFoundError
 from utilities.file_utilities import FileUtilities
 from utilities.xml_utilities import XmlUtilities
 
@@ -51,12 +53,10 @@ class FullTest(unittest.TestCase):
         """
         Tests the contents are empty when a completely blank hash is provided
         """
-        expected_xml_file_path = str(self.xmlFileDir / 'EmptyHash.xml')
         hash_file_path = str(self.hashFileDir / 'EmptyHash.json')
 
-        expected_string = FileUtilities.get_file_string(expected_xml_file_path)
-        render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        XmlUtilities.assert_xml_equal(expected_string, render)
+        with self.assertRaises(MessageGenerationError):
+            self.summaryCareRecord.populate_template_with_file(hash_file_path)
 
     def test_replacementOf(self):
         """

@@ -90,7 +90,8 @@ input_hash = {
                             "extension": "9446245796"
                         }
                     }
-                }
+                },
+                "replacementOf": []
             }
         }
     }
