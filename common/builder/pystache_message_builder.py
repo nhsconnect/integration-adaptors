@@ -1,6 +1,5 @@
 """A module that defines a Pystache-based MessageBuilder."""
-from pystache import Renderer
-from pystache import parse
+import pystache
 from pystache import common as pystache_common
 from pystache import context as pystache_context
 
@@ -17,10 +16,10 @@ class PystacheMessageBuilder(object):
         :param template_dir: The directory to load template files from
         :param template_file: The template file to populate with values.
         """
-        self._renderer = Renderer(search_dirs=template_dir, missing_tags=pystache_common.MissingTags.strict)
+        self._renderer = pystache.Renderer(search_dirs=template_dir, missing_tags=pystache_common.MissingTags.strict)
         self.template_file = template_file
         raw_template = self._renderer.load_template(template_file)
-        self._parsed_template = parse(raw_template)
+        self._parsed_template = pystache.parse(raw_template)
 
     def build_message(self, message_dictionary):
         """Build a message by populating a Mustache template with values from the provided dictionary.
