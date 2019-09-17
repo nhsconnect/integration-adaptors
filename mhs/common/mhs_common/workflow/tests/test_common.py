@@ -28,7 +28,7 @@ MHS_ASID_VALUE = "1123"
 
 
 class DummyCommonWorkflow(common.CommonWorkflow):
-    async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+    async def handle_outbound_message(self, asid: str, message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str, work_description_object: Optional[wd.WorkDescription]
                                       ) -> Tuple[int, str]:
         pass

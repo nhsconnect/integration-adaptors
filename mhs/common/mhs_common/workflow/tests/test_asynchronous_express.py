@@ -20,6 +20,7 @@ CPA_ID = 'cpa-id'
 MESSAGE_ID = 'message-id'
 CORRELATION_ID = 'correlation-id'
 URL = 'a.a'
+ASID = '123456'
 HTTP_HEADERS = {
     "type": "a",
     "Content-Type": "b",
@@ -45,6 +46,7 @@ INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+MHS_ASID = 'uniqueIdentifier'
 
 
 class TestAsynchronousExpressWorkflow(unittest.TestCase):
@@ -170,7 +172,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.side_effect = Exception()
 
-        status, message = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
                                                                       INTERACTION_DETAILS,
                                                                       PAYLOAD, None)
 
@@ -270,7 +272,11 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
-            MHS_END_POINT_KEY: [URL], MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY, MHS_CPA_ID_KEY: CPA_ID})
+            MHS_END_POINT_KEY: [URL],
+            MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY,
+            MHS_CPA_ID_KEY: CPA_ID,
+            MHS_ASID: [ASID]
+        })
 
     ############################
     # Inbound tests

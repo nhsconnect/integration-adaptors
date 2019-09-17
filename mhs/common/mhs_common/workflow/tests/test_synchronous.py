@@ -11,6 +11,34 @@ from utilities import test_utilities
 from utilities.test_utilities import async_test
 
 PARTY_KEY = "313"
+FROM_PARTY_KEY = 'from-party-key'
+TO_PARTY_KEY = 'to-party-key'
+CPA_ID = 'cpa-id'
+MESSAGE_ID = 'message-id'
+CORRELATION_ID = 'correlation-id'
+URL = 'a.a'
+ASID = '123456'
+HTTP_HEADERS = {
+    "type": "a",
+    "Content-Type": "b",
+    "charset": "c",
+    "SOAPAction": "d",
+    'start': "e"
+}
+SERVICE = 'service'
+ACTION = 'action'
+SERVICE_ID = SERVICE + ":" + ACTION
+INTERACTION_DETAILS = {
+    'workflow': 'async-express',
+    'service': SERVICE,
+    'action': ACTION,
+    'uniqueIdentifier': "31312"
+}
+
+MHS_END_POINT_KEY = 'nhsMHSEndPoint'
+MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
+MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+MHS_ASID = 'to_asid'
 
 
 class TestSynchronousWorkflow(unittest.TestCase):
@@ -72,8 +100,14 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
-        self.wf._lookup_to_asid_details = mock.MagicMock()
-        self.wf._lookup_to_asid_details.return_value = test_utilities.awaitable(("yes", "313123"))
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable({
+            'url': URL,
+            MHS_END_POINT_KEY: [URL],
+            MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY,
+            MHS_CPA_ID_KEY: CPA_ID,
+            MHS_ASID: [ASID]
+        })
         self.wf._prepare_outbound_message = mock.MagicMock()
         self.wf._prepare_outbound_message.side_effect = Exception()
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)

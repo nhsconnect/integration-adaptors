@@ -128,7 +128,7 @@ class CommonWorkflow(abc.ABC):
 
         if not unique_identifiers:
             logger.error('0024', 'Did not retrieve any unique identifiers from endpoint details')
-            return None
+            raise IndexError()
 
         asid = unique_identifiers[0]
 
