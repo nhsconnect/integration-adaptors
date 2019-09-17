@@ -264,6 +264,24 @@ class TestSynchronousWorkflow(unittest.TestCase):
             await self.wf._prepare_outbound_message("message_id", "to_asid", "from_asid", "mesasge",
                                                     {'service': 'service', 'action': 'action'})
 
+    @async_test
+    async def test_success_response(self):
+        wdo = mock.MagicMock()
+        wdo.publish.return_value = test_utilities.awaitable(None)
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
+
+        await self.wf.set_successful_message_response(wdo)
+        wdo.set_outbound_status.assert_called_once_with(work_description.MessageStatus.SYNC_RESPONSE_SUCCESSFUL)
+
+    @async_test
+    async def test_failure_response(self):
+        wdo = mock.MagicMock()
+        wdo.publish.return_value = test_utilities.awaitable(None)
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
+
+        await self.wf.set_failure_message_response(wdo)
+        wdo.set_outbound_status.assert_called_once_with(work_description.MessageStatus.SYNC_RESPONSE_FAILED)
+
     def _setup_success_workflow(self):
         self.wf._lookup_endpoint_details = mock.MagicMock()
         self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)

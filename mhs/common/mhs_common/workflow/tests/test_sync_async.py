@@ -89,6 +89,24 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
             self.assertEqual(status, 500)
             self.assertEqual("No async response received from sync-async store", response)
 
+    @test_utilities.async_test
+    async def test_success_response(self):
+        wdo = MagicMock()
+        wdo.publish.return_value = test_utilities.awaitable(None)
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
+
+        await self.workflow.set_successful_message_response(wdo)
+        wdo.set_outbound_status.assert_called_once_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+
+    @test_utilities.async_test
+    async def test_failure_response(self):
+        wdo = MagicMock()
+        wdo.publish.return_value = test_utilities.awaitable(None)
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
+
+        await self.workflow.set_failure_message_response(wdo)
+        wdo.set_outbound_status.assert_called_once_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
+
 
 class TestSyncAsyncWorkflowInbound(TestCase):
 
