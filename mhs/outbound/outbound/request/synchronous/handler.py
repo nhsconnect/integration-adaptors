@@ -8,7 +8,6 @@ from mhs_common.configuration import configuration_manager
 from utilities import integration_adaptors_logger as log, message_utilities, timing
 import mhs_common.state.work_description as wd
 
-
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
 
@@ -31,6 +30,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         correlation_id = self._extract_correlation_id()
         interaction_id = self._extract_interaction_id()
         sync_async_header = self._extract_sync_async_header()
+        from_asid = self._extract_from_asid()
 
         logger.info('0006', 'Outbound POST received. {Request}', {'Request': str(self.request)})
 
@@ -41,9 +41,9 @@ class SynchronousHandler(tornado.web.RequestHandler):
         sync_async_interaction_config = self._extract_sync_async_from_interaction_details(interaction_details)
 
         if self._should_invoke_sync_async_workflow(sync_async_interaction_config, sync_async_header):
-            await self._invoke_sync_async(message_id, correlation_id, interaction_details, body, wf)
+            await self._invoke_sync_async(from_asid, message_id, correlation_id, interaction_details, body, wf)
         else:
-            await self.invoke_default_workflow(message_id, correlation_id, interaction_details, body, wf)
+            await self.invoke_default_workflow(from_asid, message_id, correlation_id, interaction_details, body, wf)
 
     def _parse_body(self):
         body = self.request.body.decode()
@@ -51,7 +51,6 @@ class SynchronousHandler(tornado.web.RequestHandler):
             logger.error('0009', 'Body missing from request')
             raise tornado.web.HTTPError(400, 'Body missing from request', reason='Body missing from request')
         return body
-
 
     def write_error(self, status_code: int, **kwargs: Any):
         self.set_header('Content-Type', 'text/plain')
@@ -66,6 +65,9 @@ class SynchronousHandler(tornado.web.RequestHandler):
             return True
         else:
             return False
+
+    def _extract_from_asid(self):
+        return self.request.headers.get('from-asid', None)
 
     def _extract_message_id(self):
         message_id = self.request.headers.get('Message-Id', None)
@@ -132,30 +134,34 @@ class SynchronousHandler(tornado.web.RequestHandler):
         else:
             return False
 
-    async def _invoke_sync_async(self, message_id, correlation_id, interaction_details, body, async_workflow):
+    async def _invoke_sync_async(self, from_asid, message_id, correlation_id, interaction_details, body, async_workflow):
         sync_async_workflow: workflow.SyncAsyncWorkflow = self.workflows[workflow.SYNC_ASYNC]
-        status, response, wdo = await sync_async_workflow.handle_sync_async_outbound_message(message_id,
+        status, response, wdo = await sync_async_workflow.handle_sync_async_outbound_message(from_asid,
+                                                                                             message_id,
                                                                                              correlation_id,
                                                                                              interaction_details,
                                                                                              body,
                                                                                              async_workflow)
-        await self.return_sync_async_response(status, response, wdo)
+        await self.write_response_with_store_updates(status, response, wdo, sync_async_workflow)
 
-    async def return_sync_async_response(self, status: int, response: str, wdo: wd.WorkDescription):
+    async def write_response_with_store_updates(self, status: int, response: str, wdo: wd.WorkDescription,
+                                                wf: workflow.CommonWorkflow):
         try:
             self._write_response(status, response)
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+            if wdo:
+                await wf.set_successful_message_response(wdo)
         except Exception as e:
             logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
+            if wdo:
+                await wf.set_failure_message_response(wdo)
 
-    async def invoke_default_workflow(self, message_id, correlation_id, interaction_details, body, workflow):
-        status, response = await workflow.handle_outbound_message(message_id,
-                                                                  correlation_id,
-                                                                  interaction_details,
-                                                                  body,
-                                                                  None)
-        self._write_response(status, response)
+    async def invoke_default_workflow(self, from_asid, message_id, correlation_id, interaction_details, body, wf):
+            status, response, work_description_response = await wf.handle_outbound_message(from_asid, message_id,
+                                                                                           correlation_id,
+                                                                                           interaction_details,
+                                                                                           body,
+                                                                                           None)
+            await self.write_response_with_store_updates(status, response, work_description_response, wf)
 
     def _write_response(self, status: int, message: str) -> None:
         """Write the given message to the response.

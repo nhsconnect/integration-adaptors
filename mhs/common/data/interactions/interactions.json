@@ -21,5 +21,11 @@
   "get_nhs_number": {
     "url": "https://msg.opentest.hscic.gov.uk/smsp/pds",
     "async_response_expected": false
+  },
+  "QUPA_IN040000UK32": {
+    "workflow": "sync",
+    "service": "urn:nhs:names:services:pdsquery",
+    "action": "QUPA_IN040000UK32",
+    "sync_async": false
   }
 }
