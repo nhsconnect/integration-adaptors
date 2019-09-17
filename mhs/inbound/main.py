@@ -1,6 +1,6 @@
 import pathlib
 import ssl
-from typing import Tuple, Dict
+from typing import Dict
 
 import definitions
 import tornado.httpserver
@@ -10,7 +10,7 @@ import utilities.config as config
 import utilities.file_utilities as file_utilities
 import utilities.integration_adaptors_logger as log
 from comms import proton_queue_adaptor
-from mhs_common import workflow
+from mhs_common import workflow, certs
 from mhs_common.request import healthcheck_handler
 from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
 from utilities import secrets
@@ -45,23 +45,6 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
                                      inbound_queue_max_retries=inbound_queue_max_retries,
                                      inbound_queue_retry_delay=inbound_queue_retry_delay
                                      )
-
-
-def load_certs(certs_dir: pathlib.Path) -> Tuple[str, str]:
-    """Load the necessary TLS certificates from config into the specified directory.
-
-    :param certs_dir: The directory to load certificates from.
-    :return: A tuple consisting of the file names of the client's certificates file, and the client's key.
-    """
-
-    certs_file = certs_dir / "client.pem"
-    key_file = certs_dir / "client.key"
-
-    certs_dir.mkdir(parents=True, exist_ok=True)
-    certs_file.write_text(secrets.get_secret_config('CA_CERTS'))
-    key_file.write_text(secrets.get_secret_config('CLIENT_KEY'))
-
-    return str(certs_file), str(key_file)
 
 
 def load_party_key(data_dir: pathlib.Path) -> str:
@@ -118,9 +101,9 @@ def main():
     secrets.setup_secret_config("MHS")
     log.configure_logging()
 
-    data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
-    certs_dir = data_dir / "certs"
-    certs_file, key_file = load_certs(certs_dir)
+    key_file, certs_file = certs.create_certs_files(definitions.ROOT_DIR,
+                                                    private_key=secrets.get_secret_config('CLIENT_KEY'),
+                                                    ca_certs=secrets.get_secret_config('CA_CERTS'))
     party_key = secrets.get_secret_config('PARTY_KEY')
 
     workflows = initialise_workflows()
