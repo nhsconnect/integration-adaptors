@@ -11,7 +11,7 @@ import lookup.sds_exception as sds_exception
 
 logger = log.IntegrationAdaptorsLogger('SRL_CLIENT')
 
-NHS_SERVICES_BASE = "ou=services, o=nhs"
+NHS_SERVICES_BASE = "ou=services,o=nhs"
 
 MHS_OBJECT_CLASS = "nhsMhs"
 AS_OBJECT_CLASS = "nhsAs"
