@@ -37,6 +37,22 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         """Create a new EbxmlRequestEnvelope that populates the message with the provided dictionary.
 
         :param message_dictionary: The dictionary of values to use when populating the template.
+
+        Example `message_dictionary`::
+
+            {
+                'from_party_id': 'TESTGEN-201324',
+                'to_party_id': 'YEA-0000806',
+                'cpa_id': 'S1001A1630',
+                'conversation_id': '79F49A34-9798-404C-AEC4-FD38DD81C138',
+                'service': 'urn:nhs:names:services:pdsquery',
+                'action': 'QUPA_IN000006UK02',
+                'duplicate_elimination': True,
+                'ack_requested': True,
+                'ack_soap_actor': 'urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH',
+                'sync_reply': True,
+                'hl7_message': '<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>'
+            }
         """
         super().__init__(EBXML_TEMPLATE, message_dictionary)
 
