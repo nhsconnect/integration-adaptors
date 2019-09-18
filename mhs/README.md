@@ -33,20 +33,20 @@ MHS takes a number of environment variables when it is run. These are:
 the most logs and `CRITICAL` displays the least. Note: Setting this value to one of the more detailed 'standard' Python
 log levels (such as `DEBUG` or `NOTSET`) may result in the libraries used by this application logging details that
 contain sensitive information such as the content of messages being sent.
-* `MHS_PARTY_KEY` The party key associated with your MHS.
-* `MHS_CLIENT_CERT` (outbound & Spine Route Lookup service only) Your endpoint certificate
-* `MHS_CLIENT_KEY` Your endpoint private key
-* `MHS_CA_CERTS` Should include the following in this order: endpoint certificate, endpoint issuing subCA certificate, root CA Certificate.
-* `MHS_STATE_TABLE_NAME` The name of the DynamoDB table used to store MHS state.
-* `MHS_SYNC_ASYNC_STATE_TABLE_NAME` The table name used to store sync async responses
-* `MHS_STATE_STORE_RETRIES'` The max number of retries when attempting to interact with either the work description or sync-async store. Defaults to `3`
+* `MHS_SECRET_PARTY_KEY` (inbound & outbound only) The party key associated with your MHS.
+* `MHS_SECRET_CLIENT_CERT` Your endpoint certificate
+* `MHS_SECRET_CLIENT_KEY` Your endpoint private key
+* `MHS_SECRET_CA_CERTS` Should include the following in this order: endpoint issuing subCA certificate, root CA Certificate.
+* `MHS_STATE_TABLE_NAME` (inbound & outbound only) The name of the DynamoDB table used to store MHS state.
+* `MHS_SYNC_ASYNC_STATE_TABLE_NAME` (inbound & outbound only) The table name used to store sync async responses
+* `MHS_STATE_STORE_MAX_RETRIES'` (inbound & outbound only) The max number of retries when attempting to interact with either the work description or sync-async store. Defaults to `3`
 * `MHS_OUTBOUND_TRANSMISSION_MAX_RETRIES` (outbound only) This is the maximum number of retries for outbound requests. If no value is given a default of `3` is used.
 * `MHS_OUTBOUND_TRANSMISSION_RETRY_DELAY` (outbound only) The delay between retries of outbound requests in milliseconds. If no value is given, a default of `100` is used.
 * `MHS_OUTBOUND_HTTP_PROXY` (outbound only) An optional http(s) proxy to route downstream requests via. Note that the proxy must passthrough https requests transparently.
 * `MHS_OUTBOUND_HTTP_PROXY_PORT` (outbound only) The http(s) proxy port to use. Ignored if `MHS_OUTBOUND_HTTP_PROXY` is not provided. Defaults to `3128`.
 * `MHS_INBOUND_QUEUE_URL` (inbound only) The host url of the amqp inbound queue broker. e.g. `amqps://example.com:port/queue-name`. Note that if the amqp connection being used is a secured connection (which it should be in production), then the url should start with `amqps://` and not `amqp+ssl://`.
-* `MHS_INBOUND_QUEUE_USERNAME` (inbound only) The username to use when connecting to the amqp inbound queue.
-* `MHS_INBOUND_QUEUE_PASSWORD` (inbound only) The password to use when connecting to the amqp inbound queue.
+* `MHS_SECRET_INBOUND_QUEUE_USERNAME` (inbound only) The username to use when connecting to the amqp inbound queue.
+* `MHS_SECRET_INBOUND_QUEUE_PASSWORD` (inbound only) The password to use when connecting to the amqp inbound queue.
 * `MHS_INBOUND_QUEUE_MAX_RETRIES` (inbound only) The max number of times to retry putting a message onto the amqp inbound queue. Defaults to `3`.
 * `MHS_INBOUND_QUEUE_RETRY_DELAY` (inbound only) The delay in milliseconds between retrying putting a message onto the amqp inbound queue. Defaults to `100`ms.
 * `MHS_SYNC_ASYNC_STORE_MAX_RETRIES'` (inbound only) The max number of retries when attempting to add a message to the sync-async store. Defaults to `3`
@@ -68,7 +68,7 @@ connecting to the Redis host specified by `MHS_SDS_REDIS_CACHE_HOST`. Defaults t
 connections to the Redis cache used by the Spine Route Lookup service. *Must* be set to exactly `True` for TLS to be
 disabled.
 
-Note that if you are using Opentest, you should use the credentials you were given when you got access to set `MHS_PARTY_KEY`, `MHS_CLIENT_CERT`, `MHS_CLIENT_KEY` and `MHS_CA_CERTS`.
+Note that if you are using Opentest, you should use the credentials you were given when you got access to set `MHS_SECRET_PARTY_KEY`, `MHS_SECRET_CLIENT_CERT`, `MHS_SECRET_CLIENT_KEY` and `MHS_SECRET_CA_CERTS`.
 
 ## Running Unit Tests
 - `pipenv run unittests` will run all unit tests.

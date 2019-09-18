@@ -90,19 +90,19 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
       ])
       secrets = [
         {
-          name = "MHS_PARTY_KEY"
+          name = "MHS_SECRET_PARTY_KEY"
           valueFrom = var.party_key_arn
         },
         {
-          name = "MHS_CLIENT_CERT"
+          name = "MHS_SECRET_CLIENT_CERT"
           valueFrom = var.client_cert_arn
         },
         {
-          name = "MHS_CLIENT_KEY"
+          name = "MHS_SECRET_CLIENT_KEY"
           valueFrom = var.client_key_arn
         },
         {
-          name = "MHS_CA_CERTS"
+          name = "MHS_SECRET_CA_CERTS"
           valueFrom = var.ca_certs_arn
         }
       ]
@@ -167,23 +167,27 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
       ]
       secrets = [
         {
-          name = "MHS_INBOUND_QUEUE_USERNAME"
+          name = "MHS_SECRET_INBOUND_QUEUE_USERNAME"
           valueFrom = var.inbound_queue_username_arn
         },
         {
-          name = "MHS_INBOUND_QUEUE_PASSWORD"
+          name = "MHS_SECRET_INBOUND_QUEUE_PASSWORD"
           valueFrom = var.inbound_queue_password_arn
         },
         {
-          name = "MHS_PARTY_KEY"
+          name = "MHS_SECRET_PARTY_KEY"
           valueFrom = var.party_key_arn
         },
         {
-          name = "MHS_CLIENT_KEY"
+          name = "MHS_SECRET_CLIENT_CERT"
+          valueFrom = var.client_cert_arn
+        },
+        {
+          name = "MHS_SECRET_CLIENT_KEY"
           valueFrom = var.client_key_arn
         },
         {
-          name = "MHS_CA_CERTS"
+          name = "MHS_SECRET_CA_CERTS"
           valueFrom = var.ca_certs_arn
         }
       ]
@@ -251,15 +255,15 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
       ]
       secrets = [
         {
-          name = "MHS_CLIENT_CERT"
+          name = "MHS_SECRET_CLIENT_CERT"
           valueFrom = var.client_cert_arn
         },
         {
-          name = "MHS_CLIENT_KEY"
+          name = "MHS_SECRET_CLIENT_KEY"
           valueFrom = var.client_key_arn
         },
         {
-          name = "MHS_CA_CERTS"
+          name = "MHS_SECRET_CA_CERTS"
           valueFrom = var.ca_certs_arn
         }
       ]

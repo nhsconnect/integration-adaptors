@@ -47,8 +47,8 @@ def get_mhs_inbound_queue_name():
 
 
 def get_mhs_inbound_queue_certs():
-    username = os.environ.get('MHS_INBOUND_QUEUE_USERNAME', None)
-    password = os.environ.get('MHS_INBOUND_QUEUE_PASSWORD', None)
+    username = os.environ.get('MHS_SECRET_INBOUND_QUEUE_USERNAME', None)
+    password = os.environ.get('MHS_SECRET_INBOUND_QUEUE_PASSWORD', None)
     return username, password
 
 

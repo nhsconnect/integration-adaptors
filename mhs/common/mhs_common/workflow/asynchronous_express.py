@@ -9,6 +9,7 @@ from tornado import httpclient
 from utilities import timing
 
 from mhs_common import workflow
+from mhs_common.errors import ebxml_handler
 from mhs_common.errors.soap_handler import handle_soap_error
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.routing import routing_reliability
@@ -77,9 +78,16 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         start_time = timing.get_time()
         try:
             response = await self.transmission.make_request(url, http_headers, message)
+
+            code, body = ebxml_handler.handle_ebxml_error(response.code, response.headers, str(response.body))
+            if code == 500:
+                logger.warning('0005', 'Error encountered whilst making outbound request. {Body}', {'Body': body})
+                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+                return code, body, None
+
             end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
-            logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
+            logger.warning('0006', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                            {'HTTPStatus': e.code, 'Exception': e})
             self._record_outbound_audit_log(timing.get_time(), start_time,
                                             wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
@@ -92,7 +100,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
             return 500, f'Error(s) received from Spine: {e}', None
         except Exception as e:
-            logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            logger.warning('0007', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
@@ -109,7 +117,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             return 500, "Didn't get expected success response from Spine", None
 
     def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0007', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
+        logger.audit('0009', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
                              '{RequestSentTime} {AcknowledgmentReceivedTime}',
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment})
@@ -136,7 +144,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
-        logger.info('0009', 'Entered async express workflow to handle inbound message')
+        logger.info('0010', 'Entered async express workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
@@ -149,7 +157,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                                          'correlation-id': correlation_id})
                 break
             except Exception as e:
-                logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
+                logger.warning('0011', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
                 retries_remaining -= 1
                 if retries_remaining <= 0:
                     logger.error("0012",
@@ -163,7 +171,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                     "queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
-        logger.info('0011', 'Placed message onto inbound queue successfully')
+        logger.info('0014', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
