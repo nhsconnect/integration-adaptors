@@ -9,8 +9,6 @@ from scr import gp_summary_update
 
 logger = log.IntegrationAdaptorsLogger('SCR-WEB')
 
-# TODO: doctstrings
-# TODO: Note describing the behavior of the pystache (whether or not an inbound body is valid)
 
 if __name__ == "__main__":
     config.setup_config('SCR')
