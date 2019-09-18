@@ -40,14 +40,16 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
 
         self.assertEqual(response.code, 400)
-        self.assertIn('Failed to parse json body from request', response.body.decode())
+        self.assertIn('Exception raised while parsing message body: Expecting value: line 1 column 1',
+                      response.body.decode())
 
     def test_invalid_json_request_fails(self):
         body = "{'yes': 'wow'}"
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
                               body=body)
         self.assertEqual(response.code, 400)
-        error = "Failed to parse json body from request: Expecting property name enclosed in double quotes"
+        error = "Exception raised while parsing message body:" \
+                " Expecting property name enclosed in double quotes: line 1 column 2"
         self.assertIn(error, response.body.decode())
 
     def test_message_generation_exception_in_handler_returns_error_to_caller(self):
