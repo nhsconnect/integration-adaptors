@@ -84,7 +84,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
             if e.response:
-                return handle_soap_error(e.response.code, e.response.headers, e.response.body)
+                code, body, _ = handle_soap_error(e.response.code, e.response.headers, e.response.body)
+                return code, body
 
             return 500, f'Error(s) received from Spine: {e}'
         except Exception as e:

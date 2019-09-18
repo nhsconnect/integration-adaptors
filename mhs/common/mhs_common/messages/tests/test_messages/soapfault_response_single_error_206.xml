@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:crs="http://national.carerecords.nhs.uk/schema/crs/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+  <SOAP:Body>
+    <SOAP:Fault>
+      <faultcode>SOAP:Server</faultcode>
+      <faultstring>Application Exception</faultstring>
+      <detail>
+        <nasp:errorList xmlns:nasp="http://national.carerecords.nhs.uk/schema/">
+          <nasp:error>
+            <nasp:codeContext>urn:nhs:names:error:tms</nasp:codeContext>
+            <nasp:errorCode>206</nasp:errorCode>
+            <nasp:severity>Error</nasp:severity>
+            <nasp:location>Not Supported</nasp:location>
+            <nasp:description>System failure to process message - default</nasp:description>
+          </nasp:error>
+        </nasp:errorList>
+      </detail>
+    </SOAP:Fault>
+  </SOAP:Body>
+</SOAP:Envelope>

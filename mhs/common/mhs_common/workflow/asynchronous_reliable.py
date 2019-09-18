@@ -19,6 +19,9 @@ import asyncio
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_RELIABLE_WORKFLOW')
 
+SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE = 200
+ROUTING_DELIVERY_FAILURE_ERROR_CODE = 206
+FAILURE_STORING_VARIABLE_IN_MEMO = 208
 
 class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflow):
     """Handles the workflow for the asynchronous reliable messaging pattern."""
@@ -38,6 +41,10 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                                           ack_requested=True,
                                                           ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
                                                           sync_reply=True)
+
+        self.soap_errors_to_retry = [SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE,
+                                     ROUTING_DELIVERY_FAILURE_ERROR_CODE,
+                                     FAILURE_STORING_VARIABLE_IN_MEMO]
 
     @timing.time_function
     async def handle_outbound_message(self,
@@ -73,7 +80,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
         # fetch the reliability details in case a retry is required
         reliability_details = await self._lookup_reliability_details(interaction_details)
-        retry_interval = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL]
+        retry_interval = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL][0]
         num_of_retries = reliability_details[common_asynchronous.MHS_RETRIES]
 
         retries_remaining = num_of_retries
@@ -93,9 +100,10 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
                 if e.response:
                     # parse the SOAP error response
-                    soap_fault_code, soap_body = handle_soap_error(e.response.code, e.response.headers, e.response.body)
+                    soap_fault_code, soap_body, soap_fault_codes = \
+                        handle_soap_error(e.response.code, e.response.headers, e.response.body)
 
-                    if not self._is_soap_fault_retriable(soap_fault_code):
+                    if not self._is_soap_fault_retriable(soap_fault_codes):
                         return soap_fault_code, soap_body
 
                     retries_remaining -= 1
@@ -106,16 +114,18 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                     "max_retries": num_of_retries
                                     })
                     if retries_remaining <= 0:
+                        # exceeded the number of retries so return the SOAP error response
                         logger.error("0016",
                                      "A request has exceeded the maximum number of retries, {max_retries} retries",
                                      {"max_retries": num_of_retries})
-                        raise MaxRetriesExceeded("The max number of retries to make a request has been exceeded") from e
+                        raise MaxRetriesExceeded("The max number of retries to make the request has been exceeded") from e
 
-                    logger.info("0016", "Waiting for {retry_delay} milliseconds before next request attempt.",
+                    logger.info("0016", "Waiting for {retry_interval} milliseconds before next request attempt.",
                                 {"retry_interval": retry_interval})
                     await asyncio.sleep(retry_interval / 1000)
-
-                return 500, f'Error(s) received from Spine: {e}'
+                    continue
+                else:
+                    return 500, f'Error(s) received from Spine: {e}'
             except Exception as e:
                 logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
                 await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
@@ -172,5 +182,9 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
         logger.info('0011', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
-    def _is_soap_fault_retriable(self, soap_fault_code):
-        return soap_fault_code in self.soap_errors_to_retry
+    def _is_soap_fault_retriable(self, soap_fault_codes):
+        # return True only if ALL error codes are retriable
+        for soap_fault_code in soap_fault_codes:
+            if not soap_fault_code in self.soap_errors_to_retry:
+                return False
+        return True

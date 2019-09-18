@@ -1,8 +1,11 @@
 import asyncio
 import unittest
+from pathlib import Path
 from unittest import mock
-from unittest.mock import patch, sentinel, call
-from utilities.test_utilities import awaitable
+from unittest.mock import patch
+
+from definitions import ROOT_DIR
+from utilities.file_utilities import FileUtilities
 
 import exceptions
 from comms import proton_queue_adaptor
@@ -16,7 +19,6 @@ from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
-from workflow import common_asynchronous
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
@@ -52,6 +54,8 @@ MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_RETRY_INTERVAL_VAL = 10
 MHS_RETRY_VAL = 3
 
+TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
+
 
 class TestAsynchronousReliableWorkflow(unittest.TestCase):
     def setUp(self):
@@ -76,6 +80,8 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                                                                    inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
                                                                    persistence_store_max_retries=3,
                                                                    routing=self.mock_routing_reliability)
+
+        self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
     def test_construct_workflow_with_only_outbound_params(self):
         workflow = async_reliable.AsynchronousReliableWorkflow(party_key=mock.sentinel.party_key,
@@ -243,6 +249,38 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
 
     @mock.patch.object(common_async, 'logger')
     @async_test
+    async def test_handle_outbound_message_soap_error_when_calling_outbound_transmission(self, log_mock):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+
+        mock_response = mock.Mock(spec=httpclient.HTTPResponse)
+        mock_response.code = 500
+        mock_response.body = message
+        mock_response.headers = {'Content-Type': 'text/xml'}
+
+        future = asyncio.Future()
+        future.set_exception(httpclient.HTTPClientError(code=409, response=mock_response))
+        self.mock_transmission_adaptor.make_request.return_value = future
+
+        with self.assertRaises(exceptions.MaxRetriesExceeded):
+            status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID,
+                                                                          INTERACTION_DETAILS,
+                                                                          PAYLOAD, None)
+
+            self.assertEqual(500, status)
+            self.assertTrue('description=System failure to process message' in message)
+            self.mock_work_description.publish.assert_called_once()
+            self.assertEqual(
+                [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
+                self.mock_work_description.set_outbound_status.call_args_list)
+            self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+
+    @mock.patch.object(common_async, 'logger')
+    @async_test
     async def test_handle_outbound_message_non_http_202_success_response_received(self, log_mock):
         self.setup_mock_work_description()
         self._setup_routing_mock()
@@ -268,101 +306,95 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
             MHS_END_POINT_KEY: [URL], MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY, MHS_CPA_ID_KEY: CPA_ID})
         self.mock_routing_reliability.get_reliability.return_value = test_utilities.awaitable({
-            common_asynchronous.MHS_RETRY_INTERVAL: [MHS_RETRY_INTERVAL_VAL], common_asynchronous.MHS_RETRIES: MHS_RETRY_VAL})
+            workflow.common_asynchronous.MHS_RETRY_INTERVAL: [MHS_RETRY_INTERVAL_VAL],
+            workflow.common_asynchronous.MHS_RETRIES: MHS_RETRY_VAL})
 
     ############################
     # Reliability tests
     ############################
-
     @async_test
-    async def test_make_request(self):
-        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
-            sentinel.result.code = 200
-            mock_fetch.return_value = awaitable(sentinel.result)
+    async def test_soap_error_request_is_retriable(self):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
 
-            actual_response = await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-            mock_fetch.assert_called_with(URL_VALUE,
-                                          method="POST",
-                                          body=MESSAGE,
-                                          headers=HEADERS,
-                                          client_cert=CLIENT_CERT_PATH,
-                                          client_key=CLIENT_KEY_PATH,
-                                          ca_certs=CA_CERTS_PATH,
-                                          # ****************************************************************************
-                                          # This SHOULD be true, but we must temporarily set it to false due to Opentest
-                                          # limitations.
-                                          # ****************************************************************************
-                                          validate_cert=False
-                                          )
+        mock_response = mock.Mock(spec=httpclient.HTTPResponse)
+        mock_response.code = 500
+        mock_response.headers = {'Content-Type': 'text/xml'}
 
-            self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
-
-    @async_test
-    async def test_make_request_non_retriable(self):
-        errors_and_expected = [
-            ("HTTPClientError 400", httpclient.HTTPClientError(code=400), httpclient.HTTPClientError),
-            ("SSLCertVerificationError", ssl.SSLCertVerificationError(), ssl.SSLCertVerificationError),
-            ("SSLError", ssl.SSLError, ssl.SSLError)
+        sub_tests = [
+            ("a retriable 200", 'soapfault_response_single_error.xml'),
+            ("a retriable 206", 'soapfault_response_single_error_206.xml'),
+            ("a retriable 208", 'soapfault_response_single_error_208.xml')
         ]
-        for description, error, expected_result in errors_and_expected:
+        for description, soap_fault_file_path in sub_tests:
             with self.subTest(description):
-                with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
-                    mock_fetch.side_effect = error
+                try:
+                    mock_response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
+                    future = asyncio.Future()
+                    future.set_exception(httpclient.HTTPClientError(code=409, response=mock_response))
+                    self.mock_transmission_adaptor.make_request.return_value = future
 
-                    with self.assertRaises(expected_result):
-                        await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
+                    with self.assertRaises(exceptions.MaxRetriesExceeded):
+                        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID,
+                                                                                      INTERACTION_DETAILS,
+                                                                                      PAYLOAD, None)
+
+                        self.assertEqual(500, status)
+                        self.assertTrue('description=System failure to process message' in message)
+
+                    self.mock_work_description.publish.assert_called_once()
+                    self.assertEqual(self.mock_transmission_adaptor.make_request.call_count, 3)
+                finally:
+                    self.mock_work_description.publish.reset_mock()
+                    self.mock_work_description.set_outbound_status.reset_mock()
+                    self.mock_transmission_adaptor.make_request.reset_mock()
 
     @patch("asyncio.sleep")
     @async_test
-    async def test_make_request_retriable(self, mock_sleep):
-        mock_sleep.return_value = awaitable(None)
+    async def test_soap_error_request_is_non_retriable(self, mock_sleep):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
 
-        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
-            sentinel.result.code = 200
-            mock_fetch.side_effect = [httpclient.HTTPClientError(code=599), awaitable(sentinel.result)]
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-            actual_response = await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
+        mock_response = mock.Mock(spec=httpclient.HTTPResponse)
+        mock_response.code = 500
+        mock_response.headers = {'Content-Type': 'text/xml'}
 
-            self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
-            mock_sleep.assert_called_once_with(RETRY_DELAY_IN_SECONDS)
+        sub_tests = [
+            ("a non retriable 300", 'soapfault_response_single_error_300.xml')
+        ]
+        for description, soap_fault_file_path in sub_tests:
+            with self.subTest(description):
+                mock_response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
+                future = asyncio.Future()
+                future.set_exception(httpclient.HTTPClientError(code=409, response=mock_response))
+                self.mock_transmission_adaptor.make_request.return_value = future
 
-    @patch("asyncio.sleep")
-    @async_test
-    async def test_make_request_max_retries(self, mock_sleep):
-        mock_sleep.return_value = awaitable(None)
+                status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID,
+                                                                              INTERACTION_DETAILS,
+                                                                              PAYLOAD, None)
+                self.assertEqual(500, status)
+                self.assertTrue('description=System failure to process message' in message)
 
-        with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
-            mock_fetch.side_effect = httpclient.HTTPClientError(code=599)
+                self.mock_work_description.publish.assert_called_once()
+                self.mock_transmission_adaptor.make_request.assert_called_once()
 
-            with self.assertRaises(outbound_transmission.MaxRetriesExceeded) as cm:
-                await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
-            self.assertEqual(mock_fetch.side_effect, cm.exception.__cause__)
-
-            self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
-            expected_sleep_arguments = [call(RETRY_DELAY_IN_SECONDS) for i in range(MAX_RETRIES - 1)]
-            self.assertEqual(expected_sleep_arguments, mock_sleep.call_args_list)
-
-    def test_is_tornado_network_error(self):
-        errors_and_expected = [("not HTTPClientError", ValueError(), False),
-                               ("HTTPClientError without code 599", httpclient.HTTPClientError(code=400), False),
-                               ("HTTPClientError with code 599", httpclient.HTTPClientError(code=599), True)
+    def test_is_retriable_error(self):
+        errors_and_expected = [("a retriable failure to process message error code 200", [200], True),
+                               ("a retriable routing failure error code 206", [206], True),
+                               ("a retriable failure storing memo error code 208", [208], True),
+                               ("a NON retriable error code 300", [300], False),
+                               ("a NON retriable set of error codes 300, 207", [300, 207], False),
+                               ("a mix of retriable and NON retriable error codes 300, 206", [300, 206], False),
+                               ("a mix of retriable and NON retriable error codes 206, 300", [206, 300], False),
+                               ("a set of retriable error codes 208, 206", [208, 206], True)
                                ]
         for description, error, expected_result in errors_and_expected:
             with self.subTest(description):
-                result = self.transmission._is_tornado_network_error(error)
-
-                self.assertEqual(result, expected_result)
-
-    def test_is_retriable(self):
-        errors_and_expected = [("is a tornado network error", httpclient.HTTPClientError(code=599), True),
-                               ("is a HTTP error", httpclient.HTTPClientError(code=500), False),
-                               ("is a not a tornado error", IOError(), True)
-                               ]
-
-        for description, error, expected_result in errors_and_expected:
-            with self.subTest(description):
-                result = self.transmission._is_retriable(error)
+                result = self.workflow._is_soap_fault_retriable(error)
 
                 self.assertEqual(result, expected_result)
 

@@ -2,10 +2,14 @@ import asyncio
 import unittest
 from unittest import mock
 
+from tornado import httpclient
+
 import exceptions
 from comms import proton_queue_adaptor
-from tornado import httpclient
+
+from definitions import ROOT_DIR
 from utilities import test_utilities
+from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_express as async_express
@@ -14,6 +18,7 @@ from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
+from pathlib import Path
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
@@ -46,6 +51,8 @@ MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 
+TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
+
 
 class TestAsynchronousExpressWorkflow(unittest.TestCase):
     def setUp(self):
@@ -70,6 +77,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                                                   inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
                                                                   persistence_store_max_retries=3,
                                                                   routing=self.mock_routing_reliability)
+
+        self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
     def test_construct_workflow_with_only_outbound_params(self):
         workflow = async_express.AsynchronousExpressWorkflow(party_key=mock.sentinel.party_key,
@@ -207,6 +216,37 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.assertEqual(500, status)
         self.assertTrue('Error(s) received from Spine' in message)
+        self.mock_work_description.publish.assert_called_once()
+        self.assertEqual(
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
+            self.mock_work_description.set_outbound_status.call_args_list)
+        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+
+    @mock.patch.object(common_async, 'logger')
+    @async_test
+    async def test_handle_outbound_message_soap_error_when_calling_outbound_transmission(self, log_mock):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+
+        mock_response = mock.Mock(spec=httpclient.HTTPResponse)
+        mock_response.code = 500
+        mock_response.body = message
+        mock_response.headers = {'Content-Type': 'text/xml'}
+
+        future = asyncio.Future()
+        future.set_exception(httpclient.HTTPClientError(code=409, response=mock_response))
+        self.mock_transmission_adaptor.make_request.return_value = future
+
+        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID,
+                                                                      INTERACTION_DETAILS,
+                                                                      PAYLOAD, None)
+
+        self.assertEqual(500, status)
+        self.assertTrue('description=System failure to process message' in message)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],

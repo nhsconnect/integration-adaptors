@@ -69,11 +69,6 @@
     "workflow": "async-reliable",
     "sync_async": true
   },
-  "HAS_SCRA_PERMISSIONS_INSM01": {
-    "service": "",
-    "workflow": "sync",
-    "sync_async": false
-  },
   "PRPA_IN160000UK30": {
     "service": "urn:nhs:names:services:pds",
     "workflow": "async-reliable",
@@ -195,7 +190,7 @@
     "sync_async": false
   },
   "QUPC_IN010000UK32": {
-    "service": "",
+    "service": "urn:nhs:names:services:lrsquery",
     "workflow": "sync",
     "sync_async": false
   },
@@ -364,11 +359,6 @@
     "workflow": "sync",
     "sync_async": false
   },
-  "SCRA_GET_REASONABLE_ADJUSTMENTS": {
-    "service": "",
-    "workflow": "sync",
-    "sync_async": false
-  },
   "PRSC_IN150000UK06": {
     "service": "urn:nhs:names:services:ebs",
     "workflow": "forward-reliable",
@@ -414,16 +404,6 @@
     "workflow": "sync",
     "sync_async": false
   },
-  "CLINICALS_REPORT_RETRIEVAL": {
-    "service": "",
-    "workflow": "async-express",
-    "sync_async": true
-  },
-  "QURX_IN000005UK98": {
-    "service": "",
-    "workflow": "sync",
-    "sync_async": false
-  },
   "COMT_IN000004GB01": {
     "service": "urn:nhs:names:services:gpes",
     "workflow": "forward-reliable",
@@ -432,11 +412,6 @@
   "PRSC_IN080000UK03": {
     "service": "urn:nhs:names:services:ebs",
     "workflow": "Forward Express",
-    "sync_async": true
-  },
-  "DEMOGRAPHICS_REPORT_RETRIEVAL": {
-    "service": "",
-    "workflow": "async-express",
     "sync_async": true
   },
   "PRPA_IN040000UK15": {
@@ -449,13 +424,8 @@
     "workflow": "async-reliable",
     "sync_async": true
   },
-  "REPORT_RETRIEVAL": {
-    "service": "",
-    "workflow": "async-express",
-    "sync_async": true
-  },
   "QUPC_IN020000UK17": {
-    "service": "",
+    "service": "urn:nhs:names:services:lrsquery",
     "workflow": "async-express",
     "sync_async": true
   },
@@ -472,11 +442,6 @@
   "REPC_IN150018UK02": {
     "service": "urn:nhs:names:services:psis",
     "workflow": "async-reliable",
-    "sync_async": false
-  },
-  "GET_PRESCRIPTION_DOCUMENT_INUK01": {
-    "service": "",
-    "workflow": "sync",
     "sync_async": false
   },
   "REPC_IN150017UK02": {

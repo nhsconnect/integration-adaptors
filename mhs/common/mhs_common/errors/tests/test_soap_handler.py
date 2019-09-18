@@ -1,17 +1,21 @@
-import os
 import unittest
 from pathlib import Path
 
+from definitions import ROOT_DIR
 from utilities.file_utilities import FileUtilities
 
 from mhs_common.errors.soap_handler import handle_soap_error
 
+TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
+
 
 class TestOutboundSOAPHandler(unittest.TestCase):
-    message_dir = Path(os.path.dirname(os.path.abspath(__file__))) / 'test_messages'
+    def setUp(self):
+        self.message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
     def test_non_500(self):
-        self.assertEqual(handle_soap_error(202, {'Content-Type': 'text/html'}, 'Some body'), (202, 'Some body'))
+        self.assertEqual(handle_soap_error(202, {'Content-Type': 'text/xml'}, 'Some body'),
+                         (202, 'Some body', []))
 
     def test_non_soap_fault(self):
         with self.assertRaises(AssertionError):
@@ -34,9 +38,9 @@ class TestOutboundSOAPHandler(unittest.TestCase):
         self.assertTrue('The message is not well formed' in response)
 
     def test_no_content_type(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             handle_soap_error(500, {}, 'Some body')
 
     def test_non_xml_content_type(self):
-        with self.assertRaises(AssertionError):
-            self.assertRaises(AssertionError, handle_soap_error(500, {'Content-Type': 'text/html'}, 'Some body'))
+        with self.assertRaises(ValueError):
+            handle_soap_error(500, {'Content-Type': 'text/xml'}, 'Some body')
