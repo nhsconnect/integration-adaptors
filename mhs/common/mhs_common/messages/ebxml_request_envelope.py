@@ -78,7 +78,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                                ACK_SOAP_ACTOR)
 
     @staticmethod
-    def _parse_mime_message(headers: Dict[str, str], message: str) -> email.message.Message:
+    def _parse_mime_message(headers: Dict[str, str], message: str) -> email.message.EmailMessage:
         """ Take the provided message string (and set of HTTP headers received with it) and parse it to obtain a Message
         object.
 
