@@ -35,6 +35,11 @@ class MessageForwarder(object):
         populated_message = self._populate_message_template(template_populator, message_contents)
 
     def _get_interaction_template_populator(self, interaction_name: str):
+        """
+        Retrieves the template populater object for the given interaction_name
+        :param interaction_name: Human readable interaction id
+        :return: A template populator
+        """
         interaction_template_populator = self.interactions.get(interaction_name)
         if not interaction_template_populator:
             logger.error('002', 'Failed to find interaction templater for interaction name: {name}', 
@@ -43,6 +48,12 @@ class MessageForwarder(object):
         return interaction_template_populator
     
     def _populate_message_template(self, template_populator, supplier_message_parameters: Dict) -> str:
+        """
+        Generates a hl7 message string from the parameters
+        :param template_populator:
+        :param supplier_message_parameters: The parameters to be populated into the message template
+        :return: hl7 message string with the populated values
+        """
         try:
             return template_populator.populate_template(supplier_message_parameters)
         except Exception as e:

@@ -54,15 +54,22 @@ class SummaryCareRecord(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(400, 'Error whilst generating message',
                                         reason=f'Error whilst generating message: {str(e)}')
 
-    def _extract_interaction_name(self):
-        interaction_id = self.request.headers.get('interaction-id')
-        if not interaction_id:
+    def _extract_interaction_name(self) -> str:
+        """
+        Extracts the human readable interaction name from the message header
+        :return: The value assigned to the `interaction-id` header key
+        """
+        interaction_name = self.request.headers.get('interaction-id')
+        if not interaction_name:
             logger.error('0011', 'No interaction-id header provided with inbound message')
             raise tornado.web.HTTPError(400, 'No interaction-id header provided',
                                         reason=f'No interaction-id header provided')
-        return interaction_id
+        return interaction_name
 
     def _extract_message_body(self):
+        """Extracts the message body from the request
+        :return: The message body
+        """
         try:
             return json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
