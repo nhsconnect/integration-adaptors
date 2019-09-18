@@ -11,7 +11,7 @@ logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
 
 class SummaryCareRecord(tornado.web.RequestHandler):
 
-    def initialize(self, handler: mh.MessageHandler) -> None:
+    def initialize(self, handler: mh.MessageForwarder) -> None:
         self.handler = handler
 
     def post(self):
