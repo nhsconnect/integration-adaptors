@@ -109,7 +109,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         if not msg.is_multipart():
             raise ebxml_envelope.EbXmlParsingError("Non-multipart message received!")
 
-        message_parts = msg.get_payload()
+        message_parts = tuple(msg.iter_parts())
 
         for i, part in enumerate(message_parts):
             if part.defects:
