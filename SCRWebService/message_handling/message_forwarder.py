@@ -4,13 +4,7 @@ from typing import Dict
 from utilities import integration_adaptors_logger as log
 from builder.pystache_message_builder import MessageGenerationError
 
-GP_SUMMARY_UPLOAD_ID = 'REPC_IN150016UK05'
-
 logger = log.IntegrationAdaptorsLogger('MSG-HANDLER')
-
-
-class MessageSendingError(Exception):
-    pass
 
 
 class MessageForwarder(object):
