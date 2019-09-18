@@ -1,3 +1,4 @@
+"""Tests associated with the Summary Care Record endpoint"""
 import json
 import pathlib
 
@@ -15,18 +16,19 @@ complete_data_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data' / '
 
 
 class TestSummaryCareRecord(AsyncHTTPTestCase):
-
+    """Tests associated with the Summary Care Record endpoint"""
+    
     def get_app(self):
-        self.handler = mock.MagicMock()
+        self.forwarder = mock.MagicMock()
 
         return Application([
             (r'/gp_summary_upload', summary_care_record.SummaryCareRecord,
-             dict(handler=self.handler))
+             dict(forwarder=self.forwarder))
         ])
 
     def test_handler_happy_path(self):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
-        self.handler.forward_message_to_mhs.return_value = "Nice response message"
+        self.forwarder.forward_message_to_mhs.return_value = "Nice response message"
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
                               body=json.dumps(body))
 
@@ -49,7 +51,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     def test_message_generation_exception_in_handler(self):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
-        self.handler.forward_message_to_mhs.side_effect = MessageGenerationError('This is a specific error')
+        self.forwarder.forward_message_to_mhs.side_effect = MessageGenerationError('This is a specific error')
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
                               body=json.dumps(body))
 

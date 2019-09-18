@@ -1,4 +1,8 @@
+"""The Summary Care Record endpoint"""
+
 import json
+from typing import Dict
+
 import tornado.web
 import tornado.ioloop
 import utilities.integration_adaptors_logger as log
@@ -9,14 +13,22 @@ logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
 
 
 class SummaryCareRecord(tornado.web.RequestHandler):
+    """ The SummaryCareRecord endpoint - provides the entrypoint for inbound
+        ** Note: It is current expected behavior of the system that verification of the inputs is performed
+        ** by the Pystache library as a part of the message generation
+    """
 
-    def initialize(self, handler: mh.MessageForwarder) -> None:
-        self.handler = handler
+    def initialize(self, forwarder: mh.MessageForwarder) -> None:
+        """
+        SummaryCareRecord endpoint class
+        :param forwarder: A message forwarder, parsed messages are pushed to this object for processing
+        :return:
+        """
+        self.forwarder = forwarder
 
     def post(self):
         """
-        Receives a json payload and attempts to populate a gp summary upload message, for testing purposes
-        this end point currently returns the data provided
+        Receives a json payload, parses the appropriate message details before processing the message contents
         :return:
         """
 
@@ -27,9 +39,15 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         response = self._process_message(interaction_name, scr_input_json)
         self.write(response)
 
-    def _process_message(self, interaction_name, scr_input_json):
+    def _process_message(self, interaction_name: str, scr_input_json: Dict):
+        """
+        Processes the outbound message by delegating to the forwarder
+        :param interaction_name: Human readable name of the interaction
+        :param scr_input_json: Dictionary of desired input data
+        :return: Result of forwarding the message to the MHS
+        """
         try:
-            result = self.handler.forward_message_to_mhs(interaction_name, scr_input_json)
+            result = self.forwarder.forward_message_to_mhs(interaction_name, scr_input_json)
             return result
         except MessageGenerationError as e:
             logger.error('003', 'Failed to generate message {exception}', {'exception': e})

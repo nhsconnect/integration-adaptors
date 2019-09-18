@@ -58,6 +58,12 @@ class FullTest(unittest.TestCase):
         with self.assertRaises(MessageGenerationError):
             self.summaryCareRecord.populate_template_with_file(hash_file_path)
 
+    def test_missing_element_in_input_dict(self):
+        hash_file_path = str(self.hashFileDir / 'missingTag.json')
+
+        with self.assertRaises(MessageGenerationError):
+            self.summaryCareRecord.populate_template_with_file(hash_file_path)
+
     def test_replacementOf(self):
         """
         Note: this is not a valid xml instance

@@ -1,3 +1,4 @@
+"""Module that relates to the general processing of an inbound message"""
 import unittest
 from unittest import mock
 from message_handling import message_forwarder as mh
@@ -5,23 +6,24 @@ from builder.pystache_message_builder import MessageGenerationError
 
 
 class TestMessageForwarder(unittest.TestCase):
+    """Tests associated with the MessageForwarder class"""
 
     def test_call(self):
         template_mock = mock.MagicMock()
         interactions_map = {'interaction': template_mock}
 
         handler = mh.MessageForwarder(interactions_map)
-        input_json = "{'check': 'one'}"
+        input_json = {'check': 'one'}
         handler.forward_message_to_mhs('interaction', input_json)
-        template_mock.populate_template_with_json_string.assert_called_with(input_json)
+        template_mock.populate_template.assert_called_with(input_json)
 
     def test_exception_raised_during_population(self):
         template_mock = mock.MagicMock()
-        template_mock.populate_template_with_json_string.side_effect = MessageGenerationError('Exception')
+        template_mock.populate_template.side_effect = MessageGenerationError('Exception')
 
         interactions_map = {'interaction': template_mock}
         handler = mh.MessageForwarder(interactions_map)
-        input_json = "{'check': 'one'}"
+        input_json = {'check': 'one'}
 
         with self.assertRaises(MessageGenerationError) as e:
             handler.forward_message_to_mhs('interaction', input_json)
@@ -29,7 +31,7 @@ class TestMessageForwarder(unittest.TestCase):
 
     def test_no_templater(self):
         handler = mh.MessageForwarder({})
-        input_json = "{'check': 'one'}"
+        input_json = {'check': 'one'}
 
         with self.assertRaises(MessageGenerationError) as e:
             handler.forward_message_to_mhs('interaction', input_json)
