@@ -1,6 +1,8 @@
 from typing import Dict, AnyStr, Tuple
-from xml.etree import ElementTree
+
+from defusedxml import ElementTree
 from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
+
 from mhs_common.messages.soap_fault_envelope import SOAPFault
 
 logger = IntegrationAdaptorsLogger('SOAP_ERROR_HANDLER')

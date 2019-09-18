@@ -1,6 +1,6 @@
 from typing import Tuple, AnyStr, Dict, Optional
-from xml.etree import ElementTree as ET
 
+from defusedxml import ElementTree as ET
 from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
 
 from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
