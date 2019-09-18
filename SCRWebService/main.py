@@ -10,7 +10,7 @@ from scr import gp_summary_update
 logger = log.IntegrationAdaptorsLogger('SCR-WEB')
 
 
-if __name__ == "__main__":
+def main():
     config.setup_config('SCR')
     log.configure_logging()
     interactions = {
@@ -21,3 +21,13 @@ if __name__ == "__main__":
     app = tornado.web.Application([(r"/", summary_care_record.SummaryCareRecord, dict(forwarder=forwarder))])
     app.listen(80)
     tornado.ioloop.IOLoop.current().start()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+    finally:
+        logger.info('002', 'Exiting application')
+
