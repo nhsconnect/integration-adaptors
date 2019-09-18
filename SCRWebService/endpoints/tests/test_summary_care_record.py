@@ -26,7 +26,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
              dict(forwarder=self.forwarder))
         ])
 
-    def test_handler_happy_path(self):
+    def test_handler_returns_message_processing_response(self):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         self.forwarder.forward_message_to_mhs.return_value = "Nice response message"
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
@@ -34,14 +34,14 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
         self.assertEqual(response.body.decode(), "Nice response message")
 
-    def test_handler_empty_body(self):
+    def test_empty_body_request_fails(self):
         body = ''
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
 
         self.assertEqual(response.code, 400)
         self.assertIn('Failed to parse json body from request', response.body.decode())
 
-    def test_handler_invalid_json(self):
+    def test_invalid_json_request_fails(self):
         body = "{'yes': 'wow'}"
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
                               body=body)
@@ -49,7 +49,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         error = "Failed to parse json body from request: Expecting property name enclosed in double quotes"
         self.assertIn(error, response.body.decode())
 
-    def test_message_generation_exception_in_handler(self):
+    def test_message_generation_exception_in_handler_returns_error_to_caller(self):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         self.forwarder.forward_message_to_mhs.side_effect = MessageGenerationError('This is a specific error')
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
