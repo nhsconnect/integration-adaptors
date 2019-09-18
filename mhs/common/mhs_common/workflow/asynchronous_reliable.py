@@ -112,7 +112,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                         handle_soap_error(e.response.code, e.response.headers, e.response.body)
 
                     if not self._is_soap_fault_retriable(soap_fault_codes):
-                        return status, response,
+                        return status, response, None
 
                     retries_remaining -= 1
                     logger.warning("0015",
