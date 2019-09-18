@@ -75,7 +75,7 @@ class SDSClient(object):
                            {"ods_code": ods_code, "interaction_id": interaction_id})
 
         details[0]['attributes'][MHS_ASID] = asid
-        return details[0]['attributes']
+        return dict(details[0]['attributes'])
 
     async def _accredited_system_lookup(self, ods_code: str, interaction_id: str) -> List:
         """

@@ -5,7 +5,7 @@ from mhs_common.request import healthcheck_handler
 from utilities import config
 from utilities import integration_adaptors_logger as log
 
-from lookup import cache_adaptor, dictionary_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, \
+from lookup import cache_adaptor, redis_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, \
     routing_reliability
 from request import routing_handler, reliability_handler, routing_reliability_handler
 
@@ -15,8 +15,15 @@ logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_MAIN')
 def load_cache_implementation():
     cache_expiry_time = int(config.get_config("SDS_CACHE_EXPIRY_TIME", cache_adaptor.FIFTEEN_MINUTES_IN_SECONDS))
 
-    logger.info('005', 'Using the dictionary cache with {cache_expiry_time}', {'cache_expiry_time': cache_expiry_time})
-    return dictionary_cache.DictionaryCache(cache_expiry_time)
+    redis_host = config.get_config("SDS_REDIS_CACHE_HOST")
+    redis_port = int(config.get_config("SDS_REDIS_CACHE_PORT", "6379"))
+    disable_tls_flag = config.get_config("SDS_REDIS_DISABLE_TLS", None)
+    use_tls = disable_tls_flag != "True"
+
+    logger.info('005', 'Using the Redis cache with {redis_host}, {redis_port}, {cache_expiry_time}, {use_tls}',
+                {'redis_host': redis_host, 'redis_port': redis_port, 'cache_expiry_time': cache_expiry_time,
+                 'use_tls': use_tls})
+    return redis_cache.RedisCache(redis_host, redis_port, cache_expiry_time, use_tls)
 
 
 def initialise_routing(sds_url: str, tls: bool = True) -> routing_reliability.RoutingAndReliability:
