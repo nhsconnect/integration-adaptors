@@ -19,7 +19,7 @@ class MessageForwarder(object):
         self.interactions = interactions
 
     def forward_message_to_mhs(self, interaction_name, message_contents: str):
-        templater = self.interactions.get(interaction_name)
+        templater = self._get_interaction_templater(interaction_name)
         populated_message = self._populate_message_template(templater, message_contents)
 
     def _get_interaction_templater(self, interaction_name):

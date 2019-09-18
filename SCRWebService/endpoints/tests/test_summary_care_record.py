@@ -7,20 +7,20 @@ from definitions import ROOT_DIR
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
 from unittest import mock
-from endpoints import gp_summary_upload
+from endpoints import summary_care_record
 
 GP_SUMMARY_UPLOAD_URL = "/gp_summary_upload"
 
 complete_data_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data' / 'complete_input.json'
 
 
-class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
+class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     def get_app(self):
         self.handler = mock.MagicMock()
 
         return Application([
-            (r'/gp_summary_upload', gp_summary_upload.SummaryCareRecord,
+            (r'/gp_summary_upload', summary_care_record.SummaryCareRecord,
              dict(handler=self.handler))
         ])
 
