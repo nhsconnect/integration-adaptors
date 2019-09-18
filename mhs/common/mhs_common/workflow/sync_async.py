@@ -1,6 +1,6 @@
 """This module defines the sync-async workflow."""
 import asyncio
-from typing import Tuple
+from typing import Tuple, Optional
 from utilities import integration_adaptors_logger as log
 from mhs_common.state import work_description as wd
 from mhs_common.workflow import common_synchronous
@@ -41,14 +41,16 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             else None
         self.persistence_store_retries = persistence_store_max_retries
 
-    async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+    async def handle_outbound_message(self, from_asid: Optional[str],
+                                      message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str,
                                       work_description: wd.WorkDescription
                                       ) -> Tuple[int, str]:
         raise NotImplementedError("This method is not implemented for the sync-async workflow, consider using"
                                   "`self.handle_sync_async_message` instead")
 
-    async def handle_sync_async_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+    async def handle_sync_async_outbound_message(self, from_asid: Optional[str], message_id: str, correlation_id: str,
+                                                 interaction_details: dict,
                                                  payload: str,
                                                  async_workflow: common.CommonWorkflow
                                                  ) -> Tuple[int, str, wd.WorkDescription]:
@@ -59,9 +61,9 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                              outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                                              )
 
-        status_code, response = await async_workflow.handle_outbound_message(message_id, correlation_id,
-                                                                             interaction_details, payload, wdo)
-        if not (status_code == 202):
+        status_code, response, _ = await async_workflow.handle_outbound_message(from_asid, message_id, correlation_id,
+                                                                                  interaction_details, payload, wdo)
+        if not status_code == 202:
             logger.warning('0002', 'No ACK received ')
             return status_code, response, wdo
 
@@ -118,3 +120,9 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                              'on the sync-async store') from e
 
                 await asyncio.sleep(self.sync_async_store_retry_delay)
+
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)

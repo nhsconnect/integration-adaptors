@@ -4,6 +4,7 @@ from typing import Tuple, Optional
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from tornado import httpclient
+from typing import Tuple, Optional
 
 from utilities import timing
 
@@ -47,15 +48,14 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                      FAILURE_STORING_VARIABLE_IN_MEMO]
 
     @timing.time_function
-    async def handle_outbound_message(self,
-                                      message_id: str,
-                                      correlation_id: str,
-                                      interaction_details: dict,
+    async def handle_outbound_message(self, from_asid: Optional[str],
+                                      message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str,
-                                      wdo: Optional[wd.WorkDescription]) -> Tuple[int, str]:
+                                      work_description_object: Optional[wd.WorkDescription]) \
+            -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async reliable workflow to handle outbound message')
-        if not wdo:
+        if not work_description_object:
             wdo = wd.create_new_work_description(self.persistence_store,
                                                  message_id,
                                                  workflow.ASYNC_RELIABLE,
@@ -188,3 +188,9 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             if not soap_fault_code in self.soap_errors_to_retry:
                 return False
         return True
+
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        raise NotImplementedError()
+
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        raise NotImplementedError()

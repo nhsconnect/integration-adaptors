@@ -1,7 +1,7 @@
 from edifact.outgoing.models.segment import Segment
 
 
-class Address:
+class Address(object):
     """
     A class to encapsulate the address attributes required for an edifact message
     """

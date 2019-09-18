@@ -11,6 +11,7 @@ from mhs_common.routing import routing_reliability
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+MHS_TO_ASID_KEY = 'uniqueIdentifier'
 
 logger = log.IntegrationAdaptorsLogger('COMMON_WORKFLOW')
 
@@ -18,26 +19,36 @@ logger = log.IntegrationAdaptorsLogger('COMMON_WORKFLOW')
 class CommonWorkflow(abc.ABC):
     """Common functionality across all workflows."""
 
+    ENDPOINT_URL = 'url'
+    ENDPOINT_PARTY_KEY = 'party_key'
+    ENDPOINT_TO_ASID = 'to_asid'
+    ENDPOINT_SERVICE_ID = 'service_id'
+    ENDPOINT_CPA_ID = 'cpa_id'
+
     def __init__(self, routing: routing_reliability.RoutingAndReliability = None):
         self.routing_reliability = routing
         self.workflow_specific_interaction_details = dict()
 
     @abc.abstractmethod
-    async def handle_outbound_message(self, message_id: str, correlation_id: str, interaction_details: dict,
+    async def handle_outbound_message(self, from_asid: Optional[str],
+                                      message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str,
                                       work_description_object: Optional[wd.WorkDescription]
-                                      ) -> Tuple[int, str]:
+                                      ) -> Tuple[int, str, Optional[wd.WorkDescription]]:
         """
         Handle a message from the supplier system (or a message from an adaptor that the supplier system speaks to)
         that is to be sent outbound.
 
+        :param from_asid: Optional asid of the supplier system
         :param work_description_object: A potentially null value for the work description object for this message, if
                 not present the child implementation is expected to generate this work description instance
         :param message_id: ID of the message to send
         :param correlation_id: correlation ID of the request
         :param interaction_details: interaction details used to construct the message to send outbound
         :param payload: payload to send outbound
-        :return: the HTTP status and body to return as a response
+        :return: the HTTP status, body to return as a response, and optionally the work description.
+        The work description only needs to be returned if set_successful_message_response and/or
+        set_failure_message_response are implemented for the workflow.
         """
         pass
 
@@ -54,7 +65,25 @@ class CommonWorkflow(abc.ABC):
         """
         pass
 
-    async def _lookup_endpoint_details(self, interaction_details: Dict) -> Tuple[str, str, str]:
+    @abc.abstractmethod
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        """
+        Sets the work description status value to be a value that indicates the final message to the supplier was
+        sent successfully
+        :param wdo: The work description object
+        """
+        pass
+
+    @abc.abstractmethod
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        """
+        Sets the work description status value to be a value that indicates the final message to the supplier was
+        sent successfully
+        :param wdo: The work description object
+        """
+        pass
+
+    async def _lookup_endpoint_details(self, interaction_details: Dict) -> Dict:
         try:
             service_id = await self._build_service_id(interaction_details)
 
@@ -64,9 +93,15 @@ class CommonWorkflow(abc.ABC):
             url = CommonWorkflow._extract_endpoint_url(endpoint_details)
             to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]
             cpa_id = endpoint_details[MHS_CPA_ID_KEY]
-            logger.info('0002', 'Retrieved endpoint details for {service_id}. {url}, {to_party_key}, {cpa_id}',
-                        {'service_id': service_id, 'url': url, 'to_party_key': to_party_key, 'cpa_id': cpa_id})
-            return url, to_party_key, cpa_id
+            to_asid = self._extract_asid(endpoint_details)
+            details = {self.ENDPOINT_SERVICE_ID: service_id,
+                       self.ENDPOINT_URL: url,
+                       self.ENDPOINT_PARTY_KEY: to_party_key,
+                       self.ENDPOINT_CPA_ID: cpa_id,
+                       self.ENDPOINT_TO_ASID: to_asid
+                       }
+            logger.info('0002','Retrieved endpoint details for {details}', {'details': details})
+            return details
         except Exception as e:
             logger.warning('0003', 'Error encountered whilst retrieving endpoint details. {Exception}',
                            {'Exception': e})
@@ -87,6 +122,21 @@ class CommonWorkflow(abc.ABC):
                                    '{urls_received}', {'url': url, 'urls_received': endpoint_urls})
 
         return url
+
+    @staticmethod
+    def _extract_asid(endpoint_details: Dict[str, List[str]]) -> str:
+        unique_identifiers = endpoint_details.get(MHS_TO_ASID_KEY)
+
+        if not unique_identifiers:
+            logger.error('0024', 'Did not retrieve any unique identifiers from endpoint details')
+            raise IndexError()
+
+        asid = unique_identifiers[0]
+
+        if len(unique_identifiers) > 1:
+            logger.warning('0025', 'Received more than one ASID during endpoint lookup')
+
+        return asid
 
     @staticmethod
     async def _build_service_id(interaction_details):

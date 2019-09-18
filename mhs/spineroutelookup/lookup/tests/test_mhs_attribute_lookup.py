@@ -35,7 +35,7 @@ expected_mhs_attributes = {
     'nhsMhsFQDN': 'vpn-client-1411.opentest.hscic.gov.uk',
     'nhsMhsSvcIA': 'urn:nhs:names:services:psis:MCCI_IN010000UK13',
     'nhsProductKey': '7374',
-    'uniqueIdentifier': ['S918999410559']
+    'uniqueIdentifier': ['123456789']
 }
 
 
@@ -95,13 +95,20 @@ class TestMHSAttributeLookup(TestCase):
         client.get_mhs_details.return_value = test_utilities.awaitable({'attributes': 'testData'})
         handler = mhs_attribute_lookup.MHSAttributeLookup(client, cache)
 
-        await handler.cache.add_cache_value("check", "not", "added")  # value in cache for 3 seconds
+        # value in cache for 3 seconds
+        await handler.cache.add_cache_value("check", "not", "added")
 
-        patched_time.return_value = 2  # Set time to something before the expiry
-        await handler.retrieve_mhs_attributes("check", "not")  # This will come from the cache
+        # Set time to something before the expiry
+        patched_time.return_value = 2
+
+        # This will come from the cache
+        await handler.retrieve_mhs_attributes("check", "not")
         handler.sds_client.get_mhs_details.assert_not_called()
 
-        patched_time.return_value = 4.1  # wait for the cache to expire
-        await handler.retrieve_mhs_attributes("check", "not")  # This should expire in the cache and call sds
+        # wait for the cache to expire
+        patched_time.return_value = 4.1
+
+        # This should expire in the cache and call sds
+        await handler.retrieve_mhs_attributes("check", "not")
 
         handler.sds_client.get_mhs_details.assert_called_once()

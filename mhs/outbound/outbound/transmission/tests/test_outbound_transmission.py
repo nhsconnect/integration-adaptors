@@ -5,9 +5,9 @@ from unittest.mock import patch, sentinel, call
 
 import definitions
 from tornado import httpclient
-from utilities.test_utilities import async_test, awaitable
 
 from outbound.transmission import outbound_transmission
+from utilities.test_utilities import async_test, awaitable
 
 URL_NAME = "url"
 URL_VALUE = "URL"
@@ -32,12 +32,9 @@ HEADERS = {
 MESSAGE = "message"
 
 CERTS_DIR = str(Path(definitions.ROOT_DIR) / "data/certs_dir")
-CLIENT_CERT = "client.cert"
-CLIENT_KEY = "client.key"
-CA_CERTS = "client.pem"
-CLIENT_CERT_PATH = str(Path(CERTS_DIR) / CLIENT_CERT)
-CLIENT_KEY_PATH = str(Path(CERTS_DIR) / CLIENT_KEY)
-CA_CERTS_PATH = str(Path(CERTS_DIR) / CA_CERTS)
+CLIENT_CERT_PATH = str(Path(CERTS_DIR) / "client.cert")
+CLIENT_KEY_PATH = str(Path(CERTS_DIR) / "client.key")
+CA_CERTS_PATH = str(Path(CERTS_DIR) / "client.pem")
 MAX_RETRIES = 3
 RETRY_DELAY = 100
 RETRY_DELAY_IN_SECONDS = RETRY_DELAY / 1000
@@ -47,7 +44,7 @@ HTTP_PROXY_PORT = 3128
 
 class TestOutboundTransmission(TestCase):
     def setUp(self):
-        self.transmission = outbound_transmission.OutboundTransmission(CERTS_DIR, CLIENT_CERT, CLIENT_KEY, CA_CERTS,
+        self.transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH,
                                                                        MAX_RETRIES, RETRY_DELAY)
 
     @async_test
@@ -78,7 +75,7 @@ class TestOutboundTransmission(TestCase):
 
     @async_test
     async def test_make_request_with_proxy(self):
-        self.transmission = outbound_transmission.OutboundTransmission(CERTS_DIR, CLIENT_CERT, CLIENT_KEY, CA_CERTS,
+        self.transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH,
                                                                        MAX_RETRIES, RETRY_DELAY, HTTP_PROXY_HOST,
                                                                        HTTP_PROXY_PORT)
 
@@ -147,7 +144,7 @@ class TestOutboundTransmission(TestCase):
             self.assertEqual(mock_fetch.side_effect, cm.exception.__cause__)
 
             self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
-            expected_sleep_arguments = [call(RETRY_DELAY_IN_SECONDS) for i in range(MAX_RETRIES - 1)]
+            expected_sleep_arguments = [call(RETRY_DELAY_IN_SECONDS) for _ in range(MAX_RETRIES - 1)]
             self.assertEqual(expected_sleep_arguments, mock_sleep.call_args_list)
 
     def test_is_tornado_network_error(self):

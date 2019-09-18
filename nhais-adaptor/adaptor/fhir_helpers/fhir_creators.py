@@ -8,7 +8,7 @@ from fhirclient.models.patient import Patient
 from fhirclient.models.practitioner import Practitioner
 
 
-class OperationName:
+class OperationName(object):
     """
     Constants for the type of fhir operations the adaptor can use
     """
@@ -16,7 +16,7 @@ class OperationName:
     REGISTER_DEATH = "RegisterPatient-Death"
 
 
-class ParameterName:
+class ParameterName(object):
     """
     Constants for parameter names used in the adaptor
     """
@@ -30,7 +30,7 @@ class ParameterName:
     FREE_TEXT = "freeText"
 
 
-class ResourceType:
+class ResourceType(object):
     """
     Constants for the resource types used in the adaptor
     """

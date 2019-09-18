@@ -4,7 +4,7 @@ import datetime
 EBXML_TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-class MessageUtilities:
+class MessageUtilities(object):
     @staticmethod
     def get_uuid():
         """Generate a UUID suitable for sending in messages to Spine.

@@ -1,10 +1,14 @@
 from typing import Dict, AnyStr, Tuple
 from xml.etree import ElementTree
 from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
-from mhs_common.messages.soap_fault import SOAPFault
-from mhs_common.errors import ERROR_RESPONSE_DEFAULTS
+from mhs_common.messages.soap_fault_envelope import SOAPFault
 
 logger = IntegrationAdaptorsLogger('SOAP_ERROR_HANDLER')
+
+
+ERROR_RESPONSE_DEFAULTS = {
+    'errorType': 'soap_fault'
+}
 
 
 def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyStr]:
@@ -44,7 +48,7 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
             soap_fault_codes.append(int(all_fields['errorCode']))
         errors_text += '{}: {}\n'.format(idx, ' '.join([f'{k}={v}' for k, v in all_fields.items()]))
         logger.error('0002',
-                     'SOAP Fault returned: {}'.format(' '.join(['{' + f'{i}' + '}' for i in all_fields.keys()])),
+                     'SOAP Fault returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
                      all_fields)
 
     return code, f'Error(s) received from Spine. Contact system administrator.\n{errors_text}', soap_fault_codes

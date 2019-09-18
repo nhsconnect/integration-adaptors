@@ -1,21 +1,17 @@
+import os
 import unittest
 from pathlib import Path
 
-from definitions import ROOT_DIR
 from utilities.file_utilities import FileUtilities
 
 from mhs_common.errors.soap_handler import handle_soap_error
 
-TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
-
 
 class TestOutboundSOAPHandler(unittest.TestCase):
-    def setUp(self):
-        self.message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
+    message_dir = Path(os.path.dirname(os.path.abspath(__file__))) / 'test_messages'
 
     def test_non_500(self):
-        self.assertEqual(handle_soap_error(202, {'Content-Type': 'text/xml'}, 'Some body'),
-                         (202, 'Some body', []))
+        self.assertEqual(handle_soap_error(202, {'Content-Type': 'text/html'}, 'Some body'), (202, 'Some body'))
 
     def test_non_soap_fault(self):
         with self.assertRaises(AssertionError):
@@ -27,15 +23,16 @@ class TestOutboundSOAPHandler(unittest.TestCase):
 
     def test_single_error(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml' )
-        self.assertTrue('System failure to process message - default' in
-                        handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
+        self.assertIn('System failure to process message - default',
+                      handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
 
     def test_multiple_errors(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
         response = handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1]
 
-        self.assertTrue('System failure to process message - default' in response)
-        self.assertTrue('The message is not well formed' in response)
+        self.assertIn('System failure to process message - default', response)
+        self.assertIn('The message is not well formed', response)
+        self.assertIn('errorType=soap_fault', response)
 
     def test_no_content_type(self):
         with self.assertRaises(ValueError):
@@ -43,4 +40,4 @@ class TestOutboundSOAPHandler(unittest.TestCase):
 
     def test_non_xml_content_type(self):
         with self.assertRaises(ValueError):
-            handle_soap_error(500, {'Content-Type': 'text/xml'}, 'Some body')
+            handle_soap_error(500, {'Content-Type': 'text/html'}, 'Some body')

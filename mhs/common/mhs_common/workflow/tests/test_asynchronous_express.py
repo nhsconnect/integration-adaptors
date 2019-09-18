@@ -23,9 +23,11 @@ from pathlib import Path
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
 CPA_ID = 'cpa-id'
+ASID = 'asid-123'
 MESSAGE_ID = 'message-id'
 CORRELATION_ID = 'correlation-id'
 URL = 'a.a'
+ASID = '123456'
 HTTP_HEADERS = {
     "type": "a",
     "Content-Type": "b",
@@ -39,7 +41,8 @@ SERVICE_ID = SERVICE + ":" + ACTION
 INTERACTION_DETAILS = {
     'workflow': 'async-express',
     'service': SERVICE,
-    'action': ACTION
+    'action': ACTION,
+    'uniqueIdentifier': "31312"
 }
 PAYLOAD = 'payload'
 SERIALIZED_MESSAGE = 'serialized-message'
@@ -50,6 +53,7 @@ INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
+MHS_ASID = 'uniqueIdentifier'
 
 TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
 
@@ -118,8 +122,12 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                         ebxml_envelope.CPA_ID: CPA_ID}
         expected_interaction_details.update(INTERACTION_DETAILS)
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None,
+                                                                         MESSAGE_ID,
+                                                                         CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD,
+                                                                         None)
 
         self.assertEqual(202, status)
         self.assertEqual('', message)
@@ -160,8 +168,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         wdo.workflow = 'This should not change'
         wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
         wdo.update.return_value = test_utilities.awaitable(True)
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, wdo)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, wdo)
 
         self.assertEqual(202, status)
         wdo_mock.assert_not_called()
@@ -174,8 +183,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.side_effect = Exception()
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
@@ -189,8 +199,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.setup_mock_work_description()
         self.mock_routing_reliability.get_end_point.side_effect = Exception()
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error obtaining outbound URL', message)
@@ -211,8 +222,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         future.set_exception(httpclient.HTTPClientError(code=409))
         self.mock_transmission_adaptor.make_request.return_value = future
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertTrue('Error(s) received from Spine' in message)
@@ -264,8 +276,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         future.set_exception(Exception())
         self.mock_transmission_adaptor.make_request.return_value = future
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error making outbound request', message)
@@ -285,10 +298,13 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         response = mock.MagicMock()
         response.code = 200
+        response.headers = {'Content-Type': 'text/xml'}
+        response.body = '<a></a>'
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        status, message = await self.workflow.handle_outbound_message(MESSAGE_ID, CORRELATION_ID, INTERACTION_DETAILS,
-                                                                      PAYLOAD, None)
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual("Didn't get expected success response from Spine", message)
@@ -298,9 +314,65 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
+    @async_test
+    async def test_handle_outbound_message_non_http_202_success_response_ebxml_error(self):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        response = mock.MagicMock()
+        response.code = 200
+        response.headers = {'Content-Type': 'text/xml'}
+        response.body = """<?xml version="1.0" encoding="utf-8"?>
+        <SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
+            <SOAP:Header>
+                <eb:MessageHeader SOAP:mustUnderstand="1" eb:version="2.0">
+                    <eb:From>
+                        <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YEA-801248</eb:PartyId>
+                    </eb:From>
+                    <eb:To>
+                        <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">RHM-810292</eb:PartyId>
+                    </eb:To>
+                    <eb:CPAId>S2001919A2011852</eb:CPAId>
+                    <eb:ConversationId>19D02203-3CBE-11E3-9D44-9D223D2F4DB0</eb:ConversationId>
+                    <eb:Service>urn:oasis:names:tc:ebxml-msg:service</eb:Service>
+                    <eb:Action>MessageError</eb:Action>
+                    <eb:MessageData>
+                        <eb:MessageId>97111C1C-48B8-B2FA-DE13-B64B2ADEB391</eb:MessageId>
+                        <eb:Timestamp>2013-10-24T15:08:07</eb:Timestamp>
+                        <eb:RefToMessageId>19D02203-3CBE-11E3-9D44-9D223D2F4DB0</eb:RefToMessageId>
+                    </eb:MessageData>
+                </eb:MessageHeader>
+                <eb:ErrorList SOAP:mustUnderstand="1" eb:highestSeverity="Error" eb:version="2.0">
+                    <eb:Error eb:codeContext="urn:oasis:names:tc:ebxml-msg:service:errors" eb:errorCode="ValueNotRecognized" eb:severity="Error">
+                        <eb:Description xml:lang="en-GB">501319:Unknown eb:CPAId</eb:Description>
+                    </eb:Error>
+                </eb:ErrorList>
+            </SOAP:Header>
+            <SOAP:Body/>
+        </SOAP:Envelope>
+        """
+        self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
+
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS, PAYLOAD, None)
+
+        self.assertEqual(500, status)
+        self.assertIn("Error(s) received from Spine. Contact system administrator", message)
+        self.mock_work_description.publish.assert_called_once()
+        self.assertEqual(
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
+             mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+            self.mock_work_description.set_outbound_status.call_args_list)
+
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
-            MHS_END_POINT_KEY: [URL], MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY, MHS_CPA_ID_KEY: CPA_ID})
+            MHS_END_POINT_KEY: [URL],
+            MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY,
+            MHS_CPA_ID_KEY: CPA_ID,
+            MHS_ASID: [ASID]
+        })
 
     ############################
     # Inbound tests

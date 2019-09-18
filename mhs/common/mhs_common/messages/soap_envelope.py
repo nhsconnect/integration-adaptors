@@ -60,17 +60,15 @@ class SoapEnvelope(envelope.Envelope):
             soap_message_dictionary[MESSAGE_ID] = message_id
         timestamp = message_utilities.MessageUtilities.get_timestamp()
         soap_message_dictionary[TIMESTAMP] = timestamp
+
         logger.info('0001', 'Creating SOAP message with {MessageId} and {Timestamp}',
                     {'MessageId': message_id, 'Timestamp': timestamp})
 
         message = self.message_builder.build_message(soap_message_dictionary)
-        http_headers = {
-            'charset': 'UTF-8',
-            'SOAPAction': f'{soap_message_dictionary[ACTION]}'
-        }
-
-        http_headers['Content-Type'] = SOAP_CONTENT_TYPE_VALUE
-        http_headers['type'] = SOAP_CONTENT_TYPE_VALUE
+        http_headers = {'charset': 'UTF-8',
+                        'SOAPAction': soap_message_dictionary[ACTION],
+                        'Content-Type': SOAP_CONTENT_TYPE_VALUE,
+                        'type': SOAP_CONTENT_TYPE_VALUE}
 
         return message_id, http_headers, message
 

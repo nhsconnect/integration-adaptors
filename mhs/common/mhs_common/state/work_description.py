@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Optional
 import utilities.integration_adaptors_logger as log
-import datetime
 
 from utilities import timing
 
@@ -21,12 +20,15 @@ class MessageStatus(str, enum.Enum):
     OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED = 'OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED'
     OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND = 'OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND'
     OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED = 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED'
+    OUTBOUND_MESSAGE_RESPONSE_RECEIVED = 'OUTBOUND_MESSAGE_RESPONSE_RECEIVED'
     INBOUND_RESPONSE_RECEIVED = 'INBOUND_RESPONSE_RECEIVED'
     INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED = 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'
     INBOUND_RESPONSE_FAILED = 'INBOUND_RESPONSE_FAILED'
     INBOUND_SYNC_ASYNC_MESSAGE_STORED = 'INBOUND_SYNC_ASYNC_MESSAGE_STORED'
     INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED = 'INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED'
-    
+    SYNC_RESPONSE_SUCCESSFUL = "SYNC_RESPONSE_SUCCESSFUL"
+    SYNC_RESPONSE_FAILED = "SYNC_RESPONSE_FAILED"
+
 
 DATA_KEY = 'MESSAGE_KEY'
 VERSION_KEY = 'VERSION'
@@ -128,12 +130,12 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     return WorkDescription(persistence_store, work_description_map)
 
 
-class WorkDescription:
+class WorkDescription(object):
     """A local copy of an instance of a work description from the state store"""
 
     def __init__(self, persistence_store: pa.PersistenceAdaptor, store_data: dict):
         """
-        Given 
+        Given
         :param persistence_store:
         :param store_data:
         """
