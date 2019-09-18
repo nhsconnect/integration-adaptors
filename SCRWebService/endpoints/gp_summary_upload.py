@@ -4,15 +4,16 @@ import tornado.web
 import tornado.ioloop
 import scr.gp_summary_update as scr_update
 import utilities.integration_adaptors_logger as log
+from message_handling import message_handler as mh
+from builder.pystache_message_builder import MessageGenerationError
 
 logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
 
 
 class GpSummaryUpload(tornado.web.RequestHandler):
 
-    def _initialize(self) -> None:
-        self.mhs_address = os.environ['MHS_ADDRESS']
-        assert self.mhs_address
+    def initialize(self, handler: mh.MessageHandler) -> None:
+        self.handler = handler
 
     def post(self):
         """
@@ -21,20 +22,34 @@ class GpSummaryUpload(tornado.web.RequestHandler):
         :return:
         """
 
+        logger.info('001', 'Message received for gp summary upl')
+        scr_input_json = self._extract_message_body()
+        interaction_name = self._extract_interaction_name()
+        logger.info('002', 'Extracted message content, attempting to forward the message')
+        response = self._process_message(interaction_name, scr_input_json)
+        self.write(response)
+
+    def _process_message(self, interaction_name, scr_input_json):
         try:
-            scr_input_json = json.loads(self.request.body)
+            result = self.handler.forward_message_to_mhs(scr_input_json)
+            return result
+        except MessageGenerationError as e:
+            logger.error('003', 'Failed to generate message {exception}', {'exception': e})
+            raise tornado.web.HTTPError(400, 'Error whilst generating message',
+                                        reason=f'Error whilst generating message: {str(e)}')
+
+    def _extract_interaction_name(self):
+        interaction_id = self.request.headers.get('interaction-id')
+        if not interaction_id:
+            logger.error('0011', 'No interaction-id header provided with inbound message')
+            raise tornado.web.HTTPError(400, 'No interaction-id header provided',
+                                        reason=f'No interaction-id header provided')
+        return interaction_id
+
+    def _extract_message_body(self):
+        try:
+            return json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
-            self.set_status(500)
             logger.error('001', f'Failed to parse message body: {e}')
-            return self.write(f'Failed to parse message body: {e}')
-
-        try:
-            scr = scr_update.SummaryCareRecord()
-            hl7 = scr.populate_template(scr_input_json)
-            logger.info("002", hl7)
-            self.write(scr_input_json)
-        except Exception as e:
-            self.set_status(500)
-            logger.error('003', f'Summary care message generation failed: {e}')
-            return self.write(f'Exception raised whilst populating hl7 message with json: {e}')
-
+            raise tornado.web.HTTPError(400, 'Failed to parse json body from request',
+                                        reason=f'Failed to parse json body from request: {str(e)}')
