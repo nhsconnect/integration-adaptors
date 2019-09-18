@@ -1,10 +1,10 @@
 import unittest
 from unittest import mock
-from message_handling import message_handler as mh
+from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
 
 
-class TestMessageHandler(unittest.TestCase):
+class TestMessageForwarder(unittest.TestCase):
 
     def test_call(self):
         template_mock = mock.MagicMock()

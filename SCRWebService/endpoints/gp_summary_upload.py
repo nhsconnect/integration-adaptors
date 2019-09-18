@@ -3,7 +3,7 @@ import tornado.web
 import tornado.ioloop
 import scr.gp_summary_update as scr_update
 import utilities.integration_adaptors_logger as log
-from message_handling import message_handler as mh
+from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
 
 logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
