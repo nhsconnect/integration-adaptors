@@ -88,7 +88,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         """
         content_type_header = f'{CONTENT_TYPE_HEADER_NAME}: {headers[CONTENT_TYPE_HEADER_NAME]}\r\n\r\n'
 
-        msg = email.message_from_string(content_type_header + message)
+        msg = email.message_from_string(content_type_header + message, policy=email.policy.HTTP)
 
         if msg.defects:
             logger.warning('0002', 'Found defects in MIME message during parsing. {Defects}',
@@ -97,7 +97,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         return msg
 
     @staticmethod
-    def _extract_message_parts(msg: email.message.Message) -> Tuple[str, str]:
+    def _extract_message_parts(msg: email.message.EmailMessage) -> Tuple[str, str]:
         """Extract the ebXML and payload parts of the message and return them as a tuple.
 
         :param msg: The message to extract parts from.
