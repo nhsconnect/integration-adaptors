@@ -1,6 +1,4 @@
-"""This module defines the asynchronous reliable workflow."""
-from typing import Tuple, Optional
-
+"""This module defines the asynchronous express workflow."""
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from tornado import httpclient
@@ -9,7 +7,9 @@ from typing import Tuple, Optional
 from utilities import timing
 
 from mhs_common import workflow
+from mhs_common.errors import ebxml_handler
 from mhs_common.errors.soap_handler import handle_soap_error
+from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
@@ -51,11 +51,11 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     async def handle_outbound_message(self, from_asid: Optional[str],
                                       message_id: str, correlation_id: str, interaction_details: dict,
                                       payload: str,
-                                      work_description_object: Optional[wd.WorkDescription]) \
+                                      wdo: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async reliable workflow to handle outbound message')
-        if not work_description_object:
+        if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store,
                                                  message_id,
                                                  workflow.ASYNC_RELIABLE,
@@ -64,16 +64,19 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             await wdo.publish()
 
         try:
-            url, to_party_key, cpa_id = await self._lookup_endpoint_details(interaction_details)
+            details = await self._lookup_endpoint_details(interaction_details)
+            url = details[self.ENDPOINT_URL]
+            to_party_key = details[self.ENDPOINT_PARTY_KEY]
+            cpa_id = details[self.ENDPOINT_CPA_ID]
         except Exception:
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            return 500, 'Error obtaining outbound URL'
+            return 500, 'Error obtaining outbound URL', None
 
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
                                                                               interaction_details,
                                                                               payload, wdo, to_party_key, cpa_id)
         if error:
-            return error
+            return error[0], error[1], None
 
         logger.info('0004', 'About to make outbound request')
         start_time = timing.get_time()
@@ -87,12 +90,17 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
         while True:
             try:
                 response = await self.transmission.make_request(url, http_headers, message)
+                code, body = ebxml_handler.handle_ebxml_error(response.code, response.headers, str(response.body))
+                if code == 500:
+                    logger.warning('0006', 'Error encountered whilst making outbound request. {Body}', {'Body': body})
+                    await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+                    return code, body, None
+
                 end_time = timing.get_time()
             except httpclient.HTTPClientError as e:
                 logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                                {'HTTPStatus': e.code, 'Exception': e})
-                self._record_outbound_audit_log(workflow.ASYNC_RELIABLE,
-                                                timing.get_time(),
+                self._record_outbound_audit_log(timing.get_time(),
                                                 start_time,
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
@@ -100,11 +108,11 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
                 if e.response:
                     # parse the SOAP error response
-                    soap_fault_code, soap_body, soap_fault_codes = \
+                    status, response, soap_fault_codes = \
                         handle_soap_error(e.response.code, e.response.headers, e.response.body)
 
                     if not self._is_soap_fault_retriable(soap_fault_codes):
-                        return soap_fault_code, soap_body
+                        return status, response,
 
                     retries_remaining -= 1
                     logger.warning("0015",
@@ -125,34 +133,57 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                     await asyncio.sleep(retry_interval / 1000)
                     continue
                 else:
-                    return 500, f'Error(s) received from Spine: {e}'
+                    return 500, f'Error(s) received from Spine: {e}', None
             except Exception as e:
-                logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+                logger.warning('0007', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
                 await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-                return 500, 'Error making outbound request'
+                return 500, 'Error making outbound request', None
 
             if response.code == 202:
-                self._record_outbound_audit_log(workflow.ASYNC_RELIABLE,
-                                                end_time,
+                self._record_outbound_audit_log(end_time,
                                                 start_time,
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
                 await wd.update_status_with_retries(wdo, wdo.set_outbound_status, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
                                                     self.store_retries)
-                return 202, ''
+                return 202, '', None
             else:
                 logger.warning('0008', "Didn't get expected HTTP status 202 from Spine, got {HTTPStatus} instead",
                                {'HTTPStatus': response.code})
-                self._record_outbound_audit_log(workflow.ASYNC_RELIABLE,
-                                                end_time,
+                self._record_outbound_audit_log(end_time,
                                                 start_time,
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
                 await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-                return 500, "Didn't get expected success response from Spine"
+                return 500, "Didn't get expected success response from Spine", None
+
+    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
+        logger.audit('0009', 'Async-reliable workflow invoked. Message sent to Spine and {Acknowledgment} received. '
+                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
+                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
+                      'Acknowledgment': acknowledgment})
+
+    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
+                                          to_party_key, cpa_id):
+        try:
+            interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
+            interaction_details[ebxml_request_envelope.MESSAGE] = payload
+            interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
+            interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
+            interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
+            interaction_details[ebxml_envelope.CPA_ID] = cpa_id
+            _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
+        except Exception as e:
+            logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+            return (500, 'Error serialising outbound message'), None, None
+
+        logger.info('0003', 'Message serialised successfully')
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
+        return None, http_headers, message
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
-        logger.info('0009', 'Entered async reliable workflow to handle inbound message')
+        logger.info('0010', 'Entered async reliable workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
@@ -165,7 +196,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                                                          'correlation-id': correlation_id})
                 break
             except Exception as e:
-                logger.warning('0010', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
+                logger.warning('0011', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
                 retries_remaining -= 1
                 if retries_remaining <= 0:
                     logger.error("0012",
@@ -179,7 +210,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                     "queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
-        logger.info('0011', 'Placed message onto inbound queue successfully')
+        logger.info('0014', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
     def _is_soap_fault_retriable(self, soap_fault_codes):
@@ -190,7 +221,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
         return True
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
-        raise NotImplementedError()
+        pass
 
     async def set_failure_message_response(self, wdo: wd.WorkDescription):
-        raise NotImplementedError()
+        pass

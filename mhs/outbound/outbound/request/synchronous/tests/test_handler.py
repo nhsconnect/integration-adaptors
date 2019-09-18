@@ -322,6 +322,7 @@ class TestSynchronousHandlerSyncMessage(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.workflow = unittest.mock.Mock(spec=synchronous.SynchronousWorkflow)
+        self.workflow.workflow_specific_interaction_details = {}
         self.sync_async_workflow = unittest.mock.MagicMock()
         self.config_manager = unittest.mock.Mock()
         return tornado.web.Application([

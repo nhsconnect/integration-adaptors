@@ -39,13 +39,6 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
         super().__init__(routing)
 
-    def _record_outbound_audit_log(self, workflow, end_time, start_time, acknowledgment):
-        logger.audit('0007', '{workflow} workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{RequestSentTime} {AcknowledgmentReceivedTime}', {'workflow': workflow,
-                                                                                'RequestSentTime': start_time,
-                                                                                'AcknowledgmentReceivedTime': end_time,
-                                                                                'Acknowledgment': acknowledgment})
-
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key, cpa_id):
         try:
