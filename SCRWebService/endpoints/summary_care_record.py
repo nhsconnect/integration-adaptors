@@ -9,7 +9,7 @@ import utilities.integration_adaptors_logger as log
 from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
 
-logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
+logger = log.IntegrationAdaptorsLogger('SCR_ENDPOINT')
 
 
 class SummaryCareRecord(tornado.web.RequestHandler):
@@ -32,7 +32,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         :return:
         """
 
-        logger.info('001', 'Message received for gp summary upl')
+        logger.info('001', 'Message received for gp summary upload')
         scr_input_json = self._extract_message_body()
         interaction_name = self._extract_interaction_name()
         logger.info('002', 'Extracted message content, attempting to forward the message')
@@ -73,6 +73,6 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         try:
             return json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
-            logger.error('001', f'Failed to parse message body: {e}')
+            logger.error('004', 'Exception raised whilst parsing message body: {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Failed to parse json body from request',
-                                        reason=f'Failed to parse json body from request: {str(e)}')
+                                        reason=f'Exception raised while parsing message body: {str(e)}')

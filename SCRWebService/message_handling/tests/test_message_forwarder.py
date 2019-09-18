@@ -17,9 +17,9 @@ class TestMessageForwarder(unittest.TestCase):
         handler.forward_message_to_mhs('interaction', input_json)
         template_mock.populate_template.assert_called_with(input_json)
 
-    def test_exception_raised_during_population_is_raised(self):
+    def test_exceptions_raised_during_message_population_are_caught_and_raised_as_MessageGenerationError(self):
         template_mock = mock.MagicMock()
-        template_mock.populate_template.side_effect = MessageGenerationError('Exception')
+        template_mock.populate_template.side_effect = Exception('Exception')
 
         interactions_map = {'interaction': template_mock}
         handler = mh.MessageForwarder(interactions_map)
