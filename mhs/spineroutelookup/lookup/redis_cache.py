@@ -84,11 +84,11 @@ class RedisCache(cache_adaptor.CacheAdaptor):
             logger.info("0007", "Attempting to store {value} in the cache using {key}",
                         {"value": json_value, "key": key})
             await event_loop.run_in_executor(None, self._redis_client.setex, key, self.expiry_time, json_value)
+            logger.info("0009", "Successfully stored {value} in the cache using {key}",
+                        {"value": json_value, "key": key})
         except redis.RedisError as re:
             logger.warning("0008", "An error occurred when caching {value}. {exception}",
                            {"value": json_value, "exception": re})
-
-        logger.info("0009", "Successfully stored {value} in the cache using {key}", {"value": json_value, "key": key})
 
     @staticmethod
     def _generate_key(ods_code: str, interaction_id: str) -> str:
