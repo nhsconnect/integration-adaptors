@@ -42,11 +42,7 @@ class TestConfig(unittest.TestCase):
 
         self.assertEqual("111", config.get_config("LOG_LEVEL", default="111"))
 
-    def test_get_config_default_none(self, mock_environ):
-        mock_environ["PREFIX_TEST"] = "123"
-
-        config.setup_config("PREFIX")
-
+    def test_get_config_default_none(self, unused):
         self.assertIsNone(config.get_config("LOG_LEVEL", default=None))
 
     @patch('sys.stdout', new_callable=io.StringIO)
@@ -64,5 +60,5 @@ class TestConfig(unittest.TestCase):
             config.get_config("BLAH")
 
         output = mock_stdout.getvalue()
-        self.assertIn('Failed to get config ConfigName:"BLAH" ProcessKey=CONFIG001', output)
+        self.assertIn('Failed to get config ConfigName:"BLAH" ProcessKey=CONFIG003', output)
         self.assertIn("LogLevel=ERROR", output)
