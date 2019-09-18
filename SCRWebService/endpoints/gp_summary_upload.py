@@ -1,4 +1,3 @@
-import os
 import json
 import tornado.web
 import tornado.ioloop
@@ -10,7 +9,7 @@ from builder.pystache_message_builder import MessageGenerationError
 logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
 
 
-class GpSummaryUpload(tornado.web.RequestHandler):
+class SummaryCareRecord(tornado.web.RequestHandler):
 
     def initialize(self, handler: mh.MessageHandler) -> None:
         self.handler = handler
@@ -31,7 +30,7 @@ class GpSummaryUpload(tornado.web.RequestHandler):
 
     def _process_message(self, interaction_name, scr_input_json):
         try:
-            result = self.handler.forward_message_to_mhs(scr_input_json)
+            result = self.handler.forward_message_to_mhs(interaction_name, scr_input_json)
             return result
         except MessageGenerationError as e:
             logger.error('003', 'Failed to generate message {exception}', {'exception': e})

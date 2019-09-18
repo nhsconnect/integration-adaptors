@@ -18,7 +18,7 @@ class MessageHandler(object):
     def __init__(self):
         self.message_generator = gp_summary_update.SummaryCareRecord()
 
-    def forward_message_to_mhs(self, message_contents: str):
+    def forward_message_to_mhs(self, interaction_name, message_contents: str):
         populated_message = self._populate_message_template(message_contents)
 
     def _populate_message_template(self, supplier_message_parameters: str) -> str:

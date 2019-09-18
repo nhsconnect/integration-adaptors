@@ -20,7 +20,7 @@ class TestGpSummaryUploadHandler(AsyncHTTPTestCase):
         self.handler = mock.MagicMock()
 
         return Application([
-            (r'/gp_summary_upload', gp_summary_upload.GpSummaryUpload,
+            (r'/gp_summary_upload', gp_summary_upload.SummaryCareRecord,
              dict(handler=self.handler))
         ])
 
