@@ -251,6 +251,19 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
         {
           name = "MHS_DISABLE_SDS_TLS"
           value = var.spineroutelookup_service_disable_sds_tls
+        },
+        {
+          name = "MHS_SDS_REDIS_CACHE_HOST"
+          value = aws_elasticache_replication_group.elasticache_replication_group.primary_endpoint_address
+        },
+        {
+          name = "MHS_SDS_REDIS_CACHE_PORT"
+          value = tostring(aws_elasticache_replication_group.elasticache_replication_group.port)
+        },
+        # TODO: This shouldn't need to be set!
+        {
+          name = "MHS_SDS_REDIS_DISABLE_TLS"
+          value = "True"
         }
       ]
       secrets = [
