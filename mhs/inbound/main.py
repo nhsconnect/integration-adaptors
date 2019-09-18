@@ -55,8 +55,8 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
 
     :param persistence_store: persistence store adaptor for message information
     :param local_certs_file: The filename of the certificate to present for authentication.
-    :param ca_certs_file: The filename of the CA certificates that form the certificate chain for the certificate
-    identified by local_certs_file.
+    :param ca_certs_file: The filename of the CA certificates as passed to
+    ssl.SSLContext.load_verify_locations
     :param key_file: The filename of the private key for the certificate identified by local_certs_file.
     :param workflows: The workflows to be used to handle messages.
     :param party_key: The party key to use to identify this MHS.
