@@ -4,10 +4,11 @@ from typing import Dict
 import tornado.web
 import tornado.ioloop
 import utilities.integration_adaptors_logger as log
+from utilities import message_utilities
+
 from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
 from message_handling.message_forwarder import MessageSendingError
-
 
 logger = log.IntegrationAdaptorsLogger('SCR_ENDPOINT')
 
@@ -34,11 +35,16 @@ class SummaryCareRecord(tornado.web.RequestHandler):
 
         scr_input_json = self._extract_message_body()
         interaction_name = self._extract_interaction_name()
+        correlation_id = self._extract_correlation_id()
+        message_id = self._extract_message_id()
         logger.info('002', 'Extracted message content, attempting to forward the message')
-        response = await self._process_message(interaction_name, scr_input_json)
+        response = await self._process_message(interaction_name, scr_input_json, message_id, correlation_id)
         self.write(response)
 
-    async def _process_message(self, interaction_name: str, scr_input_json: Dict):
+    async def _process_message(self, interaction_name: str,
+                               scr_input_json: Dict,
+                               message_id: str,
+                               correlation_id: str):
         """
         Processes the outbound message by delegating to the forwarder
         :param interaction_name: Human readable name of the interaction
@@ -46,7 +52,11 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         :return: Result of forwarding the message to the MHS
         """
         try:
-            result = await self.forwarder.forward_message_to_mhs(interaction_name, scr_input_json)
+            result = await self.forwarder.forward_message_to_mhs(interaction_name,
+                                                                 scr_input_json,
+                                                                 message_id,
+                                                                 correlation_id
+                                                                 )
             return result
         except MessageGenerationError as e:
             logger.error('003', 'Failed to generate message {exception}', {'exception': e})
@@ -80,3 +90,27 @@ class SummaryCareRecord(tornado.web.RequestHandler):
             logger.error('004', 'Exception raised whilst parsing message body: {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Failed to parse json body from request',
                                         reason=f'Exception raised while parsing message body: {str(e)}')
+
+    def _extract_correlation_id(self):
+        """
+        Attempts to extract the correlation-id from the message headers, if this fails a new one is generated,
+        either way the correlation id is set in the logger
+        :return: A UUID
+        """
+        correlation_id = self.request.headers.get('Correlation-Id', None)
+        if not correlation_id:
+            correlation_id = message_utilities.MessageUtilities.get_uuid()
+            log.correlation_id.set(correlation_id)
+            logger.info('005', "Failed to extract correlation-id from message, generated a new one")
+        else:
+            log.correlation_id.set(correlation_id)
+            logger.info('006', 'Found correlation id on incoming request.')
+        return correlation_id
+
+    def _extract_message_id(self):
+        """
+        Attempts to extract a message id from the headers, there is no consequence for not providing this as the
+        SCR adaptor doesn't use message id, and the MHS will generate one
+        :return:
+        """
+        return self.request.headers.get('Message-Id', None)

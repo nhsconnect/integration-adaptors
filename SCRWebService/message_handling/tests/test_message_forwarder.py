@@ -18,7 +18,7 @@ class TestMessageForwarder(unittest.TestCase):
 
         handler = mh.MessageForwarder(interactions_map, sender_mock)
         input_json = {'check': 'one'}
-        await handler.forward_message_to_mhs('interaction', input_json)
+        await handler.forward_message_to_mhs('interaction', input_json, None, None)
         template_mock.populate_template.assert_called_with(input_json)
 
     @async_test
@@ -32,7 +32,7 @@ class TestMessageForwarder(unittest.TestCase):
         input_json = {'check': 'one'}
 
         with self.assertRaises(MessageGenerationError) as e:
-            await handler.forward_message_to_mhs('interaction', input_json)
+            await handler.forward_message_to_mhs('interaction', input_json, None, None)
             self.assertEqual(str(e), 'Exception')
 
     @async_test
@@ -42,5 +42,5 @@ class TestMessageForwarder(unittest.TestCase):
         input_json = {'check': 'one'}
 
         with self.assertRaises(MessageGenerationError) as e:
-            await handler.forward_message_to_mhs('interaction', input_json)
+            await handler.forward_message_to_mhs('interaction', input_json, None, None)
             self.assertEqual(str(e), 'Failed to find interaction with interaction name: interaction')
