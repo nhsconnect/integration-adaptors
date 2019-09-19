@@ -1,9 +1,8 @@
 import unittest
 from pathlib import Path
-
+from builder.pystache_message_builder import MessageGenerationError
 from utilities.file_utilities import FileUtilities
 from utilities.xml_utilities import XmlUtilities
-
 from scr_definitions import ROOT_DIR
 from scr.gp_summary_update import SummaryCareRecord
 
@@ -47,16 +46,20 @@ class FullTest(unittest.TestCase):
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
-    def test_empty_hash(self):
+    def test_should_raise_exception_when_hash_is_empty(self):
         """
         Tests the contents are empty when a completely blank hash is provided
         """
-        expected_xml_file_path = str(self.xmlFileDir / 'EmptyHash.xml')
         hash_file_path = str(self.hashFileDir / 'EmptyHash.json')
 
-        expected_string = FileUtilities.get_file_string(expected_xml_file_path)
-        render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        XmlUtilities.assert_xml_equal(expected_string, render)
+        with self.assertRaises(MessageGenerationError):
+            self.summaryCareRecord.populate_template_with_file(hash_file_path)
+
+    def test_should_raise_exception_when_missing_element_in_input_dict(self):
+        hash_file_path = str(self.hashFileDir / 'missingTag.json')
+
+        with self.assertRaises(MessageGenerationError):
+            self.summaryCareRecord.populate_template_with_file(hash_file_path)
 
     def test_replacementOf(self):
         """
