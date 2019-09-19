@@ -53,7 +53,7 @@ MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_ASID = 'uniqueIdentifier'
-MHS_RETRY_INTERVAL_VAL = 10 / 1000
+MHS_RETRY_INTERVAL_VAL = 'PT1S'
 MHS_RETRY_VAL = 3
 
 TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
