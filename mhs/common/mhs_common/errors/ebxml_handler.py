@@ -61,7 +61,7 @@ def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Option
     """
 
     if code != 200 or not body:
-        logger.warning('0001', 'Not HTTP 200 response. {Code} {Body}', {'Code': code, 'Body': body})
+        logger.info('0001', 'Not HTTP 200 response. {Code} {Body}', {'Code': code, 'Body': body})
         return code, body
 
     if 'Content-Type' not in headers:
