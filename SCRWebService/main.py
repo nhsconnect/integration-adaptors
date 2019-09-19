@@ -7,7 +7,6 @@ import utilities.integration_adaptors_logger as log
 from message_handling import message_forwarder, message_sender
 from scr import gp_summary_upload
 
-
 logger = log.IntegrationAdaptorsLogger('SCR-WEB')
 
 

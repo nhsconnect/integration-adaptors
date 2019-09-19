@@ -55,7 +55,8 @@ class FullTest(unittest.TestCase):
         with self.assertRaises(MessageGenerationError):
             self.summaryCareRecord.populate_template_with_file(hash_file_path)
 
-    def test_should_raise_exception_when_missing_element_in_input_dict_(self):
+    def test_should_raise_exception_when_missing_element_in_input_dict(self):
+
         hash_file_path = str(self.hashFileDir / 'missingTag.json')
 
         with self.assertRaises(MessageGenerationError):

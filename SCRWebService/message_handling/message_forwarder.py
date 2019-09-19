@@ -1,11 +1,11 @@
 """Module related to processing of an outbound message"""
 from typing import Dict
-
 from utilities import integration_adaptors_logger as log
 from builder.pystache_message_builder import MessageGenerationError
 from message_handling.message_sender import MessageSender
 
 logger = log.IntegrationAdaptorsLogger('MSG-HANDLER')
+
 
 
 class MessageSendingError(Exception):
@@ -26,6 +26,7 @@ class MessageForwarder(object):
         self.message_sender = message_sender
 
     async def forward_message_to_mhs(self, interaction_name: str, message_contents: Dict):
+
         """
         Handles forwarding a given interaction to the MHS, including populating the appropriate message template
         :param interaction_name: The human readable name associated with a particular interaction
@@ -76,3 +77,4 @@ class MessageForwarder(object):
         except Exception as e:
             logger.error('003', 'Exception raised during message sending: {exception}', {'exception': e})
             raise MessageSendingError(str(e)) from e
+

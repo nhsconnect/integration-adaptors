@@ -10,6 +10,7 @@ from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
 from message_handling.message_forwarder import MessageSendingError
 
+
 logger = log.IntegrationAdaptorsLogger('SCR_ENDPOINT')
 
 
@@ -26,6 +27,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         :return:
         """
         self.forwarder = forwarder
+
 
     async def post(self):
         """
@@ -54,6 +56,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
             logger.error('003', 'Failed to generate message {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Error whilst generating message',
                                         reason=f'Error whilst generating message: {str(e)}')
+
         except MessageSendingError as e:
             logger.error('004', 'Exception raised whilst attempting to send the message to the MHS {exception}',
                          {'exception': e})

@@ -3,7 +3,7 @@ import json
 import pathlib
 
 from builder.pystache_message_builder import MessageGenerationError
-from utilities import file_utilities
+from utilities import file_utilities, test_utilities
 from definitions import ROOT_DIR
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
@@ -28,7 +28,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     def test_handler_returns_message_processing_response(self):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
-        self.forwarder.forward_message_to_mhs.return_value = "Nice response message"
+        self.forwarder.forward_message_to_mhs.return_value = test_utilities.awaitable("Nice response message")
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
                               body=json.dumps(body))
 
