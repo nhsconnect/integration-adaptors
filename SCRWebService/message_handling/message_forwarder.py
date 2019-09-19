@@ -6,9 +6,15 @@ from message_handling.message_sender import MessageSender
 
 logger = log.IntegrationAdaptorsLogger('MSG-HANDLER')
 
+
 class MessageSendingError(Exception):
     """Error raised during message sending"""
-    pass
+
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
 
 
 class MessageForwarder(object):

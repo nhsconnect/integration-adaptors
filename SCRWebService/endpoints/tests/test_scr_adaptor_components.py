@@ -2,7 +2,7 @@
 import json
 import pathlib
 from scr import gp_summary_upload
-from utilities import file_utilities, test_utilities
+from utilities import file_utilities, test_utilities, xml_utilities
 from definitions import ROOT_DIR
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
@@ -32,8 +32,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_scr_adaptor_calls_mhs_end_point_happy_path(self, request_mock):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
-        expected_message = file_utilities.FileUtilities.get_file_string(populated_message_path)\
-            .replace("\\r\\n", "\r\n")
+        expected_message = file_utilities.FileUtilities.get_file_string(populated_message_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
@@ -41,9 +40,14 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
                               headers={'interaction-name': 'SCR_GP_SUMMARY_UPLOAD'},
                               body=json.dumps(body))
 
-        request_mock.assert_called_with(headers={'Interaction-Id': 'REPC_IN150016UK05', 'sync-async': 'true'},
-                                        url=self.address,
-                                        body=expected_message, method='POST',)
+        body_call_value = request_mock.call_args[1]['body']
+        call_method = request_mock.call_args[1]['method']
+        url_method = request_mock.call_args[1]['url']
+        
+        xml_utilities.XmlUtilities.assert_xml_equal(body_call_value, expected_message)
+        self.assertEqual(call_method, 'POST')
+        self.assertEqual(url_method, self.address)
+
         self.assertEqual(response.body.decode(), "Response message")
 
     @mock.patch('comms.common_https.CommonHttps.make_request')

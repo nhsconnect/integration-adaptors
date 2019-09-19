@@ -32,7 +32,6 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         :return:
         """
 
-        logger.info('001', 'Message received for gp summary upload')
         scr_input_json = self._extract_message_body()
         interaction_name = self._extract_interaction_name()
         logger.info('002', 'Extracted message content, attempting to forward the message')
@@ -53,7 +52,6 @@ class SummaryCareRecord(tornado.web.RequestHandler):
             logger.error('003', 'Failed to generate message {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Error whilst generating message',
                                         reason=f'Error whilst generating message: {str(e)}')
-
         except MessageSendingError as e:
             logger.error('004', 'Exception raised whilst attempting to send the message to the MHS {exception}',
                          {'exception': e})
