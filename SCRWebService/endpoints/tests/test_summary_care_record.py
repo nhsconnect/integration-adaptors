@@ -35,7 +35,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.forwarder.forward_message_to_mhs.assert_called_once_with("123", body)
         self.assertEqual(response.body.decode(), "Nice response message")
 
-    def test_empty_body_request_fails(self):
+    def test_null_body_request_fails(self):
         body = ''
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', body=body)
 
