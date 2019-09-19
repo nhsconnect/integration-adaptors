@@ -57,15 +57,15 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        expected_message = file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
-        # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
-        # file, so normalize the line endings of the strings being compared
-        self.normalized_expected_serialized_message = file_utilities.FileUtilities.normalize_line_endings(
-            expected_message)
+        self.normalized_expected_serialized_message = self.get_expected_file_string(EXPECTED_EBXML)
+
+    #####################
+    # Serialisation tests
+    #####################
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_serialize(self, mock_get_uuid, mock_get_timestamp):
+    def test_serialize_with_no_attachments(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
 
@@ -78,6 +78,62 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
         self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(self.normalized_expected_serialized_message, normalized_message)
+
+    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_serialize_with_one_attachment(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_uuid.side_effect = ["8F1D7DE1-02AB-48D7-A797-A947B09F347F", test_ebxml_envelope.MOCK_UUID]
+        mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
+
+        message_dictionary = get_test_message_dictionary()
+        message_dictionary[ebxml_request_envelope.ATTACHMENTS] = [{
+            ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+            ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
+            ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
+        }]
+        envelope = ebxml_request_envelope.EbxmlRequestEnvelope(message_dictionary)
+
+        message_id, http_headers, message = envelope.serialize()
+
+        normalized_expected_message = self.get_expected_file_string('ebxml_request_one_attachment.xml')
+        normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+
+        self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
+        self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
+        self.assertEqual(normalized_expected_message, normalized_message)
+
+    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_serialize_with_multiple_attachments(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_uuid.side_effect = [
+            "8F1D7DE1-02AB-48D7-A797-A947B09F347F", "64A73E03-30BD-4231-9959-0C4B54400345",
+            test_ebxml_envelope.MOCK_UUID
+        ]
+        mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
+
+        message_dictionary = get_test_message_dictionary()
+        message_dictionary[ebxml_request_envelope.ATTACHMENTS] = [
+            {
+                ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+                ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
+                ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
+            },
+            {
+                ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'image/png',
+                ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Another description',
+                ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'QW5vdGhlciBwYXlsb2Fk'
+            }
+        ]
+        envelope = ebxml_request_envelope.EbxmlRequestEnvelope(message_dictionary)
+
+        message_id, http_headers, message = envelope.serialize()
+
+        normalized_expected_message = self.get_expected_file_string('ebxml_request_multiple_attachments.xml')
+        normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+
+        self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
+        self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
+        self.assertEqual(normalized_expected_message, normalized_message)
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
@@ -114,7 +170,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_serialize_optional_tags(self, mock_get_uuid, mock_get_timestamp):
+    def test_serialize_boolean_tag_set_to_false(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
 
@@ -123,10 +179,10 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             (ebxml_request_envelope.ACK_REQUESTED, 'eb:AckRequested'),
             (ebxml_request_envelope.SYNC_REPLY, 'eb:SyncReply')
         ]
-        for optional_tag, optional_xml_tag in test_cases:
-            with self.subTest(optional_tag=optional_tag):
+        for boolean_tag, boolean_xml_tag in test_cases:
+            with self.subTest(boolean_tag=boolean_tag):
                 message_dictionary = get_test_message_dictionary()
-                message_dictionary[optional_tag] = False
+                message_dictionary[boolean_tag] = False
                 envelope = ebxml_request_envelope.EbxmlRequestEnvelope(message_dictionary)
 
                 message_id, http_headers, message = envelope.serialize()
@@ -136,7 +192,11 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
                 self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
                 self.assertNotEqual(self.normalized_expected_serialized_message, normalized_message)
-                self.assertNotIn(optional_xml_tag, normalized_message)
+                self.assertNotIn(boolean_xml_tag, normalized_message)
+
+    #######################
+    # Deserialisation tests
+    #######################
 
     def test_from_string(self):
         with self.subTest("A valid request containing a payload"):
@@ -200,7 +260,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
                 expected_values_with_payload[key] = False
 
-                parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+                parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS,
+                                                                                         message)
 
                 self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
@@ -222,3 +283,13 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             with self.assertRaisesRegex(
                     ebxml_envelope.EbXmlParsingError, "Weren't able to find required attribute actor"):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+    #######################
+    # Helper methods
+    #######################
+
+    def get_expected_file_string(self, filename: str):
+        # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
+        # file, so normalize the line endings of the strings being compared
+        return file_utilities.FileUtilities.normalize_line_endings(
+            file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / filename)))

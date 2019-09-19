@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
+import copy
 import email
 import email.message
 import email.policy
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple, Union, List
 from xml.etree.ElementTree import Element
 
 from defusedxml import ElementTree
-from utilities import integration_adaptors_logger as log
+from utilities import integration_adaptors_logger as log, message_utilities
 
 from mhs_common.messages import ebxml_envelope
 
@@ -26,6 +27,11 @@ ACK_REQUESTED = "ack_requested"
 ACK_SOAP_ACTOR = "ack_soap_actor"
 SYNC_REPLY = "sync_reply"
 
+ATTACHMENTS = 'attachments'
+ATTACHMENT_CONTENT_ID = 'content_id'
+ATTACHMENT_CONTENT_TYPE = 'content_type'
+ATTACHMENT_PAYLOAD = 'payload'
+ATTACHMENT_DESCRIPTION = 'description'
 EBXML_CONTENT_TYPE_VALUE = 'multipart/related; boundary="--=_MIME-Boundary"; type=text/xml; ' \
                            'start=ebXMLHeader@spine.nhs.uk'
 
@@ -33,7 +39,7 @@ EBXML_CONTENT_TYPE_VALUE = 'multipart/related; boundary="--=_MIME-Boundary"; typ
 class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     """An envelope that contains a request to be sent asynchronously to a remote MHS."""
 
-    def __init__(self, message_dictionary: Dict[str, Union[str, bool]]):
+    def __init__(self, message_dictionary: Dict[str, Union[str, bool, List[Dict[str, str]]]]):
         """Create a new EbxmlRequestEnvelope that populates the message with the provided dictionary.
 
         :param message_dictionary: The dictionary of values to use when populating the template.
@@ -51,13 +57,31 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                 'ack_requested': True,
                 'ack_soap_actor': 'urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH',
                 'sync_reply': True,
-                'hl7_message': '<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>'
+                'hl7_message': '<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>',
+                'attachments': [ # Optional, defaults to empty list if not set
+                    {
+                        'content_type': 'text/plain',
+                        'payload': 'Some text here',
+                        'description': 'Attachment description'
+                    },
+                    {
+                        'content_type': 'image/png',
+                        'payload': 'base64-encoded content here',
+                        'description': 'Another attachment description'
+                    }
+                ]
             }
         """
         super().__init__(EBXML_TEMPLATE, message_dictionary)
 
-    def serialize(self) -> Tuple[str, Dict[str, str], str]:
-        message_id, http_headers, message = super().serialize()
+    def serialize(self, message_dictionary=None) -> Tuple[str, Dict[str, str], str]:
+        message_dictionary = copy.deepcopy(self.message_dictionary)
+
+        for attachment in message_dictionary.setdefault(ATTACHMENTS, []):
+            attachment[ATTACHMENT_CONTENT_ID] = message_utilities.MessageUtilities.get_uuid()
+
+        message_id, http_headers, message = super().serialize(message_dictionary=message_dictionary)
+
         http_headers[CONTENT_TYPE_HEADER_NAME] = EBXML_CONTENT_TYPE_VALUE
         return message_id, http_headers, message
 
