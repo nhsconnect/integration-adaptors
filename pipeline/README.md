@@ -187,9 +187,9 @@ with `amqps://` and not `amqp+ssl://`. This URL should not include the queue nam
 messages on. e.g `queue-name`
 - INBOUND_QUEUE_USERNAME_ARN: The ARN (in secrets manager) of the username to use when connecting to the AMQP inbound
 queue.
-- MHS_INBOUND_QUEUE_USERNAME: The username to use when connecting to the AMQP inbound queue (used by the integration
+- MHS_SECRET_INBOUND_QUEUE_USERNAME: The username to use when connecting to the AMQP inbound queue (used by the integration
 tests)
-- MHS_INBOUND_QUEUE_PASSWORD: The password to use when connecting to the AMQP inbound queue (used by the integration
+- MHS_SECRET_INBOUND_QUEUE_PASSWORD: The password to use when connecting to the AMQP inbound queue (used by the integration
 tests)
 - INBOUND_QUEUE_PASSWORD_ARN: The ARN (in secrets manager) of the password to use when connecting to the AMQP inbound
 queue.

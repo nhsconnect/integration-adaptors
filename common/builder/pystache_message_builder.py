@@ -13,6 +13,10 @@ class PystacheMessageBuilder(object):
 
     def __init__(self, template_dir, template_file):
         """Create a new PystacheMessageBuilder that uses the specified template file.
+
+        ** Note: Is it expected behavior that pystache should fail if there are missing tags - This should not be
+        ** changed without strong reason as it is the mechanism for assuring message contents is valid within other
+        ** services.
         :param template_dir: The directory to load template files from
         :param template_file: The template file to populate with values.
         """

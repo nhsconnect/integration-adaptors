@@ -1,7 +1,6 @@
 """This module defines the outbound transmission component."""
 
 import asyncio
-from pathlib import Path
 from ssl import SSLError
 from typing import Dict
 
@@ -23,22 +22,21 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
 
     """A component that sends HTTP requests to a remote MHS."""
 
-    def __init__(self, certs_dir: str, client_cert: str, client_key: str, ca_certs: str, max_retries: int,
+    def __init__(self, client_cert: str, client_key: str, ca_certs: str, max_retries: int,
                  retry_delay: int, http_proxy_host: str = None, http_proxy_port: int = None):
         """Create a new OutboundTransmission that loads certificates from the specified directory.
 
-        :param certs_dir: A string containing the path to the directory to load certificates from.
-        :param client_cert: A string containing the name of the client certificate file in the certs directory.
-        :param client_key: A string containing the name of the client private key file in the certs directory.
-        :param ca_certs: A string containing the name of the certificate authority certificate file in the certs directory.
+        :param client_cert: A string containing the filepath of the client certificate file.
+        :param client_key: A string containing the filepath of the client private key file.
+        :param ca_certs: A string containing the filepath of the certificate authority certificate file.
         :param max_retries: An integer with the value of the max number times to retry sending the request.
         :param retry_delay: An integer representing the delay (in milliseconds) to use between retry attempts.
         :param http_proxy_host The hostname of the HTTP proxy to be used.
         :param http_proxy_port The port of the HTTP proxy to be used.
         """
-        self._client_cert = str(Path(certs_dir) / client_cert)
-        self._client_key = str(Path(certs_dir) / client_key)
-        self._ca_certs = str(Path(certs_dir) / ca_certs)
+        self._client_cert = client_cert
+        self._client_key = client_key
+        self._ca_certs = ca_certs
         self._max_retries = max_retries
         self._retry_delay = retry_delay
 

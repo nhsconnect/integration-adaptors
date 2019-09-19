@@ -1,12 +1,14 @@
+"""Module containing methodology for populating a Gp Summary Upload template"""
 import json
 from pathlib import Path
-
 from builder.pystache_message_builder import PystacheMessageBuilder
 
 from scr_definitions import ROOT_DIR
 
 
 class SummaryCareRecord(object):
+    """Class for populating a Gp Summary Upload template"""
+
     summaryCareRecordPath = Path(ROOT_DIR) / "data/templates"
 
     def __init__(self):
