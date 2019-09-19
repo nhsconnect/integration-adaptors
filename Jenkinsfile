@@ -190,7 +190,9 @@ pipeline {
         }
 
         stage('Cleanup docker images') {
-            sh label: 'Removing unused docker images', script: "docker image prune --all --force"
+            steps {
+                sh label: 'Removing unused docker images', script: "docker image prune --all --force"
+            }
         }
     }
 
