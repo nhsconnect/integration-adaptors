@@ -12,6 +12,7 @@ tornado = "*"
 python-qpid-proton = "*"
 pystache = "*"
 lxml = "*"
+isodate = "*"
 
 [requires]
 python_version = "3.7"

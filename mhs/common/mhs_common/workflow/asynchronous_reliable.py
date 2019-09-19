@@ -1,4 +1,6 @@
 """This module defines the asynchronous express workflow."""
+from isodate import isoerror
+
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from tornado import httpclient
@@ -17,6 +19,8 @@ from mhs_common.workflow import common_asynchronous
 from mhs_common.routing import routing_reliability
 from exceptions import MaxRetriesExceeded
 import asyncio
+
+from utilities.xml_utilities import XmlUtilities
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_RELIABLE_WORKFLOW')
 
@@ -83,7 +87,12 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
         # fetch the reliability details in case a retry is required
         reliability_details = await self._lookup_reliability_details(interaction_details)
-        retry_interval = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL][0]
+        retry_interval_xml_datetime = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL][0]
+        try:
+            retry_interval = XmlUtilities.convert_xml_date_time_format_to_seconds(retry_interval_xml_datetime)
+        except isoerror.ISO8601Error:
+            return 500, 'Error when converting retry interval: {} to seconds'.format(retry_interval_xml_datetime), None
+
         num_of_retries = reliability_details[common_asynchronous.MHS_RETRIES]
 
         retries_remaining = num_of_retries
@@ -130,7 +139,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
                     logger.info("0016", "Waiting for {retry_interval} milliseconds before next request attempt.",
                                 {"retry_interval": retry_interval})
-                    await asyncio.sleep(retry_interval / 1000)
+                    await asyncio.sleep(retry_interval)
                     continue
                 else:
                     return 500, f'Error(s) received from Spine: {e}', None

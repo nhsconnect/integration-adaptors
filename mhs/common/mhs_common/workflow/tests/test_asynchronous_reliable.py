@@ -4,6 +4,8 @@ from pathlib import Path
 from unittest import mock
 from unittest.mock import patch
 
+from isodate import isoerror
+
 from definitions import ROOT_DIR
 from utilities.file_utilities import FileUtilities
 
@@ -18,6 +20,7 @@ from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
+from utilities.xml_utilities import XmlUtilities
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
@@ -48,12 +51,11 @@ SERIALIZED_MESSAGE = 'serialized-message'
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
 INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
-
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_ASID = 'uniqueIdentifier'
-MHS_RETRY_INTERVAL_VAL = 10
+MHS_RETRY_INTERVAL_VAL = 10 / 1000
 MHS_RETRY_VAL = 3
 
 TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
