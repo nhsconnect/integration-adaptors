@@ -52,7 +52,7 @@ Content-Transfer-Encoding: 8bit
 ----=_MIME-Boundary--
 Content-Id: <8F1D7DE1-02AB-48D7-A797-A947B09F347F>
 Content-Type: text/plain
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 
 Some payload
 ----=_MIME-Boundary--

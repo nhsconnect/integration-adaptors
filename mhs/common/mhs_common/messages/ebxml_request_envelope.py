@@ -9,6 +9,7 @@ import email.policy
 from typing import Dict, Tuple, Union, List
 from xml.etree.ElementTree import Element
 
+from builder import pystache_message_builder
 from defusedxml import ElementTree
 from utilities import integration_adaptors_logger as log, message_utilities
 
@@ -30,6 +31,8 @@ SYNC_REPLY = "sync_reply"
 ATTACHMENTS = 'attachments'
 ATTACHMENT_CONTENT_ID = 'content_id'
 ATTACHMENT_CONTENT_TYPE = 'content_type'
+ATTACHMENT_BASE64 = 'is_base64'
+ATTACHMENT_CONTENT_TRANSFER_ENCODING = 'content_transfer_encoding'
 ATTACHMENT_PAYLOAD = 'payload'
 ATTACHMENT_DESCRIPTION = 'description'
 EBXML_CONTENT_TYPE_VALUE = 'multipart/related; boundary="--=_MIME-Boundary"; type=text/xml; ' \
@@ -62,11 +65,13 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                     {
                         'content_type': 'text/plain',
                         'payload': 'Some text here',
+                        'is_base64': False,
                         'description': 'Attachment description'
                     },
                     {
                         'content_type': 'image/png',
                         'payload': 'base64-encoded content here',
+                        'is_base64': True,
                         'description': 'Another attachment description'
                     }
                 ]
@@ -77,8 +82,21 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     def serialize(self, message_dictionary=None) -> Tuple[str, Dict[str, str], str]:
         message_dictionary = copy.deepcopy(self.message_dictionary)
 
+        attachment: dict
         for attachment in message_dictionary.setdefault(ATTACHMENTS, []):
             attachment[ATTACHMENT_CONTENT_ID] = message_utilities.MessageUtilities.get_uuid()
+            try:
+                attachment[ATTACHMENT_CONTENT_TRANSFER_ENCODING] = 'base64' if attachment.pop(ATTACHMENT_BASE64) \
+                    else '8bit'
+            except KeyError as e:
+                logger.error('0001',
+                             'Failed to find {Key} when generating message from {TemplateFile} . {ErrorMessage}',
+                             {'Key': f'{ATTACHMENTS}[].{ATTACHMENT_BASE64}', 'TemplateFile': EBXML_TEMPLATE,
+                              'ErrorMessage': e})
+                raise pystache_message_builder.MessageGenerationError(f'Failed to find '
+                                                                      f'key:{ATTACHMENTS}[].{ATTACHMENT_BASE64} when '
+                                                                      f'generating message from template '
+                                                                      f'file:{EBXML_TEMPLATE}') from e
 
         message_id, http_headers, message = super().serialize(message_dictionary=message_dictionary)
 
@@ -100,7 +118,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         cls._extract_more_values_from_xml_tree(xml_tree, extracted_values)
 
-        logger.info('0001', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
+        logger.info('0002', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
 
         if payload_part:
             extracted_values[MESSAGE] = payload_part
@@ -131,7 +149,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         msg = email.message_from_string(content_type_header + message, policy=email.policy.HTTP)
 
         if msg.defects:
-            logger.warning('0002', 'Found defects in MIME message during parsing. {Defects}',
+            logger.warning('0003', 'Found defects in MIME message during parsing. {Defects}',
                            {'Defects': msg.defects})
 
         return msg
@@ -153,7 +171,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         for i, part in enumerate(message_parts):
             if part.defects:
-                logger.warning('0003', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
+                logger.warning('0004', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
                                {'PartIndex': i, 'Defects': part.defects})
 
         ebxml_part = message_parts[0].get_payload()

@@ -88,6 +88,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         message_dictionary = get_test_message_dictionary()
         message_dictionary[ebxml_request_envelope.ATTACHMENTS] = [{
             ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+            ebxml_request_envelope.ATTACHMENT_BASE64: False,
             ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
             ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
         }]
@@ -115,11 +116,13 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         message_dictionary[ebxml_request_envelope.ATTACHMENTS] = [
             {
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+                ebxml_request_envelope.ATTACHMENT_BASE64: False,
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
             },
             {
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'image/png',
+                ebxml_request_envelope.ATTACHMENT_BASE64: True,
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Another description',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'QW5vdGhlciBwYXlsb2Fk'
             }
@@ -164,6 +167,32 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 test_message_dict = get_test_message_dictionary()
                 del test_message_dict[required_tag]
                 envelope = ebxml_request_envelope.EbxmlRequestEnvelope(test_message_dict)
+
+                with self.assertRaisesRegex(pystache_message_builder.MessageGenerationError, 'Failed to find key'):
+                    envelope.serialize()
+
+    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_serialize_attachment_required_tags(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
+
+        required_tags = [
+            ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE, ebxml_request_envelope.ATTACHMENT_BASE64,
+            ebxml_request_envelope.ATTACHMENT_DESCRIPTION, ebxml_request_envelope.ATTACHMENT_PAYLOAD
+        ]
+        for required_tag in required_tags:
+            with self.subTest(required_tag=required_tag):
+                mock_get_uuid.side_effect = ["8F1D7DE1-02AB-48D7-A797-A947B09F347F", test_ebxml_envelope.MOCK_UUID]
+
+                message_dictionary = get_test_message_dictionary()
+                message_dictionary[ebxml_request_envelope.ATTACHMENTS] = [{
+                    ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+                    ebxml_request_envelope.ATTACHMENT_BASE64: False,
+                    ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
+                    ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
+                }]
+                del message_dictionary[ebxml_request_envelope.ATTACHMENTS][0][required_tag]
+                envelope = ebxml_request_envelope.EbxmlRequestEnvelope(message_dictionary)
 
                 with self.assertRaisesRegex(pystache_message_builder.MessageGenerationError, 'Failed to find key'):
                     envelope.serialize()
