@@ -66,7 +66,7 @@
         "excerptForm": {
           "CareDocs": {
             "presentationText": {
-              "value": "<h1>header</h1>",
+              "value": "",
               "id": {
                 "root": "EA3BCDEB-A439-4984-A519-2EE25EB3F24C"
               },
@@ -82,37 +82,7 @@
               "extension": "9446245796"
             }
           }
-        },
-        "replacementOf": [
-          {
-            "priorMessageRef": {
-              "id": {
-                "root": "A05B9416-F700-48F1-99D8-98874D3406B9"
-              }
-            }
-          },
-          {
-            "priorMessageRef": {
-              "id": {
-                "root": "Code 2"
-              }
-            }
-          },
-          {
-            "priorMessageRef": {
-              "id": {
-                "root": "Code 3"
-              }
-            }
-          },
-          {
-            "priorMessageRef": {
-              "id": {
-                "root": "Code 4"
-              }
-            }
-          }
-        ]
+        }
       }
     }
   }
