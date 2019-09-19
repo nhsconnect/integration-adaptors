@@ -1,3 +1,4 @@
+import os
 import xml.etree.ElementTree as ET
 from unittest import TestCase
 
@@ -12,7 +13,7 @@ from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilde
 class SynchronousWorkflowTests(TestCase):
 
     def setUp(self):
-        DYNAMO_WRAPPER.clear_all_records_in_table(table='mhs_state')
+        DYNAMO_WRAPPER.clear_all_records_in_table(table=os.environ.get('MHS_DYNAMODB_TABLE_NAME', 'mhs_state'))
 
     def test_should_record_synchronous_message_status_as_successful(self):
         # Arrange

@@ -43,3 +43,9 @@ resource "aws_dynamodb_table" "mhs_sync_async_table" {
     EnvironmentId = var.environment_id
   }
 }
+
+# Terraform output variable of the DynamoDB table used to store the MHS state
+output "mhs_state_table_name" {
+  value = aws_dynamodb_table.mhs_state_table.name
+  description = "The name of the DynamoDB table used to store the MHS state"
+}

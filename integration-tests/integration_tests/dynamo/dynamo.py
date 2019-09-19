@@ -35,8 +35,4 @@ class DynamoWrapper(object):
             self.dynamo_client.delete_item(TableName=table, Key={'key': {'S': each['key']['S']}})
 
 
-DYNAMO_WRAPPER = DynamoWrapper(
-    region_name=os.environ.get('DYNAMO_DB_REGION', 'eu-west-2'),
-    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY', 'anything'),
-    aws_secret_access_key=os.environ.get('AWS_SECRET_KEY', 'anything'),
-    endpoint_url=os.environ.get('DYNAMO_ENDPOINT_URL', 'http://localhost:8000'))
+DYNAMO_WRAPPER = DynamoWrapper(region_name='eu-west-2', endpoint_url=os.environ.get('MHS_DYNAMODB_ENDPOINT_URL', None))
