@@ -105,7 +105,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
 
     @mock.patch.object(async_reliable, 'logger')
     @async_test
-    async def test_handle_outbound_message(self, log_mock):
+    async def test_successful_handle_outbound_message(self, log_mock):
         response = mock.MagicMock()
         response.code = 202
 
@@ -193,7 +193,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
     @async_test
-    async def test_handle_outbound_message_error_when_looking_up_url(self):
+    async def test_handle_outbound_message_error_when_looking_up_spine_url(self):
         self.setup_mock_work_description()
         self.mock_routing_reliability.get_end_point.side_effect = Exception()
 
@@ -313,17 +313,6 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
-    def _setup_routing_mock(self):
-        self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
-            MHS_END_POINT_KEY: [URL],
-            MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY,
-            MHS_CPA_ID_KEY: CPA_ID,
-            MHS_ASID: [ASID]
-        })
-        self.mock_routing_reliability.get_reliability.return_value = test_utilities.awaitable({
-            workflow.common_asynchronous.MHS_RETRY_INTERVAL: [MHS_RETRY_INTERVAL_VAL],
-            workflow.common_asynchronous.MHS_RETRIES: MHS_RETRY_VAL})
-
     @async_test
     async def test_handle_outbound_message_non_http_202_success_response_ebxml_error(self):
         self.setup_mock_work_description()
@@ -391,9 +380,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         mock_response.headers = {'Content-Type': 'text/xml'}
 
         sub_tests = [
-            ("a retriable 200", 'soapfault_response_single_error.xml'),
-            ("a retriable 206", 'soapfault_response_single_error_206.xml'),
-            ("a retriable 208", 'soapfault_response_single_error_208.xml')
+            ("a retriable soap 200 error code", 'soapfault_response_single_error.xml'),
+            ("a retriable soap 206 error code", 'soapfault_response_single_error_206.xml'),
+            ("a retriable soap 208 error code", 'soapfault_response_single_error_208.xml')
         ]
         for description, soap_fault_file_path in sub_tests:
             with self.subTest(description):
@@ -432,7 +421,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         mock_response.headers = {'Content-Type': 'text/xml'}
 
         sub_tests = [
-            ("a non retriable 300", 'soapfault_response_single_error_300.xml')
+            ("a non retriable soap 300 error code", 'soapfault_response_single_error_300.xml')
         ]
         for description, soap_fault_file_path in sub_tests:
             with self.subTest(description):
@@ -451,7 +440,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                 self.mock_work_description.publish.assert_called_once()
                 self.mock_transmission_adaptor.make_request.assert_called_once()
 
-    def test_is_retriable_error(self):
+    def test_soap_error_codes_are_retriable_or_not(self):
         errors_and_expected = [("a retriable failure to process message error code 200", [200], True),
                                ("a retriable routing failure error code 206", [206], True),
                                ("a retriable failure storing memo error code 208", [208], True),
@@ -472,7 +461,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
     ############################
 
     @async_test
-    async def test_handle_inbound_message(self):
+    async def test_successful_handle_inbound_message(self):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
@@ -536,3 +525,14 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         log_mock.audit.assert_called_once()
         audit_log_dict = log_mock.audit.call_args[0][2]
         self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
+
+    def _setup_routing_mock(self):
+        self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
+            MHS_END_POINT_KEY: [URL],
+            MHS_TO_PARTY_KEY_KEY: TO_PARTY_KEY,
+            MHS_CPA_ID_KEY: CPA_ID,
+            MHS_ASID: [ASID]
+        })
+        self.mock_routing_reliability.get_reliability.return_value = test_utilities.awaitable({
+            workflow.common_asynchronous.MHS_RETRY_INTERVAL: [MHS_RETRY_INTERVAL_VAL],
+            workflow.common_asynchronous.MHS_RETRIES: MHS_RETRY_VAL})
