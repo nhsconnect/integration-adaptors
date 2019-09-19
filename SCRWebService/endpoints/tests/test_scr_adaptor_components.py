@@ -49,3 +49,12 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
         self.assertEqual(response.code, 500)
         self.assertIn('Failed to route the dam packet', response.body.decode())
+
+    def test_empty_interaction_name_raises_erorr(self):
+        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={},
+                              body=json.dumps(body))
+
+        self.assertEqual(response.code, 400)
+        self.assertIn('No interaction-id header provided', response.body.decode())
