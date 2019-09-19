@@ -43,8 +43,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         wdo = wd.create_new_work_description(self.wd_store,
                                              message_id,
                                              workflow.SYNC,
-                                             wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
-                                             )
+                                             outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         await wdo.publish()
         if not from_asid:
             return 400, '`from_asid` header field required for sync messages', None
