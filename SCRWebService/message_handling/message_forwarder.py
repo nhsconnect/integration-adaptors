@@ -3,22 +3,29 @@ from typing import Dict
 
 from utilities import integration_adaptors_logger as log
 from builder.pystache_message_builder import MessageGenerationError
+from message_handling.message_sender import MessageSender
 
 logger = log.IntegrationAdaptorsLogger('MSG-HANDLER')
+
+
+class MessageSendingError(Exception):
+    """Error raised during message sending"""
+    pass
 
 
 class MessageForwarder(object):
     """Class to provide message forwarding functionality, in particular hl7 message population is performed."""
 
-    def __init__(self, interactions: dict):
+    def __init__(self, interactions: dict, message_sender: MessageSender):
         """
         Constructor for the message forwarder
         :param interactions: A dictionary mapping human readable interaction names to the object that is responsible
         for populating the associated message template
         """
         self.interactions = interactions
+        self.message_sender = message_sender
 
-    def forward_message_to_mhs(self, interaction_name: str, message_contents: Dict):
+    async def forward_message_to_mhs(self, interaction_name: str, message_contents: Dict):
         """
         Handles forwarding a given interaction to the MHS, including populating the appropriate message template
         :param interaction_name: The human readable name associated with a particular interaction
@@ -27,6 +34,9 @@ class MessageForwarder(object):
         """
         template_populator = self._get_interaction_template_populator(interaction_name)
         populated_message = self._populate_message_template(template_populator, message_contents)
+        response = await self._send_message_to_mhs(interaction_id=template_populator.interaction_id,
+                                                   message=populated_message)
+        return response
 
     def _get_interaction_template_populator(self, interaction_name: str):
         """
@@ -36,11 +46,11 @@ class MessageForwarder(object):
         """
         interaction_template_populator = self.interactions.get(interaction_name)
         if not interaction_template_populator:
-            logger.error('002', 'Failed to find interaction templater for interaction name: {name}', 
+            logger.error('002', 'Failed to find interaction templater for interaction name: {name}',
                          {'name': interaction_name})
             raise MessageGenerationError(f'Failed to find interaction with interaction name: {interaction_name}')
         return interaction_template_populator
-    
+
     def _populate_message_template(self, template_populator, supplier_message_parameters: Dict) -> str:
         """
         Generates a hl7 message string from the parameters
@@ -53,3 +63,16 @@ class MessageForwarder(object):
         except Exception as e:
             logger.error('001', 'Message generation failed {exception}', {'exception': e})
             raise MessageGenerationError(str(e))
+
+    async def _send_message_to_mhs(self, interaction_id, message):
+        """
+        Using the message sender dependency, the generated message is forwarded to the mhs
+        :param interaction_id: The interaction id used as part of the header
+        :param message: hl7 message body
+        :return: The response from the mhs of sending the
+        """
+        try:
+            return await self.message_sender.send_message_to_mhs(interaction_id, message)
+        except Exception as e:
+            logger.error('003', 'Exception raised during message sending: {exception}', {'exception': e})
+            raise MessageSendingError(str(e)) from e

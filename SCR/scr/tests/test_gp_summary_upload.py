@@ -4,11 +4,11 @@ from builder.pystache_message_builder import MessageGenerationError
 from utilities.file_utilities import FileUtilities
 from utilities.xml_utilities import XmlUtilities
 from scr_definitions import ROOT_DIR
-from scr.gp_summary_update import SummaryCareRecord
+from scr.gp_summary_upload import GpSummaryUpload
 
 
 class FullTest(unittest.TestCase):
-    summaryCareRecord = SummaryCareRecord()
+    summaryCareRecord = GpSummaryUpload()
 
     xmlFileDir = Path(ROOT_DIR + '/scr/tests/test_xmls/')
     hashFileDir = Path(ROOT_DIR + '/scr/tests/hashes/')

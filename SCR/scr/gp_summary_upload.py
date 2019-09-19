@@ -6,13 +6,15 @@ from builder.pystache_message_builder import PystacheMessageBuilder
 from scr_definitions import ROOT_DIR
 
 
-class SummaryCareRecord(object):
+class GpSummaryUpload(object):
     """Class for populating a Gp Summary Upload template"""
 
     summaryCareRecordPath = Path(ROOT_DIR) / "data/templates"
+    file_name = "16UK05"
+    interaction_id = "REPC_IN150016UK05"
 
     def __init__(self):
-        self.builder = PystacheMessageBuilder(str(self.summaryCareRecordPath), "16UK05")
+        self.builder = PystacheMessageBuilder(str(self.summaryCareRecordPath), self.file_name)
 
     def populate_template_with_file(self, json_file):
         """

@@ -8,6 +8,7 @@ import tornado.ioloop
 import utilities.integration_adaptors_logger as log
 from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
+from message_handling.message_forwarder import MessageSendingError
 
 logger = log.IntegrationAdaptorsLogger('SCR_ENDPOINT')
 
@@ -26,7 +27,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         """
         self.forwarder = forwarder
 
-    def post(self):
+    async def post(self):
         """
         Receives a json payload, parses the appropriate message details before processing the message contents
         :return:
@@ -36,10 +37,10 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         scr_input_json = self._extract_message_body()
         interaction_name = self._extract_interaction_name()
         logger.info('002', 'Extracted message content, attempting to forward the message')
-        response = self._process_message(interaction_name, scr_input_json)
+        response = await self._process_message(interaction_name, scr_input_json)
         self.write(response)
 
-    def _process_message(self, interaction_name: str, scr_input_json: Dict):
+    async def _process_message(self, interaction_name: str, scr_input_json: Dict):
         """
         Processes the outbound message by delegating to the forwarder
         :param interaction_name: Human readable name of the interaction
@@ -47,12 +48,17 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         :return: Result of forwarding the message to the MHS
         """
         try:
-            result = self.forwarder.forward_message_to_mhs(interaction_name, scr_input_json)
+            result = await self.forwarder.forward_message_to_mhs(interaction_name, scr_input_json)
             return result
         except MessageGenerationError as e:
             logger.error('003', 'Failed to generate message {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Error whilst generating message',
                                         reason=f'Error whilst generating message: {str(e)}')
+        except MessageSendingError as e:
+            logger.error('004', 'Exception raised whilst attempting to send the message to the MHS {exception}',
+                         {'exception': e})
+            raise tornado.web.HTTPError(500, f'Error whilst attempting to send the message to the MHS: {str(e)}',
+                                        reason=f'Error whilst attempting to send the message to the MHS: {str(e)}')
 
     def _extract_interaction_name(self) -> str:
         """
