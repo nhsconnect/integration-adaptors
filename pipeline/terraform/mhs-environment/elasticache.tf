@@ -16,8 +16,7 @@ resource "aws_elasticache_replication_group" "elasticache_replication_group" {
   node_type = var.elasticache_node_type
   number_cache_clusters = length(data.aws_availability_zones.all.names)
   at_rest_encryption_enabled = true
-  transit_encryption_enabled = false
-  # TODO: Needs to be true!
+  transit_encryption_enabled = true
   port = 6379
   subnet_group_name = aws_elasticache_subnet_group.elasticache_subnet_group.name
   security_group_ids = [
