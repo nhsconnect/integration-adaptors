@@ -28,7 +28,7 @@ class SynchronousWorkflowTests(TestCase):
         DynamoMhsTableStateAssertor(MHS_DYNAMO_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values({
-                # 'INBOUND_STATUS': None,
+                'INBOUND_STATUS': None,
                 'OUTBOUND_STATUS': 'SYNC_RESPONSE_SUCCESSFUL',
                 'WORKFLOW': 'sync'
             })
