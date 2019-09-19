@@ -29,7 +29,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
     def test_handler_returns_message_processing_response(self):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         self.forwarder.forward_message_to_mhs.return_value = test_utilities.awaitable("Nice response message")
-        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-name': '123'},
                               body=json.dumps(body))
 
         self.forwarder.forward_message_to_mhs.assert_called_once_with("123", body)
@@ -45,7 +45,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     def test_invalid_json_request_fails(self):
         body = "{'yes': 'wow'}"
-        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-name': '123'},
                               body=body)
         self.assertEqual(response.code, 400)
         error = "Exception raised while parsing message body:" \
@@ -55,7 +55,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
     def test_message_generation_exception_in_handler_returns_error_to_caller(self):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         self.forwarder.forward_message_to_mhs.side_effect = MessageGenerationError('This is a specific error')
-        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-id': '123'},
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-name': '123'},
                               body=json.dumps(body))
 
         self.assertEqual(response.code, 400)

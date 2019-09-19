@@ -68,11 +68,11 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         Extracts the human readable interaction name from the message header
         :return: The value assigned to the `interaction-id` header key
         """
-        interaction_name = self.request.headers.get('interaction-id')
+        interaction_name = self.request.headers.get('interaction-name')
         if not interaction_name:
-            logger.error('0011', 'No interaction-id header provided with inbound message')
+            logger.error('0011', 'No interaction-name header provided with inbound message')
             raise tornado.web.HTTPError(400, 'No interaction-id header provided',
-                                        reason=f'No interaction-id header provided')
+                                        reason=f'No interaction-name header provided')
         return interaction_name
 
     def _extract_message_body(self):
