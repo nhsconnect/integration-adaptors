@@ -1,11 +1,13 @@
+import copy
 from unittest.mock import patch
+
+from builder import pystache_message_builder
+from utilities import file_utilities
+from utilities import message_utilities
 
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs_common.messages.tests.test_ebxml_envelope as test_ebxml_envelope
-from builder import pystache_message_builder
-from utilities import file_utilities
-from utilities import message_utilities
 
 EXPECTED_EBXML = "ebxml_request.xml"
 
@@ -18,6 +20,7 @@ _ADDITIONAL_EXPECTED_VALUES = {
     ebxml_request_envelope.ACK_REQUESTED: True,
     ebxml_request_envelope.ACK_SOAP_ACTOR: "urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
     ebxml_request_envelope.SYNC_REPLY: True,
+    ebxml_request_envelope.ATTACHMENTS: []
 }
 EXPECTED_VALUES = {**test_ebxml_envelope.BASE_EXPECTED_VALUES, **_ADDITIONAL_EXPECTED_VALUES}
 
@@ -45,7 +48,7 @@ def get_test_message_dictionary():
 
 
 def expected_values(message=None):
-    values = EXPECTED_VALUES.copy()
+    values = copy.deepcopy(EXPECTED_VALUES)
 
     if message:
         values[ebxml_request_envelope.MESSAGE] = message
@@ -262,10 +265,42 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
             self.assertEqual(expected_values_with_no_payload, parsed_message.message_dictionary)
 
-        with self.subTest("A valid request containing an additional MIME part"):
+        with self.subTest("A valid request containing one textual attachment"):
             message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_additional_attachment.msg"))
+                str(self.message_dir / "ebxml_request_one_attachment.msg"))
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
+                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F',
+                ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+                ebxml_request_envelope.ATTACHMENT_BASE64: False,
+                ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
+                ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
+            })
+
+            parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+            self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
+
+        with self.subTest("A valid request containing one textual and one base64 attachment"):
+            message = file_utilities.FileUtilities.get_file_string(
+                str(self.message_dir / "ebxml_request_multiple_attachments.msg"))
+            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS] += [
+                {
+                    ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F',
+                    ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+                    ebxml_request_envelope.ATTACHMENT_BASE64: False,
+                    ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
+                    ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
+                },
+                {
+                    ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '64A73E03-30BD-4231-9959-0C4B54400345',
+                    ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'image/png',
+                    ebxml_request_envelope.ATTACHMENT_BASE64: True,
+                    ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Another description',
+                    ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR'
+                                                               '42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+                }]
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -312,6 +347,22 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             with self.assertRaisesRegex(
                     ebxml_envelope.EbXmlParsingError, "Weren't able to find required attribute actor"):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+        with self.subTest("A valid request containing one attachment without a description"):
+            message = file_utilities.FileUtilities.get_file_string(
+                str(self.message_dir / "ebxml_request_one_attachment_without_description.msg"))
+            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
+                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F',
+                ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+                ebxml_request_envelope.ATTACHMENT_BASE64: False,
+                ebxml_request_envelope.ATTACHMENT_DESCRIPTION: '',
+                ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
+            })
+
+            parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+            self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
     #######################
     # Helper methods

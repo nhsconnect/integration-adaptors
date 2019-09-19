@@ -3,9 +3,10 @@ import copy
 from typing import Dict, Tuple, Any, Optional, NamedTuple
 from xml.etree.ElementTree import Element
 
-from mhs_common.messages import envelope
 import utilities.message_utilities as message_utilities
 from utilities import integration_adaptors_logger as log
+
+from mhs_common.messages import envelope
 
 logger = log.IntegrationAdaptorsLogger('COMMON_EBXML_ENVELOPE')
 
@@ -23,9 +24,11 @@ RECEIVED_MESSAGE_ID = "received_message_id"
 
 EBXML_NAMESPACE = "eb"
 SOAP_NAMESPACE = "SOAP"
+XLINK_NAMESPACE = "xlink"
 
 NAMESPACES = {SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
-              EBXML_NAMESPACE: "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"}
+              EBXML_NAMESPACE: "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd",
+              XLINK_NAMESPACE: "http://www.w3.org/1999/xlink"}
 
 
 class EbxmlEnvelope(envelope.Envelope):

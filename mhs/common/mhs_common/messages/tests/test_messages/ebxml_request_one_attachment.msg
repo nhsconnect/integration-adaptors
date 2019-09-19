@@ -8,18 +8,19 @@ Content-Transfer-Encoding: 8bit
 <SOAP:Header>
 	<eb:MessageHeader SOAP:mustUnderstand="1" eb:version="2.0">
 		<eb:From>
-			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">TESTGEN-201324</eb:PartyId>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YES-0000806</eb:PartyId>
 		</eb:From>
 		<eb:To>
-			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YEA-0000806</eb:PartyId>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">A91424-9199121</eb:PartyId>
 		</eb:To>
 		<eb:CPAId>S1001A1630</eb:CPAId>
-		<eb:ConversationId>79F49A34-9798-404C-AEC4-FD38DD81C138</eb:ConversationId>
-		<eb:Service>urn:nhs:names:services:pdsquery</eb:Service>
-		<eb:Action>QUPA_IN000006UK02</eb:Action>
+		<eb:ConversationId>10F5A436-1913-43F0-9F18-95EA0E43E61A</eb:ConversationId>
+		<eb:Service>urn:nhs:names:services:psis</eb:Service>
+		<eb:Action>MCCI_IN010000UK13</eb:Action>
 		<eb:MessageData>
-			<eb:MessageId>5BB171D4-53B2-4986-90CF-428BE6D157F5</eb:MessageId>
-			<eb:Timestamp>2012-03-15T06:51:08Z</eb:Timestamp>
+			<eb:MessageId>C614484E-4B10-499A-9ACD-5D645CFACF61</eb:MessageId>
+			<eb:Timestamp>2019-05-04T20:55:16Z</eb:Timestamp>
+			<eb:RefToMessageId>F106022D-758B-49A9-A80A-8FF211C32A43</eb:RefToMessageId>
 		</eb:MessageData>
         <eb:DuplicateElimination/>
     </eb:MessageHeader>
@@ -28,12 +29,12 @@ Content-Transfer-Encoding: 8bit
 </SOAP:Header>
 <SOAP:Body>
 	<eb:Manifest SOAP:mustUnderstand="1" eb:version="2.0">
-		<eb:Reference xlink:href="cid:5BB171D4-53B2-4986-90CF-428BE6D157F5@spine.nhs.uk">
+		<eb:Reference xlink:href="cid:C614484E-4B10-499A-9ACD-5D645CFACF61@spine.nhs.uk">
 			<eb:Schema eb:location="http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd" eb:version="1.0"/>
 			<eb:Description xml:lang="en">HL7 payload</eb:Description>
 			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
 		</eb:Reference>
-        <eb:Reference xlink:href="cid:8F1D7DE1-02AB-48D7-A797-A947B09F347F">
+		<eb:Reference xlink:href="cid:8F1D7DE1-02AB-48D7-A797-A947B09F347F">
             <eb:Description xml:lang="en">Some description</eb:Description>
         </eb:Reference>
 	</eb:Manifest>
@@ -41,11 +42,11 @@ Content-Transfer-Encoding: 8bit
 </SOAP:Envelope>
 
 ----=_MIME-Boundary
-Content-Id: <5BB171D4-53B2-4986-90CF-428BE6D157F5@spine.nhs.uk>
+Content-Id: <C614484E-4B10-499A-9ACD-5D645CFACF61@spine.nhs.uk>
 Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>
+<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>
 ----=_MIME-Boundary
 Content-Id: <8F1D7DE1-02AB-48D7-A797-A947B09F347F>
 Content-Type: text/plain

@@ -49,13 +49,13 @@ Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 <QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>
-----=_MIME-Boundary--
+----=_MIME-Boundary
 Content-Id: <8F1D7DE1-02AB-48D7-A797-A947B09F347F>
 Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 
 Some payload
-----=_MIME-Boundary--
+----=_MIME-Boundary
 Content-Id: <64A73E03-30BD-4231-9959-0C4B54400345>
 Content-Type: image/png
 Content-Transfer-Encoding: base64

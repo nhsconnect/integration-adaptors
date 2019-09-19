@@ -54,12 +54,12 @@ Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 {{{hl7_message}}}
-----=_MIME-Boundary--
 {{#attachments}}
+----=_MIME-Boundary
 Content-Id: <{{content_id}}>
 Content-Type: {{content_type}}
 Content-Transfer-Encoding: {{content_transfer_encoding}}
 
 {{{payload}}}
-----=_MIME-Boundary--
 {{/attachments}}
+----=_MIME-Boundary--

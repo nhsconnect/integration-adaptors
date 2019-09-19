@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import copy
 import email
 import email.message
@@ -42,7 +43,7 @@ EBXML_CONTENT_TYPE_VALUE = 'multipart/related; boundary="--=_MIME-Boundary"; typ
 class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     """An envelope that contains a request to be sent asynchronously to a remote MHS."""
 
-    def __init__(self, message_dictionary: Dict[str, Union[str, bool, List[Dict[str, str]]]]):
+    def __init__(self, message_dictionary: Dict[str, Union[str, bool, List[Dict[str, Union[str, bool]]]]]):
         """Create a new EbxmlRequestEnvelope that populates the message with the provided dictionary.
 
         :param message_dictionary: The dictionary of values to use when populating the template.
@@ -112,11 +113,14 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         :return: An instance of an EbxmlAckEnvelope constructed from the message.
         """
         msg = EbxmlRequestEnvelope._parse_mime_message(headers, message)
-        ebxml_part, payload_part = EbxmlRequestEnvelope._extract_message_parts(msg)
-        xml_tree = ElementTree.fromstring(ebxml_part)
+        ebxml_part, payload_part, attachments = EbxmlRequestEnvelope._extract_message_parts(msg)
+        xml_tree: Element = ElementTree.fromstring(ebxml_part)
         extracted_values = super().parse_message(xml_tree)
 
         cls._extract_more_values_from_xml_tree(xml_tree, extracted_values)
+
+        cls._add_descriptions_to_attachments(xml_tree, attachments)
+        extracted_values[ATTACHMENTS] = attachments
 
         logger.info('0002', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
 
@@ -124,6 +128,23 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
             extracted_values[MESSAGE] = payload_part
 
         return EbxmlRequestEnvelope(extracted_values)
+
+    @classmethod
+    def _add_descriptions_to_attachments(cls, xml_tree, attachments):
+        for attachment in attachments:
+            description_element = xml_tree.find(
+                f".//{ebxml_envelope.EBXML_NAMESPACE}:Reference["
+                f"@{ebxml_envelope.XLINK_NAMESPACE}:href='cid:{attachment[ATTACHMENT_CONTENT_ID]}']"
+                f"/{ebxml_envelope.EBXML_NAMESPACE}:Description",
+                ebxml_envelope.NAMESPACES)
+            if description_element is None:
+                logger.info('0003', "{Attachment} with {ContentType} found with no description. "
+                                    "Setting description to ''",
+                            {'Attachment': attachment[ATTACHMENT_CONTENT_ID],
+                             'ContentType': attachment[ATTACHMENT_CONTENT_TYPE]})
+                attachment[ATTACHMENT_DESCRIPTION] = ''
+            else:
+                attachment[ATTACHMENT_DESCRIPTION] = description_element.text
 
     @classmethod
     def _extract_more_values_from_xml_tree(cls, xml_tree: Element,
@@ -149,13 +170,13 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         msg = email.message_from_string(content_type_header + message, policy=email.policy.HTTP)
 
         if msg.defects:
-            logger.warning('0003', 'Found defects in MIME message during parsing. {Defects}',
+            logger.warning('0004', 'Found defects in MIME message during parsing. {Defects}',
                            {'Defects': msg.defects})
 
         return msg
 
     @staticmethod
-    def _extract_message_parts(msg: email.message.EmailMessage) -> Tuple[str, str]:
+    def _extract_message_parts(msg: email.message.EmailMessage) -> Tuple[str, str, List[Dict[str, Union[str, bool]]]]:
         """Extract the ebXML and payload parts of the message and return them as a tuple.
 
         :param msg: The message to extract parts from.
@@ -171,13 +192,26 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         for i, part in enumerate(message_parts):
             if part.defects:
-                logger.warning('0004', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
+                logger.warning('0005', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
                                {'PartIndex': i, 'Defects': part.defects})
 
         ebxml_part = message_parts[0].get_content()
 
         payload_part = None
+        attachments = []
         if len(message_parts) > 1:
             payload_part = message_parts[1].get_content()
 
-        return ebxml_part, payload_part
+            for attachment_message in message_parts[2:]:
+                attachment = {
+                    ATTACHMENT_PAYLOAD: attachment_message.get_content(),
+                    ATTACHMENT_BASE64: False,
+                    ATTACHMENT_CONTENT_ID: str(attachment_message['Content-Id'][1:-1]),
+                    ATTACHMENT_CONTENT_TYPE: attachment_message.get_content_type()
+                }
+                if isinstance(attachment[ATTACHMENT_PAYLOAD], bytes):
+                    attachment[ATTACHMENT_PAYLOAD] = base64.b64encode(attachment[ATTACHMENT_PAYLOAD]).decode()
+                    attachment[ATTACHMENT_BASE64] = True
+                attachments.append(attachment)
+
+        return ebxml_part, payload_part, attachments
