@@ -1,8 +1,6 @@
 """The Summary Care Record endpoint"""
-
 import json
 from typing import Dict
-
 import tornado.web
 import tornado.ioloop
 import utilities.integration_adaptors_logger as log
@@ -27,7 +25,6 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         :return:
         """
         self.forwarder = forwarder
-
 
     async def post(self):
         """

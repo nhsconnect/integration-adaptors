@@ -1,7 +1,6 @@
+"""A set of component tests that ties multiple parts of the SCR Adaptor together"""
 import json
 import pathlib
-
-from builder.pystache_message_builder import MessageGenerationError
 from scr import gp_summary_upload
 from utilities import file_utilities, test_utilities
 from definitions import ROOT_DIR
@@ -18,7 +17,7 @@ populated_message_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data'
 
 
 class TestSummaryCareRecord(AsyncHTTPTestCase):
-    """Tests associated with the Summary Care Record endpoint"""
+    """Tests associated with the Summary Care Record adaptor"""
 
     def get_app(self):
         interactions = {
@@ -31,7 +30,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         return Application([(r"/", summary_care_record.SummaryCareRecord, dict(forwarder=forwarder))])
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_scr_adaptor_calls_mhs_end_point(self, request_mock):
+    def test_scr_adaptor_calls_mhs_end_point_happy_path(self, request_mock):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         expected_message = file_utilities.FileUtilities.get_file_string(populated_message_path)\
             .replace("\\r\\n", "\r\n")

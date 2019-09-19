@@ -6,8 +6,6 @@ from message_handling.message_sender import MessageSender
 
 logger = log.IntegrationAdaptorsLogger('MSG-HANDLER')
 
-
-
 class MessageSendingError(Exception):
     """Error raised during message sending"""
     pass
@@ -76,5 +74,5 @@ class MessageForwarder(object):
             return await self.message_sender.send_message_to_mhs(interaction_id, message)
         except Exception as e:
             logger.error('003', 'Exception raised during message sending: {exception}', {'exception': e})
-            raise MessageSendingError(str(e)) from e
+            raise MessageSendingError(str(e))
 
