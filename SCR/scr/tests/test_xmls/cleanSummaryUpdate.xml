@@ -17,7 +17,7 @@
             <id root="1.2.826.0.1285.0.2.0.107" extension="511736638012"/>
         </device>
     </communicationFunctionSnd>
-    <ControlActEvent classCode="CACT" moodCode="EVN">
+    <ControlActEvent classCode="ALRT" moodCode="EVN">
         <author1 typeCode="AUT">
             <AgentSystemSDS classCode="AGNT">
                 <agentSystemSDS classCode="DEV" determinerCode="INSTANCE">
