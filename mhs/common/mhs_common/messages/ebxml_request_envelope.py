@@ -6,7 +6,7 @@ import copy
 import email
 import email.message
 import email.policy
-from typing import Dict, Tuple, Union, List
+from typing import Dict, Tuple, Union, List, Sequence
 from xml.etree.ElementTree import Element
 
 from builder import pystache_message_builder
@@ -167,17 +167,17 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         if not msg.is_multipart():
             raise ebxml_envelope.EbXmlParsingError("Non-multipart message received!")
 
-        message_parts = tuple(msg.iter_parts())
+        message_parts: Sequence[email.message.EmailMessage] = tuple(msg.iter_parts())
 
         for i, part in enumerate(message_parts):
             if part.defects:
                 logger.warning('0004', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
                                {'PartIndex': i, 'Defects': part.defects})
 
-        ebxml_part = message_parts[0].get_payload()
+        ebxml_part = message_parts[0].get_content()
 
         payload_part = None
         if len(message_parts) > 1:
-            payload_part = message_parts[1].get_payload()
+            payload_part = message_parts[1].get_content()
 
         return ebxml_part, payload_part
