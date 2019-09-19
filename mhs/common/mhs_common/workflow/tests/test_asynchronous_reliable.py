@@ -4,8 +4,6 @@ from pathlib import Path
 from unittest import mock
 from unittest.mock import patch
 
-from isodate import isoerror
-
 from definitions import ROOT_DIR
 from utilities.file_utilities import FileUtilities
 
