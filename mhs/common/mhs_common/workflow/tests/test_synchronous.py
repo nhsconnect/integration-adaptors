@@ -34,7 +34,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
-    async def test_store_status_set_to_received(self, wd_mock):
+    async def test_should_set_store_outbound_status_to_received_when_handling_outbound_message(self, wd_mock):
         wdo_mock = mock.MagicMock()
         wd_mock.return_value = wdo_mock
 
@@ -47,8 +47,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
             # Don't care for exceptions, just want to check the store is set correctly first
             pass
 
-        wd_mock.assert_called_with(self.wd_store, "123", workflow.SYNC,
-                                   work_description.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+        wd_mock.assert_called_with(self.wd_store, "123", workflow.SYNC, outbound_status=work_description.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         wdo_mock.publish.assert_called_once()
 
     @mock.patch.object(sync, 'logger')
