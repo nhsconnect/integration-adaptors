@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import unittest
+import uuid
 
 import requests
 
@@ -16,7 +19,7 @@ class MhsHttpRequestBuilder(object):
         self.body = None
         self.assertor = unittest.TestCase('__init__')
 
-    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool):
+    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool) -> MhsHttpRequestBuilder:
         """
         Allows the setting of required headers for the MHS
         :param interaction_id: id of this interaction used within MHS to track this request lifecycle
@@ -27,14 +30,14 @@ class MhsHttpRequestBuilder(object):
         self.headers = {
             'Interaction-Id': interaction_id,
             'Message-Id': message_id,
-            'Correlation-Id': '1',
+            'Correlation-Id': str(uuid.uuid4()).upper(),
             'sync-async': str(sync_async),
             'from-asid': f'{get_asid()}'
         }
 
         return self
 
-    def with_body(self, body):
+    def with_body(self, body) -> MhsHttpRequestBuilder:
         """
         Allows the setting of the payload for the HTTP request
         :param body: the payload to send
@@ -44,7 +47,7 @@ class MhsHttpRequestBuilder(object):
 
         return self
 
-    def execute_post_expecting_success(self):
+    def execute_post_expecting_success(self) -> MhsHttpRequestBuilder:
         """
         Execute a POST request against the MHS using the configured body and headers within this class.
         Asserts the response is successful.

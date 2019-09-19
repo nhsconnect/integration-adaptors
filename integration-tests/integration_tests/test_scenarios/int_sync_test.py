@@ -1,9 +1,8 @@
-import os
 import xml.etree.ElementTree as ET
 from unittest import TestCase
 
-from integration_tests.dynamo.dynamo import DYNAMO_WRAPPER
-from integration_tests.dynamo.dynamo_mhs_table import DyanmoMhsTableStateAssertor
+from integration_tests.dynamo.dynamo import MHS_DYNAMO_WRAPPER
+from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.helpers import methods
 from integration_tests.helpers.build_message import build_message
 from integration_tests.helpers.methods import get_asid
@@ -13,7 +12,7 @@ from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilde
 class SynchronousWorkflowTests(TestCase):
 
     def setUp(self):
-        DYNAMO_WRAPPER.clear_all_records_in_table(table=os.environ.get('MHS_DYNAMODB_TABLE_NAME', 'mhs_state'))
+        MHS_DYNAMO_WRAPPER.clear_all_records_in_table()
 
     def test_should_record_synchronous_message_status_as_successful(self):
         # Arrange
@@ -26,7 +25,7 @@ class SynchronousWorkflowTests(TestCase):
             .execute_post_expecting_success()
 
         # Assert
-        DyanmoMhsTableStateAssertor(DYNAMO_WRAPPER.get_all_records_in_table(table='mhs_state')) \
+        DynamoMhsTableStateAssertor(MHS_DYNAMO_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values({
                 # 'INBOUND_STATUS': None,
