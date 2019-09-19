@@ -21,11 +21,14 @@ class RedisCache(cache_adaptor.CacheAdaptor):
         :param expiry_time: The expiry time (in seconds) to set for cache entries.
         :param use_tls: Whether or not to use TLS when connecting to the Redis host.
         """
+        if expiry_time < 0:
+            raise ValueError('Expiry time must not be non-negative')
+
+        self.expiry_time = expiry_time
+
         self._redis_client = redis.Redis(host=redis_host, port=redis_port, ssl=use_tls)
         logger.info("0001", "Redis client configured. {host}, {port}, {ssl}",
                     {"host": redis_host, "port": redis_port, "ssl": use_tls})
-
-        super().__init__(expiry_time)
 
     @timing.time_function
     async def retrieve_mhs_attributes_value(self, ods_code: str, interaction_id: str) -> Optional[Dict]:
@@ -43,27 +46,20 @@ class RedisCache(cache_adaptor.CacheAdaptor):
         try:
             logger.info("0002", "Attempting to retrieve cache entry for {key}", {"key": key})
             cached_json_value = await event_loop.run_in_executor(None, self._redis_client.get, key)
-        except redis.RedisError as re:
-            logger.warning("0003", "An error occurred when attempting to load {key}. {exception}",
-                           {"key": key, "exception": re})
-            return None
 
-        if cached_json_value is None:
-            logger.info("0004", "No cache entry found for {key}.", {"key": key})
-            return None
+            if cached_json_value is None:
+                logger.info("0004", "No cache entry found for {key}.", {"key": key})
+                return None
 
-        # We need to parse the value from a JSON string, since Redis doesn't support maps with non-string values.
-        try:
             value = json.loads(cached_json_value)
-        except json.JSONDecodeError as jde:
-            logger.warning("0005", "An error occurred when attempting to parse cached value returned for {key}. "
-                                   "{cached_value}, {exception}",
-                           {"key": key, "cached_value": cached_json_value, "exception": jde})
+
+            logger.info("0006", "Retrieved cache entry for {key}. {value}", {"key": key, "value": value})
+
+            return value
+        except redis.RedisError as re:
+            logger.error("0003", "An error occurred when attempting to load {key}. {exception}",
+                         {"key": key, "exception": re})
             return None
-
-        logger.info("0006", "Retrieved cache entry for {key}. {value}", {"key": key, "value": value})
-
-        return value
 
     @timing.time_function
     async def add_cache_value(self, ods_code: str, interaction_id: str, value: Dict) -> None:
@@ -87,8 +83,8 @@ class RedisCache(cache_adaptor.CacheAdaptor):
             logger.info("0009", "Successfully stored {value} in the cache using {key}",
                         {"value": json_value, "key": key})
         except redis.RedisError as re:
-            logger.warning("0008", "An error occurred when caching {value}. {exception}",
-                           {"value": json_value, "exception": re})
+            logger.error("0008", "An error occurred when caching {value}. {exception}",
+                         {"value": json_value, "exception": re})
 
     @staticmethod
     def _generate_key(ods_code: str, interaction_id: str) -> str:

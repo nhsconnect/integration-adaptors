@@ -81,7 +81,7 @@ class TestSDSClient(TestCase):
         self.assertEqual(len(attributes), len(expected_mhs_attributes))
 
     @async_test
-    async def test_get_mhs_lookup_returns_dictionary(self):
+    async def test_should_return_result_as_dictionary(self):
         client = mocks.mocked_sds_client()
 
         attributes = await client.get_mhs_details(ODS_CODE, INTERACTION_ID)
