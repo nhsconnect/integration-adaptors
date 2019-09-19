@@ -125,7 +125,7 @@ pipeline {
                                 env.MHS_DYNAMODB_TABLE_NAME = sh (
                                     label: 'Obtaining the dynamodb table name used for the MHS state',
                                     returnStdout: true,
-                                    scrpit: "terraform output mhs_state_table_name"
+                                    script: "terraform output mhs_state_table_name"
                                 ).trim()
                             }
                         }
