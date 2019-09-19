@@ -126,7 +126,7 @@ pipeline {
                                     label: 'Obtaining the dynamodb table name used for the MHS state',
                                     returnStdout: true,
                                     scrpit: "terraform output mhs_state_table_name"
-                                )
+                                ).trim()
                             }
                         }
                     }
