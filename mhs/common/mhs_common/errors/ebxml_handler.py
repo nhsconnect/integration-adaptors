@@ -47,12 +47,13 @@ def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Option
         <SOAP:Body/>
     </SOAP:Envelope>
 
-    Function checks for HTTP code 200, content-type text/xml and body for the structure as above
-    In case there is not 200 passed `code` and `body` will be returned back
-    In case body isn't structured as ebXML error message passed `code` and `body` will be returned back
-    In case content-type is not presented or is not text/xml `ValueError` exception should be raised
+    Function checks for HTTP code 200, content-type text/xml and body for the structure as above.
+    In case there is not HTTP code 200 passed in, `code` and `body` will be returned back.
+    In case HTTP code that is not 2xx is passed in, a `ValueError` exception will be raised.
+    In case body isn't structured as ebXML error message passed `code` and `body` will be returned back.
+    In case content-type is not presented or is not text/xml `ValueError` exception should be raised.
     In case the response actually is ebXML error all the error details like severity, description, error code and
-    error context will be logged according to logging policy with `errorType` equal to `ebxml_error`
+    error context will be logged according to logging policy with `errorType` equal to `ebxml_error`.
 
     :param code: HTTP response code
     :param headers: HTTP response headers
@@ -60,8 +61,18 @@ def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Option
     :return: Response to external client represented as HTTP status code and body
     """
 
-    if code != 200 or not body:
-        logger.warning('0001', 'Not HTTP 200 response. {Code} {Body}', {'Code': code, 'Body': body})
+    if code != 200:
+        if code // 100 == 2:  # If code is 2xx
+            logger.info('0001', "HTTP {Code} success response code received. So can assume this isn't an ebXML error "
+                                "as they are HTTP 200.", {'Code': code})
+            return code, body
+        logger.error('0002', 'Non-HTTP 2xx response code received: {Code} . It is likely that there is a bug in the '
+                             'code.', {'Code': code})
+        raise ValueError(f'Non-HTTP-2xx code passed to ebxml_handler function: {code}')
+
+    if not body:
+        logger.info('0003',
+                    "HTTP 200 success response received with empty body, so can assume this isn't an ebXML error.")
         return code, body
 
     if 'Content-Type' not in headers:
@@ -73,7 +84,7 @@ def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Option
     parsed_body = ET.fromstring(body)
 
     if not EbxmlErrorEnvelope.is_ebxml_error(parsed_body):
-        logger.info('0002', 'Not ebXML error.')
+        logger.info('0004', 'Not ebXML error.')
         return code, body
 
     ebxml_error_envelope: EbxmlErrorEnvelope = EbxmlErrorEnvelope.from_string(body)
@@ -82,7 +93,7 @@ def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Option
     for idx, error_fields in enumerate(ebxml_error_envelope.errors):
         all_fields = {**error_fields, **ERROR_RESPONSE_DEFAULTS}
         errors_text += '{}: {}\n'.format(idx, ' '.join([f'{k}={v}' for k, v in all_fields.items()]))
-        logger.error('0002',
+        logger.error('0005',
                      'ebXML error returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
                      all_fields)
 
