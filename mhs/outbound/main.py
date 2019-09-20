@@ -7,16 +7,17 @@ import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-import utilities.config as config
-import utilities.integration_adaptors_logger as log
-from mhs_common import workflow
+from mhs_common import workflow, certs
 from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
 
 import outbound.request.synchronous.handler as client_request_handler
+import utilities.config as config
+import utilities.integration_adaptors_logger as log
 from outbound.transmission import outbound_transmission
+from utilities import secrets
 
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
@@ -81,26 +82,22 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
 
 def main():
     config.setup_config("MHS")
+    secrets.setup_secret_config("MHS")
     log.configure_logging()
 
     configure_http_client()
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
-    certs_dir = data_dir / "certs"
-    client_cert = "client.cert"
-    client_key = "client.key"
-    ca_certs = "client.pem"
-
-    certs_dir.mkdir(parents=True, exist_ok=True)
-    (certs_dir / client_cert).write_text(config.get_config('CLIENT_CERT'))
-    (certs_dir / client_key).write_text(config.get_config('CLIENT_KEY'))
-    (certs_dir / ca_certs).write_text(config.get_config('CA_CERTS'))
+    client_key, client_cert, ca_certs = certs.create_certs_files(data_dir / '..',
+                                                                 private_key=secrets.get_secret_config('CLIENT_KEY'),
+                                                                 local_cert=secrets.get_secret_config('CLIENT_CERT'),
+                                                                 ca_certs=secrets.get_secret_config('CA_CERTS'))
 
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
     store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
 
-    party_key = config.get_config('PARTY_KEY')
+    party_key = secrets.get_secret_config('PARTY_KEY')
     work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
@@ -114,7 +111,7 @@ def main():
     http_proxy_port = None
     if http_proxy_host is not None:
         http_proxy_port = int(config.get_config('OUTBOUND_HTTP_PROXY_PORT', default="3128"))
-    transmission = outbound_transmission.OutboundTransmission(str(certs_dir), client_cert, client_key, ca_certs,
+    transmission = outbound_transmission.OutboundTransmission(client_cert, client_key, ca_certs,
                                                               max_retries, retry_delay, http_proxy_host,
                                                               http_proxy_port)
 
