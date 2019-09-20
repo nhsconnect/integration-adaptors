@@ -31,17 +31,6 @@ class FunctionalTest(TestCase):
         xml_element = xml_response.find('.//hl7:detail', namespaces=xml_parser.NAMESPACES)
         self.assertEqual(xml_element.text, 'GP Summary upload successful', "should match")
 
-    # Message Pattern Type: Synchronous
-    # Interaction: PDS Retrieval Query (QUPA_IN040000UK32)
-    def test_mhs_synchronous(self):
-        mhs_response, _, _ = methods.get_interaction_from_template('synchronous',
-                                                                   'QUPA_IN040000UK32',
-                                                                   '9689174606',
-                                                                   'Synchronous test')
-
-        self.assertTrue(methods.check_response(mhs_response.text, 'PdsSuccessfulRetrieval'),
-                        "Synchronous smoke test failed")
-
     # Message Pattern Type: Forward Reliable
     # Interaction: GP2GP Common Content Large Messaging (COPC_IN000001UK01)
     @skip('waiting for RT-14 - Implement MHS Forward Reliable Message Pattern')

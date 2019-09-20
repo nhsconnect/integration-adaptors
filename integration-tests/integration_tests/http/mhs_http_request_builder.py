@@ -4,6 +4,7 @@ import unittest
 import uuid
 
 import requests
+from requests import Response
 
 from integration_tests.helpers import methods
 from integration_tests.helpers.methods import get_asid
@@ -47,7 +48,7 @@ class MhsHttpRequestBuilder(object):
 
         return self
 
-    def execute_post_expecting_success(self) -> MhsHttpRequestBuilder:
+    def execute_post_expecting_success(self) -> Response:
         """
         Execute a POST request against the MHS using the configured body and headers within this class.
         Asserts the response is successful.
@@ -58,4 +59,4 @@ class MhsHttpRequestBuilder(object):
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')
 
-        return self
+        return response
