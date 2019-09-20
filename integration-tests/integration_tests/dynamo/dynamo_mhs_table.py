@@ -30,6 +30,13 @@ class MhsItemAssertor(object):
             self.assertor.assertEqual(expected_value, actual_value,
                                       f'Values not equal when comparing dictionary keys: {key}')
 
+    def item_contains_value(self, expected_key: str, expected_value) -> bool:
+        json_string_value = self.item['data']['S']
+        actual_values = json.loads(json_string_value)['DATA']
+
+        actual_value = actual_values.get(expected_key)
+        return actual_value == expected_value
+
 
 class DynamoMhsTableStateAssertor(object):
     """
