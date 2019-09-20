@@ -1,6 +1,6 @@
 """The Summary Care Record endpoint"""
 import json
-from typing import Dict
+from typing import Dict, Optional
 import tornado.web
 import tornado.ioloop
 import utilities.integration_adaptors_logger as log
@@ -43,7 +43,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
 
     async def _process_message(self, interaction_name: str,
                                scr_input_json: Dict,
-                               message_id: str,
+                               message_id: Optional[str],
                                correlation_id: str):
         """
         Processes the outbound message by delegating to the forwarder
@@ -87,7 +87,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         try:
             return json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
-            logger.error('004', 'Exception raised whilst parsing message body: {exception}', {'exception': e})
+            logger.error('005', 'Exception raised whilst parsing message body: {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Failed to parse json body from request',
                                         reason=f'Exception raised while parsing message body: {str(e)}')
 
@@ -101,16 +101,20 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
             log.correlation_id.set(correlation_id)
-            logger.info('005', "Failed to extract correlation-id from message, generated a new one")
+            logger.info('006', "Failed to extract correlation-id from message, generated a new one")
         else:
             log.correlation_id.set(correlation_id)
-            logger.info('006', 'Found correlation id on incoming request.')
+            logger.info('007', 'Found correlation id on incoming request.')
         return correlation_id
 
-    def _extract_message_id(self):
+    def _extract_message_id(self) -> Optional[str]:
         """
         Attempts to extract a message id from the headers, there is no consequence for not providing this as the
         SCR adaptor doesn't use message id, and the MHS will generate one
         :return:
         """
-        return self.request.headers.get('Message-Id', None)
+        message_id = self.request.headers.get('Message-Id', None)
+        if message_id:
+            log.message_id.set(message_id)
+            logger.info('008', "Found message id on incoming request")
+        return message_id
