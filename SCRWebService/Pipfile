@@ -12,6 +12,7 @@ requests = "*"
 integration-adaptors-common = {editable = true,path = "./../common"}
 scr = {editable = true,path = "./../SCR"}
 tornado = "*"
+isodate = "*"
 
 [requires]
 python_version = "3.7"
@@ -24,5 +25,3 @@ coverage-report-xml = 'coverage xml'
 coverage-report-html = 'coverage html'
 inttests = 'python -m xmlrunner discover -o test-reports -p "int_*" -v'
 scr-server = "python main.py"
-
-
