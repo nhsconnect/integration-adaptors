@@ -8,7 +8,7 @@ from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilde
 from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
 
-class SynchronousWorkflowTests(TestCase):
+class SynchronousMessagingPatternTests(TestCase):
     """
     These tests show a synchronous response from Spine via the MHS for the example message interaction of PDS
     (Personal Demographics Service).
