@@ -122,6 +122,11 @@ pipeline {
                                     returnStdout: true,
                                     script: "terraform output route_lb_target_group_arn"
                                 ).trim()
+                                env.MHS_DYNAMODB_TABLE_NAME = sh (
+                                    label: 'Obtaining the dynamodb table name used for the MHS state',
+                                    returnStdout: true,
+                                    script: "terraform output mhs_state_table_name"
+                                ).trim()
                             }
                         }
                     }
