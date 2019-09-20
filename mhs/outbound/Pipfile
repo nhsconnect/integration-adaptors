@@ -7,6 +7,7 @@ verify_ssl = true
 coverage = "~=4.5"
 unittest-xml-reporting = "~=2.5"
 apispec = "~=3.0"
+apispec-webframeworks = "~=0.5"
 
 [packages]
 tornado = "*"
