@@ -26,6 +26,92 @@ class SynchronousHandler(tornado.web.RequestHandler):
 
     @timing.time_request
     async def post(self):
+        """
+        ---
+        summary: Make a request to the MHS
+        description: Make a request to the MHS
+        operationId: postMHS
+        parameters:
+          - name: Interaction-Id
+            in: header
+            required: true
+            schema:
+              type: string
+            description: ID of the interaction that you want to invoke. e.g. QUPC_IN160101UK05
+          - name: sync-async
+            in: header
+            required: true
+            schema:
+              type: boolean
+            description: >-
+              If set to true and the interaction ID is for an async interaction
+              that supports sync-async, then the HTTP response will be the
+              response from Spine, and the response will not be put onto the
+              inbound queue.
+
+
+              If set to false for an async interaction, then the response from
+              Spine will be put onto the inbound queue and the HTTP response will
+              just acknowledge sending the request successfully to Spine.
+
+
+              For sync interactions or async interactions that don't support
+              sync-async, this header must be set to false.
+          - name: from-asid
+            in: header
+            required: false
+            schema:
+              type: string
+            description: from-asid
+          - name: Message-Id
+            in: header
+            required: false
+            schema:
+              type: string
+            description: >-
+              Message ID of the message to send to Spine. If not sent, the MHS
+              generates a random message ID.
+
+
+              When performing async requests where the response is put on the
+              inbound queue, the message ID will be put with the response on the
+              queue.
+          - name: Correlation-Id
+            in: header
+            required: false
+            schema:
+              type: string
+            description: >-
+              Correlation ID that is used when logging. If not passed, a random
+              correlation ID is generated. The idea is that log messages produced
+              by the MHS include this correlation ID which allows correlating logs
+              relating to a single request together. If the supplier system uses
+              it's own correlation ID when producing it's logs, then that should
+              be passed in here, so that logs for a single request can be tied
+              together across the supplier system and the MHS.
+
+
+              When performing async requests where the response is put on the
+              inbound queue, the correlation ID will be put with the response on the
+              queue.
+
+
+              Note that this correlation ID gets sent to/from Spine.
+        responses:
+          200:
+            description: Successful response from Spine.
+          202:
+            description: >-
+              Acknowledgement that we successfully sent the message to Spine
+              (response will come asynchronously on the inbound queue).
+        requestBody:
+          required: true
+          content:
+            'text/xml':
+              schema:
+                $ref: '#/definitions/RequestBody'
+          description: HL7 payload that is to be sent to Spine.
+        """
         message_id = self._extract_message_id()
         correlation_id = self._extract_correlation_id()
         interaction_id = self._extract_interaction_id()
