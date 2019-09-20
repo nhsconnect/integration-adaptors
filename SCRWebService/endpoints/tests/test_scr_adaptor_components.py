@@ -15,13 +15,18 @@ GP_SUMMARY_UPLOAD_URL = "/"
 complete_data_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data' / 'complete_input.json'
 populated_message_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data' / 'populated_message_template.xml'
 
+CORRELATION_ID = 'correlation-id'
+MESSAGE_ID = 'message-id'
+INTERACTION_NAME = 'interaction-name'
+GP_SUMMARY_UPLOAD_NAME = 'SCR_GP_SUMMARY_UPLOAD'
+
 
 class TestSummaryCareRecord(AsyncHTTPTestCase):
     """Tests associated with the Summary Care Record adaptor"""
 
     def get_app(self):
         interactions = {
-            'SCR_GP_SUMMARY_UPLOAD': gp_summary_upload.GpSummaryUpload()
+            GP_SUMMARY_UPLOAD_NAME: gp_summary_upload.GpSummaryUpload()
         }
         self.address = 'http://Fixed-Address.com'
         sender = message_sender.MessageSender(self.address)
@@ -37,7 +42,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         request_mock.return_value = test_utilities.awaitable("Response message")
 
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
-                              headers={'interaction-name': 'SCR_GP_SUMMARY_UPLOAD'},
+                              headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
                               body=json.dumps(body))
 
         body_call_value = request_mock.call_args[1]['body']
@@ -56,7 +61,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         request_mock.side_effect = Exception('Failed to route the dam packet')
 
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
-                              headers={'interaction-name': 'SCR_GP_SUMMARY_UPLOAD'},
+                              headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
                               body=json.dumps(body))
 
         self.assertEqual(response.code, 500)
@@ -72,48 +77,48 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertIn('No interaction-name header provided', response.body.decode())
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_correlation_id_is_passed_to_mhs(self, request_mock):
+    def test_correlation_id_is_passed_to_mhs_if_provided_to_scr_adaptor(self, request_mock):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
         self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
                    headers={
-                       'interaction-name': 'SCR_GP_SUMMARY_UPLOAD',
-                       'correlation-id': "123123123"
+                       INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME,
+                       CORRELATION_ID: "123123123"
                    },
                    body=json.dumps(body))
 
-        correlation_id_header = request_mock.call_args[1]['headers']['correlation-id']
+        correlation_id_header = request_mock.call_args[1]['headers'][CORRELATION_ID]
         self.assertEqual(correlation_id_header, "123123123")
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_message_id_is_passed_to_mhs(self, request_mock):
+    def test_message_id_is_passed_to_mhs_if_provided_to_scr_adaptor(self, request_mock):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
         self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
                    headers={
-                       'interaction-name': 'SCR_GP_SUMMARY_UPLOAD',
-                       'message-id': "123123123"
+                       INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME,
+                       MESSAGE_ID: "123123123"
                    },
                    body=json.dumps(body))
 
-        correlation_id_header = request_mock.call_args[1]['headers']['message-id']
+        correlation_id_header = request_mock.call_args[1]['headers'][MESSAGE_ID]
         self.assertEqual(correlation_id_header, "123123123")
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_both_message_id_and_correlation_are_passed_to_mhs(self, request_mock):
+    def test_both_message_id_and_correlation_are_passed_to_mhs_when_provided(self, request_mock):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
         self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
                    headers={
-                       'interaction-name': 'SCR_GP_SUMMARY_UPLOAD',
-                       'message-id': 'messageId1212',
-                       'correlation-id': 'correlationId1212'
+                       INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME,
+                       MESSAGE_ID: 'messageId1212',
+                       CORRELATION_ID: 'correlationId1212'
                    },
                    body=json.dumps(body))
 
@@ -134,11 +139,10 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
         self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
                    headers={
-                       'interaction-name': 'SCR_GP_SUMMARY_UPLOAD',
-                       'message-id': 'messageId1212'
+                       INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME,
+                       MESSAGE_ID: 'messageId1212'
                    },
                    body=json.dumps(body))
 
-        correlation_id_header = request_mock.call_args[1]['headers']['correlation-id']
+        correlation_id_header = request_mock.call_args[1]['headers'][CORRELATION_ID]
         self.assertEqual(correlation_id_header, "yes-this-is-mocked")
-
