@@ -3,11 +3,19 @@ from typing import Callable
 
 
 class AssertWithRetries(object):
+    """
+    Asserts a condition is met within a number of retries, with a synchronous 1 second wait between each retry.
+    """
 
     def __init__(self, retry_count: int):
         self.retry_count = retry_count
 
-    def assert_condition_met(self, func: Callable[[], bool]):
+    def assert_condition_met(self, func: Callable[[], bool]) -> None:
+        """
+        Asserts a condition is met within the number of retries
+        :param func: condition to be met
+        :return: None, or throws exception if condition is not met
+        """
         for retry in range(0, self.retry_count):
             result = func()
             if result:

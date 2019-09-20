@@ -82,7 +82,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
             'WORKFLOW': 'async-express'
         })
 
-    def test_should_return_successful_response_from_spine_in_original_post_request_body(self):
+    def test_should_return_successful_response_from_spine_in_original_post_request_body_if_sync_async_requested(self):
         # Arrange
         message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923', 'Asynchronous Express test')
 
