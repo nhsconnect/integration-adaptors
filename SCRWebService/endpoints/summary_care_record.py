@@ -1,13 +1,14 @@
 """The Summary Care Record endpoint"""
-
 import json
-from typing import Dict
-
+from typing import Dict, Optional
 import tornado.web
 import tornado.ioloop
 import utilities.integration_adaptors_logger as log
+from utilities import message_utilities
+
 from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
+from message_handling.message_forwarder import MessageSendingError
 
 logger = log.IntegrationAdaptorsLogger('SCR_ENDPOINT')
 
@@ -26,44 +27,59 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         """
         self.forwarder = forwarder
 
-    def post(self):
+    async def post(self):
         """
         Receives a json payload, parses the appropriate message details before processing the message contents
         :return:
         """
 
-        logger.info('001', 'Message received for gp summary upload')
         scr_input_json = self._extract_message_body()
         interaction_name = self._extract_interaction_name()
-        logger.info('002', 'Extracted message content, attempting to forward the message')
-        response = self._process_message(interaction_name, scr_input_json)
+        correlation_id = self._extract_correlation_id()
+        message_id = self._extract_message_id()
+        logger.info('001', 'Extracted message content, attempting to forward the message')
+        response = await self._process_message(interaction_name, scr_input_json, message_id, correlation_id)
         self.write(response)
 
-    def _process_message(self, interaction_name: str, scr_input_json: Dict):
+    async def _process_message(self, interaction_name: str,
+                               scr_input_json: Dict,
+                               message_id: Optional[str],
+                               correlation_id: str):
         """
         Processes the outbound message by delegating to the forwarder
         :param interaction_name: Human readable name of the interaction
         :param scr_input_json: Dictionary of desired input data
+        :param message_id
+        :param correlation_id
         :return: Result of forwarding the message to the MHS
         """
         try:
-            result = self.forwarder.forward_message_to_mhs(interaction_name, scr_input_json)
+            result = await self.forwarder.forward_message_to_mhs(interaction_name,
+                                                                 scr_input_json,
+                                                                 message_id,
+                                                                 correlation_id
+                                                                 )
             return result
         except MessageGenerationError as e:
-            logger.error('003', 'Failed to generate message {exception}', {'exception': e})
+            logger.error('002', 'Failed to generate message {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Error whilst generating message',
                                         reason=f'Error whilst generating message: {str(e)}')
+        except MessageSendingError as e:
+            logger.error('003', 'Exception raised whilst attempting to send the message to the MHS {exception}',
+                         {'exception': e})
+            raise tornado.web.HTTPError(500, f'Error whilst attempting to send the message to the MHS: {str(e)}',
+                                        reason=f'Error whilst attempting to send the message to the MHS: {str(e)}')
 
     def _extract_interaction_name(self) -> str:
         """
         Extracts the human readable interaction name from the message header
         :return: The value assigned to the `interaction-id` header key
         """
-        interaction_name = self.request.headers.get('interaction-id')
+        interaction_name = self.request.headers.get('interaction-name')
         if not interaction_name:
-            logger.error('0011', 'No interaction-id header provided with inbound message')
+            logger.error('004', 'No interaction-name header provided with inbound message')
             raise tornado.web.HTTPError(400, 'No interaction-id header provided',
-                                        reason=f'No interaction-id header provided')
+                                        reason=f'No interaction-name header provided')
         return interaction_name
 
     def _extract_message_body(self):
@@ -73,6 +89,34 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         try:
             return json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
-            logger.error('004', 'Exception raised whilst parsing message body: {exception}', {'exception': e})
+            logger.error('005', 'Exception raised whilst parsing message body: {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Failed to parse json body from request',
                                         reason=f'Exception raised while parsing message body: {str(e)}')
+
+    def _extract_correlation_id(self):
+        """
+        Attempts to extract the correlation-id from the message headers, if this fails a new one is generated,
+        either way the correlation id is set in the logger
+        :return: A UUID
+        """
+        correlation_id = self.request.headers.get('Correlation-Id', None)
+        if not correlation_id:
+            correlation_id = message_utilities.MessageUtilities.get_uuid()
+            log.correlation_id.set(correlation_id)
+            logger.info('006', "No correlation-id header found in message, generated a new one")
+        else:
+            log.correlation_id.set(correlation_id)
+            logger.info('007', 'Found correlation id on incoming request.')
+        return correlation_id
+
+    def _extract_message_id(self) -> Optional[str]:
+        """
+        Attempts to extract a message id from the headers, there is no consequence for not providing this as the
+        SCR adaptor doesn't use message id, and the MHS will generate one
+        :return:
+        """
+        message_id = self.request.headers.get('Message-Id', None)
+        if message_id:
+            log.message_id.set(message_id)
+            logger.info('008', "Found message id on incoming request")
+        return message_id
