@@ -32,13 +32,12 @@ class MessageSender(object):
                                                   body=message_body,
                                                   method='POST')
 
-        logger.info('002', 'Response received from MHS')
         return response
 
     def _build_headers(self, interaction_id: str, message_id: Optional[str], correlation_id: Optional[str]):
         """
         Builds the appropriate header dictionary for the given parameters
-        :param interaction_id: 
+        :param interaction_id:
         :param message_id:
         :param correlation_id:
         :return:
@@ -50,7 +49,6 @@ class MessageSender(object):
         if message_id:
             headers['message-id'] = message_id
 
-        if correlation_id:
-            headers['correlation-id'] = correlation_id
+        headers['correlation-id'] = correlation_id
 
         return headers

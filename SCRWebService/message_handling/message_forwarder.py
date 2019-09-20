@@ -58,7 +58,7 @@ class MessageForwarder(object):
         """
         interaction_template_populator = self.interactions.get(interaction_name)
         if not interaction_template_populator:
-            logger.error('002', 'Failed to find interaction templater for interaction name: {name}',
+            logger.error('001', 'Failed to find interaction templater for interaction name: {name}',
                          {'name': interaction_name})
             raise MessageGenerationError(f'Failed to find interaction with interaction name: {interaction_name}')
         return interaction_template_populator
@@ -73,7 +73,7 @@ class MessageForwarder(object):
         try:
             return template_populator.populate_template(supplier_message_parameters)
         except Exception as e:
-            logger.error('001', 'Message generation failed {exception}', {'exception': e})
+            logger.error('002', 'Message generation failed {exception}', {'exception': e})
             raise MessageGenerationError(str(e))
 
     async def _send_message_to_mhs(self, interaction_id: str,

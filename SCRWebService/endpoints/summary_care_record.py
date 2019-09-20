@@ -37,7 +37,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         interaction_name = self._extract_interaction_name()
         correlation_id = self._extract_correlation_id()
         message_id = self._extract_message_id()
-        logger.info('002', 'Extracted message content, attempting to forward the message')
+        logger.info('001', 'Extracted message content, attempting to forward the message')
         response = await self._process_message(interaction_name, scr_input_json, message_id, correlation_id)
         self.write(response)
 
@@ -61,11 +61,11 @@ class SummaryCareRecord(tornado.web.RequestHandler):
                                                                  )
             return result
         except MessageGenerationError as e:
-            logger.error('003', 'Failed to generate message {exception}', {'exception': e})
+            logger.error('002', 'Failed to generate message {exception}', {'exception': e})
             raise tornado.web.HTTPError(400, 'Error whilst generating message',
                                         reason=f'Error whilst generating message: {str(e)}')
         except MessageSendingError as e:
-            logger.error('004', 'Exception raised whilst attempting to send the message to the MHS {exception}',
+            logger.error('003', 'Exception raised whilst attempting to send the message to the MHS {exception}',
                          {'exception': e})
             raise tornado.web.HTTPError(500, f'Error whilst attempting to send the message to the MHS: {str(e)}',
                                         reason=f'Error whilst attempting to send the message to the MHS: {str(e)}')
@@ -77,7 +77,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         """
         interaction_name = self.request.headers.get('interaction-name')
         if not interaction_name:
-            logger.error('0011', 'No interaction-name header provided with inbound message')
+            logger.error('004', 'No interaction-name header provided with inbound message')
             raise tornado.web.HTTPError(400, 'No interaction-id header provided',
                                         reason=f'No interaction-name header provided')
         return interaction_name
@@ -103,7 +103,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
             log.correlation_id.set(correlation_id)
-            logger.info('006', "Failed to extract correlation-id from message, generated a new one")
+            logger.info('006', "No correlation-id header found in message, generated a new one")
         else:
             log.correlation_id.set(correlation_id)
             logger.info('007', 'Found correlation id on incoming request.')
