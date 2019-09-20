@@ -14,6 +14,12 @@ variable "build_id" {
   description = "ID used to identify the current build."
 }
 
+variable "mhs_vpc_cidr_block" {
+  type = string
+  description = "The CIDR block to use for the MHS VPC that is created."
+  default = "10.0.0.0/16"
+}
+
 variable "supplier_vpc_id" {
   type = string
   description = "VPC id of the supplier system that connects to the MHS"
