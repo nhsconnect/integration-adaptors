@@ -49,6 +49,14 @@ services:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SDS_URL=ldap://msg.opentest.hscic.gov.uk
       - MHS_DISABLE_SDS_TLS=True
+
+  scradaptor:
+    image: local/scr-web-service
+    ports:
+      - "9000:9009"
+    environment:
+      - SCR_LOG_LEVEL=NOTSET
+      - SCR_MHS_ADDRESS=http://outbound:80
   dynamodb:
     build: ./common/local-env/dynamodb-local
     ports:
@@ -59,3 +67,4 @@ services:
       - "15672:15672"
       - "5672:5672"
     hostname: "localhost"
+
