@@ -49,6 +49,8 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         Processes the outbound message by delegating to the forwarder
         :param interaction_name: Human readable name of the interaction
         :param scr_input_json: Dictionary of desired input data
+        :param message_id
+        :param correlation_id
         :return: Result of forwarding the message to the MHS
         """
         try:

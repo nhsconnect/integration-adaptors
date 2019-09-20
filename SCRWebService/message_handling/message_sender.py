@@ -36,6 +36,13 @@ class MessageSender(object):
         return response
 
     def _build_headers(self, interaction_id: str, message_id: Optional[str], correlation_id: Optional[str]):
+        """
+        Builds the appropriate header dictionary for the given parameters
+        :param interaction_id: 
+        :param message_id:
+        :param correlation_id:
+        :return:
+        """
         headers = {
             'Interaction-Id': interaction_id,
             'sync-async': 'true'

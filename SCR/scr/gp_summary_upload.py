@@ -10,11 +10,11 @@ class GpSummaryUpload(object):
     """Class for populating a Gp Summary Upload template"""
 
     summaryCareRecordPath = Path(ROOT_DIR) / "data/templates"
-    file_name = "16UK05"
+    file_template_name = "16UK05"
     interaction_id = "REPC_IN150016UK05"
 
     def __init__(self):
-        self.builder = PystacheMessageBuilder(str(self.summaryCareRecordPath), self.file_name)
+        self.builder = PystacheMessageBuilder(str(self.summaryCareRecordPath), self.file_template_name)
 
     def populate_template_with_file(self, json_file):
         """
