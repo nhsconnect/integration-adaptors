@@ -11,7 +11,7 @@ ERROR_RESPONSE_DEFAULTS = {
 }
 
 
-def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyStr]:
+def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyStr, list]:
     """
     Analyzes response from NHS which works in as web service mode
     and returns result of interpretation to external client
