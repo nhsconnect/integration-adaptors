@@ -1,5 +1,5 @@
 """
-Provides access to an AMQ queues
+Provides access to AMQ queues
 """
 import os
 
