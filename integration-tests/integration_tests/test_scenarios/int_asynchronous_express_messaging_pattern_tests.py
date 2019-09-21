@@ -1,3 +1,6 @@
+"""
+Provides tests around the Asynchronous Express workflow, including sync-async wrapping
+"""
 from unittest import TestCase
 
 from integration_tests.amq.amq import MHS_INBOUND_QUEUE

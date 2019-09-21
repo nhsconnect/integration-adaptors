@@ -1,3 +1,6 @@
+"""
+Provides a way of asserting a condition is met within a number of retries in order to avoid test timing issues
+"""
 import time
 from typing import Callable
 

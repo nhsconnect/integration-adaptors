@@ -1,3 +1,6 @@
+"""
+Provides functionality to assert items within the MHS Dynamo table
+"""
 import json
 import unittest
 

@@ -1,3 +1,6 @@
+"""
+Provides access to an AMQ queues
+"""
 import os
 
 from proton import Message

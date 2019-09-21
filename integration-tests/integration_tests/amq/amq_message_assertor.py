@@ -1,3 +1,6 @@
+"""
+Provides a way of asserting AMQ messages
+"""
 from __future__ import annotations
 import unittest
 
