@@ -1,3 +1,6 @@
+"""
+Provides a way of asserting a HL7 XML message
+"""
 from __future__ import annotations
 
 import re

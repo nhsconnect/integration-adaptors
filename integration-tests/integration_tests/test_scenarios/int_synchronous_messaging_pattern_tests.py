@@ -1,3 +1,6 @@
+"""
+Provides tests around the Synchronous workflow
+"""
 from unittest import TestCase
 
 from integration_tests.dynamo.dynamo import MHS_DYNAMO_WRAPPER
