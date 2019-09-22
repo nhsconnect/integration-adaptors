@@ -5,20 +5,6 @@ from integration_tests.helpers import methods, interactions, message_retriever
 
 class FunctionalTest(TestCase):
 
-    # Message Pattern Type: Asynchronous Express
-    # Interaction: PSIS Document List Data Request (QUPC_IN160101UK05)
-    def test_mhs_async_express(self):
-        methods.get_interaction_from_template('async express',
-                                              'QUPC_IN160101UK05',
-                                              '9689174746',
-                                              'Asynchronous Express test')
-
-        # then retrieve the response from the queue...
-        _, _, inbound_response = message_retriever.get_inbound_response()
-
-        self.assertTrue(methods.check_response(inbound_response, 'queryResponseCode'),
-                        "Asynchronous Express smoke test failed")
-
     # Message Pattern Type: Asynchronous Reliable
     # Interaction: GP Summary (REPC_IN150016UK05)
     @skip('waiting for RT-12 - Implement MHS Async Reliable Message Pattern')
