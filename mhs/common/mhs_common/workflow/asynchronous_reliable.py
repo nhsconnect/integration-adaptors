@@ -22,7 +22,7 @@ from mhs_common.routing import routing_reliability
 from exceptions import MaxRetriesExceeded
 import asyncio
 
-from utilities.xml_utilities import XmlUtilities
+from utilities.date_utilities import DateUtilities
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_RELIABLE_WORKFLOW')
 
@@ -81,7 +81,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
         reliability_details = await self._lookup_reliability_details(interaction_details)
         retry_interval_xml_datetime = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL][0]
         try:
-            retry_interval = XmlUtilities.convert_xml_date_time_format_to_seconds(retry_interval_xml_datetime)
+            retry_interval = DateUtilities.convert_xml_date_time_format_to_seconds(retry_interval_xml_datetime)
         except isoerror.ISO8601Error:
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error when converting retry interval: {} to seconds'.format(retry_interval_xml_datetime), None

@@ -14,7 +14,6 @@ ldap3 = "*"
 tornado = "*"
 aioboto3 = "*"
 defusedxml = "~=0.6"
-isodate = "*"
 
 [requires]
 python_version = "3.7"

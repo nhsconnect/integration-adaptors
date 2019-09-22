@@ -2,10 +2,10 @@ import unittest
 
 from isodate import isoerror
 
-from utilities.xml_utilities import XmlUtilities
+from utilities.date_utilities import DateUtilities
 
 
-class TestXMLUtilities(unittest.TestCase):
+class TestDateUtilities(unittest.TestCase):
 
     def test_xml_dates_parsed_successfully(self):
         test_cases = [('P1DT2H', 93600),
@@ -19,7 +19,7 @@ class TestXMLUtilities(unittest.TestCase):
         for xml_date, expected_seconds in test_cases:
             description = 'Test {} is parsed to seconds correctly'.format(xml_date)
             with self.subTest(description):
-                actual_seconds = XmlUtilities.convert_xml_date_time_format_to_seconds(xml_date)
+                actual_seconds = DateUtilities.convert_xml_date_time_format_to_seconds(xml_date)
                 self.assertEqual(expected_seconds, actual_seconds, 'Should have parsed to expected number of seconds')
 
     def test_xml_dates_unable_to_parse(self):
@@ -32,5 +32,5 @@ class TestXMLUtilities(unittest.TestCase):
             description = 'Test {} is unable to be parsed to seconds correctly'.format(xml_date)
             with self.subTest(description):
                 with self.assertRaises(expected_exception):
-                    XmlUtilities.convert_xml_date_time_format_to_seconds(xml_date)
+                    DateUtilities.convert_xml_date_time_format_to_seconds(xml_date)
 
