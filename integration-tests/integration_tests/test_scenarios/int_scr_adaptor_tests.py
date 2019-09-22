@@ -14,7 +14,7 @@ class FunctionalTest(TestCase):
         scr_response = interactions.call_scr_adaptor(scr_json)
 
         # now send the scr_response to the mhs
-        mhs_response = interactions.call_mhs('gp_summary_upload', scr_response, None, False, None, False, False)
+        mhs_response = interactions.call_mhs('gp_summary_upload', scr_response, None, False, None, False)
 
         # then validate the mhs-response
         self.assertTrue(methods.check_response(mhs_response, 'requestSuccessDetail'),
