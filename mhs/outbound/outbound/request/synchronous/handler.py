@@ -1,12 +1,17 @@
 """This module defines the outbound synchronous request handler component."""
-
+import json
 from typing import Dict, Any
+
+import marshmallow
+import mhs_common.state.work_description as wd
+import mhs_common.workflow as workflow
+import tornado.escape
 import tornado.locks
 import tornado.web
-import mhs_common.workflow as workflow
 from mhs_common.configuration import configuration_manager
+
+from outbound.request.synchronous import request_body_schema
 from utilities import integration_adaptors_logger as log, message_utilities, timing
-import mhs_common.state.work_description as wd
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
@@ -107,7 +112,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         requestBody:
           required: true
           content:
-            'text/xml':
+            'application/json':
               schema:
                 $ref: '#/definitions/RequestBody'
           description: HL7 payload that is to be sent to Spine.
@@ -132,11 +137,35 @@ class SynchronousHandler(tornado.web.RequestHandler):
             await self.invoke_default_workflow(from_asid, message_id, correlation_id, interaction_details, body, wf)
 
     def _parse_body(self):
+        try:
+            content_type = self.request.headers['Content-Type']
+        except KeyError as e:
+            logger.error('0011', 'Missing Content-Type header')
+            raise tornado.web.HTTPError(400, 'Missing Content-Type header', reason='Missing Content-Type header') from e
+        if content_type != 'application/json':
+            logger.error('0012', 'Unsupported content type in request. {ExpectedContentType} {ActualContentType}',
+                         {'ExpectedContentType': 'application/json', 'ActualContentType': content_type})
+            raise tornado.web.HTTPError(415,
+                                        'Unsupported content type. Only application/json request bodies are supported.',
+                                        reason='Unsupported content type. Only application/json request bodies are '
+                                               'supported.')
         body = self.request.body.decode()
         if not body:
             logger.error('0009', 'Body missing from request')
             raise tornado.web.HTTPError(400, 'Body missing from request', reason='Body missing from request')
-        return body
+        try:
+            # Parse the body as JSON and validate it against RequestBodySchema
+            parsed_body: request_body_schema.RequestBody = request_body_schema.RequestBodySchema().loads(body)
+        except json.JSONDecodeError as e:
+            logger.error('0013', 'Invalid JSON request body')
+            raise tornado.web.HTTPError(400, 'Invalid JSON request body', reason='Invalid JSON request body') from e
+        except marshmallow.ValidationError as e:
+            # e.messages is a nested dict of all the validation errors
+            validation_errors = str(e.messages)
+            logger.error('0014', 'Invalid request. {ValidationErrors}', {'ValidationErrors': validation_errors})
+            raise tornado.web.HTTPError(400, f'Invalid request. Validation errors: {validation_errors}',
+                                        reason=f'Invalid request. Validation errors: {validation_errors}') from e
+        return parsed_body.payload
 
     def write_error(self, status_code: int, **kwargs: Any):
         self.set_header('Content-Type', 'text/plain')

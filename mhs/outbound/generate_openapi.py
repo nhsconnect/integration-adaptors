@@ -5,7 +5,7 @@ import apispec.ext.marshmallow
 import apispec_webframeworks.tornado
 from mhs_common.request import healthcheck_handler
 
-from outbound.request.synchronous import handler
+from outbound.request.synchronous import request_body_schema, handler
 
 
 def create_spec() -> apispec.APISpec:
@@ -19,6 +19,8 @@ def create_spec() -> apispec.APISpec:
         openapi_version='3.0.2',
         plugins=[apispec.ext.marshmallow.MarshmallowPlugin(), apispec_webframeworks.tornado.TornadoPlugin()]
     )
+
+    spec.components.schema("RequestBody", schema=request_body_schema.RequestBodySchema)
 
     spec.path(urlspec=(r'/', handler.SynchronousHandler))
     spec.path(urlspec=(r'/healthcheck', healthcheck_handler.HealthcheckHandler))

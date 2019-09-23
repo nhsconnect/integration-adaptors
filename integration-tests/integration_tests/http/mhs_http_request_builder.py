@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 import uuid
 
@@ -32,7 +33,8 @@ class MhsHttpRequestBuilder(object):
             'Message-Id': message_id,
             'Correlation-Id': str(uuid.uuid4()).upper(),
             'sync-async': str(sync_async),
-            'from-asid': f'{get_asid()}'
+            'from-asid': f'{get_asid()}',
+            'Content-Type': 'application/json'
         }
 
         return self
@@ -43,7 +45,7 @@ class MhsHttpRequestBuilder(object):
         :param body: the payload to send
         :return: self
         """
-        self.body = body
+        self.body = json.dumps({"payload": body})
 
         return self
 

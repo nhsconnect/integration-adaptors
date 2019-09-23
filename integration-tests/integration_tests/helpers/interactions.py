@@ -1,5 +1,6 @@
-import requests
+import json
 
+import requests
 from utilities import message_utilities
 
 from integration_tests.helpers import methods
@@ -47,8 +48,9 @@ def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_i
 
     headers['sync-async'] = 'true' if sync_async else 'false'
     headers['from-asid'] = f'{from_asid}'
+    headers['Content-Type'] = 'application/json'
 
-    return requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
+    return requests.post(methods.get_mhs_hostname(), headers=headers, data=json.dumps({'payload': hl7payload}))
 
 
 def call_scr_adaptor(json_string):
