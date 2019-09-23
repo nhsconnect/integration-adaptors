@@ -68,7 +68,10 @@ class SynchronousHandler(tornado.web.RequestHandler):
             required: false
             schema:
               type: string
-            description: from-asid
+            description: >-
+              The ASID of the sending system. This should be the same as the from-asid
+              value within the HL7 payload. This header is optional and only
+              required/used for interactions that use the sync workflow.
           - name: Message-Id
             in: header
             required: false
