@@ -48,7 +48,8 @@ class MessageForwarder(object):
                                                    message=populated_message, 
                                                    message_id=message_id,
                                                    correlation_id=correlation_id)
-        return response
+        parsed_response = template_populator.parse_response(response)
+        return parsed_response
 
     def _get_interaction_template_populator(self, interaction_name: str):
         """

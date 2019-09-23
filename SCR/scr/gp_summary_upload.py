@@ -2,7 +2,6 @@
 import json
 from pathlib import Path
 from builder.pystache_message_builder import PystacheMessageBuilder
-
 from scr_definitions import ROOT_DIR
 
 
@@ -43,3 +42,12 @@ class GpSummaryUpload(object):
         :return: xml string containing populated template
         """
         return self.builder.build_message(input_hash)
+
+    def parse_response(self, response_message: str) -> Dict[str: str]:
+        """
+        Parses a given Gp summary Upload response.
+        NOTE: This is purely a success parsing response mecahnism, error parsing is currently not supported
+        :param response_message: A Successful Gp Summary Upload response acknolwedgement
+        :return: A dictionary containing the key success details of the message
+        """
+        pass
