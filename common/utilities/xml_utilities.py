@@ -17,6 +17,10 @@ class XmlUtilities(object):
         expected = etree.tostring(obj1)
         obj2 = objectify.fromstring(actual)
         actual = etree.tostring(obj2)
+
+
+        print(f"EXPECTED: {expected}")
+        print(f"ACTUAL: {actual}")
         unittest.TestCase().assertEqual(expected, actual)
 
     @staticmethod
