@@ -48,16 +48,16 @@ class RedisCache(cache_adaptor.CacheAdaptor):
             cached_json_value = await event_loop.run_in_executor(None, self._redis_client.get, key)
 
             if cached_json_value is None:
-                logger.info("0004", "No cache entry found for {key}.", {"key": key})
+                logger.info("0003", "No cache entry found for {key}.", {"key": key})
                 return None
 
             value = json.loads(cached_json_value)
 
-            logger.info("0006", "Retrieved cache entry for {key}. {value}", {"key": key, "value": value})
+            logger.info("0004", "Retrieved cache entry for {key}. {value}", {"key": key, "value": value})
 
             return value
         except redis.RedisError as re:
-            logger.error("0003", "An error occurred when attempting to load {key}. {exception}",
+            logger.error("0005", "An error occurred when attempting to load {key}. {exception}",
                          {"key": key, "exception": re})
             return None
 
@@ -77,10 +77,10 @@ class RedisCache(cache_adaptor.CacheAdaptor):
 
         event_loop = asyncio.get_event_loop()
         try:
-            logger.info("0007", "Attempting to store {value} in the cache using {key}",
+            logger.info("0006", "Attempting to store {value} in the cache using {key}",
                         {"value": json_value, "key": key})
             await event_loop.run_in_executor(None, self._redis_client.setex, key, self.expiry_time, json_value)
-            logger.info("0009", "Successfully stored {value} in the cache using {key}",
+            logger.info("0007", "Successfully stored {value} in the cache using {key}",
                         {"value": json_value, "key": key})
         except redis.RedisError as re:
             logger.error("0008", "An error occurred when caching {value}. {exception}",
