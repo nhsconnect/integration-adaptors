@@ -128,6 +128,11 @@ pipeline {
                                     returnStdout: true,
                                     script: "terraform output mhs_state_table_name"
                                 ).trim()
+                                env.MHS_SYNC_ASYNC_TABLE_NAME = sh (
+                                    label: 'Obtaining the dynamodb table name used for the MHS sync/async state',
+                                    returnStdout: true,
+                                    script: "terraform output mhs_sync_async_table_name"
+                                ).trim()
                             }
                         }
                     }
