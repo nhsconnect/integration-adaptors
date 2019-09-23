@@ -16,6 +16,7 @@ In order to run the build pipeline, the following resources must be created manu
 
 - An S3 bucket to be used to store the Terraform state databases for the MHS & SCR configurations. This allows deployed resources to be re-used in
 subsequent builds, reducing the time needed to deploy updated services.
+    - It is recommended that default encryption of objects in this bucket is enabled when creating it
 - Two DynamoDB tables to be used to allow Terraform to lock the shared state of the MHS & SCR configurations, preventing issues if concurrent deployments
 of the same environment are performed. These tables must have a primary key named `LockID`.
 - Log groups in Cloudwatch under the following names:
