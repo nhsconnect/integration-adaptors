@@ -44,7 +44,7 @@ class FullTest(unittest.TestCase):
 
         expected_string = FileUtilities.get_file_string(expected_xml_file_path)
         render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
-        XmlUtilities.assert_xml_equal(expected_string, render)
+        XmlUtilities.assert_xml_equal(expected_string.rstrip(), render.rstrip())
 
     def test_should_raise_exception_when_hash_is_empty(self):
         """
