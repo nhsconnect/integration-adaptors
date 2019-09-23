@@ -176,7 +176,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertEqual(response_body['messageDetail'], 'GP Summary upload successful')
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_failure_during_parsing_returns_error_message(self, request_mock):
+    def test_bad_message_body_returns_an_error(self, request_mock):
         # Arrange
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         response_mock = TestResponse()
@@ -191,4 +191,4 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         response_body = json.loads(response.body.decode())
 
         # Assert
-        self.assertEqual(response_body['error'], 'Exception raised whilst attempting to parse response')
+        self.assertEqual(response_body['error'], 'Failed to parse response from xml provided')

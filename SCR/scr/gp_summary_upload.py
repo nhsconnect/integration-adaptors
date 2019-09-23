@@ -3,8 +3,11 @@ import json
 from pathlib import Path
 from builder.pystache_message_builder import PystacheMessageBuilder
 from scr_definitions import ROOT_DIR
-from typing import Dict
+from typing import Dict, Optional, Callable
 import xml.etree.ElementTree as ET
+from utilities import integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
 
 
 class GpSummaryUpload(object):
@@ -48,21 +51,67 @@ class GpSummaryUpload(object):
     def parse_response(self, response_message: str) -> Dict:
         """
         Parses te key values of a given Gp summary Upload response into a dictionary.
-        NOTE: This is purely a success parsing response mecahnism, error parsing is currently not supported
-        :param response_message: A Successful Gp Summary Upload response acknolwedgement
+        NOTE: This is purely a success parsing response mechanism, error parsing is currently not supported
+        :param response_message: A Successful Gp Summary Upload response acknowledgement
         :return: A dictionary containing the key success details of the message
         """
-        root = ET.ElementTree(ET.fromstring(response_message)).getroot()
-        message_id = self._find_hl7_element(root, './/hl7:id').attrib['root']
-        message_reference = self._find_hl7_element(root, './/hl7:messageRef/hl7:id').attrib['root']
-        creation_time = self._find_hl7_element(root, './/hl7:creationTime').attrib['value']
-        message_detail = self._find_hl7_element(root, './/hl7:ControlActEvent/hl7:requestSuccessDetail/hl7:detail').text
-        return {
-            'messageRef': message_reference,
-            'messageId': message_id,
-            'creationTime': creation_time,
-            'messageDetail': message_detail
-        }
+        root = self._get_root(response_message)
+        if not root:
+            return {'error': 'Failed to parse response from xml provided'}
 
-    def _find_hl7_element(self, root, element_name:str):
-        return root.find(element_name, namespaces={'hl7': 'urn:hl7-org:v3'})
+        message_id = self._find_hl7_element_attribute(root, './/hl7:id', 'root')
+        message_reference = self._find_hl7_element_attribute(root, './/hl7:messageRef//hl7:id', 'root')
+        creation_time = self._find_hl7_element_attribute(root, './/hl7:creationTime', 'value')
+        message_detail = self._find_hl7_element_text(root,
+                                                     './/hl7:ControlActEvent//hl7:requestSuccessDetail//hl7:detail')
+
+        return self._create_response_dictionary(message_id, message_reference, creation_time, message_detail)
+
+    def _get_root(self, message: str) -> Optional[ET.Element]:
+        try:
+            return ET.ElementTree(ET.fromstring(message)).getroot()
+        except ET.ParseError as e:
+            logger.error('001', 'Exception raised while creating XML object from string {exception}',
+                         {'exception': e})
+            return None
+
+    def _find_hl7_element_attribute(self, root: ET.Element, element_name: str, attribute: str) -> Optional[str]:
+        try:
+            return self._get_element(root, element_name, lambda x: x.attrib[attribute])
+        except KeyError:
+            logger.info('002', 'Failed to find attribute on {element} {attribute}',
+                        {'element': element_name, 'attribute': attribute}
+                        )
+            return None
+
+    def _find_hl7_element_text(self, root: ET.Element, element_name: str):
+        return self._get_element(root, element_name, lambda x: x.text)
+
+    def _get_element(self, root: ET.Element, element_name: str, func: Callable[[ET.Element], str]):
+        element = root.find(element_name, namespaces={'hl7': 'urn:hl7-org:v3'})
+        if element is None:
+            return None
+
+        return func(element)
+
+    def _create_response_dictionary(self, message_id: str, message_ref: str, creation_time: str, message_detail: str) \
+            -> Dict:
+
+        if all([message_id, message_ref, creation_time, message_detail]):
+            return {
+                'messageRef': message_ref,
+                'messageId': message_id,
+                'creationTime': creation_time,
+                'messageDetail': message_detail
+            }
+        else:
+            logger.error('003', 'Failed to parse all necessary elements from xml {message_id} {message_reference}'
+                                ' {creation_time} {message_details}',
+                         {'message_id': message_id,
+                          'message_reference': message_ref,
+                          'creation_time': creation_time,
+                          'message_details': message_detail
+                          }
+                         )
+            return {'error': 'Failed to parse all the necessary elements from xml returned from MHS'}
+

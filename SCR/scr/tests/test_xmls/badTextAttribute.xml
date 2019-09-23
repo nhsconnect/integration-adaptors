@@ -31,7 +31,7 @@
             </hl7:AgentSystemSDS>
         </hl7:author1>
         <hl7:requestSuccessDetail>
-            <hl7:detail>GP Summary upload successful</hl7:detail>
+            <hl7:detail></hl7:detail>
             <hl7:id root="Not Known" />
         </hl7:requestSuccessDetail>
     </hl7:ControlActEvent>

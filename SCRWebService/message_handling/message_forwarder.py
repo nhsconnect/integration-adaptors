@@ -59,7 +59,7 @@ class MessageForwarder(object):
         """
         interaction_template_populator = self.interactions.get(interaction_name)
         if not interaction_template_populator:
-            logger.error('001', 'Failed to find interaction templater for interaction name: {name}',
+            logger.error('001', 'Failed to find interaction templator for interaction name: {name}',
                          {'name': interaction_name})
             raise MessageGenerationError(f'Failed to find interaction with interaction name: {interaction_name}')
         return interaction_template_populator

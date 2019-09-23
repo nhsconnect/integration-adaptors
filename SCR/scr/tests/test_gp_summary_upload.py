@@ -7,7 +7,7 @@ from scr_definitions import ROOT_DIR
 from scr.gp_summary_upload import GpSummaryUpload
 
 
-class FullTest(unittest.TestCase):
+class GpSummaryUploadTest(unittest.TestCase):
     gp_summary_upload_templator = GpSummaryUpload()
 
     xmlFileDir = Path(ROOT_DIR + '/scr/tests/test_xmls/')
@@ -122,3 +122,27 @@ class FullTest(unittest.TestCase):
         self.assertEqual(parsed_data['messageId'], '2E372546-229A-483F-9B11-EF46ABF3178C')
         self.assertEqual(parsed_data['creationTime'], '20190923112609')
         self.assertEqual(parsed_data['messageDetail'], 'GP Summary upload successful')
+
+    def test_hl7_parsing_bad_attribute(self):
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'badAttributeParse.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
+
+    def test_hl7_parsing_text_attribute(self):
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'badTextAttribute.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
+
+    def test_hl7_parsing_should_error_when_details_tag_is_missing(self):
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'missingAttribute.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
+
+    def test_hl7_parsing_should_error_when_time_tag_is_missing(self):
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'missingAttribute.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
