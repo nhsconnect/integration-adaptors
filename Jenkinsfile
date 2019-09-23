@@ -36,6 +36,9 @@ pipeline {
          stage('Spine Route Lookup Unit Tests') {
             steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
         }
+        stage('SCR Library Unit Tests'){
+            steps { dir('SCR')} { executeUnitTestsWithCoverage() }
+        }
         stage('SCR Web Service Unit Tests') {
             steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
         }
