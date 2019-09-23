@@ -58,7 +58,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             wdo = wd.create_new_work_description(self.persistence_store,
                                                  message_id,
                                                  workflow.ASYNC_EXPRESS,
-                                                 wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
+                                                 outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
                                                  )
             await wdo.publish()
 

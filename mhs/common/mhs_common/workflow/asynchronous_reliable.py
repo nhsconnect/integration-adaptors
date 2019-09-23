@@ -58,7 +58,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             wdo = wd.create_new_work_description(self.persistence_store,
                                                  message_id,
                                                  workflow.ASYNC_RELIABLE,
-                                                 wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
+                                                 outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
                                                  )
             await wdo.publish()
 
@@ -91,17 +91,9 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
         retries_remaining = num_of_retries
 
         while True:
-            try:
-                start_time = timing.get_time()
-                logger.info('0004', 'About to make outbound request')
-                response = await self.transmission.make_request(url, http_headers, message)
-            except Exception as e:
-                end_time = timing.get_time()
-                logger.warning('0016', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
-                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-                self._record_outbound_audit_log(end_time, start_time,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-                raise e
+            start_time = timing.get_time()
+            logger.info('0004', 'About to make outbound request')
+            response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
 
             if response.code == 202:
                 end_time = timing.get_time()
