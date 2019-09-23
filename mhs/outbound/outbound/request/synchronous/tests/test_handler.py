@@ -234,6 +234,18 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.headers["Content-Type"], "text/plain")
         self.assertIn("Unsupported content type", response.body.decode())
 
+    def test_post_with_invalid_json_body(self):
+        self.config_manager.get_interaction_details.return_value = None
+
+        response = self.fetch("/", method="POST",
+                              headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
+                                       'sync-async': 'true'},
+                              body="{]")
+
+        self.assertEqual(response.code, 400)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertIn("Invalid JSON request body", response.body.decode())
+
     def test_handler_updates_store_for_sync_async(self):
         expected_response = "Hello world!"
         wdo = unittest.mock.MagicMock()
