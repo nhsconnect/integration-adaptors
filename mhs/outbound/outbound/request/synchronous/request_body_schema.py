@@ -27,7 +27,9 @@ class AttachmentSchema(marshmallow.Schema):
                                           validate=marshmallow.validate.OneOf(_ATTACHMENT_ALLOWED_CONTENT_TYPES))
     payload = marshmallow.fields.Str(required=True,
                                      description='The attachment, possibly base64-encoded as per is_base64.',
-                                     validate=marshmallow.validate.Length(min=1))
+                                     # Max length of payload is 5MB ie 5 000 000 characters. This requirement is from
+                                     # EIS section 2.5.4.2
+                                     validate=marshmallow.validate.Length(min=1, max=5_000_000))
     description = marshmallow.fields.Str(required=True, description='Description of the attachment',
                                          validate=marshmallow.validate.Length(min=1))
 

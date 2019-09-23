@@ -435,9 +435,6 @@ class TestSynchronousHandlerRequestBodyValidation(tornado.testing.AsyncHTTPTestC
         sub_tests = [
             {"request_body": {"payload": ""}, "field_name": "payload"},
             {"request_body": {"payload": "test", "attachments": [
-                {"is_base64": False, "content_type": "text/plain", "payload": "", "description": "some description"}]},
-             "field_name": "payload"},
-            {"request_body": {"payload": "test", "attachments": [
                 {"is_base64": False, "content_type": "text/plain", "payload": "some payload", "description": ""}]},
              "field_name": "description"},
         ]
@@ -487,6 +484,20 @@ class TestSynchronousHandlerRequestBodyValidation(tornado.testing.AsyncHTTPTestC
         response_body = self._make_request_and_check_invalid_request_response(
             {'request_body': request_body, 'field_name': "content_type"})
         self.assertIn("Must be one of", response_body)
+
+    def test_post_with_request_body_with_attachment_payload_wrong_size(self):
+        payloads = ["", "e" * 5_000_001]
+        for payload in payloads:
+            with self.subTest(payload_size=len(payload)):
+                request_body = {"payload": "test",
+                                "attachments": [{
+                                    "is_base64": False,
+                                    "content_type": "text/plain",
+                                    "payload": payload,
+                                    "description": "some description"}]}
+                response_body = self._make_request_and_check_invalid_request_response(
+                    {'request_body': request_body, 'field_name': "payload"})
+                self.assertIn("Length must be between 1 and 5000000", response_body)
 
     def _make_request_and_check_invalid_request_response(self, sub_test: dict) -> str:
         response = self.fetch("/", method="POST",
