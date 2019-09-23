@@ -3,6 +3,8 @@ import json
 from pathlib import Path
 from builder.pystache_message_builder import PystacheMessageBuilder
 from scr_definitions import ROOT_DIR
+from typing import Dict
+import xml.etree.ElementTree as ET
 
 
 class GpSummaryUpload(object):
@@ -43,11 +45,24 @@ class GpSummaryUpload(object):
         """
         return self.builder.build_message(input_hash)
 
-    def parse_response(self, response_message: str) -> Dict[str: str]:
+    def parse_response(self, response_message: str) -> Dict:
         """
         Parses a given Gp summary Upload response.
         NOTE: This is purely a success parsing response mecahnism, error parsing is currently not supported
         :param response_message: A Successful Gp Summary Upload response acknolwedgement
         :return: A dictionary containing the key success details of the message
         """
-        pass
+        root = ET.ElementTree(ET.fromstring(response_message)).getroot()
+        message_id = self._find_hl7_element(root, './/hl7:id').attrib['root']
+        message_reference = self._find_hl7_element(root, './/hl7:messageRef/hl7:id').attrib['root']
+        creation_time = self._find_hl7_element(root, './/hl7:creationTime').attrib['value']
+        message_detail = self._find_hl7_element(root, './/hl7:ControlActEvent/hl7:requestSuccessDetail/hl7:detail').text
+        return {
+            'messageRef': message_reference,
+            'messageId': message_id,
+            'creationTime': creation_time,
+            'messageDetail': message_detail
+        }
+
+    def _find_hl7_element(self, root, element_name:str):
+        return root.find(element_name, namespaces={'hl7': 'urn:hl7-org:v3'})
