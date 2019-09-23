@@ -47,7 +47,8 @@ class SynchronousHandler(tornado.web.RequestHandler):
             in: header
             required: true
             schema:
-              type: boolean
+              type: string
+              enum: ["true", "false"]
             description: >-
               If set to true and the interaction ID is for an async interaction
               that supports sync-async, then the HTTP response will be the
