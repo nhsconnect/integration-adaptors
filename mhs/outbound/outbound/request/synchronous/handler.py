@@ -109,6 +109,8 @@ class SynchronousHandler(tornado.web.RequestHandler):
         responses:
           200:
             description: Successful response from Spine.
+            content:
+              text/xml: {}
           202:
             description: >-
               Acknowledgement that we successfully sent the message to Spine
@@ -116,7 +118,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         requestBody:
           required: true
           content:
-            'application/json':
+            application/json:
               schema:
                 $ref: '#/definitions/RequestBody'
           description: The HL7 payload (and optional attachments) to be sent to Spine.
