@@ -17,6 +17,7 @@ pipeline {
                 dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
                 dir('mhs/outbound'){ buildModules('Installing outbound dependencies') }
                 dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
+                dir('SCR') { buildModules('Installing SCR lib dependencies') }
                 dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
             }
         }
