@@ -76,7 +76,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
             .assert_element_attribute('.//queryAck//queryResponseCode', 'code', 'OK')
 
         AssertWithRetries(retry_count=10) \
-            .assert_condition_met(lambda: self.wait_for_inbound_response_processed(message_id))
+            .assert_condition_met(lambda: DynamoMhsTableStateAssertor.wait_for_inbound_response_processed(message_id))
 
         DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
@@ -119,9 +119,3 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
             .assert_single_item_exists_with_key(message_id) \
             .assert_element_attribute('.//queryAck//queryResponseCode', 'code', 'OK') \
             .assert_element_attribute('.//patient//id', 'extension', '9689177923')
-
-    @staticmethod
-    def wait_for_inbound_response_processed(message_id: str) -> bool:
-        return DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
-            .assert_single_item_exists_with_key(message_id) \
-            .item_contains_value('INBOUND_STATUS', 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED')

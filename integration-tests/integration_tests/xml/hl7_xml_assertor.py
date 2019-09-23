@@ -31,6 +31,19 @@ class Hl7XmlResponseAssertor(object):
         self.__get_element(xpath)
         return self
 
+    def assert_element_exists_with_value(self, xpath: str, expected_value: str):
+        """
+        Asserts an element exists and contains the expected value
+        :param xpath: the xpath of the element
+        :param expected_value: the expected value of the element
+        :return: self
+        """
+        element = self.__get_element(xpath)
+        actual_value = element.text
+        self.assertor.assertEqual(actual_value, expected_value,
+                                  f"Expected value: {expected_value} not equal to actual value: {actual_value}")
+        return self
+
     def assert_element_attribute(self, xpath: str, attribute: str, expected_value: Any) -> Hl7XmlResponseAssertor:
         """
         Asserts an element exists and has an attribute with the expected value
