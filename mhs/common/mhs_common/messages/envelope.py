@@ -24,7 +24,6 @@ MESSAGE = "hl7_message"
 CONTENT_TYPE_HEADER_NAME = "Content-Type"
 TEMPLATES_DIR = "data/templates"
 
-
 class Envelope(abc.ABC):
     """An envelope that contains a message to be sent to a remote MHS."""
 

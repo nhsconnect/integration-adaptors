@@ -12,7 +12,8 @@ class CommonHttps(object):
     @staticmethod
     async def make_request(url: str, method: str, headers: Dict[str, str], body: str, client_cert: str = None,
                            client_key: str = None, ca_certs: str = None, validate_cert: bool = True,
-                           http_proxy_host: str = None, http_proxy_port: int = None):
+                           http_proxy_host: str = None, http_proxy_port: int = None,
+                           raise_error_response: bool = True):
         """Send a HTTPS request and return it's response.
         :param url: A string containing the endpoint to send the request to.
         :param method: A string containing the HTTP method to send the request as.
@@ -24,6 +25,7 @@ class CommonHttps(object):
         :param validate_cert: Whether the server's certificate should be validated or not.
         :param http_proxy_host The hostname of the HTTP proxy to be used.
         :param http_proxy_port The port of the HTTP proxy to be used.
+        :param raise_error_response: Return an error response
         """
 
         logger.info("0001", "About to send {method} request with {headers} to {url} using {proxy_host} & {proxy_port}",
@@ -34,6 +36,7 @@ class CommonHttps(object):
             logger.warning("0003", "Server certificate validation has been disabled.")
 
         response = await httpclient.AsyncHTTPClient().fetch(url,
+                                                            raise_error=raise_error_response,
                                                             method=method,
                                                             body=body,
                                                             headers=headers,

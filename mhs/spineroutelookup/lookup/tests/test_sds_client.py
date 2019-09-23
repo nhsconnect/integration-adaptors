@@ -81,6 +81,14 @@ class TestSDSClient(TestCase):
         self.assertEqual(len(attributes), len(expected_mhs_attributes))
 
     @async_test
+    async def test_should_return_result_as_dictionary(self):
+        client = mocks.mocked_sds_client()
+
+        attributes = await client.get_mhs_details(ODS_CODE, INTERACTION_ID)
+
+        self.assertIsInstance(attributes, dict)
+
+    @async_test
     async def test_no_results(self):
         client = mocks.mocked_sds_client()
         with self.assertRaises(re.SDSException):

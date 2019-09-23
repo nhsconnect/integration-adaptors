@@ -1,7 +1,7 @@
 import os
 import unittest
-import xml
 from pathlib import Path
+from xml.etree import ElementTree
 
 from utilities.file_utilities import FileUtilities
 
@@ -12,14 +12,18 @@ class TestEbxmlHandler(unittest.TestCase):
     message_dir = Path(os.path.dirname(os.path.abspath(__file__))) / 'test_messages'
 
     def test_non_200(self):
-        self.assertEqual(handle_ebxml_error(202, {'Content-Type': 'text/xml'}, 'Some body'), (202, 'Some body'))
+        self.assertEqual(handle_ebxml_error(202, {'Content-Type': 'text/xml'}, ''), (202, ''))
+
+    def test_non_2xx(self):
+        with self.assertRaises(ValueError):
+            handle_ebxml_error(400, {'Content-Type': 'text/xml'}, 'Some body')
 
     def test_non_ebxml_fault(self):
         self.assertEqual(handle_ebxml_error(200, {'Content-Type': 'text/xml'}, '<a><b></b></a>'),
                          (200, '<a><b></b></a>'))
 
     def test_invalid_xml(self):
-        with self.assertRaises(xml.etree.ElementTree.ParseError):
+        with self.assertRaises(ElementTree.ParseError):
             handle_ebxml_error(200, {'Content-Type': 'text/xml'}, '<a><b><b></a>')
 
     def test_single_error(self):

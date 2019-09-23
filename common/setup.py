@@ -15,6 +15,7 @@ setup(
         'pystache',
         'lxml',
         'python-qpid-proton',
-        'tornado'
+        'tornado',
+        'isodate'
     ]
 )
