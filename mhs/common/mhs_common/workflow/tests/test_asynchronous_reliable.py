@@ -346,7 +346,6 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
 
         self.assertEqual(500, status)
         self.assertTrue('Error when converting retry interval' in message)
-        self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
              mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
@@ -379,14 +378,8 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                                                                                      INTERACTION_DETAILS,
                                                                                      PAYLOAD, None)
 
-                    self.assertEqual(500, status)
-                    self.assertTrue('description=System failure to process message' in message)
-
-                    self.mock_work_description.publish.assert_called_once()
                     self.assertEqual(self.mock_transmission_adaptor.make_request.call_count, 3)
                 finally:
-                    self.mock_work_description.publish.reset_mock()
-                    self.mock_work_description.set_outbound_status.reset_mock()
                     self.mock_transmission_adaptor.make_request.reset_mock()
 
     @async_test
@@ -412,10 +405,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                                                                                  CORRELATION_ID,
                                                                                  INTERACTION_DETAILS,
                                                                                  PAYLOAD, None)
-                self.assertEqual(500, status)
-                self.assertTrue('description=System failure to process message' in message)
 
-                self.mock_work_description.publish.assert_called_once()
                 self.mock_transmission_adaptor.make_request.assert_called_once()
 
 
