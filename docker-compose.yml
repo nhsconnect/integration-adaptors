@@ -49,6 +49,8 @@ services:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SDS_URL=ldap://msg.opentest.hscic.gov.uk
       - MHS_DISABLE_SDS_TLS=True
+      - MHS_SDS_REDIS_CACHE_HOST=redis
+      - MHS_SDS_REDIS_DISABLE_TLS=True
   dynamodb:
     build: ./common/local-env/dynamodb-local
     ports:
@@ -59,3 +61,7 @@ services:
       - "15672:15672"
       - "5672:5672"
     hostname: "localhost"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
