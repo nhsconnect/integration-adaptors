@@ -1,3 +1,6 @@
+"""
+Provides functionality for calling the MHS over HTTP
+"""
 from __future__ import annotations
 
 import json
@@ -5,6 +8,7 @@ import unittest
 import uuid
 
 import requests
+from requests import Response
 
 from integration_tests.helpers import methods
 from integration_tests.helpers.methods import get_asid
@@ -20,9 +24,10 @@ class MhsHttpRequestBuilder(object):
         self.body = None
         self.assertor = unittest.TestCase('__init__')
 
-    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool) -> MhsHttpRequestBuilder:
+    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool, correlation_id: str = str(uuid.uuid4()).upper()) -> MhsHttpRequestBuilder:
         """
         Allows the setting of required headers for the MHS
+        :param correlation_id: the correlation id used
         :param interaction_id: id of this interaction used within MHS to track this request lifecycle
         :param message_id: the message id
         :param sync_async: whether this request should execute synchronously or not
@@ -31,8 +36,8 @@ class MhsHttpRequestBuilder(object):
         self.headers = {
             'Interaction-Id': interaction_id,
             'Message-Id': message_id,
-            'Correlation-Id': str(uuid.uuid4()).upper(),
-            'sync-async': str(sync_async),
+            'Correlation-Id': correlation_id,
+            'sync-async': str(sync_async).lower(),
             'from-asid': f'{get_asid()}',
             'Content-Type': 'application/json'
         }
@@ -49,7 +54,7 @@ class MhsHttpRequestBuilder(object):
 
         return self
 
-    def execute_post_expecting_success(self) -> MhsHttpRequestBuilder:
+    def execute_post_expecting_success(self) -> Response:
         """
         Execute a POST request against the MHS using the configured body and headers within this class.
         Asserts the response is successful.
@@ -60,4 +65,4 @@ class MhsHttpRequestBuilder(object):
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')
 
-        return self
+        return response

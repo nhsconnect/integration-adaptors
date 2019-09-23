@@ -1,5 +1,7 @@
+"""
+Provides a way of accessing a Dynamo table
+"""
 import os
-
 import boto3
 
 

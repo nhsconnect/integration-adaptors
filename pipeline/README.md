@@ -94,6 +94,7 @@ containers to be published to ECR and the integration test environment to be sto
     - AmazonDynamoDBFullAccess
     - CloudWatchLogsFullAccess
     - AmazonRoute53FullAccess
+    - AmazonElastiCacheFullAccess
 - An ECS Cluster for the SCR application to be deployed into. This must be an EC2 Linux cluster.
 - Entries in AWS Secrets Manager for all sensitive data. These entries should be created by following the AWS, selecting
 to store the secret as "Other type of secrets" and entering the required value using the plaintext tab (these values

@@ -5,20 +5,6 @@ from integration_tests.helpers import methods, interactions, message_retriever
 
 class FunctionalTest(TestCase):
 
-    # Message Pattern Type: Asynchronous Express
-    # Interaction: PSIS Document List Data Request (QUPC_IN160101UK05)
-    def test_mhs_async_express(self):
-        methods.get_interaction_from_template('async express',
-                                              'QUPC_IN160101UK05',
-                                              '9689174746',
-                                              'Asynchronous Express test')
-
-        # then retrieve the response from the queue...
-        _, _, inbound_response = message_retriever.get_inbound_response()
-
-        self.assertTrue(methods.check_response(inbound_response, 'queryResponseCode'),
-                        "Asynchronous Express smoke test failed")
-
     # Message Pattern Type: Asynchronous Reliable
     # Interaction: GP Summary (REPC_IN150016UK05)
     @skip('waiting for RT-12 - Implement MHS Async Reliable Message Pattern')
@@ -29,17 +15,6 @@ class FunctionalTest(TestCase):
                                                                    'Asynchronous Reliable test')
         self.assertTrue(methods.check_response(mhs_response, 'requestSuccessDetail'),
                         "Asynchronous Reliable smoke test failed")
-
-    # Message Pattern Type: Synchronous
-    # Interaction: PDS Retrieval Query (QUPA_IN040000UK32)
-    def test_mhs_synchronous(self):
-        mhs_response, _, _ = methods.get_interaction_from_template('synchronous',
-                                                                   'QUPA_IN040000UK32',
-                                                                   '9689174606',
-                                                                   'Synchronous test')
-
-        self.assertTrue(methods.check_response(mhs_response.text, 'PdsSuccessfulRetrieval'),
-                        "Synchronous smoke test failed")
 
     # Message Pattern Type: Forward Reliable
     # Interaction: GP2GP Common Content Large Messaging (COPC_IN000001UK01)

@@ -1,11 +1,11 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
-import lookup.dictionary_cache as dc
-import lookup.mhs_attribute_lookup as mhs_attribute_lookup
-import lookup.tests.ldap_mocks as mocks
+from unittest import mock
+
 from utilities import test_utilities
 from utilities.test_utilities import async_test
 
+import lookup.mhs_attribute_lookup as mhs_attribute_lookup
+import lookup.tests.ldap_mocks as mocks
 
 NHS_SERVICES_BASE = "ou=services, o=nhs"
 
@@ -42,11 +42,14 @@ expected_mhs_attributes = {
 class TestMHSAttributeLookup(TestCase):
 
     def setUp(self) -> None:
-        self.cache = dc.DictionaryCache()
+        self.cache = mock.MagicMock()
 
     @async_test
     async def test_get_endpoint(self):
+        self.cache.retrieve_mhs_attributes_value.return_value = test_utilities.awaitable(None)
+        self.cache.add_cache_value.return_value = test_utilities.awaitable(None)
         handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), self.cache)
+
         attributes = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
         for key, value in expected_mhs_attributes.items():
             self.assertEqual(value, attributes[key])
@@ -66,49 +69,21 @@ class TestMHSAttributeLookup(TestCase):
 
     @async_test
     async def test_value_added_to_cache(self):
-        handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), MagicMock())
-
-        handler.cache.retrieve_mhs_attributes_value.return_value = test_utilities.awaitable(None)
-        handler.cache.add_cache_value.return_value = test_utilities.awaitable(None)
+        handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), self.cache)
+        self.cache.retrieve_mhs_attributes_value.return_value = test_utilities.awaitable(None)
+        self.cache.add_cache_value.return_value = test_utilities.awaitable(None)
 
         result = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
 
-        handler.cache.add_cache_value.assert_called_with(ODS_CODE, INTERACTION_ID, result)
+        self.cache.add_cache_value.assert_called_with(ODS_CODE, INTERACTION_ID, result)
 
     @async_test
     async def test_sds_not_called_when_value_in_cache(self):
-        await self.cache.add_cache_value("check", "not", "added")
-        handler = mhs_attribute_lookup.MHSAttributeLookup(MagicMock(), self.cache)
+        expected_value = {"some-key": "some-value"}
+        self.cache.retrieve_mhs_attributes_value.return_value = test_utilities.awaitable(expected_value)
+        handler = mhs_attribute_lookup.MHSAttributeLookup(mock.MagicMock(), self.cache)
 
-        result = await handler.retrieve_mhs_attributes("check", "not")
+        result = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
 
-        self.assertEqual(result, "added")
+        self.assertEqual(result, expected_value)
         handler.sds_client.assert_not_called()
-
-    @patch('time.time')
-    @async_test
-    async def test_retrieving_cache_value_doesnt_reset_ttl(self, patched_time):
-        cache = dc.DictionaryCache(expiry_time=3)
-        patched_time.return_value = 1
-        client = MagicMock()
-
-        client.get_mhs_details.return_value = test_utilities.awaitable({'attributes': 'testData'})
-        handler = mhs_attribute_lookup.MHSAttributeLookup(client, cache)
-
-        # value in cache for 3 seconds
-        await handler.cache.add_cache_value("check", "not", "added")
-
-        # Set time to something before the expiry
-        patched_time.return_value = 2
-
-        # This will come from the cache
-        await handler.retrieve_mhs_attributes("check", "not")
-        handler.sds_client.get_mhs_details.assert_not_called()
-
-        # wait for the cache to expire
-        patched_time.return_value = 4.1
-
-        # This should expire in the cache and call sds
-        await handler.retrieve_mhs_attributes("check", "not")
-
-        handler.sds_client.get_mhs_details.assert_called_once()

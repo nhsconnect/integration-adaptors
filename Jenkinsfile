@@ -104,7 +104,8 @@ pipeline {
                                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                     -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                                     -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
-                                    -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
+                                    -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
+                                    -var elasticache_node_type="cache.t2.micro"
                                 """
                             script {
                                 env.MHS_ADDRESS = sh (

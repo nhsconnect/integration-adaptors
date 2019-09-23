@@ -13,6 +13,7 @@ tornado = "*"
 defusedxml = "~=0.6"
 ldap3 = "*"
 mhs-common = {editable = true,path = "./../common"}
+redis = "*"
 
 [requires]
 python_version = "3.7"

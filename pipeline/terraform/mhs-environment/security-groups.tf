@@ -108,6 +108,17 @@ resource "aws_security_group_rule" "mhs_route_security_group_ingress_rule" {
   description = "Allow HTTP inbound requests from MHS route service load balancer"
 }
 
+# Egress rule to allow requests to ElastiCache
+resource "aws_security_group_rule" "mhs_route_security_group_elasticache_egress_rule" {
+  security_group_id = aws_security_group.mhs_route_security_group.id
+  type = "egress"
+  from_port = 6379
+  to_port = 6379
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.sds_cache_security_group.id
+  description = "ElastiCache access (for caching SDS query results)."
+}
+
 # Egress rule to allow requests to S3 (as ECR stores images there and we need to be
 # able to get the MHS route image to run)
 resource "aws_security_group_rule" "mhs_route_security_group_egress_rule" {
@@ -283,6 +294,17 @@ resource "aws_security_group" "sds_cache_security_group" {
   name = "SDS Cache Security Group"
   description = "The security group used to control traffic for the SDS cache endpoint."
   vpc_id = aws_vpc.mhs_vpc.id
+
+  ingress {
+    from_port = 6379
+    to_port = 6379
+    protocol = "tcp"
+    # Only allow incoming requests from MHS route service security group
+    security_groups = [
+      aws_security_group.mhs_route_security_group.id
+    ]
+    description = "Allow Redis requests from MHS route task"
+  }
 
   tags = {
     Name = "${var.environment_id}-sds-cache-sg"
