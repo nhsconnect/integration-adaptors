@@ -8,7 +8,6 @@ verify_ssl = true
 [packages]
 integration-adaptors-common = {editable = true,path = "./../common"}
 scr = {editable = true,path = "."}
-isodate = "*"
 
 [requires]
 python_version = "3.7"

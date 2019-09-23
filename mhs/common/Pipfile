@@ -12,7 +12,6 @@ tornado = "*"
 defusedxml = "~=0.6"
 integration-adaptors-common = {editable = true,path = "./../../common"}
 aioboto3 = "*"
-isodate = "*"
 
 [requires]
 python_version = "3.7"
