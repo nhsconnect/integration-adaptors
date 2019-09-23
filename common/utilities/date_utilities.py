@@ -1,3 +1,7 @@
+"""
+Date utility class
+"""
+
 import isodate
 
 

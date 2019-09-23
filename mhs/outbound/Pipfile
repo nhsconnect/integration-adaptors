@@ -12,7 +12,7 @@ tornado = "*"
 defusedxml = "~=0.6"
 integration-adaptors-common = {editable = true,path = "./../../common"}
 mhs-common = {editable = true,path = "./../common"}
-isodate = "*"
+
 # Temporarily hack the pycurl dependency so that we use a binary package
 # on Windows. This hack should be removed once
 # https://github.com/pycurl/pycurl/issues/569 is fixed.
