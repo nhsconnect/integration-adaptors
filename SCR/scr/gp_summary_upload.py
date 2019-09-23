@@ -68,6 +68,11 @@ class GpSummaryUpload(object):
         return self._create_response_dictionary(message_id, message_reference, creation_time, message_detail)
 
     def _get_root(self, message: str) -> Optional[ET.Element]:
+        """
+        Parses an xml string and returns the root element of that element tree
+        :param message: xml input string
+        :return: The root element of the element tree
+        """
         try:
             return ET.ElementTree(ET.fromstring(message)).getroot()
         except ET.ParseError as e:
@@ -76,6 +81,14 @@ class GpSummaryUpload(object):
             return None
 
     def _find_hl7_element_attribute(self, root: ET.Element, element_name: str, attribute: str) -> Optional[str]:
+        """
+        Searches the tree with the given root node for an element with the element name, then looks for the given 
+        attribute of that element
+        :param root: The root of the element tree
+        :param element_name: The element tag to search for
+        :param attribute: the attribute on that given element
+        :return: The value of the attribute on the element, if it exists
+        """
         try:
             return self._get_element(root, element_name, lambda x: x.attrib[attribute])
         except KeyError:
@@ -85,9 +98,21 @@ class GpSummaryUpload(object):
             return None
 
     def _find_hl7_element_text(self, root: ET.Element, element_name: str):
+        """
+        :param root: The root of the element tree to search 
+        :param element_name:  the name of the element to look for
+        :return: the text within the tags of the given element
+        """
         return self._get_element(root, element_name, lambda x: x.text)
 
     def _get_element(self, root: ET.Element, element_name: str, func: Callable[[ET.Element], str]):
+        """
+        Searches for an element on the element tree of the given root, the passes the element to the found function
+        :param root: Root element of the element tree
+        :param element_name: element to search for
+        :param func: function to call which processes the result of the element search
+        :return: the result of the func call 
+        """
         element = root.find(element_name, namespaces={'hl7': 'urn:hl7-org:v3'})
         if element is None:
             return None
@@ -96,7 +121,14 @@ class GpSummaryUpload(object):
 
     def _create_response_dictionary(self, message_id: str, message_ref: str, creation_time: str, message_detail: str) \
             -> Dict:
-
+        """
+        Creates a success/error dictionary based on the given parameters
+        :param message_id: 
+        :param message_ref: 
+        :param creation_time: 
+        :param message_detail: 
+        :return: A dict containing either the parsed values or the errror response
+        """
         if all([message_id, message_ref, creation_time, message_detail]):
             return {
                 'messageRef': message_ref,
