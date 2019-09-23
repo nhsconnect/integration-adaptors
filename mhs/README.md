@@ -64,14 +64,17 @@ contain sensitive information such as the content of messages being sent.
 * `MHS_SPINE_ROUTE_LOOKUP_URL` (outbound only) The URL of the Spine route lookup service. E.g `https://example.com`. This URL should not contain path or query parameter parts.
 * `MHS_SPINE_ORG_CODE` (outbound only) The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
 * `MHS_SDS_URL` (Spine Route Lookup service only) The URL to communicate with SDS on. e.g. `ldaps://example.com`
-* `MHS_DISABLE_SDS_TLS` (Spine Route Lookup service only) A flag that can be set to disable TLS for SDS connections.
-*Must* be set to exactly `True` for TLS to be disabled.
-* `MHS_SDS_CACHE_IMPLEMENTATION` (Spine Route Lookup service only) Identifies the caching implementation to use when
-caching values retrieved from SDS. This value is optional. Possible values are:
-    * `DICTIONARY_CACHE` - An in-memory cache using a Python dictionary. Not suitable for production use. If no
-    implementation is specified, this is the default.
+* `MHS_DISABLE_SDS_TLS` (Spine Route Lookup service only) An optional flag that can be set to disable TLS for SDS
+connections. *Must* be set to exactly `True` for TLS to be disabled.
 * `MHS_SDS_CACHE_EXPIRY_TIME` (Spine Route Lookup service only). An optional value that specifies the time (in seconds)
 that a value should be held in the SDS cache. Defaults to `900` (fifteen minutes)
+* `MHS_SDS_REDIS_CACHE_HOST` (Spine Route Lookup service only). The Redis host to use when caching SDS information
+retrieved from SDS.
+* `MHS_SDS_REDIS_CACHE_PORT` (Spine Route Lookup service only). An optional value that specified the port to use when
+connecting to the Redis host specified by `MHS_SDS_REDIS_CACHE_HOST`. Defaults to `6379`.
+* `MHS_SDS_REDIS_DISABLE_TLS` (Spine Route Lookup service only) An optional flag that can be set to disable TLS for
+connections to the Redis cache used by the Spine Route Lookup service. *Must* be set to exactly `True` for TLS to be
+disabled.
 
 Note that if you are using Opentest, you should use the credentials you were given when you got access to set `MHS_SECRET_PARTY_KEY`, `MHS_SECRET_CLIENT_CERT`, `MHS_SECRET_CLIENT_KEY` and `MHS_SECRET_CA_CERTS`.
 

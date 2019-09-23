@@ -4,6 +4,12 @@ application to AWS.
 
 This configuration will create a full test environment running an MHS application.
 
+## Known Issues
+- There is an [issue](https://github.com/terraform-providers/terraform-provider-aws/issues/8561) using newer versions of
+Terraform to deploy the ElastiCache replication group defined in [`elasticache.tf`](elasticache.tf). If using the latest
+Terraform 0.12.x versions, attempting to create the replication group with encryption in transit enabled results in a
+failure with the replication group's state being reported as `create-failed`. You can work around this issue by using an
+earlier 0.12 version of Terraform (this configuration has been proven to work using version 0.12.3).
 
 ## Deploying Manually
 In order to manually deploy this environment you will need to first ensure that Terraform can authenticate to AWS. See

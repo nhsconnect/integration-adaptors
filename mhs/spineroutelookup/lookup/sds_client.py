@@ -11,7 +11,7 @@ import lookup.sds_exception as sds_exception
 
 logger = log.IntegrationAdaptorsLogger('SRL_CLIENT')
 
-NHS_SERVICES_BASE = "ou=services, o=nhs"
+NHS_SERVICES_BASE = "ou=services,o=nhs"
 
 MHS_OBJECT_CLASS = "nhsMhs"
 AS_OBJECT_CLASS = "nhsAs"
@@ -75,7 +75,7 @@ class SDSClient(object):
                            {"ods_code": ods_code, "interaction_id": interaction_id})
 
         details[0]['attributes'][MHS_ASID] = asid
-        return details[0]['attributes']
+        return dict(details[0]['attributes'])
 
     async def _accredited_system_lookup(self, ods_code: str, interaction_id: str) -> List:
         """
