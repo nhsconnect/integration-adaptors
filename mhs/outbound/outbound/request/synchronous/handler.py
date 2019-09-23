@@ -4,6 +4,7 @@ from typing import Dict, Any
 import tornado.locks
 import tornado.web
 import mhs_common.workflow as workflow
+from mhs_common.messages import ebxml_envelope
 from mhs_common.configuration import configuration_manager
 from utilities import integration_adaptors_logger as log, message_utilities, timing
 import mhs_common.state.work_description as wd
@@ -38,6 +39,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
 
         interaction_details = self._retrieve_interaction_details(interaction_id)
         wf = self._extract_default_workflow(interaction_details, interaction_id)
+        self._extend_interaction_details(wf, interaction_details)
         sync_async_interaction_config = self._extract_sync_async_from_interaction_details(interaction_details)
 
         if self._should_invoke_sync_async_workflow(sync_async_interaction_config, sync_async_header):
@@ -101,6 +103,10 @@ class SynchronousHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found',
                                         reason='Required Interaction-Id header not found') from e
         return interaction_id
+
+    def _extend_interaction_details(self, wf, interaction_details):
+        if wf.workflow_specific_interaction_details:
+            interaction_details.update(wf.workflow_specific_interaction_details)
 
     def _extract_default_workflow(self, interaction_details, interaction_id):
         try:
@@ -184,6 +190,8 @@ class SynchronousHandler(tornado.web.RequestHandler):
             logger.error('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
             raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
                                         reason=f'Unknown interaction ID: {interaction_id}')
+
+        interaction_details[ebxml_envelope.ACTION] = interaction_id
 
         return interaction_details
 

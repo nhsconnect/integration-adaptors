@@ -1,7 +1,7 @@
 import os
 import unittest
-import xml
 from pathlib import Path
+from xml.etree import ElementTree
 
 from utilities.file_utilities import FileUtilities
 
@@ -23,7 +23,7 @@ class TestEbxmlHandler(unittest.TestCase):
                          (200, '<a><b></b></a>'))
 
     def test_invalid_xml(self):
-        with self.assertRaises(xml.etree.ElementTree.ParseError):
+        with self.assertRaises(ElementTree.ParseError):
             handle_ebxml_error(200, {'Content-Type': 'text/xml'}, '<a><b><b></a>')
 
     def test_single_error(self):

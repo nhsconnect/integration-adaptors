@@ -40,9 +40,23 @@ class DummyCommonAsynchronousWorkflow(common_asynchronous.CommonAsynchronousWork
 
 class TestCommonAsynchronousWorkflow(unittest.TestCase):
     def setUp(self):
+        party_key = 'PARTY_KEY'
+        persistence_store = mock.MagicMock()
+        transmission = mock.MagicMock()
+        queue_adaptor = mock.MagicMock()
+        inbound_queue_max_retries = 3
+        inbound_queue_retry_delay = 3
+        persistence_store_max_retries = 3
         self.mock_routing_reliability = mock.MagicMock()
 
-        self.workflow = DummyCommonAsynchronousWorkflow(self.mock_routing_reliability)
+        self.workflow = DummyCommonAsynchronousWorkflow(party_key,
+                                                        persistence_store,
+                                                        transmission,
+                                                        queue_adaptor,
+                                                        inbound_queue_max_retries,
+                                                        inbound_queue_retry_delay,
+                                                        persistence_store_max_retries,
+                                                        self.mock_routing_reliability)
 
     @async_test
     async def test_lookup_reliability_details(self):

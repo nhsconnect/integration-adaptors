@@ -12,7 +12,7 @@ from tornado import httpclient
 from utilities import test_utilities
 from utilities.test_utilities import async_test
 
-import mhs_common.workflow.asynchronous_express as async_express
+import mhs_common.workflow.asynchronous_reliable as async_reliable
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
@@ -37,7 +37,7 @@ SERVICE = 'service'
 ACTION = 'action'
 SERVICE_ID = SERVICE + ":" + ACTION
 INTERACTION_DETAILS = {
-    'workflow': 'async-express',
+    'workflow': 'async-reliable',
     'service': SERVICE,
     'action': ACTION,
     'uniqueIdentifier': "31312"
@@ -53,11 +53,12 @@ MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_ASID = 'uniqueIdentifier'
 MHS_RETRY_INTERVAL_VAL = 'PT1S'
 MHS_RETRY_VAL = 3
+MHS_RETRY_INTERVAL_INVALID_VAL = 'P'
 
 TEST_MESSAGE_DIR = "mhs_common/messages/tests/test_messages"
 
 
-class TestAsynchronousExpressWorkflow(unittest.TestCase):
+class TestAsynchronousReliableWorkflow(unittest.TestCase):
     def setUp(self):
         self.mock_persistence_store = mock.MagicMock()
         self.mock_transmission_adaptor = mock.MagicMock()
@@ -72,28 +73,28 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.workflow = async_express.AsynchronousExpressWorkflow(party_key=FROM_PARTY_KEY,
-                                                                  persistence_store=self.mock_persistence_store,
-                                                                  transmission=self.mock_transmission_adaptor,
-                                                                  queue_adaptor=self.mock_queue_adaptor,
-                                                                  inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                                  inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
-                                                                  persistence_store_max_retries=3,
-                                                                  routing=self.mock_routing_reliability)
+        self.workflow = async_reliable.AsynchronousReliableWorkflow(party_key=FROM_PARTY_KEY,
+                                                                   persistence_store=self.mock_persistence_store,
+                                                                   transmission=self.mock_transmission_adaptor,
+                                                                   queue_adaptor=self.mock_queue_adaptor,
+                                                                   inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+                                                                   inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+                                                                   persistence_store_max_retries=3,
+                                                                   routing=self.mock_routing_reliability)
 
         self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
     def test_construct_workflow_with_only_outbound_params(self):
-        workflow = async_express.AsynchronousExpressWorkflow(party_key=mock.sentinel.party_key,
+        workflow = async_reliable.AsynchronousReliableWorkflow(party_key=mock.sentinel.party_key,
                                                               persistence_store=mock.sentinel.persistence_store,
                                                               transmission=mock.sentinel.transmission,
                                                               routing=self.mock_routing_reliability)
         self.assertIsNotNone(workflow)
 
     def test_construct_workflow_with_only_inbound_params(self):
-        workflow = async_express.AsynchronousExpressWorkflow(queue_adaptor=mock.sentinel.queue_adaptor,
-                                                             inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                             inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
+        workflow = async_reliable.AsynchronousReliableWorkflow(queue_adaptor=mock.sentinel.queue_adaptor,
+                                                              inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+                                                              inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
         self.assertIsNotNone(workflow)
         self.assertEqual(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS, workflow.inbound_queue_retry_delay)
 
@@ -101,7 +102,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     # Outbound tests
     ############################
 
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(async_reliable, 'logger')
     @async_test
     async def test_successful_handle_outbound_message(self, log_mock):
         response = mock.MagicMock()
@@ -128,7 +129,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(202, status)
         self.assertEqual('', message)
         self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
-                                                                      workflow.ASYNC_EXPRESS,
+                                                                      workflow.ASYNC_RELIABLE,
                                                                       outbound_status=MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
@@ -141,7 +142,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(async_reliable, 'logger')
     @async_test
     async def test_handle_outbound_doesnt_overwrite_work_description(self, log_mock, wdo_mock):
         response = mock.MagicMock()
@@ -208,7 +209,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(async_reliable, 'logger')
     @async_test
     async def test_well_formed_soap_error_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -237,7 +238,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(async_reliable, 'logger')
     @async_test
     async def test_unhandled_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -263,7 +264,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(async_reliable, 'logger')
     @async_test
     async def test_well_formed_ebxml_error_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -314,6 +315,99 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+
+    ############################
+    # Reliability tests
+    ############################
+    @async_test
+    @mock.patch.object(async_reliable, 'logger')
+    async def test_retry_interval_contract_property_is_invalid(self, log_mock):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_routing_reliability.get_reliability.return_value = test_utilities.awaitable({
+            workflow.common_asynchronous.MHS_RETRY_INTERVAL: MHS_RETRY_INTERVAL_INVALID_VAL,
+            workflow.common_asynchronous.MHS_RETRIES: MHS_RETRY_VAL})
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+
+        response = httpclient.HTTPResponse
+        response.code = 500
+        response.body = message
+        response.headers = {'Content-Type': 'text/xml'}
+
+        self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
+
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
+
+        self.assertEqual(500, status)
+        self.assertTrue('Error when converting retry interval' in message)
+        self.assertEqual(
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
+             mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+            self.mock_work_description.set_outbound_status.call_args_list)
+
+    @async_test
+    async def test_soap_error_request_is_retriable(self):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        response = httpclient.HTTPResponse
+        response.code = 500
+        response.headers = {'Content-Type': 'text/xml'}
+
+        sub_tests = [
+            ("a retriable soap 200 error code", 'soapfault_response_single_error.xml'),
+            ("a retriable soap 206 error code", 'soapfault_response_single_error_206.xml'),
+            ("a retriable soap 208 error code", 'soapfault_response_single_error_208.xml')
+        ]
+        for description, soap_fault_file_path in sub_tests:
+            with self.subTest(description):
+                try:
+                    response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
+                    self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
+
+                    status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID,
+                                                                                     CORRELATION_ID,
+                                                                                     INTERACTION_DETAILS,
+                                                                                     PAYLOAD, None)
+
+                    self.assertEqual(self.mock_transmission_adaptor.make_request.call_count, 3)
+                finally:
+                    self.mock_transmission_adaptor.make_request.reset_mock()
+
+    @async_test
+    async def test_soap_error_request_is_non_retriable(self,):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        response = httpclient.HTTPResponse
+        response.code = 500
+        response.headers = {'Content-Type': 'text/xml'}
+
+        sub_tests = [
+            ("a non retriable soap 300 error code", 'soapfault_response_single_error_300.xml')
+        ]
+        for description, soap_fault_file_path in sub_tests:
+            with self.subTest(description):
+                response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
+                self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
+
+                status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID,
+                                                                                 CORRELATION_ID,
+                                                                                 INTERACTION_DETAILS,
+                                                                                 PAYLOAD, None)
+
+                self.mock_transmission_adaptor.make_request.assert_called_once()
+
 
     ############################
     # Inbound tests
@@ -393,5 +487,5 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             MHS_ASID: [ASID]
         })
         self.mock_routing_reliability.get_reliability.return_value = test_utilities.awaitable({
-            workflow.common_asynchronous.MHS_RETRY_INTERVAL: [MHS_RETRY_INTERVAL_VAL],
+            workflow.common_asynchronous.MHS_RETRY_INTERVAL: MHS_RETRY_INTERVAL_VAL,
             workflow.common_asynchronous.MHS_RETRIES: MHS_RETRY_VAL})
