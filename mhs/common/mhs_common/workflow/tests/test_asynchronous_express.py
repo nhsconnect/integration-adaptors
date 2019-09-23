@@ -136,7 +136,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_routing_reliability.get_end_point.assert_called_once_with(SERVICE_ID)
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
-        self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE)
+        self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
+                                                                            raise_error_response=False)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -186,7 +187,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
         self.mock_work_description.publish.assert_called_once()
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED),
+                          mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 

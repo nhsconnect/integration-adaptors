@@ -75,16 +75,12 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                                               interaction_details,
                                                                               payload, wdo, to_party_key, cpa_id)
         if error:
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return error[0], error[1], None
 
-        try:
-            start_time = timing.get_time()
-            logger.info('0004', 'About to make outbound request')
-            response = await self.transmission.make_request(url, http_headers, message)
-        except Exception as e:
-            logger.warning('0016', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            raise e
+        start_time = timing.get_time()
+        logger.info('0004', 'About to make outbound request')
+        response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
 
         if response.code == 202:
             end_time = timing.get_time()
