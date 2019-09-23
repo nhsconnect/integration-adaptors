@@ -79,7 +79,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             return error[0], error[1], None
 
         reliability_details = await self._lookup_reliability_details(interaction_details)
-        retry_interval_xml_datetime = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL][0]
+        retry_interval_xml_datetime = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL]
         try:
             retry_interval = DateUtilities.convert_xml_date_time_format_to_seconds(retry_interval_xml_datetime)
         except isoerror.ISO8601Error:

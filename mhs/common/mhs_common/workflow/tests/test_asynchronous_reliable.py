@@ -3,8 +3,6 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from isodate import isoerror
-
 from definitions import ROOT_DIR
 from utilities.file_utilities import FileUtilities
 
@@ -19,7 +17,6 @@ from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
-from utilities.xml_utilities import XmlUtilities
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
@@ -328,7 +325,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self._setup_routing_mock()
 
         self.mock_routing_reliability.get_reliability.return_value = test_utilities.awaitable({
-            workflow.common_asynchronous.MHS_RETRY_INTERVAL: [MHS_RETRY_INTERVAL_INVALID_VAL],
+            workflow.common_asynchronous.MHS_RETRY_INTERVAL: MHS_RETRY_INTERVAL_INVALID_VAL,
             workflow.common_asynchronous.MHS_RETRIES: MHS_RETRY_VAL})
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
@@ -499,5 +496,5 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             MHS_ASID: [ASID]
         })
         self.mock_routing_reliability.get_reliability.return_value = test_utilities.awaitable({
-            workflow.common_asynchronous.MHS_RETRY_INTERVAL: [MHS_RETRY_INTERVAL_VAL],
+            workflow.common_asynchronous.MHS_RETRY_INTERVAL: MHS_RETRY_INTERVAL_VAL,
             workflow.common_asynchronous.MHS_RETRIES: MHS_RETRY_VAL})
