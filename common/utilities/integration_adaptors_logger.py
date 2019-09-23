@@ -42,7 +42,7 @@ def configure_logging():
         datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
     handler.setFormatter(formatter)
-
+    logger.handlers = []
     logger.addHandler(handler)
 
 
