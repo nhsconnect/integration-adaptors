@@ -4,6 +4,7 @@ a supplier can perform Summary Care Record (SCR) based actions. A supplier will 
 for a particular SCR function, this data will then be used to populate templates for SCR functions producing
  a HL7 message which is forwarded to an MHS and further to spine.
  
- A simple integration test is provided, by default the application runs on port 9000 but this can be set 
- with the environment variable `SCR_SERVICE_PORT`, the integration test defaults to `http://localhost:9000`
- but again this can be changed with the environment variable `SCR_SERVICE_ADDRESS`.
+The SCR Web Service requires several environment variables to run:
+
+* SCR_LOG_LEVEL: Level of logging 
+* SCR_MHS_ADDRESS: The address of the MHS that the SCR adaptor will forward requests to

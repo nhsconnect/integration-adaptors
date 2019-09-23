@@ -49,11 +49,10 @@ services:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SDS_URL=ldap://msg.opentest.hscic.gov.uk
       - MHS_DISABLE_SDS_TLS=True
-
   scradaptor:
     image: local/scr-web-service
     ports:
-      - "9000:9009"
+      - "9000:80"
     environment:
       - SCR_LOG_LEVEL=NOTSET
       - SCR_MHS_ADDRESS=http://outbound:80
