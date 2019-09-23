@@ -6,7 +6,8 @@ import marshmallow.validate
 # These allowed content types for attachments are taken from the EIS part 2.5.4.2
 _ATTACHMENT_ALLOWED_CONTENT_TYPES = (
     'text/plain', 'text/html', 'application/pdf', 'text/xml', 'application/xml', 'text/rtf', 'audio/basic',
-    'audio/mpeg', 'image/png', 'image/gif', 'image/jpeg', 'image/tiff', 'video/mpeg', 'application/msword'
+    'audio/mpeg', 'image/png', 'image/gif', 'image/jpeg', 'image/tiff', 'video/mpeg', 'application/msword',
+    'application/octet-stream'
 )
 
 
