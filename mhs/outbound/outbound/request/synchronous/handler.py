@@ -115,7 +115,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
             'application/json':
               schema:
                 $ref: '#/definitions/RequestBody'
-          description: HL7 payload that is to be sent to Spine.
+          description: The HL7 payload (and optional attachments) to be sent to Spine.
         """
         message_id = self._extract_message_id()
         correlation_id = self._extract_correlation_id()
