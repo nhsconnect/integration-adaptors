@@ -3,6 +3,7 @@ from typing import Dict, Optional
 from utilities import integration_adaptors_logger as log
 from builder.pystache_message_builder import MessageGenerationError
 from message_handling.message_sender import MessageSender
+import xml.etree.ElementTree as ET
 
 logger = log.IntegrationAdaptorsLogger('MSG-HANDLER')
 
@@ -42,14 +43,13 @@ class MessageForwarder(object):
         :param message_id: 
         :return: None
         """
-        template_populator = self._get_interaction_template_populator(interaction_name)
-        populated_message = self._populate_message_template(template_populator, message_contents)
-        response = await self._send_message_to_mhs(interaction_id=template_populator.interaction_id,
+        templator = self._get_interaction_template_populator(interaction_name)
+        populated_message = self._populate_message_template(templator, message_contents)
+        response = await self._send_message_to_mhs(interaction_id=templator.interaction_id,
                                                    message=populated_message, 
                                                    message_id=message_id,
                                                    correlation_id=correlation_id)
-        parsed_response = template_populator.parse_response(response)
-        return parsed_response
+        return self._parse_response(templator, response)
 
     def _get_interaction_template_populator(self, interaction_name: str):
         """
@@ -92,4 +92,12 @@ class MessageForwarder(object):
         except Exception as e:
             logger.error('003', 'Exception raised during message sending: {exception}', {'exception': e})
             raise MessageSendingError(str(e))
+
+    def _parse_response(self, templator, response: str):
+        try:
+            return templator.parse_response(response)
+        except ET.ParseError as e:
+            logger.error('004', 'Exception raised whilst parsing message response: {exception}',
+                         {'exception': e})
+            return {'error': 'Exception raised whilst attempting to parse response'}
 
