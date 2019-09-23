@@ -49,7 +49,10 @@ class RequestBodySchema(marshmallow.Schema):
                                      validate=marshmallow.validate.Length(min=1))
     attachments = marshmallow.fields.Nested(AttachmentSchema, many=True, missing=[],
                                             description='Optional attachments to send with the payload. Only for use '
-                                                        'for interactions that support sending attachments.')
+                                                        'for interactions that support sending attachments.',
+                                            # EIS 2.5.4.2 says that the max number of attachments is 100, including
+                                            # the ebXML MIME part. And there is also the HL7 payload, so 100 - 2 = 98
+                                            validate=marshmallow.validate.Length(max=98))
 
     @marshmallow.post_load
     def make_request_body(self, data, **kwargs):

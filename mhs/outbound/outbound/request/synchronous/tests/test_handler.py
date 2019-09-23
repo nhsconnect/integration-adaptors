@@ -499,6 +499,18 @@ class TestSynchronousHandlerRequestBodyValidation(tornado.testing.AsyncHTTPTestC
                     {'request_body': request_body, 'field_name': "payload"})
                 self.assertIn("Length must be between 1 and 5000000", response_body)
 
+    def test_post_with_request_body_with_too_many_attachments(self):
+        attachment = {
+            "is_base64": False,
+            "content_type": "text/plain",
+            "payload": "blah",
+            "description": "some description"}
+        request_body = {"payload": "test",
+                        "attachments": [attachment] * 99}
+        response_body = self._make_request_and_check_invalid_request_response(
+            {'request_body': request_body, 'field_name': "attachments"})
+        self.assertIn("Longer than maximum length 98", response_body)
+
     def _make_request_and_check_invalid_request_response(self, sub_test: dict) -> str:
         response = self.fetch("/", method="POST",
                               headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
