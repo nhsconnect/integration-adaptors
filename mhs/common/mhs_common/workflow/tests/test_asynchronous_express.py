@@ -129,7 +129,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual('', message)
         self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
                                                                       workflow.ASYNC_EXPRESS,
-                                                                      MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+                                                                      outbound_status=MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],

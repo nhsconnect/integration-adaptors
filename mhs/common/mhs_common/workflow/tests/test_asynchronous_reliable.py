@@ -130,14 +130,15 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual('', message)
         self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
                                                                       workflow.ASYNC_RELIABLE,
-                                                                      MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+                                                                      outbound_status=MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_routing_reliability.get_end_point.assert_called_once_with(SERVICE_ID)
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
-        self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE)
+        self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
+                                                                            raise_error_response=False)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
