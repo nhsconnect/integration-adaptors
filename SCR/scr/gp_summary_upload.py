@@ -47,7 +47,7 @@ class GpSummaryUpload(object):
 
     def parse_response(self, response_message: str) -> Dict:
         """
-        Parses a given Gp summary Upload response.
+        Parses te key values of a given Gp summary Upload response into a dictionary.
         NOTE: This is purely a success parsing response mecahnism, error parsing is currently not supported
         :param response_message: A Successful Gp Summary Upload response acknolwedgement
         :return: A dictionary containing the key success details of the message

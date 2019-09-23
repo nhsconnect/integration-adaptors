@@ -94,6 +94,12 @@ class MessageForwarder(object):
             raise MessageSendingError(str(e))
 
     def _parse_response(self, templator, response: str):
+        """
+        A wrapper for the message parsing done by a templator, looks for errors and returns a simple error message
+        :param templator: 
+        :param response: 
+        :return: 
+        """
         try:
             return templator.parse_response(response)
         except ET.ParseError as e:

@@ -155,7 +155,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertEqual(correlation_id_header, "yes-this-is-mocked")
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_success_response_parsing(self, request_mock):
+    def test_success_response_parses_correctly(self, request_mock):
         # Arrange
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         response_body = file_utilities.FileUtilities.get_file_string(response_xml)
@@ -174,3 +174,21 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertEqual(response_body['messageId'], '2E372546-229A-483F-9B11-EF46ABF3178C')
         self.assertEqual(response_body['creationTime'], '20190923112609')
         self.assertEqual(response_body['messageDetail'], 'GP Summary upload successful')
+
+    @mock.patch('comms.common_https.CommonHttps.make_request')
+    def test_failure_during_parsing_returns_error_message(self, request_mock):
+        # Arrange
+        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        response_mock = TestResponse()
+        response_mock.body = "This is a bad response to parse"
+        request_mock.return_value = test_utilities.awaitable(response_mock)
+
+        # Act
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
+                              headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
+                              body=json.dumps(body))
+
+        response_body = json.loads(response.body.decode())
+
+        # Assert
+        self.assertEqual(response_body['error'], 'Exception raised whilst attempting to parse response')
