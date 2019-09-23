@@ -149,6 +149,19 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
         self.workflow.handle_outbound_message.assert_not_called()
 
+    def test_post_message_returns_correct_status_line_in_error_response(self):
+        """
+        At one point the error response being returned had the response body being additionally set as the textual
+        phrase on the status line (see https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1). This test
+        checks that this isn't being done.
+        """
+        response = self.fetch("/", method="POST", body="A request")
+
+        self.assertEqual(response.code, 404)
+        self.assertEqual(response.error.message, "Not Found")
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertIn('Required Interaction-Id header not found', response.body.decode())
+
     def test_post_message_where_interaction_detail_has_invalid_workflow(self):
         self.config_manager.get_interaction_details.return_value = {'workflow': 'nonexistent workflow'}
 

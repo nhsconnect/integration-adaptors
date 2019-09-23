@@ -168,8 +168,10 @@ class SynchronousHandler(tornado.web.RequestHandler):
         return parsed_body.payload
 
     def write_error(self, status_code: int, **kwargs: Any):
+        reason = self._reason  # Don't inline this, as self.set_status changes self._reason
+        self.set_status(status_code)
         self.set_header('Content-Type', 'text/plain')
-        self.finish(f'{status_code}: {self._reason}')
+        self.finish(f'{status_code}: {reason}')
 
     def _extract_sync_async_header(self):
         sync_async_header = self.request.headers.get('sync-async', None)
