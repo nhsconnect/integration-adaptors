@@ -4,11 +4,11 @@ from builder.pystache_message_builder import MessageGenerationError
 from utilities.file_utilities import FileUtilities
 from utilities.xml_utilities import XmlUtilities
 from scr_definitions import ROOT_DIR
-from scr.gp_summary_update import SummaryCareRecord
+from scr.gp_summary_upload import GpSummaryUpload
 
 
 class FullTest(unittest.TestCase):
-    summaryCareRecord = SummaryCareRecord()
+    summaryCareRecord = GpSummaryUpload()
 
     xmlFileDir = Path(ROOT_DIR + '/scr/tests/test_xmls/')
     hashFileDir = Path(ROOT_DIR + '/scr/tests/hashes/')
@@ -56,6 +56,7 @@ class FullTest(unittest.TestCase):
             self.summaryCareRecord.populate_template_with_file(hash_file_path)
 
     def test_should_raise_exception_when_missing_element_in_input_dict(self):
+
         hash_file_path = str(self.hashFileDir / 'missingTag.json')
 
         with self.assertRaises(MessageGenerationError):
