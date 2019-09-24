@@ -186,7 +186,8 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         # (if present) must be the first additional attachment.
 
         if not msg.is_multipart():
-            raise ebxml_envelope.EbXmlParsingError("Non-multipart message received!")
+            logger.error('0005', 'Non-multipart message received')
+            raise ebxml_envelope.EbXmlParsingError("Non-multipart message received")
 
         message_parts: Sequence[email.message.EmailMessage] = tuple(msg.iter_parts())
 
