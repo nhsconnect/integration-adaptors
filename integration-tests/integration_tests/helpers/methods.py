@@ -61,15 +61,6 @@ def get_mhs_hostname():
     return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
 
 
-def get_scr_adaptor_hostname():
-    """ Looks up the scr adaptor hostname from the environment settings
-
-    The scr adaptor hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
-        if this is not set, it will default to 'localhost'
-    """
-    return "http://" + os.environ.get('SCR_ADAPTOR_ADDRESS', 'localhost') + "/"
-
-
 def get_interaction_from_template(type, template, nhs_number, payload,
                                   pass_message_id=False, pass_correlation_id=False, sync_async=False):
     """ Sends the template to be rendered and passed on to the the MHS
@@ -109,29 +100,3 @@ def check_response(returned_xml, section_name):
     section = parser.extract_hl7xml_section(returned_data, section_name)
 
     return section is not None
-
-
-def get_section(xml, attribute, section_name, parent=None):
-    """ Extracts the data from an XML section
-
-    :param xml: the message that we're checking
-    :param attribute: the attribute we want
-    :param section_name: the section we're looking for
-    :param parent: ...and it's parent (optional)
-    :return: the extracted data
-    """
-    parser = xml_parser.XmlMessageParser()
-    returned_data = parser.parse_message(xml)
-    value = parser.extract_hl7xml_text_value(returned_data, attribute, section_name, parent=parent)
-
-    return value
-
-
-def check_status_code(response, expected_code):
-    """ Validates the response status code
-
-    :param response: the response (from the 'post' request
-    :param expected_code: the code we're expecting
-    :return: True is they match, otherwise False
-    """
-    return response.status_code == expected_code

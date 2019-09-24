@@ -3,19 +3,6 @@ from integration_tests.helpers import methods, interactions, message_retriever, 
 
 
 class FunctionalTest(TestCase):
-    # Message Pattern Type: Asynchronous Reliable
-    # Interaction: GP Summary (REPC_IN150016UK05)
-    def test_mhs_async_reliable(self):
-        methods.get_interaction_from_template('async reliable',
-                                              'REPC_IN150016UK05',
-                                              '9446245796',
-                                              'Asynchronous Reliable test')
-
-        _, _, inbound_response = message_retriever.get_inbound_response()
-        parser = xml_parser.XmlMessageParser()
-        xml_response = parser.parse_message(inbound_response)
-        xml_element = xml_response.find('.//hl7:detail', namespaces=xml_parser.NAMESPACES)
-        self.assertEqual(xml_element.text, 'GP Summary upload successful', "should match")
 
     # Message Pattern Type: Forward Reliable
     # Interaction: GP2GP Common Content Large Messaging (COPC_IN000001UK01)
