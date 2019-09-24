@@ -83,6 +83,15 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     def serialize(self, _message_dictionary=None) -> Tuple[str, Dict[str, str], str]:
         message_dictionary = copy.deepcopy(self.message_dictionary)
 
+        self._set_headers_for_attachments(message_dictionary)
+
+        message_id, http_headers, message = super().serialize(_message_dictionary=message_dictionary)
+
+        http_headers[CONTENT_TYPE_HEADER_NAME] = EBXML_CONTENT_TYPE_VALUE
+        return message_id, http_headers, message
+
+    @staticmethod
+    def _set_headers_for_attachments(message_dictionary):
         attachment: dict
         for attachment in message_dictionary.setdefault(ATTACHMENTS, []):
             attachment[ATTACHMENT_CONTENT_ID] = message_utilities.MessageUtilities.get_uuid()
@@ -98,11 +107,6 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                                                                       f'key:{ATTACHMENTS}[].{ATTACHMENT_BASE64} when '
                                                                       f'generating message from template '
                                                                       f'file:{EBXML_TEMPLATE}') from e
-
-        message_id, http_headers, message = super().serialize(_message_dictionary=message_dictionary)
-
-        http_headers[CONTENT_TYPE_HEADER_NAME] = EBXML_CONTENT_TYPE_VALUE
-        return message_id, http_headers, message
 
     @classmethod
     def from_string(cls, headers: Dict[str, str], message: str) -> EbxmlRequestEnvelope:
