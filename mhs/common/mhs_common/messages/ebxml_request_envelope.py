@@ -259,6 +259,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
             attachment = {
                 ATTACHMENT_PAYLOAD: payload,
                 ATTACHMENT_BASE64: is_base64,
+                # The [1:-1] is to remove angle brackets (<>) that surround the content ID
                 ATTACHMENT_CONTENT_ID: str(attachment_message['Content-Id'][1:-1]),
                 ATTACHMENT_CONTENT_TYPE: attachment_message.get_content_type()
             }
