@@ -30,12 +30,13 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
     def test_handler_returns_message_processing_response(self, uuid_mock):
         uuid_mock.return_value = "check123"
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
-        self.forwarder.forward_message_to_mhs.return_value = test_utilities.awaitable("Nice response message")
+        response_mock = {'data': "Nice response message"}
+        self.forwarder.forward_message_to_mhs.return_value = test_utilities.awaitable(response_mock)
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-name': '123'},
                               body=json.dumps(body))
 
         self.forwarder.forward_message_to_mhs.assert_called_once_with("123", body, None, "check123")
-        self.assertEqual(response.body.decode(), "Nice response message")
+        self.assertEqual(json.loads(response.body.decode()), {'data': "Nice response message"})
 
     def test_null_body_request_fails(self):
         body = ''

@@ -61,14 +61,20 @@
   "post-processors": [
     [
       {
+        "name": "publish",
         "type": "docker-tag",
         "repository": "{{user `registry`}}{{user `repository`}}",
         "tag": "scr-{{user `tag`}}"
       },
       {
+        "name": "publish",
         "type": "docker-push",
         "ecr_login": true,
         "login_server": "https://{{user `registry`}}{{user `repository`}}"
+      },
+      {
+        "type": "docker-tag",
+        "repository": "local/scr-web-service"
       }
     ]
   ]
