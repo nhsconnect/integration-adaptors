@@ -161,7 +161,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_serialize_required_tags(self, mock_get_uuid, mock_get_timestamp):
+    def test_serialize_raises_error_when_required_tags_not_passed(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
 
@@ -176,7 +176,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_serialize_attachment_required_tags(self, mock_get_uuid, mock_get_timestamp):
+    def test_serialize_raises_error_when_required_attachment_tags_not_passed(self, mock_get_uuid, mock_get_timestamp):
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
 
         required_tags = [
@@ -202,7 +202,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     @patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_serialize_boolean_tag_set_to_false(self, mock_get_uuid, mock_get_timestamp):
+    def test_serialize_doesnt_include_xml_tag_when_corresponding_boolean_flag_set_to_false(self, mock_get_uuid,
+                                                                                           mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
 
@@ -230,7 +231,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
     # Deserialisation tests
     #######################
 
-    def test_from_string(self):
+    def test_from_string_parses_valid_requests(self):
         with self.subTest("A valid request containing a payload"):
             message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_request.msg"))
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
@@ -315,7 +316,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
-    def test_from_string_invalid_request(self):
+    def test_from_string_errors_on_invalid_request(self):
         with self.subTest("A message that is not a multi-part MIME message"):
             with self.assertRaises(ebxml_envelope.EbXmlParsingError):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string({CONTENT_TYPE_HEADER_NAME: "text/plain"},
@@ -336,7 +337,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 with self.assertRaises(ebxml_envelope.EbXmlParsingError):
                     ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
-    def test_from_string_missing_additional_values(self):
+    def test_from_string_parses_messages_with_optional_parts_missing(self):
         sub_tests = [
             ('DuplicateElimination', 'ebxml_request_no_duplicate_elimination.msg',
              ebxml_request_envelope.DUPLICATE_ELIMINATION),
@@ -373,7 +374,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                     ebxml_envelope.EbXmlParsingError, "Weren't able to find required attribute actor"):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
-        with self.subTest("A valid request containing one attachment without a description"):
+        with self.subTest("A valid request containing one attachment without a description has description defaulted "
+                          "to an empty string"):
             message = file_utilities.FileUtilities.get_file_string(
                 str(self.message_dir / "ebxml_request_one_attachment_without_description.msg"))
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
