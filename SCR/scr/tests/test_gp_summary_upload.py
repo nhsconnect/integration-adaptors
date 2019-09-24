@@ -7,8 +7,8 @@ from scr_definitions import ROOT_DIR
 from scr.gp_summary_upload import GpSummaryUpload
 
 
-class FullTest(unittest.TestCase):
-    summaryCareRecord = GpSummaryUpload()
+class GpSummaryUploadTest(unittest.TestCase):
+    gp_summary_upload_templator = GpSummaryUpload()
 
     xmlFileDir = Path(ROOT_DIR + '/scr/tests/test_xmls/')
     hashFileDir = Path(ROOT_DIR + '/scr/tests/hashes/')
@@ -21,7 +21,7 @@ class FullTest(unittest.TestCase):
         hash_file_path = str(self.hashFileDir / 'hash16UK05.json')
 
         expected_string = FileUtilities.get_file_string(expected_xml_file_path)
-        render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
+        render = self.gp_summary_upload_templator.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_extended_html(self):
@@ -32,7 +32,7 @@ class FullTest(unittest.TestCase):
         hash_file_path = str(self.hashFileDir / 'extendedHTMLhash.json')
 
         expected_string = FileUtilities.get_file_string(expected_xml_file_path)
-        render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
+        render = self.gp_summary_upload_templator.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_empty_html(self):
@@ -43,7 +43,7 @@ class FullTest(unittest.TestCase):
         hash_file_path = str(self.hashFileDir / 'emptyHtmlHash.json')
 
         expected_string = FileUtilities.get_file_string(expected_xml_file_path)
-        render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
+        render = self.gp_summary_upload_templator.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_should_raise_exception_when_hash_is_empty(self):
@@ -53,14 +53,14 @@ class FullTest(unittest.TestCase):
         hash_file_path = str(self.hashFileDir / 'EmptyHash.json')
 
         with self.assertRaises(MessageGenerationError):
-            self.summaryCareRecord.populate_template_with_file(hash_file_path)
+            self.gp_summary_upload_templator.populate_template_with_file(hash_file_path)
 
     def test_should_raise_exception_when_missing_element_in_input_dict(self):
 
         hash_file_path = str(self.hashFileDir / 'missingTag.json')
 
         with self.assertRaises(MessageGenerationError):
-            self.summaryCareRecord.populate_template_with_file(hash_file_path)
+            self.gp_summary_upload_templator.populate_template_with_file(hash_file_path)
 
     def test_replacementOf(self):
         """
@@ -73,7 +73,7 @@ class FullTest(unittest.TestCase):
         hash_file_path = str(self.hashFileDir / 'replacementOfhash.json')
 
         expected_string = FileUtilities.get_file_string(expected_xml_file_path)
-        render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
+        render = self.gp_summary_upload_templator.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_multipleReplacementOf(self):
@@ -86,7 +86,7 @@ class FullTest(unittest.TestCase):
         hash_file_path = str(self.hashFileDir / 'multiReplacementOfhash.json')
 
         expected_string = FileUtilities.get_file_string(expected_xml_file_path)
-        render = self.summaryCareRecord.populate_template_with_file(hash_file_path)
+        render = self.gp_summary_upload_templator.populate_template_with_file(hash_file_path)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_python_dictionary_example(self):
@@ -97,7 +97,7 @@ class FullTest(unittest.TestCase):
             str(Path(ROOT_DIR) / 'scr/tests/test_xmls/cleanSummaryUpdate.xml'))
         from scr.tests.hashes.basic_dict import input_hash
 
-        render = self.summaryCareRecord.populate_template(input_hash)
+        render = self.gp_summary_upload_templator.populate_template(input_hash)
         XmlUtilities.assert_xml_equal(expected_string, render)
 
     def test_json_string_example(self):
@@ -108,5 +108,41 @@ class FullTest(unittest.TestCase):
         json_file = str(self.hashFileDir / 'hash16UK05.json')
         with open(json_file) as file:
             data = file.read()  # Reads file contents into a string
-            render = self.summaryCareRecord.populate_template_with_json_string(data)
+            render = self.gp_summary_upload_templator.populate_template_with_json_string(data)
             XmlUtilities.assert_xml_equal(expected_string, render)
+
+    def test_should_return_success_response_with_valid_json(self):
+        """
+        Simple assertion of correct values returned from the response parsing method
+        """
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'parseSuccessResponse.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['messageRef'], '9C534C19-C587-4463-9AED-B76F715D3EA3')
+        self.assertEqual(parsed_data['messageId'], '2E372546-229A-483F-9B11-EF46ABF3178C')
+        self.assertEqual(parsed_data['creationTime'], '20190923112609')
+        self.assertEqual(parsed_data['messageDetail'], 'GP Summary upload successful')
+
+    def test_should_return_error_when_there_is_a_bad_attribute_format(self):
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'badAttributeParse.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
+
+    def test_should_return_error_when_the_text_value_for_attribute_is_empty(self):
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'badTextAttribute.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
+
+    def test_should_return_error_when_required_details_tag_is_missing(self):
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'missingAttribute.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
+
+    def test_should_return_error_when_required_creationTime_tag_is_missing(self):
+        input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'missingAttribute.xml'))
+        parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
+
+        self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
