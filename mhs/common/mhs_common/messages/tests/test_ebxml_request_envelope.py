@@ -321,33 +321,20 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string({CONTENT_TYPE_HEADER_NAME: "text/plain"},
                                                                         "A message")
 
-        with self.subTest("An invalid multi-part MIME message"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_no_header.msg"))
+        sub_tests = [
+            ("An invalid multi-part MIME message", "ebxml_request_no_header.msg"),
+            ("A message with an invalid binary ebXML header", "ebxml_request_invalid_binary_ebxml_header.msg"),
+            ("A message with an invalid binary HL7 payload", "ebxml_request_invalid_binary_hl7_payload.msg"),
+            ("A message with an invalid application/xml binary HL7 payload",
+             "ebxml_request_invalid_application_xml_binary_hl7_payload.msg")
+        ]
+        for sub_test_name, filename in sub_tests:
+            with self.subTest(sub_test_name):
+                message = file_utilities.FileUtilities.get_file_string(
+                    str(self.message_dir / filename))
 
-            with self.assertRaises(ebxml_envelope.EbXmlParsingError):
-                ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
-
-        with self.subTest("A message with an invalid binary ebXML header"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_invalid_binary_ebxml_header.msg"))
-
-            with self.assertRaises(ebxml_envelope.EbXmlParsingError):
-                ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
-
-        with self.subTest("A message with an invalid binary HL7 payload"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_invalid_binary_hl7_payload.msg"))
-
-            with self.assertRaises(ebxml_envelope.EbXmlParsingError):
-                ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
-
-        with self.subTest("A message with an invalid application/xml binary HL7 payload"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_invalid_application_xml_binary_hl7_payload.msg"))
-
-            with self.assertRaises(ebxml_envelope.EbXmlParsingError):
-                ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+                with self.assertRaises(ebxml_envelope.EbXmlParsingError):
+                    ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
     def test_from_string_missing_additional_values(self):
         sub_tests = [
