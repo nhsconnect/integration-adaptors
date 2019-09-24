@@ -4,6 +4,8 @@ Provides functionality to assert items within the MHS Dynamo table
 import json
 import unittest
 
+from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER
+
 
 class MhsItemAssertor(object):
     """
@@ -63,3 +65,9 @@ class DynamoMhsTableStateAssertor(object):
         self.assertor.assertTrue(len(items_with_key) == 1,
                                  f'Expected an item with key: {key} but not exactly one found')
         return MhsItemAssertor(items_with_key[0])
+
+    @staticmethod
+    def wait_for_inbound_response_processed(message_id: str) -> bool:
+        return DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+            .assert_single_item_exists_with_key(message_id) \
+            .item_contains_value('INBOUND_STATUS', 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED')
