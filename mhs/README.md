@@ -55,6 +55,11 @@ contain sensitive information such as the content of messages being sent.
 * `MHS_RESYNC_INTERVAL` (outbound only) The time in between polls of the sync-async store, the interval is in seconds and defaults to `1`
 * `MHS_SPINE_ROUTE_LOOKUP_URL` (outbound only) The URL of the Spine route lookup service. E.g `https://example.com`. This URL should not contain path or query parameter parts.
 * `MHS_SPINE_ORG_CODE` (outbound only) The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
+* `MHS_SECRET_SPINE_ROUTE_LOOKUP_CLIENT_CERT` (outbound only) Optional. The client certificate to present when making HTTPS connections to the Spine Route Lookup service. If not specified, no client certificate will be presented. 
+* `MHS_SECRET_SPINE_ROUTE_LOOKUP_CLIENT_KEY` (outbound only) Optional. The private key for the client certificate to present when making HTTPS connections to the Spine Route Lookup service. Must be specified if `MHS_SPINE_ROUTE_LOOKUP_CLIENT_CERT` is provided.
+* `MHS_SECRET_SPINE_ROUTE_LOOKUP_CA_CERTS` (outbound only) Optional. The CA certificates used to validate the certificate presented by the Spine Route Lookup service. Should include the following in this order: endpoint issuing subCA certificate, root CA Certificate. If not specified, the system defaults will be used.
+* `MHS_SPINE_ROUTE_LOOKUP_HTTP_PROXY` (outbound only) An optional http(s) proxy to route requests to the Spine Route Lookup service via. Note that the proxy must pass through https requests transparently.
+* `MHS_SPINE_ROUTE_LOOKUP_HTTP_PROXY_PORT` (outbound only) The http(s) proxy port to use for the Spine Route Lookup service proxy. Ignored if `MHS_SPINE_ROUTE_LOOKUP_HTTP_PROXY` is not provided. Defaults to `3128`.
 * `MHS_SDS_URL` (Spine Route Lookup service only) The URL to communicate with SDS on. e.g. `ldaps://example.com`
 * `MHS_DISABLE_SDS_TLS` (Spine Route Lookup service only) An optional flag that can be set to disable TLS for SDS
 connections. *Must* be set to exactly `True` for TLS to be disabled.
