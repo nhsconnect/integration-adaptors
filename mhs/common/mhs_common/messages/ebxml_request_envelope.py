@@ -7,7 +7,7 @@ import copy
 import email
 import email.message
 import email.policy
-from typing import Dict, Tuple, Union, List, Sequence
+from typing import Dict, Tuple, Union, List, Sequence, Generator
 from xml.etree.ElementTree import Element
 
 from builder import pystache_message_builder
@@ -212,35 +212,57 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         message_parts: Sequence[email.message.EmailMessage] = tuple(msg.iter_parts())
 
+        EbxmlRequestEnvelope._report_any_defects_in_message_parts(message_parts)
+
+        # ebXML part is the first part of the message
+        ebxml_part = EbxmlRequestEnvelope._extract_ebxml_part(message_parts[0])
+
+        payload_part = None
+        attachments = []
+        if len(message_parts) > 1:
+            # HL7 payload part is the second part of the message
+            payload_part = EbxmlRequestEnvelope._extract_hl7_payload_part(message_parts[1])
+
+            # Any additional attachments are from the third part of the message onwards
+            attachments.extend(EbxmlRequestEnvelope._extract_additional_attachments_parts(message_parts[2:]))
+
+        return ebxml_part, payload_part, attachments
+
+    @staticmethod
+    def _report_any_defects_in_message_parts(message_parts: Sequence[email.message.EmailMessage]):
         for i, part in enumerate(message_parts):
             if part.defects:
                 logger.warning('0006', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
                                {'PartIndex': i, 'Defects': part.defects})
 
-        ebxml_part, is_base64_ebxml_part = EbxmlRequestEnvelope._convert_message_part_to_str(message_parts[0])
+    @staticmethod
+    def _extract_ebxml_part(message_part: email.message.EmailMessage) -> str:
+        ebxml_part, is_base64_ebxml_part = EbxmlRequestEnvelope._convert_message_part_to_str(message_part)
         if is_base64_ebxml_part:
             logger.error('0007', 'Failed to decode ebXML header part of message as text')
             raise ebxml_envelope.EbXmlParsingError("Failed to decode ebXML header part of message as text")
+        return ebxml_part
 
-        payload_part = None
-        attachments = []
-        if len(message_parts) > 1:
-            payload_part, is_base64_payload = EbxmlRequestEnvelope._convert_message_part_to_str(message_parts[1])
-            if is_base64_payload:
-                logger.error('0008', 'Failed to decode HL7 payload part of message as text')
-                raise ebxml_envelope.EbXmlParsingError("Failed to decode HL7 payload part of message as text")
+    @staticmethod
+    def _extract_hl7_payload_part(message_part: email.message.EmailMessage) -> str:
+        payload_part, is_base64_payload = EbxmlRequestEnvelope._convert_message_part_to_str(message_part)
+        if is_base64_payload:
+            logger.error('0008', 'Failed to decode HL7 payload part of message as text')
+            raise ebxml_envelope.EbXmlParsingError("Failed to decode HL7 payload part of message as text")
+        return payload_part
 
-            for attachment_message in message_parts[2:]:
-                payload, is_base64 = EbxmlRequestEnvelope._convert_message_part_to_str(attachment_message)
-                attachment = {
-                    ATTACHMENT_PAYLOAD: payload,
-                    ATTACHMENT_BASE64: is_base64,
-                    ATTACHMENT_CONTENT_ID: str(attachment_message['Content-Id'][1:-1]),
-                    ATTACHMENT_CONTENT_TYPE: attachment_message.get_content_type()
-                }
-                attachments.append(attachment)
-
-        return ebxml_part, payload_part, attachments
+    @staticmethod
+    def _extract_additional_attachments_parts(message_parts: Sequence[email.message.EmailMessage]) \
+            -> Generator[Dict[Union[str, bool]]]:
+        for attachment_message in message_parts:
+            payload, is_base64 = EbxmlRequestEnvelope._convert_message_part_to_str(attachment_message)
+            attachment = {
+                ATTACHMENT_PAYLOAD: payload,
+                ATTACHMENT_BASE64: is_base64,
+                ATTACHMENT_CONTENT_ID: str(attachment_message['Content-Id'][1:-1]),
+                ATTACHMENT_CONTENT_TYPE: attachment_message.get_content_type()
+            }
+            yield attachment
 
     @staticmethod
     def _convert_message_part_to_str(message_part: email.message.EmailMessage) -> Tuple[str, bool]:
