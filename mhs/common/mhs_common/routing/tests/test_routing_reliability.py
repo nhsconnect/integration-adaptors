@@ -153,7 +153,8 @@ class TestRoutingAndReliability(unittest.TestCase):
 
     def _assert_http_client_called_with_expected_args(self, expected_url, client_cert=None, client_key=None,
                                                       ca_certs=None, proxy_host=None, proxy_port=None):
-        self.mock_http_client.fetch.assert_called_with(expected_url, method=HTTP_METHOD, body=None, headers=None,
+        self.mock_http_client.fetch.assert_called_with(expected_url, raise_error=True,
+                                                       method=HTTP_METHOD, body=None, headers=None,
                                                        client_cert=client_cert, client_key=client_key,
                                                        ca_certs=ca_certs, validate_cert=True, proxy_host=proxy_host,
                                                        proxy_port=proxy_port)
