@@ -1,20 +1,8 @@
 from unittest import skip, TestCase
-
-from integration_tests.helpers import methods, interactions, message_retriever
+from integration_tests.helpers import methods, interactions, message_retriever, xml_parser
 
 
 class FunctionalTest(TestCase):
-
-    # Message Pattern Type: Asynchronous Reliable
-    # Interaction: GP Summary (REPC_IN150016UK05)
-    @skip('waiting for RT-12 - Implement MHS Async Reliable Message Pattern')
-    def test_mhs_async_reliable(self):
-        mhs_response, _, _ = methods.get_interaction_from_template('async reliable',
-                                                                   'REPC_IN150016UK05',
-                                                                   '9446245796',
-                                                                   'Asynchronous Reliable test')
-        self.assertTrue(methods.check_response(mhs_response, 'requestSuccessDetail'),
-                        "Asynchronous Reliable smoke test failed")
 
     # Message Pattern Type: Forward Reliable
     # Interaction: GP2GP Common Content Large Messaging (COPC_IN000001UK01)
@@ -29,7 +17,7 @@ class FunctionalTest(TestCase):
 
     # Message Pattern Type: Asynchronous Reliable
     # Interaction: SCR-Adaptor using json template (json_hash16UK05), which forms GP Summary (REPC_IN150016UK05)
-    @skip('waiting for RT-12 - Implement MHS Async Reliable Message Pattern')
+    @skip('waiting RT-136 and RT-90')
     def test_scr_adaptor(self):
         scr_json, uuid = methods.get_json('hash16UK05', '9689177869', 'json message test')
 
@@ -38,7 +26,7 @@ class FunctionalTest(TestCase):
 
         # now send the scr_response to the mhs
         # This may not be necessary, as the adaptor may do this for us..
-        mhs_response = interactions.call_mhs('REPC_IN150016UK05', scr_response, None, False, None, False)
+        mhs_response = interactions.call_mhs('REPC_IN150016UK05', scr_response, None, False, None, False, False)
 
         # then validate the mhs-response
         self.assertTrue(methods.check_response(mhs_response, 'requestSuccessDetail'),

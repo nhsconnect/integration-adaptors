@@ -21,7 +21,6 @@ NS = {
     NS_NASP: 'http://national.carerecords.nhs.uk/schema/'
 }
 
-
 SOAP_FAULT = f'{NS_SOAP}:Fault'
 FAULT_CODE = 'faultcode'
 FAULT_STRING = 'faultstring'
@@ -38,6 +37,14 @@ ERR_CODE_CONTEXT = 'codeContext'
 ERR_FIELDS = [ERR_CODE, ERR_SEVERITY, ERR_LOCATION, ERR_DESCRIPTION, ERR_CODE_CONTEXT]
 
 logger = IntegrationAdaptorsLogger('SOAP_FAULT_PARSER')
+
+SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE = 200
+ROUTING_DELIVERY_FAILURE_ERROR_CODE = 206
+FAILURE_STORING_VARIABLE_IN_MEMO = 208
+
+SOAP_ERRORS_TO_RETRY = [SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE,
+                        ROUTING_DELIVERY_FAILURE_ERROR_CODE,
+                        FAILURE_STORING_VARIABLE_IN_MEMO]
 
 
 def _extract_tag_text(elem: ElementTree, path: AnyStr) -> AnyStr:
@@ -82,3 +89,11 @@ class SOAPFault(SoapEnvelope):
 
     def serialize(self) -> Tuple[str, Dict[str, str], str]:
         raise NotImplementedError
+
+    @staticmethod
+    def is_soap_fault_retriable(soap_fault_codes):
+        # return True only if ALL error codes are retriable
+        for soap_fault_code in soap_fault_codes:
+            if not soap_fault_code in SOAP_ERRORS_TO_RETRY:
+                return False
+        return True

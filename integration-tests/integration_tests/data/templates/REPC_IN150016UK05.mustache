@@ -84,6 +84,34 @@
                         <code code="163171000000105" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Care Professional Documentation"/>
                     </pertinentRootCREType>
                 </pertinentInformation1>
+                <pertinentInformation2 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
+					<templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1"/>
+					<seperatableInd value="true"/>
+					<pertinentCREType classCode="CATEGORY" moodCode="EVN">
+						<code code="163221000000102" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Allergies and Adverse Reactions"/>
+						<component typeCode="COMP" contextConductionInd="true">
+							<templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
+							<seperatableInd value="false"/>
+							<UKCT_MT144053UK02.Allergy classCode="OBS" moodCode="EVN" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+								<id root="016CFE10-FE26-11E4-8E2F-010000002000"/>
+								<code code="218291007" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Adverse reaction to erythromycin (finding)">
+									<originalText>Adverse reaction to erythromycin</originalText>
+								</code>
+								<statusCode code="completed"/>
+								<effectiveTime>
+									<low value="20100615"/>
+								</effectiveTime>
+								<pertinentInformation typeCode="PERT" contextConductionInd="true">
+									<seperatableInd value="false"/>
+									<pertinentSupportingInfo classCode="OBS" moodCode="EVN">
+										<value>severe vomiting</value>
+										<code code="SupportingText" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.126" displayName="Supporting Text"/>
+									</pertinentSupportingInfo>
+								</pertinentInformation>
+							</UKCT_MT144053UK02.Allergy>
+						</component>
+					</pertinentCREType>
+				</pertinentInformation2>
                 <recordTarget typeCode="RCT">
                     <patient classCode="PAT">
                         <id root="2.16.840.1.113883.2.1.4.1" extension="{{patient_nhs_number}}"/>
