@@ -14,6 +14,7 @@ setup(
     install_requires=[
         'defusedxml',
         'aioboto3',
-        'tornado'
+        'tornado',
+        'isodate'
     ]
 )

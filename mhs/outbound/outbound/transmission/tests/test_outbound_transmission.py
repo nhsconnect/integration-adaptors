@@ -57,6 +57,7 @@ class TestOutboundTransmission(TestCase):
 
             mock_fetch.assert_called_with(URL_VALUE,
                                           method="POST",
+                                          raise_error=True,
                                           body=MESSAGE,
                                           headers=HEADERS,
                                           client_cert=CLIENT_CERT_PATH,
@@ -87,6 +88,7 @@ class TestOutboundTransmission(TestCase):
 
             mock_fetch.assert_called_with(URL_VALUE,
                                           method="POST",
+                                          raise_error=True,
                                           body=MESSAGE,
                                           headers=HEADERS,
                                           client_cert=CLIENT_CERT_PATH,
