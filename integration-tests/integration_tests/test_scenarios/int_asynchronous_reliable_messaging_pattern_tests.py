@@ -61,7 +61,6 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
         # Arrange
         message, message_id = build_message('REPC_IN150016UK05', get_asid(), '9446245796', 'Asynchronous Express test')
 
-        print(message)
         # Act
         MhsHttpRequestBuilder() \
             .with_headers(interaction_id='REPC_IN150016UK05',
