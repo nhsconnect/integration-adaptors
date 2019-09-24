@@ -54,16 +54,16 @@ class EbxmlEnvelope(envelope.Envelope):
     def __init__(self, template_file: str, message_dictionary: Dict[str, Any]):
         super().__init__(template_file, message_dictionary)
 
-    def serialize(self, message_dictionary: Dict[str, Any] = None) -> Tuple[str, Dict[str, str], str]:
+    def serialize(self, _message_dictionary: Dict[str, Any] = None) -> Tuple[str, Dict[str, str], str]:
         """Produce a serialised representation of this ebXML message by populating a Mustache template with this
         object's properties.
 
-        :type message_dictionary: An optional `message_dictionary` to use instead of the one supplied when this instance
-        was constructed. For use by subclasses.
+        :type _message_dictionary: An optional `message_dictionary` to use instead of the one supplied when this
+        instance was constructed. For use by subclasses.
         :return: A tuple string containing the message ID, HTTP headers to be sent with the message and the message
         itself.
         """
-        ebxml_message_dictionary = copy.deepcopy(message_dictionary or self.message_dictionary)
+        ebxml_message_dictionary = copy.deepcopy(_message_dictionary or self.message_dictionary)
 
         message_id = ebxml_message_dictionary.get(MESSAGE_ID)
         if not message_id:

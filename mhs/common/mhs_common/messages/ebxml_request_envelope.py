@@ -80,7 +80,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         """
         super().__init__(EBXML_TEMPLATE, message_dictionary)
 
-    def serialize(self, message_dictionary=None) -> Tuple[str, Dict[str, str], str]:
+    def serialize(self, _message_dictionary=None) -> Tuple[str, Dict[str, str], str]:
         message_dictionary = copy.deepcopy(self.message_dictionary)
 
         attachment: dict
@@ -99,7 +99,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                                                                       f'generating message from template '
                                                                       f'file:{EBXML_TEMPLATE}') from e
 
-        message_id, http_headers, message = super().serialize(message_dictionary=message_dictionary)
+        message_id, http_headers, message = super().serialize(_message_dictionary=message_dictionary)
 
         http_headers[CONTENT_TYPE_HEADER_NAME] = EBXML_CONTENT_TYPE_VALUE
         return message_id, http_headers, message
