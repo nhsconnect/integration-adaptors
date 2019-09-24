@@ -111,7 +111,7 @@ class GpSummaryUploadTest(unittest.TestCase):
             render = self.gp_summary_upload_templator.populate_template_with_json_string(data)
             XmlUtilities.assert_xml_equal(expected_string, render)
 
-    def test_hl7_parsing_returns_correct_json(self):
+    def test_should_return_success_response_with_valid_json(self):
         """
         Simple assertion of correct values returned from the response parsing method
         """
@@ -123,25 +123,25 @@ class GpSummaryUploadTest(unittest.TestCase):
         self.assertEqual(parsed_data['creationTime'], '20190923112609')
         self.assertEqual(parsed_data['messageDetail'], 'GP Summary upload successful')
 
-    def test_hl7_parsing_bad_attribute(self):
+    def test_should_return_error_when_there_is_a_bad_attribute_format(self):
         input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'badAttributeParse.xml'))
         parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
 
         self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
 
-    def test_hl7_parsing_text_attribute(self):
+    def test_should_return_error_when_the_text_value_for_attribute_is_empty(self):
         input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'badTextAttribute.xml'))
         parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
 
         self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
 
-    def test_hl7_parsing_should_error_when_details_tag_is_missing(self):
+    def test_should_return_error_when_required_details_tag_is_missing(self):
         input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'missingAttribute.xml'))
         parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
 
         self.assertEqual(parsed_data['error'], 'Failed to parse all the necessary elements from xml returned from MHS')
 
-    def test_hl7_parsing_should_error_when_time_tag_is_missing(self):
+    def test_should_return_error_when_required_creationTime_tag_is_missing(self):
         input_xml = FileUtilities.get_file_string(str(self.xmlFileDir / 'missingAttribute.xml'))
         parsed_data = self.gp_summary_upload_templator.parse_response(input_xml)
 

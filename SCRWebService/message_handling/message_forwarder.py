@@ -49,7 +49,7 @@ class MessageForwarder(object):
                                                    message=populated_message, 
                                                    message_id=message_id,
                                                    correlation_id=correlation_id)
-        return self._parse_response(templator, response)
+        return templator.parse_response(response)
 
     def _get_interaction_template_populator(self, interaction_name: str):
         """
@@ -92,18 +92,3 @@ class MessageForwarder(object):
         except Exception as e:
             logger.error('003', 'Exception raised during message sending: {exception}', {'exception': e})
             raise MessageSendingError(str(e))
-
-    def _parse_response(self, templator, response: str):
-        """
-        A wrapper for the message parsing done by a templator, looks for errors and returns a simple error message
-        :param templator: 
-        :param response: 
-        :return: 
-        """
-        try:
-            return templator.parse_response(response)
-        except ET.ParseError as e:
-            logger.error('004', 'Exception raised whilst parsing message response: {exception}',
-                         {'exception': e})
-            return {'error': 'Exception raised whilst attempting to parse response'}
-
