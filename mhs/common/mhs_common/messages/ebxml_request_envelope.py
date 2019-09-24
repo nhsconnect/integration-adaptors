@@ -92,6 +92,11 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
     @staticmethod
     def _set_headers_for_attachments(message_dictionary):
+        """
+        Generate a content ID for each attachment and set the content transfer encoding based on whether the
+        attachment is Base64-encoded or not.
+        :param message_dictionary: message dictionary that has the attachments
+        """
         attachment: dict
         for attachment in message_dictionary.setdefault(ATTACHMENTS, []):
             attachment[ATTACHMENT_CONTENT_ID] = message_utilities.MessageUtilities.get_uuid()
@@ -134,7 +139,13 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         return EbxmlRequestEnvelope(extracted_values)
 
     @classmethod
-    def _add_descriptions_to_attachments(cls, xml_tree, attachments):
+    def _add_descriptions_to_attachments(cls, xml_tree: Element, attachments: List[Dict[str, Union[str, bool]]]):
+        """
+        For the attachments in attachments, extract the corresponding description of the attachment from xml_tree and
+        set the description on the attachment. If a description isn't found, set '' as the description.
+        :param xml_tree: XML tree containing attachment descriptions
+        :param attachments: attachments to add descriptions to
+        """
         for attachment in attachments:
             description_element = xml_tree.find(
                 f".//{ebxml_envelope.EBXML_NAMESPACE}:Reference["
@@ -153,6 +164,12 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     @classmethod
     def _extract_more_values_from_xml_tree(cls, xml_tree: Element,
                                            extracted_values: Dict[str, Union[str, bool]]):
+        """
+        Extract more values from XML tree (DuplicateElimination, SyncReply, AckRequested and SOAP actor). Some of the
+        values extracted are booleans (ie if the element is present or not).
+        :param xml_tree: XML tree to extract values from.
+        :param extracted_values: Values extracted so far. The additional extracted values will be added to this dict.
+        """
         cls._add_flag(extracted_values, DUPLICATE_ELIMINATION,
                       cls._extract_ebxml_value(xml_tree, "DuplicateElimination"))
         cls._add_flag(extracted_values, SYNC_REPLY, cls._extract_ebxml_value(xml_tree, "SyncReply"))
