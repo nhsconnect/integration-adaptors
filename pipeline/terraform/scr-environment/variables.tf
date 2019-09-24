@@ -38,3 +38,8 @@ variable "scr_service_port" {
   type = number
   description = "The port to be exposed for the scr web service"
 }
+
+variable "scr_mhs_address" {
+  type = string
+  description = "The address on the MHS for the SCR to forward messages to"
+}
