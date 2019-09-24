@@ -153,9 +153,9 @@ class SynchronousHandler(tornado.web.RequestHandler):
     async def write_response_with_store_updates(self, status: int, response: str, wdo: wd.WorkDescription,
                                                 wf: workflow.CommonWorkflow):
         try:
-            self._write_response(status, response)
             if wdo:
                 await wf.set_successful_message_response(wdo)
+            self._write_response(status, response)
         except Exception as e:
             logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
             if wdo:
