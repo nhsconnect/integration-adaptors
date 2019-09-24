@@ -193,26 +193,60 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         for i, part in enumerate(message_parts):
             if part.defects:
-                logger.warning('0005', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
+                logger.warning('0006', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
                                {'PartIndex': i, 'Defects': part.defects})
 
-        ebxml_part = message_parts[0].get_content()
+        ebxml_part, is_base64_ebxml_part = EbxmlRequestEnvelope._convert_message_part_to_str(message_parts[0])
+        if is_base64_ebxml_part:
+            logger.error('0007', 'Failed to decode ebXML header part of message as text')
+            raise ebxml_envelope.EbXmlParsingError("Failed to decode ebXML header part of message as text")
 
         payload_part = None
         attachments = []
         if len(message_parts) > 1:
-            payload_part = message_parts[1].get_content()
+            payload_part, is_base64_payload = EbxmlRequestEnvelope._convert_message_part_to_str(message_parts[1])
+            if is_base64_payload:
+                logger.error('0008', 'Failed to decode HL7 payload part of message as text')
+                raise ebxml_envelope.EbXmlParsingError("Failed to decode HL7 payload part of message as text")
 
             for attachment_message in message_parts[2:]:
+                payload, is_base64 = EbxmlRequestEnvelope._convert_message_part_to_str(attachment_message)
                 attachment = {
-                    ATTACHMENT_PAYLOAD: attachment_message.get_content(),
-                    ATTACHMENT_BASE64: False,
+                    ATTACHMENT_PAYLOAD: payload,
+                    ATTACHMENT_BASE64: is_base64,
                     ATTACHMENT_CONTENT_ID: str(attachment_message['Content-Id'][1:-1]),
                     ATTACHMENT_CONTENT_TYPE: attachment_message.get_content_type()
                 }
-                if isinstance(attachment[ATTACHMENT_PAYLOAD], bytes):
-                    attachment[ATTACHMENT_PAYLOAD] = base64.b64encode(attachment[ATTACHMENT_PAYLOAD]).decode()
-                    attachment[ATTACHMENT_BASE64] = True
                 attachments.append(attachment)
 
         return ebxml_part, payload_part, attachments
+
+    @staticmethod
+    def _convert_message_part_to_str(message_part: email.message.EmailMessage) -> Tuple[str, bool]:
+        content: Union[str, bytes] = message_part.get_content()
+        content_type = message_part.get_content_type()
+        content_transfer_encoding = message_part['Content-Transfer-Encoding']
+        logger_dict = {'ContentType': content_type, 'ContentTransferEncoding': content_transfer_encoding}
+
+        if isinstance(content, str):
+            logger.info('0009', 'Successfully decoded message part with {ContentType} {ContentTransferEncoding} as '
+                                'string', logger_dict)
+            return content, False
+        try:
+            if content_type == 'application/xml':
+                decoded_content = content.decode()
+                logger.info('0010',
+                            'Successfully decoded message part with {ContentType} {ContentTransferEncoding} as a '
+                            'string', logger_dict)
+                return decoded_content, False
+            decoded_content = base64.b64encode(content).decode()
+            logger.info('0011',
+                        'Successfully encoded binary message part with {ContentType} {ContentTransferEncoding} as '
+                        'a base64 string', logger_dict)
+            return decoded_content, True
+        except UnicodeDecodeError as e:
+            logger.error('0012', 'Failed to decode ebXML message part with {ContentType} {ContentTransferEncoding}.',
+                         logger_dict)
+            raise ebxml_envelope.EbXmlParsingError(f'Failed to decode ebXML message part with '
+                                                   f'Content-Type: {content_type} and '
+                                                   f'Content-Transfer-Encoding: {content_transfer_encoding}') from e

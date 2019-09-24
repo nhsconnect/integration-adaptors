@@ -256,6 +256,20 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
             self.assertEqual(expected_values_with_test_payload, parsed_message.message_dictionary)
 
+        with self.subTest("A message with an invalid binary ebXML header"):
+            message = file_utilities.FileUtilities.get_file_string(
+                str(self.message_dir / "ebxml_request_invalid_binary_ebxml_header.msg"))
+
+            with self.assertRaises(ebxml_envelope.EbXmlParsingError):
+                ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+        with self.subTest("A message with an invalid binary HL7 payload"):
+            message = file_utilities.FileUtilities.get_file_string(
+                str(self.message_dir / "ebxml_request_invalid_binary_hl7_payload.msg"))
+
+            with self.assertRaises(ebxml_envelope.EbXmlParsingError):
+                ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
         with self.subTest("A valid request that does not contain the optional payload MIME part"):
             message = file_utilities.FileUtilities.get_file_string(
                 str(self.message_dir / "ebxml_request_no_payload.msg"))
@@ -280,6 +294,29 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
+
+        with self.subTest("A valid request containing one textual attachment with application/xml content type"):
+            message = file_utilities.FileUtilities.get_file_string(
+                str(self.message_dir / "ebxml_request_one_attachment_application_xml_content_type.msg"))
+            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
+                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F',
+                ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+                ebxml_request_envelope.ATTACHMENT_BASE64: False,
+                ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
+                ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
+            })
+
+            parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
+
+            self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
+
+        with self.subTest("A message with an invalid application/xml binary HL7 payload"):
+            message = file_utilities.FileUtilities.get_file_string(
+                str(self.message_dir / "ebxml_request_invalid_application_xml_binary_hl7_payload.msg"))
+
+            with self.assertRaises(ebxml_envelope.EbXmlParsingError):
+                ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
         with self.subTest("A valid request containing one textual and one base64 attachment"):
             message = file_utilities.FileUtilities.get_file_string(
