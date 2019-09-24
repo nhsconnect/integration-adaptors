@@ -60,7 +60,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.normalized_expected_serialized_message = self.get_expected_file_string(EXPECTED_EBXML)
+        self.normalized_expected_serialized_message = self._get_expected_file_string(EXPECTED_EBXML)
 
     #####################
     # Serialisation tests
@@ -99,7 +99,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         message_id, http_headers, message = envelope.serialize()
 
-        normalized_expected_message = self.get_expected_file_string('ebxml_request_one_attachment.xml')
+        normalized_expected_message = self._get_expected_file_string('ebxml_request_one_attachment.xml')
         normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
 
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
@@ -134,7 +134,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         message_id, http_headers, message = envelope.serialize()
 
-        normalized_expected_message = self.get_expected_file_string('ebxml_request_multiple_attachments.xml')
+        normalized_expected_message = self._get_expected_file_string('ebxml_request_multiple_attachments.xml')
         normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
 
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
@@ -395,7 +395,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
     # Helper methods
     #######################
 
-    def get_expected_file_string(self, filename: str):
+    def _get_expected_file_string(self, filename: str):
         # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
         # file, so normalize the line endings of the strings being compared
         return file_utilities.FileUtilities.normalize_line_endings(
