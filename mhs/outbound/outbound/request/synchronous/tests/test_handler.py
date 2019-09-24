@@ -27,6 +27,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.workflow = unittest.mock.Mock()
+        self.workflow.workflow_specific_interaction_details = dict()
         self.sync_async_workflow = unittest.mock.MagicMock()
         self.config_manager = unittest.mock.Mock()
         return tornado.web.Application([
@@ -383,8 +384,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
         self.setup_workflows()
         self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
         self.fetch("/", method="POST", headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
-                                                'sync-async': 'false'},
-                   body=REQUEST_BODY)
+                                                'sync-async': 'false'}, body=REQUEST_BODY)
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_called_once()
 
@@ -529,6 +529,7 @@ class TestSynchronousHandlerSyncMessage(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.workflow = unittest.mock.Mock(spec=synchronous.SynchronousWorkflow)
+        self.workflow.workflow_specific_interaction_details = {}
         self.sync_async_workflow = unittest.mock.MagicMock()
         self.config_manager = unittest.mock.Mock()
         return tornado.web.Application([

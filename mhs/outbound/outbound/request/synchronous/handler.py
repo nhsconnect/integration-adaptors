@@ -9,9 +9,10 @@ import tornado.escape
 import tornado.locks
 import tornado.web
 from mhs_common.configuration import configuration_manager
+from mhs_common.messages import ebxml_envelope
+from utilities import integration_adaptors_logger as log, message_utilities, timing
 
 from outbound.request.synchronous import request_body_schema
-from utilities import integration_adaptors_logger as log, message_utilities, timing
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
@@ -135,6 +136,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
 
         interaction_details = self._retrieve_interaction_details(interaction_id)
         wf = self._extract_default_workflow(interaction_details, interaction_id)
+        self._extend_interaction_details(wf, interaction_details)
         sync_async_interaction_config = self._extract_sync_async_from_interaction_details(interaction_details)
 
         if self._should_invoke_sync_async_workflow(sync_async_interaction_config, sync_async_header):
@@ -225,6 +227,10 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         reason='Required Interaction-Id header not found') from e
         return interaction_id
 
+    def _extend_interaction_details(self, wf, interaction_details):
+        if wf.workflow_specific_interaction_details:
+            interaction_details.update(wf.workflow_specific_interaction_details)
+
     def _extract_default_workflow(self, interaction_details, interaction_id):
         try:
             wf = self.workflows[interaction_details['workflow']]
@@ -270,9 +276,9 @@ class SynchronousHandler(tornado.web.RequestHandler):
     async def write_response_with_store_updates(self, status: int, response: str, wdo: wd.WorkDescription,
                                                 wf: workflow.CommonWorkflow):
         try:
-            self._write_response(status, response)
             if wdo:
                 await wf.set_successful_message_response(wdo)
+            self._write_response(status, response)
         except Exception as e:
             logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
             if wdo:
@@ -307,6 +313,8 @@ class SynchronousHandler(tornado.web.RequestHandler):
             logger.error('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
             raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
                                         reason=f'Unknown interaction ID: {interaction_id}')
+
+        interaction_details[ebxml_envelope.ACTION] = interaction_id
 
         return interaction_details
 

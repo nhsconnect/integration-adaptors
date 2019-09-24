@@ -32,6 +32,7 @@ class TestCommonHttps(TestCase):
                                                              http_proxy_port=HTTP_PROXY_PORT)
 
             mock_fetch.assert_called_with(URL,
+                                          raise_error=True,
                                           method=METHOD,
                                           body=BODY,
                                           headers=HEADERS,
@@ -53,6 +54,7 @@ class TestCommonHttps(TestCase):
             actual_response = await CommonHttps.make_request(url=URL, method=METHOD, headers=HEADERS, body=BODY)
 
             mock_fetch.assert_called_with(URL,
+                                          raise_error=True,
                                           method=METHOD,
                                           body=BODY,
                                           headers=HEADERS,

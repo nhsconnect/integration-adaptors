@@ -11,7 +11,7 @@ class TestOutboundSOAPHandler(unittest.TestCase):
     message_dir = Path(os.path.dirname(os.path.abspath(__file__))) / 'test_messages'
 
     def test_non_500(self):
-        self.assertEqual(handle_soap_error(202, {'Content-Type': 'text/html'}, 'Some body'), (202, 'Some body'))
+        self.assertEqual(handle_soap_error(202, {'Content-Type': 'text/html'}, 'Some body'), (202, 'Some body', []))
 
     def test_non_soap_fault(self):
         with self.assertRaises(AssertionError):
