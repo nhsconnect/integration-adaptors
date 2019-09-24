@@ -155,7 +155,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertEqual(correlation_id_header, "yes-this-is-mocked")
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_success_response_parses_correctly(self, request_mock):
+    def test_should_correct_parse_success_response(self, request_mock):
         # Arrange
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         response_body = file_utilities.FileUtilities.get_file_string(response_xml)
@@ -176,7 +176,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertEqual(response_body['messageDetail'], 'GP Summary upload successful')
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_bad_message_body_returns_an_error(self, request_mock):
+    def test_should_return_error_message_when_bad_response_body_is_returned(self, request_mock):
         # Arrange
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         response_mock = TestResponse()
