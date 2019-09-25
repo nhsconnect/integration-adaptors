@@ -21,3 +21,4 @@ python_version = "3.7"
 
 [scripts]
 inttests = 'python -m xmlrunner discover -o test-reports -p "int_*" -v'
+componenttests = 'python -m xmlrunner discover -o test-reports -p "component_*" -v'

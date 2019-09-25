@@ -21,21 +21,3 @@ def get_asid():
 
     return os.environ.get('INTEGRATION_TEST_ASID', asid)
 
-
-def get_mhs_hostname():
-    """ Looks up the mhs hostname from the environment settings
-
-    The mhs hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
-        if this is not set, it will default to 'localhost'
-    """
-    return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
-
-
-def get_scr_hostname():
-    """
-    Looks up the hostname of the SCR from the environment variables
-    
-    :return: 
-    """
-    return os.environ.get('SCR_ADDRESS')
-
