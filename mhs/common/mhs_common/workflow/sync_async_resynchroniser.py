@@ -19,8 +19,8 @@ class SyncAsyncResynchroniser(object):
         """
         :param sync_async_store: The store where the sync-async messages are placed from the inbound service
         :param max_retries: The total number of polling attempts to the sync async store while attempting to resynchronise
-        :param retry_interval: The time between polling requests to the sync-async store in milliseconds
-        :param initial_delay: The time to wait before making the first request to the
+        :param retry_interval: The time between polling requests to the sync-async store in seconds
+        :param initial_delay: The time to wait before making the first request to the sync async store in seconds
         """
         self.max_retries = max_retries
         self.retry_interval = retry_interval
