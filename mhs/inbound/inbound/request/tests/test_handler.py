@@ -145,7 +145,6 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         log.inbound_message_id.set.assert_called_with('C614484E-4B10-499A-9ACD-5D645CFACF61')
         mock_message_id.set.assert_called_with(REF_TO_MESSAGE_ID)
 
-    @skip('Unskip once sync workflow works')
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_receive_sync_message(self, mock_get_uuid, mock_get_timestamp):

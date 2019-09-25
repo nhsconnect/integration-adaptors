@@ -1,4 +1,4 @@
-"""This module defines the asynchronous reliable workflow."""
+"""This module defines the asynchronous forward reliable workflow."""
 from isodate import isoerror
 
 import utilities.integration_adaptors_logger as log
@@ -24,11 +24,11 @@ import asyncio
 
 from utilities.date_utilities import DateUtilities
 
-logger = log.IntegrationAdaptorsLogger('ASYNC_RELIABLE_WORKFLOW')
+logger = log.IntegrationAdaptorsLogger('ASYNC_FORWARD_WORKFLOW')
 
 
-class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflow):
-    """Handles the workflow for the asynchronous reliable messaging pattern."""
+class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflow):
+    """Handles the workflow for the asynchronous forward reliable messaging pattern."""
     def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
@@ -36,15 +36,16 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                  inbound_queue_retry_delay: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
-        super(AsynchronousReliableWorkflow, self).__init__(party_key, persistence_store, transmission,
-                                                           queue_adaptor, inbound_queue_max_retries,
-                                                           inbound_queue_retry_delay, persistence_store_max_retries,
-                                                           routing)
+        super(AsynchronousForwardReliableWorkflow, self).__init__(party_key, persistence_store, transmission,
+                                                                  queue_adaptor, inbound_queue_max_retries,
+                                                                  inbound_queue_retry_delay,
+                                                                  persistence_store_max_retries,
+                                                                  routing)
 
         self.workflow_specific_interaction_details = dict(duplicate_elimination=True,
                                                           ack_requested=True,
-                                                          ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-                                                          sync_reply=True)
+                                                          ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:nextMSH",
+                                                          sync_reply=False)
 
     @timing.time_function
     async def handle_outbound_message(self, from_asid: Optional[str],
@@ -53,11 +54,11 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                       wdo: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
-        logger.info('0001', 'Entered async reliable workflow to handle outbound message')
+        logger.info('0001', 'Entered async forward reliable workflow to handle outbound message')
         if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store,
                                                  message_id,
-                                                 workflow.ASYNC_RELIABLE,
+                                                 workflow.FORWARD_RELIABLE,
                                                  outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
                                                  )
             await wdo.publish()
@@ -156,7 +157,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                 return 500, parsed_response, None
 
     def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0009', 'Async-reliable workflow invoked. Message sent to Spine and {Acknowledgment} received. '
+        logger.audit('0009', 'Async-forward-reliable workflow invoked. Message sent to Spine and {Acknowledgment} received. '
                              '{RequestSentTime} {AcknowledgmentReceivedTime}',
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment})
@@ -183,7 +184,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
-        logger.info('0010', 'Entered async reliable workflow to handle inbound message')
+        logger.info('0010', 'Entered async forward reliable workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,

@@ -7,12 +7,16 @@ class FunctionalTest(TestCase):
     # Message Pattern Type: Forward Reliable
     # Interaction: GP2GP Common Content Large Messaging (COPC_IN000001UK01)
     def test_mhs_forward_reliable(self):
-        mhs_response, _, _ = methods.get_interaction_from_template('forward_reliable',
-                                                                   'COPC_IN000001UK01',
-                                                                   '9446245796',
-                                                                   'Forward Reliable test')
-        self.assertTrue(methods.check_response(mhs_response, 'requestSuccessDetail'),
-                        "Forward Reliable smoke test failed")
+        methods.get_interaction_from_template('forward_reliable',
+                                              'COPC_IN000001UK01',
+                                              '9446245796',
+                                              'Forward Reliable test')
+
+        _, _, inbound_response = message_retriever.get_inbound_response()
+        parser = xml_parser.XmlMessageParser()
+        xml_response = parser.parse_message(inbound_response)
+        xml_element = xml_response.find('.//hl7:detail', namespaces=xml_parser.NAMESPACES)
+        self.assertEqual(xml_element.text, 'text', "should match")
 
     # Message Pattern Type: Asynchronous Reliable
     # Interaction: SCR-Adaptor using json template (json_hash16UK05), which forms GP Summary (REPC_IN150016UK05)
