@@ -26,7 +26,7 @@ def main():
     config.setup_config('SCR')
     log.configure_logging()
     app = build_app()
-    app.listen(9000)
+    app.listen(80)
     tornado.ioloop.IOLoop.current().start()
 
 
