@@ -3,6 +3,8 @@ import json
 import pathlib
 from scr import gp_summary_upload
 from utilities import file_utilities, test_utilities, xml_utilities
+from utilities.file_utilities import FileUtilities
+
 from definitions import ROOT_DIR
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
@@ -12,13 +14,19 @@ from message_handling import message_sender, message_forwarder
 
 GP_SUMMARY_UPLOAD_URL = "/"
 
-complete_data_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data' / 'complete_input.json'
-populated_message_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data' / 'populated_message_template.xml'
+data_path = pathlib.Path(ROOT_DIR) / 'endpoints' / 'tests' / 'data'
+complete_data_path = data_path / 'complete_input.json'
+populated_message_path = data_path / 'populated_message_template.xml'
+response_xml = data_path / 'success_response.xml'
 
 CORRELATION_ID = 'correlation-id'
 MESSAGE_ID = 'message-id'
 INTERACTION_NAME = 'interaction-name'
 GP_SUMMARY_UPLOAD_NAME = 'SCR_GP_SUMMARY_UPLOAD'
+
+
+class TestResponse(object):
+    body = None
 
 
 class TestSummaryCareRecord(AsyncHTTPTestCase):
@@ -35,16 +43,17 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         return Application([(r"/", summary_care_record.SummaryCareRecord, dict(forwarder=forwarder))])
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
-    def test_scr_adaptor_calls_mhs_end_point_happy_path(self, request_mock):
+    def test_scr_adaptor_calls_mhs_end_point_with_populated_message(self, request_mock):
+        # Arrange
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
         expected_message = file_utilities.FileUtilities.get_file_string(populated_message_path)
 
-        request_mock.return_value = test_utilities.awaitable("Response message")
+        # Act
+        self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
+                   headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
+                   body=json.dumps(body))
 
-        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
-                              headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
-                              body=json.dumps(body))
-
+        # Assert
         body_call_value = request_mock.call_args[1]['body']
         call_method = request_mock.call_args[1]['method']
         url_method = request_mock.call_args[1]['url']
@@ -52,8 +61,6 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         xml_utilities.XmlUtilities.assert_xml_equal(body_call_value, expected_message)
         self.assertEqual(call_method, 'POST')
         self.assertEqual(url_method, self.address)
-
-        self.assertEqual(response.body.decode(), "Response message")
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_exception_raised_during_message_sending_raises_MessageSendingError(self, request_mock):
@@ -146,3 +153,42 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
         correlation_id_header = request_mock.call_args[1]['headers'][CORRELATION_ID]
         self.assertEqual(correlation_id_header, "yes-this-is-mocked")
+
+    @mock.patch('comms.common_https.CommonHttps.make_request')
+    def test_should_correct_parse_success_response(self, request_mock):
+        # Arrange
+        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        response_body = file_utilities.FileUtilities.get_file_string(response_xml)
+        response_mock = TestResponse()
+        response_mock.body = response_body
+        request_mock.return_value = test_utilities.awaitable(response_mock)
+
+        # Act
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
+                              headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
+                              body=json.dumps(body))
+
+        response_body = json.loads(response.body.decode())
+
+        self.assertEqual(response_body['messageRef'], '9C534C19-C587-4463-9AED-B76F715D3EA3')
+        self.assertEqual(response_body['messageId'], '2E372546-229A-483F-9B11-EF46ABF3178C')
+        self.assertEqual(response_body['creationTime'], '20190923112609')
+        self.assertEqual(response_body['messageDetail'], 'GP Summary upload successful')
+
+    @mock.patch('comms.common_https.CommonHttps.make_request')
+    def test_should_return_error_message_when_bad_response_body_is_returned(self, request_mock):
+        # Arrange
+        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        response_mock = TestResponse()
+        response_mock.body = "This is a bad response to parse"
+        request_mock.return_value = test_utilities.awaitable(response_mock)
+
+        # Act
+        response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
+                              headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
+                              body=json.dumps(body))
+
+        response_body = json.loads(response.body.decode())
+
+        # Assert
+        self.assertEqual(response_body['error'], 'Failed to parse response from xml provided')
