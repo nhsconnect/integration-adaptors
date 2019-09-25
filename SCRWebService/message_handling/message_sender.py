@@ -32,7 +32,7 @@ class MessageSender(object):
                                                   body=message_body,
                                                   method='POST')
 
-        return response
+        return response.body
 
     def _build_headers(self, interaction_id: str, message_id: Optional[str], correlation_id: Optional[str]):
         """
