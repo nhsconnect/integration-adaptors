@@ -1,10 +1,12 @@
 """Module responsible for building and sending http messages to the SCR Adaptor"""
 from __future__ import annotations
+
+import os
 import unittest
 import uuid
+
 import requests
 from requests import Response
-from integration_tests.helpers import methods
 
 
 class ScrHttpRequestBuilder(object):
@@ -15,6 +17,7 @@ class ScrHttpRequestBuilder(object):
     def __init__(self):
         self.headers = {}
         self.body = None
+        self.scr_host = os.environ.get('SCR_ADDRESS')
         self.assertor = unittest.TestCase('__init__')
 
     def with_headers(self, interaction_name: str, message_id: str,
@@ -50,7 +53,7 @@ class ScrHttpRequestBuilder(object):
         Asserts the response is successful.
         :return: self
         """
-        response = requests.post(methods.get_scr_hostname(), headers=self.headers, data=self.body)
+        response = requests.post(self.scr_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')
