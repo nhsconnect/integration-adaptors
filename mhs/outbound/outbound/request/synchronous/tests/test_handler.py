@@ -340,7 +340,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         response = self.call_handler(sync_async='true')
 
         self.assertEqual(response.code, 400)
-        self.assertIn("Message header requested sync-async wrap for a message patternthat does not support sync-async",
+        self.assertIn("Message header requested sync-async wrap for a message pattern that does not support sync-async",
                       response.body.decode())
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_not_called()

@@ -258,7 +258,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         elif (not interaction_config) and sync_async_header:
             logger.error('0033', 'Message header requested sync-async wrap for un-supported sync-async')
             raise tornado.web.HTTPError(400, f'Message header requested sync-async wrap for un-supported sync-async',
-                                        reason='Message header requested sync-async wrap for a message pattern'
+                                        reason='Message header requested sync-async wrap for a message pattern '
                                                'that does not support sync-async')
         else:
             return False
