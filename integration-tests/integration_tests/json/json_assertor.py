@@ -45,12 +45,10 @@ class JsonResponseAssertor(object):
         :param xpath: The xpath of the desired key/value
         :return: The value at the given xpath
         """
-        try:
-            value_at_xpath = dpath.util.get(self.json_response, xpath)
-        except KeyError:
-            value_at_xpath = None
+        values = dpath.util.search(self.json_response, xpath)
 
-        self.assertor.assertIsNotNone(value_at_xpath,
-                                      f'Key with xpath: {xpath} not found in response json: '
-                                      f'{self.json_response}')
-        return value_at_xpath
+        #TODO Upate error text
+        self.assertor.assertEqual(len(values.keys()), 1,
+                                  f'Key with xpath: {xpath} not found in response json: '
+                                  f'{self.json_response}')
+        return dpath.util.get(self.json_response, xpath)

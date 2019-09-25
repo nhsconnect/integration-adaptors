@@ -50,22 +50,3 @@ def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_i
 
     return requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
 
-
-def call_scr_adaptor(json_string):
-    """ Call the SCR adaptor with the provided json string
-
-    :param json_string: the json to be sent
-    :return: the response from the adaptor
-    """
-
-    # TODO RT-186
-    # once we know the scr_adaptor end point, we need to send the json_string to the scr_adaptor
-    # scr_adaptor_response = requests.post(methods.get_scr_adaptor_hostname() + json_string)
-    # return scr_adaptor_response.text
-
-    # meanwhile, build an example response...
-    scr_adaptor_response, message_id = build_message('REPC_IN150016UK05',
-                                                     methods.get_asid(),
-                                                     '9689177869',
-                                                     'json message test')
-    return scr_adaptor_response

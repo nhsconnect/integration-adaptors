@@ -14,7 +14,7 @@ def build_app():
     interactions = {
         'SCR_GP_SUMMARY_UPLOAD': gp_summary_upload.GpSummaryUpload()
     }
-    address = config.get_config('MHS_ADDRESS')
+    address = 'https://' + config.get_config('MHS_ADDRESS') + '/'
     sender = message_sender.MessageSender(address)
     forwarder = message_forwarder.MessageForwarder(interactions, sender)
 

@@ -87,16 +87,6 @@ def get_interaction_from_template(type, template, nhs_number, payload,
                                         sync_async)
 
 
-def get_json(template, patient_nhs_number, payload):
-    """ Renders the template
-
-    :param template: the template to use
-    :param patient_nhs_number: the NHS number of the test patient
-    :param payload: the actual payload message being inserted into the template
-    """
-    return build_message(template, get_asid(), patient_nhs_number, payload)
-
-
 def check_response(returned_xml, section_name):
     """ Validates the given XML contains a given section
 
