@@ -169,15 +169,6 @@ pipeline {
                     steps {
                         dir('integration-tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                            // Wait for MHS container to fully stand up
-                            timeout(2) {
-                                waitUntil {
-                                   script {
-                                       def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
-                                       return (r == '405');
-                                   }
-                                }
-                            }
 
                             // Wait for MHS load balancers to have healthy targets
                             dir('../pipeline/scripts/check-target-group-health') {
