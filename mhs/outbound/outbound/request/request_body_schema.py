@@ -1,3 +1,15 @@
+"""
+Schema definition for the request body that MHS accepts. To use this module, simply do:
+
+.. code-block:: python
+
+    try:
+        request_body = RequestBodySchema().loads(body)
+    except json.JSONDecodeError as e:
+        ... # handle JSON decode errors
+    except marshmallow.ValidationError as e:
+        ... # handle validation errors
+"""
 import dataclasses
 from typing import List
 
@@ -13,12 +25,17 @@ _ATTACHMENT_ALLOWED_CONTENT_TYPES = (
 
 @dataclasses.dataclass
 class Attachment:
+    """
+    Dataclass representing an attachment in the request body that MHS accepts.
+    `AttachmentSchema` deserialises to this class.
+    """
     is_base64: bool
     content_type: str
     payload: str
 
 
 class AttachmentSchema(marshmallow.Schema):
+    """Schema for an attachment in the request body that MHS accepts"""
     is_base64 = marshmallow.fields.Bool(required=True,
                                         description='Whether the attachment payload is base64-encoded or not. This is '
                                                     'only required for binary attachments eg images.',
@@ -40,11 +57,13 @@ class AttachmentSchema(marshmallow.Schema):
 
 @dataclasses.dataclass
 class RequestBody:
+    """Dataclass representing the request body that MHS accepts. `RequestBodySchema` deserialises to this class."""
     payload: str
     attachments: List[Attachment]
 
 
 class RequestBodySchema(marshmallow.Schema):
+    """Schema for the request body that MHS accepts"""
     payload = marshmallow.fields.Str(required=True, description='HL7 Payload to send to Spine',
                                      validate=marshmallow.validate.Length(min=1))
     attachments = marshmallow.fields.Nested(AttachmentSchema, many=True, missing=[],
