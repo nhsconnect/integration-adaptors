@@ -9,7 +9,6 @@ UUID = 'uuid'
 TIMESTAMP = 'timestamp'
 ASID = 'asid'
 PATIENT_NHS_NUMBER = 'patient_nhs_number'
-PAYLOAD = 'payload'
 TO_PARTY_ID = 'to_party_id'
 FILE_UPLOAD = 'file_upload'
 DISSENT_OVERRIDE = 'dissentOverride'
@@ -18,7 +17,7 @@ DOCUMENT_TYPE = 'documentType'
 TO_ASID = 'to_asid'
 
 
-def build_message(template, asid, patient_nhs_number, payload):
+def build_message(template, asid, patient_nhs_number):
     """Build an upload message
 
     :param template: The Name of the template to be used.
@@ -41,7 +40,6 @@ def build_message(template, asid, patient_nhs_number, payload):
         TIMESTAMP: timestamp,
         ASID: asid,
         TO_ASID: '928942012545',
-        PAYLOAD: payload,
         PATIENT_NHS_NUMBER: patient_nhs_number,
         TO_PARTY_ID: to_party_id,
         FILE_UPLOAD: file_upload,

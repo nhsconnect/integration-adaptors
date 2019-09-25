@@ -38,7 +38,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
     @skip('Run once implemented Forward Reliable Message Pattern')
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796', 'Forward Reliable test')
+        message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -60,7 +60,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
     @skip('Run once implemented Forward Reliable Message Pattern')
     def test_should_record_forward_reliable_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796', 'Forward Reliable test')
+        message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -91,7 +91,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
     @skip('Run once implemented Forward Reliable Message Pattern')
     def test_should_return_successful_response_from_spine_in_original_post_request_body_if_sync_async_requested(self):
         # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796', 'Forward Reliable test')
+        message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796')
 
         # Act
         response = MhsHttpRequestBuilder() \
@@ -106,7 +106,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
     @skip('Run once implemented Forward Reliable Message Pattern')
     def test_should_record_the_correct_response_between_the_inbound_and_outbound_components_if_sync_async_requested(self):
         # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796', 'Forward Reliable test')
+        message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796')
 
         # Act
         MhsHttpRequestBuilder() \
