@@ -45,7 +45,7 @@ class RequestBody:
 
 
 class RequestBodySchema(marshmallow.Schema):
-    payload = marshmallow.fields.Str(required=True, description='Payload to send to Spine',
+    payload = marshmallow.fields.Str(required=True, description='HL7 Payload to send to Spine',
                                      validate=marshmallow.validate.Length(min=1))
     attachments = marshmallow.fields.Nested(AttachmentSchema, many=True, missing=[],
                                             description='Optional attachments to send with the payload. Only for use '
