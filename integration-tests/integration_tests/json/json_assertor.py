@@ -47,8 +47,6 @@ class JsonResponseAssertor(object):
         """
         values = dpath.util.search(self.json_response, xpath)
 
-        #TODO Upate error text
         self.assertor.assertEqual(len(values.keys()), 1,
-                                  f'Key with xpath: {xpath} not found in response json: '
-                                  f'{self.json_response}')
+                                  f'Failed to find exactly one key with the given xpath, found: {values}')
         return dpath.util.get(self.json_response, xpath)
