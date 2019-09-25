@@ -23,6 +23,7 @@ def create_spec() -> apispec.APISpec:
 
     spec.components.schema("RequestBody", schema=request_body_schema.RequestBodySchema)
 
+    # The paths here should match the paths in main.py
     spec.path(urlspec=(r'/', handler.SynchronousHandler))
     spec.path(urlspec=(r'/healthcheck', healthcheck_handler.HealthcheckHandler))
 
