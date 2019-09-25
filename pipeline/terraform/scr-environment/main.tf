@@ -35,6 +35,10 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
         {
           name = "SCR_LOG_LEVEL"
           value = var.scr_log_level
+        },
+        {
+          name = "SCR_MHS_ADDRESS"
+          value = var.scr_mhs_address
         }
       ]
 

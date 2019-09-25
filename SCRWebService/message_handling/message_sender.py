@@ -27,11 +27,11 @@ class MessageSender(object):
         """
         logger.info('001', 'Preparing message headers to send to mhs address')
         headers = self._build_headers(interaction_id, message_id, correlation_id)
+        
         response = await CommonHttps.make_request(url=self.mhs_address,
                                                   headers=headers,
                                                   body=message_body,
                                                   method='POST')
-
         return response.body
 
     def _build_headers(self, interaction_id: str, message_id: Optional[str], correlation_id: Optional[str]):

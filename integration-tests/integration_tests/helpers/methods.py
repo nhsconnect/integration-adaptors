@@ -3,8 +3,6 @@ from pathlib import Path
 
 from utilities.file_utilities import FileUtilities
 
-from integration_tests.helpers import interactions, xml_parser
-from integration_tests.helpers.build_message import build_message
 from test_definitions import ROOT_DIR
 
 
@@ -33,25 +31,11 @@ def get_mhs_hostname():
     return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
 
 
-def get_json(template, patient_nhs_number, payload):
-    """ Renders the template
-
-    :param template: the template to use
-    :param patient_nhs_number: the NHS number of the test patient
-    :param payload: the actual payload message being inserted into the template
+def get_scr_hostname():
     """
-    return build_message(template, get_asid(), patient_nhs_number, payload)
-
-
-def check_response(returned_xml, section_name):
-    """ Validates the given XML contains a given section
-
-    :param returned_xml: the message that we're checking
-    :param section_name: the section we're expecting
-    :return: True if section is present, otherwise False
+    Looks up the hostname of the SCR from the environment variables
+    
+    :return: 
     """
-    parser = xml_parser.XmlMessageParser()
-    returned_data = parser.parse_message(returned_xml)
-    section = parser.extract_hl7xml_section(returned_data, section_name)
+    return os.environ.get('SCR_ADDRESS')
 
-    return section is not None
