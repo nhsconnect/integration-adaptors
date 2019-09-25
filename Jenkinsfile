@@ -157,7 +157,7 @@ pipeline {
                                     -var ecr_address=${DOCKER_REGISTRY} \
                                     -var scr_log_level=DEBUG \
                                     -var scr_service_port=${SCR_SERVICE_PORT} \
-                                    -var scr_mhs_address=${MHS_ADDRESS}
+                                    -var scr_mhs_address=http://${MHS_ADDRESS}
                                 """
                         }
                     }

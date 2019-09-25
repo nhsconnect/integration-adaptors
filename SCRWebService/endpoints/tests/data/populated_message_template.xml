@@ -82,6 +82,8 @@
                         <code code="163171000000105" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Care Professional Documentation" />
                     </pertinentRootCREType>
                 </pertinentInformation1>
+                <pertinentInformation2 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
+                </pertinentInformation2>
                 <recordTarget typeCode="RCT">
                     <patient classCode="PAT">
                         <id root="2.16.840.1.113883.2.1.4.1" extension="9446245796" />

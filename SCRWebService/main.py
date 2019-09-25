@@ -14,7 +14,7 @@ def build_app():
     interactions = {
         'SCR_GP_SUMMARY_UPLOAD': gp_summary_upload.GpSummaryUpload()
     }
-    address = 'http://' + config.get_config('MHS_ADDRESS') + '/'
+    address = config.get_config('MHS_ADDRESS')
     sender = message_sender.MessageSender(address)
     forwarder = message_forwarder.MessageForwarder(interactions, sender)
 
@@ -26,7 +26,7 @@ def main():
     config.setup_config('SCR')
     log.configure_logging()
     app = build_app()
-    app.listen(80)
+    app.listen(9000)
     tornado.ioloop.IOLoop.current().start()
 
 
