@@ -33,7 +33,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_in_original_post_request_body(self):
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606', 'Synchronous test')
+        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606')
 
         # Act
         response = MhsHttpRequestBuilder() \
@@ -50,7 +50,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
     def test_should_record_synchronous_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606', 'Synchronous test')
+        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606')
 
         # Act
         MhsHttpRequestBuilder() \

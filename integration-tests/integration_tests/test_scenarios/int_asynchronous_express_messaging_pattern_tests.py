@@ -38,7 +38,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923', 'Asynchronous Express test')
+        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -59,7 +59,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_record_asynchronous_express_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923', 'Asynchronous Express test')
+        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -88,7 +88,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_in_original_post_request_body_if_sync_async_requested(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923', 'Asynchronous Express test')
+        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923')
 
         # Act
         response = MhsHttpRequestBuilder() \
@@ -103,7 +103,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_record_the_correct_response_between_the_inbound_and_outbound_components_if_sync_async_requested(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923', 'Asynchronous Express test')
+        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923')
 
         # Act
         MhsHttpRequestBuilder() \
