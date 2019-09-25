@@ -183,6 +183,21 @@ variable "ca_certs_arn" {
   description = "ARN of the secrets manager secret of the endpoint issuing subCA certificate and root CA Certificate (in that order)."
 }
 
+variable "route_ca_certs_arn" {
+  type = string
+  description = "ARN of the secrets manager secret containing the CA certificates to be used to verify the certificate presented by the Spine Route Lookup service"
+}
+
+variable "outbound_alb_certificate_arn" {
+  type = string
+  description = "ARN of the TLS certificate that the outbound load balancer should present. This can be a certificate stored in IAM or ACM."
+}
+
+variable "route_alb_certificate_arn" {
+  type = string
+  description = "ARN of the TLS certificate that the outbound load balancer should present. This can be a certificate stored in IAM or ACM."
+}
+
 variable "spineroutelookup_service_sds_url" {
   type = string
   description = "The SDS URL the Spine Route Lookup service should communicate with."

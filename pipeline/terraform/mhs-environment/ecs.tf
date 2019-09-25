@@ -65,7 +65,7 @@ locals {
     },
     {
       name = "MHS_SPINE_ROUTE_LOOKUP_URL",
-      value = aws_route53_record.mhs_route_load_balancer_record.name
+      value = "https://${aws_route53_record.mhs_route_load_balancer_record.name}"
     },
     {
       name = "MHS_SPINE_ORG_CODE",
@@ -104,6 +104,10 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
         {
           name = "MHS_SECRET_CA_CERTS"
           valueFrom = var.ca_certs_arn
+        },
+        {
+          name = "MHS_SECRET_SPINE_ROUTE_LOOKUP_CA_CERTS",
+          valueFrom = var.route_ca_certs_arn
         }
       ]
       essential = true

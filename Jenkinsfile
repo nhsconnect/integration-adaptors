@@ -96,6 +96,9 @@ pipeline {
                                     -var client_cert_arn=${CLIENT_CERT_ARN} \
                                     -var client_key_arn=${CLIENT_KEY_ARN} \
                                     -var ca_certs_arn=${CA_CERTS_ARN} \
+                                    -var route_ca_certs_arn=${ROUTE_CA_CERTS_ARN} \
+                                    -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
+                                    -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
                                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                     -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                                     -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
