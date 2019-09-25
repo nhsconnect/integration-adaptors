@@ -23,9 +23,10 @@ class MhsHttpRequestBuilder(object):
         self.body = None
         self.assertor = unittest.TestCase('__init__')
 
-    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool, correlation_id: str = str(uuid.uuid4()).upper()) -> MhsHttpRequestBuilder:
+    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool, correlation_id: str = str(uuid.uuid4()).upper(), ods_code: str = "YES") -> MhsHttpRequestBuilder:
         """
         Allows the setting of required headers for the MHS
+        :param ods_code: the ods code of the system you wish to communicate with (spine is YES)
         :param correlation_id: the correlation id used
         :param interaction_id: id of this interaction used within MHS to track this request lifecycle
         :param message_id: the message id
@@ -37,7 +38,8 @@ class MhsHttpRequestBuilder(object):
             'Message-Id': message_id,
             'Correlation-Id': correlation_id,
             'sync-async': str(sync_async).lower(),
-            'from-asid': f'{get_asid()}'
+            'from-asid': f'{get_asid()}',
+            'ods-code': ods_code
         }
 
         return self
