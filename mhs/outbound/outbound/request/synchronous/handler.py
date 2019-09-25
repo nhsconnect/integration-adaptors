@@ -12,7 +12,7 @@ from mhs_common.configuration import configuration_manager
 from mhs_common.messages import ebxml_envelope
 from utilities import integration_adaptors_logger as log, message_utilities, timing
 
-from outbound.request.synchronous import request_body_schema
+from outbound.request import request_body_schema
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
