@@ -35,7 +35,6 @@ class ForwardReliableMessagingPatternTests(TestCase):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
 
-    @skip('Run once implemented Forward Reliable Message Pattern')
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796', 'Forward Reliable test')

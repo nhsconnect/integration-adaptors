@@ -25,7 +25,6 @@ def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_i
 
     headers['sync-async'] = 'true' if sync_async else 'false'
     headers['from-asid'] = f'{from_asid}'
-    headers['ods-code'] = 'X26'
 
     return requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
 
