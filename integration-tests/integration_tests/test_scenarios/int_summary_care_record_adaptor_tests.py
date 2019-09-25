@@ -34,7 +34,7 @@ class ScrAdaptorTests(TestCase):
 
     def test_should_return_success_response_from_spine_as_json(self):
         # Arrange
-        scr_json, message_id = build_message('json_16UK05', get_asid(), '9689174606', 'Scr GP Summary Upload test')
+        scr_json, message_id = build_message('json_16UK05', get_asid(), '9689174606')
 
         # Act
         response = ScrHttpRequestBuilder() \
