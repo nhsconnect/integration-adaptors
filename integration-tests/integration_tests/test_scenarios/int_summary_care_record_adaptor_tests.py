@@ -48,7 +48,7 @@ class ScrAdaptorTests(TestCase):
         JsonResponseAssertor(response.text) \
             .assert_key_exists('messageId') \
             .assert_key_exists('creationTime') \
-            .assert_key_exists_with_value('messageRef', "1E2C0BB8-A0AE-4B65-A2EE-AE062F36FFB9") \
+            .assert_key_exists_with_value('messageRef', message_id) \
             .assert_key_exists_with_value('messageDetail', 'GP Summary upload successful')
 
 

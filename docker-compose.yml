@@ -71,4 +71,4 @@ services:
       - "9000:80"
     environment:
       - SCR_LOG_LEVEL=NOTSET
-      - SCR_MHS_ADDRESS=http://outbound:80
+      - SCR_MHS_ADDRESS=outbound:80
