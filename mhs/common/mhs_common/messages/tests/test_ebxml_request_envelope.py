@@ -264,7 +264,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 str(self.message_dir / "ebxml_request_one_attachment.msg"))
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
             expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
-                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F',
+                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                 ebxml_request_envelope.ATTACHMENT_BASE64: False,
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
@@ -280,7 +280,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 str(self.message_dir / "ebxml_request_one_attachment_application_xml_content_type.msg"))
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
             expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
-                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F',
+                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                 ebxml_request_envelope.ATTACHMENT_BASE64: False,
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
@@ -297,14 +297,14 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
             expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS] += [
                 {
-                    ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F',
+                    ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                     ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                     ebxml_request_envelope.ATTACHMENT_BASE64: False,
                     ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                     ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
                 },
                 {
-                    ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '64A73E03-30BD-4231-9959-0C4B54400345',
+                    ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '64A73E03-30BD-4231-9959-0C4B54400345@spine.nhs.uk',
                     ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'image/png',
                     ebxml_request_envelope.ATTACHMENT_BASE64: True,
                     ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Another description',
@@ -380,7 +380,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 str(self.message_dir / "ebxml_request_one_attachment_without_description.msg"))
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
             expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
-                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F',
+                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                 ebxml_request_envelope.ATTACHMENT_BASE64: False,
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: '',
