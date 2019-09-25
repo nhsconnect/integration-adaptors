@@ -39,7 +39,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         message_id = self._extract_message_id()
         logger.info('001', 'Extracted message content, attempting to forward the message')
         response = await self._process_message(interaction_name, scr_input_json, message_id, correlation_id)
-        self.write(response)
+        self.write(json.dumps(response))
 
     async def _process_message(self, interaction_name: str,
                                scr_input_json: Dict,
