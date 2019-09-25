@@ -45,7 +45,8 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
                           sync_async=False,
-                          correlation_id='1') \
+                          correlation_id='1',
+                          ods_code='X26') \
             .with_body(message) \
             .execute_post_expecting_success()
 
@@ -66,7 +67,8 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
                           sync_async=False,
-                          correlation_id='1') \
+                          correlation_id='1',
+                          ods_code='X26') \
             .with_body(message) \
             .execute_post_expecting_success()
 
@@ -93,7 +95,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, ods_code='X26', sync_async=True) \
             .with_body(message) \
             .execute_post_expecting_success()
 
@@ -102,8 +104,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .assert_element_exists('.//MCCI_IN010000UK13//Message//acknowledgement')
 
     @skip('Run once implemented Forward Reliable Message Pattern')
-    def test_should_record_the_correct_response_between_the_inbound_and_outbound_components_if_sync_async_requested(
-            self):
+    def test_should_record_the_correct_response_between_the_inbound_and_outbound_components_if_sync_async_requested(self):
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', get_asid(), '9446245796', 'Forward Reliable test')
 
@@ -112,7 +113,8 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
                           sync_async=True,
-                          correlation_id='1') \
+                          correlation_id='1',
+                          ods_code='X26') \
             .with_body(message) \
             .execute_post_expecting_success()
 
