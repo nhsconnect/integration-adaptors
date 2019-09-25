@@ -3,7 +3,6 @@ import copy
 import json
 from pathlib import Path
 from typing import Dict, Tuple, Union
-from xml import etree
 
 import lxml.etree as ET
 from utilities import integration_adaptors_logger as log, message_utilities
@@ -87,7 +86,7 @@ class SoapEnvelope(envelope.Envelope):
         try:
             soap_headers = str(soap_header_transformer(xml_message, **headers))
             soap_body = str(soap_body_transformer(xml_message, **headers))
-        except etree.XSLTApplyError as ae:
+        except ET.XSLTApplyError as ae:
             logger.error('0002', "An error occurred when transforming the SOAP XML message")
             raise SoapParsingError(f"An error occurred when transforming the SOAP XML message") from ae
         except Exception as e:

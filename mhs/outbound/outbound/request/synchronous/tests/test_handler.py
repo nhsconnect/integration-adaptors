@@ -383,6 +383,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
 
         self.call_handler(sync_async='false')
+
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_called_once()
 
