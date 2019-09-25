@@ -73,6 +73,30 @@ class TestSynchronousHandler(BaseHandlerTest):
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(MOCK_UUID_2)
 
+    def test_post_message_works_correctly_when_attachment_is_a_valid_content_type(self):
+        textual_content_types = ['text/plain', 'text/html', 'text/xml', 'application/xml', 'text/rtf']
+        binary_content_types = ['application/pdf', 'audio/basic', 'audio/mpeg', 'image/png', 'image/gif', 'image/jpeg',
+                                'image/tiff', 'video/mpeg', 'application/msword', 'application/octet-stream']
+        textual_sub_tests = [(False, content_type, 'test') for content_type in textual_content_types]
+        binary_sub_tests = [(True, content_type, 'iVBORw0KGgoAAA==') for content_type in binary_content_types]
+        for is_base64, content_type, payload in textual_sub_tests + binary_sub_tests:
+            with self.subTest(content_type=content_type):
+                self.workflow.handle_outbound_message.return_value = test_utilities.awaitable(
+                    (200, "Hello world!", None))
+                self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
+
+                body = {
+                    "payload": REQUEST_BODY_PAYLOAD,
+                    "attachments": [{
+                        "is_base64": is_base64,
+                        "content_type": content_type,
+                        "payload": payload,
+                        "description": "some description"
+                    }]}
+                response = self.call_handler(body=json.dumps(body))
+
+                self.assertEqual(response.code, 200)
+
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     @patch.object(log, "correlation_id")
     @patch.object(log, "message_id")
@@ -262,7 +286,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.config_manager.get_interaction_details.return_value = {'sync_async': True, 'workflow': WORKFLOW_NAME}
 
-        response = self.call_handler(sync_async='true')
+        self.call_handler(sync_async='true')
 
         self.sync_async_workflow.set_failure_message_response.assert_called_once_with(wdo)
 
@@ -417,6 +441,9 @@ class TestSynchronousHandlerRequestBodyValidation(BaseHandlerTest):
         sub_tests = [
             {"request_body": {"payload": True}, "field_name": "payload"},
             {"request_body": {"payload": "test", "attachments": ""}, "field_name": "attachments"},
+            {"request_body": {"payload": "test", "attachments": [
+                {"is_base64": False, "content_type": False, "payload": "blah", "description": "some description"}]},
+             "field_name": "content_type"},
             {"request_body": {"payload": "test", "attachments": [
                 {"is_base64": False, "content_type": "text/plain", "payload": [], "description": "some description"}]},
              "field_name": "payload"},
