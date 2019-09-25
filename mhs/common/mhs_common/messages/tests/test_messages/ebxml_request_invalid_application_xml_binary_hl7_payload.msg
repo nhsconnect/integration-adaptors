@@ -34,9 +34,6 @@ Content-Transfer-Encoding: 8bit
 			<eb:Description xml:lang="en">HL7 payload</eb:Description>
 			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
 		</eb:Reference>
-		<eb:Reference xlink:href="cid:8F1D7DE1-02AB-48D7-A797-A947B09F347F">
-            <eb:Description xml:lang="en">Some description</eb:Description>
-        </eb:Reference>
 	</eb:Manifest>
 </SOAP:Body>
 </SOAP:Envelope>
