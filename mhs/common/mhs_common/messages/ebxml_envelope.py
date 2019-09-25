@@ -3,9 +3,10 @@ import copy
 from typing import Dict, Tuple, Any, Optional, NamedTuple
 from xml.etree.ElementTree import Element
 
-from mhs_common.messages import envelope
 import utilities.message_utilities as message_utilities
 from utilities import integration_adaptors_logger as log
+
+from mhs_common.messages import envelope
 
 logger = log.IntegrationAdaptorsLogger('COMMON_EBXML_ENVELOPE')
 
@@ -23,9 +24,11 @@ RECEIVED_MESSAGE_ID = "received_message_id"
 
 EBXML_NAMESPACE = "eb"
 SOAP_NAMESPACE = "SOAP"
+XLINK_NAMESPACE = "xlink"
 
 NAMESPACES = {SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
-              EBXML_NAMESPACE: "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"}
+              EBXML_NAMESPACE: "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd",
+              XLINK_NAMESPACE: "http://www.w3.org/1999/xlink"}
 
 
 class EbxmlEnvelope(envelope.Envelope):
@@ -51,14 +54,16 @@ class EbxmlEnvelope(envelope.Envelope):
     def __init__(self, template_file: str, message_dictionary: Dict[str, Any]):
         super().__init__(template_file, message_dictionary)
 
-    def serialize(self) -> Tuple[str, Dict[str, str], str]:
+    def serialize(self, _message_dictionary: Dict[str, Any] = None) -> Tuple[str, Dict[str, str], str]:
         """Produce a serialised representation of this ebXML message by populating a Mustache template with this
         object's properties.
 
+        :type _message_dictionary: An optional `message_dictionary` to use instead of the one supplied when this
+        instance was constructed. For use by subclasses.
         :return: A tuple string containing the message ID, HTTP headers to be sent with the message and the message
         itself.
         """
-        ebxml_message_dictionary = copy.deepcopy(self.message_dictionary)
+        ebxml_message_dictionary = copy.deepcopy(_message_dictionary or self.message_dictionary)
 
         message_id = ebxml_message_dictionary.get(MESSAGE_ID)
         if not message_id:

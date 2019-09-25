@@ -1,8 +1,9 @@
-from typing import Dict, Tuple, List, AnyStr, Any
-from xml.etree import ElementTree as ET
+from typing import Dict, Tuple, List, AnyStr
+from xml.etree.ElementTree import Element
+
+from defusedxml import ElementTree as ET
 
 from mhs_common.messages.ebxml_envelope import NAMESPACES as NS, EBXML_NAMESPACE as EBXML_PREFIX
-
 
 ERROR_LIST = 'ErrorList'
 ERROR = 'Error'
@@ -33,7 +34,7 @@ class EbxmlErrorEnvelope:
         raise NotImplementedError
 
     @classmethod
-    def _from_parsed(cls, parsed_message: ET.ElementTree):
+    def _from_parsed(cls, parsed_message: Element):
         attrib_fields = [ERR_CODE_CTX, ERR_CODE, ERR_SEVERITY]
         tag_fields = [ERR_DESC]
 
@@ -47,9 +48,9 @@ class EbxmlErrorEnvelope:
 
     @classmethod
     def from_string(cls, message: AnyStr):
-        parsed_message: ET.ElementTree = ET.fromstring(message)
+        parsed_message: Element = ET.fromstring(message)
         return EbxmlErrorEnvelope._from_parsed(parsed_message)
 
     @staticmethod
-    def is_ebxml_error(parsed: ET.ElementTree) -> bool:
+    def is_ebxml_error(parsed: Element) -> bool:
         return False if not parsed or parsed.find(f'*/{EBXML_PREFIX}:{ERROR_LIST}', NS) is None else True

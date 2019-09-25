@@ -1,8 +1,8 @@
 import os
 import unittest
 from pathlib import Path
-from xml.etree import ElementTree
 
+from defusedxml import ElementTree
 from utilities.file_utilities import FileUtilities
 
 from mhs_common.errors.ebxml_handler import handle_ebxml_error
