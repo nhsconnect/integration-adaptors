@@ -8,58 +8,49 @@ Content-Transfer-Encoding: 8bit
 <SOAP:Header>
 	<eb:MessageHeader SOAP:mustUnderstand="1" eb:version="2.0">
 		<eb:From>
-			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">{{from_party_id}}</eb:PartyId>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YES-0000806</eb:PartyId>
 		</eb:From>
 		<eb:To>
-			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">{{to_party_id}}</eb:PartyId>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">A91424-9199121</eb:PartyId>
 		</eb:To>
-		<eb:CPAId>{{cpa_id}}</eb:CPAId>
-		<eb:ConversationId>{{conversation_id}}</eb:ConversationId>
-		<eb:Service>{{service}}</eb:Service>
-		<eb:Action>{{action}}</eb:Action>
+		<eb:CPAId>S1001A1630</eb:CPAId>
+		<eb:ConversationId>10F5A436-1913-43F0-9F18-95EA0E43E61A</eb:ConversationId>
+		<eb:Service>urn:nhs:names:services:psis</eb:Service>
+		<eb:Action>MCCI_IN010000UK13</eb:Action>
 		<eb:MessageData>
-			<eb:MessageId>{{message_id}}</eb:MessageId>
-			<eb:Timestamp>{{timestamp}}</eb:Timestamp>
+			<eb:MessageId>C614484E-4B10-499A-9ACD-5D645CFACF61</eb:MessageId>
+			<eb:Timestamp>2019-05-04T20:55:16Z</eb:Timestamp>
+			<eb:RefToMessageId>F106022D-758B-49A9-A80A-8FF211C32A43</eb:RefToMessageId>
 		</eb:MessageData>
-        {{#duplicate_elimination}}
         <eb:DuplicateElimination/>
-        {{/duplicate_elimination}}
     </eb:MessageHeader>
-    {{#ack_requested}}
-    <eb:AckRequested SOAP:mustUnderstand="1" eb:version="2.0" eb:signed="false" SOAP:actor="{{ack_soap_actor}}"/>
-    {{/ack_requested}}
-    {{#sync_reply}}
+    <eb:AckRequested SOAP:mustUnderstand="1" eb:version="2.0" eb:signed="false" SOAP:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH"/>
     <eb:SyncReply SOAP:mustUnderstand="1" eb:version="2.0" SOAP:actor="http://schemas.xmlsoap.org/soap/actor/next"/>
-    {{/sync_reply}}
 </SOAP:Header>
 <SOAP:Body>
 	<eb:Manifest SOAP:mustUnderstand="1" eb:version="2.0">
-		<eb:Reference xlink:href="cid:{{message_id}}@spine.nhs.uk">
+		<eb:Reference xlink:href="cid:C614484E-4B10-499A-9ACD-5D645CFACF61@spine.nhs.uk">
 			<eb:Schema eb:location="http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd" eb:version="1.0"/>
 			<eb:Description xml:lang="en">HL7 payload</eb:Description>
 			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
 		</eb:Reference>
-    {{#attachments}}
-        <eb:Reference xlink:href="cid:{{content_id}}">
-            <eb:Description xml:lang="en">{{description}}</eb:Description>
+		<eb:Reference xlink:href="cid:8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk">
+            <eb:Description xml:lang="en">Some description</eb:Description>
         </eb:Reference>
-    {{/attachments}}
 	</eb:Manifest>
 </SOAP:Body>
 </SOAP:Envelope>
 
 ----=_MIME-Boundary
-Content-Id: <{{message_id}}@spine.nhs.uk>
+Content-Id: <C614484E-4B10-499A-9ACD-5D645CFACF61@spine.nhs.uk>
 Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-{{{hl7_message}}}
-{{#attachments}}
+<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>
 ----=_MIME-Boundary
-Content-Id: <{{content_id}}>
-Content-Type: {{content_type}}
-Content-Transfer-Encoding: {{content_transfer_encoding}}
+Content-Id: <8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk>
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-{{{payload}}}
-{{/attachments}}
+Some payload
 ----=_MIME-Boundary--
