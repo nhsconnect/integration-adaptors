@@ -1,3 +1,4 @@
+"""Module responsible for building and sending http messages to the SCR Adaptor"""
 from __future__ import annotations
 import unittest
 import uuid
@@ -19,11 +20,10 @@ class ScrHttpRequestBuilder(object):
     def with_headers(self, interaction_name: str, message_id: str,
                      correlation_id: str = str(uuid.uuid4()).upper()) -> ScrHttpRequestBuilder:
         """
-        Allows the setting of required headers for the MHS
+        Sets the required headers for the SCR Adaptor
         :param correlation_id: the correlation id used
         :param interaction_name: id of this interaction used within MHS to track this request lifecycle
         :param message_id: the message id
-        :param sync_async: whether this request should execute synchronously or not
         :return: self
         """
         self.headers = {
@@ -36,7 +36,7 @@ class ScrHttpRequestBuilder(object):
 
     def with_body(self, body) -> ScrHttpRequestBuilder:
         """
-        Allows the setting of the payload for the HTTP request
+        Sets the payload of the HTTP request
         :param body: the payload to send
         :return: self
         """
@@ -46,7 +46,7 @@ class ScrHttpRequestBuilder(object):
     
     def execute_post_expecting_success(self) -> Response:
         """
-        Execute a POST request against the MHS using the configured body and headers within this class.
+        Execute a POST request against the SCR adaptor using the configured body and headers within this class.
         Asserts the response is successful.
         :return: self
         """

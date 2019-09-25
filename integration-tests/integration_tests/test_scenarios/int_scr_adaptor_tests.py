@@ -53,10 +53,10 @@ class ScrAdaptorTests(TestCase):
 
         # Assert
         JsonResponseAssertor(response.text) \
-            .assert_element_exists('messageId') \
-            .assert_element_exists('creationTime') \
-            .assert_key_value('messageRef', message_id) \
-            .assert_key_value('messageDetail', 'GP Summary upload successful')
+            .assert_key_exists('messageId') \
+            .assert_key_exists('creationTime') \
+            .assert_key_exists_with_value('messageRef', message_id) \
+            .assert_key_exists_with_value('messageDetail', 'GP Summary upload successful')
 
     def test_should_record_the_correct_response_between_inbound_and_outbound_components(self):
         # Arrange

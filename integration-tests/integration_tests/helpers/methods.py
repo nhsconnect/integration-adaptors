@@ -19,7 +19,7 @@ def get_asid():
         asid_file = str(Path(ROOT_DIR) / "integration_tests/data/certs/asid.txt")
         asid = FileUtilities.get_file_string(asid_file)
     except:
-        asid = 918999199084
+        asid = None
 
     return os.environ.get('INTEGRATION_TEST_ASID', asid)
 
@@ -68,7 +68,6 @@ def get_scr_hostname():
     :return: 
     """
     return os.environ.get('SCR_ADDRESS')
-    # return "http://" + os.environ.get('SCR_ADDRESS', 'localhost') + "/"
 
 
 def get_interaction_from_template(type, template, nhs_number, payload,
