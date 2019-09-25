@@ -58,9 +58,11 @@ pipeline {
                 }
 
                 stage('Component Tests') {
-                    dir('integration-tests') {
-                        sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                        sh label: 'Running integration tests', script: 'pipenv run componenttests'
+                    steps {
+                        dir('integration-tests') {
+                            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                            sh label: 'Running integration tests', script: 'pipenv run componenttests'
+                        }
                     }
                 }
             }
