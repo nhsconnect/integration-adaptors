@@ -49,6 +49,23 @@ pipeline {
             }
         }
 
+        stage('Run Component Tests') {
+            stages {
+                stage('Docker compose up component test environment') {
+                    steps {
+                        sh 'echo TODO'
+                    }
+                }
+
+                stage('Component Tests') {
+                    dir('integration-tests') {
+                        sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                        sh label: 'Running integration tests', script: 'pipenv run componenttests'
+                    }
+                }
+            }
+        }
+
         stage('Run Integration Tests') {
             options {
                 lock('exemplar-test-environment')
