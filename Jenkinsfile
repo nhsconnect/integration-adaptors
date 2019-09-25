@@ -201,6 +201,7 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
+            sh 'docker image prune -a --force'
         }
     }
 }
