@@ -11,7 +11,6 @@ import mhs_common.state.work_description as wd
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
-
 class SynchronousHandler(tornado.web.RequestHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a supplier system."""
 
@@ -32,6 +31,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         interaction_id = self._extract_interaction_id()
         sync_async_header = self._extract_sync_async_header()
         from_asid = self._extract_from_asid()
+        ods_code = self._extract_ods_code()
 
         logger.info('0006', 'Outbound POST received. {Request}', {'Request': str(self.request)})
 
@@ -40,6 +40,8 @@ class SynchronousHandler(tornado.web.RequestHandler):
         interaction_details = self._retrieve_interaction_details(interaction_id)
         wf = self._extract_default_workflow(interaction_details, interaction_id)
         self._extend_interaction_details(wf, interaction_details)
+
+        interaction_details['ods-code'] = ods_code
         sync_async_interaction_config = self._extract_sync_async_from_interaction_details(interaction_details)
 
         if self._should_invoke_sync_async_workflow(sync_async_interaction_config, sync_async_header):
@@ -103,6 +105,9 @@ class SynchronousHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found',
                                         reason='Required Interaction-Id header not found') from e
         return interaction_id
+
+    def _extract_ods_code(self):
+        return self.request.headers.get('ods-code', None)
 
     def _extend_interaction_details(self, wf, interaction_details):
         if wf.workflow_specific_interaction_details:
