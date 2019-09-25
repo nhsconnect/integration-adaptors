@@ -1,5 +1,4 @@
 import requests
-
 from utilities import message_utilities
 
 from integration_tests.helpers import methods
@@ -48,7 +47,9 @@ def call_mhs(mhs_command, hl7payload, message_id, pass_message_id, correlation_i
     headers['sync-async'] = 'true' if sync_async else 'false'
     headers['from-asid'] = f'{from_asid}'
 
-    return requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload)
+    # TODO: Add a verify="/path/to/cacerts_file" argument. Or use REQUESTS_CA_BUNDLE environment variable? Or set verify=False
+    # See https://requests.kennethreitz.org/en/master/user/advanced/#ssl-cert-verification
+    return requests.post(methods.get_mhs_hostname(), headers=headers, data=hl7payload, verify=False)
 
 
 def call_scr_adaptor(json_string):

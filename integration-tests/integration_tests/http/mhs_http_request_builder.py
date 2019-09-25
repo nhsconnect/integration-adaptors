@@ -23,7 +23,8 @@ class MhsHttpRequestBuilder(object):
         self.body = None
         self.assertor = unittest.TestCase('__init__')
 
-    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool, correlation_id: str = str(uuid.uuid4()).upper()) -> MhsHttpRequestBuilder:
+    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool,
+                     correlation_id: str = str(uuid.uuid4()).upper()) -> MhsHttpRequestBuilder:
         """
         Allows the setting of required headers for the MHS
         :param correlation_id: the correlation id used
@@ -58,7 +59,9 @@ class MhsHttpRequestBuilder(object):
         Asserts the response is successful.
         :return: self
         """
-        response = requests.post(methods.get_mhs_hostname(), headers=self.headers, data=self.body)
+        # TODO: Add a verify="/path/to/cacerts_file" argument. Or use REQUESTS_CA_BUNDLE environment variable? Or set verify=false
+        # See https://requests.kennethreitz.org/en/master/user/advanced/#ssl-cert-verification
+        response = requests.post(methods.get_mhs_hostname(), headers=self.headers, data=self.body, verify=False)
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')

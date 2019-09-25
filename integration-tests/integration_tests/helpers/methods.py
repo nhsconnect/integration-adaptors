@@ -58,7 +58,8 @@ def get_mhs_hostname():
     The mhs hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
         if this is not set, it will default to 'localhost'
     """
-    return "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
+    # TODO: Need to be able to use HTTPs as well as HTTP
+    return "https://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
 
 
 def get_interaction_from_template(type, template, nhs_number, payload,
