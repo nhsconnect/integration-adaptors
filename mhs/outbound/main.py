@@ -49,7 +49,8 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
 
     resynchroniser = resync.SyncAsyncResynchroniser(sync_async_store,
                                                     int(config.get_config('RESYNC_RETRIES', '20')),
-                                                    float(config.get_config('RESYNC_INTERVAL', '1.0')))
+                                                    float(config.get_config('RESYNC_INTERVAL', '1.0')),
+                                                    float(config.get_config('RESYNC_INITIAL_DELAY', '0')))
 
     return workflow.get_workflow_map(party_key,
                                      work_description_store=work_description_store,
