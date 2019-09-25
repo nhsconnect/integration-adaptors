@@ -13,20 +13,26 @@ class SyncAsyncResynchroniser(object):
 
     def __init__(self, sync_async_store: persistence_adaptor.PersistenceAdaptor,
                  max_retries: int,
-                 retry_interval: float
+                 retry_interval: float,
+                 initial_delay: float
                  ):
         """
         :param sync_async_store: The store where the sync-async messages are placed from the inbound service
         :param max_retries: The total number of polling attempts to the sync async store while attempting to resynchronise
-        :param retry_interval: The time between polling requests to the sync-async store in milliseconds
+        :param retry_interval: The time between polling requests to the sync-async store in seconds
+        :param initial_delay: The time to wait before making the first request to the sync async store in seconds
         """
         self.max_retries = max_retries
         self.retry_interval = retry_interval
         self.sync_async_store = sync_async_store
+        self.initial_delay = initial_delay
 
     async def pause_request(self, message_id: str) -> dict:
         retries = 0
         logger.info('001', 'Beginning async retrieval from sync-async store')
+
+        await asyncio.sleep(self.initial_delay)
+
         while retries < self.max_retries:
             item = await self.sync_async_store.get(message_id)
             if item is not None:
