@@ -24,34 +24,6 @@ def get_asid():
     return os.environ.get('INTEGRATION_TEST_ASID', asid)
 
 
-def get_mhs_inbound_queue_url():
-    """ Looks up the mhs inbound host URL from the environment settings.
-
-    :return: the mhs inbound host URL
-
-    The mhs inbound hostname should be set in the 'Environment variables' section of the Run/Debug Configurations
-        if this is not set, it will default to 'localhost:5672'
-    """
-    return os.environ.get('MHS_INBOUND_QUEUE_URL', 'http://localhost:5672')
-
-
-def get_mhs_inbound_queue_name():
-    """ Looks up the mhs inbound queue name from the environment settings.
-
-    :return: the mhs inbound queue name
-
-    The mhs inbound queue name should be set in the 'Environment variables' section of the Run/Debug Configurations
-        if this is not set, it will default to 'inbound'
-    """
-    return os.environ.get('MHS_INBOUND_QUEUE_NAME', 'inbound')
-
-
-def get_mhs_inbound_queue_certs():
-    username = os.environ.get('MHS_SECRET_INBOUND_QUEUE_USERNAME', None)
-    password = os.environ.get('MHS_SECRET_INBOUND_QUEUE_PASSWORD', None)
-    return username, password
-
-
 def get_mhs_hostname():
     """ Looks up the mhs hostname from the environment settings
 
