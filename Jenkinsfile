@@ -51,12 +51,6 @@ pipeline {
 
         stage('Run Component Tests') {
             stages {
-                stage('Docker compose up component test environment') {
-                    steps {
-                        sh 'echo TODO'
-                    }
-                }
-
                 stage('Component Tests') {
                     steps {
                         dir('integration-tests') {
