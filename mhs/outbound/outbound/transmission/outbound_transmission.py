@@ -43,7 +43,8 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         self._proxy_host = http_proxy_host
         self._proxy_port = http_proxy_port
 
-    async def make_request(self, url: str, headers: Dict[str, str], message: str) -> httpclient.HTTPResponse:
+    async def make_request(self, url: str, headers: Dict[str, str], message: str,
+                           raise_error_response: bool = True) -> httpclient.HTTPResponse:
 
         request_method = "POST"
 
@@ -62,11 +63,15 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                                           client_cert=self._client_cert, client_key=self._client_key,
                                                           ca_certs=self._ca_certs, validate_cert=False,
                                                           http_proxy_host=self._proxy_host,
-                                                          http_proxy_port=self._proxy_port)
+                                                          http_proxy_port=self._proxy_port,
+                                                          raise_error_response=raise_error_response)
                 logger.info("0002", "Sent message with {headers} to {url} using {proxy_host} & {proxy_port} and "
                                     "received status code {code}",
                             {"headers": headers, "url": url, "proxy_host": self._proxy_host,
                              "proxy_port": self._proxy_port, "code": response.code})
+
+                if response.code == 599:
+                    raise httpclient.HTTPClientError(code=599)
                 return response
             except Exception as e:
                 if not self._is_retriable(e):

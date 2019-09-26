@@ -6,7 +6,8 @@ from unittest import TestCase
 from integration_tests.amq.amq import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
-from integration_tests.dynamo.dynamo import MHS_DYNAMO_WRAPPER
+from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
+from integration_tests.dynamo.dynamo_sync_async_mhs_table import DynamoSyncAsyncMhsTableStateAssertor
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
 from integration_tests.helpers.methods import get_asid
@@ -32,11 +33,12 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
     """
 
     def setUp(self):
-        MHS_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923', 'Asynchronous Express test')
+        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -57,8 +59,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_record_asynchronous_express_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923',
-                                            'Asynchronous Express test')
+        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -74,10 +75,10 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
             .assertor_for_hl7_xml_message() \
             .assert_element_attribute('.//queryAck//queryResponseCode', 'code', 'OK')
 
-        AssertWithRetries(retry_count=10)\
-            .assert_condition_met(lambda: self.wait_for_inbound_response_processed(message_id))
+        AssertWithRetries(retry_count=10) \
+            .assert_condition_met(lambda: DynamoMhsTableStateAssertor.wait_for_inbound_response_processed(message_id))
 
-        DynamoMhsTableStateAssertor(MHS_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values({
             'INBOUND_STATUS': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',
@@ -87,7 +88,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_in_original_post_request_body_if_sync_async_requested(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923', 'Asynchronous Express test')
+        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923')
 
         # Act
         response = MhsHttpRequestBuilder() \
@@ -100,8 +101,21 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
             .assert_element_attribute('.//queryAck//queryResponseCode', 'code', 'OK') \
             .assert_element_attribute('.//patient//id', 'extension', '9689177923')
 
-    @staticmethod
-    def wait_for_inbound_response_processed(message_id: str) -> bool:
-        return DynamoMhsTableStateAssertor(MHS_DYNAMO_WRAPPER.get_all_records_in_table())\
-            .assert_single_item_exists_with_key(message_id)\
-            .item_contains_value('INBOUND_STATUS', 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED')
+    def test_should_record_the_correct_response_between_the_inbound_and_outbound_components_if_sync_async_requested(self):
+        # Arrange
+        message, message_id = build_message('QUPC_IN160101UK05', get_asid(), '9689177923')
+
+        # Act
+        MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='QUPC_IN160101UK05',
+                          message_id=message_id,
+                          sync_async=True,
+                          correlation_id='1') \
+            .with_body(message) \
+            .execute_post_expecting_success()
+
+        # Assert
+        DynamoSyncAsyncMhsTableStateAssertor(MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+            .assert_single_item_exists_with_key(message_id) \
+            .assert_element_attribute('.//queryAck//queryResponseCode', 'code', 'OK') \
+            .assert_element_attribute('.//patient//id', 'extension', '9689177923')

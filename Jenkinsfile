@@ -53,6 +53,19 @@ pipeline {
             }
         }
 
+        stage('Run Component Tests') {
+            stages {
+                stage('Component Tests') {
+                    steps {
+                        dir('integration-tests') {
+                            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                            sh label: 'Running integration tests', script: 'pipenv run componenttests'
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Run Integration Tests') {
             options {
                 lock('exemplar-test-environment')
@@ -103,7 +116,8 @@ pipeline {
                                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                     -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                                     -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
-                                    -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS}
+                                    -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
+                                    -var elasticache_node_type="cache.t2.micro"
                                 """
                             script {
                                 env.MHS_ADDRESS = sh (
@@ -131,6 +145,11 @@ pipeline {
                                     returnStdout: true,
                                     script: "terraform output mhs_state_table_name"
                                 ).trim()
+                                env.MHS_SYNC_ASYNC_TABLE_NAME = sh (
+                                    label: 'Obtaining the dynamodb table name used for the MHS sync/async state',
+                                    returnStdout: true,
+                                    script: "terraform output mhs_sync_async_table_name"
+                                ).trim()
                             }
                         }
                     }
@@ -154,7 +173,8 @@ pipeline {
                                     -var task_execution_role=${TASK_EXECUTION_ROLE} \
                                     -var ecr_address=${DOCKER_REGISTRY} \
                                     -var scr_log_level=DEBUG \
-                                    -var scr_service_port=${SCR_SERVICE_PORT}
+                                    -var scr_service_port=${SCR_SERVICE_PORT} \
+                                    -var scr_mhs_address=http://${MHS_ADDRESS}
                                 """
                         }
                     }
@@ -198,6 +218,9 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
+            // Prune Docker images for current CI build.
+            // Note that the * in the glob patterns doesn't match /
+            sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
         }
     }
 }

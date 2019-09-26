@@ -83,54 +83,6 @@
                     </pertinentRootCREType>
                 </pertinentInformation1>
                 <pertinentInformation2 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
-                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1" />
-                    <seperatableInd value="true" />
-                    <pertinentCREType classCode="CATEGORY" moodCode="EVN">
-                        <code code="163221000000102" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Allergies and Adverse Reactions" />
-                        <component typeCode="COMP" contextConductionInd="true">
-                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component" />
-                            <seperatableInd value="false" />
-                            <UKCT_MT144053UK02.Allergy classCode="OBS" moodCode="EVN" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                                <id root="F3E1EB02-A62D-4AB4-BDF5-F61405E3B6B8" />
-                                <code code="418038007" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Propensity to adverse reaction to substance">
-                                    <originalText>Peanut allergy</originalText>
-                                    <qualifier>
-                                        <name code="246075003" displayName="causative agent" />
-                                        <value code="91935009" displayName="Allergy to peanuts" />
-                                    </qualifier>
-                                </code>
-                                <statusCode code="completed" />
-                                <effectiveTime>
-                                    <low value="20080404" />
-                                </effectiveTime>
-                            </UKCT_MT144053UK02.Allergy>
-                        </component>
-                        <component typeCode="COMP" contextConductionInd="true">
-                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component" />
-                            <seperatableInd value="false" />
-                            <UKCT_MT144053UK02.Allergy classCode="OBS" moodCode="EVN" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                                <id root="AAB6941E-40A7-404E-BC81-BA464A91F079" />
-                                <code code="416098002" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Drug Allergy">
-                                    <originalText>Allergy - penicillamine tablets 125mg</originalText>
-                                    <qualifier>
-                                        <name code="246075003" displayName="causative agent" />
-                                        <value code="330026007" displayName="Penicillamine 125mg tablets" />
-                                    </qualifier>
-                                </code>
-                                <statusCode code="completed" />
-                                <effectiveTime>
-                                    <low value="20080404" />
-                                </effectiveTime>
-                                <pertinentInformation typeCode="PERT" contextConductionInd="true">
-                                    <seperatableInd value="false" />
-                                    <pertinentSupportingInfo classCode="OBS" moodCode="EVN">
-                                        <value>Severity - Mild, Certainty - Possible.</value>
-                                        <code code="SupportingText" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.126" displayName="Supporting Text" />
-                                    </pertinentSupportingInfo>
-                                </pertinentInformation>
-                            </UKCT_MT144053UK02.Allergy>
-                        </component>
-                    </pertinentCREType>
                 </pertinentInformation2>
                 <recordTarget typeCode="RCT">
                     <patient classCode="PAT">

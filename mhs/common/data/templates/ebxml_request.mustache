@@ -39,6 +39,11 @@ Content-Transfer-Encoding: 8bit
 			<eb:Description xml:lang="en">HL7 payload</eb:Description>
 			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
 		</eb:Reference>
+    {{#attachments}}
+        <eb:Reference xlink:href="cid:{{content_id}}">
+            <eb:Description xml:lang="en">{{description}}</eb:Description>
+        </eb:Reference>
+    {{/attachments}}
 	</eb:Manifest>
 </SOAP:Body>
 </SOAP:Envelope>
@@ -49,4 +54,12 @@ Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 {{{hl7_message}}}
+{{#attachments}}
+----=_MIME-Boundary
+Content-Id: <{{content_id}}>
+Content-Type: {{content_type}}
+Content-Transfer-Encoding: {{content_transfer_encoding}}
+
+{{{payload}}}
+{{/attachments}}
 ----=_MIME-Boundary--

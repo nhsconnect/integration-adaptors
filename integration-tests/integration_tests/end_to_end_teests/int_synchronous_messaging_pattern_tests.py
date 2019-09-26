@@ -3,7 +3,7 @@ Provides tests around the Synchronous workflow
 """
 from unittest import TestCase
 
-from integration_tests.dynamo.dynamo import MHS_DYNAMO_WRAPPER
+from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
 from integration_tests.helpers.methods import get_asid
@@ -29,11 +29,11 @@ class SynchronousMessagingPatternTests(TestCase):
     """
 
     def setUp(self):
-        MHS_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
 
     def test_should_return_successful_response_from_spine_in_original_post_request_body(self):
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606', 'Synchronous test')
+        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606')
 
         # Act
         response = MhsHttpRequestBuilder() \
@@ -50,7 +50,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
     def test_should_record_synchronous_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606', 'Synchronous test')
+        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -59,7 +59,7 @@ class SynchronousMessagingPatternTests(TestCase):
             .execute_post_expecting_success()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values({
             'INBOUND_STATUS': None,

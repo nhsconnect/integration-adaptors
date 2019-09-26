@@ -1,8 +1,9 @@
 import unittest
+from unittest import mock
 
+from utilities import test_utilities
 from utilities.test_utilities import async_test
 
-import lookup.dictionary_cache as dict_cache
 import lookup.mhs_attribute_lookup as mhs_attribute_lookup
 import lookup.routing_reliability as rar
 import lookup.sds_exception as sds_exception
@@ -32,42 +33,60 @@ EXPECTED_RELIABILITY = {
 
 class TestRoutingAndReliability(unittest.TestCase):
 
-    def setUp(self):
-        cache = dict_cache.DictionaryCache()
-        handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), cache)
-        self.router = rar.RoutingAndReliability(handler)
-
     @async_test
     async def test_get_routing(self):
-        mhs_route_details = await self.router.get_end_point(ODS_CODE, INTERACTION_ID)
+        router = self._configure_routing_and_reliability()
+
+        mhs_route_details = await router.get_end_point(ODS_CODE, INTERACTION_ID)
+
         self.assertEqual(mhs_route_details, EXPECTED_ROUTING)
 
     @async_test
     async def test_get_routing_bad_ods_code(self):
+        router = self._configure_routing_and_reliability()
+
         with self.assertRaises(sds_exception.SDSException):
-            await self.router.get_end_point("bad code", INTERACTION_ID)
+            await router.get_end_point("bad code", INTERACTION_ID)
 
     @async_test
     async def test_get_routing_bad_interaction_id(self):
+        router = self._configure_routing_and_reliability()
+
         with self.assertRaises(sds_exception.SDSException):
-            await self.router.get_end_point(ODS_CODE, "bad interaction")
+            await router.get_end_point(ODS_CODE, "bad interaction")
 
     @async_test
     async def test_get_reliability(self):
-        reliability_details = await self.router.get_reliability(ODS_CODE, INTERACTION_ID)
+        router = self._configure_routing_and_reliability()
+
+        reliability_details = await router.get_reliability(ODS_CODE, INTERACTION_ID)
+
         self.assertEqual(reliability_details, EXPECTED_RELIABILITY)
 
     @async_test
     async def test_get_reliability_bad_ods_code(self):
+        router = self._configure_routing_and_reliability()
+
         with self.assertRaises(sds_exception.SDSException):
-            await self.router.get_reliability("bad code", INTERACTION_ID)
+            await router.get_reliability("bad code", INTERACTION_ID)
 
     @async_test
     async def test_get_reliability_bad_interaction_id(self):
+        router = self._configure_routing_and_reliability()
+
         with self.assertRaises(sds_exception.SDSException):
-            await self.router.get_reliability(ODS_CODE, "whew")
+            await router.get_reliability(ODS_CODE, "whew")
 
     @async_test
     async def test_empty_handler(self):
         with self.assertRaises(ValueError):
             rar.RoutingAndReliability(None)
+
+    @staticmethod
+    def _configure_routing_and_reliability():
+        cache = mock.Mock()
+        cache.add_cache_value.return_value = test_utilities.awaitable(None)
+        cache.retrieve_mhs_attributes_value.return_value = test_utilities.awaitable(None)
+        handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), cache)
+        router = rar.RoutingAndReliability(handler)
+        return router

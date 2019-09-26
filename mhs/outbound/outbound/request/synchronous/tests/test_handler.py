@@ -2,13 +2,13 @@ import unittest.mock
 from unittest.mock import patch
 
 import tornado.testing
-import tornado.web
 import tornado.util
+import tornado.web
+from mhs_common.workflow import synchronous
 from utilities import integration_adaptors_logger as log, test_utilities
 from utilities import message_utilities
-import mhs_common.state.work_description as wd
+
 from outbound.request.synchronous import handler
-from mhs_common.workflow import synchronous
 
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
@@ -23,6 +23,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.workflow = unittest.mock.Mock()
+        self.workflow.workflow_specific_interaction_details = dict()
         self.sync_async_workflow = unittest.mock.MagicMock()
         self.config_manager = unittest.mock.Mock()
         return tornado.web.Application([
@@ -321,6 +322,7 @@ class TestSynchronousHandlerSyncMessage(tornado.testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.workflow = unittest.mock.Mock(spec=synchronous.SynchronousWorkflow)
+        self.workflow.workflow_specific_interaction_details = {}
         self.sync_async_workflow = unittest.mock.MagicMock()
         self.config_manager = unittest.mock.Mock()
         return tornado.web.Application([

@@ -4,23 +4,13 @@ implementations."""
 from __future__ import annotations
 
 import abc
-from typing import Optional, Dict, Type
+from typing import Optional, Dict
 
 FIFTEEN_MINUTES_IN_SECONDS = 900
-
-implementations: Dict[str, Type[CacheAdaptor]] = {}
 
 
 class CacheAdaptor(abc.ABC):
     """An adaptor that provides a common interface to the message configuration cache."""
-
-    def __init__(self, expiry_time=FIFTEEN_MINUTES_IN_SECONDS):
-        """
-        :param expiry_time: Time for a value to expire in seconds
-        """
-        if expiry_time < 0:
-            raise ValueError('Expiry time must not be non-negative')
-        self.expiry_time = expiry_time
 
     @abc.abstractmethod
     async def retrieve_mhs_attributes_value(self, ods_code: str, interaction_id: str) -> Optional[Dict]:

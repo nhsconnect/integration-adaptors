@@ -1,11 +1,11 @@
 """ Module defines a class representing SOAP Fault response from NHS Spine """
 from typing import Tuple, Dict, AnyStr, List
-from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 
+from defusedxml import ElementTree
 from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
 
 from mhs_common.messages.soap_envelope import SoapEnvelope
-
 
 NS_SOAP = 'SOAP'
 NS_SOAP_ENV = 'SOAP-ENV'
@@ -20,7 +20,6 @@ NS = {
     NS_WSA: 'http://schemas.xmlsoap.org/ws/2004/08/addressing',
     NS_NASP: 'http://national.carerecords.nhs.uk/schema/'
 }
-
 
 SOAP_FAULT = f'{NS_SOAP}:Fault'
 FAULT_CODE = 'faultcode'
@@ -39,8 +38,16 @@ ERR_FIELDS = [ERR_CODE, ERR_SEVERITY, ERR_LOCATION, ERR_DESCRIPTION, ERR_CODE_CO
 
 logger = IntegrationAdaptorsLogger('SOAP_FAULT_PARSER')
 
+SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE = 200
+ROUTING_DELIVERY_FAILURE_ERROR_CODE = 206
+FAILURE_STORING_VARIABLE_IN_MEMO = 208
 
-def _extract_tag_text(elem: ElementTree.ElementTree, path: AnyStr) -> AnyStr:
+SOAP_ERRORS_TO_RETRY = [SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE,
+                        ROUTING_DELIVERY_FAILURE_ERROR_CODE,
+                        FAILURE_STORING_VARIABLE_IN_MEMO]
+
+
+def _extract_tag_text(elem: ElementTree, path: AnyStr) -> AnyStr:
     try:
         return elem.find(path, NS).text
     except AttributeError as e:
@@ -58,7 +65,7 @@ class SOAPFault(SoapEnvelope):
         self.error_list = error_list
 
     @staticmethod
-    def is_soap_fault(parsed_message: ElementTree.ElementTree) -> bool:
+    def is_soap_fault(parsed_message: Element) -> bool:
         if parsed_message is not None and len(parsed_message.findall(f'*/{SOAP_FAULT}', NS)):
             return True
 
@@ -66,11 +73,11 @@ class SOAPFault(SoapEnvelope):
 
     @classmethod
     def from_string(cls, headers: Dict[str, str], message: str):
-        parsed: ElementTree.ElementTree = ElementTree.fromstring(message)
+        parsed: Element = ElementTree.fromstring(message)
         return SOAPFault.from_parsed(headers, parsed)
 
     @classmethod
-    def from_parsed(cls, headers: Dict[str, str], parsed: ElementTree.ElementTree):
+    def from_parsed(cls, headers: Dict[str, str], parsed: Element):
         fault_code = _extract_tag_text(parsed, f'*/{SOAP_FAULT}/{FAULT_CODE}')
         fault_string = _extract_tag_text(parsed, f'*/{SOAP_FAULT}/{FAULT_STRING}')
 
@@ -82,3 +89,11 @@ class SOAPFault(SoapEnvelope):
 
     def serialize(self) -> Tuple[str, Dict[str, str], str]:
         raise NotImplementedError
+
+    @staticmethod
+    def is_soap_fault_retriable(soap_fault_codes):
+        # return True only if ALL error codes are retriable
+        for soap_fault_code in soap_fault_codes:
+            if not soap_fault_code in SOAP_ERRORS_TO_RETRY:
+                return False
+        return True

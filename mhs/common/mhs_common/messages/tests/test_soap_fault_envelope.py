@@ -61,3 +61,19 @@ class TestSOAPFault(TestCase):
         self.assertEqual(fault.error_list[1]['severity'], 'Error')
         self.assertEqual(fault.error_list[1]['location'], 'Not Supported')
         self.assertEqual(fault.error_list[1]['description'], 'The message is not well formed')
+
+    def test_soap_error_codes_are_retriable_or_not(self):
+        errors_and_expected = [("a retriable failure to process message error code 200", [200], True),
+                               ("a retriable routing failure error code 206", [206], True),
+                               ("a retriable failure storing memo error code 208", [208], True),
+                               ("a NON retriable error code 300", [300], False),
+                               ("a NON retriable set of error codes 300, 207", [300, 207], False),
+                               ("a mix of retriable and NON retriable error codes 300, 206", [300, 206], False),
+                               ("a mix of retriable and NON retriable error codes 206, 300", [206, 300], False),
+                               ("a set of retriable error codes 208, 206", [208, 206], True)
+                               ]
+        for description, error, expected_result in errors_and_expected:
+            with self.subTest(description):
+                result = SOAPFault.is_soap_fault_retriable(error)
+
+                self.assertEqual(result, expected_result)
