@@ -4,7 +4,7 @@ Provides functionality to assert items within the MHS sync/async Dynamo table
 import json
 import unittest
 
-from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
+from integration_tests.integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
 
 class DynamoSyncAsyncMhsTableStateAssertor(object):
