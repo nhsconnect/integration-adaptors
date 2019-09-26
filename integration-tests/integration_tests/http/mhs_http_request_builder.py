@@ -3,6 +3,7 @@ Provides functionality for calling the MHS over HTTP
 """
 from __future__ import annotations
 
+import json
 import os
 import unittest
 import uuid
@@ -40,6 +41,7 @@ class MhsHttpRequestBuilder(object):
             'Correlation-Id': correlation_id,
             'sync-async': str(sync_async).lower(),
             'from-asid': f'{get_asid()}',
+            'Content-Type': 'application/json',
             'ods-code': ods_code
         }
 
@@ -51,7 +53,7 @@ class MhsHttpRequestBuilder(object):
         :param body: the payload to send
         :return: self
         """
-        self.body = body
+        self.body = json.dumps({"payload": body})
 
         return self
 
