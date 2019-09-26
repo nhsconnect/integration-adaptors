@@ -44,6 +44,7 @@ class MessageSender(object):
         :return:
         """
         headers = {
+            'Content-Type': 'application/json',
             'Interaction-Id': interaction_id,
             'sync-async': 'true'
         }

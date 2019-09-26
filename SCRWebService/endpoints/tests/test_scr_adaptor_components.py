@@ -84,6 +84,19 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertIn('No interaction-name header provided', response.body.decode())
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
+    def test_application_json_content_type_is_passed_to_mhs(self, request_mock):
+        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+
+        request_mock.return_value = test_utilities.awaitable("Response message")
+
+        self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
+                   headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
+                   body=json.dumps(body))
+
+        content_type_header = request_mock.call_args[1]['headers']['Content-Type']
+        self.assertEqual(content_type_header, "application/json")
+
+    @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_correlation_id_is_passed_to_mhs_if_provided_to_scr_adaptor(self, request_mock):
         body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
 
