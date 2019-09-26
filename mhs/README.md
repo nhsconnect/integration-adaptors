@@ -106,19 +106,11 @@ Ensure sonar-scanner is on your path, and configured for the sonarqube host with
 NOTE: Coverage will not show in the analysis unless you have already generated the xml report (as per above.)
 
 ## Running Integration Tests
-`pipenv run inttests` will run all integration tests.
-
-When running the tests locally, you will need to set the MHS_ADDRESS and ASID in the 'Environment variables' section of
- the Run/Debug Configurations.
-- The ASID is a 12 digit number needed to access Opentest, supplied by NHS Digital
-    - eg ASID=123456789012
-- The MHS_ADDRESS is the hostname of the MHS instance being used for testing and should be supplied in it's raw state,
- without the 'http://' prefix or '/' suffix
-    - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
+See the [integration tests README](../integration-tests/README.md).
 
 Timeouts received whilst waiting for a response from Spine on a Windows machine could be due to the machine rejecting incoming connections on port 443. In order to open the port, follow these instructions:
 https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/create-an-inbound-port-rule
 
-Any content POSTed to `/` on port 80 will result in the request configuration for the `path` entry in
+Any content POSTed to `/` on port 80 will result in the request configuration for the `Interaction-Id` header in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
 `interactions.json` will allow you to define new supported interactions.

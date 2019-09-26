@@ -21,8 +21,7 @@ class MhsHttpRequestBuilder(object):
     def __init__(self):
         self.headers = {}
         self.body = None
-        # TODO: Make environment variable contain full URL
-        self.mhs_host = "https://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
+        self.mhs_host = os.environ.get('MHS_ADDRESS', 'http://localhost') + "/"
         self.assertor = unittest.TestCase('__init__')
 
     def with_headers(self, interaction_id: str, message_id: str, sync_async: bool,
