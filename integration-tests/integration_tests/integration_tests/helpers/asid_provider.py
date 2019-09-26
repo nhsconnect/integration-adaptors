@@ -3,7 +3,7 @@ from pathlib import Path
 
 from utilities.file_utilities import FileUtilities
 
-from test_definitions import ROOT_DIR
+from integration_tests.test_definitions import ROOT_DIR
 
 
 def get_asid():
@@ -14,7 +14,7 @@ def get_asid():
         or default to '123456789012' if 'asid.txt' is not found
     """
     try:
-        asid_file = str(Path(ROOT_DIR) / "integration_tests/data/certs/asid.txt")
+        asid_file = str(Path(ROOT_DIR) / "data/certs/asid.txt")
         asid = FileUtilities.get_file_string(asid_file)
     except:
         asid = None

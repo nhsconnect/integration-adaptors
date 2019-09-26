@@ -11,7 +11,7 @@ import uuid
 import requests
 from requests import Response
 
-from integration_tests.helpers.methods import get_asid
+from integration_tests.helpers.asid_provider import get_asid
 
 
 class MhsHttpRequestBuilder(object):

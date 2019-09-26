@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d8358b276464b654cdce95c9bde559db5df5efe5ef1b4331e250f42d11f006af"
+            "sha256": "d96fb263a7fe1cd81ccaeb564e388c04d29aac1478fa15940bef3e3420eb2d71"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -133,7 +133,7 @@
         },
         "integration-adaptors-common": {
             "editable": true,
-            "path": "./../common"
+            "path": "./../../common"
         },
         "isodate": {
             "hashes": [

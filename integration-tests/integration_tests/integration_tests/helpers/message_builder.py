@@ -1,9 +1,9 @@
 
 from builder import pystache_message_builder
 from pathlib import Path
-from test_definitions import ROOT_DIR
+from integration_tests.test_definitions import ROOT_DIR
 
-TEMPLATES_DIR = "integration_tests/data/templates"
+TEMPLATES_DIR = "data/templates"
 
 
 class MustacheMessageBuilder(pystache_message_builder.PystacheMessageBuilder):

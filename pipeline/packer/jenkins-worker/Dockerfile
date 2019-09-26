@@ -41,7 +41,9 @@ RUN apt-get update && \
         apt-key fingerprint 0EBFCD88 && \
         add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" && \
         apt-get update && \
-        apt-get install -qq -y --no-install-recommends docker-ce=18.06.3~ce~3-0~debian
+        apt-get install -qq -y --no-install-recommends docker-ce=18.06.3~ce~3-0~debian && \
+        curl -L https://github.com/docker/compose/releases/download/1.24.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && \
+        chmod +x /usr/local/bin/docker-compose
 
 # Install curl and libSSL, so Tornado can use the CURL HTTP client.
 RUN apt-get update && apt-get install -y libcurl4-openssl-dev libssl-dev
