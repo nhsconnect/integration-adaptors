@@ -50,6 +50,9 @@ pipeline {
         }
 
         stage('Run Component Tests') {
+            options {
+                lock('local-docker-compose-environment')
+            }
             stages {
                 stage('Deploy component locally') {
                     steps {
@@ -64,6 +67,11 @@ pipeline {
                             sh label: 'Running integration tests', script: 'pipenv run componenttests'
                         }
                     }
+                }
+            }
+            post {
+                always {
+                    sh label: 'Docker compose down', script: 'docker-compose down -v'
                 }
             }
         }
