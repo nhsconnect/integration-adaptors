@@ -5,9 +5,10 @@ from __future__ import annotations
 import abc
 import pathlib
 from typing import Dict, Tuple, Any
-from definitions import ROOT_DIR
 
 from builder import pystache_message_builder
+
+from definitions import ROOT_DIR
 
 FROM_PARTY_ID = "from_party_id"
 TO_PARTY_ID = "to_party_id"

@@ -49,6 +49,19 @@ pipeline {
             }
         }
 
+        stage('Run Component Tests') {
+            stages {
+                stage('Component Tests') {
+                    steps {
+                        dir('integration-tests') {
+                            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                            sh label: 'Running integration tests', script: 'pipenv run componenttests'
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Run Integration Tests') {
             options {
                 lock('exemplar-test-environment')
@@ -159,7 +172,8 @@ pipeline {
                                     -var task_execution_role=${TASK_EXECUTION_ROLE} \
                                     -var ecr_address=${DOCKER_REGISTRY} \
                                     -var scr_log_level=DEBUG \
-                                    -var scr_service_port=${SCR_SERVICE_PORT}
+                                    -var scr_service_port=${SCR_SERVICE_PORT} \
+                                    -var scr_mhs_address=http://${MHS_ADDRESS}
                                 """
                         }
                     }
@@ -194,6 +208,7 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
+            sh 'docker image prune -a --force'
         }
     }
 }

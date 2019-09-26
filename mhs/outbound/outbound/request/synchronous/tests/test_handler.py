@@ -2,13 +2,13 @@ import unittest.mock
 from unittest.mock import patch
 
 import tornado.testing
-import tornado.web
 import tornado.util
+import tornado.web
+from mhs_common.workflow import synchronous
 from utilities import integration_adaptors_logger as log, test_utilities
 from utilities import message_utilities
-import mhs_common.state.work_description as wd
+
 from outbound.request.synchronous import handler
-from mhs_common.workflow import synchronous
 
 MOCK_UUID = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
 MOCK_UUID_2 = "82B5FE90-FD7C-41AC-82A3-9032FB0317FB"
@@ -303,7 +303,7 @@ class TestSynchronousHandler(tornado.testing.AsyncHTTPTestCase):
     def test_not_sync_async_when_interactions_is_false_header_is_false(self):
         self.setup_workflows()
         self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
-        resp = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME, 'sync-async': 'false'},
+        self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME, 'sync-async': 'false'},
                    body=REQUEST_BODY)
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_called_once()

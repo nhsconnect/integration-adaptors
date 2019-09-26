@@ -39,7 +39,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - MHS_RESYNC_INTERVAL=1
       - MAX_RESYNC_RETRIES=20
-      - MHS_SPINE_ROUTE_LOOKUP_URL=http://route:80
+      - MHS_SPINE_ROUTE_LOOKUP_URL=http://route
       - MHS_SPINE_ORG_CODE=YES
   route:
     image: local/mhs-route
@@ -71,4 +71,4 @@ services:
       - "9000:80"
     environment:
       - SCR_LOG_LEVEL=NOTSET
-      - SCR_MHS_ADDRESS=http://outbound:80
+      - SCR_MHS_ADDRESS=http://outbound
