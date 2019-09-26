@@ -196,5 +196,5 @@ variable "elasticache_node_type" {
 variable "mhs_resync_initial_delay" {
   type = number
   description = "The delay before the first poll to the sync async store after receiving an acknowledgement from Spine"
-  default = 0
+  default = 0.150
 }
