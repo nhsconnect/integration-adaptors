@@ -1,4 +1,5 @@
 """Module related to sending messages from the SCR Adaptor to the MHS"""
+import json
 from typing import Optional
 
 from comms.common_https import CommonHttps
@@ -30,7 +31,7 @@ class MessageSender(object):
         
         response = await CommonHttps.make_request(url=self.mhs_address,
                                                   headers=headers,
-                                                  body=message_body,
+                                                  body=json.dumps({'payload': message_body}),
                                                   method='POST')
         return response.body
 
