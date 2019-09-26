@@ -54,6 +54,19 @@ pipeline {
             }
         }
 
+        stage('Run Component Tests') {
+            stages {
+                stage('Component Tests') {
+                    steps {
+                        dir('integration-tests') {
+                            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                            sh label: 'Running integration tests', script: 'pipenv run componenttests'
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Run Integration Tests') {
             options {
                 lock('exemplar-test-environment')
