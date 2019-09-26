@@ -122,7 +122,18 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                 await asyncio.sleep(self.sync_async_store_retry_delay)
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
+        await wd.update_status_with_retries(wdo,
+                                            wdo.set_outbound_status,
+                                            wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED,
+                                            self.persistence_store_retries
+                                            )
+        # await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
 
     async def set_failure_message_response(self, wdo: wd.WorkDescription):
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND)
+
+        await wd.update_status_with_retries(wdo,
+                                            wdo.set_outbound_status,
+                                            wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND,
+                                            self.persistence_store_retries
+                                            )
+
