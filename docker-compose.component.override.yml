@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  route:
+    build: ./integration-tests/fake_spineroutelookup
+    ports:
+      - "8080:80"

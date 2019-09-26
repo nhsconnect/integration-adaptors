@@ -6,7 +6,6 @@ from unittest import TestCase
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
-from integration_tests.helpers.methods import get_asid
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
@@ -33,7 +32,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_in_original_post_request_body(self):
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606')
+        message, message_id = build_message('QUPA_IN040000UK32', '9689174606')
 
         # Act
         response = MhsHttpRequestBuilder() \
@@ -50,7 +49,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
     def test_should_record_synchronous_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', get_asid(), '9689174606')
+        message, message_id = build_message('QUPA_IN040000UK32', '9689174606')
 
         # Act
         MhsHttpRequestBuilder() \
