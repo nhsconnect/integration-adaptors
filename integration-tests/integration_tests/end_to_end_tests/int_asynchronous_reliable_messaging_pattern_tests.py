@@ -10,7 +10,6 @@ from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.dynamo.dynamo_sync_async_mhs_table import DynamoSyncAsyncMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
-from integration_tests.helpers.methods import get_asid
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
@@ -39,7 +38,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('REPC_IN150016UK05', get_asid(), '9446245796')
+        message, message_id = build_message('REPC_IN150016UK05', '9446245796')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -59,7 +58,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
 
     def test_should_record_asynchronous_reliable_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('REPC_IN150016UK05', get_asid(), '9446245796')
+        message, message_id = build_message('REPC_IN150016UK05', '9446245796')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -88,7 +87,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_in_original_post_request_body_if_sync_async_requested(self):
         # Arrange
-        message, message_id = build_message('REPC_IN150016UK05', get_asid(), '9446245796')
+        message, message_id = build_message('REPC_IN150016UK05', '9446245796')
 
         # Act
         response = MhsHttpRequestBuilder() \
@@ -102,7 +101,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
 
     def test_should_record_the_correct_response_between_the_inbound_and_outbound_components_if_sync_async_requested(self):
         # Arrange
-        message, message_id = build_message('REPC_IN150016UK05', get_asid(), '9446245796')
+        message, message_id = build_message('REPC_IN150016UK05', '9446245796')
 
         # Act
         MhsHttpRequestBuilder() \

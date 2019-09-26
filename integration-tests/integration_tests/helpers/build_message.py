@@ -2,6 +2,7 @@ import datetime
 
 from utilities import message_utilities
 from integration_tests.helpers import message_builder
+from integration_tests.helpers.asid_provider import get_asid
 
 TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"
 
@@ -17,11 +18,10 @@ DOCUMENT_TYPE = 'documentType'
 TO_ASID = 'to_asid'
 
 
-def build_message(template, asid, patient_nhs_number):
+def build_message(template, patient_nhs_number):
     """Build an upload message
 
     :param template: The Name of the template to be used.
-    :param asid: The ASID of this node.
     :param patient_nhs_number: The NHS number of the patient this record belongs to.
     :param payload: The human readable payload to be included in the summary message.
     :return: A tuple of the message and the message id (UUID) used in it.
@@ -38,7 +38,7 @@ def build_message(template, asid, patient_nhs_number):
     message = message_builder.MustacheMessageBuilder(template).build_message({
         UUID: uuid,
         TIMESTAMP: timestamp,
-        ASID: asid,
+        ASID: get_asid(),
         TO_ASID: '928942012545',
         PATIENT_NHS_NUMBER: patient_nhs_number,
         TO_PARTY_ID: to_party_id,
