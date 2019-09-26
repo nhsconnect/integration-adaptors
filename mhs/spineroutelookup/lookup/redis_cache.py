@@ -59,7 +59,7 @@ class RedisCache(cache_adaptor.CacheAdaptor):
         except redis.RedisError as re:
             logger.error("0005", "An error occurred when attempting to load {key}. {exception}",
                          {"key": key, "exception": re})
-            return None
+            raise re
 
     @timing.time_function
     async def add_cache_value(self, ods_code: str, interaction_id: str, value: Dict) -> None:
@@ -85,6 +85,7 @@ class RedisCache(cache_adaptor.CacheAdaptor):
         except redis.RedisError as re:
             logger.error("0008", "An error occurred when caching {value}. {exception}",
                          {"value": json_value, "exception": re})
+            raise re
 
     @staticmethod
     def _generate_key(ods_code: str, interaction_id: str) -> str:
