@@ -221,6 +221,7 @@ pipeline {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
             sh 'docker-compose down -v'
+            sh 'docker volume prune --force'
             sh 'docker image prune -a --force'
         }
     }
