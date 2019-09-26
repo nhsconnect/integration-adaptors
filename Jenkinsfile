@@ -53,7 +53,7 @@ pipeline {
             stages {
                 stage('Deploy component locally') {
                     steps {
-                        sh label: 'Composing up local services', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up --build > compose-logs.txt &'
+                        sh label: 'Composing up local services', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up --build'
                     }
                 }
                 stage('Component Tests') {
