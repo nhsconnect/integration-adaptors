@@ -31,7 +31,12 @@ pipeline {
             steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
         }
         stage('MHS Outbound Unit Tests') {
-            steps { dir('mhs/outbound') { executeUnitTestsWithCoverage() } }
+            steps {
+                dir('mhs/outbound') {
+                    executeUnitTestsWithCoverage()
+                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+                }
+            }
         }
          stage('Spine Route Lookup Unit Tests') {
             steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
