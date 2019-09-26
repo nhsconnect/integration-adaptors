@@ -127,7 +127,6 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                             wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED,
                                             self.persistence_store_retries
                                             )
-        # await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED)
 
     async def set_failure_message_response(self, wdo: wd.WorkDescription):
 

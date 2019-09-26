@@ -93,6 +93,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
     @test_utilities.async_test
     async def test_success_response(self):
         wdo = MagicMock()
+        wdo.update.return_value = test_utilities.awaitable(None)
         wdo.publish.return_value = test_utilities.awaitable(None)
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
 
@@ -103,6 +104,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
     @test_utilities.async_test
     async def test_failure_response(self):
         wdo = MagicMock()
+        wdo.update.return_value = test_utilities.awaitable(None)
         wdo.publish.return_value = test_utilities.awaitable(None)
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
 
