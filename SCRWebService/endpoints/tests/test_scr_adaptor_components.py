@@ -1,14 +1,14 @@
 """A set of component tests that ties multiple parts of the SCR Adaptor together"""
 import json
 import pathlib
-from scr import gp_summary_upload
-from utilities import file_utilities, test_utilities, xml_utilities
-from utilities.file_utilities import FileUtilities
+from unittest import mock
 
-from definitions import ROOT_DIR
+from scr import gp_summary_upload
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
-from unittest import mock
+from utilities import file_utilities, test_utilities, xml_utilities
+
+from definitions import ROOT_DIR
 from endpoints import summary_care_record
 from message_handling import message_sender, message_forwarder
 
@@ -54,11 +54,11 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
                    body=json.dumps(body))
 
         # Assert
-        body_call_value = request_mock.call_args[1]['body']
+        body_call_value = json.loads(request_mock.call_args[1]['body'])
         call_method = request_mock.call_args[1]['method']
         url_method = request_mock.call_args[1]['url']
 
-        xml_utilities.XmlUtilities.assert_xml_equal(body_call_value, expected_message)
+        xml_utilities.XmlUtilities.assert_xml_equal(body_call_value['payload'], expected_message)
         self.assertEqual(call_method, 'POST')
         self.assertEqual(url_method, self.address)
 
