@@ -53,7 +53,7 @@ pipeline {
             stages {
                 stage('Component Tests') {
                     steps {
-                        dir('integration-tests') {
+                        dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                             sh label: 'Running integration tests', script: 'pipenv run componenttests'
                         }
@@ -178,7 +178,7 @@ pipeline {
 
                 stage('Integration Tests') {
                     steps {
-                        dir('integration-tests') {
+                        dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                             // Wait for MHS container to fully stand up
                             timeout(2) {
@@ -191,7 +191,7 @@ pipeline {
                             }
 
                             // Wait for MHS load balancers to have healthy targets
-                            dir('../pipeline/scripts/check-target-group-health') {
+                            dir('../../pipeline/scripts/check-target-group-health') {
                                 sh script: 'pipenv install'
                                 timeout(13) {
                                     waitUntil {
