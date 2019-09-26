@@ -253,6 +253,10 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
           value = var.spineroutelookup_service_sds_url
         },
         {
+          name = "MHS_SDS_SEARCH_BASE"
+          value = var.spineroutelookup_service_search_base
+        },
+        {
           name = "MHS_DISABLE_SDS_TLS"
           value = var.spineroutelookup_service_disable_sds_tls
         },

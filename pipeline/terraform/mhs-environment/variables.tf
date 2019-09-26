@@ -182,6 +182,11 @@ variable "spineroutelookup_service_sds_url" {
   description = "The SDS URL the Spine Route Lookup service should communicate with."
 }
 
+variable "spineroutelookup_service_search_base" {
+  type = string
+  description = "The LDAP location the Spine Route Lookup service should use as the base of its searches when querying SDS."
+}
+
 variable "spineroutelookup_service_disable_sds_tls" {
   type = string
   description = "Whether TLS should be disabled for connections to SDS."
