@@ -1,6 +1,6 @@
 # Summary Care Record Web Service
  This is a web service which provides a simple interface with which 
-a supplier can perform Summary Care Record (SCR) based actions. A supplier will provide JSON formatted input data 
+a supplier can perform Summary Care Record (SCR) based actions. A supplier can provide JSON formatted input data 
 for a particular SCR function, this data will then be used to populate templates for SCR functions producing
  a HL7 message which is forwarded to an MHS and further to spine.
  
@@ -22,11 +22,10 @@ actual Gp Summary Upload payload, this is the Id of the message received by spin
 success response such as `GP Summary upload successful`  
 
 
-Examples of the usage and interface of the SCR can be found within the integration tests directory, details are 
-provided below:
+Examples of the usage and interface of the SCR can be found within the integration tests directory, details of the
+ expected inputs are provided below:
 
 #####Headers:
-
 - interaction-name (required): The name of the particular interaction to send to the MHS, this is a human readable name that 
 maps internally in the SCR Adaptor to interaction-ids, current support mappings are:
     - `SCR_GP_SUMMARY_UPLOAD` -> `REPC_IN150016UK05`
