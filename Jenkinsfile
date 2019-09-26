@@ -228,6 +228,8 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
+            sh 'docker-compose down -v'
+            sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
             sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
