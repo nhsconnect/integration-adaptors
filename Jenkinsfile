@@ -216,7 +216,7 @@ pipeline {
             junit '**/test-reports/*.xml'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
-            sh 'docker image rm $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
+            sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
         }
     }
 }
