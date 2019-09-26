@@ -214,7 +214,7 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-            sh 'docker images rm $(docker images "*/*/*:${BUILD_TAG}" -q)'
+            sh 'docker images rm $(docker images "*/*:${BUILD_TAG}" -q) $(docker images "*/*/*:${BUILD_TAG}" -q)'
         }
     }
 }
