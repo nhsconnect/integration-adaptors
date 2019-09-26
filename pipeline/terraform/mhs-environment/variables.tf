@@ -192,3 +192,8 @@ variable "elasticache_node_type" {
   type = string
   description = "The type of ElastiCache node to use when deploying the ElastiCache cluster. Possible node types can be found from https://aws.amazon.com/elasticache/features/#Available_Cache_Node_Types"
 }
+
+variable "mhs_forward_reliable_endpoint_url" {
+  type = string
+  description = "The URL to communicate with Spine for Forward Reliable messaging from the outbound service"
+}

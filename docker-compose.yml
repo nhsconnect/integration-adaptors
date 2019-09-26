@@ -41,6 +41,7 @@ services:
       - MAX_RESYNC_RETRIES=20
       - MHS_SPINE_ROUTE_LOOKUP_URL=http://route:80
       - MHS_SPINE_ORG_CODE=YES
+      - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable
   route:
     image: local/mhs-route
     ports:

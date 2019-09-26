@@ -75,6 +75,7 @@ connecting to the Redis host specified by `MHS_SDS_REDIS_CACHE_HOST`. Defaults t
 * `MHS_SDS_REDIS_DISABLE_TLS` (Spine Route Lookup service only) An optional flag that can be set to disable TLS for
 connections to the Redis cache used by the Spine Route Lookup service. *Must* be set to exactly `True` for TLS to be
 disabled.
+* `MHS_FORWARD_RELIABLE_ENDPOINT_URL` (outbound only) The URL to communicate with Spine for Forward Reliable messaging
 
 Note that if you are using Opentest, you should use the credentials you were given when you got access to set `MHS_SECRET_PARTY_KEY`, `MHS_SECRET_CLIENT_CERT`, `MHS_SECRET_CLIENT_KEY` and `MHS_SECRET_CA_CERTS`.
 

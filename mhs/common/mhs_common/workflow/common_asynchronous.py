@@ -58,13 +58,12 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
 
-    async def _lookup_reliability_details(self, interaction_details: Dict) -> Dict:
+    async def _lookup_reliability_details(self, interaction_details: Dict, org_code: str = None) -> Dict:
         try:
             service_id = await self._build_service_id(interaction_details)
 
             logger.info('0001', 'Looking up reliability details for {service_id}.', {'service_id': service_id})
-            reliability_details = await self.routing_reliability.get_reliability(service_id,
-                                                                                 interaction_details.get('ods-code'))
+            reliability_details = await self.routing_reliability.get_reliability(service_id, org_code)
 
             logger.info('0002', 'Retrieved reliability details for {service_id}. {reliability_details}',
                         {'service_id': service_id, 'reliability_details': reliability_details})

@@ -8,7 +8,7 @@ from typing import Tuple, Optional
 
 from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
 from mhs_common.messages.soap_fault_envelope import SOAPFault
-from utilities import timing
+from utilities import timing, config
 
 from mhs_common import workflow
 from mhs_common.errors import ebxml_handler
@@ -65,7 +65,7 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
 
         try:
             details = await self._lookup_endpoint_details(interaction_details)
-            url = details[self.ENDPOINT_URL]
+            url = config.get_config("FORWARD_RELIABLE_ENDPOINT_URL")
             to_party_key = details[self.ENDPOINT_PARTY_KEY]
             cpa_id = details[self.ENDPOINT_CPA_ID]
         except Exception:
@@ -79,7 +79,8 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return error[0], error[1], None
 
-        reliability_details = await self._lookup_reliability_details(interaction_details)
+        reliability_details = await self._lookup_reliability_details(interaction_details,
+                                                                     interaction_details.get('ods-code'))
         retry_interval_xml_datetime = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL]
         try:
             retry_interval = DateUtilities.convert_xml_date_time_format_to_seconds(retry_interval_xml_datetime)

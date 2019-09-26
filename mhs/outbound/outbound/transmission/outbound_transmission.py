@@ -59,7 +59,6 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                 # instance currently returns endpoints as IP addresses. This MUST be changed before this code is used in
                 # a production environment
                 # ******************************************************************************************************
-                url = 'https://192.168.128.11/reliablemessaging/forwardreliable' #TODO: remove this line
                 response = await CommonHttps.make_request(url=url, method=request_method, headers=headers, body=message,
                                                           client_cert=self._client_cert, client_key=self._client_key,
                                                           ca_certs=self._ca_certs, validate_cert=False,
