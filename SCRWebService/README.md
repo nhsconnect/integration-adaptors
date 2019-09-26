@@ -38,3 +38,118 @@ by the MHS
 The message body is a json object containing the values used to populate the xml template, this message body must
 contain all keys even if the values are empty. Examples of message bodies can be found within the unit tests and 
 another example is provided in `integration-adaptors/integration-tests/data/templates/json_16UK05.mustache`
+
+
+An example of input body is:
+
+````
+{
+  "Id": "83096C81-2FDB-49FB-B4E5-2FFE23C22E22",
+  "creationTime": "20190926151928",
+  "versionCode": "V3NPfIT4.2.00",
+  "communicationFunctionRcv": {
+    "device": {
+      "id": {
+        "extension": "227319907548"
+      }
+    }
+  },
+  "communicationFunctionSnd": {
+    "device": {
+      "id": {
+        "extension": "None"
+      }
+    }
+  },
+  "controlActEvent": {
+    "author1": {
+      "agentSystemSDS": {
+        "id": {
+          "extension": "None"
+        }
+      }
+    },
+    "author": {
+      "AgentPersonSDS": {
+        "id": {
+          "extension": "055888118514"
+        },
+        "agentPersonSDS": {
+          "id": {
+            "extension": "979603625513"
+          }
+        },
+        "part": {
+          "partSDSRole": {
+            "id": {
+              "extension": "R0260"
+            }
+          }
+        }
+      }
+    },
+    "subject": {
+      "GPSummary": {
+        "id": {
+          "root": "83096C81-2FDB-49FB-B4E5-2FFE23C22E22"
+        },
+        "effectiveTime": "20190926151928",
+        "author": {
+          "time": "20190926151928",
+          "AgentPersonSDS": {
+            "id": {
+              "extension": "055888118514"
+            },
+            "agentPersonSDS": {
+              "id": {
+                "extension": "979603625513"
+              },
+              "name": "<family>NICA_Test_Automation_Healthchecks</family>"
+            }
+          }
+        },
+        "excerptForm": {
+          "CareDocs": {
+            "presentationText": {
+              "value": "<h1>header</h1>",
+              "id": {
+                "root": "EA3BCDEB-A439-4984-A519-2EE25EB3F24C"
+              },
+              "effectiveTime": {
+                "value": "20190926151928"
+              }
+            }
+          }
+        },
+        "recordTarget": {
+          "patient": {
+            "id": {
+              "extension": "9446245796"
+            }
+          }
+        },
+        "replacementOf": [
+          {
+            "priorMessageRef": {
+              "id": {
+                "root": "A05B9416-F700-48F1-99D8-98874D3406B9"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+````
+
+And message response:
+
+````
+{
+    "messageRef": "1E2C0BB8-A0AE-4B65-A2EE-AE062F36FFB9",
+    "messageId": "0CA0BB71-067A-49A4-AF9F-B4E19106F1C6",
+    "creationTime": "20190924132325",
+    "messageDetail": "GP Summary upload successful"
+}
+````

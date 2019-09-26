@@ -7,7 +7,7 @@ to generate a GP Summary Upload message by identifying the parts of the message 
  variable (such as supplier IDs, author information, and human readable updates) and templating them so a 
  supplier only has to concern themselves with the variable data which can be populated with a json object.
 
-Within the `data/templates` directory there exists a `mustache` [2] template[3] of the message to be sent to the Spine 
+Within the `data/templates` directory there exists a `mustache`[2] template[3] of the message to be sent to the Spine 
 system, and in the `scr/gpsummaryupdate` module there is a simple interface for populating the template. 
 This interface can take either a python dictionary or a json file path which will contain the values for the 
 variable portions of the template. The interface will return the template populated with the values of the 
