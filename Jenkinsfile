@@ -214,6 +214,8 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
+            // Prune Docker images for current CI build.
+            // Note that the * in the glob patterns doesn't match /
             sh 'docker images rm $(docker images "*/*:${BUILD_TAG}" -q) $(docker images "*/*/*:${BUILD_TAG}" -q)'
         }
     }
