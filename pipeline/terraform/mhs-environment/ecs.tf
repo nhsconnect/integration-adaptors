@@ -72,6 +72,24 @@ locals {
       value = var.mhs_spine_org_code
     }
   ]
+  mhs_outbound_base_secrets = [
+    {
+      name = "MHS_SECRET_PARTY_KEY"
+      valueFrom = var.party_key_arn
+    },
+    {
+      name = "MHS_SECRET_CLIENT_CERT"
+      valueFrom = var.client_cert_arn
+    },
+    {
+      name = "MHS_SECRET_CLIENT_KEY"
+      valueFrom = var.client_key_arn
+    },
+    {
+      name = "MHS_SECRET_CA_CERTS"
+      valueFrom = var.ca_certs_arn
+    }
+  ]
 }
 
 # MHS outbound ECS task definition
@@ -92,28 +110,12 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
           value = var.mhs_resync_initial_delay
         }
       ])
-      secrets = [
-        {
-          name = "MHS_SECRET_PARTY_KEY"
-          valueFrom = var.party_key_arn
-        },
-        {
-          name = "MHS_SECRET_CLIENT_CERT"
-          valueFrom = var.client_cert_arn
-        },
-        {
-          name = "MHS_SECRET_CLIENT_KEY"
-          valueFrom = var.client_key_arn
-        },
-        {
-          name = "MHS_SECRET_CA_CERTS"
-          valueFrom = var.ca_certs_arn
-        },
+      secrets = var.route_ca_certs_arn == "" ? local.mhs_outbound_base_secrets : concat(local.mhs_outbound_base_secrets, [
         {
           name = "MHS_SECRET_SPINE_ROUTE_LOOKUP_CA_CERTS",
           valueFrom = var.route_ca_certs_arn
         }
-      ]
+      ])
       essential = true
       logConfiguration = {
         logDriver = "awslogs"

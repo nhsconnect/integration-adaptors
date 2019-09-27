@@ -185,7 +185,8 @@ variable "ca_certs_arn" {
 
 variable "route_ca_certs_arn" {
   type = string
-  description = "ARN of the secrets manager secret containing the CA certificates to be used to verify the certificate presented by the Spine Route Lookup service"
+  description = "ARN of the secrets manager secret containing the CA certificates to be used to verify the certificate presented by the Spine Route Lookup service. Required if you are using certificates that are not signed by a legitimate CA."
+  default = ""
 }
 
 variable "outbound_alb_certificate_arn" {
