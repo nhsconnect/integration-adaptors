@@ -96,6 +96,26 @@ containers to be published to ECR and the integration test environment to be sto
     - CloudWatchLogsFullAccess
     - AmazonRoute53FullAccess
     - AmazonElastiCacheFullAccess
+    - If you are using a self-signed certificate for your outbound load balancer (see the TLS certificates step below)
+    this role also needs a policy to allow it to fetch the CA certificates to use to validate the outbound load
+    balancer's certificate from AWS secrets manager (see secrets manager step below for details on storing these
+    secrets). These CA certificates are used by the SCR service and the integration tests when communicating with the
+    MHS. This policy should look like:
+```
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "secretsmanager:GetSecretValue",
+            "Resource": [
+                "Secret ARNs here"
+            ]
+        }
+    ]
+}
+```
 - An ECS Cluster for the SCR application to be deployed into. This must be an EC2 Linux cluster.
 - Two TLS certificates. One to be used for the outbound load balancer and one for the route load balancer
     - These certificates should be stored in AWS Certificate Manager (they can either be requested through Certificate
@@ -118,8 +138,12 @@ values should not be specified as JSON). The following secrets are required:
     - The party key associated with your MHS
     - The client certificate the outbound MHS component should present to other MHS instances
     - The private key for the client certificate the outbound MHS component should present to other MHS instances
-    - The CA certificates used to validate the certificates presented by incoming connections to the MHS.
-    - The CA certificates used to validate the certificate presented by the MHS' route service
+    - (Optional) The CA certificates used to validate the certificates presented by the MHS. This value is required if
+    the certificate you have used for the outbound load balancer (above) is not signed by a legitimate CA. If you have
+    used a self-signed certificate, this value can be that certificate.
+    - (Optional) The CA certificates used to validate the certificate presented by the MHS' route service. This value is required if
+    the certificate you have used for the route load balancer (above) is not signed by a legitimate CA. If you have
+    used a self-signed certificate, this value can be that certificate.
 
 # Jenkins
 
