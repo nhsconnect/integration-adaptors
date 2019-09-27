@@ -26,7 +26,7 @@ class RoutingResponse(object):
         return self
 
     def get_response(self):
-        
+
 
 
 class RequestMatcher(object):
