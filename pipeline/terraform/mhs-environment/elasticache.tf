@@ -11,7 +11,7 @@
 # (see number_cache_clusters).
 resource "aws_elasticache_replication_group" "elasticache_replication_group" {
   automatic_failover_enabled = true
-  replication_group_id = "${var.environment_id}-rep-group"
+  replication_group_id = "${var.environment_id}-rg"
   replication_group_description = "An ElastiCache cluster for the environment: ${var.environment_id}"
   node_type = var.elasticache_node_type
   number_cache_clusters = length(data.aws_availability_zones.all.names)
