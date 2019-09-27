@@ -49,7 +49,8 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
 
     resynchroniser = resync.SyncAsyncResynchroniser(sync_async_store,
                                                     int(config.get_config('RESYNC_RETRIES', '20')),
-                                                    float(config.get_config('RESYNC_INTERVAL', '1.0')))
+                                                    float(config.get_config('RESYNC_INTERVAL', '1.0')),
+                                                    float(config.get_config('RESYNC_INITIAL_DELAY', '0')))
 
     return workflow.get_workflow_map(party_key,
                                      work_description_store=work_description_store,
@@ -69,6 +70,8 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
     interactions_config_file = str(data_dir / "interactions" / "interactions.json")
     config_manager = configuration_manager.ConfigurationManager(interactions_config_file)
 
+    # Note that the paths in generate_openapi.py should be updated if these
+    # paths are changed
     supplier_application = tornado.web.Application(
         [(r"/", client_request_handler.SynchronousHandler,
           dict(config_manager=config_manager, workflows=workflows)),

@@ -1,13 +1,18 @@
 """This module defines the outbound synchronous request handler component."""
-
+import json
 from typing import Dict, Any
+
+import marshmallow
+import mhs_common.state.work_description as wd
+import mhs_common.workflow as workflow
+import tornado.escape
 import tornado.locks
 import tornado.web
-import mhs_common.workflow as workflow
-from mhs_common.messages import ebxml_envelope
 from mhs_common.configuration import configuration_manager
+from mhs_common.messages import ebxml_envelope
 from utilities import integration_adaptors_logger as log, message_utilities, timing
-import mhs_common.state.work_description as wd
+
+from outbound.request import request_body_schema
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
@@ -26,6 +31,98 @@ class SynchronousHandler(tornado.web.RequestHandler):
 
     @timing.time_request
     async def post(self):
+        """
+        ---
+        summary: Make a request to the MHS
+        description: Make a request to the MHS
+        operationId: postMHS
+        parameters:
+          - name: Interaction-Id
+            in: header
+            required: true
+            schema:
+              type: string
+            description: ID of the interaction that you want to invoke. e.g. QUPC_IN160101UK05
+          - name: sync-async
+            in: header
+            required: true
+            schema:
+              type: string
+              enum: ["true", "false"]
+            description: >-
+              If set to true and the interaction ID is for an async interaction
+              that supports sync-async, then the HTTP response will be the
+              response from Spine, and the response will not be put onto the
+              inbound queue.
+
+
+              If set to false for an async interaction, then the response from
+              Spine will be put onto the inbound queue and the HTTP response will
+              just acknowledge sending the request successfully to Spine.
+
+
+              For sync interactions or async interactions that don't support
+              sync-async, this header must be set to false.
+          - name: from-asid
+            in: header
+            required: false
+            schema:
+              type: string
+            description: >-
+              The ASID of the sending system. This should be the same as the from-asid
+              value within the HL7 payload. This header is optional and only
+              required/used for interactions that use the sync workflow.
+          - name: Message-Id
+            in: header
+            required: false
+            schema:
+              type: string
+            description: >-
+              Message ID of the message to send to Spine. If not sent, the MHS
+              generates a random message ID.
+
+
+              When performing async requests where the response is put on the
+              inbound queue, the message ID will be put with the response on the
+              queue.
+          - name: Correlation-Id
+            in: header
+            required: false
+            schema:
+              type: string
+            description: >-
+              Correlation ID that is used when logging. If not passed, a random
+              correlation ID is generated. The idea is that log messages produced
+              by the MHS include this correlation ID which allows correlating logs
+              relating to a single request together. If the supplier system uses
+              it's own correlation ID when producing it's logs, then that should
+              be passed in here, so that logs for a single request can be tied
+              together across the supplier system and the MHS.
+
+
+              When performing async requests where the response is put on the
+              inbound queue, the correlation ID will be put with the response on the
+              queue.
+
+
+              Note that this correlation ID gets sent to/from Spine.
+        responses:
+          200:
+            description: Successful response from Spine.
+            content:
+              text/xml: {}
+          202:
+            description: >-
+              Acknowledgement that we successfully sent the message to Spine
+              (response will come asynchronously on the inbound queue).
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/RequestBody'
+          description: The HL7 payload (and optional attachments) to be sent to Spine.
+        """
         message_id = self._extract_message_id()
         correlation_id = self._extract_correlation_id()
         interaction_id = self._extract_interaction_id()
@@ -50,15 +147,41 @@ class SynchronousHandler(tornado.web.RequestHandler):
             await self.invoke_default_workflow(from_asid, message_id, correlation_id, interaction_details, body, wf)
 
     def _parse_body(self):
+        try:
+            content_type = self.request.headers['Content-Type']
+        except KeyError as e:
+            logger.error('0011', 'Missing Content-Type header')
+            raise tornado.web.HTTPError(400, 'Missing Content-Type header', reason='Missing Content-Type header') from e
+        if content_type != 'application/json':
+            logger.error('0012', 'Unsupported content type in request. {ExpectedContentType} {ActualContentType}',
+                         {'ExpectedContentType': 'application/json', 'ActualContentType': content_type})
+            raise tornado.web.HTTPError(415,
+                                        'Unsupported content type. Only application/json request bodies are supported.',
+                                        reason='Unsupported content type. Only application/json request bodies are '
+                                               'supported.')
         body = self.request.body.decode()
         if not body:
             logger.error('0009', 'Body missing from request')
             raise tornado.web.HTTPError(400, 'Body missing from request', reason='Body missing from request')
-        return body
+        try:
+            # Parse the body as JSON and validate it against RequestBodySchema
+            parsed_body: request_body_schema.RequestBody = request_body_schema.RequestBodySchema().loads(body)
+        except json.JSONDecodeError as e:
+            logger.error('0013', 'Invalid JSON request body')
+            raise tornado.web.HTTPError(400, 'Invalid JSON request body', reason='Invalid JSON request body') from e
+        except marshmallow.ValidationError as e:
+            # e.messages is a nested dict of all the validation errors
+            validation_errors = str(e.messages)
+            logger.error('0014', 'Invalid request. {ValidationErrors}', {'ValidationErrors': validation_errors})
+            raise tornado.web.HTTPError(400, f'Invalid request. Validation errors: {validation_errors}',
+                                        reason=f'Invalid request. Validation errors: {validation_errors}') from e
+        return parsed_body.payload
 
     def write_error(self, status_code: int, **kwargs: Any):
+        reason = self._reason  # Don't inline this, as self.set_status changes self._reason
+        self.set_status(status_code)
         self.set_header('Content-Type', 'text/plain')
-        self.finish(f'{status_code}: {self._reason}')
+        self.finish(f'{status_code}: {reason}')
 
     def _extract_sync_async_header(self):
         sync_async_header = self.request.headers.get('sync-async', None)
@@ -140,7 +263,7 @@ class SynchronousHandler(tornado.web.RequestHandler):
         elif (not interaction_config) and sync_async_header:
             logger.error('0033', 'Message header requested sync-async wrap for un-supported sync-async')
             raise tornado.web.HTTPError(400, f'Message header requested sync-async wrap for un-supported sync-async',
-                                        reason='Message header requested sync-async wrap for a message pattern'
+                                        reason='Message header requested sync-async wrap for a message pattern '
                                                'that does not support sync-async')
         else:
             return False

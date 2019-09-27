@@ -9,4 +9,16 @@ class HealthcheckHandler(tornado.web.RequestHandler):
     """
 
     async def get(self):
+        """
+        ---
+        summary: Healthcheck endpoint
+        description: >-
+          This endpoint just returns a HTTP 200 response and does no further processing. This endpoint
+          is intended to be used by load balancers/other infrastructure to check that the server is
+          running.
+        operationId: getHealthcheck
+        responses:
+          200:
+            description: The only response this endpoint returns.
+        """
         self.set_status(200)

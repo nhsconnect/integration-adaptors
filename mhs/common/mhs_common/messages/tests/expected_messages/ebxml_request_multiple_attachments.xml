@@ -1,0 +1,64 @@
+----=_MIME-Boundary
+Content-Id: <ebXMLHeader@spine.nhs.uk>
+Content-Type: text/xml; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP:Envelope xmlns:xsi="http://www.w3c.org/2001/XML-Schema-Instance" xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:hl7ebxml="urn:hl7-org:transport/ebXML/DSTUv1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+<SOAP:Header>
+	<eb:MessageHeader SOAP:mustUnderstand="1" eb:version="2.0">
+		<eb:From>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">TESTGEN-201324</eb:PartyId>
+		</eb:From>
+		<eb:To>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YEA-0000806</eb:PartyId>
+		</eb:To>
+		<eb:CPAId>S1001A1630</eb:CPAId>
+		<eb:ConversationId>79F49A34-9798-404C-AEC4-FD38DD81C138</eb:ConversationId>
+		<eb:Service>urn:nhs:names:services:pdsquery</eb:Service>
+		<eb:Action>QUPA_IN000006UK02</eb:Action>
+		<eb:MessageData>
+			<eb:MessageId>5BB171D4-53B2-4986-90CF-428BE6D157F5</eb:MessageId>
+			<eb:Timestamp>2012-03-15T06:51:08Z</eb:Timestamp>
+		</eb:MessageData>
+        <eb:DuplicateElimination/>
+    </eb:MessageHeader>
+    <eb:AckRequested SOAP:mustUnderstand="1" eb:version="2.0" eb:signed="false" SOAP:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH"/>
+    <eb:SyncReply SOAP:mustUnderstand="1" eb:version="2.0" SOAP:actor="http://schemas.xmlsoap.org/soap/actor/next"/>
+</SOAP:Header>
+<SOAP:Body>
+	<eb:Manifest SOAP:mustUnderstand="1" eb:version="2.0">
+		<eb:Reference xlink:href="cid:5BB171D4-53B2-4986-90CF-428BE6D157F5@spine.nhs.uk">
+			<eb:Schema eb:location="http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd" eb:version="1.0"/>
+			<eb:Description xml:lang="en">HL7 payload</eb:Description>
+			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
+		</eb:Reference>
+        <eb:Reference xlink:href="cid:8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk">
+            <eb:Description xml:lang="en">Some description</eb:Description>
+        </eb:Reference>
+        <eb:Reference xlink:href="cid:64A73E03-30BD-4231-9959-0C4B54400345@spine.nhs.uk">
+            <eb:Description xml:lang="en">Another description</eb:Description>
+        </eb:Reference>
+	</eb:Manifest>
+</SOAP:Body>
+</SOAP:Envelope>
+
+----=_MIME-Boundary
+Content-Id: <5BB171D4-53B2-4986-90CF-428BE6D157F5@spine.nhs.uk>
+Content-Type: text/xml; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<QUPA_IN000006UK02 xmlns="urn:hl7-org:v3"></QUPA_IN000006UK02>
+----=_MIME-Boundary
+Content-Id: <8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk>
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+
+Some payload
+----=_MIME-Boundary
+Content-Id: <64A73E03-30BD-4231-9959-0C4B54400345@spine.nhs.uk>
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+
+QW5vdGhlciBwYXlsb2Fk
+----=_MIME-Boundary--

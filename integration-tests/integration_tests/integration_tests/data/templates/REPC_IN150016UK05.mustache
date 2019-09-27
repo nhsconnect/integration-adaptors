@@ -1,0 +1,123 @@
+<REPC_IN150016UK05 ITSVersion="XML_1.0"
+    xmlns="urn:hl7-org:v3">
+    <id root="{{uuid}}"/>
+    <creationTime value="{{timestamp}}"/>
+    <versionCode code="V3NPfIT4.2.00"/>
+    <interactionId root="2.16.840.1.113883.2.1.3.2.4.12" extension="REPC_IN150016UK05"/>
+    <processingCode code="P"/>
+    <processingModeCode code="T"/>
+    <acceptAckCode code="NE"/>
+    <communicationFunctionRcv typeCode="RCV">
+        <device classCode="DEV" determinerCode="INSTANCE">
+            <id root="1.2.826.0.1285.0.2.0.107" extension="227319907548"/>
+        </device>
+    </communicationFunctionRcv>
+    <communicationFunctionSnd typeCode="SND">
+        <device classCode="DEV" determinerCode="INSTANCE">
+            <id root="1.2.826.0.1285.0.2.0.107" extension="{{asid}}"/>
+        </device>
+    </communicationFunctionSnd>
+    <ControlActEvent classCode="CACT" moodCode="EVN">
+        <author1 typeCode="AUT">
+            <AgentSystemSDS classCode="AGNT">
+                <agentSystemSDS classCode="DEV" determinerCode="INSTANCE">
+                    <id root="1.2.826.0.1285.0.2.0.107" extension="{{asid}}"/>
+                </agentSystemSDS>
+            </AgentSystemSDS>
+        </author1>
+        <author typeCode="AUT">
+            <AgentPersonSDS classCode="AGNT">
+                <id root="1.2.826.0.1285.0.2.0.67" extension="055888118514"/>
+                <agentPersonSDS classCode="PSN" determinerCode="INSTANCE">
+                    <id root="1.2.826.0.1285.0.2.0.65" extension="979603625513"/>
+                </agentPersonSDS>
+                <part typeCode="PART">
+                    <partSDSRole classCode="ROL">
+                        <id extension="R0260" root="1.2.826.0.1285.0.2.1.104"/>
+                    </partSDSRole>
+                </part>
+            </AgentPersonSDS>
+        </author>
+        <subject typeCode="SUBJ" contextConductionInd="false">
+            <GPSummary classCode="COMPOSITION" moodCode="EVN">
+                <id root="{{uuid}}"/>
+                <code code="196981000000101" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="General Practice Summary"/>
+                <effectiveTime value="{{timestamp}}"/>
+                <statusCode code="active"/>
+                <author typeCode="AUT" contextControlCode="OP">
+                    <time value="{{timestamp}}"/>
+                    <UKCT_MT160018UK01.AgentPersonSDS classCode="AGNT"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                        <id root="1.2.826.0.1285.0.2.0.67" extension="055888118514"/>
+                        <agentPersonSDS classCode="PSN" determinerCode="INSTANCE">
+                            <id root="1.2.826.0.1285.0.2.0.65" extension="979603625513"/>
+                            <name>
+                                <family>NICA_Test_Automation_Healthchecks</family>
+                            </name>
+                        </agentPersonSDS>
+                    </UKCT_MT160018UK01.AgentPersonSDS>
+                </author>
+                <excerptFrom typeCode="XCRPT" inversionInd="false" contextConductionInd="true" negationInd="false">
+                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAT_RM-NPfITUK10.excerptFrom"/>
+                    <seperatableInd value="false"/>
+                    <UKCT_MT144051UK01.CareProfessionalDocumentationCRE classCode="CATEGORY" moodCode="EVN">
+                        <code code="163171000000105" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Care Professional Documentation"/>
+                        <component typeCode="COMP" inversionInd="false" negationInd="false">
+                            <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
+                            <seperatableInd value="false"/>
+                            <presentationText classCode="OBS" moodCode="EVN">
+                                <value mediaType="text/plain">
+                                    <h1>Test data</h1>
+                                </value>
+                                <id root="EA3BCDEB-A439-4984-A519-2EE25EB3F24C"/>
+                                <code code="PresentationText" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.126" displayName="Presentation Text"/>
+                                <statusCode code="completed"/>
+                                <effectiveTime value="{{timestamp}}"/>
+                            </presentationText>
+                        </component>
+                    </UKCT_MT144051UK01.CareProfessionalDocumentationCRE>
+                </excerptFrom>
+                <pertinentInformation1 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
+                    <templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1"/>
+                    <seperatableInd value="true"/>
+                    <pertinentRootCREType classCode="CATEGORY" moodCode="EVN">
+                        <code code="163171000000105" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Care Professional Documentation"/>
+                    </pertinentRootCREType>
+                </pertinentInformation1>
+                <pertinentInformation2 typeCode="PERT" inversionInd="false" contextConductionInd="true" negationInd="false">
+					<templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.pertinentInformation1"/>
+					<seperatableInd value="true"/>
+					<pertinentCREType classCode="CATEGORY" moodCode="EVN">
+						<code code="163221000000102" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Allergies and Adverse Reactions"/>
+						<component typeCode="COMP" contextConductionInd="true">
+							<templateId root="2.16.840.1.113883.2.1.3.2.4.18.2" extension="CSAB_RM-NPfITUK10.component"/>
+							<seperatableInd value="false"/>
+							<UKCT_MT144053UK02.Allergy classCode="OBS" moodCode="EVN" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+								<id root="016CFE10-FE26-11E4-8E2F-010000002000"/>
+								<code code="218291007" codeSystem="2.16.840.1.113883.2.1.3.2.4.15" displayName="Adverse reaction to erythromycin (finding)">
+									<originalText>Adverse reaction to erythromycin</originalText>
+								</code>
+								<statusCode code="completed"/>
+								<effectiveTime>
+									<low value="20100615"/>
+								</effectiveTime>
+								<pertinentInformation typeCode="PERT" contextConductionInd="true">
+									<seperatableInd value="false"/>
+									<pertinentSupportingInfo classCode="OBS" moodCode="EVN">
+										<value>severe vomiting</value>
+										<code code="SupportingText" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.126" displayName="Supporting Text"/>
+									</pertinentSupportingInfo>
+								</pertinentInformation>
+							</UKCT_MT144053UK02.Allergy>
+						</component>
+					</pertinentCREType>
+				</pertinentInformation2>
+                <recordTarget typeCode="RCT">
+                    <patient classCode="PAT">
+                        <id root="2.16.840.1.113883.2.1.4.1" extension="{{patient_nhs_number}}"/>
+                    </patient>
+                </recordTarget>
+            </GPSummary>
+        </subject>
+    </ControlActEvent>
+</REPC_IN150016UK05>

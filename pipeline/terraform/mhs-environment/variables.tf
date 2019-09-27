@@ -193,6 +193,12 @@ variable "elasticache_node_type" {
   description = "The type of ElastiCache node to use when deploying the ElastiCache cluster. Possible node types can be found from https://aws.amazon.com/elasticache/features/#Available_Cache_Node_Types"
 }
 
+variable "mhs_resync_initial_delay" {
+  type = number
+  description = "The delay before the first poll to the sync async store after receiving an acknowledgement from Spine"
+  default = 0.150
+}
+
 variable "mhs_forward_reliable_endpoint_url" {
   type = string
   description = "The URL to communicate with Spine for Forward Reliable messaging from the outbound service"
