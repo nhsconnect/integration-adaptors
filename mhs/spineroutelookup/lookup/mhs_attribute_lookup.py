@@ -36,14 +36,24 @@ class MHSAttributeLookup(object):
         :param interaction_id:
         :return:
         """
-        cache_value = await self.cache.retrieve_mhs_attributes_value(ods_code, interaction_id)
-        if cache_value:
-            logger.info('0001', 'MHS details found in cache for {ods_code} & {interaction_id}',
-                        {'ods_code': ods_code, 'interaction_id': interaction_id})
-            return cache_value
+        try:
+            cache_value = await self.cache.retrieve_mhs_attributes_value(ods_code, interaction_id)
+            if cache_value:
+                logger.info('0001', 'MHS details found in cache for {ods_code} & {interaction_id}',
+                            {'ods_code': ods_code, 'interaction_id': interaction_id})
+                return cache_value
+        except Exception as e:
+            logger.error('0002', 'Failed to retrieve value from cache for {ods_code} & {interaction_id}. {exception}',
+                         {'ods_code': ods_code, 'interaction_id': interaction_id, 'exception': e})
 
         endpoint_details = await self.sds_client.get_mhs_details(ods_code, interaction_id)
-        logger.info('0002', 'MHS details obtained from sds, adding to cache for {ods_code} & {interaction_id}',
+        logger.info('0003', 'MHS details obtained from sds, adding to cache for {ods_code} & {interaction_id}',
                     {'ods_code': ods_code, 'interaction_id': interaction_id})
-        await self.cache.add_cache_value(ods_code, interaction_id, endpoint_details)
+
+        try:
+            await self.cache.add_cache_value(ods_code, interaction_id, endpoint_details)
+        except Exception as e:
+            logger.error('0004', 'Failed to store value in cache for {ods_code} & {interaction_id}. {exception}',
+                         {'ods_code': ods_code, 'interaction_id': interaction_id, 'exception': e})
+
         return endpoint_details

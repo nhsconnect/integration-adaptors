@@ -6,7 +6,7 @@ variable "region" {
 
 variable "environment_id" {
   type = string
-  description = "An ID used to identify the environment being deployed by this configuration."
+  description = "An ID used to identify the environment being deployed by this configuration. As this is used as a prefix for the names of most resources this should be kept to 20 characters or less."
 }
 
 variable "build_id" {
@@ -201,6 +201,11 @@ variable "route_alb_certificate_arn" {
 variable "spineroutelookup_service_sds_url" {
   type = string
   description = "The SDS URL the Spine Route Lookup service should communicate with."
+}
+
+variable "spineroutelookup_service_search_base" {
+  type = string
+  description = "The LDAP location the Spine Route Lookup service should use as the base of its searches when querying SDS."
 }
 
 variable "spineroutelookup_service_disable_sds_tls" {
