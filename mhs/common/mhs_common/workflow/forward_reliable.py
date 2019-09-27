@@ -215,7 +215,7 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
         logger.info('0014', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
-    def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str):
+    def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str, attachments: list):
         pass
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):

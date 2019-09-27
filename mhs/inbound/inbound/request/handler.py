@@ -109,9 +109,11 @@ class InboundHandler(base_handler.BaseHandler):
                                                           request_message: ebxml_request_envelope.EbxmlRequestEnvelope):
         logger.info('002', 'Received unsolicited inbound request for the forward-reliable workflow. Passing the '
                            'request to forward-reliable workflow.')
+        attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
         try:
             await forward_reliable_workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id,
-                                                                               received_message)
+                                                                               received_message,
+                                                                               attachments)
             self._send_ack(request_message)
         except Exception as e:
             logger.error('011', 'Exception in workflow {exception}', {'exception': e})
