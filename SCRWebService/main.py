@@ -1,11 +1,13 @@
 """The main entry point for the summary care record service"""
-import tornado.web
 import tornado.ioloop
-from utilities import config
-from endpoints import summary_care_record
+import tornado.web
 import utilities.integration_adaptors_logger as log
-from message_handling import message_forwarder, message_sender
 from scr import gp_summary_upload
+from utilities import config, secrets, certs
+
+import definitions
+from endpoints import summary_care_record
+from message_handling import message_forwarder, message_sender
 
 logger = log.IntegrationAdaptorsLogger('SCR-WEB')
 
@@ -15,7 +17,11 @@ def build_app():
         'SCR_GP_SUMMARY_UPLOAD': gp_summary_upload.GpSummaryUpload()
     }
     address = config.get_config('MHS_ADDRESS')
-    sender = message_sender.MessageSender(address)
+
+    certificates = certs.Certs.create_certs_files(definitions.ROOT_DIR,
+                                                  ca_certs=secrets.get_secret_config('MHS_CA_CERTS', default=None))
+
+    sender = message_sender.MessageSender(address, ca_certs=certificates.ca_certs_path)
     forwarder = message_forwarder.MessageForwarder(interactions, sender)
 
     app = tornado.web.Application([(r"/", summary_care_record.SummaryCareRecord, dict(forwarder=forwarder))])
@@ -37,4 +43,3 @@ if __name__ == "__main__":
         logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
     finally:
         logger.info('002', 'Exiting application')
-
