@@ -12,4 +12,5 @@ boto3 = "*"
 python_version = "3.7"
 
 [scripts]
-main = "python main.py"
+check-target-group-health = "python check-target-group-health.py"
+get-secrets-manager-value = "python get-secrets-manager-value.py"
