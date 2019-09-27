@@ -187,7 +187,8 @@ class TestLogger(TestCase):
                 mock_config.return_value = level
                 log.configure_logging()
                 output = mock_stdout.getvalue()
-                self.assertIn('The current log level is set below INFO level, it is known that libraries used '
+                self.assertIn(f'The current log level (logLevel={level}) is set below INFO level,'
+                              f' it is known that libraries used '
                               'by this application sometimes log out clinical patient data at DEBUG level. '
                               'The log level provided MUST NOT be used in a production environment.', output)
 
