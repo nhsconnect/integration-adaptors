@@ -17,9 +17,11 @@ def _check_for_insecure_log_level(log_level: str):
     integer_level = logging.getLevelName(log_level)
     if integer_level < logging.INFO:
         logger = IntegrationAdaptorsLogger('INSECURE-LOG-LEVEL')
-        logger.critical('000', 'The current log level is set below INFO level, it is known that libraries used '
-                               'by this application sometimes log out clinical patient data at DEBUG level. '
-                               'The log level provided MUST NOT be used in a production environment.')
+        logger.critical('000',
+                        'The current log level ({logLevel}) is set below INFO level, it is known that libraries used '
+                        'by this application sometimes log out clinical patient data at DEBUG level. '
+                        'The log level provided MUST NOT be used in a production environment.',
+                        {'logLevel': log_level})
 
 
 # Set the logging info globally, make each module get a new logger based on that log ref we provide
