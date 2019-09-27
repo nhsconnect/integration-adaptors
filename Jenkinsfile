@@ -181,7 +181,7 @@ pipeline {
                                 env.OUTBOUND_CA_CERTS = sh (
                                     label: "Obtaining the CA certs to use when validating the outbound load balancer's TLS certificate",
                                     returnStdout: true,
-                                    script: "pipenv run get-secrets-manager-value ${OUTBOUND_CA_CERTS_ARN}"
+                                    script: "AWS_DEFAULT_REGION=eu-west-2 pipenv run get-secrets-manager-value ${OUTBOUND_CA_CERTS_ARN}"
                                 ).trim()
 
                                 // Required for the integration tests to validate outbound load balancer's certificates
