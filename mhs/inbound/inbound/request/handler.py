@@ -7,13 +7,14 @@ import mhs_common.messages.ebxml_envelope as ebxml_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs_common.workflow as workflow
 import tornado.web
+from mhs_common.configuration import configuration_manager
 from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID, \
     CONTENT_TYPE_HEADER_NAME
 from mhs_common.messages.soap_envelope import SoapEnvelope, SoapParsingError
-
 from mhs_common.state import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.state.persistence_adaptor import PersistenceAdaptor
+from mhs_common.workflow import forward_reliable
 from utilities import integration_adaptors_logger as log
 from utilities.timing import time_request
 
@@ -27,13 +28,16 @@ class InboundHandler(tornado.web.RequestHandler):
     workflows: Dict[str, workflow.CommonWorkflow]
 
     def initialize(self, workflows: Dict[str, workflow.CommonWorkflow],
+                   config_manager: configuration_manager.ConfigurationManager,
                    work_description_store: pa.PersistenceAdaptor, party_id: str):
         """Initialise this request handler with the provided dependencies.
         :param workflows:
+        :param config_manager: The object that can be used to obtain interaction details.
         :param work_description_store: The state store
         :param party_id: The party ID of this MHS. Sent in ebXML acknowledgements.
         """
         self.workflows = workflows
+        self.config_manager = config_manager
         self.party_id = party_id
         self.work_description_store = work_description_store
 
@@ -55,11 +59,9 @@ class InboundHandler(tornado.web.RequestHandler):
         try:
             work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
         except wd.EmptyWorkDescriptionError as e:
-            logger.warning('003', 'No work description found in state store with {messageId}',
-                           {'messageId': ref_to_message_id})
-            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
-                                             'received from spine',
-                                        reason="Unknown message reference") from e
+            await self._handle_no_work_description_found_for_request(e, ref_to_message_id, correlation_id,
+                                                                     request_message, received_message)
+            return
 
         message_workflow = self.workflows[work_description.workflow]
         logger.info('004', 'Retrieved work description from state store, forwarding message to {workflow}',
@@ -74,6 +76,53 @@ class InboundHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
                                              ' failed to complete workflow',
                                         reason=f'Exception in workflow') from e
+
+    async def _handle_no_work_description_found_for_request(self, e: wd.EmptyWorkDescriptionError,
+                                                            ref_to_message_id: str, correlation_id: str,
+                                                            request_message:
+                                                            ebxml_request_envelope.EbxmlRequestEnvelope,
+                                                            received_message: str):
+        # Lookup workflow for request
+        interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
+        interaction_details = self.config_manager.get_interaction_details(interaction_id)
+
+        if interaction_details is None:
+            logger.error('006', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
+            raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
+                                        reason=f'Unknown interaction ID: {interaction_id}')
+
+        try:
+            workflow = self.workflows[interaction_details['workflow']]
+        except KeyError as e:
+            logger.error('0008', "Wasn't able to determine workflow for {InteractionId} . This likely is due to a "
+                                 "misconfiguration in interactions.json", {"InteractionId": interaction_id})
+            raise tornado.web.HTTPError(500,
+                                        f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
+                                        reason=f"Couldn't determine workflow to invoke for interaction ID: "
+                                               f"{interaction_id}") from e
+
+        # If it matches forward reliable workflow, then this will be an unsolicited request from another GP system.
+        # So let the workflow handle this.
+        if isinstance(workflow, forward_reliable.AsynchronousForwardReliableWorkflow):
+            logger.info('002', 'Received unsolicited inbound request for the forward-reliable workflow. Passing the '
+                               'request to forward-reliable workflow.')
+            try:
+                await workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id, received_message)
+                self._send_ack(request_message)
+            except Exception as e:
+                logger.error('011', 'Exception in workflow {exception}', {'exception': e})
+                raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
+                                                 ' failed to complete workflow',
+                                            reason=f'Exception in workflow') from e
+
+        # If not, then something has gone wrong
+        else:
+            logger.warning('003', 'No work description found in state store for message with {workflow} , unsolicited '
+                                  'message received unexpectedly from Spine.',
+                           {'workflow': interaction_details['workflow']})
+            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
+                                             'received from Spine',
+                                        reason="Unknown message reference") from e
 
     def _send_ack(self, parsed_message: ebxml_envelope.EbxmlEnvelope):
         logger.info('012', 'Building and sending acknowledgement')
