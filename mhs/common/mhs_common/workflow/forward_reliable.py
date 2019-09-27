@@ -135,12 +135,12 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
                                              "A request has exceeded the maximum number of retries, {max_retries} "
                                              "retries", {"max_retries": num_of_retries})
                             else:
-                                logger.info("0016", "Waiting for {retry_interval} milliseconds before next request "
+                                logger.info("0017", "Waiting for {retry_interval} milliseconds before next request "
                                                     "attempt.", {"retry_interval": retry_interval})
                                 await asyncio.sleep(retry_interval)
                                 continue
                     else:
-                        logger.warning('0017', "Received an unexpected response from Spine",
+                        logger.warning('0018', "Received an unexpected response from Spine",
                                        {'HTTPStatus': response.code})
                         parsed_response = "Didn't get expected response from Spine"
 
@@ -148,7 +148,7 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
                                                     wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
                     await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
                 except ET.ParseError as pe:
-                    logger.warning('0010', 'Unable to parse response from Spine. {Exception}',
+                    logger.warning('0019', 'Unable to parse response from Spine. {Exception}',
                                    {'Exception': repr(pe)})
                     parsed_response = 'Unable to handle response returned from Spine'
                     self._record_outbound_audit_log(timing.get_time(), start_time,
@@ -216,7 +216,36 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
     def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str, attachments: list):
-        pass
+        logger.info('0005', 'Entered async forward reliable workflow to handle unsolicited inbound message')
+        work_description = wd.create_new_work_description(self.persistence_store, message_id, workflow.FORWARD_RELIABLE,
+                                                          wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
+
+        retries_remaining = self.inbound_queue_max_retries
+        while True:
+            try:
+                await self.queue_adaptor.send_async(payload, properties={'message-id': message_id,
+                                                                         'correlation-id': correlation_id})
+                break
+            except Exception as e:
+                logger.warning('0006', 'Failed to put unsolicited message onto inbound queue due to {Exception}',
+                               {'Exception': e})
+                retries_remaining -= 1
+                if retries_remaining <= 0:
+                    logger.error("0020",
+                                 "Exceeded the maximum number of retries, {max_retries} retries, when putting "
+                                 "unsolicited message onto inbound queue",
+                                 {"max_retries": self.inbound_queue_max_retries})
+                    await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
+                    raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
+                                             'been exceeded') from e
+
+                logger.info("0021", "Waiting for {retry_delay} seconds before retrying putting unsolicited message "
+                                    "onto inbound queue", {"retry_delay": self.inbound_queue_retry_delay})
+                await asyncio.sleep(self.inbound_queue_retry_delay)
+
+        logger.audit('0022', 'Forward reliable workflow invoked for inbound unsolicited request. '
+                             'Message placed onto inbound queue. ')
+        await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         pass
