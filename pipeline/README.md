@@ -215,10 +215,12 @@ queue.
 `CLIENT_CERT_ARN`
 - CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented by
 incoming connections to the MHS.
-- ROUTE_CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented by
-the Spine Route Lookup service.
 - OUTBOUND_ALB_CERT_ARN: The ARN (in AWS Certificate Manager) of the certificates the outbound ALB should present.
 - ROUTE_ALB_CERT_ARN: The ARN (in AWS Certificate Manager) of the certificates the outbound ALB should present.
+- ROUTE_CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented by
+the Spine Route Lookup service.
+- OUTBOUND_CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented
+by the outbound service's load balancer.
 - SPINE_ORG_CODE: The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
 - SPINEROUTELOOKUP_SERVICE_LDAP_URL: The URL the Spine Route Lookup service should use to communicate with SDS.
 e.g. `ldaps://example.com`

@@ -170,6 +170,23 @@ pipeline {
                                 ).trim()
                             }
                         }
+
+                        dir('pipeline/scripts/aws-tools') {
+                            script {
+                                sh (
+                                    label: 'Installing dependencies required for the AWS tools',
+                                    script: "pipenv install"
+                                )
+                                env.OUTBOUND_CA_CERTS = sh (
+                                    label: 'Obtaining the CA certs to use when validating the outbound load balancer's TLS certificate',
+                                    returnStdout: true,
+                                    script: "pipenv run get-secrets-manager-value ${OUTBOUND_CA_CERTS_ARN}"
+                                ).trim()
+
+                                // Required for the integration tests to validate outbound load balancer's certificates
+                                env.REQUESTS_CA_BUNDLE = env.OUTBOUND_CA_CERTS
+                            }
+                        }
                     }
                 }
 
@@ -205,7 +222,6 @@ pipeline {
 
                             // Wait for MHS load balancers to have healthy targets
                             dir('../../pipeline/scripts/aws-tools') {
-                                sh script: 'pipenv install'
                                 timeout(13) {
                                     waitUntil {
                                         script {

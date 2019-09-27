@@ -9,9 +9,8 @@ import unittest
 import uuid
 
 import requests
-from requests import Response
-
 from integration_tests.helpers.asid_provider import get_asid
+from requests import Response
 
 
 class MhsHttpRequestBuilder(object):
@@ -64,7 +63,7 @@ class MhsHttpRequestBuilder(object):
         Asserts the response is successful.
         :return: self
         """
-        response = requests.post(self.mhs_host, headers=self.headers, data=self.body, verify=False)
+        response = requests.post(self.mhs_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')
