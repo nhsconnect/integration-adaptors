@@ -43,7 +43,7 @@ SDK, HTML docs) using various OpenAPI tools available online. For example:
 
 ```bash
 pipenv run generate-openapi-docs > test.json
-docker run --rm -v ~${PWD}:/local  openapitools/openapi-generator-cli generate -g html -i /local/test.json -o /local/out/html
+docker run --rm -v ${PWD}:/local  openapitools/openapi-generator-cli generate -g html -i /local/test.json -o /local/out/html
 ```
 
 generates HTML docs. An invocation of this command can be seen
