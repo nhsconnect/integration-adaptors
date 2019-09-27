@@ -144,21 +144,3 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         mock_correlation_id.set.assert_called_with(CORRELATION_ID)
         log.inbound_message_id.set.assert_called_with('C614484E-4B10-499A-9ACD-5D645CFACF61')
         mock_message_id.set.assert_called_with(REF_TO_MESSAGE_ID)
-
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_receive_sync_message(self, mock_get_uuid, mock_get_timestamp):
-        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
-        mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        expected_sync_response = file_utilities.FileUtilities.get_file_string(
-            str(self.message_dir / EXPECTED_SYNC_RESPONSE_FILE))
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
-
-        sync_response = self.fetch("/", method="POST", body=request_body, headers=SYNC_CONTENT_TYPE_HEADERS)
-
-        self.assertEqual(sync_response.code, 200)
-        self.assertEqual(sync_response.headers["Content-Type"], "text/xml")
-        xml_utilities.XmlUtilities.assert_xml_equal(expected_sync_response, sync_response.body)
-        self.mock_workflow.handle_inbound_message.assert_called_once_with(REF_TO_MESSAGE_ID, CORRELATION_ID,
-                                                                          unittest.mock.ANY, EXPECTED_MESSAGE)
-
