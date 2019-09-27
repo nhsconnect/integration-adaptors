@@ -203,5 +203,7 @@ incoming connections to the MHS.
 - SPINE_ORG_CODE: The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
 - SPINEROUTELOOKUP_SERVICE_LDAP_URL: The URL the Spine Route Lookup service should use to communicate with SDS.
 e.g. `ldaps://example.com`
+- SPINEROUTELOOKUP_SERVICE_SEARCH_BASE: The LDAP location the Spine Route Lookup service should use as the base of its
+searches when querying SDS. e.g. `ou=services,o=nhs`. This value should not contain whitespace.
 - SPINEROUTELOOKUP_SERVICE_DISABLE_TLS: An optional flag. If set to exactly `True`, TLS will be disabled for SDS
 requests.

@@ -10,6 +10,8 @@ SERVER_INFO_PATH = str(MHS_TEST_DATA_PATH / 'my_real_server_info.json')
 SCHEMA_PATH = str(MHS_TEST_DATA_PATH / 'my_real_server_schema.json')
 SERVER_ENTRIES_PATH = str(MHS_TEST_DATA_PATH / 'my_real_server_entries.json')
 
+NHS_SERVICES_BASE = "ou=services,o=nhs"
+
 
 def fake_ldap_connection() -> ldap3.Connection:
     fake_server = ldap3.Server.from_definition('my_fake_server',
@@ -28,4 +30,4 @@ def fake_ldap_connection() -> ldap3.Connection:
 
 
 def mocked_sds_client():
-    return sds_client.SDSClient(fake_ldap_connection())
+    return sds_client.SDSClient(fake_ldap_connection(), NHS_SERVICES_BASE)

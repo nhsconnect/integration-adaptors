@@ -70,13 +70,12 @@ class TestRedisCache(unittest.TestCase):
         self.assertIsNone(value)
 
     @async_test
-    async def test_should_return_none_if_fails_to_retrieve_value(self):
+    async def test_should_raise_exception_if_fails_to_retrieve_value(self):
         cache = redis_cache.RedisCache(REDIS_HOST, REDIS_PORT)
         self.mock_redis.get.side_effect = redis.RedisError
 
-        value = await cache.retrieve_mhs_attributes_value(ODS_CODE, INTERACTION_ID)
-
-        self.assertIsNone(value)
+        with (self.assertRaises(redis.RedisError)):
+            await cache.retrieve_mhs_attributes_value(ODS_CODE, INTERACTION_ID)
 
     @async_test
     async def test_should_store_value_as_json(self):
@@ -97,13 +96,12 @@ class TestRedisCache(unittest.TestCase):
         self.mock_redis.setex.assert_called_with(CACHE_KEY, custom_expiry_time, VALUE_DICTIONARY_JSON)
 
     @async_test
-    async def test_store_should_not_propagate_redis_error_to_caller(self):
+    async def test_store_should_propagate_redis_error_to_caller(self):
         cache = redis_cache.RedisCache(REDIS_HOST, REDIS_PORT)
         self.mock_redis.setex.side_effect = redis.RedisError()
 
-        await cache.add_cache_value(ODS_CODE, INTERACTION_ID, VALUE_DICTIONARY)
-
-        # Call successful, no error raised.
+        with self.assertRaises(redis.RedisError):
+            await cache.add_cache_value(ODS_CODE, INTERACTION_ID, VALUE_DICTIONARY)
 
     @async_test
     async def test_should_only_accept_positive_expiry_times(self):
