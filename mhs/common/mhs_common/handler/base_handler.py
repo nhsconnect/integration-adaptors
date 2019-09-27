@@ -32,7 +32,7 @@ class BaseHandler(tornado.web.RequestHandler):
         try:
             wf = self.workflows[interaction_details['workflow']]
         except KeyError as e:
-            logger.error('0008', "Wasn't able to determine workflow for {InteractionId} . This likely is due to a "
+            logger.error('0001', "Wasn't able to determine workflow for {InteractionId} . This likely is due to a "
                                  "misconfiguration in interactions.json", {"InteractionId": interaction_id})
             raise tornado.web.HTTPError(500,
                                         f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
@@ -44,7 +44,7 @@ class BaseHandler(tornado.web.RequestHandler):
         interaction_details = self.config_manager.get_interaction_details(interaction_id)
 
         if interaction_details is None:
-            logger.error('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
+            logger.error('0002', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
             raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
                                         reason=f'Unknown interaction ID: {interaction_id}')
 
