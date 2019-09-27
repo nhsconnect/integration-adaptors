@@ -83,46 +83,39 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
 
         if response.code == 202:
-            end_time = timing.get_time()
-            self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+            self._record_outbound_audit_log(
+                message_id,
+                interaction_details['action'],
+                start_time=start_time,
+                end_time=timing.get_time(),
+                acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
                                                 self.store_retries)
             return response.code, '', None
         else:
-            try:
-                parsed_body = ET.fromstring(response.body)
+            parsed_response = self._parse_soap_error_response(response)
 
-                if EbxmlErrorEnvelope.is_ebxml_error(parsed_body):
-                    _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
-                                                                          response.headers,
-                                                                          response.body)
-                    logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
-                                   {'HTTPStatus': response.code, 'Errors': parsed_response})
-                elif SOAPFault.is_soap_fault(parsed_body):
-                    _, parsed_response, _ = handle_soap_error(response.code,
-                                                              response.headers,
-                                                              response.body)
-                    logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
-                                   {'HTTPStatus': response.code, 'Errors': parsed_response})
-                else:
-                    logger.warning('0009', "Received an unexpected response from Spine",
-                                   {'HTTPStatus': response.code})
-                    parsed_response = "Didn't get expected response from Spine"
-
-                self._record_outbound_audit_log(timing.get_time(), start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            except ET.ParseError as pe:
-                logger.warning('0010', 'Unable to parse response from Spine. {Exception}', {'Exception': repr(pe)})
-                parsed_response = 'Unable to handle response returned from Spine'
+            self._record_outbound_audit_log(
+                message_id,
+                interaction_details['action'],
+                start_time=start_time,
+                end_time=timing.get_time(),
+                acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
             return 500, parsed_response, None
 
-    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0011', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
+    def _record_outbound_audit_log(self,
+                                   message_id,
+                                   interaction_id,
+                                   start_time, end_time,
+                                   acknowledgment):
+        logger.audit('0011', 'Async-Express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
+                             '{Message-ID} {Interaction-ID} {RequestSentTime} {AcknowledgmentReceivedTime}',
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment})
+                      'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
 
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key, cpa_id):
@@ -142,6 +135,32 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         logger.info('0003', 'Message serialised successfully')
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
+
+    def _parse_soap_error_response(self, response):
+        try:
+            parsed_body = ET.fromstring(response.body)
+
+            if EbxmlErrorEnvelope.is_ebxml_error(parsed_body):
+                _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
+                                                                      response.headers,
+                                                                      response.body)
+                logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
+                               {'HTTPStatus': response.code, 'Errors': parsed_response})
+            elif SOAPFault.is_soap_fault(parsed_body):
+                _, parsed_response, _ = handle_soap_error(response.code,
+                                                          response.headers,
+                                                          response.body)
+                logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
+                               {'HTTPStatus': response.code, 'Errors': parsed_response})
+            else:
+                logger.warning('0009', "Received an unexpected response from Spine",
+                               {'HTTPStatus': response.code})
+                parsed_response = "Didn't get expected response from Spine"
+        except ET.ParseError as pe:
+            logger.warning('0010', 'Unable to parse response from Spine. {Exception}', {'Exception': repr(pe)})
+            parsed_response = 'Unable to handle response returned from Spine'
+
+        return parsed_response
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
