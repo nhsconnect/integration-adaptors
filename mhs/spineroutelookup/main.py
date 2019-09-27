@@ -26,10 +26,11 @@ def load_cache_implementation():
     return redis_cache.RedisCache(redis_host, redis_port, cache_expiry_time, use_tls)
 
 
-def initialise_routing(sds_url: str, tls: bool = True) -> routing_reliability.RoutingAndReliability:
+def initialise_routing(sds_url: str, search_base: str, tls: bool = True) -> routing_reliability.RoutingAndReliability:
     """Initialise the routing and reliability component to be used for SDS queries.
 
     :param sds_url: The URL to communicate with SDS on.
+    :param search_base: The LDAP location to use as the base of SDS searched. e.g. ou=services,o=nhs.
     :param tls: A flag to indicate whether TLS should be enabled for the SDS connection.
     :return:
     """
@@ -49,7 +50,7 @@ def initialise_routing(sds_url: str, tls: bool = True) -> routing_reliability.Ro
     else:
         sds_connection = sds_connection_factory.build_sds_connection(ldap_address=sds_url)
 
-    client = sds_client.SDSClient(sds_connection)
+    client = sds_client.SDSClient(sds_connection, search_base)
     attribute_lookup = mhs_attribute_lookup.MHSAttributeLookup(client=client, cache=cache)
     routing = routing_reliability.RoutingAndReliability(attribute_lookup)
     return routing
@@ -82,8 +83,9 @@ def main():
     sds_url = config.get_config("SDS_URL")
     disable_tls_flag = config.get_config("DISABLE_SDS_TLS", None)
     use_tls = disable_tls_flag != "True"
+    search_base = config.get_config("SDS_SEARCH_BASE")
 
-    routing = initialise_routing(sds_url=sds_url, tls=use_tls)
+    routing = initialise_routing(sds_url=sds_url, search_base=search_base, tls=use_tls)
     start_tornado_server(routing)
 
 

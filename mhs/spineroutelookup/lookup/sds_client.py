@@ -11,8 +11,6 @@ import lookup.sds_exception as sds_exception
 
 logger = log.IntegrationAdaptorsLogger('SRL_CLIENT')
 
-NHS_SERVICES_BASE = "ou=services,o=nhs"
-
 MHS_OBJECT_CLASS = "nhsMhs"
 AS_OBJECT_CLASS = "nhsAs"
 MHS_PARTY_KEY = 'nhsMHSPartyKey'
@@ -29,15 +27,21 @@ mhs_attributes = [
 class SDSClient(object):
     """A client that can be used to query SDS."""
 
-    def __init__(self, sds_connection: ldap3.Connection, timeout: int = 3):
+    def __init__(self, sds_connection: ldap3.Connection, search_base: str, timeout: int = 3):
         """
         :param sds_connection: takes an ldap connection to the sds server
+        :param search_base: The LDAP location to use as the base of SDS searches. e.g. ou=services,o=nhs.
+        :param timeout The amount of time to wait for an LDAP query to complete.
         """
         if not sds_connection:
             raise ValueError('sds_connection must not be null')
 
+        if not search_base:
+            raise ValueError('search_base must be specified')
+
         self.connection = sds_connection
         self.timeout = timeout
+        self.search_base = search_base
 
     async def get_mhs_details(self, ods_code: str, interaction_id: str) -> Dict:
         """
@@ -86,7 +90,7 @@ class SDSClient(object):
 
         search_filter = f"(&(nhsIDCode={ods_code}) (objectClass={AS_OBJECT_CLASS}) (nhsAsSvcIA={interaction_id}))"
 
-        message_id = self.connection.search(search_base=NHS_SERVICES_BASE,
+        message_id = self.connection.search(search_base=self.search_base,
                                             search_filter=search_filter,
                                             attributes=[MHS_PARTY_KEY, MHS_ASID])
         logger.info("0005", "{message_id} - for query: {ods_code} {interaction_id}",
@@ -106,7 +110,7 @@ class SDSClient(object):
         search_filter = f"(&(objectClass={MHS_OBJECT_CLASS})" \
             f" ({MHS_PARTY_KEY}={party_key})" \
             f" (nhsMhsSvcIA={interaction_id}))"
-        message_id = self.connection.search(search_base=NHS_SERVICES_BASE,
+        message_id = self.connection.search(search_base=self.search_base,
                                             search_filter=search_filter,
                                             attributes=mhs_attributes)
 
