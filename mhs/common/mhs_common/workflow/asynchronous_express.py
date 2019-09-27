@@ -50,7 +50,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                       correlation_id: str,
                                       interaction_details: dict,
                                       payload: str,
-                                      wdo: Optional[wd.WorkDescription])\
+                                      wdo: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
@@ -112,7 +112,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                    interaction_id,
                                    start_time, end_time,
                                    acknowledgment):
-        logger.audit('0011', 'Async-Express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
+        logger.audit('0011', 'Async-Express outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
+                             'received. '
                              '{Message-ID} {Interaction-ID} {RequestSentTime} {AcknowledgmentReceivedTime}',
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
@@ -171,6 +172,20 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
                                             self.store_retries)
 
+        logger.audit('0011', 'Async-Express inbound workflow invoked. Message received from spine '
+                             '{Message-ID} {Time} ',
+                     {'Time': timing.get_time(), 'Message-ID': message_id})
+
+        await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, payload)
+
+        logger.info('0015', 'Placed message onto inbound queue successfully')
+        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+
+    async def _publish_message_to_inbound_queue(self,
+                                                message_id: str,
+                                                correlation_id: str,
+                                                work_description: wd.WorkDescription,
+                                                payload: str):
         retries_remaining = self.inbound_queue_max_retries
         while True:
             try:
@@ -191,9 +206,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                 logger.info("0014", "Waiting for {retry_delay} seconds before retrying putting message onto inbound "
                                     "queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
-
-        logger.info('0015', 'Placed message onto inbound queue successfully')
-        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         pass
