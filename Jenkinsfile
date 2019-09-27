@@ -141,7 +141,7 @@ pipeline {
                                 env.MHS_ADDRESS = sh (
                                     label: 'Obtaining outbound LB DNS name',
                                     returnStdout: true,
-                                    script: "echo \"https://$(terraform output outbound_lb_domain_name)\""
+                                    script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
                                 ).trim()
                                 env.MHS_OUTBOUND_TARGET_GROUP = sh (
                                     label: 'Obtaining outbound LB target group ARN',
