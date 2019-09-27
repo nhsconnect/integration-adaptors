@@ -5,7 +5,7 @@ from tornado.options import parse_command_line
 
 
 class MainHandler(tornado.web.RequestHandler):
-    async def get(self):
+    async def post(self):
         self.write("Hello, world")
 
 
@@ -20,5 +20,5 @@ if __name__ == "__main__":
 
     application = build_application()
     server = tornado.httpserver.HTTPServer(application)
-    server.listen(80)
+    server.listen(443)
     tornado.ioloop.IOLoop.current().start()

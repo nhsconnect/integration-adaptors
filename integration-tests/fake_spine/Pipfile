@@ -12,4 +12,4 @@ tornado = "*"
 python_version = "3.7"
 
 [scripts]
-start = "python fake_spineroutelookup/main.py"
+start = "python fake_spine/main.py"
