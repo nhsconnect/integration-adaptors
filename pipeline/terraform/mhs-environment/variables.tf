@@ -6,7 +6,7 @@ variable "region" {
 
 variable "environment_id" {
   type = string
-  description = "An ID used to identify the environment being deployed by this configuration."
+  description = "An ID used to identify the environment being deployed by this configuration. As this is used as a prefix for the names of most resources this should be kept to 10 characters or less."
 }
 
 variable "build_id" {
