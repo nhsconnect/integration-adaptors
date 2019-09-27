@@ -8,10 +8,10 @@ import tornado.web
 import utilities.config as config
 import utilities.integration_adaptors_logger as log
 from comms import proton_queue_adaptor
-from mhs_common import workflow, certs
+from mhs_common import workflow
 from mhs_common.request import healthcheck_handler
 from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
-from utilities import secrets
+from utilities import secrets, certs
 
 import inbound.request.handler as async_request_handler
 

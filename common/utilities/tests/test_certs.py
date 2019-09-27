@@ -2,7 +2,7 @@ import pathlib
 import tempfile
 import unittest
 
-from mhs_common import certs
+from utilities import certs
 
 _TEST_FILE_CONTENTS = 'test-file-contents'
 

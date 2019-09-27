@@ -7,13 +7,13 @@ import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-import utilities.config as config
 import utilities.integration_adaptors_logger as log
-from mhs_common import workflow, certs
+from mhs_common import workflow
 from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
+from utilities import config, certs
 from utilities import secrets
 
 import outbound.request.synchronous.handler as client_request_handler

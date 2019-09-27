@@ -1,7 +1,7 @@
 import ssl
 
 import ldap3
-from mhs_common import certs
+from utilities import certs
 
 import definitions
 
