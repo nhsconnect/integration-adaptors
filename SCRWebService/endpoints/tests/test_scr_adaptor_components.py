@@ -1,14 +1,14 @@
 """A set of component tests that ties multiple parts of the SCR Adaptor together"""
 import json
 import pathlib
-from scr import gp_summary_upload
-from utilities import file_utilities, test_utilities, xml_utilities
-from utilities.file_utilities import FileUtilities
+from unittest import mock
 
-from definitions import ROOT_DIR
+from scr import gp_summary_upload
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
-from unittest import mock
+from utilities import file_utilities, test_utilities, xml_utilities
+
+from definitions import ROOT_DIR
 from endpoints import summary_care_record
 from message_handling import message_sender, message_forwarder
 
@@ -54,11 +54,11 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
                    body=json.dumps(body))
 
         # Assert
-        body_call_value = request_mock.call_args[1]['body']
+        body_call_value = json.loads(request_mock.call_args[1]['body'])
         call_method = request_mock.call_args[1]['method']
         url_method = request_mock.call_args[1]['url']
 
-        xml_utilities.XmlUtilities.assert_xml_equal(body_call_value, expected_message)
+        xml_utilities.XmlUtilities.assert_xml_equal(body_call_value['payload'], expected_message)
         self.assertEqual(call_method, 'POST')
         self.assertEqual(url_method, self.address)
 
@@ -82,6 +82,19 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
         self.assertEqual(response.code, 400)
         self.assertIn('No interaction-name header provided', response.body.decode())
+
+    @mock.patch('comms.common_https.CommonHttps.make_request')
+    def test_application_json_content_type_is_passed_to_mhs(self, request_mock):
+        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+
+        request_mock.return_value = test_utilities.awaitable("Response message")
+
+        self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
+                   headers={INTERACTION_NAME: GP_SUMMARY_UPLOAD_NAME},
+                   body=json.dumps(body))
+
+        content_type_header = request_mock.call_args[1]['headers']['Content-Type']
+        self.assertEqual(content_type_header, "application/json")
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_correlation_id_is_passed_to_mhs_if_provided_to_scr_adaptor(self, request_mock):

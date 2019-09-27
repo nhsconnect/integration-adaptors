@@ -69,6 +69,7 @@ def time_request(func):
     mainly holds as a placeholder if any extra data is required from the call
     """
     if inspect.iscoroutinefunction(func):
+        @wraps(func)
         async def method_wrapper(*args, **kwargs):
             handler = args[0]
             stopwatch = _begin_stopwatch()
@@ -82,6 +83,7 @@ def time_request(func):
 
         return method_wrapper
     else:
+        @wraps(func)
         def method_wrapper(*args, **kwargs):
             handler = args[0]
             stopwatch = _begin_stopwatch()
