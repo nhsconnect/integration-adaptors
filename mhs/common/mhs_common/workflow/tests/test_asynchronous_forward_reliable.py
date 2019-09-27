@@ -73,7 +73,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.workflow = forward_reliable.TestForwardReliableWorkflow(party_key=FROM_PARTY_KEY,
+        self.workflow = forward_reliable.AsynchronousForwardReliableWorkflow(party_key=FROM_PARTY_KEY,
                                                                    persistence_store=self.mock_persistence_store,
                                                                    transmission=self.mock_transmission_adaptor,
                                                                    queue_adaptor=self.mock_queue_adaptor,
@@ -85,14 +85,14 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
     def test_construct_workflow_with_only_outbound_params(self):
-        workflow = forward_reliable.TestForwardReliableWorkflow(party_key=mock.sentinel.party_key,
+        workflow = forward_reliable.AsynchronousForwardReliableWorkflow(party_key=mock.sentinel.party_key,
                                                               persistence_store=mock.sentinel.persistence_store,
                                                               transmission=mock.sentinel.transmission,
                                                               routing=self.mock_routing_reliability)
         self.assertIsNotNone(workflow)
 
     def test_construct_workflow_with_only_inbound_params(self):
-        workflow = forward_reliable.TestForwardReliableWorkflow(queue_adaptor=mock.sentinel.queue_adaptor,
+        workflow = forward_reliable.AsynchronousForwardReliableWorkflow(queue_adaptor=mock.sentinel.queue_adaptor,
                                                               inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
                                                               inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
         self.assertIsNotNone(workflow)
@@ -122,9 +122,10 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                                         ebxml_envelope.CPA_ID: CPA_ID}
         expected_interaction_details.update(INTERACTION_DETAILS)
 
-        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
-                                                                         INTERACTION_DETAILS,
-                                                                         PAYLOAD, None)
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                             INTERACTION_DETAILS,
+                                                                             PAYLOAD, None)
 
         self.assertEqual(202, status)
         self.assertEqual('', message)
@@ -143,8 +144,9 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @mock.patch.object(forward_reliable, 'logger')
+    @mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest')
     @async_test
-    async def test_handle_outbound_doesnt_overwrite_work_description(self, log_mock, wdo_mock):
+    async def test_handle_outbound_doesnt_overwrite_work_description(self, log_mock, wdo_mock, config):
         response = mock.MagicMock()
         response.code = 202
 
@@ -181,9 +183,10 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.side_effect = Exception()
 
-        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
-                                                                         INTERACTION_DETAILS,
-                                                                         PAYLOAD, None)
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                             INTERACTION_DETAILS,
+                                                                             PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
@@ -226,9 +229,10 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
-                                                                         INTERACTION_DETAILS,
-                                                                         PAYLOAD, None)
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                             INTERACTION_DETAILS,
+                                                                             PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertTrue('description=System failure to process message' in message)
@@ -252,9 +256,10 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         response.body = '<a></a>'
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
-                                                                         INTERACTION_DETAILS,
-                                                                         PAYLOAD, None)
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                             INTERACTION_DETAILS,
+                                                                             PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertEqual("Didn't get expected response from Spine", message)
@@ -307,8 +312,9 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
-                                                                         INTERACTION_DETAILS, PAYLOAD, None)
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                             INTERACTION_DETAILS, PAYLOAD, None)
 
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
@@ -340,9 +346,10 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
-                                                                         INTERACTION_DETAILS,
-                                                                         PAYLOAD, None)
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                             INTERACTION_DETAILS,
+                                                                             PAYLOAD, None)
 
         self.assertEqual(500, status)
         self.assertTrue('Error when converting retry interval' in message)
@@ -373,17 +380,19 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                     response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
                     self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-                    status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID,
-                                                                                     CORRELATION_ID,
-                                                                                     INTERACTION_DETAILS,
-                                                                                     PAYLOAD, None)
+                    with mock.patch('utilities.config.get_config',
+                                    return_value='localhost/reliablemessaging/queryrequest'):
+                        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID,
+                                                                                         CORRELATION_ID,
+                                                                                         INTERACTION_DETAILS,
+                                                                                         PAYLOAD, None)
 
                     self.assertEqual(self.mock_transmission_adaptor.make_request.call_count, 3)
                 finally:
                     self.mock_transmission_adaptor.make_request.reset_mock()
 
     @async_test
-    async def test_soap_error_request_is_non_retriable(self,):
+    async def test_soap_error_request_is_non_retriable(self):
         self.setup_mock_work_description()
         self._setup_routing_mock()
 
@@ -401,10 +410,11 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                 response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
                 self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-                status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID,
-                                                                                 CORRELATION_ID,
-                                                                                 INTERACTION_DETAILS,
-                                                                                 PAYLOAD, None)
+                with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+                    status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID,
+                                                                                     CORRELATION_ID,
+                                                                                     INTERACTION_DETAILS,
+                                                                                     PAYLOAD, None)
 
                 self.mock_transmission_adaptor.make_request.assert_called_once()
 
