@@ -120,8 +120,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
         self.assertEqual(response.code, 500)
-        expected = '<html><title>500: Exception in workflow</title><body>500: Exception in workflow</body></html>'
-        self.assertEqual(response.body.decode('utf-8'), expected)
+        self.assertEqual('500: Exception in workflow', response.body.decode())
 
     def test_no_reference_to_id(self):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / NO_REF_FILE))
@@ -155,10 +154,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
         self.assertEqual(response.code, 500)
-        message = response.body.decode('utf-8')
-        self.assertEqual(
-            message,
-            '<html><title>500: Unknown message reference</title><body>500: Unknown message reference</body></html>')
+        self.assertEqual('500: Unknown message reference', response.body.decode())
 
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")

@@ -8,6 +8,7 @@ import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs_common.workflow as workflow
 import tornado.web
 from mhs_common.configuration import configuration_manager
+from mhs_common.handler import base_handler
 from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID, \
     CONTENT_TYPE_HEADER_NAME
 from mhs_common.messages.soap_envelope import SoapEnvelope, SoapParsingError
@@ -21,7 +22,7 @@ from utilities.timing import time_request
 logger = log.IntegrationAdaptorsLogger('INBOUND_HANDLER')
 
 
-class InboundHandler(tornado.web.RequestHandler):
+class InboundHandler(base_handler.BaseHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a remote MHS."""
     work_description_store: PersistenceAdaptor
     party_id: str
@@ -36,8 +37,7 @@ class InboundHandler(tornado.web.RequestHandler):
         :param work_description_store: The state store
         :param party_id: The party ID of this MHS. Sent in ebXML acknowledgements.
         """
-        self.workflows = workflows
-        self.config_manager = config_manager
+        super().initialize(workflows, config_manager)
         self.party_id = party_id
         self.work_description_store = work_description_store
 
@@ -84,36 +84,14 @@ class InboundHandler(tornado.web.RequestHandler):
                                                             received_message: str):
         # Lookup workflow for request
         interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
-        interaction_details = self.config_manager.get_interaction_details(interaction_id)
-
-        if interaction_details is None:
-            logger.error('006', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
-            raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
-                                        reason=f'Unknown interaction ID: {interaction_id}')
-
-        try:
-            workflow = self.workflows[interaction_details['workflow']]
-        except KeyError as e:
-            logger.error('0008', "Wasn't able to determine workflow for {InteractionId} . This likely is due to a "
-                                 "misconfiguration in interactions.json", {"InteractionId": interaction_id})
-            raise tornado.web.HTTPError(500,
-                                        f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
-                                        reason=f"Couldn't determine workflow to invoke for interaction ID: "
-                                               f"{interaction_id}") from e
+        interaction_details = self._get_interaction_details(interaction_id)
+        message_workflow = self._extract_default_workflow(interaction_details, interaction_id)
 
         # If it matches forward reliable workflow, then this will be an unsolicited request from another GP system.
         # So let the workflow handle this.
-        if isinstance(workflow, forward_reliable.AsynchronousForwardReliableWorkflow):
-            logger.info('002', 'Received unsolicited inbound request for the forward-reliable workflow. Passing the '
-                               'request to forward-reliable workflow.')
-            try:
-                await workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id, received_message)
-                self._send_ack(request_message)
-            except Exception as e:
-                logger.error('011', 'Exception in workflow {exception}', {'exception': e})
-                raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
-                                                 ' failed to complete workflow',
-                                            reason=f'Exception in workflow') from e
+        if isinstance(message_workflow, forward_reliable.AsynchronousForwardReliableWorkflow):
+            await self.handle_forward_reliable_unsolicited_request(correlation_id, message_workflow, received_message,
+                                                                   ref_to_message_id, request_message)
 
         # If not, then something has gone wrong
         else:
@@ -123,6 +101,17 @@ class InboundHandler(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
                                              'received from Spine',
                                         reason="Unknown message reference") from e
+
+    async def handle_forward_reliable_unsolicited_request(self, correlation_id: str, forward_reliable_workflow: workflow.AsynchronousForwardReliableWorkflow, received_message: str, ref_to_message_id: str, request_message: ebxml_request_envelope.EbxmlRequestEnvelope):
+        logger.info('002', 'Received unsolicited inbound request for the forward-reliable workflow. Passing the '
+                           'request to forward-reliable workflow.')
+        try:
+            await forward_reliable_workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id, received_message)
+            self._send_ack(request_message)
+        except Exception as e:
+            logger.error('011', 'Exception in workflow {exception}', {'exception': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
+                                        reason=f'Exception in workflow') from e
 
     def _send_ack(self, parsed_message: ebxml_envelope.EbxmlEnvelope):
         logger.info('012', 'Building and sending acknowledgement')
