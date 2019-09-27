@@ -5,3 +5,8 @@ services:
     build: ./integration-tests/fake_spineroutelookup
     ports:
       - "8080:80"
+
+  fakespine:
+    build: ./integration-tests/fake_spine
+    ports:
+      - "8081:80"
