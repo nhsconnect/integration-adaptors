@@ -194,7 +194,7 @@ class TestLogger(TestCase):
     @patch('utilities.config.get_config')
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_should_not_log_critical_message_if_log_level_is_above_debug(self, mock_stdout, mock_config):
-        safe_log_levels = ['INFO', 'AUDIT', 'WARNING', 'CRITICAL']
+        safe_log_levels = ['INFO', 'AUDIT', 'WARNING', 'ERROR', 'CRITICAL']
         for level in safe_log_levels:
             with self.subTest(f'Log level {level} should not result in critical log message being logged out'):
                 mock_config.return_value = level
