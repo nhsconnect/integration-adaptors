@@ -178,3 +178,26 @@ class TestLogger(TestCase):
         time_value = output.split('[')[1].split(']')[0]
         time.strptime(time_value, '%Y-%m-%dT%H:%M:%S.%fZ')
 
+    @patch('utilities.config.get_config')
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_should_log_critical_message_if_log_level_is_below_info(self, mock_stdout, mock_config):
+        unsafe_log_levels = ['NOTSET', 'DEBUG']
+        for level in unsafe_log_levels:
+            with self.subTest(f'Log level {level} should result in critical log message being logged out'):
+                mock_config.return_value = level
+                log.configure_logging()
+                output = mock_stdout.getvalue()
+                self.assertIn('The current log level is set below INFO level, it is known that libraries used '
+                              'by this application sometimes log out clinical patient data at DEBUG level. '
+                              'The log level provided MUST NOT be used in a production environment.', output)
+
+    @patch('utilities.config.get_config')
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_should_not_log_critical_message_if_log_level_is_above_debug(self, mock_stdout, mock_config):
+        unsafe_log_levels = ['INFO', 'AUDIT', 'WARNING', 'CRITICAL']
+        for level in unsafe_log_levels:
+            with self.subTest(f'Log level {level} should not result in critical log message being logged out'):
+                mock_config.return_value = level
+                log.configure_logging()
+                output = mock_stdout.getvalue()
+                self.assertEqual('', output)

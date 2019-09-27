@@ -13,8 +13,9 @@ correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlatio
 inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
 
 
-def _check_for_insecure_log_level(log_level: int):
-    if log_level < logging.INFO:
+def _check_for_insecure_log_level(log_level: str):
+    integer_level = logging.getLevelName(log_level)
+    if integer_level < logging.INFO:
         logger = IntegrationAdaptorsLogger('INSECURE-LOG-LEVEL')
         logger.critical('000', 'The current log level is set below INFO level, it is known that libraries used '
                                'by this application sometimes log out clinical patient data at DEBUG level. '
