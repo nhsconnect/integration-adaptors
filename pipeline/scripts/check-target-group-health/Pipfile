@@ -12,4 +12,4 @@ boto3 = "*"
 python_version = "3.7"
 
 [scripts]
-check-target-group-health = "python main.py"
+main = "python main.py"
