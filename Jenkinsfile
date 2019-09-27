@@ -31,7 +31,12 @@ pipeline {
             steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
         }
         stage('MHS Outbound Unit Tests') {
-            steps { dir('mhs/outbound') { executeUnitTestsWithCoverage() } }
+            steps {
+                dir('mhs/outbound') {
+                    executeUnitTestsWithCoverage()
+                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+                }
+            }
         }
          stage('Spine Route Lookup Unit Tests') {
             steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
@@ -50,14 +55,28 @@ pipeline {
         }
 
         stage('Run Component Tests') {
+            options {
+                lock('local-docker-compose-environment')
+            }
             stages {
+                stage('Deploy component locally') {
+                    steps {
+                        sh label: 'Building local images', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build'
+                        sh label: 'Composing up local services', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up > compose-logs.txt &'
+                    }
+                }
                 stage('Component Tests') {
                     steps {
-                        dir('integration-tests') {
+                        dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                             sh label: 'Running integration tests', script: 'pipenv run componenttests'
                         }
                     }
+                }
+            }
+            post {
+                always {
+                    sh label: 'Docker compose down', script: 'docker-compose down -v'
                 }
             }
         }
@@ -112,6 +131,7 @@ pipeline {
                                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                     -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                                     -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
+                                    -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
                                     -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
                                     -var elasticache_node_type="cache.t2.micro"
                                 """
@@ -178,7 +198,7 @@ pipeline {
 
                 stage('Integration Tests') {
                     steps {
-                        dir('integration-tests') {
+                        dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                             // Wait for MHS container to fully stand up
                             timeout(2) {
@@ -191,7 +211,7 @@ pipeline {
                             }
 
                             // Wait for MHS load balancers to have healthy targets
-                            dir('../pipeline/scripts/check-target-group-health') {
+                            dir('../../pipeline/scripts/check-target-group-health') {
                                 sh script: 'pipenv install'
                                 timeout(13) {
                                     waitUntil {
@@ -214,7 +234,11 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-            sh 'docker image prune -a --force'
+            sh 'docker-compose down -v'
+            sh 'docker volume prune --force'
+            // Prune Docker images for current CI build.
+            // Note that the * in the glob patterns doesn't match /
+            sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
         }
     }
 }

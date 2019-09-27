@@ -86,6 +86,10 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
         {
           name = "MHS_OUTBOUND_HTTP_PROXY"
           value = var.mhs_outbound_http_proxy
+        },
+        {
+          name = "MHS_RESYNC_INITIAL_DELAY"
+          value = var.mhs_resync_initial_delay
         }
       ])
       secrets = [
@@ -247,6 +251,10 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
         {
           name = "MHS_SDS_URL"
           value = var.spineroutelookup_service_sds_url
+        },
+        {
+          name = "MHS_SDS_SEARCH_BASE"
+          value = var.spineroutelookup_service_search_base
         },
         {
           name = "MHS_DISABLE_SDS_TLS"

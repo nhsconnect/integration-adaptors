@@ -6,7 +6,7 @@ variable "region" {
 
 variable "environment_id" {
   type = string
-  description = "An ID used to identify the environment being deployed by this configuration."
+  description = "An ID used to identify the environment being deployed by this configuration. As this is used as a prefix for the names of most resources this should be kept to 20 characters or less."
 }
 
 variable "build_id" {
@@ -182,6 +182,11 @@ variable "spineroutelookup_service_sds_url" {
   description = "The SDS URL the Spine Route Lookup service should communicate with."
 }
 
+variable "spineroutelookup_service_search_base" {
+  type = string
+  description = "The LDAP location the Spine Route Lookup service should use as the base of its searches when querying SDS."
+}
+
 variable "spineroutelookup_service_disable_sds_tls" {
   type = string
   description = "Whether TLS should be disabled for connections to SDS."
@@ -191,4 +196,10 @@ variable "spineroutelookup_service_disable_sds_tls" {
 variable "elasticache_node_type" {
   type = string
   description = "The type of ElastiCache node to use when deploying the ElastiCache cluster. Possible node types can be found from https://aws.amazon.com/elasticache/features/#Available_Cache_Node_Types"
+}
+
+variable "mhs_resync_initial_delay" {
+  type = number
+  description = "The delay before the first poll to the sync async store after receiving an acknowledgement from Spine"
+  default = 0.150
 }
