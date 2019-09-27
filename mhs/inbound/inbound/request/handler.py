@@ -102,11 +102,16 @@ class InboundHandler(base_handler.BaseHandler):
                                              'received from Spine',
                                         reason="Unknown message reference") from e
 
-    async def handle_forward_reliable_unsolicited_request(self, correlation_id: str, forward_reliable_workflow: workflow.AsynchronousForwardReliableWorkflow, received_message: str, ref_to_message_id: str, request_message: ebxml_request_envelope.EbxmlRequestEnvelope):
+    async def handle_forward_reliable_unsolicited_request(self, correlation_id: str,
+                                                          forward_reliable_workflow:
+                                                          workflow.AsynchronousForwardReliableWorkflow,
+                                                          received_message: str, ref_to_message_id: str,
+                                                          request_message: ebxml_request_envelope.EbxmlRequestEnvelope):
         logger.info('002', 'Received unsolicited inbound request for the forward-reliable workflow. Passing the '
                            'request to forward-reliable workflow.')
         try:
-            await forward_reliable_workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id, received_message)
+            await forward_reliable_workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id,
+                                                                               received_message)
             self._send_ack(request_message)
         except Exception as e:
             logger.error('011', 'Exception in workflow {exception}', {'exception': e})
@@ -174,7 +179,7 @@ class InboundHandler(base_handler.BaseHandler):
     def _extract_incoming_sync_request_message(self):
         try:
             request_message = SoapEnvelope.from_string(self.request.headers,
-                                                                     self.request.body.decode())
+                                                       self.request.body.decode())
         except SoapParsingError as e:
             logger.error('021', 'Failed to parse response: {exception}', {'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
