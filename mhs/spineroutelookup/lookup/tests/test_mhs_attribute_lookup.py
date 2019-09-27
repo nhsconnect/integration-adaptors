@@ -51,11 +51,8 @@ class TestMHSAttributeLookup(TestCase):
         handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), self.cache)
 
         attributes = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
-        for key, value in expected_mhs_attributes.items():
-            self.assertEqual(value, attributes[key])
 
-        # Assert exact number of attributes
-        self.assertEqual(len(attributes), len(expected_mhs_attributes))
+        self.assertEqual(expected_mhs_attributes, attributes)
 
     @async_test
     async def test_no_client(self):
@@ -87,3 +84,23 @@ class TestMHSAttributeLookup(TestCase):
 
         self.assertEqual(result, expected_value)
         handler.sds_client.assert_not_called()
+
+    @async_test
+    async def test_should_not_propagate_exception_when_retrieving_cache_entry(self):
+        self.cache.retrieve_mhs_attributes_value.side_effect = Exception
+        self.cache.add_cache_value.return_value = test_utilities.awaitable(None)
+        handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), self.cache)
+
+        attributes = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
+
+        self.assertEqual(expected_mhs_attributes, attributes)
+
+    @async_test
+    async def test_should_not_propagate_exception_when_storing_cache_entry(self):
+        self.cache.retrieve_mhs_attributes_value.side_effect = test_utilities.awaitable(None)
+        self.cache.add_cache_value.side_effect = None
+        handler = mhs_attribute_lookup.MHSAttributeLookup(mocks.mocked_sds_client(), self.cache)
+
+        attributes = await handler.retrieve_mhs_attributes(ODS_CODE, INTERACTION_ID)
+
+        self.assertEqual(expected_mhs_attributes, attributes)

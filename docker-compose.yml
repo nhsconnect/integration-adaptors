@@ -49,6 +49,7 @@ services:
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SDS_URL=ldap://msg.opentest.hscic.gov.uk
+      - MHS_SDS_SEARCH_BASE=ou=services,o=nhs
       - MHS_DISABLE_SDS_TLS=True
       - MHS_SDS_REDIS_CACHE_HOST=redis
       - MHS_SDS_REDIS_DISABLE_TLS=True

@@ -7,8 +7,6 @@ import lookup.sds_client as sds_client
 import lookup.sds_exception as re
 import lookup.tests.ldap_mocks as mocks
 
-NHS_SERVICES_BASE = "ou=services, o=nhs"
-
 MHS_OBJECT_CLASS = "nhsMhs"
 
 PARTY_KEY = "AP4RTY-K33Y"
@@ -95,6 +93,11 @@ class TestSDSClient(TestCase):
             await client.get_mhs_details("fake code", "fake interaction")
 
     @async_test
-    async def test_no_connection(self):
+    async def test_should_raise_error_if_no_connection_set(self):
         with self.assertRaises(ValueError):
-            sds_client.SDSClient(None)
+            sds_client.SDSClient(None, "ou=search,o=base")
+
+    @async_test
+    async def test_should_raise_error_if_no_search_base_set(self):
+        with self.assertRaises(ValueError):
+            sds_client.SDSClient(mocks.fake_ldap_connection(), None)
