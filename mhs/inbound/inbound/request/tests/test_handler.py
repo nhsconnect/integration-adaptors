@@ -76,6 +76,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     def get_app(self):
         return tornado.web.Application([
             (r".*", handler.InboundHandler, dict(workflows=self.mocked_workflows,
+                                                 config_manager=unittest.mock.MagicMock(),
                                                  work_description_store=self.state, party_id=FROM_PARTY_ID))
         ])
 
