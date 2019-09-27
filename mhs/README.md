@@ -47,7 +47,7 @@ docker run --rm -v ${PWD}:/local  openapitools/openapi-generator-cli generate -g
 ```
 
 generates HTML docs. An invocation of this command can be seen
-[here](https://htmlpreview.github.io/?https://github.com/nhsconnect/integration-adaptors/blob/feature/add-mhs-outbound-api-doc-export/mhs/outbound/openapi-docs.html).
+[here](https://htmlpreview.github.io/?https://github.com/nhsconnect/integration-adaptors/blob/develop/mhs/outbound/openapi-docs.html).
 
 ### Environment Variables
 MHS takes a number of environment variables when it is run. These are:
