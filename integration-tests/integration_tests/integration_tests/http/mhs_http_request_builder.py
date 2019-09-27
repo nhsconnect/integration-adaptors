@@ -63,7 +63,7 @@ class MhsHttpRequestBuilder(object):
         Asserts the response is successful.
         :return: self
         """
-        response = requests.post(self.mhs_host, headers=self.headers, data=self.body)
+        response = requests.post(self.mhs_host, headers=self.headers, data=self.body, verify=False)
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')

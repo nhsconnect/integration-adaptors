@@ -206,22 +206,13 @@ pipeline {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
 
                             // Wait for MHS load balancers to have healthy targets
-                            dir('../../pipeline/scripts/aws-tools') {
+                            dir('../../pipeline/scripts/check-target-group-health') {
                                 sh script: 'pipenv install'
-
-                                script {
-                                    // Required for the integration tests to validate the outbound load balancer's certificates
-                                    env.REQUESTS_CA_BUNDLE = sh (
-                                        label: "Obtaining the CA certs to use to validate the outbound load balancer's TLS certificate",
-                                        returnStdout: true,
-                                        script: "AWS_DEFAULT_REGION=eu-west-2 pipenv run get-secrets-manager-value ${OUTBOUND_CA_CERTS_ARN}"
-                                    ).trim()
-                                }
 
                                 timeout(13) {
                                     waitUntil {
                                         script {
-                                            def r = sh script: 'sleep 10; AWS_DEFAULT_REGION=eu-west-2 pipenv run check-target-group-health ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
+                                            def r = sh script: 'sleep 10; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
                                             return (r == 0);
                                         }
                                     }
