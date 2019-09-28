@@ -66,7 +66,7 @@ pipeline {
                             . ./component-test-source.sh
                             echo $FAKE_SPINE_CERTIFICATE
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up > compose-logs.txt &'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up'''
                     }
                 }
                 stage('Component Tests') {
