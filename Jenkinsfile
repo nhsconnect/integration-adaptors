@@ -62,10 +62,11 @@ pipeline {
                 stage('Deploy component locally') {
                     steps {
                         sh label: 'Setup component test environment', script: './setup_component_test_env.sh'
-                        sh label: 'Export environment variables', script: '. ./component-test-source.sh'
-                        sh label: 'Test', script: 'echo $FAKE_SPINE_CERTIFICATE'
-                        sh label: 'Building local images', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build'
-                        sh label: 'Composing up local services', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up > compose-logs.txt &'
+                        sh label: 'Export environment variables', script: '''
+                            . ./component-test-source.sh
+                            echo $FAKE_SPINE_CERTIFICATE
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up > compose-logs.txt &'''
                     }
                 }
                 stage('Component Tests') {
