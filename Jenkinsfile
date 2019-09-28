@@ -66,7 +66,7 @@ pipeline {
                             . ./component-test-source.sh
                             echo $FAKE_SPINE_CERTIFICATE
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up > compose-logs.txt &'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up -d'''
                     }
                 }
                 stage('Component Tests') {
@@ -81,7 +81,8 @@ pipeline {
             }
             post {
                 always {
-                    sh label: 'Docker compose down', script: 'docker-compose down -v'
+                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml logs'
+                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
                 }
             }
         }
