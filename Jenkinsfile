@@ -239,7 +239,8 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-            sh 'docker-compose down -v'
+            sh 'cat compose-logs.txt'
+            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
