@@ -30,6 +30,7 @@ def build_app():
 
 def main():
     config.setup_config('SCR')
+    secrets.setup_secret_config("SCR")
     log.configure_logging()
     app = build_app()
     app.listen(80)

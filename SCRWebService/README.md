@@ -8,7 +8,7 @@ The SCR Web Service requires several environment variables to run:
 
 * SCR_LOG_LEVEL: Level of logging 
 * SCR_MHS_ADDRESS: The address of the MHS that the SCR adaptor will forward requests to
-* SCR_MHS_CA_CERTS: Optional. The CA certificates bundle to use when validating the certificate presented by the MHS. If
+* SCR_SECRET_MHS_CA_CERTS: Optional. The CA certificates bundle to use when validating the certificate presented by the MHS. If
 not specified, the system defaults will be used.
 
 
