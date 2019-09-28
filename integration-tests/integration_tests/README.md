@@ -19,3 +19,13 @@ When running the tests locally, you will need to set the MHS_ADDRESS, ASID, AWS_
 
 
 You will need to complete the setup steps for all the associated services in test prior to running this test suite
+
+## Running the Component Tests
+`pipenv run componenttests` will run all component tests.
+
+To setup the test environment locally, run the following commands from the root directory:
+```bash
+./setup_component_test_env.sh
+source ./component-test-source.sh
+docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up --build
+```

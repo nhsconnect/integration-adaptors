@@ -34,8 +34,8 @@ if __name__ == "__main__":
 
     certs = Certs.create_certs_files(ROOT_DIR,
                                      private_key=os.environ.get('FAKE_SPINE_PRIVATE_KEY'),
-                                     local_cert=os.environ.get('FAKE_SPINE_PUBLIC_KEY'),
-                                     ca_certs=os.environ.get('FAKE_SPINE_CA_CERTS'))
+                                     local_cert=os.environ.get('FAKE_SPINE_CERTIFICATE'),
+                                     ca_certs=os.environ.get('FAKE_SPINE_CA_STORE'))
 
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     ssl_ctx.load_cert_chain(certs.local_cert_path, certs.private_key_path)

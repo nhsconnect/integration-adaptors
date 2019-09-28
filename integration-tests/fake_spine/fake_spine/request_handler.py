@@ -15,6 +15,6 @@ class RoutingRequestHandler(tornado.web.RequestHandler):
         status, response = self.fake_response_handler.response_for_request(self.request)
         logger.log(logging.INFO, f"response to request {status} : {response}")
 
-        self.add_header('Content-Type', 'text/xml')
+        self.set_header('Content-Type', 'text/xml')
         self.set_status(status)
         self.write(response)
