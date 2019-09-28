@@ -73,7 +73,7 @@ pipeline {
                     steps {
                         dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                            sh 'sleep 30s'
+                            sh 'curl http://outbound'
                             sh label: 'Running integration tests', script: 'pipenv run componenttests'
                         }
                     }
