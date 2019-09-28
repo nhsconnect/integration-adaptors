@@ -66,13 +66,14 @@ pipeline {
                             . ./component-test-source.sh
                             echo $FAKE_SPINE_CERTIFICATE
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up > compose-logs.txt &'''
                     }
                 }
                 stage('Component Tests') {
                     steps {
                         dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                            sh 'sleep 30s'
                             sh label: 'Running integration tests', script: 'pipenv run componenttests'
                         }
                     }
