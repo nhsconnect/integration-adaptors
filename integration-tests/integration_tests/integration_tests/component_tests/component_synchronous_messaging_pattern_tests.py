@@ -17,7 +17,7 @@ class SynchronousMessagingPatternTests(TestCase):
     They make use of the fake-spine-route-lookup service, which has known responses for certain interaction ids.
     """
 
-    def should_return_error_response_to_client_when_error_response_returned_from_spine(self):
+    def test_should_return_error_response_to_client_when_error_response_returned_from_spine(self):
         # Arrange
         message, message_id = build_message('QUPA_IN040000UK32', '9689174606')
 
@@ -25,12 +25,8 @@ class SynchronousMessagingPatternTests(TestCase):
         response = MhsHttpRequestBuilder() \
             .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False) \
             .with_body(message) \
-            .execute_post_expecting_success()
+            .execute_post_expecting_error_response()
 
         # Assert
-        Hl7XmlResponseAssertor(response.text) \
-            .assert_element_exists('.//retrievalQueryResponse//QUPA_IN050000UK32//PdsSuccessfulRetrieval') \
-            .assert_element_attribute('.//queryAck//queryResponseCode', 'code', 'OK') \
-            .assert_element_attribute('.//patientRole//id', 'extension', '9689174606') \
-            .assert_element_attribute('.//messageRef//id', 'root', message_id)
-
+        # Hl7XmlResponseAssertor(response.text) \
+        #     .assert_element_exists('.//retrievalQueryResponse//QUPA_IN050000UK32//PdsSuccessfulRetrieval')
