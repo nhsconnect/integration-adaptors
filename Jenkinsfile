@@ -64,17 +64,17 @@ pipeline {
                         sh label: 'Setup component test environment', script: './setup_component_test_env.sh'
                         sh label: 'Export environment variables', script: '''
                             . ./component-test-source.sh
-                            echo $FAKE_SPINE_CERTIFICATE
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up -d'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up -p custom_network -d'''
                     }
                 }
                 stage('Component Tests') {
                     steps {
                         dir('integration-tests/integration_tests') {
-                            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                            sh 'curl http://localhost/healthcheck'
-                            sh label: 'Running integration tests', script: 'pipenv run componenttests'
+                            sh label: 'Build component test docker image', script: 'docker build . -t component-tests:$BUILD_TAG'
+                            sh label: 'Running component tests', script: '''
+                                docker run --network custom_network_default -v $PWD/test-reports:/test/test-reports component-tests:$BUILD_TAG
+                            '''
                         }
                     }
                 }
