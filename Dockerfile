@@ -7,11 +7,9 @@ WORKDIR /test
 
 RUN pip install pipenv
 
-COPY Pipfile Pipfile
-COPY Pipfile.lock Pipfile.lock
-RUN pipenv install --dev --deploy --ignore-pipfile
-
 COPY . .
+WORKDIR integration-tests/integration_tests
+RUN pipenv install --dev --deploy --ignore-pipfile
 
 ENV MHS_ADDRESS="outbound"
 EXPOSE 80

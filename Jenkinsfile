@@ -70,12 +70,11 @@ pipeline {
                 }
                 stage('Component Tests') {
                     steps {
-                        dir('integration-tests/integration_tests') {
-                            sh label: 'Build component test docker image', script: 'docker build . -t component-tests:$BUILD_TAG'
-                            sh label: 'Running component tests', script: '''
-                                docker run --network custom_network_default -v $PWD/test-reports:/test/test-reports component-tests:$BUILD_TAG
-                            '''
-                        }
+                        sh label: 'Build component test docker image', script: 'docker build . -t component-tests:$BUILD_TAG'
+                        sh label: 'Running component tests', script: '''
+                            docker run --network custom_network_default -v $PWD/test-reports:/test/test-reports component-tests:$BUILD_TAG
+                            ls ./test-reports
+                        '''
                     }
                 }
             }
