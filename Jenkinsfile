@@ -65,7 +65,7 @@ pipeline {
                         sh label: 'Export environment variables', script: '''
                             . ./component-test-source.sh
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up -p custom_network -d'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up -d'''
                     }
                 }
                 stage('Component Tests') {
