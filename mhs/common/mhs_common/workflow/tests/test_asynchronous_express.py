@@ -25,7 +25,7 @@ ASID = 'asid-123'
 MESSAGE_ID = 'message-id'
 CORRELATION_ID = 'correlation-id'
 URL = 'a.a'
-ASID = '123456'
+
 HTTP_HEADERS = {
     "type": "a",
     "Content-Type": "b",
@@ -389,8 +389,13 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     def assert_audit_log_recorded_with_message_status(self, log_mock, message_status):
         log_mock.audit.assert_called_once()
         audit_log_dict = log_mock.audit.call_args[0][2]
+        audit_text = log_mock.audit.call_args[0][1]
         self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
         self.assertEqual(MESSAGE_ID, audit_log_dict['Message-ID'])
+        self.assertEqual(audit_log_dict['Interaction-ID'], ACTION)
+        self.assertEqual(audit_text, "Async-Express outbound workflow invoked. Message sent to Spine and"
+                                     " {Acknowledgment} received. {Message-ID} {Interaction-ID} {RequestSentTime}"
+                                     " {AcknowledgmentReceivedTime}")
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
