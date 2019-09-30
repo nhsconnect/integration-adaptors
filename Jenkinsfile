@@ -72,7 +72,12 @@ pipeline {
                     steps {
                         sh label: 'Running component tests', script: '''
                              docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
-                             docker run --network custom_network_default --env "MHS_ADDRESS=http://outbound" componenttest:$BUILD_TAG
+                             docker run --rm --network custom_network_default \
+                                --env "MHS_ADDRESS=http://outbound" \
+                                --env "AWS_ACCESS_KEY_ID=test" \
+                                --env "AWS_SECRET_ACCESS_KEY=test" \
+                                --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
+                                componenttest:$BUILD_TAG
                         '''
                     }
                 }
