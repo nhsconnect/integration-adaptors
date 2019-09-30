@@ -61,18 +61,17 @@ pipeline {
             stages {
                 stage('Deploy component locally') {
                     steps {
-                        sh label: 'Setup component test environment', script: './setup_component_test_env.sh'
+                        sh label: 'Setup component test environment', script: './integration_tests/setup_component_test_env.sh'
                         sh label: 'Export environment variables', script: '''
-                            . ./component-test-source.sh
+                            . ./integration_tests/component-test-source.sh
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up -d'''
                     }
                 }
                 stage('Component Tests') {
                     steps {
-                        sh label: 'Build component test docker image', script: 'docker build . -t component-tests:$BUILD_TAG'
                         sh label: 'Running component tests', script: '''
-                            docker run --network custom_network_default component-tests:$BUILD_TAG
+                            docker run --network custom_network_default -v $PWD:/test --entrypoint /test/integration-tests/run_component_tests.sh python:3-slim
                         '''
                     }
                 }
