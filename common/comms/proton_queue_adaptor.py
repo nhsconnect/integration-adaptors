@@ -42,12 +42,24 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         logger.info('000', 'Initialized proton queue adaptor for {host}', {'host': self.host})
 
     async def send_async(self, message: str, properties: Dict[str, Any] = None) -> None:
+        """Builds and asynchronously sends a message to the host defined when this adaptor was constructed. Raises an
+        exception to indicate that the message could not be sent successfully.
+
+        :param message: The message body to send.
+        :param properties: Optional application properties to send with the message.
+        """
         logger.info('008', 'Sending message asynchronously.')
         payload = self.__construct_message(message, properties=properties)
         await tornado.ioloop.IOLoop.current() \
             .run_in_executor(executor=None, func=lambda: self.__send(payload))
 
     def send_sync(self, message: str, properties: Dict[str, Any] = None) -> None:
+        """Builds and synchronously sends a message to the host defined when this adaptor was constructed.  Raises an
+        exception to indicate that the message could not be sent successfully.
+
+        :param message: The message body to send.
+        :param properties: Optional application properties to send with the message.
+        """
         logger.info('009', 'Sending message synchronously.')
         payload = self.__construct_message(message, properties=properties)
         self.__send(payload)
@@ -74,7 +86,8 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
 
 
 class ProtonMessagingHandler(proton.handlers.MessagingHandler):
-    """Implementation of a Proton MessagingHandler which will send a single message."""
+    """Implementation of a Proton MessagingHandler which will send a single message. Note that this class will raise
+    an exception to indicate that a message could not be sent successfully."""
 
     def __init__(self, host: str, username: str, password: str, message: proton.Message) -> None:
         """
