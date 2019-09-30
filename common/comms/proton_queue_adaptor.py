@@ -125,7 +125,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
                 logger.info('003', 'Message sent to {host}.', {'host': self._host})
                 self._sent = True
         else:
-            logger.warning('004', 'Failed to send message as no available credit.')
+            logger.error('004', 'Failed to send message as no available credit.')
             raise MessageSendingError()
 
     def on_accepted(self, event: proton.Event) -> None:
@@ -143,7 +143,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         """
         logger.info('006', 'Disconnected from {host}.', {'host': self._host})
         if not self._sent:
-            logger.warning('010', 'Disconnected before message could be sent.')
+            logger.error('010', 'Disconnected before message could be sent.')
             raise EarlyDisconnectError()
 
     def on_rejected(self, event: proton.Event) -> None:
@@ -160,8 +160,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The transport error event.
         """
-        logger.warning('011', "There was an error with the transport used for the connection to {host}.",
-                       {'host': self._host})
+        logger.error('011', "There was an error with the transport used for the connection to {host}.",
+                     {'host': self._host})
         raise EarlyDisconnectError()
 
     def on_connection_error(self, event: proton.Event) -> None:
@@ -169,8 +169,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The connection error event.
         """
-        logger.warning('012', "{host} closed the connection with an error. {remote_condition}",
-                       {'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error('012', "{host} closed the connection with an error. {remote_condition}",
+                     {'host': self._host, 'remote_condition': event.context.remote_condition})
         raise EarlyDisconnectError()
 
     def on_session_error(self, event: proton.Event) -> None:
@@ -178,8 +178,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The session error event.
         """
-        logger.warning('013', "{host} closed the session with an error. {remote_condition}",
-                       {'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error('013', "{host} closed the session with an error. {remote_condition}",
+                     {'host': self._host, 'remote_condition': event.context.remote_condition})
         raise EarlyDisconnectError()
 
     def on_link_error(self, event: proton.Event) -> None:
@@ -187,6 +187,6 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The link error event.
         """
-        logger.warning('014', "{host} closed the link with an error. {remote_condition}",
-                       {'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error('014', "{host} closed the link with an error. {remote_condition}",
+                     {'host': self._host, 'remote_condition': event.context.remote_condition})
         raise EarlyDisconnectError()
