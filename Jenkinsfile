@@ -14,7 +14,7 @@ pipeline {
             steps{
                 sh '''
                 ls $PWD
-                docker run -v $PWD:/test python:3-slim ls /test
+                docker run -v $PWD:/test python:3-slim ls /test | wc -l
                 '''
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
