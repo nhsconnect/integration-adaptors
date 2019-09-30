@@ -83,6 +83,9 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
     """
     Attempts to retrieve and deserialize a work description instance from the given persistence store to create
     a local work description
+    :param persistence_store: persistence store to search for work description instance in
+    :param key: key to look for
+    :raise EmptyWorkDescriptionError: when no work description is found for the given key
     """
 
     if persistence_store is None:
@@ -94,7 +97,7 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
 
     json_store_data = await persistence_store.get(key)
     if json_store_data is None:
-        logger.error('003', 'Persistence store returned empty value for {key}', {'key': key})
+        logger.info('003', 'Persistence store returned empty value for {key}', {'key': key})
         raise EmptyWorkDescriptionError(f'Failed to find a value for key id {key}')
 
     return WorkDescription(persistence_store, json_store_data)

@@ -43,3 +43,9 @@ variable "scr_mhs_address" {
   type = string
   description = "The address on the MHS for the SCR to forward messages to"
 }
+
+variable "scr_mhs_ca_certs_arn" {
+  type = string
+  description = "ARN of the secrets manager secret containing the CA certificates to be used to verify the certificate presented by the MHS. Required if your MHS is using certificates that are not signed by a legitimate CA."
+  default = ""
+}

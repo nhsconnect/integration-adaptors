@@ -65,7 +65,7 @@ locals {
     },
     {
       name = "MHS_SPINE_ROUTE_LOOKUP_URL",
-      value = aws_route53_record.mhs_route_load_balancer_record.name
+      value = "https://${aws_route53_record.mhs_route_load_balancer_record.name}"
     },
     {
       name = "MHS_SPINE_ORG_CODE",
@@ -74,6 +74,24 @@ locals {
     {
       name = "MHS_FORWARD_RELIABLE_ENDPOINT_URL",
       value = var.mhs_forward_reliable_endpoint_url
+    }
+  ]
+  mhs_outbound_base_secrets = [
+    {
+      name = "MHS_SECRET_PARTY_KEY"
+      valueFrom = var.party_key_arn
+    },
+    {
+      name = "MHS_SECRET_CLIENT_CERT"
+      valueFrom = var.client_cert_arn
+    },
+    {
+      name = "MHS_SECRET_CLIENT_KEY"
+      valueFrom = var.client_key_arn
+    },
+    {
+      name = "MHS_SECRET_CA_CERTS"
+      valueFrom = var.ca_certs_arn
     }
   ]
 }
@@ -96,24 +114,12 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
           value = var.mhs_resync_initial_delay
         }
       ])
-      secrets = [
+      secrets = var.route_ca_certs_arn == "" ? local.mhs_outbound_base_secrets : concat(local.mhs_outbound_base_secrets, [
         {
-          name = "MHS_SECRET_PARTY_KEY"
-          valueFrom = var.party_key_arn
-        },
-        {
-          name = "MHS_SECRET_CLIENT_CERT"
-          valueFrom = var.client_cert_arn
-        },
-        {
-          name = "MHS_SECRET_CLIENT_KEY"
-          valueFrom = var.client_key_arn
-        },
-        {
-          name = "MHS_SECRET_CA_CERTS"
-          valueFrom = var.ca_certs_arn
+          name = "MHS_SECRET_SPINE_ROUTE_LOOKUP_CA_CERTS",
+          valueFrom = var.route_ca_certs_arn
         }
-      ]
+      ])
       essential = true
       logConfiguration = {
         logDriver = "awslogs"

@@ -14,6 +14,12 @@ variable "build_id" {
   description = "ID used to identify the current build."
 }
 
+variable "mhs_vpc_cidr_block" {
+  type = string
+  description = "The CIDR block to use for the MHS VPC that is created. Should be a /16 block. Note that this cidr block must not overlap with the cidr blocks of the VPCs that the MHS VPC is to be peered with."
+  default = "10.0.0.0/16"
+}
+
 variable "supplier_vpc_id" {
   type = string
   description = "VPC id of the supplier system that connects to the MHS"
@@ -175,6 +181,22 @@ variable "client_key_arn" {
 variable "ca_certs_arn" {
   type = string
   description = "ARN of the secrets manager secret of the endpoint issuing subCA certificate and root CA Certificate (in that order)."
+}
+
+variable "route_ca_certs_arn" {
+  type = string
+  description = "ARN of the secrets manager secret containing the CA certificates to be used to verify the certificate presented by the Spine Route Lookup service. Required if you are using certificates that are not signed by a legitimate CA."
+  default = ""
+}
+
+variable "outbound_alb_certificate_arn" {
+  type = string
+  description = "ARN of the TLS certificate that the outbound load balancer should present. This can be a certificate stored in IAM or ACM."
+}
+
+variable "route_alb_certificate_arn" {
+  type = string
+  description = "ARN of the TLS certificate that the outbound load balancer should present. This can be a certificate stored in IAM or ACM."
 }
 
 variable "spineroutelookup_service_sds_url" {

@@ -1,14 +1,18 @@
 """This module defines the common base for all asynchronous workflows."""
-from comms import queue_adaptor
-from mhs_common.state import persistence_adaptor
-from mhs_common.transmission import transmission_adaptor
-from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
-from mhs_common.state import work_description as wd
-from mhs_common.workflow.common import CommonWorkflow
+import asyncio
 from typing import Dict
 
 import utilities.integration_adaptors_logger as log
+from comms import queue_adaptor
+from exceptions import MaxRetriesExceeded
+from utilities import timing
+
+from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.routing import routing_reliability
+from mhs_common.state import persistence_adaptor
+from mhs_common.state import work_description as wd
+from mhs_common.transmission import transmission_adaptor
+from mhs_common.workflow.common import CommonWorkflow
 
 logger = log.IntegrationAdaptorsLogger('COMMON_ASYNC_WORKFLOW')
 
@@ -58,6 +62,37 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
 
+    @timing.time_function
+    async def _handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
+                                     payload: str):
+        await wd.update_status_with_retries(work_description,
+                                            work_description.set_inbound_status,
+                                            wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
+                                            self.store_retries)
+
+        retries_remaining = self.inbound_queue_max_retries
+        while True:
+            try:
+                await self._put_message_onto_queue_with(message_id, correlation_id, payload)
+                break
+            except Exception as e:
+                logger.warning('0012', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
+                retries_remaining -= 1
+                if retries_remaining <= 0:
+                    logger.error("0013",
+                                 "Exceeded the maximum number of retries, {max_retries} retries, when putting "
+                                 "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
+                    await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
+                    raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
+                                             'been exceeded') from e
+
+                logger.info("0014", "Waiting for {retry_delay} seconds before retrying putting message onto inbound "
+                                    "queue", {"retry_delay": self.inbound_queue_retry_delay})
+                await asyncio.sleep(self.inbound_queue_retry_delay)
+
+        logger.info('0015', 'Placed message onto inbound queue successfully')
+        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+
     async def _lookup_reliability_details(self, interaction_details: Dict, org_code: str = None) -> Dict:
         try:
             service_id = await self._build_service_id(interaction_details)
@@ -71,3 +106,21 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         except Exception as e:
             logger.warning('0003', 'Error encountered whilst obtaining outbound URL. {exception}', {'exception': e})
             raise e
+
+    async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments=None):
+        await self.queue_adaptor.send_async({'payload': payload, 'attachments': attachments or []},
+                                            properties={'message-id': message_id,
+                                                        'correlation-id': correlation_id})
+
+    def _record_outbound_audit_log(self, workflow_name: str, end_time: str, start_time: str,
+                                   acknowledgment: wd.MessageStatus):
+        logger.audit('0011', '{WorkflowName} invoked. Message sent to Spine and {Acknowledgment} received. '
+                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
+                     {'WorkflowName': workflow_name, 'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
+                      'Acknowledgment': acknowledgment})
+
+    async def set_successful_message_response(self, wdo: wd.WorkDescription):
+        pass
+
+    async def set_failure_message_response(self, wdo: wd.WorkDescription):
+        pass

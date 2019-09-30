@@ -11,7 +11,7 @@ pipeline {
 
     stages {
         stage('Build modules') {
-            steps{
+            steps {
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
                 dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
@@ -61,22 +61,26 @@ pipeline {
             stages {
                 stage('Deploy component locally') {
                     steps {
-                        sh label: 'Building local images', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build'
-                        sh label: 'Composing up local services', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up > compose-logs.txt &'
+                        sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
+                        sh label: 'Export environment variables', script: '''
+                            . ./component-test-source.sh
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up -d'''
                     }
                 }
                 stage('Component Tests') {
                     steps {
-                        dir('integration-tests/integration_tests') {
-                            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                            sh label: 'Running integration tests', script: 'pipenv run componenttests'
-                        }
+                        sh label: 'Running component tests', script: '''
+                             docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
+                             docker run --network custom_network_default --env "MHS_ADDRESS=http://outbound" componenttest:$BUILD_TAG
+                        '''
                     }
                 }
             }
             post {
                 always {
-                    sh label: 'Docker compose down', script: 'docker-compose down -v'
+                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml logs'
+                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
                 }
             }
         }
@@ -128,6 +132,9 @@ pipeline {
                                     -var client_cert_arn=${CLIENT_CERT_ARN} \
                                     -var client_key_arn=${CLIENT_KEY_ARN} \
                                     -var ca_certs_arn=${CA_CERTS_ARN} \
+                                    -var route_ca_certs_arn=${ROUTE_CA_CERTS_ARN} \
+                                    -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
+                                    -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
                                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                     -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                                     -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
@@ -140,7 +147,7 @@ pipeline {
                                 env.MHS_ADDRESS = sh (
                                     label: 'Obtaining outbound LB DNS name',
                                     returnStdout: true,
-                                    script: "terraform output outbound_lb_domain_name"
+                                    script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
                                 ).trim()
                                 env.MHS_OUTBOUND_TARGET_GROUP = sh (
                                     label: 'Obtaining outbound LB target group ARN',
@@ -191,7 +198,8 @@ pipeline {
                                     -var ecr_address=${DOCKER_REGISTRY} \
                                     -var scr_log_level=DEBUG \
                                     -var scr_service_port=${SCR_SERVICE_PORT} \
-                                    -var scr_mhs_address=http://${MHS_ADDRESS}
+                                    -var scr_mhs_address=${MHS_ADDRESS} \
+                                    -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
                                 """
                         }
                     }
@@ -201,19 +209,11 @@ pipeline {
                     steps {
                         dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                            // Wait for MHS container to fully stand up
-                            timeout(2) {
-                                waitUntil {
-                                   script {
-                                       def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
-                                       return (r == '405');
-                                   }
-                                }
-                            }
 
                             // Wait for MHS load balancers to have healthy targets
                             dir('../../pipeline/scripts/check-target-group-health') {
                                 sh script: 'pipenv install'
+
                                 timeout(13) {
                                     waitUntil {
                                         script {
@@ -235,7 +235,7 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-            sh 'docker-compose down -v'
+            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
