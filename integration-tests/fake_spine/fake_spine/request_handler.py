@@ -5,7 +5,7 @@ from fake_spine.request_matching import SpineRequestResponseMapper
 logger = logging.getLogger(__name__)
 
 
-class RoutingRequestHandler(tornado.web.RequestHandler):
+class SpineRequestHandler(tornado.web.RequestHandler):
 
     def initialize(self, fake_response_handler: SpineRequestResponseMapper) -> None:
         self.fake_response_handler = fake_response_handler

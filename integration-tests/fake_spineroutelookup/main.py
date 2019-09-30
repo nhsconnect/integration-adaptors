@@ -20,7 +20,9 @@ def build_application(fake_response_handler: SpineRouteLookupRequestResponseMapp
 
 def build_application_configuration() -> SpineRouteLookupRequestResponseMapper:
     return SpineRouteLookupRequestResponseMapper({
-        RequestMatcher(lambda x: query_argument_contains_string(x, "service-id", "QUPA_IN040000UK32")): RoutingResponse()
+        RequestMatcher(
+            'routing-QUPA_IN040000UK32',
+            lambda x: query_argument_contains_string(x, "service-id", "QUPA_IN040000UK32")): RoutingResponse()
     })
 
 

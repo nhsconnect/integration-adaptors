@@ -6,9 +6,9 @@ import tornado.ioloop
 import tornado.web
 from tornado.options import parse_command_line
 from fake_spine.certs import Certs
-from fake_spine.request_handler import RoutingRequestHandler
+from fake_spine.request_handler import SpineRequestHandler
 from fake_spine.request_matching import SpineRequestResponseMapper, RequestMatcher
-from fake_spine.routing_response import RoutingResponse
+from fake_spine.spine_response import SpineResponse
 
 logger = logging.getLogger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,14 +16,14 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def build_application(fake_response_handler: SpineRequestResponseMapper):
     return tornado.web.Application([
-        (r"/", RoutingRequestHandler, dict(fake_response_handler=fake_response_handler)),
+        (r"/", SpineRequestHandler, dict(fake_response_handler=fake_response_handler)),
     ])
 
 
 def build_application_configuration() -> SpineRequestResponseMapper:
     return SpineRequestResponseMapper({
-        RequestMatcher(lambda x: True):
-            RoutingResponse().override_response_code(500).override_response('TEST_RESPONSE.xml')
+        RequestMatcher('default-matcher', lambda x: True):
+            SpineResponse().override_response_code(500).override_response('TEST_RESPONSE.xml')
     })
 
 

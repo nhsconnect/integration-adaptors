@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-class RoutingResponse(object):
+class SpineResponse(object):
 
     def __init__(self):
         self.response_file_location = None

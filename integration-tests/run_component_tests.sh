@@ -12,5 +12,5 @@ apt-get install -y build-essential libssl-dev swig pkg-config
 pip install pipenv
 (cd /test/integration-tests/integration_tests || exit; pipenv install --dev --deploy --ignore-pipfile)
 
-export MHS_ADDRESS="outbound"
+export MHS_ADDRESS="http://outbound"
 (cd /test/integration-tests/integration_tests || exit; pipenv run componenttests)
