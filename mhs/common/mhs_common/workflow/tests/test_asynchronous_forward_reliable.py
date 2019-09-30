@@ -3,16 +3,15 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from definitions import ROOT_DIR
-from utilities.file_utilities import FileUtilities
-
 import exceptions
 from comms import proton_queue_adaptor
 from tornado import httpclient
 from utilities import test_utilities
+from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
 
 import mhs_common.workflow.forward_reliable as forward_reliable
+from definitions import ROOT_DIR
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
@@ -73,28 +72,34 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.workflow = forward_reliable.AsynchronousForwardReliableWorkflow(party_key=FROM_PARTY_KEY,
-                                                                   persistence_store=self.mock_persistence_store,
-                                                                   transmission=self.mock_transmission_adaptor,
-                                                                   queue_adaptor=self.mock_queue_adaptor,
-                                                                   inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                                   inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
-                                                                   persistence_store_max_retries=3,
-                                                                   routing=self.mock_routing_reliability)
+        self.workflow = forward_reliable.AsynchronousForwardReliableWorkflow(
+            party_key=FROM_PARTY_KEY,
+            persistence_store=self.mock_persistence_store,
+            transmission=self.mock_transmission_adaptor,
+            queue_adaptor=self.mock_queue_adaptor,
+            inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+            inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+            persistence_store_max_retries=3,
+            routing=self.mock_routing_reliability
+        )
 
         self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
     def test_construct_workflow_with_only_outbound_params(self):
-        workflow = forward_reliable.AsynchronousForwardReliableWorkflow(party_key=mock.sentinel.party_key,
-                                                              persistence_store=mock.sentinel.persistence_store,
-                                                              transmission=mock.sentinel.transmission,
-                                                              routing=self.mock_routing_reliability)
+        workflow = forward_reliable.AsynchronousForwardReliableWorkflow(
+            party_key=mock.sentinel.party_key,
+            persistence_store=mock.sentinel.persistence_store,
+            transmission=mock.sentinel.transmission,
+            routing=self.mock_routing_reliability
+        )
         self.assertIsNotNone(workflow)
 
     def test_construct_workflow_with_only_inbound_params(self):
-        workflow = forward_reliable.AsynchronousForwardReliableWorkflow(queue_adaptor=mock.sentinel.queue_adaptor,
-                                                              inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                              inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
+        workflow = forward_reliable.AsynchronousForwardReliableWorkflow(
+            queue_adaptor=mock.sentinel.queue_adaptor,
+            inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+            inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY
+        )
         self.assertIsNotNone(workflow)
         self.assertEqual(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS, workflow.inbound_queue_retry_delay)
 
@@ -129,9 +134,11 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.assertEqual(202, status)
         self.assertEqual('', message)
-        self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
-                                                                      workflow.forward_reliable,
-                                                                      outbound_status=MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+        self.mock_create_new_work_description.assert_called_once_with(
+            self.mock_persistence_store, MESSAGE_ID,
+            workflow.forward_reliable,
+            outbound_status=MessageStatus.OUTBOUND_MESSAGE_RECEIVED
+        )
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
@@ -325,6 +332,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
     ############################
     # Reliability tests
     ############################
+
     @async_test
     @mock.patch.object(forward_reliable, 'logger')
     async def test_retry_interval_contract_property_is_invalid(self, log_mock):
@@ -418,7 +426,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
                 self.mock_transmission_adaptor.make_request.assert_called_once()
 
-
     ############################
     # Inbound tests
     ############################
@@ -476,6 +483,78 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
+
+    ############################
+    # Inbound unsolicited tests
+    ############################
+
+    @mock.patch.object(forward_reliable, 'logger')
+    @async_test
+    async def test_successful_handle_inbound_message(self, log_mock):
+        self.setup_mock_work_description()
+        self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
+
+        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, [])
+
+        self.mock_queue_adaptor.send_async.assert_called_once_with(PAYLOAD,
+                                                                   properties={'message-id': MESSAGE_ID,
+                                                                               'correlation-id': CORRELATION_ID})
+        self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
+                                                                      workflow.FORWARD_RELIABLE,
+                                                                      MessageStatus.
+                                                                      UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
+        self.mock_work_description.publish.assert_called_once()
+        log_mock.audit.assert_called_once_with(mock.ANY, 'Forward reliable workflow invoked for inbound unsolicited '
+                                                         'request. Message placed onto inbound queue.')
+        self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
+                         self.mock_work_description.set_inbound_status.call_args_list)
+
+    @mock.patch.object(forward_reliable, 'logger')
+    @mock.patch('asyncio.sleep')
+    @async_test
+    async def test_handle_inbound_message_error_putting_message_onto_queue_then_success(self, mock_sleep, log_mock):
+        self.setup_mock_work_description()
+        error_future = asyncio.Future()
+        error_future.set_exception(proton_queue_adaptor.MessageSendingError())
+        self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
+        mock_sleep.return_value = test_utilities.awaitable(None)
+
+        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, [])
+
+        self.mock_queue_adaptor.send_async.assert_called_with(PAYLOAD,
+                                                              properties={'message-id': MESSAGE_ID,
+                                                                          'correlation-id': CORRELATION_ID})
+        log_mock.audit.assert_called_once_with(mock.ANY, 'Forward reliable workflow invoked for inbound unsolicited '
+                                                         'request. Message placed onto inbound queue.')
+        self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
+                         self.mock_work_description.set_inbound_status.call_args_list)
+        mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
+
+    @mock.patch.object(forward_reliable, 'logger')
+    @mock.patch('asyncio.sleep')
+    @async_test
+    async def test_handle_inbound_message_error_putting_message_onto_queue_despite_retries(self, mock_sleep, log_mock):
+        self.setup_mock_work_description()
+        future = asyncio.Future()
+        future.set_exception(proton_queue_adaptor.MessageSendingError())
+        self.mock_queue_adaptor.send_async.return_value = future
+        mock_sleep.return_value = test_utilities.awaitable(None)
+
+        with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
+            await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, [])
+        self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
+
+        self.assertEqual(
+            [mock.call(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS) for _ in range(INBOUND_QUEUE_MAX_RETRIES - 1)],
+            mock_sleep.call_args_list)
+
+        log_mock.audit.assert_not_called()
+        self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)],
+                         self.mock_work_description.set_inbound_status.call_args_list)
+
+    ############################
+    # Helper methods
+    ############################
 
     def setup_mock_work_description(self):
         self.mock_work_description = self.mock_create_new_work_description.return_value

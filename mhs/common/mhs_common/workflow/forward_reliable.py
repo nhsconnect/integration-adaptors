@@ -220,6 +220,7 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
         logger.info('0005', 'Entered async forward reliable workflow to handle unsolicited inbound message')
         work_description = wd.create_new_work_description(self.persistence_store, message_id, workflow.FORWARD_RELIABLE,
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
+        await work_description.publish()
 
         retries_remaining = self.inbound_queue_max_retries
         while True:
@@ -245,7 +246,7 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
         logger.audit('0022', 'Forward reliable workflow invoked for inbound unsolicited request. '
-                             'Message placed onto inbound queue. ')
+                             'Message placed onto inbound queue.')
         await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
