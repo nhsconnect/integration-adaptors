@@ -47,6 +47,7 @@ class InboundHandler(tornado.web.RequestHandler):
             request_message = self._extract_incoming_sync_request_message()
 
         interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
+        log.interaction_id.set(interaction_id)
 
         ref_to_message_id = self._extract_ref_message(request_message)
         correlation_id = self._extract_correlation_id(request_message)
