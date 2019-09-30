@@ -29,7 +29,7 @@ def build_message(template, patient_nhs_number):
     current_utc_time = datetime.datetime.utcnow()
     timestamp = current_utc_time.strftime(TIMESTAMP_FORMAT)
     uuid = message_utilities.MessageUtilities.get_uuid()
-    to_party_id = 'YES-0000806'
+    to_party_id = 'X26-9199246'
     file_upload = 'test file will go here'
     dissent_override = '0'
     use_date_filter = False
@@ -39,7 +39,7 @@ def build_message(template, patient_nhs_number):
         UUID: uuid,
         TIMESTAMP: timestamp,
         ASID: get_asid(),
-        TO_ASID: '928942012545',
+        TO_ASID: '918999199246',
         PATIENT_NHS_NUMBER: patient_nhs_number,
         TO_PARTY_ID: to_party_id,
         FILE_UPLOAD: file_upload,

@@ -3,7 +3,7 @@ Provides tests around the Forward Reliable workflow, including sync-async wrappi
 """
 from unittest import TestCase, skip
 
-from integration_tests.amq.amq import MHS_INBOUND_QUEUE
+import integration_tests.amq.amq
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
@@ -34,7 +34,6 @@ class ForwardReliableMessagingPatternTests(TestCase):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
 
-    def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', '9446245796')
 
@@ -49,7 +48,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .execute_post_expecting_success()
 
         # Assert
-        AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
+        AMQMessageAssertor(integration_tests.amq.amq.MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
             .assert_property('message-id', message_id) \
             .assert_property('correlation-id', '1') \
             .assertor_for_hl7_xml_message() \
@@ -71,7 +70,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .execute_post_expecting_success()
 
         # Assert
-        AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
+        AMQMessageAssertor(integration_tests.amq.amq.MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
             .assertor_for_hl7_xml_message() \
             .assert_element_exists('.//MCCI_IN010000UK13//Message//acknowledgement')
 
