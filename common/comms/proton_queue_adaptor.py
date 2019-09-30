@@ -104,7 +104,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
                 logger.info('003', 'Message sent to {host}.', {'host': self._host})
                 self._sent = True
         else:
-            logger.error('004', 'Failed to send message as no available credit.')
+            logger.warning('004', 'Failed to send message as no available credit.')
             raise MessageSendingError()
 
     def on_accepted(self, event):
@@ -114,7 +114,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
     def on_disconnected(self, event):
         logger.info('006', 'Disconnected from {host}.', {'host': self._host})
         if not self._sent:
-            logger.error('010', 'Disconnected before message could be sent.')
+            logger.warning('010', 'Disconnected before message could be sent.')
             raise EarlyDisconnectError()
 
     def on_rejected(self, event):
