@@ -1,14 +1,31 @@
 """
 Provides tests around the Synchronous workflow
 """
-from unittest import TestCase
-
+import unittest
+import re
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
-from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
 
-class SynchronousMessagingPatternTests(TestCase):
+class TextErrorResponseAssertor(object):
+
+    def __init__(self, received_message: str):
+        self.received_message = received_message
+        self.assertor = unittest.TestCase('__init__')
+
+    def assert_error_code(self, expected_error_code: int):
+        expression = re.compile('(errorCode=(?P<errorCode>[0-9]+))')
+        matches = expression.search(self.received_message)
+        if len(matches.groups()) != 2:
+            raise Exception("No error code found in the returned string")
+
+        matching_groups = matches.group('errorCode')
+        self.assertor.assertEqual(int(matching_groups), expected_error_code, 'Error code did not match expected value')
+
+        return self
+
+
+class SynchronousMessagingPatternTests(unittest.TestCase):
     """
      These tests show a synchronous response from Spine via the MHS for the example message interaction of PDS
     (Personal Demographics Service).
@@ -28,5 +45,6 @@ class SynchronousMessagingPatternTests(TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        # Hl7XmlResponseAssertor(response.text) \
-        #     .assert_element_exists('.//retrievalQueryResponse//QUPA_IN050000UK32//PdsSuccessfulRetrieval')
+
+        TextErrorResponseAssertor(response.text)\
+            .assert_error_code(200)

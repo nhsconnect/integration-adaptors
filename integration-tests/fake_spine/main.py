@@ -22,8 +22,8 @@ def build_application(fake_response_handler: SpineRequestResponseMapper):
 
 def build_application_configuration() -> SpineRequestResponseMapper:
     return SpineRequestResponseMapper({
-        RequestMatcher('default-matcher', lambda x: True):
-            SpineResponse().override_response_code(500).override_response('TEST_RESPONSE.xml')
+        RequestMatcher('soap-fault-response', lambda x: True):
+            SpineResponse().override_response_code(500).override_response('soap_fault_single_error.xml')
     })
 
 
