@@ -18,7 +18,7 @@ DOCUMENT_TYPE = 'documentType'
 TO_ASID = 'to_asid'
 
 
-def build_message(template, patient_nhs_number):
+def build_message(template, patient_nhs_number='9446245796', to_party_id='YES-0000806', to_asid='928942012545'):
     """Build an upload message
 
     :param template: The Name of the template to be used.
@@ -29,7 +29,7 @@ def build_message(template, patient_nhs_number):
     current_utc_time = datetime.datetime.utcnow()
     timestamp = current_utc_time.strftime(TIMESTAMP_FORMAT)
     uuid = message_utilities.MessageUtilities.get_uuid()
-    to_party_id = 'X26-9199246'
+    to_party_id = to_party_id
     file_upload = 'test file will go here'
     dissent_override = '0'
     use_date_filter = False
@@ -39,7 +39,7 @@ def build_message(template, patient_nhs_number):
         UUID: uuid,
         TIMESTAMP: timestamp,
         ASID: get_asid(),
-        TO_ASID: '918999199246',
+        TO_ASID: to_asid,
         PATIENT_NHS_NUMBER: patient_nhs_number,
         TO_PARTY_ID: to_party_id,
         FILE_UPLOAD: file_upload,
