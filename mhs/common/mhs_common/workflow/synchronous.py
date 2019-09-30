@@ -96,7 +96,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
 
         if exception.response:
-            code, response = handle_soap_error(exception.response.code,
+            code, response, _ = handle_soap_error(exception.response.code,
                                                exception.response.headers,
                                                exception.response.body)
             return code, response
