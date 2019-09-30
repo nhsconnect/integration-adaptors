@@ -13,7 +13,8 @@ pipeline {
         stage('Build modules') {
             steps{
                 sh '''
-                docker run --network custom_network_default -v $PWD:/test --entrypoint "ls /test" python:3-slim
+                ls $PWD
+                docker run -v $PWD:/test --entrypoint ls python:3-slim
                 '''
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
