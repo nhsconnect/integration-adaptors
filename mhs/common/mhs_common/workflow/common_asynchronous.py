@@ -43,6 +43,17 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
         super().__init__(routing)
 
+    async def _create_new_work_description_if_required(self, message_id: str, wdo: wd.WorkDescription,
+                                                       workflow_name: str):
+        if not wdo:
+            wdo = wd.create_new_work_description(self.persistence_store,
+                                                 message_id,
+                                                 workflow_name,
+                                                 outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
+                                                 )
+            await wdo.publish()
+        return wdo
+
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key, cpa_id):
         try:

@@ -49,13 +49,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async forward reliable workflow to handle outbound message')
-        if not wdo:
-            wdo = wd.create_new_work_description(self.persistence_store,
-                                                 message_id,
-                                                 workflow.FORWARD_RELIABLE,
-                                                 outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
-                                                 )
-            await wdo.publish()
+        wdo = await self._create_new_work_description_if_required(message_id, wdo, workflow.FORWARD_RELIABLE)
 
         try:
             details = await self._lookup_endpoint_details(interaction_details)

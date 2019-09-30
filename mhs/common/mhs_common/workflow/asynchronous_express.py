@@ -51,13 +51,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
-        if not wdo:
-            wdo = wd.create_new_work_description(self.persistence_store,
-                                                 message_id,
-                                                 workflow.ASYNC_EXPRESS,
-                                                 outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
-                                                 )
-            await wdo.publish()
+        wdo = await self._create_new_work_description_if_required(message_id, wdo, workflow.ASYNC_EXPRESS)
 
         try:
             details = await self._lookup_endpoint_details(interaction_details)
