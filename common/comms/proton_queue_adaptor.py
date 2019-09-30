@@ -149,43 +149,31 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         """
         logger.warning('011', "There was an error with the transport used for the connection to {host}.",
                        {'host': self._host})
-
-        if not self._sent:
-            logger.warning('012', "Transport error occurred before message could be sent.", {'host': self._host})
-            raise EarlyDisconnectError()
+        raise EarlyDisconnectError()
 
     def on_connection_error(self, event: proton.Event) -> None:
         """Called when the peer closes the connection with an error condition.
 
         :param event: The connection error event.
         """
-        logger.warning('013', "{host} closed the connection with an error. {remote_condition}",
+        logger.warning('012', "{host} closed the connection with an error. {remote_condition}",
                        {'host': self._host, 'remote_condition': event.context.remote_condition})
-
-        if not self._sent:
-            logger.warning('014', "{host} closed the connection before message could be sent.", {'host': self._host})
-            raise EarlyDisconnectError()
+        raise EarlyDisconnectError()
 
     def on_session_error(self, event: proton.Event) -> None:
         """Called when the peer closes the session with an error condition.
 
         :param event: The session error event.
         """
-        logger.warning('015', "{host} closed the session with an error. {remote_condition}",
+        logger.warning('013', "{host} closed the session with an error. {remote_condition}",
                        {'host': self._host, 'remote_condition': event.context.remote_condition})
-
-        if not self._sent:
-            logger.warning('016', "{host} closed the session before message could be sent.", {'host': self._host})
-            raise EarlyDisconnectError()
+        raise EarlyDisconnectError()
 
     def on_link_error(self, event: proton.Event) -> None:
         """Called when the peer closes the link with an error condition.
 
         :param event: The link error event.
         """
-        logger.warning('017', "{host} closed the link with an error. {remote_condition}",
+        logger.warning('014', "{host} closed the link with an error. {remote_condition}",
                        {'host': self._host, 'remote_condition': event.context.remote_condition})
-
-        if not self._sent:
-            logger.warning('018', "{host} closed the link before message could be sent.", {'host': self._host})
-            raise EarlyDisconnectError()
+        raise EarlyDisconnectError()
