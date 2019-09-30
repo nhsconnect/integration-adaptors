@@ -61,8 +61,10 @@ output "outbound_lb_target_group_arn" {
 # Listener for MHS outbound load balancer that forwards requests to the correct target group
 resource "aws_lb_listener" "outbound_alb_listener" {
   load_balancer_arn = aws_lb.outbound_alb.arn
-  port = 80
-  protocol = "HTTP"
+  port = 443
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = var.outbound_alb_certificate_arn
 
   default_action {
     type = "forward"
@@ -129,8 +131,10 @@ output "route_lb_target_group_arn" {
 # Listener for MHS route service's load balancer that forwards requests to the correct target group
 resource "aws_lb_listener" "route_alb_listener" {
   load_balancer_arn = aws_lb.route_alb.arn
-  port = 80
-  protocol = "HTTP"
+  port = 443
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = var.route_alb_certificate_arn
 
   default_action {
     type = "forward"

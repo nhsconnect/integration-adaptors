@@ -9,9 +9,8 @@ import unittest
 import uuid
 
 import requests
-from requests import Response
-
 from integration_tests.helpers.asid_provider import get_asid
+from requests import Response
 
 
 class MhsHttpRequestBuilder(object):
@@ -22,10 +21,11 @@ class MhsHttpRequestBuilder(object):
     def __init__(self):
         self.headers = {}
         self.body = None
-        self.mhs_host = "http://" + os.environ.get('MHS_ADDRESS', 'localhost') + "/"
+        self.mhs_host = os.environ.get('MHS_ADDRESS', 'http://localhost') + "/"
         self.assertor = unittest.TestCase('__init__')
 
-    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool, correlation_id: str = str(uuid.uuid4()).upper(), ods_code: str = "YES") -> MhsHttpRequestBuilder:
+    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool,
+                     correlation_id: str = str(uuid.uuid4()).upper(), ods_code: str = "YES") -> MhsHttpRequestBuilder:
         """
         Allows the setting of required headers for the MHS
         :param ods_code: the ods code of the system you wish to communicate with (spine is YES)
@@ -63,7 +63,7 @@ class MhsHttpRequestBuilder(object):
         Asserts the response is successful.
         :return: response from MHS
         """
-        response = requests.post(self.mhs_host, headers=self.headers, data=self.body)
+        response = requests.post(self.mhs_host, headers=self.headers, data=self.body, verify=False)
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')

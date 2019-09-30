@@ -52,11 +52,11 @@ resource "aws_security_group_rule" "mhs_outbound_security_group_vpc_endpoints_eg
 resource "aws_security_group_rule" "mhs_outbound_security_group_route_egress_rule" {
   security_group_id = aws_security_group.mhs_outbound_security_group.id
   type = "egress"
-  from_port = 80
-  to_port = 80
+  from_port = 443
+  to_port = 443
   protocol = "tcp"
   source_security_group_id = aws_security_group.alb_route_security_group.id
-  description = "Allow HTTP outbound connections to MHS Route service LB."
+  description = "Allow HTTPS outbound connections to MHS Route service LB."
 }
 
 # Egress rule to allow requests to ECR (to pull the MHS outbound image to run)
@@ -332,13 +332,13 @@ resource "aws_security_group" "alb_outbound_security_group" {
   # A supplier could restrict this rule further by limiting access, for
   # example to a specific Security Group
   ingress {
-    from_port = 80
-    to_port = 80
+    from_port = 443
+    to_port = 443
     protocol = "tcp"
     cidr_blocks = [
       data.aws_vpc.supplier_vpc.cidr_block
     ]
-    description = "Allow inbound HTTP connections from supplier VPC"
+    description = "Allow inbound HTTPS connections from supplier VPC"
   }
 
   # Allow outbound traffic to MHS outbound tasks
@@ -367,13 +367,13 @@ resource "aws_security_group" "alb_route_security_group" {
 
   # Allow inbound traffic from MHS outbound
   ingress {
-    from_port = 80
-    to_port = 80
+    from_port = 443
+    to_port = 443
     protocol = "tcp"
     security_groups = [
       aws_security_group.mhs_outbound_security_group.id
     ]
-    description = "Allow inbound HTTP connections from MHS outbound tasks"
+    description = "Allow inbound HTTPS connections from MHS outbound tasks"
   }
 
   # Allow outbound traffic to MHS route tasks

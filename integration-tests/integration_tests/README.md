@@ -10,9 +10,8 @@ When running the tests locally, you will need to set the MHS_ADDRESS, ASID, AWS_
  the Run/Debug Configurations.
 - The ASID is a 12 digit number needed to access Opentest, supplied by NHS Digital
     - eg ASID=123456789012
-- The MHS_ADDRESS is the hostname of the MHS instance being used for testing and should be supplied in it's raw state,
- without the 'http://' prefix or '/' suffix
-    - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
+- The MHS_ADDRESS is the URL of the MHS instance being used for testing
+    - eg MHS_ADDRESS=http://localhost
 - The AWS_ACCESS_KEY_ID can be 'test' locally.
 - The AWS_SECRET_ACCESS_KEY can be 'test' locally.
 - MHS_DYNAMODB_ENDPOINT_URL can be http://localhost:8000 locally.
