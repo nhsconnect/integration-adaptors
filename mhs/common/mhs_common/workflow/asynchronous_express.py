@@ -1,24 +1,24 @@
 """This module defines the asynchronous express workflow."""
 import asyncio
-
 from typing import Tuple, Optional
+from xml.etree import ElementTree as ET
+
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
-from mhs_common.messages.soap_fault_envelope import SOAPFault
-from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
 from utilities import timing
 
 from mhs_common import workflow
 from mhs_common.errors import ebxml_handler
 from mhs_common.errors.soap_handler import handle_soap_error
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
+from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
+from mhs_common.messages.soap_fault_envelope import SOAPFault
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous
-from xml.etree import ElementTree as ET
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_EXPRESS_WORKFLOW')
 
@@ -155,8 +155,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         retries_remaining = self.inbound_queue_max_retries
         while True:
             try:
-                await self.queue_adaptor.send_async(payload, properties={'message-id': message_id,
-                                                                         'correlation-id': correlation_id})
+                await self._put_message_onto_queue_with(message_id, correlation_id, payload)
                 break
             except Exception as e:
                 logger.warning('0012', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})

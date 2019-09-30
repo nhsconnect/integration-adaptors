@@ -71,3 +71,8 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         except Exception as e:
             logger.warning('0003', 'Error encountered whilst obtaining outbound URL. {exception}', {'exception': e})
             raise e
+
+    async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments=None):
+        await self.queue_adaptor.send_async({'payload': payload, 'attachments': attachments or []},
+                                            properties={'message-id': message_id,
+                                                        'correlation-id': correlation_id})

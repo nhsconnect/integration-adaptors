@@ -326,7 +326,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
 
-        self.mock_queue_adaptor.send_async.assert_called_once_with(PAYLOAD,
+        self.mock_queue_adaptor.send_async.assert_called_once_with({'payload': PAYLOAD, 'attachments': []},
                                                                    properties={'message-id': MESSAGE_ID,
                                                                                'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
@@ -344,7 +344,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
 
-        self.mock_queue_adaptor.send_async.assert_called_with(PAYLOAD,
+        self.mock_queue_adaptor.send_async.assert_called_with({'payload': PAYLOAD, 'attachments': []},
                                                               properties={'message-id': MESSAGE_ID,
                                                                           'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),

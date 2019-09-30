@@ -43,6 +43,13 @@ INTERACTION_DETAILS = {
 }
 PAYLOAD = 'payload'
 SERIALIZED_MESSAGE = 'serialized-message'
+ATTACHMENTS = [{
+    ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
+    ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+    ebxml_request_envelope.ATTACHMENT_BASE64: False,
+    ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
+    ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
+}]
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
 INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
@@ -136,7 +143,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual('', message)
         self.mock_create_new_work_description.assert_called_once_with(
             self.mock_persistence_store, MESSAGE_ID,
-            workflow.forward_reliable,
+            workflow.FORWARD_RELIABLE,
             outbound_status=MessageStatus.OUTBOUND_MESSAGE_RECEIVED
         )
         self.mock_work_description.publish.assert_called_once()
@@ -437,7 +444,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
 
-        self.mock_queue_adaptor.send_async.assert_called_once_with(PAYLOAD,
+        self.mock_queue_adaptor.send_async.assert_called_once_with({'payload': PAYLOAD, 'attachments': []},
                                                                    properties={'message-id': MESSAGE_ID,
                                                                                'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
@@ -455,7 +462,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
 
-        self.mock_queue_adaptor.send_async.assert_called_with(PAYLOAD,
+        self.mock_queue_adaptor.send_async.assert_called_with({'payload': PAYLOAD, 'attachments': []},
                                                               properties={'message-id': MESSAGE_ID,
                                                                           'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
@@ -490,13 +497,13 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
     @mock.patch.object(forward_reliable, 'logger')
     @async_test
-    async def test_successful_handle_inbound_message(self, log_mock):
+    async def test_successful_handle_unsolicited_inbound_message(self, log_mock):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, [])
+        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, ATTACHMENTS)
 
-        self.mock_queue_adaptor.send_async.assert_called_once_with(PAYLOAD,
+        self.mock_queue_adaptor.send_async.assert_called_once_with({'payload': PAYLOAD, 'attachments': ATTACHMENTS},
                                                                    properties={'message-id': MESSAGE_ID,
                                                                                'correlation-id': CORRELATION_ID})
         self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
@@ -512,16 +519,16 @@ class TestForwardReliableWorkflow(unittest.TestCase):
     @mock.patch.object(forward_reliable, 'logger')
     @mock.patch('asyncio.sleep')
     @async_test
-    async def test_handle_inbound_message_error_putting_message_onto_queue_then_success(self, mock_sleep, log_mock):
+    async def test_handle_unsolicited_inbound_message_error_putting_message_onto_queue_then_success(self, mock_sleep, log_mock):
         self.setup_mock_work_description()
         error_future = asyncio.Future()
         error_future.set_exception(proton_queue_adaptor.MessageSendingError())
         self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
         mock_sleep.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, [])
+        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, ATTACHMENTS)
 
-        self.mock_queue_adaptor.send_async.assert_called_with(PAYLOAD,
+        self.mock_queue_adaptor.send_async.assert_called_with({'payload': PAYLOAD, 'attachments': ATTACHMENTS},
                                                               properties={'message-id': MESSAGE_ID,
                                                                           'correlation-id': CORRELATION_ID})
         log_mock.audit.assert_called_once_with(mock.ANY, 'Forward reliable workflow invoked for inbound unsolicited '
@@ -533,7 +540,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
     @mock.patch.object(forward_reliable, 'logger')
     @mock.patch('asyncio.sleep')
     @async_test
-    async def test_handle_inbound_message_error_putting_message_onto_queue_despite_retries(self, mock_sleep, log_mock):
+    async def test_handle_unsolicited_inbound_message_error_putting_message_onto_queue_despite_retries(self, mock_sleep, log_mock):
         self.setup_mock_work_description()
         future = asyncio.Future()
         future.set_exception(proton_queue_adaptor.MessageSendingError())
