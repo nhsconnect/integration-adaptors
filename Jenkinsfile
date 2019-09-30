@@ -11,7 +11,7 @@ pipeline {
 
     stages {
         stage('Build modules') {
-            steps{
+            steps {
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
                 dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
@@ -61,22 +61,26 @@ pipeline {
             stages {
                 stage('Deploy component locally') {
                     steps {
-                        sh label: 'Building local images', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build'
-                        sh label: 'Composing up local services', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up > compose-logs.txt &'
+                        sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
+                        sh label: 'Export environment variables', script: '''
+                            . ./component-test-source.sh
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up -d'''
                     }
                 }
                 stage('Component Tests') {
                     steps {
-                        dir('integration-tests/integration_tests') {
-                            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                            sh label: 'Running integration tests', script: 'pipenv run componenttests'
-                        }
+                        sh label: 'Running component tests', script: '''
+                             docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
+                             docker run --network custom_network_default --env "MHS_ADDRESS=http://outbound" componenttest:$BUILD_TAG
+                        '''
                     }
                 }
             }
             post {
                 always {
-                    sh label: 'Docker compose down', script: 'docker-compose down -v'
+                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml logs'
+                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
                 }
             }
         }
@@ -230,7 +234,7 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-            sh 'docker-compose down -v'
+            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
