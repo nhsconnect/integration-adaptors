@@ -92,12 +92,20 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         self._sender = None
         self._sent = False
 
-    def on_start(self, event):
+    def on_start(self, event: proton.Event) -> None:
+        """Called when this messaging handler is started.
+
+        :param event: The start event.
+        """
         logger.info('002', 'Establishing connection to {host} for sending messages.', {'host': self._host})
         self._sender = event.container.create_sender(proton.Url(self._host, username=self._username,
                                                                 password=self._password))
 
-    def on_sendable(self, event):
+    def on_sendable(self, event: proton.Event) -> None:
+        """Called when the link is ready for sending messages.
+
+        :param event: The sendable event.
+        """
         if event.sender.credit:
             if not self._sent:
                 event.sender.send(self._message)
@@ -107,17 +115,30 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
             logger.warning('004', 'Failed to send message as no available credit.')
             raise MessageSendingError()
 
-    def on_accepted(self, event):
+    def on_accepted(self, event: proton.Event) -> None:
+        """Called when the outgoing message is accepted by the remote peer.
+
+        :param event: The accepted event.
+        """
         logger.info('005', 'Message received by {host}.', {'host': self._host})
         event.connection.close()
 
-    def on_disconnected(self, event):
+    def on_disconnected(self, event: proton.Event) -> None:
+        """Called when the socket is disconnected.
+
+        :param event: The disconnect event.
+        """
         logger.info('006', 'Disconnected from {host}.', {'host': self._host})
         if not self._sent:
             logger.warning('010', 'Disconnected before message could be sent.')
             raise EarlyDisconnectError()
 
-    def on_rejected(self, event):
+    def on_rejected(self, event: proton.Event) -> None:
+        """Called when the outgoing message is rejected by the remote peer.
+
+        :param event:
+        :return:
+        """
         logger.warning('007', 'Message rejected by {host}.', {'host': self._host})
         self._sent = False
 
