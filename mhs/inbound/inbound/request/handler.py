@@ -95,7 +95,7 @@ class InboundHandler(base_handler.BaseHandler):
 
         # If not, then something has gone wrong
         else:
-            logger.warning('003', 'No work description found in state store for message with {workflow} , unsolicited '
+            logger.error('003', 'No work description found in state store for message with {workflow} , unsolicited '
                                   'message received unexpectedly from Spine.',
                            {'workflow': interaction_details['workflow']})
             raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
