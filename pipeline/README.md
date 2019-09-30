@@ -16,6 +16,7 @@ In order to run the build pipeline, the following resources must be created manu
 
 - An S3 bucket to be used to store the Terraform state databases for the MHS & SCR configurations. This allows deployed resources to be re-used in
 subsequent builds, reducing the time needed to deploy updated services.
+    - It is recommended that default encryption of objects in this bucket is enabled when creating it
 - Two DynamoDB tables to be used to allow Terraform to lock the shared state of the MHS & SCR configurations, preventing issues if concurrent deployments
 of the same environment are performed. These tables must have a primary key named `LockID`.
 - Log groups in Cloudwatch under the following names:
@@ -33,8 +34,8 @@ of the same environment are performed. These tables must have a primary key name
 with the trusted entity set to 'Elastic Container Service Task' with the built-in `AmazonECSTaskExecutionRolePolicy`.
 You can use the `ecsTaskExecutionRole` created for you automatically by AWS when creating a task definition from the
 console, if available.
-  - This role also needs a policy to allow it to fetch the required secrets from AWS secrets manager (see
-  [below section](#global-variables) for details of the required secrets). This policy should look like:
+  - This role also needs a policy to allow it to fetch the required secrets from AWS secrets manager (see below for
+  details of the required secrets). This policy should look like:
 ```
   {
     "Version": "2012-10-17",
@@ -96,15 +97,33 @@ containers to be published to ECR and the integration test environment to be sto
     - AmazonRoute53FullAccess
     - AmazonElastiCacheFullAccess
 - An ECS Cluster for the SCR application to be deployed into. This must be an EC2 Linux cluster.
-- Entries in AWS Secrets Manager for all sensitive data. These entries should be created by following the AWS, selecting
-to store the secret as "Other type of secrets" and entering the required value using the plaintext tab (these values
-should not be specified as JSON). The following secrets are required:
+- Two TLS certificates. One to be used for the outbound load balancer and one for the route load balancer
+    - These certificates should be stored in AWS Certificate Manager (they can either be requested through Certificate
+    Manager, or imported into it)
+    - If you wish to use self-signed certificates, these can be generated using OpenSSL with the following command:
+    `openssl req -x509 -subj //CN=<lb-hostname> -newkey rsa:<key-length> -nodes -keyout key.pem -out cert.pem -days <days-until-expiry>`
+        - Where route-lb-hostname is the DNS name of the loadbalancer. This is
+        `mhs-outbound.<environment-id>.<internal_root_domain>` for the outbound loadbalancer and
+        `mhs-route.<environment-id>.<internal_root_domain>` for the route loadbalancer, where `environment-id` and
+        `<internal_root_domain>` are the variables provided to Terraform when deploying the exmplar blueprint.
+        - Where key-length is the length of the RSA key (in bits) to use for the certificate
+        - Where days-until-expiry is the number of days the generated certificate should be valid for
+        - e.g: `openssl req -x509 -subj //CN=mhs-outbound.example-environment.myteam.example.com -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365`
+- Entries in AWS Secrets Manager for all sensitive data. These entries should be created by following the [AWS tutorial
+on storing secrets](https://docs.aws.amazon.com/secretsmanager/latest/userguide/tutorials_basic.html#tutorial-basic-step1),
+selecting to store the secret as "Other type of secrets" and entering the required value using the plaintext tab (these
+values should not be specified as JSON). The following secrets are required:
     - The username to use when connecting to the AMQP inbound queue
     - The password to use when connecting to the AMQP inbound queue
     - The party key associated with your MHS
     - The client certificate the outbound MHS component should present to other MHS instances
     - The private key for the client certificate the outbound MHS component should present to other MHS instances
-    - The CA certificates used to validate the certificates presented by incoming connections to the MHS.
+    - (Optional) The CA certificates used to validate the certificates presented by the MHS. This value is required if
+    the certificate you have used for the outbound load balancer (above) is not signed by a legitimate CA. If you have
+    used a self-signed certificate, this value can be that certificate.
+    - (Optional) The CA certificates used to validate the certificate presented by the MHS' route service. This value is required if
+    the certificate you have used for the route load balancer (above) is not signed by a legitimate CA. If you have
+    used a self-signed certificate, this value can be that certificate.
 
 # Jenkins
 
@@ -200,6 +219,12 @@ queue.
 `CLIENT_CERT_ARN`
 - CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented by
 incoming connections to the MHS.
+- OUTBOUND_ALB_CERT_ARN: The ARN (in AWS Certificate Manager) of the certificates the outbound ALB should present.
+- ROUTE_ALB_CERT_ARN: The ARN (in AWS Certificate Manager) of the certificates the outbound ALB should present.
+- ROUTE_CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented by
+the Spine Route Lookup service.
+- OUTBOUND_CA_CERTS_ARN: The ARN (in secrets manager) of the CA certificates used to validate the certificates presented
+by the outbound service's load balancer.
 - SPINE_ORG_CODE: The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
 - SPINEROUTELOOKUP_SERVICE_LDAP_URL: The URL the Spine Route Lookup service should use to communicate with SDS.
 e.g. `ldaps://example.com`

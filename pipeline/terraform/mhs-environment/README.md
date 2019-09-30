@@ -101,11 +101,13 @@ In practice, this means that:
 - the supplier VPC needs to:
   - allow outbound traffic on port 80 to the MHS outbound load balancer
   - allow inbound traffic on port 5671 to the Amazon MQ instance
+  - Have DNS hostnames enabled
 - the Opentest VPC needs to:
   - allow outbound traffic on port 443 to the MHS inbound load balancer for requests/responses
   from Spine
   - allow inbound traffic from the MHS VPC on port 3128 for the HTTP proxy
   - allow inbound traffic from the MHS VPC on port 389 for LDAP requests
+  - Have DNS hostnames enabled
 
 Also note that the MHS VPC uses the private ip address cidr block 10.0.0.0/16. The supplier
 and Opentest VPCs will need to use non-overlapping cidr blocks in order for the VPC

@@ -9,11 +9,11 @@ import tornado.web
 import utilities.config as config
 import utilities.integration_adaptors_logger as log
 from comms import proton_queue_adaptor
-from mhs_common import workflow, certs
+from mhs_common import workflow
 from mhs_common.configuration import configuration_manager
 from mhs_common.request import healthcheck_handler
 from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
-from utilities import secrets
+from utilities import secrets, certs
 
 import inbound.request.handler as async_request_handler
 
@@ -93,12 +93,12 @@ def main():
     secrets.setup_secret_config("MHS")
     log.configure_logging()
 
-    data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
+    data_dir = pathlib.Path(definitions.ROOT_DIR) / 'data'
 
-    key_file, local_cert_file, ca_certs_file = certs.create_certs_files(data_dir / '..',
-                                                    private_key=secrets.get_secret_config('CLIENT_KEY'),
-                                                    local_cert=secrets.get_secret_config('CLIENT_CERT'),
-                                                    ca_certs=secrets.get_secret_config('CA_CERTS'))
+    certificates = certs.Certs.create_certs_files(data_dir / '..',
+                                                  private_key=secrets.get_secret_config('CLIENT_KEY'),
+                                                  local_cert=secrets.get_secret_config('CLIENT_CERT'),
+                                                  ca_certs=secrets.get_secret_config('CA_CERTS'))
     party_key = secrets.get_secret_config('PARTY_KEY')
 
     workflows = initialise_workflows()
@@ -107,7 +107,8 @@ def main():
     interactions_config_file = str(data_dir / "interactions" / "interactions.json")
     config_manager = configuration_manager.ConfigurationManager(interactions_config_file)
 
-    start_inbound_server(local_cert_file, ca_certs_file, key_file, party_key, workflows, store, config_manager)
+    start_inbound_server(certificates.local_cert_path, certificates.ca_certs_path, certificates.private_key_path,
+                         party_key, workflows, store, config_manager)
 
 
 if __name__ == "__main__":
