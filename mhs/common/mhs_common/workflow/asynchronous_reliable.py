@@ -29,6 +29,7 @@ logger = log.IntegrationAdaptorsLogger('ASYNC_RELIABLE_WORKFLOW')
 
 class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflow):
     """Handles the workflow for the asynchronous reliable messaging pattern."""
+
     def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
@@ -123,7 +124,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                         if SOAPFault.is_soap_fault_retriable(soap_fault_codes):
                             retries_remaining -= 1
                             logger.warning("0015", "A retriable error was encountered {error} {retries_remaining} "
-                                           "{max_retries}",
+                                                   "{max_retries}",
                                            {"error": parsed_response,
                                             "retries_remaining": retries_remaining,
                                             "max_retries": num_of_retries})
@@ -162,8 +163,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                    interaction_id=None,
                                    acknowledgment=None):
         logger.audit('0011', 'Async-Reliable outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
-                             'received. '
-                             '{Message-ID} {Interaction-ID}',
+                             'received. {Message-ID} {Interaction-ID}',
                      {'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
 
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
@@ -189,7 +189,9 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0010', 'Entered async reliable workflow to handle inbound message')
-        self._record_outbound_audit_log(message_id)
+        logger.audit('0011', 'Async-Reliable inbound workflow invoked. Message received from Spine '
+                             'received. {Message-ID}',
+                     {'Message-ID': message_id})
 
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,

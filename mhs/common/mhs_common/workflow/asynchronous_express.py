@@ -158,17 +158,16 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
-        self._record_outbound_audit_log(message_id)
+
+        logger.audit('0011', 'Async-Express inbound workflow invoked. Message received from spine '
+                             '{Message-ID}',
+                     {'Message-ID': message_id})
 
         logger.info('0010', 'Entered async express workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
                                             self.store_retries)
-
-        logger.audit('0011', 'Async-Express inbound workflow invoked. Message received from spine '
-                             '{Message-ID} {Time} ',
-                     {'Time': timing.get_time(), 'Message-ID': message_id})
 
         await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, payload)
 

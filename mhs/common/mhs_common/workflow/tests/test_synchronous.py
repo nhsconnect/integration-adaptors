@@ -232,7 +232,6 @@ class TestSynchronousWorkflow(unittest.TestCase):
                     ' {Message-ID} {Interaction-ID}',
             {'Acknowledgment': True, 'Message-ID': '123', 'Interaction-ID': 'test-interaction'})
 
-    @mock.patch('utilities.timing.get_time')
     @mock.patch('mhs_common.workflow.synchronous.logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test

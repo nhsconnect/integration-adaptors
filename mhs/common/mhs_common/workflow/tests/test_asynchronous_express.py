@@ -336,7 +336,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
         log_mock.audit.assert_called_with(
-            '0011', 'Async-Express inbound workflow invoked. Message received from spine {Message-ID} {Time} ',
+            '0011', 'Async-Express inbound workflow invoked. Message received from spine {Message-ID}',
             {'Message-ID': MESSAGE_ID})
 
     @mock.patch('asyncio.sleep')

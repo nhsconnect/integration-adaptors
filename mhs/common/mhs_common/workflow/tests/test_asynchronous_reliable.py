@@ -74,27 +74,27 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.addCleanup(patcher.stop)
 
         self.workflow = async_reliable.AsynchronousReliableWorkflow(party_key=FROM_PARTY_KEY,
-                                                                   persistence_store=self.mock_persistence_store,
-                                                                   transmission=self.mock_transmission_adaptor,
-                                                                   queue_adaptor=self.mock_queue_adaptor,
-                                                                   inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                                   inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
-                                                                   persistence_store_max_retries=3,
-                                                                   routing=self.mock_routing_reliability)
+                                                                    persistence_store=self.mock_persistence_store,
+                                                                    transmission=self.mock_transmission_adaptor,
+                                                                    queue_adaptor=self.mock_queue_adaptor,
+                                                                    inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+                                                                    inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+                                                                    persistence_store_max_retries=3,
+                                                                    routing=self.mock_routing_reliability)
 
         self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
     def test_construct_workflow_with_only_outbound_params(self):
         workflow = async_reliable.AsynchronousReliableWorkflow(party_key=mock.sentinel.party_key,
-                                                              persistence_store=mock.sentinel.persistence_store,
-                                                              transmission=mock.sentinel.transmission,
-                                                              routing=self.mock_routing_reliability)
+                                                               persistence_store=mock.sentinel.persistence_store,
+                                                               transmission=mock.sentinel.transmission,
+                                                               routing=self.mock_routing_reliability)
         self.assertIsNotNone(workflow)
 
     def test_construct_workflow_with_only_inbound_params(self):
         workflow = async_reliable.AsynchronousReliableWorkflow(queue_adaptor=mock.sentinel.queue_adaptor,
-                                                              inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                              inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
+                                                               inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+                                                               inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
         self.assertIsNotNone(workflow)
         self.assertEqual(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS, workflow.inbound_queue_retry_delay)
 
@@ -383,7 +383,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                     self.mock_transmission_adaptor.make_request.reset_mock()
 
     @async_test
-    async def test_soap_error_request_is_non_retriable(self,):
+    async def test_soap_error_request_is_non_retriable(self, ):
         self.setup_mock_work_description()
         self._setup_routing_mock()
 
@@ -408,13 +408,13 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
 
                 self.mock_transmission_adaptor.make_request.assert_called_once()
 
-
     ############################
     # Inbound tests
     ############################
 
+    @mock.patch('mhs_common.workflow.asynchronous_reliable.logger')
     @async_test
-    async def test_successful_handle_inbound_message(self):
+    async def test_successful_handle_inbound_message(self, log_mock):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
@@ -426,6 +426,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
+        log_mock.audit.assert_called_with('0011', 'Async-Reliable inbound workflow invoked. Message received from Spine'
+                                          ' received. {Message-ID}',
+                                          {'Message-ID': 'message-id'})
 
     @mock.patch('asyncio.sleep')
     @async_test
