@@ -208,20 +208,16 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.assertEqual(error, 200)
         self.assertEqual(text, 'response body')
 
-    @mock.patch('utilities.timing.get_time')
     @mock.patch('mhs_common.workflow.synchronous.logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
-    async def test_audit_log_should_be_called_when_successful_response_is_returned_from_spine(self, wd_mock,
-                                                                                              log_mock, time_mock):
+    async def test_success_audit_log_should_be_called_when_successful_response_is_returned_from_spine(self, wd_mock,
+                                                                                                      log_mock):
         self._setup_success_workflow()
-        self.transmission.make_request.side_effect = Exception("Test Exception")
-
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
-        time_mock.return_value = 10
 
         await self.wf.handle_outbound_message(
             from_asid="202020",
@@ -232,24 +228,25 @@ class TestSynchronousWorkflow(unittest.TestCase):
             work_description_object=None)
 
         log_mock.audit.assert_called_with(
-            '0011', 'Synchronous workflow invoked. Message sent to Spine and {Acknowledgment} received. {Message-ID} '
-                    '{Interaction-ID} {RequestSentTime} {AcknowledgmentReceivedTime}',
-            {'RequestSentTime': 10, 'AcknowledgmentReceivedTime': 10, 'Acknowledgment': False, 'Message-ID': '123',
-             'Interaction-ID': 'test-interaction'})
+            '0011', 'Synchronous workflow invoked. Message sent to Spine and {Acknowledgment} received.'
+                    ' {Message-ID} {Interaction-ID}',
+            {'Acknowledgment': True, 'Message-ID': '123', 'Interaction-ID': 'test-interaction'})
 
     @mock.patch('utilities.timing.get_time')
     @mock.patch('mhs_common.workflow.synchronous.logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
-    async def test_failure_audit_log_should_be_called_when_successful_response_is_returned_from_spine(self, wd_mock,
-                                                                                                      log_mock,
-                                                                                                      time_mock):
+    async def test_failure_audit_log_should_be_called_when_failure_response_is_returned_from_spine(self, wd_mock,
+                                                                                                   log_mock):
         self._setup_success_workflow()
         wdo = mock.MagicMock()
         wdo.publish.return_value = test_utilities.awaitable(None)
         wd_mock.return_value = wdo
         wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
-        time_mock.return_value = 10
+
+        future = asyncio.Future()
+        future.set_exception(httpclient.HTTPClientError(code=451))
+        self.transmission.make_request.return_value = future
 
         await self.wf.handle_outbound_message(
             from_asid="202020",
@@ -260,10 +257,9 @@ class TestSynchronousWorkflow(unittest.TestCase):
             work_description_object=None)
 
         log_mock.audit.assert_called_with(
-            '0011', 'Synchronous workflow invoked. Message sent to Spine and {Acknowledgment} received. {Message-ID} '
-                    '{Interaction-ID} {RequestSentTime} {AcknowledgmentReceivedTime}',
-            {'RequestSentTime': 10, 'AcknowledgmentReceivedTime': 10, 'Acknowledgment': True, 'Message-ID': '123',
-             'Interaction-ID': 'test-interaction'})
+            '0011', 'Synchronous workflow invoked. Message sent to Spine and {Acknowledgment} received.'
+                    ' {Message-ID} {Interaction-ID}',
+            {'Acknowledgment': False, 'Message-ID': '123', 'Interaction-ID': 'test-interaction'})
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test

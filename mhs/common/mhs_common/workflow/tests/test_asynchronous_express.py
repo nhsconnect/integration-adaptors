@@ -337,7 +337,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                          self.mock_work_description.set_inbound_status.call_args_list)
         log_mock.audit.assert_called_with(
             '0011', 'Async-Express inbound workflow invoked. Message received from spine {Message-ID} {Time} ',
-            {'Time': '10', 'Message-ID': MESSAGE_ID})
+            {'Message-ID': MESSAGE_ID})
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -393,9 +393,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
         self.assertEqual(MESSAGE_ID, audit_log_dict['Message-ID'])
         self.assertEqual(audit_log_dict['Interaction-ID'], ACTION)
-        self.assertEqual(audit_text, "Async-Express outbound workflow invoked. Message sent to Spine and"
-                                     " {Acknowledgment} received. {Message-ID} {Interaction-ID} {RequestSentTime}"
-                                     " {AcknowledgmentReceivedTime}")
+        self.assertEqual(audit_text, "Async-Express outbound workflow invoked. Message sent to Spine and "
+                                     "{Acknowledgment} received. {Message-ID} {Interaction-ID}")
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({

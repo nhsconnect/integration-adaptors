@@ -78,7 +78,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return error[0], error[1], None
 
-        start_time = timing.get_time()
         logger.info('0004', 'About to make outbound request')
         response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
 
@@ -86,8 +85,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             self._record_outbound_audit_log(
                 message_id,
                 interaction_details['action'],
-                start_time=start_time,
-                end_time=timing.get_time(),
                 acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
@@ -100,8 +97,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             self._record_outbound_audit_log(
                 message_id,
                 interaction_details['action'],
-                start_time=start_time,
-                end_time=timing.get_time(),
                 acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
@@ -109,14 +104,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
     def _record_outbound_audit_log(self,
                                    message_id,
-                                   interaction_id,
-                                   start_time, end_time,
-                                   acknowledgment):
+                                   interaction_id=None,
+                                   acknowledgment=None):
         logger.audit('0011', 'Async-Express outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
-                             'received. '
-                             '{Message-ID} {Interaction-ID} {RequestSentTime} {AcknowledgmentReceivedTime}',
-                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
+                             'received. {Message-ID} {Interaction-ID}',
+                     {'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
 
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key, cpa_id):
@@ -166,6 +158,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
+        self._record_outbound_audit_log(message_id)
+
         logger.info('0010', 'Entered async express workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,

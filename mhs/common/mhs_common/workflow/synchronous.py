@@ -71,38 +71,31 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
 
         logger.info('003', 'About to make outbound request')
-        start_time = timing.get_time()
         try:
             response = await self.transmission.make_request(url, headers, message)
-            end_time = timing.get_time()
         except httpclient.HTTPClientError as e:
-            end_time = timing.get_time()
             code, error = await self._handle_http_exception(e, wdo)
-            self._record_outbound_audit_log(message_id, interaction_details['action'], start_time, end_time, False)
+            self._record_outbound_audit_log(message_id, interaction_details['action'], False)
             return code, error, None
 
         except Exception as e:
-            end_time = timing.get_time()
             logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            self._record_outbound_audit_log(message_id, interaction_details['action'], start_time, end_time, False)
+            self._record_outbound_audit_log(message_id, interaction_details['action'], False)
             return 500, 'Error making outbound request', None
 
-        self._record_outbound_audit_log(message_id, interaction_details['action'], start_time, end_time, True)
-        logger.info('0021', 'Response received from spine {startTime} {endTime}',
-                    {'startTime': start_time, 'endTime': end_time})
+        self._record_outbound_audit_log(message_id, interaction_details['action'], True)
+
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         return response.code, response.body.decode(), wdo
 
     def _record_outbound_audit_log(self,
                                    message_id,
-                                   interaction_id,
-                                   start_time, end_time,
-                                   acknowledgment):
+                                   interaction_id=None,
+                                   acknowledgment=None):
         logger.audit('0011', 'Synchronous workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{Message-ID} {Interaction-ID} {RequestSentTime} {AcknowledgmentReceivedTime}',
-                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
+                             '{Message-ID} {Interaction-ID}',
+                     {'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
 
     async def _handle_http_exception(self, exception, wdo):
         logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',

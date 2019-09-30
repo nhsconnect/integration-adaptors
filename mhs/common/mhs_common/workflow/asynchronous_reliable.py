@@ -91,13 +91,13 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
         retries_remaining = num_of_retries
 
         while True:
-            start_time = timing.get_time()
             logger.info('0004', 'About to make outbound request')
             response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
 
             if response.code == 202:
-                end_time = timing.get_time()
-                self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+                self._record_outbound_audit_log(message_id,
+                                                interaction_id=interaction_details['action'],
+                                                acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
                 await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
                                                     wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
                                                     self.store_retries)
@@ -142,24 +142,29 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                        {'HTTPStatus': response.code})
                         parsed_response = "Didn't get expected response from Spine"
 
-                    self._record_outbound_audit_log(timing.get_time(), start_time,
-                                                    wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+                    self._record_outbound_audit_log(message_id,
+                                                    interaction_id=interaction_details['action'],
+                                                    acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
                     await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
                 except ET.ParseError as pe:
                     logger.warning('0010', 'Unable to parse response from Spine. {Exception}',
                                    {'Exception': repr(pe)})
                     parsed_response = 'Unable to handle response returned from Spine'
-                    self._record_outbound_audit_log(timing.get_time(), start_time,
-                                                    wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+                    self._record_outbound_audit_log(message_id,
+                                                    interaction_id=interaction_details['action'],
+                                                    acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
                     await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
                 return 500, parsed_response, None
 
-    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0009', 'Async-reliable workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
-                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment})
+    def _record_outbound_audit_log(self,
+                                   message_id,
+                                   interaction_id=None,
+                                   acknowledgment=None):
+        logger.audit('0011', 'Async-Reliable outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
+                             'received. '
+                             '{Message-ID} {Interaction-ID}',
+                     {'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
 
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key, cpa_id):
@@ -184,6 +189,8 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0010', 'Entered async reliable workflow to handle inbound message')
+        self._record_outbound_audit_log(message_id)
+
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
