@@ -6,6 +6,7 @@
 
 # in order to use this script run:
 # docker run --network custom_network_default -v $PWD:/test --entrypoint /test/integration-tests/run_component_tests.sh python:3-slim
+set -e
 apt-get update
 apt-get install -y build-essential libssl-dev swig pkg-config
 pip install pipenv
