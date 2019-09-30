@@ -11,11 +11,7 @@ pipeline {
 
     stages {
         stage('Build modules') {
-            steps{
-                sh '''
-                ls $PWD
-                docker run -v $PWD:/test python:3-slim ls /test | wc -l
-                '''
+            steps {
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
                 dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
@@ -75,7 +71,8 @@ pipeline {
                 stage('Component Tests') {
                     steps {
                         sh label: 'Running component tests', script: '''
-                            docker run --network custom_network_default -v $PWD:/test --entrypoint /test/integration-tests/run_component_tests.sh python:3-slim
+                             docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
+                             docker run --network custom_network_default --env "MHS_ADDRESS=http://outbound" componenttest:$BUILD_TAG
                         '''
                     }
                 }
