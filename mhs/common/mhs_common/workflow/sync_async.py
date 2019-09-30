@@ -48,7 +48,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                       work_description: wd.WorkDescription
                                       ) -> Tuple[int, str]:
         raise NotImplementedError("This method is not implemented for the sync-async workflow, consider using"
-                                  "`self.handle_sync_async_message` instead")
+                                  "`self.handle_sync_async_outbound_message` instead")
 
     async def handle_sync_async_outbound_message(self, from_asid: Optional[str], message_id: str, correlation_id: str,
                                                  interaction_details: dict,
