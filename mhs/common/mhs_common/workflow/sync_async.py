@@ -32,7 +32,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         :param sync_async_store: The resynchronisor state store
         :param work_description_store: The persistence store instance that holds the work description data
         :param sync_async_store_retry_delay: time between sync async store publish attempts
-        :param sync_async_store_max_retries: number of retries whilst publishing something to the sync-async store
+        :param persistence_store_max_retries: number of times to retry publishing something to a persistence store
         """
         self.sync_async_store = sync_async_store
         self.work_description_store = work_description_store
