@@ -42,6 +42,13 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
         }
       ]
 
+      secrets = var.scr_mhs_ca_certs_arn == "" ? [] : [
+        {
+          name = "SCR_SECRET_MHS_CA_CERTS",
+          valueFrom = var.scr_mhs_ca_certs_arn
+        }
+      ]
+
       portMappings = [
         {
           containerPort = 80

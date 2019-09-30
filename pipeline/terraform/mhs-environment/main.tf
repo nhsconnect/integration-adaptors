@@ -33,7 +33,7 @@ data "aws_vpc" "supplier_vpc" {
 resource "aws_vpc" "mhs_vpc" {
   # Note that this cidr block must not overlap with the cidr blocks of the VPCs
   # that the MHS VPC is peered with.
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.mhs_vpc_cidr_block
   enable_dns_hostnames = true
 
   tags = {
@@ -48,7 +48,12 @@ resource "aws_subnet" "mhs_subnet" {
 
   vpc_id = aws_vpc.mhs_vpc.id
   availability_zone = data.aws_availability_zones.all.names[count.index]
-  cidr_block = "10.0.${count.index}.0/24"
+
+  # Generates a CIDR block with a different prefix within the VPC's CIDR block for each subnet being created.
+  # E.g if the VPC's CIDR block is 10.0.0.0/16, this generates subnets that have CIDR blocks 10.0.0.0/24, 10.0.1.0/24,
+  # etc.
+  cidr_block = cidrsubnet(var.mhs_vpc_cidr_block, 8, count.index)
+
   map_public_ip_on_launch = false
 
   tags = {
