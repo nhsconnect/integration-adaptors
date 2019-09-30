@@ -54,6 +54,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
+        logger.audit('0100', 'Async-Express outbound workflow invoked.', {})
+
         if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store,
                                                  message_id,
@@ -82,10 +84,9 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
 
         if response.code == 202:
-            self._record_outbound_audit_log(
-                message_id,
-                interaction_details['action'],
-                acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+            logger.audit('0101', 'Async-Express outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
+                                 'received. {Message-ID} {Interaction-ID}',
+                         {'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_ACKD})
 
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
@@ -93,22 +94,9 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             return response.code, '', None
         else:
             parsed_response = self._parse_soap_error_response(response)
-
-            self._record_outbound_audit_log(
-                message_id,
-                interaction_details['action'],
-                acknowledgment=wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
             return 500, parsed_response, None
-
-    def _record_outbound_audit_log(self,
-                                   message_id,
-                                   interaction_id=None,
-                                   acknowledgment=None):
-        logger.audit('0011', 'Async-Express outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
-                             'received. {Message-ID} {Interaction-ID}',
-                     {'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
 
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key, cpa_id):
@@ -159,9 +147,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
 
-        logger.audit('0011', 'Async-Express inbound workflow invoked. Message received from spine '
-                             '{Message-ID}',
-                     {'Message-ID': message_id})
+        logger.audit('0103', 'Async-Express inbound workflow invoked. Message received from spine')
 
         logger.info('0010', 'Entered async express workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
@@ -173,6 +159,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
         logger.info('0015', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        logger.audit('0104', 'Async-Express inbound workflow completed. Message successfully processed, returning '
+                             '{acknowledgement}  to spine', {'acknowledgement': True})
 
     async def _publish_message_to_inbound_queue(self,
                                                 message_id: str,

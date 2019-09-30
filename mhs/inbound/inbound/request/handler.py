@@ -46,6 +46,8 @@ class InboundHandler(tornado.web.RequestHandler):
         else:
             request_message = self._extract_incoming_sync_request_message()
 
+        interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
+
         ref_to_message_id = self._extract_ref_message(request_message)
         correlation_id = self._extract_correlation_id(request_message)
         self._extract_message_id(request_message)
@@ -136,7 +138,7 @@ class InboundHandler(tornado.web.RequestHandler):
     def _extract_incoming_sync_request_message(self):
         try:
             request_message = SoapEnvelope.from_string(self.request.headers,
-                                                                     self.request.body.decode())
+                                                       self.request.body.decode())
         except SoapParsingError as e:
             logger.error('021', 'Failed to parse response: {exception}', {'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
