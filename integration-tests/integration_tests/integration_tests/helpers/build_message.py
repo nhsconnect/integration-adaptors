@@ -18,17 +18,16 @@ DOCUMENT_TYPE = 'documentType'
 TO_ASID = 'to_asid'
 
 
-def build_message(template, patient_nhs_number):
+def build_message(template, patient_nhs_number, message_id: str = message_utilities.MessageUtilities.get_uuid()):
     """Build an upload message
 
+    :param message_id: message id
     :param template: The Name of the template to be used.
     :param patient_nhs_number: The NHS number of the patient this record belongs to.
-    :param payload: The human readable payload to be included in the summary message.
     :return: A tuple of the message and the message id (UUID) used in it.
     """
     current_utc_time = datetime.datetime.utcnow()
     timestamp = current_utc_time.strftime(TIMESTAMP_FORMAT)
-    uuid = message_utilities.MessageUtilities.get_uuid()
     to_party_id = 'YES-0000806'
     file_upload = 'test file will go here'
     dissent_override = '0'
@@ -36,7 +35,7 @@ def build_message(template, patient_nhs_number):
     document_type = '196971000000103'
 
     message = message_builder.MustacheMessageBuilder(template).build_message({
-        UUID: uuid,
+        UUID: message_id,
         TIMESTAMP: timestamp,
         ASID: get_asid(),
         TO_ASID: '928942012545',
@@ -48,4 +47,4 @@ def build_message(template, patient_nhs_number):
         DOCUMENT_TYPE: document_type
     })
 
-    return message, uuid
+    return message, message_id
