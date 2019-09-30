@@ -77,6 +77,11 @@ contain sensitive information such as the content of messages being sent.
 * `MHS_RESYNC_INTERVAL` (outbound only) The time in between polls of the sync-async store, the interval is in seconds and defaults to `1`
 * `MHS_SPINE_ROUTE_LOOKUP_URL` (outbound only) The URL of the Spine route lookup service. E.g `https://example.com`. This URL should not contain path or query parameter parts.
 * `MHS_SPINE_ORG_CODE` (outbound only) The organisation code for the Spine instance that your MHS is communicating with. E.g `YES`
+* `MHS_SECRET_SPINE_ROUTE_LOOKUP_CLIENT_CERT` (outbound only) Optional. The client certificate to present when making HTTPS connections to the Spine Route Lookup service. If not specified, no client certificate will be presented. 
+* `MHS_SECRET_SPINE_ROUTE_LOOKUP_CLIENT_KEY` (outbound only) Optional. The private key for the client certificate to present when making HTTPS connections to the Spine Route Lookup service. Must be specified if `MHS_SPINE_ROUTE_LOOKUP_CLIENT_CERT` is provided.
+* `MHS_SECRET_SPINE_ROUTE_LOOKUP_CA_CERTS` (outbound only) Optional. The CA certificates used to validate the certificate presented by the Spine Route Lookup service. Should include the following in this order: endpoint issuing subCA certificate, root CA Certificate. If not specified, the system defaults will be used.
+* `MHS_SPINE_ROUTE_LOOKUP_HTTP_PROXY` (outbound only) An optional http(s) proxy to route requests to the Spine Route Lookup service via. Note that the proxy must pass through https requests transparently.
+* `MHS_SPINE_ROUTE_LOOKUP_HTTP_PROXY_PORT` (outbound only) The http(s) proxy port to use for the Spine Route Lookup service proxy. Ignored if `MHS_SPINE_ROUTE_LOOKUP_HTTP_PROXY` is not provided. Defaults to `3128`.
 * `MHS_SDS_URL` (Spine Route Lookup service only) The URL to communicate with SDS on. e.g. `ldaps://example.com`
 * `MHS_SDS_SEARCH_BASE` (Spine Route Lookup service only) The LDAP location to use as the base of SDS searches, e.g. `ou=services,o=nhs`. This value is specific to the SDS instance you configure your MHS to communicate with and should not contain whitespace.
 * `MHS_DISABLE_SDS_TLS` (Spine Route Lookup service only) An optional flag that can be set to disable TLS for SDS
@@ -116,19 +121,11 @@ Ensure sonar-scanner is on your path, and configured for the sonarqube host with
 NOTE: Coverage will not show in the analysis unless you have already generated the xml report (as per above.)
 
 ## Running Integration Tests
-`pipenv run inttests` will run all integration tests.
-
-When running the tests locally, you will need to set the MHS_ADDRESS and ASID in the 'Environment variables' section of
- the Run/Debug Configurations.
-- The ASID is a 12 digit number needed to access Opentest, supplied by NHS Digital
-    - eg ASID=123456789012
-- The MHS_ADDRESS is the hostname of the MHS instance being used for testing and should be supplied in it's raw state,
- without the 'http://' prefix or '/' suffix
-    - eg MHS_ADDRESS=localhost will be resolved as 'http://localhost/'
+See the [integration tests README](../integration-tests/README.md).
 
 Timeouts received whilst waiting for a response from Spine on a Windows machine could be due to the machine rejecting incoming connections on port 443. In order to open the port, follow these instructions:
 https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/create-an-inbound-port-rule
 
-Any content POSTed to `/` on port 80 will result in the request configuration for the `path` entry in
+Any content POSTed to `/` on port 80 will result in the request configuration for the `Interaction-Id` header in
 `data/interactions.json` being loaded and the content sent as the body of the request to Spine. Adding entries to
 `interactions.json` will allow you to define new supported interactions.
