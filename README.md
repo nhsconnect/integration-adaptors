@@ -27,6 +27,8 @@ and provides a prototype FHIR interface for sending registration events taking p
 - [pipeline](pipeline) - Scripts and configuration files used to build container images for adaptors and deploy them to various
 environments. Intended for use as part of an automated build pipeline.
 - [SCR](SCR) - A package of assets that simplify the building of HL7 GP Summary Update request messages.
+- [SCRWebservice](SCRWebService) - An application that uses the SCR package to build GP summary upload HL7 messages,
+ forwards the message to the MHS, parses the success response and returns the parsed details to the supplier  
 - [supplier-example](supplier-example) - An example web application that uses the assets from the SCR package to
 generate a GP Summary Update request and send it to an instance of the MHS reference implementation. Intended to show
 how the adaptors can be used together to simplify integration.
