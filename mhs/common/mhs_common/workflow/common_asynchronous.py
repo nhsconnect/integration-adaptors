@@ -112,6 +112,13 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                                             properties={'message-id': message_id,
                                                         'correlation-id': correlation_id})
 
+    def _record_outbound_audit_log(self, workflow_name: str, end_time: str, start_time: str,
+                                   acknowledgment: wd.MessageStatus):
+        logger.audit('0011', '{WorkflowName} invoked. Message sent to Spine and {Acknowledgment} received. '
+                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
+                     {'WorkflowName': workflow_name, 'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
+                      'Acknowledgment': acknowledgment})
+
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         pass
 

@@ -3,16 +3,16 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from definitions import ROOT_DIR
-from utilities.file_utilities import FileUtilities
-
 import exceptions
 from comms import proton_queue_adaptor
 from tornado import httpclient
 from utilities import test_utilities
+from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_reliable as async_reliable
+import mhs_common.workflow.common_asynchronous as common_async
+from definitions import ROOT_DIR
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
@@ -209,7 +209,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
-    @mock.patch.object(async_reliable, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_well_formed_soap_error_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -238,7 +238,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
-    @mock.patch.object(async_reliable, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_unhandled_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -264,7 +264,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
-    @mock.patch.object(async_reliable, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_well_formed_ebxml_error_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -478,6 +478,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         log_mock.audit.assert_called_once()
         audit_log_dict = log_mock.audit.call_args[0][2]
         self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
+        self.assertEqual(workflow.ASYNC_RELIABLE, audit_log_dict['WorkflowName'])
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({

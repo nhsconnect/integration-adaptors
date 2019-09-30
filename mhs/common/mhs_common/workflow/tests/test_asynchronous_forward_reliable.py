@@ -10,6 +10,7 @@ from utilities import test_utilities
 from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
 
+import mhs_common.workflow.common_asynchronous as common_async
 import mhs_common.workflow.forward_reliable as forward_reliable
 from definitions import ROOT_DIR
 from mhs_common import workflow
@@ -226,7 +227,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
-    @mock.patch.object(forward_reliable, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_well_formed_soap_error_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -256,7 +257,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
-    @mock.patch.object(forward_reliable, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_unhandled_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -283,7 +284,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
-    @mock.patch.object(forward_reliable, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_well_formed_ebxml_error_response_from_spine(self, log_mock):
         self.setup_mock_work_description()
@@ -575,6 +576,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         log_mock.audit.assert_called_once()
         audit_log_dict = log_mock.audit.call_args[0][2]
         self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
+        self.assertEqual(workflow.FORWARD_RELIABLE, audit_log_dict['WorkflowName'])
         self.assertIn('Message sent to Spine', log_mock.audit.call_args[0][1])
 
     def assert_audit_log_recorded_with_message_status_for_unsolicited_message(self, log_mock, message_status):
