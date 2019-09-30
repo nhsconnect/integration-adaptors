@@ -155,12 +155,6 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
 
                 return 500, parsed_response, None
 
-    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0009', 'Async-forward-reliable workflow invoked. Message sent to Spine and {Acknowledgment} '
-                             'received. {RequestSentTime} {AcknowledgmentReceivedTime}',
-                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment})
-
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key, cpa_id):
         try:
@@ -233,6 +227,7 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
                                  "Exceeded the maximum number of retries, {max_retries} retries, when putting "
                                  "unsolicited message onto inbound queue",
                                  {"max_retries": self.inbound_queue_max_retries})
+                    self._record_unsolicited_inbound_audit_log(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
                     await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
                     raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
                                              'been exceeded') from e
@@ -241,9 +236,19 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
                                     "onto inbound queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
-        logger.audit('0022', 'Forward reliable workflow invoked for inbound unsolicited request. '
-                             'Message placed onto inbound queue.')
+        self._record_unsolicited_inbound_audit_log(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
         await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+
+    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
+        logger.audit('0009', 'Async-forward-reliable workflow invoked. Message sent to Spine and {Acknowledgment} '
+                             'received. {RequestSentTime} {AcknowledgmentReceivedTime}',
+                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
+                      'Acknowledgment': acknowledgment})
+
+    def _record_unsolicited_inbound_audit_log(self, acknowledgment):
+        logger.audit('0022', 'Async-forward-reliable workflow invoked for inbound unsolicited request. '
+                             'Attempted to place message onto inbound queue with {Acknowledgment}.',
+                     {'Acknowledgment': acknowledgment})
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         pass

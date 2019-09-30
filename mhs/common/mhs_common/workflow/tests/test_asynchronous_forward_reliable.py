@@ -511,8 +511,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                                                                       MessageStatus.
                                                                       UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         self.mock_work_description.publish.assert_called_once()
-        log_mock.audit.assert_called_once_with(mock.ANY, 'Forward reliable workflow invoked for inbound unsolicited '
-                                                         'request. Message placed onto inbound queue.')
+        self.assert_audit_log_recorded_with_message_status_for_unsolicited_message(
+            log_mock, MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
 
@@ -531,8 +531,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.assert_called_with({'payload': PAYLOAD, 'attachments': ATTACHMENTS},
                                                               properties={'message-id': MESSAGE_ID,
                                                                           'correlation-id': CORRELATION_ID})
-        log_mock.audit.assert_called_once_with(mock.ANY, 'Forward reliable workflow invoked for inbound unsolicited '
-                                                         'request. Message placed onto inbound queue.')
+        self.assert_audit_log_recorded_with_message_status_for_unsolicited_message(
+            log_mock, MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
         mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
@@ -555,7 +555,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             [mock.call(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS) for _ in range(INBOUND_QUEUE_MAX_RETRIES - 1)],
             mock_sleep.call_args_list)
 
-        log_mock.audit.assert_not_called()
+        self.assert_audit_log_recorded_with_message_status_for_unsolicited_message(
+            log_mock, MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
 
@@ -574,6 +575,13 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         log_mock.audit.assert_called_once()
         audit_log_dict = log_mock.audit.call_args[0][2]
         self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
+        self.assertIn('Message sent to Spine', log_mock.audit.call_args[0][1])
+
+    def assert_audit_log_recorded_with_message_status_for_unsolicited_message(self, log_mock, message_status):
+        log_mock.audit.assert_called_once()
+        audit_log_dict = log_mock.audit.call_args[0][2]
+        self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
+        self.assertIn('Attempted to place message onto inbound queue', log_mock.audit.call_args[0][1])
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
