@@ -176,21 +176,6 @@ class TestProtonMessagingHandler(unittest.TestCase):
 
         self.assertIs(ex.exception, TEST_EXCEPTION)
 
-    # TESTING DISCONNECT METHOD
-    def test_on_disconnected_success(self):
-        """Test happy path for disconnecting from the host."""
-        mock_event = unittest.mock.MagicMock()
-        self.handler._sent = True
-
-        self.handler.on_disconnected(mock_event)
-
-    def test_on_disconnected_early(self):
-        """Test unhappy path when disconnecting from the host occurs too early."""
-        mock_event = unittest.mock.MagicMock()
-
-        with self.assertRaises(comms.proton_queue_adaptor.EarlyDisconnectError):
-            self.handler.on_disconnected(mock_event)
-
     # TESTING REJECTED METHOD
     def test_on_rejected(self):
         """Test happy path allowing for a message to be rejected by the host (and ultimately re-submitted)."""
@@ -200,3 +185,29 @@ class TestProtonMessagingHandler(unittest.TestCase):
         self.handler.on_rejected(mock_event)
 
         self.assertFalse(self.handler._sent)
+
+    # TESTING ERROR HANDLING METHODS
+    def test_should_not_raise_exception_on_error_if_message_already_sent(self):
+        for error_handling_method in self._error_handling_methods():
+            with self.subTest(error_handling_method.__name__):
+                mock_event = unittest.mock.MagicMock()
+                self.handler._sent = True
+
+                error_handling_method(mock_event)
+
+    def test_should_raise_exception_on_error_if_message_not_sent(self):
+        for error_handling_method in self._error_handling_methods():
+            with self.subTest(error_handling_method.__name__):
+                mock_event = unittest.mock.MagicMock()
+
+                with self.assertRaises(comms.proton_queue_adaptor.EarlyDisconnectError):
+                    error_handling_method(mock_event)
+
+    def _error_handling_methods(self):
+        return [
+            self.handler.on_disconnected,
+            self.handler.on_transport_error,
+            self.handler.on_connection_error,
+            self.handler.on_session_error,
+            self.handler.on_link_error
+        ]
