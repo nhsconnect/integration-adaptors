@@ -156,8 +156,8 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
                 return 500, parsed_response, None
 
     def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0009', 'Async-forward-reliable workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
+        logger.audit('0009', 'Async-forward-reliable workflow invoked. Message sent to Spine and {Acknowledgment} '
+                             'received. {RequestSentTime} {AcknowledgmentReceivedTime}',
                      {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
                       'Acknowledgment': acknowledgment})
 
