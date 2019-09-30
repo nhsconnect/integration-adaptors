@@ -139,7 +139,12 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
+        # self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
+
+        log_mock.audit.assert_called_with('0101',
+                                          'Outbound Async-Reliable outbound workflow completed. Message sent to Spine'
+                                          ' and {Acknowledgment} received.',
+                                          {'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD'})
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @mock.patch.object(async_reliable, 'logger')
@@ -236,7 +241,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        log_mock.audit.assert_called_once_with('0100',
+                                               'Outbound Async-Reliable workflow invoked.',
+                                               {})
 
     @mock.patch.object(async_reliable, 'logger')
     @async_test
@@ -262,7 +269,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        log_mock.audit.assert_called_once_with('0100',
+                                               'Outbound Async-Reliable workflow invoked.',
+                                               {})
 
     @mock.patch.object(async_reliable, 'logger')
     @async_test
@@ -314,7 +323,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        log_mock.audit.assert_called_once_with('0100',
+                                               'Outbound Async-Reliable workflow invoked.',
+                                               {})
 
     ############################
     # Reliability tests
@@ -426,9 +437,10 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
-        log_mock.audit.assert_called_with('0011', 'Async-Reliable inbound workflow invoked. Message received from Spine'
-                                          ' received. {Message-ID}',
-                                          {'Message-ID': 'message-id'})
+        log_mock.audit.assert_called_with('0104',
+                                          'Inbound Async-Reliable outbound workflow completed. Message sent placed on queue, returning '
+                                          '{Acknowledgement} to spine',
+                                          {'Acknowledgement': 'OUTBOUND_MESSAGE_ACKD'})
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -449,9 +461,10 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                          self.mock_work_description.set_inbound_status.call_args_list)
         mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
 
+    @mock.patch('mhs_common.workflow.asynchronous_reliable.logger')
     @mock.patch('asyncio.sleep')
     @async_test
-    async def test_handle_inbound_message_error_putting_message_onto_queue_despite_retries(self, mock_sleep):
+    async def test_handle_inbound_message_error_putting_message_onto_queue_despite_retries(self, mock_sleep, mock_log):
         self.setup_mock_work_description()
         future = asyncio.Future()
         future.set_exception(proton_queue_adaptor.MessageSendingError())
@@ -469,6 +482,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
+        # Should be called when invoked
+        mock_log.audit.assert_called_once_with('0103', 'Async-Reliable inbound workflow invoked. Message'
+                                                       ' received from Spine received.', {})
 
     def setup_mock_work_description(self):
         self.mock_work_description = self.mock_create_new_work_description.return_value
@@ -476,11 +492,6 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_work_description.set_outbound_status.return_value = test_utilities.awaitable(None)
         self.mock_work_description.set_inbound_status.return_value = test_utilities.awaitable(None)
         self.mock_work_description.update.return_value = test_utilities.awaitable(None)
-
-    def assert_audit_log_recorded_with_message_status(self, log_mock, message_status):
-        log_mock.audit.assert_called_once()
-        audit_log_dict = log_mock.audit.call_args[0][2]
-        self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({

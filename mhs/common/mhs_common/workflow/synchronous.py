@@ -40,6 +40,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                       work_description_object: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
         logger.info('001', 'Entered sync workflow for outbound message')
+        logger.audit('0100', 'Outbound Synchronous workflow invoked.', {})
+
         wdo = wd.create_new_work_description(self.wd_store,
                                              message_id,
                                              workflow.SYNC,
@@ -75,16 +77,16 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             response = await self.transmission.make_request(url, headers, message)
         except httpclient.HTTPClientError as e:
             code, error = await self._handle_http_exception(e, wdo)
-            self._record_outbound_audit_log(message_id, interaction_details['action'], False)
             return code, error, None
 
         except Exception as e:
             logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            self._record_outbound_audit_log(message_id, interaction_details['action'], False)
             return 500, 'Error making outbound request', None
 
-        self._record_outbound_audit_log(message_id, interaction_details['action'], True)
+        logger.audit('0101',
+                     'Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
+                     {'Acknowledgment': True})
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         return response.code, response.body.decode(), wdo
@@ -105,8 +107,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         if exception.response:
             code, response, fault_codes = handle_soap_error(exception.response.code,
-                                               exception.response.headers,
-                                               exception.response.body)
+                                                            exception.response.headers,
+                                                            exception.response.body)
             return code, response
 
         return 500, f'Error(s) received from Spine: {exception}'
