@@ -1,6 +1,6 @@
 import logging
 import tornado.web
-from request_matching import SpineRouteLookupRequestResponseMapper
+from fake_spineroutelookup.request_matching import SpineRouteLookupRequestResponseMapper
 
 logger = logging.getLogger(__name__)
 

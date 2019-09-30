@@ -131,4 +131,4 @@ mhs-reference-implementation/selenium_tests/data/local_asid
 /configure-env-vars.sh
 
 # component test enviornment file
-component-test-source.sh
+**/component-test-source.sh

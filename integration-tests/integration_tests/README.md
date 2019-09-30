@@ -27,5 +27,5 @@ To setup the test environment locally, run the following commands from the root 
 ```bash
 ./setup_component_test_env.sh
 source ./component-test-source.sh
-docker-compose -f docker-compose.yml -f docker-compose.component.override.yml up --build
+docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up --build
 ```

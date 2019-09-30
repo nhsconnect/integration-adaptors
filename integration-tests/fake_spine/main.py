@@ -4,11 +4,11 @@ import ssl
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-from certs import Certs
-from request_handler import RoutingRequestHandler
 from tornado.options import parse_command_line
-from request_matching import SpineRequestResponseMapper, RequestMatcher
-from routing_response import RoutingResponse
+from fake_spine.certs import Certs
+from fake_spine.request_handler import RoutingRequestHandler
+from fake_spine.request_matching import SpineRequestResponseMapper, RequestMatcher
+from fake_spine.routing_response import RoutingResponse
 
 logger = logging.getLogger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))

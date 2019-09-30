@@ -4,10 +4,10 @@ import tornado.ioloop
 import tornado.log
 import tornado.web
 from tornado.options import parse_command_line
-from request_handler import RoutingRequestHandler
-from request_matching import SpineRouteLookupRequestResponseMapper, RequestMatcher
-from request_matcher_wrappers import query_argument_contains_string
-from routing_response import RoutingResponse
+from fake_spineroutelookup.request_handler import RoutingRequestHandler
+from fake_spineroutelookup.request_matching import SpineRouteLookupRequestResponseMapper, RequestMatcher
+from fake_spineroutelookup.request_matcher_wrappers import query_argument_contains_string
+from fake_spineroutelookup.routing_response import RoutingResponse
 
 logger = logging.getLogger(__name__)
 

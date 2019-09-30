@@ -1,7 +1,7 @@
 import logging
 from typing import Callable, Dict
 from tornado.httputil import HTTPServerRequest
-from routing_response import RoutingResponse
+from fake_spineroutelookup.routing_response import RoutingResponse
 
 logger = logging.getLogger(__name__)
 
