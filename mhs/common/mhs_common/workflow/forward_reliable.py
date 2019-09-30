@@ -20,13 +20,14 @@ from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
-from mhs_common.workflow import common_asynchronous
+from mhs_common.workflow import common_asynchronous, asynchronous_reliable
 
 logger = log.IntegrationAdaptorsLogger('ASYNC_FORWARD_WORKFLOW')
 
 
-class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflow):
+class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReliableWorkflow):
     """Handles the workflow for the asynchronous forward reliable messaging pattern."""
+
     def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
@@ -34,16 +35,12 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
                  inbound_queue_retry_delay: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
-        super(AsynchronousForwardReliableWorkflow, self).__init__(party_key, persistence_store, transmission,
-                                                                  queue_adaptor, inbound_queue_max_retries,
-                                                                  inbound_queue_retry_delay,
-                                                                  persistence_store_max_retries,
-                                                                  routing)
+        super().__init__(party_key, persistence_store, transmission,
+                         queue_adaptor, inbound_queue_max_retries,
+                         inbound_queue_retry_delay, persistence_store_max_retries,
+                         routing)
 
-        self.workflow_specific_interaction_details = dict(duplicate_elimination=True,
-                                                          ack_requested=True,
-                                                          ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:nextMSH",
-                                                          sync_reply=False)
+        self.workflow_specific_interaction_details['ack_soap_actor'] = "urn:oasis:names:tc:ebxml-msg:actor:nextMSH"
 
     @timing.time_function
     async def handle_outbound_message(self, from_asid: Optional[str],
@@ -123,7 +120,7 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
                         if SOAPFault.is_soap_fault_retriable(soap_fault_codes):
                             retries_remaining -= 1
                             logger.warning("0015", "A retriable error was encountered {error} {retries_remaining} "
-                                           "{max_retries}",
+                                                   "{max_retries}",
                                            {"error": parsed_response,
                                             "retries_remaining": retries_remaining,
                                             "max_retries": num_of_retries})
@@ -178,33 +175,7 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0010', 'Entered async forward reliable workflow to handle inbound message')
-        await wd.update_status_with_retries(work_description,
-                                            work_description.set_inbound_status,
-                                            wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
-                                            self.store_retries)
-
-        retries_remaining = self.inbound_queue_max_retries
-        while True:
-            try:
-                await self._put_message_onto_queue_with(message_id, correlation_id, payload)
-                break
-            except Exception as e:
-                logger.warning('0011', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
-                retries_remaining -= 1
-                if retries_remaining <= 0:
-                    logger.error("0012",
-                                 "Exceeded the maximum number of retries, {max_retries} retries, when putting "
-                                 "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
-                    await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
-                    raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
-                                             'been exceeded') from e
-
-                logger.info("0013", "Waiting for {retry_delay} seconds before retrying putting message onto inbound "
-                                    "queue", {"retry_delay": self.inbound_queue_retry_delay})
-                await asyncio.sleep(self.inbound_queue_retry_delay)
-
-        logger.info('0014', 'Placed message onto inbound queue successfully')
-        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        await super().handle_inbound_message(message_id, correlation_id, work_description, payload)
 
     async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str,
                                                  attachments: list):
@@ -249,9 +220,3 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
         logger.audit('0022', 'Async-forward-reliable workflow invoked for inbound unsolicited request. '
                              'Attempted to place message onto inbound queue with {Acknowledgment}.',
                      {'Acknowledgment': acknowledgment})
-
-    async def set_successful_message_response(self, wdo: wd.WorkDescription):
-        pass
-
-    async def set_failure_message_response(self, wdo: wd.WorkDescription):
-        pass
