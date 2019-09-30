@@ -126,7 +126,6 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The transport error event.
         """
-
         logger.warning('011', "There was an error with the transport used for the connection to {host}.",
                        {'host': self._host})
 
