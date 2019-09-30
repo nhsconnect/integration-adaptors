@@ -152,7 +152,6 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
 
                 return 500, parsed_response, None
 
-    @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0010', 'Entered async forward reliable workflow to handle inbound message')
