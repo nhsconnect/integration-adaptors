@@ -128,6 +128,9 @@ pipeline {
                                     -var client_cert_arn=${CLIENT_CERT_ARN} \
                                     -var client_key_arn=${CLIENT_KEY_ARN} \
                                     -var ca_certs_arn=${CA_CERTS_ARN} \
+                                    -var route_ca_certs_arn=${ROUTE_CA_CERTS_ARN} \
+                                    -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
+                                    -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
                                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                     -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                                     -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
@@ -139,7 +142,7 @@ pipeline {
                                 env.MHS_ADDRESS = sh (
                                     label: 'Obtaining outbound LB DNS name',
                                     returnStdout: true,
-                                    script: "terraform output outbound_lb_domain_name"
+                                    script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
                                 ).trim()
                                 env.MHS_OUTBOUND_TARGET_GROUP = sh (
                                     label: 'Obtaining outbound LB target group ARN',
@@ -190,7 +193,8 @@ pipeline {
                                     -var ecr_address=${DOCKER_REGISTRY} \
                                     -var scr_log_level=DEBUG \
                                     -var scr_service_port=${SCR_SERVICE_PORT} \
-                                    -var scr_mhs_address=http://${MHS_ADDRESS}
+                                    -var scr_mhs_address=${MHS_ADDRESS} \
+                                    -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
                                 """
                         }
                     }
@@ -200,19 +204,11 @@ pipeline {
                     steps {
                         dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-                            // Wait for MHS container to fully stand up
-                            timeout(2) {
-                                waitUntil {
-                                   script {
-                                       def r = sh script: 'sleep 2; curl -o /dev/null --silent --head --write-out "%{http_code}" ${MHS_ADDRESS} || echo 1', returnStdout: true
-                                       return (r == '405');
-                                   }
-                                }
-                            }
 
                             // Wait for MHS load balancers to have healthy targets
                             dir('../../pipeline/scripts/check-target-group-health') {
                                 sh script: 'pipenv install'
+
                                 timeout(13) {
                                     waitUntil {
                                         script {

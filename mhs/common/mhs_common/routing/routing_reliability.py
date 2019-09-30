@@ -13,15 +13,29 @@ logger = log.IntegrationAdaptorsLogger("MHS_ROUTING_RELIABILITY")
 class RoutingAndReliability:
     """A tool that allows the routing and reliability information for a remote MHS to be retrieved."""
 
-    def __init__(self, spine_route_lookup_url: str, spine_org_code: str):
+    def __init__(self, spine_route_lookup_url: str, spine_org_code: str, client_cert: str = None,
+                 client_key: str = None, ca_certs: str = None, http_proxy_host: str = None,
+                 http_proxy_port: int = None):
         """Initialise a new RoutingAndReliability instance.
 
         :param spine_route_lookup_url: The URL to make requests to the Spine Route Lookup service on. e.g.
         http://example.com. This URL should not contain path or query parameter parts.
         :param spine_org_code The organisation code of the Spine instance this MHS is communicating with.
+        :param client_cert: An optional string containing the path of the client certificate file.
+        :param client_key: An optional string containing the path of the client private key file.
+        :param ca_certs: An optional string containing the path of the certificate authority certificate file.
+        :param http_proxy_host The hostname of the HTTP proxy to be used.
+        :param http_proxy_port The port of the HTTP proxy to be used.
         """
         self.url = spine_route_lookup_url
         self.spine_org_code = spine_org_code
+
+        self._client_cert = client_cert
+        self._client_key = client_key
+        self._ca_certs = ca_certs
+
+        self._proxy_host = http_proxy_host
+        self._proxy_port = http_proxy_port
 
     @timing.time_function
     async def get_end_point(self, service_id: str, org_code: str = None) -> Dict:
@@ -43,7 +57,12 @@ class RoutingAndReliability:
 
             logger.info("0001", "Requesting endpoint details from Spine route lookup service for {org_code} & "
                                 "{service_id}.", {"org_code": org_code, "service_id": service_id})
-            http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None)
+            http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None,
+                                                                        client_cert=self._client_cert,
+                                                                        client_key=self._client_key,
+                                                                        ca_certs=self._ca_certs,
+                                                                        http_proxy_host=self._proxy_host,
+                                                                        http_proxy_port=self._proxy_port)
             endpoint_details = json.loads(http_response.body)
 
             logger.info("0002", "Received endpoint details from Spine route lookup service for {org_code} & "
@@ -75,7 +94,12 @@ class RoutingAndReliability:
         try:
             logger.info("0004", "Requesting reliability details from Spine route lookup service for {org_code} & "
                                 "{service_id}.", {"org_code": org_code, "service_id": service_id})
-            http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None)
+            http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None,
+                                                                        client_cert=self._client_cert,
+                                                                        client_key=self._client_key,
+                                                                        ca_certs=self._ca_certs,
+                                                                        http_proxy_host=self._proxy_host,
+                                                                        http_proxy_port=self._proxy_port)
             reliability_details = json.loads(http_response.body)
 
             logger.info("0005", "Received reliability details from Spine route lookup service for {org_code} & "

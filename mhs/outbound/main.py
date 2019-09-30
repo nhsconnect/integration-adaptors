@@ -7,17 +7,17 @@ import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-from mhs_common import workflow, certs
+import utilities.integration_adaptors_logger as log
+from mhs_common import workflow
 from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
 from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
+from utilities import config, certs
+from utilities import secrets
 
 import outbound.request.synchronous.handler as client_request_handler
-import utilities.config as config
-import utilities.integration_adaptors_logger as log
 from outbound.transmission import outbound_transmission
-from utilities import secrets
 
 logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
 
@@ -61,6 +61,31 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
                                      )
 
 
+def initialise_routing():
+    spine_route_lookup_url = config.get_config('SPINE_ROUTE_LOOKUP_URL')
+    spine_org_code = config.get_config('SPINE_ORG_CODE')
+
+    route_data_dir = pathlib.Path(definitions.ROOT_DIR) / "route"
+    certificates = certs.Certs.create_certs_files(route_data_dir,
+                                                  private_key=secrets.get_secret_config('SPINE_ROUTE_LOOKUP_CLIENT_KEY',
+                                                                                        default=None),
+                                                  local_cert=secrets.get_secret_config('SPINE_ROUTE_LOOKUP_CLIENT_CERT',
+                                                                                       default=None),
+                                                  ca_certs=secrets.get_secret_config('SPINE_ROUTE_LOOKUP_CA_CERTS',
+                                                                                     default=None))
+
+    route_proxy_host = config.get_config('SPINE_ROUTE_LOOKUP_HTTP_PROXY', default=None)
+    route_proxy_port = None
+    if route_proxy_host is not None:
+        route_proxy_port = int(config.get_config('SPINE_ROUTE_LOOKUP_HTTP_PROXY_PORT', default="3128"))
+
+    return routing_reliability.RoutingAndReliability(spine_route_lookup_url, spine_org_code,
+                                                     client_cert=certificates.local_cert_path,
+                                                     client_key=certificates.private_key_path,
+                                                     ca_certs=certificates.ca_certs_path,
+                                                     http_proxy_host=route_proxy_host, http_proxy_port=route_proxy_port)
+
+
 def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.CommonWorkflow]) -> None:
     """
     Start Tornado server
@@ -87,37 +112,33 @@ def main():
     config.setup_config("MHS")
     secrets.setup_secret_config("MHS")
     log.configure_logging()
+    data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
 
     configure_http_client()
 
-    data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
-    client_key, client_cert, ca_certs = certs.create_certs_files(data_dir / '..',
-                                                                 private_key=secrets.get_secret_config('CLIENT_KEY'),
-                                                                 local_cert=secrets.get_secret_config('CLIENT_CERT'),
-                                                                 ca_certs=secrets.get_secret_config('CA_CERTS'))
+    routing = initialise_routing()
 
+    certificates = certs.Certs.create_certs_files(data_dir / '..',
+                                                  private_key=secrets.get_secret_config('CLIENT_KEY'),
+                                                  local_cert=secrets.get_secret_config('CLIENT_CERT'),
+                                                  ca_certs=secrets.get_secret_config('CA_CERTS'))
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
-    store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
+    http_proxy_host = config.get_config('OUTBOUND_HTTP_PROXY', default=None)
+    http_proxy_port = None
+    if http_proxy_host is not None:
+        http_proxy_port = int(config.get_config('OUTBOUND_HTTP_PROXY_PORT', default="3128"))
+    transmission = outbound_transmission.OutboundTransmission(certificates.local_cert_path,
+                                                              certificates.private_key_path, certificates.ca_certs_path,
+                                                              max_retries, retry_delay, http_proxy_host,
+                                                              http_proxy_port)
 
     party_key = secrets.get_secret_config('PARTY_KEY')
     work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('STATE_TABLE_NAME'))
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
-
-    spine_route_lookup_url = config.get_config('SPINE_ROUTE_LOOKUP_URL')
-    spine_org_code = config.get_config('SPINE_ORG_CODE')
-    routing = routing_reliability.RoutingAndReliability(spine_route_lookup_url, spine_org_code)
-
-    http_proxy_host = config.get_config('OUTBOUND_HTTP_PROXY', default=None)
-    http_proxy_port = None
-    if http_proxy_host is not None:
-        http_proxy_port = int(config.get_config('OUTBOUND_HTTP_PROXY_PORT', default="3128"))
-    transmission = outbound_transmission.OutboundTransmission(client_cert, client_key, ca_certs,
-                                                              max_retries, retry_delay, http_proxy_host,
-                                                              http_proxy_port)
-
+    store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
     workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store, store_retries,
                                      routing)
     start_tornado_server(data_dir, workflows)

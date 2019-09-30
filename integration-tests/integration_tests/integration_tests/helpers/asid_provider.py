@@ -20,4 +20,3 @@ def get_asid():
         asid = None
 
     return os.environ.get('INTEGRATION_TEST_ASID', asid)
-
