@@ -52,6 +52,7 @@ MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_ASID = 'uniqueIdentifier'
 MHS_RETRY_INTERVAL_VAL = 'PT1S'
+MHS_RETRY_INTERVAL_VAL_IN_SECONDS = 1
 MHS_RETRY_VAL = 3
 MHS_RETRY_INTERVAL_INVALID_VAL = 'P'
 
@@ -209,11 +210,13 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
+    @mock.patch('asyncio.sleep')
     @mock.patch.object(common_async, 'logger')
     @async_test
-    async def test_well_formed_soap_error_response_from_spine(self, log_mock):
+    async def test_well_formed_soap_error_response_from_spine(self, log_mock, mock_sleep):
         self.setup_mock_work_description()
         self._setup_routing_mock()
+        mock_sleep.return_value = test_utilities.awaitable(None)
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
@@ -351,10 +354,12 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
              mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
             self.mock_work_description.set_outbound_status.call_args_list)
 
+    @mock.patch('asyncio.sleep')
     @async_test
-    async def test_soap_error_request_is_retriable(self):
+    async def test_soap_error_request_is_retriable(self, mock_sleep):
         self.setup_mock_work_description()
         self._setup_routing_mock()
+        mock_sleep.return_value = test_utilities.awaitable(None)
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
@@ -373,14 +378,15 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                     response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
                     self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-                    status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID,
-                                                                                     CORRELATION_ID,
-                                                                                     INTERACTION_DETAILS,
-                                                                                     PAYLOAD, None)
+                    await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                INTERACTION_DETAILS, PAYLOAD, None)
 
                     self.assertEqual(self.mock_transmission_adaptor.make_request.call_count, 3)
+                    self.assertEqual(mock_sleep.call_count, 2)
+                    mock_sleep.assert_called_with(MHS_RETRY_INTERVAL_VAL_IN_SECONDS)
                 finally:
                     self.mock_transmission_adaptor.make_request.reset_mock()
+                    mock_sleep.reset_mock()
 
     @async_test
     async def test_soap_error_request_is_non_retriable(self,):
