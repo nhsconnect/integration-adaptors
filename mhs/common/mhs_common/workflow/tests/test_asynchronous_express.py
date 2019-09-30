@@ -101,7 +101,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     # Outbound tests
     ############################
 
-    @mock.patch.object(async_express, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_successful_handle_outbound_message(self, log_mock):
         response = mock.MagicMock()
@@ -134,7 +134,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.mock_routing_reliability.get_end_point.assert_called_once_with(SERVICE_ID)
+        self.mock_routing_reliability.get_end_point.assert_called_once_with(SERVICE_ID, None)
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)

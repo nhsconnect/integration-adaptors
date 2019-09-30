@@ -36,11 +36,13 @@ HTTP_HEADERS = {
 SERVICE = 'service'
 ACTION = 'action'
 SERVICE_ID = SERVICE + ":" + ACTION
+ODS_CODE = 'ODS code'
 INTERACTION_DETAILS = {
     'workflow': 'forward-reliable',
     'service': SERVICE,
     'action': ACTION,
-    'uniqueIdentifier': "31312"
+    'uniqueIdentifier': "31312",
+    'ods-code': ODS_CODE
 }
 PAYLOAD = 'payload'
 SERIALIZED_MESSAGE = 'serialized-message'
@@ -116,7 +118,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
     # Outbound tests
     ############################
 
-    @mock.patch.object(forward_reliable, 'logger')
+    @mock.patch.object(common_async, 'logger')
     @async_test
     async def test_successful_handle_outbound_message(self, log_mock):
         response = mock.MagicMock()
@@ -136,10 +138,12 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                                         ebxml_envelope.CPA_ID: CPA_ID}
         expected_interaction_details.update(INTERACTION_DETAILS)
 
-        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+        mock_url = 'localhost/reliablemessaging/queryrequest'
+        with mock.patch('utilities.config.get_config', return_value=mock_url) as mock_get_config:
             status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
                                                                              INTERACTION_DETAILS,
                                                                              PAYLOAD, None)
+            mock_get_config.assert_called_once_with('FORWARD_RELIABLE_ENDPOINT_URL')
 
         self.assertEqual(202, status)
         self.assertEqual('', message)
@@ -152,9 +156,9 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.mock_routing_reliability.get_end_point.assert_called_once_with(SERVICE_ID)
+        self.mock_routing_reliability.get_end_point.assert_called_once_with(SERVICE_ID, ODS_CODE)
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
-        self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
+        self.mock_transmission_adaptor.make_request.assert_called_once_with(mock_url, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
         self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
