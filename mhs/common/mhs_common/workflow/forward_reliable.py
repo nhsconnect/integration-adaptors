@@ -13,7 +13,6 @@ from utilities.date_utilities import DateUtilities
 from mhs_common import workflow
 from mhs_common.errors import ebxml_handler
 from mhs_common.errors.soap_handler import handle_soap_error
-from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
 from mhs_common.messages.soap_fault_envelope import SOAPFault
 from mhs_common.routing import routing_reliability
@@ -151,25 +150,6 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                     await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
                 return 500, parsed_response, None
-
-    async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
-                                          to_party_key, cpa_id):
-        try:
-            interaction_details[ebxml_envelope.MESSAGE_ID] = message_id
-            interaction_details[ebxml_request_envelope.MESSAGE] = payload
-            interaction_details[ebxml_envelope.FROM_PARTY_ID] = self.party_key
-            interaction_details[ebxml_envelope.CONVERSATION_ID] = correlation_id
-            interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
-            interaction_details[ebxml_envelope.CPA_ID] = cpa_id
-            _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
-        except Exception as e:
-            logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
-            return (500, 'Error serialising outbound message'), None, None
-
-        logger.info('0003', 'Message serialised successfully')
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
-        return None, http_headers, message
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
