@@ -1,6 +1,5 @@
 """This module defines the outbound synchronous request handler component."""
 import json
-from typing import Dict, Any
 
 import marshmallow
 import mhs_common.state.work_description as wd
@@ -8,7 +7,7 @@ import mhs_common.workflow as workflow
 import tornado.escape
 import tornado.locks
 import tornado.web
-from mhs_common.configuration import configuration_manager
+from mhs_common.handler import base_handler
 from mhs_common.messages import ebxml_envelope
 from utilities import integration_adaptors_logger as log, message_utilities, timing
 
@@ -16,18 +15,9 @@ from outbound.request import request_body_schema
 
 logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
 
-class SynchronousHandler(tornado.web.RequestHandler):
+
+class SynchronousHandler(base_handler.BaseHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a supplier system."""
-
-    def initialize(self, workflows: Dict[str, workflow.CommonWorkflow],
-                   config_manager: configuration_manager.ConfigurationManager):
-        """Initialise this request handler with the provided configuration values.
-
-        :param workflows: The workflows to use to send messages.
-        :param config_manager: The object that can be used to obtain configuration details.
-        """
-        self.workflows = workflows
-        self.config_manager = config_manager
 
     @timing.time_request
     async def post(self):
@@ -177,12 +167,6 @@ class SynchronousHandler(tornado.web.RequestHandler):
                                         reason=f'Invalid request. Validation errors: {validation_errors}') from e
         return parsed_body.payload
 
-    def write_error(self, status_code: int, **kwargs: Any):
-        reason = self._reason  # Don't inline this, as self.set_status changes self._reason
-        self.set_status(status_code)
-        self.set_header('Content-Type', 'text/plain')
-        self.finish(f'{status_code}: {reason}')
-
     def _extract_sync_async_header(self):
         sync_async_header = self.request.headers.get('sync-async', None)
         if not sync_async_header:
@@ -235,18 +219,6 @@ class SynchronousHandler(tornado.web.RequestHandler):
     def _extend_interaction_details(self, wf, interaction_details):
         if wf.workflow_specific_interaction_details:
             interaction_details.update(wf.workflow_specific_interaction_details)
-
-    def _extract_default_workflow(self, interaction_details, interaction_id):
-        try:
-            wf = self.workflows[interaction_details['workflow']]
-        except KeyError as e:
-            logger.error('0008', "Wasn't able to determine workflow for {InteractionId} . This likely is due to a "
-                                 "misconfiguration in interactions.json", {"InteractionId": interaction_id})
-            raise tornado.web.HTTPError(500,
-                                        f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
-                                        reason=f"Couldn't determine workflow to invoke for interaction ID: "
-                                        f"{interaction_id}") from e
-        return wf
 
     def _extract_sync_async_from_interaction_details(self, interaction_details):
         is_sync_async = interaction_details.get('sync_async')
@@ -314,14 +286,6 @@ class SynchronousHandler(tornado.web.RequestHandler):
     def _retrieve_interaction_details(self, interaction_id):
         interaction_details = self._get_interaction_details(interaction_id)
 
-        if interaction_details is None:
-            logger.error('0007', 'Unknown {InteractionId} in request', {'InteractionId': interaction_id})
-            raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
-                                        reason=f'Unknown interaction ID: {interaction_id}')
-
         interaction_details[ebxml_envelope.ACTION] = interaction_id
 
         return interaction_details
-
-    def _get_interaction_details(self, interaction_name: str) -> dict:
-        return self.config_manager.get_interaction_details(interaction_name)
