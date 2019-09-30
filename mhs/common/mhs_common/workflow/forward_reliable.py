@@ -215,7 +215,8 @@ class AsynchronousForwardReliableWorkflow(common_asynchronous.CommonAsynchronous
         logger.info('0014', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
-    def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str, attachments: list):
+    async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str,
+                                                 attachments: list):
         logger.info('0005', 'Entered async forward reliable workflow to handle unsolicited inbound message')
         work_description = wd.create_new_work_description(self.persistence_store, message_id, workflow.FORWARD_RELIABLE,
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
