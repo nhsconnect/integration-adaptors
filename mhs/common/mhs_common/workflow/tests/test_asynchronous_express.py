@@ -329,7 +329,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
     @mock.patch('mhs_common.workflow.asynchronous_express.logger')
     @async_test
-    async def test_successful_handle_inbound_message(self, log_mock, time_mock):
+    async def test_successful_handle_inbound_message(self, log_mock):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
@@ -343,8 +343,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                          self.mock_work_description.set_inbound_status.call_args_list)
         log_mock.audit.assert_called_with(
             '0104', 'Async-Express inbound workflow completed. Message successfully processed, returning '
-                    '{acknowledgement}  to spine',
-            {'acknowledgement': True})
+                    '{Acknowledgement}  to spine',
+            {'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'})
 
     @mock.patch('asyncio.sleep')
     @async_test

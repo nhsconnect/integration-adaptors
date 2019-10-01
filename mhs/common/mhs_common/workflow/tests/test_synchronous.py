@@ -230,7 +230,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
         log_mock.audit.assert_called_with(
             '0101',
             'Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
-            {'Acknowledgment': True})
+            {'Acknowledgment': 'OUTBOUND_MESSAGE_RESPONSE_RECEIVED'})
 
     @mock.patch('mhs_common.workflow.synchronous.logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
