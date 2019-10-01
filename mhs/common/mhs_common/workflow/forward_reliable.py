@@ -1,7 +1,6 @@
 """This module defines the asynchronous forward reliable workflow."""
 import asyncio
 from typing import Tuple, Optional
-from xml.etree import ElementTree as ET
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
@@ -11,10 +10,6 @@ from utilities import timing, config
 from utilities.date_utilities import DateUtilities
 
 from mhs_common import workflow
-from mhs_common.errors import ebxml_handler
-from mhs_common.errors.soap_handler import handle_soap_error
-from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
-from mhs_common.messages.soap_fault_envelope import SOAPFault
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
@@ -40,6 +35,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                          routing)
 
         self.workflow_specific_interaction_details['ack_soap_actor'] = "urn:oasis:names:tc:ebxml-msg:actor:nextMSH"
+        self.workflow_name = workflow.FORWARD_RELIABLE
 
     @timing.time_function
     async def handle_outbound_message(self, from_asid: Optional[str],
@@ -49,13 +45,8 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async forward reliable workflow to handle outbound message')
-        if not wdo:
-            wdo = wd.create_new_work_description(self.persistence_store,
-                                                 message_id,
-                                                 workflow.FORWARD_RELIABLE,
-                                                 outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
-                                                 )
-            await wdo.publish()
+        logger.audit('0100', 'Outbound {WorkflowName} workflow invoked.', {'WorkflowName': self.workflow_name})
+        wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
 
         try:
             details = await self._lookup_endpoint_details(interaction_details)
@@ -82,75 +73,8 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error when converting retry interval: {} to seconds'.format(retry_interval_xml_datetime), None
 
-        num_of_retries = reliability_details[common_asynchronous.MHS_RETRIES]
-
-        retries_remaining = num_of_retries
-
-        while True:
-            start_time = timing.get_time()
-            logger.info('0004', 'About to make outbound request')
-            response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
-
-            if response.code == 202:
-                end_time = timing.get_time()
-                self._record_outbound_audit_log(workflow.FORWARD_RELIABLE, end_time, start_time,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
-                await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
-                                                    wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
-                                                    self.store_retries)
-                return response.code, '', None
-            else:
-                try:
-                    parsed_body = ET.fromstring(response.body)
-
-                    if EbxmlErrorEnvelope.is_ebxml_error(parsed_body):
-                        _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
-                                                                              response.headers,
-                                                                              response.body)
-                        logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
-                                       {'HTTPStatus': response.code, 'Errors': parsed_response})
-
-                    elif SOAPFault.is_soap_fault(parsed_body):
-                        _, parsed_response, soap_fault_codes = handle_soap_error(response.code,
-                                                                                 response.headers,
-                                                                                 response.body)
-                        logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
-                                       {'HTTPStatus': response.code, 'Errors': parsed_response})
-
-                        if SOAPFault.is_soap_fault_retriable(soap_fault_codes):
-                            retries_remaining -= 1
-                            logger.warning("0015", "A retriable error was encountered {error} {retries_remaining} "
-                                                   "{max_retries}",
-                                           {"error": parsed_response,
-                                            "retries_remaining": retries_remaining,
-                                            "max_retries": num_of_retries})
-                            if retries_remaining <= 0:
-                                # exceeded the number of retries so return the SOAP error response
-                                logger.error("0016",
-                                             "A request has exceeded the maximum number of retries, {max_retries} "
-                                             "retries", {"max_retries": num_of_retries})
-                            else:
-                                logger.info("0017", "Waiting for {retry_interval} milliseconds before next request "
-                                                    "attempt.", {"retry_interval": retry_interval})
-                                await asyncio.sleep(retry_interval)
-                                continue
-                    else:
-                        logger.warning('0018', "Received an unexpected response from Spine",
-                                       {'HTTPStatus': response.code})
-                        parsed_response = "Didn't get expected response from Spine"
-
-                    self._record_outbound_audit_log(workflow.FORWARD_RELIABLE, timing.get_time(), start_time,
-                                                    wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-                    await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-                except ET.ParseError as pe:
-                    logger.warning('0019', 'Unable to parse response from Spine. {Exception}',
-                                   {'Exception': repr(pe)})
-                    parsed_response = 'Unable to handle response returned from Spine'
-                    self._record_outbound_audit_log(workflow.FORWARD_RELIABLE, timing.get_time(), start_time,
-                                                    wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-                    await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-
-                return 500, parsed_response, None
+        return await self._make_outbound_request_with_retries_and_handle_response(url, http_headers, message, wdo,
+                                                                                  reliability_details, retry_interval)
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
@@ -160,7 +84,9 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
     async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str,
                                                  attachments: list):
         logger.info('0005', 'Entered async forward reliable workflow to handle unsolicited inbound message')
-        work_description = wd.create_new_work_description(self.persistence_store, message_id, workflow.FORWARD_RELIABLE,
+        logger.audit('0100', 'Unsolicited inbound {WorkflowName} workflow invoked.',
+                     {'WorkflowName': self.workflow_name})
+        work_description = wd.create_new_work_description(self.persistence_store, message_id, self.workflow_name,
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         await work_description.publish()
 
@@ -178,7 +104,6 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                  "Exceeded the maximum number of retries, {max_retries} retries, when putting "
                                  "unsolicited message onto inbound queue",
                                  {"max_retries": self.inbound_queue_max_retries})
-                    self._record_unsolicited_inbound_audit_log(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
                     await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
                     raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
                                              'been exceeded') from e
@@ -187,10 +112,8 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                     "onto inbound queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
-        self._record_unsolicited_inbound_audit_log(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        logger.audit('0022', '{WorkflowName} workflow invoked for inbound unsolicited request. '
+                             'Attempted to place message onto inbound queue with {Acknowledgement}.',
+                     {'Acknowledgement': wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
+                      'WorkflowName': self.workflow_name})
         await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
-
-    def _record_unsolicited_inbound_audit_log(self, acknowledgment):
-        logger.audit('0022', 'Async-forward-reliable workflow invoked for inbound unsolicited request. '
-                             'Attempted to place message onto inbound queue with {Acknowledgment}.',
-                     {'Acknowledgment': acknowledgment})

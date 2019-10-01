@@ -25,6 +25,8 @@ class CommonWorkflow(abc.ABC):
     ENDPOINT_SERVICE_ID = 'service_id'
     ENDPOINT_CPA_ID = 'cpa_id'
 
+    workflow_name: str
+
     def __init__(self, routing: routing_reliability.RoutingAndReliability = None):
         self.routing_reliability = routing
         self.workflow_specific_interaction_details = dict()

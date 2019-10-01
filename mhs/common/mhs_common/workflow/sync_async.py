@@ -41,6 +41,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         self.sync_async_store_retry_delay = sync_async_store_retry_delay / 1000 if sync_async_store_retry_delay \
             else None
         self.persistence_store_retries = persistence_store_max_retries
+        self.workflow_name = workflow.SYNC_ASYNC
 
     async def handle_outbound_message(self, from_asid: Optional[str],
                                       message_id: str, correlation_id: str, interaction_details: dict,

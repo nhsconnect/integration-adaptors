@@ -140,7 +140,12 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     @unittest.mock.patch.object(log, "inbound_message_id")
     @unittest.mock.patch.object(log, "correlation_id")
     @unittest.mock.patch.object(log, "message_id")
-    def test_logging_context_variables_are_set(self, mock_message_id, mock_correlation_id, mock_inbound_message_id):
+    @unittest.mock.patch.object(log, 'interaction_id')
+    def test_logging_context_variables_are_set(self,
+                                               mock_interaction_id,
+                                               mock_message_id,
+                                               mock_correlation_id,
+                                               mock_inbound_message_id):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
@@ -150,6 +155,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         mock_correlation_id.set.assert_called_with(CORRELATION_ID)
         log.inbound_message_id.set.assert_called_with('C614484E-4B10-499A-9ACD-5D645CFACF61')
         mock_message_id.set.assert_called_with(REF_TO_MESSAGE_ID)
+        mock_interaction_id.set.assert_called_with('MCCI_IN010000UK13')
 
     ###################################
     # Unsolicited inbound request tests
