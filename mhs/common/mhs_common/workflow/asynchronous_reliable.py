@@ -55,6 +55,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
         logger.info('0001', 'Entered async reliable workflow to handle outbound message')
         wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
+        logger.audit('0100', 'Outbound {WorkflowName} workflow invoked.', {'WorkflowName': self.workflow_name})
 
         try:
             details = await self._lookup_endpoint_details(interaction_details)
@@ -94,20 +95,17 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                                   num_of_retries=num_of_retries, retries_remaining=retries_remaining)
 
         while True:
-            start_time = timing.get_time()
-
             try:
                 return await self._make_outbound_request_and_handle_response(url, http_headers, message, wdo,
-                                                                             handle_error_response, start_time,
-                                                                             self.workflow_name)
+                                                                             handle_error_response)
             except _NeedToRetryException:
                 logger.info("0017", "Waiting for {retry_interval} milliseconds before next request "
                                     "attempt.", {"retry_interval": retry_interval})
                 await asyncio.sleep(retry_interval)
                 continue
 
-    def _handle_error_response(self, response: httpclient.HTTPResponse, start_time: str,
-                               num_of_retries: int, retries_remaining: List[int]):
+    def _handle_error_response(self, response: httpclient.HTTPResponse, num_of_retries: int,
+                               retries_remaining: List[int]):
         try:
             parsed_body = ET.fromstring(response.body)
 
@@ -144,14 +142,10 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                {'HTTPStatus': response.code})
                 parsed_response = "Didn't get expected response from Spine"
 
-            self._record_outbound_audit_log(self.workflow_name, timing.get_time(), start_time,
-                                            wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
         except ET.ParseError as pe:
             logger.warning('0010', 'Unable to parse response from Spine. {Exception}',
                            {'Exception': repr(pe)})
             parsed_response = 'Unable to handle response returned from Spine'
-            self._record_outbound_audit_log(self.workflow_name, timing.get_time(), start_time,
-                                            wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
         return 500, parsed_response, None
 

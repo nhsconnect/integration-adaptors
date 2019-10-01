@@ -75,27 +75,27 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.addCleanup(patcher.stop)
 
         self.workflow = async_reliable.AsynchronousReliableWorkflow(party_key=FROM_PARTY_KEY,
-                                                                   persistence_store=self.mock_persistence_store,
-                                                                   transmission=self.mock_transmission_adaptor,
-                                                                   queue_adaptor=self.mock_queue_adaptor,
-                                                                   inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                                   inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
-                                                                   persistence_store_max_retries=3,
-                                                                   routing=self.mock_routing_reliability)
+                                                                    persistence_store=self.mock_persistence_store,
+                                                                    transmission=self.mock_transmission_adaptor,
+                                                                    queue_adaptor=self.mock_queue_adaptor,
+                                                                    inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+                                                                    inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+                                                                    persistence_store_max_retries=3,
+                                                                    routing=self.mock_routing_reliability)
 
         self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
     def test_construct_workflow_with_only_outbound_params(self):
         workflow = async_reliable.AsynchronousReliableWorkflow(party_key=mock.sentinel.party_key,
-                                                              persistence_store=mock.sentinel.persistence_store,
-                                                              transmission=mock.sentinel.transmission,
-                                                              routing=self.mock_routing_reliability)
+                                                               persistence_store=mock.sentinel.persistence_store,
+                                                               transmission=mock.sentinel.transmission,
+                                                               routing=self.mock_routing_reliability)
         self.assertIsNotNone(workflow)
 
     def test_construct_workflow_with_only_inbound_params(self):
         workflow = async_reliable.AsynchronousReliableWorkflow(queue_adaptor=mock.sentinel.queue_adaptor,
-                                                              inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-                                                              inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
+                                                               inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
+                                                               inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY)
         self.assertIsNotNone(workflow)
         self.assertEqual(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS, workflow.inbound_queue_retry_delay)
 
@@ -103,9 +103,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
     # Outbound tests
     ############################
 
-    @mock.patch.object(common_async, 'logger')
+    @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
-    async def test_successful_handle_outbound_message(self, log_mock):
+    async def test_successful_handle_outbound_message(self, audit_log_mock):
         response = mock.MagicMock()
         response.code = 202
 
@@ -140,12 +140,15 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
+
+        audit_log_mock.assert_called_with('0101',
+                                          '{WorkflowName} outbound workflow invoked. Message sent to Spine'
+                                          ' and {Acknowledgment} received.',
+                                          {'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD', 'WorkflowName': 'async-reliable'})
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
-    @mock.patch.object(async_reliable, 'logger')
     @async_test
-    async def test_handle_outbound_doesnt_overwrite_work_description(self, log_mock, wdo_mock):
+    async def test_handle_outbound_doesnt_overwrite_work_description(self, wdo_mock):
         response = mock.MagicMock()
         response.code = 202
 
@@ -211,9 +214,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
     @mock.patch('asyncio.sleep')
-    @mock.patch.object(common_async, 'logger')
+    @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
-    async def test_well_formed_soap_error_response_from_spine(self, log_mock, mock_sleep):
+    async def test_well_formed_soap_error_response_from_spine(self, audit_log_mock, mock_sleep):
         self.setup_mock_work_description()
         self._setup_routing_mock()
         mock_sleep.return_value = test_utilities.awaitable(None)
@@ -239,11 +242,13 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        audit_log_mock.assert_called_once_with('0100',
+                                               'Outbound {WorkflowName} workflow invoked.',
+                                               {'WorkflowName': 'async-reliable'})
 
-    @mock.patch.object(common_async, 'logger')
+    @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
-    async def test_unhandled_response_from_spine(self, log_mock):
+    async def test_unhandled_response_from_spine(self, audit_log_mock):
         self.setup_mock_work_description()
         self._setup_routing_mock()
 
@@ -265,11 +270,13 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        audit_log_mock.assert_called_once_with('0100',
+                                               'Outbound {WorkflowName} workflow invoked.',
+                                               {'WorkflowName': 'async-reliable'})
 
-    @mock.patch.object(common_async, 'logger')
+    @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
-    async def test_well_formed_ebxml_error_response_from_spine(self, log_mock):
+    async def test_well_formed_ebxml_error_response_from_spine(self, audit_log_mock):
         self.setup_mock_work_description()
         self._setup_routing_mock()
 
@@ -317,14 +324,15 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        audit_log_mock.assert_called_once_with('0100',
+                                               'Outbound {WorkflowName} workflow invoked.',
+                                               {'WorkflowName': 'async-reliable'})
 
     ############################
     # Reliability tests
     ############################
     @async_test
-    @mock.patch.object(async_reliable, 'logger')
-    async def test_retry_interval_contract_property_is_invalid(self, log_mock):
+    async def test_retry_interval_contract_property_is_invalid(self):
         self.setup_mock_work_description()
         self._setup_routing_mock()
 
@@ -389,7 +397,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                     mock_sleep.reset_mock()
 
     @async_test
-    async def test_soap_error_request_is_non_retriable(self,):
+    async def test_soap_error_request_is_non_retriable(self, ):
         self.setup_mock_work_description()
         self._setup_routing_mock()
 
@@ -414,13 +422,13 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
 
                 self.mock_transmission_adaptor.make_request.assert_called_once()
 
-
     ############################
     # Inbound tests
     ############################
 
+    @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
-    async def test_successful_handle_inbound_message(self):
+    async def test_successful_handle_inbound_message(self, audit_log_mock):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
@@ -432,6 +440,11 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
+        audit_log_mock.assert_called_with('0104',
+                                          '{WorkflowName} inbound workflow completed. Message placed on queue,'
+                                          ' returning {Acknowledgement} to spine',
+                                          {'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',
+                                           'WorkflowName': 'async-reliable'})
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -452,9 +465,11 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                          self.mock_work_description.set_inbound_status.call_args_list)
         mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
 
+    @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @mock.patch('asyncio.sleep')
     @async_test
-    async def test_handle_inbound_message_error_putting_message_onto_queue_despite_retries(self, mock_sleep):
+    async def test_handle_inbound_message_error_putting_message_onto_queue_despite_retries(self, mock_sleep,
+                                                                                           audit_log_mock):
         self.setup_mock_work_description()
         future = asyncio.Future()
         future.set_exception(proton_queue_adaptor.MessageSendingError())
@@ -472,6 +487,9 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
+        # Should be called when invoked
+        audit_log_mock.assert_called_once_with('0103', '{WorkflowName} inbound workflow invoked. Message '
+                                                       'received from spine', {'WorkflowName': 'async-reliable'})
 
     def setup_mock_work_description(self):
         self.mock_work_description = self.mock_create_new_work_description.return_value
@@ -479,12 +497,6 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_work_description.set_outbound_status.return_value = test_utilities.awaitable(None)
         self.mock_work_description.set_inbound_status.return_value = test_utilities.awaitable(None)
         self.mock_work_description.update.return_value = test_utilities.awaitable(None)
-
-    def assert_audit_log_recorded_with_message_status(self, log_mock, message_status):
-        log_mock.audit.assert_called_once()
-        audit_log_dict = log_mock.audit.call_args[0][2]
-        self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
-        self.assertEqual(workflow.ASYNC_RELIABLE, audit_log_dict['WorkflowName'])
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({

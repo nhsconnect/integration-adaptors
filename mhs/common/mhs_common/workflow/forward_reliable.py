@@ -45,6 +45,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async forward reliable workflow to handle outbound message')
+        logger.audit('0100', 'Outbound {WorkflowName} workflow invoked.', {'WorkflowName': self.workflow_name})
         wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
 
         try:
@@ -83,6 +84,8 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
     async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str,
                                                  attachments: list):
         logger.info('0005', 'Entered async forward reliable workflow to handle unsolicited inbound message')
+        logger.audit('0100', 'Unsolicited inbound {WorkflowName} workflow invoked.',
+                     {'WorkflowName': self.workflow_name})
         work_description = wd.create_new_work_description(self.persistence_store, message_id, self.workflow_name,
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         await work_description.publish()
@@ -101,7 +104,6 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                  "Exceeded the maximum number of retries, {max_retries} retries, when putting "
                                  "unsolicited message onto inbound queue",
                                  {"max_retries": self.inbound_queue_max_retries})
-                    self._record_unsolicited_inbound_audit_log(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
                     await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
                     raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
                                              'been exceeded') from e
@@ -110,10 +112,8 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                     "onto inbound queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
-        self._record_unsolicited_inbound_audit_log(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        logger.audit('0022', '{WorkflowName} workflow invoked for inbound unsolicited request. '
+                             'Attempted to place message onto inbound queue with {Acknowledgement}.',
+                     {'Acknowledgement': wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
+                      'WorkflowName': self.workflow_name})
         await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
-
-    def _record_unsolicited_inbound_audit_log(self, acknowledgment):
-        logger.audit('0022', 'Async-forward-reliable workflow invoked for inbound unsolicited request. '
-                             'Attempted to place message onto inbound queue with {Acknowledgment}.',
-                     {'Acknowledgment': acknowledgment})

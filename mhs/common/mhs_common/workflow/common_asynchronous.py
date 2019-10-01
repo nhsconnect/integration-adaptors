@@ -76,34 +76,49 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
 
     async def _make_outbound_request_and_handle_response(
             self, url: str, http_headers: Dict[str, str], message: str, wdo: wd.WorkDescription,
-            handle_error_response: Callable[[httpclient.HTTPResponse, str],
-                                            Tuple[int, str, Optional[wd.WorkDescription]]],
-            start_time: str, workflow_name: str):
+            handle_error_response: Callable[[httpclient.HTTPResponse], Tuple[int, str, Optional[wd.WorkDescription]]]):
 
         logger.info('0006', 'About to make outbound request')
         response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
 
         if response.code == 202:
-            end_time = timing.get_time()
-            self._record_outbound_audit_log(workflow_name, end_time, start_time,
-                                            wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+            logger.audit('0101', '{WorkflowName} outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
+                                 'received.',
+                         {'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_ACKD, 'WorkflowName': self.workflow_name})
+
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
                                                 self.store_retries)
             return response.code, '', None
 
-        error_response = handle_error_response(response, start_time)
+        error_response = handle_error_response(response)
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
         return error_response
 
     @timing.time_function
     async def _handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
+        logger.audit('0103', '{WorkflowName} inbound workflow invoked. Message received from spine',
+                     {'WorkflowName': self.workflow_name})
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
                                             self.store_retries)
 
+        await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, payload)
+
+        logger.info('0015', 'Placed message onto inbound queue successfully')
+        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        logger.audit('0104', '{WorkflowName} inbound workflow completed. Message placed on queue, returning '
+                             '{Acknowledgement} to spine',
+                     {'Acknowledgement': wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
+                      'WorkflowName': self.workflow_name})
+
+    async def _publish_message_to_inbound_queue(self,
+                                                message_id: str,
+                                                correlation_id: str,
+                                                work_description: wd.WorkDescription,
+                                                payload: str):
         retries_remaining = self.inbound_queue_max_retries
         while True:
             try:
@@ -124,9 +139,6 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                                     "queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
 
-        logger.info('0015', 'Placed message onto inbound queue successfully')
-        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
-
     async def _lookup_reliability_details(self, interaction_details: Dict, org_code: str = None) -> Dict:
         try:
             service_id = await self._build_service_id(interaction_details)
@@ -145,13 +157,6 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         await self.queue_adaptor.send_async({'payload': payload, 'attachments': attachments or []},
                                             properties={'message-id': message_id,
                                                         'correlation-id': correlation_id})
-
-    def _record_outbound_audit_log(self, workflow_name: str, end_time: str, start_time: str,
-                                   acknowledgment: wd.MessageStatus):
-        logger.audit('0011', '{WorkflowName} invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
-                     {'WorkflowName': workflow_name, 'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment})
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         pass

@@ -207,6 +207,8 @@ class SynchronousHandler(base_handler.BaseHandler):
     def _extract_interaction_id(self):
         try:
             interaction_id = self.request.headers['Interaction-Id']
+            log.interaction_id.set(interaction_id)
+            logger.info('0021', 'Found Interaction-Id in message headers')
         except KeyError as e:
             logger.error('0005', 'Required Interaction-Id header not passed in request')
             raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found',

@@ -49,10 +49,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                       correlation_id: str,
                                       interaction_details: dict,
                                       payload: str,
-                                      wdo: Optional[wd.WorkDescription])\
+                                      wdo: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
+        logger.audit('0100', '{WorkflowName} outbound workflow invoked.', {'WorkflowName': self.workflow_name})
         wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
 
         try:
@@ -71,12 +72,10 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return error[0], error[1], None
 
-        start_time = timing.get_time()
         return await self._make_outbound_request_and_handle_response(url, http_headers, message, wdo,
-                                                                     self._handle_error_response, start_time,
-                                                                     self.workflow_name)
+                                                                     self._handle_error_response)
 
-    def _handle_error_response(self, response: httpclient.HTTPResponse, start_time: str):
+    def _handle_error_response(self, response: httpclient.HTTPResponse):
         try:
             parsed_body = ET.fromstring(response.body)
 
@@ -97,8 +96,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                {'HTTPStatus': response.code})
                 parsed_response = "Didn't get expected response from Spine"
 
-            self._record_outbound_audit_log(self.workflow_name, timing.get_time(), start_time,
-                                            wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
         except ET.ParseError as pe:
             logger.warning('0010', 'Unable to parse response from Spine. {Exception}', {'Exception': repr(pe)})
             parsed_response = 'Unable to handle response returned from Spine'
