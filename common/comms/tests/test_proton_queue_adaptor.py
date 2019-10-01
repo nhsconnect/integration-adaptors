@@ -51,22 +51,6 @@ class TestProtonQueueAdaptor(unittest.TestCase):
 
         self.assert_proton_called_correctly(properties=TEST_PROPERTIES)
 
-    # TESTING SEND SYNC METHOD
-
-    def test_send_success(self):
-        """Test happy path of send_sync."""
-
-        self.service.send_sync(TEST_MESSAGE)
-
-        self.assert_proton_called_correctly()
-
-    def test_send_with_properties_success(self):
-        """Test happy path of send_sync."""
-
-        self.service.send_sync(TEST_MESSAGE, properties=TEST_PROPERTIES)
-
-        self.assert_proton_called_correctly(properties=TEST_PROPERTIES)
-
     def assert_proton_called_correctly(self, properties=None):
         self.assertTrue(self.mock_container.return_value.run.called)
         proton_messaging_handler = self.mock_container.call_args[0][0]
@@ -200,3 +184,19 @@ class TestProtonMessagingHandler(unittest.TestCase):
         self.handler.on_rejected(mock_event)
 
         self.assertFalse(self.handler._sent)
+
+    # TESTING ERROR HANDLING METHODS
+    def test_should_raise_exception_on_error(self):
+        error_handling_methods = [
+            self.handler.on_transport_error,
+            self.handler.on_connection_error,
+            self.handler.on_session_error,
+            self.handler.on_link_error
+        ]
+
+        for error_handling_method in error_handling_methods:
+            with self.subTest(error_handling_method.__name__):
+                mock_event = unittest.mock.MagicMock()
+
+                with self.assertRaises(comms.proton_queue_adaptor.EarlyDisconnectError):
+                    error_handling_method(mock_event)

@@ -29,8 +29,7 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
         Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
         """
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', '9689174606',
-                                            message_id='F5187FB6-B033-4A75-838B-9E7A1AFB3111')
+        message, message_id = build_message('QUPA_IN040000UK32', '9689174606', message_id='F5187FB6-B033-4A75-838B-9E7A1AFB3111')
 
         # Act
         response = MhsHttpRequestBuilder() \

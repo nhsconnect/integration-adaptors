@@ -5,6 +5,7 @@ pipeline {
 
     environment {
       BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+      BUILD_TAG_LOWER = sh label: 'Lowercase build tag', returnStdout: true, script: "echo -n ${BUILD_TAG} | tr '[:upper:]' '[:lower:]'"
       ENVIRONMENT_ID = "build"
       MHS_INBOUND_QUEUE_NAME = "${ENVIRONMENT_ID}-inbound"
     }
@@ -71,14 +72,14 @@ pipeline {
                             export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
                             export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} up -d'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
                     }
                 }
                 stage('Component Tests') {
                     steps {
                         sh label: 'Running component tests', script: '''
                              docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
-                             docker run --rm --network ${BUILD_TAG} \
+                             docker run --rm --network "${BUILD_TAG_LOWER}_default" \
                                 --env "MHS_ADDRESS=http://outbound" \
                                 --env "AWS_ACCESS_KEY_ID=test" \
                                 --env "AWS_SECRET_ACCESS_KEY=test" \
@@ -90,8 +91,8 @@ pipeline {
             }
             post {
                 always {
-                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} logs'
-                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} down -v'
+                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
+                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
                 }
             }
         }
@@ -245,7 +246,7 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} down -v'
+            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /

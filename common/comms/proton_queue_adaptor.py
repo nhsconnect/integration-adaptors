@@ -42,15 +42,16 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         logger.info('000', 'Initialized proton queue adaptor for {host}', {'host': self.host})
 
     async def send_async(self, message: str, properties: Dict[str, Any] = None) -> None:
+        """Builds and asynchronously sends a message to the host defined when this adaptor was constructed. Raises an
+        exception to indicate that the message could not be sent successfully.
+
+        :param message: The message body to send.
+        :param properties: Optional application properties to send with the message.
+        """
         logger.info('008', 'Sending message asynchronously.')
         payload = self.__construct_message(message, properties=properties)
         await tornado.ioloop.IOLoop.current() \
             .run_in_executor(executor=None, func=lambda: self.__send(payload))
-
-    def send_sync(self, message: str, properties: Dict[str, Any] = None) -> None:
-        logger.info('009', 'Sending message synchronously.')
-        payload = self.__construct_message(message, properties=properties)
-        self.__send(payload)
 
     @staticmethod
     def __construct_message(message: str, properties: Dict[str, Any] = None) -> proton.Message:
@@ -74,7 +75,8 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
 
 
 class ProtonMessagingHandler(proton.handlers.MessagingHandler):
-    """Implementation of a Proton MessagingHandler which will send a single message."""
+    """Implementation of a Proton MessagingHandler which will send a single message. Note that this class will raise
+    an exception to indicate that a message could not be sent successfully."""
 
     def __init__(self, host: str, username: str, password: str, message: proton.Message) -> None:
         """
@@ -92,12 +94,20 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         self._sender = None
         self._sent = False
 
-    def on_start(self, event):
+    def on_start(self, event: proton.Event) -> None:
+        """Called when this messaging handler is started.
+
+        :param event: The start event.
+        """
         logger.info('002', 'Establishing connection to {host} for sending messages.', {'host': self._host})
         self._sender = event.container.create_sender(proton.Url(self._host, username=self._username,
                                                                 password=self._password))
 
-    def on_sendable(self, event):
+    def on_sendable(self, event: proton.Event) -> None:
+        """Called when the link is ready for sending messages.
+
+        :param event: The sendable event.
+        """
         if event.sender.credit:
             if not self._sent:
                 event.sender.send(self._message)
@@ -107,16 +117,69 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
             logger.error('004', 'Failed to send message as no available credit.')
             raise MessageSendingError()
 
-    def on_accepted(self, event):
+    def on_accepted(self, event: proton.Event) -> None:
+        """Called when the outgoing message is accepted by the remote peer.
+
+        :param event: The accepted event.
+        """
         logger.info('005', 'Message received by {host}.', {'host': self._host})
         event.connection.close()
 
-    def on_disconnected(self, event):
+    def on_disconnected(self, event: proton.Event) -> None:
+        """Called when the socket is disconnected.
+
+        :param event: The disconnect event.
+        """
         logger.info('006', 'Disconnected from {host}.', {'host': self._host})
         if not self._sent:
             logger.error('010', 'Disconnected before message could be sent.')
             raise EarlyDisconnectError()
 
-    def on_rejected(self, event):
+    def on_rejected(self, event: proton.Event) -> None:
+        """Called when the outgoing message is rejected by the remote peer.
+
+        :param event:
+        :return:
+        """
         logger.warning('007', 'Message rejected by {host}.', {'host': self._host})
         self._sent = False
+
+    def on_transport_error(self, event: proton.Event) -> None:
+        """Called when an error is encountered with the transport over which the AMQP connection is established.
+
+        :param event: The transport error event.
+        """
+        logger.error('011', "There was an error with the transport used for the connection to {host}.",
+                     {'host': self._host})
+        super().on_transport_error(event)
+        raise EarlyDisconnectError()
+
+    def on_connection_error(self, event: proton.Event) -> None:
+        """Called when the peer closes the connection with an error condition.
+
+        :param event: The connection error event.
+        """
+        logger.error('012', "{host} closed the connection with an error. {remote_condition}",
+                     {'host': self._host, 'remote_condition': event.context.remote_condition})
+        super().on_connection_error(event)
+        raise EarlyDisconnectError()
+
+    def on_session_error(self, event: proton.Event) -> None:
+        """Called when the peer closes the session with an error condition.
+
+        :param event: The session error event.
+        """
+        logger.error('013', "{host} closed the session with an error. {remote_condition}",
+                     {'host': self._host, 'remote_condition': event.context.remote_condition})
+        super().on_session_error(event)
+        raise EarlyDisconnectError()
+
+    def on_link_error(self, event: proton.Event) -> None:
+        """Called when the peer closes the link with an error condition.
+
+        :param event: The link error event.
+        """
+        logger.error('014', "{host} closed the link with an error. {remote_condition}",
+                     {'host': self._host, 'remote_condition': event.context.remote_condition})
+        super().on_link_error(event)
+        raise EarlyDisconnectError()
