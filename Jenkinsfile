@@ -5,6 +5,7 @@ pipeline {
 
     environment {
       BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+      BUILD_TAG_LOWER = sh label: 'Lowercase build tag', returnStdout: true, script: "echo -n ${BUILD_TAG} | tr '[:upper:]' '[:lower:]'"
       ENVIRONMENT_ID = "build"
       MHS_INBOUND_QUEUE_NAME = "${ENVIRONMENT_ID}-inbound"
     }
@@ -63,24 +64,35 @@ pipeline {
                     steps {
                         sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
                         sh label: 'Export environment variables', script: '''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
                             . ./component-test-source.sh
+                            export INBOUND_BUILD_TAG="inbound-${BUILD_TAG}"
+                            export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
+                            export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
+                            export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up -d'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
                     }
                 }
                 stage('Component Tests') {
                     steps {
                         sh label: 'Running component tests', script: '''
                              docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
-                             docker run --network custom_network_default --env "MHS_ADDRESS=http://outbound" componenttest:$BUILD_TAG
+                             docker run --rm --network "${BUILD_TAG_LOWER}_default" \
+                                --env "MHS_ADDRESS=http://outbound" \
+                                --env "AWS_ACCESS_KEY_ID=test" \
+                                --env "AWS_SECRET_ACCESS_KEY=test" \
+                                --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
+                                componenttest:$BUILD_TAG
                         '''
                     }
                 }
             }
             post {
                 always {
-                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml logs'
-                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
+                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
+                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
                 }
             }
         }
@@ -234,7 +246,7 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
+            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
