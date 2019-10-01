@@ -70,7 +70,8 @@
       },
       {
         "type": "docker-tag",
-        "repository": "local/mhs-route"
+        "repository": "local/mhs-route",
+        "tag": "route-{{user `tag`}}"
       }
     ]
   ]

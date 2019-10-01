@@ -2,7 +2,7 @@ version: '3'
 
 services:
   inbound:
-    image: local/mhs-inbound
+    image: local/mhs-inbound:${INBOUND_BUILD_TAG}
     ports:
       - "443:443"
       - "8079:80"
@@ -23,7 +23,7 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
   outbound:
-    image: local/mhs-outbound
+    image: local/mhs-outbound:${OUTBOUND_BUILD_TAG}
     ports:
       - "80:80"
     environment:
@@ -43,7 +43,7 @@ services:
       - MHS_SPINE_ORG_CODE=YES
       - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable
   route:
-    image: local/mhs-route
+    image: local/mhs-route:${ROUTE_BUILD_TAG}
     ports:
       - "8080:80"
     environment:
@@ -68,7 +68,7 @@ services:
     ports:
       - "6379:6379"
   scradaptor:
-    image: local/scr-web-service
+    image: local/scr-web-service:${WEB_SERVICE_BUILD_TAG}
     ports:
       - "9000:80"
     environment:

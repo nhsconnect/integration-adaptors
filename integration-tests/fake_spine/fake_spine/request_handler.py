@@ -11,7 +11,7 @@ class SpineRequestHandler(tornado.web.RequestHandler):
         self.fake_response_handler = fake_response_handler
 
     async def post(self):
-        logger.log(logging.INFO, f"request accepted {self.request} with headers: {self.request.headers}")
+        logger.log(logging.INFO, f"request accepted {self.request} with headers: {self.request.headers}, and body: {self.request.body}")
         status, response = self.fake_response_handler.response_for_request(self.request)
         logger.log(logging.INFO, f"response to request {status} : {response}")
 
