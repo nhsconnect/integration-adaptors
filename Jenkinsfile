@@ -71,14 +71,14 @@ pipeline {
                             export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
                             export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} up -d'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG,,} up -d'''
                     }
                 }
                 stage('Component Tests') {
                     steps {
                         sh label: 'Running component tests', script: '''
                              docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
-                             docker run --rm --network "${BUILD_TAG}_default" \
+                             docker run --rm --network "${BUILD_TAG,,}_default" \
                                 --env "MHS_ADDRESS=http://outbound" \
                                 --env "AWS_ACCESS_KEY_ID=test" \
                                 --env "AWS_SECRET_ACCESS_KEY=test" \
@@ -90,8 +90,8 @@ pipeline {
             }
             post {
                 always {
-                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} logs'
-                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} down -v'
+                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG,,} logs'
+                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG,,} down -v'
                 }
             }
         }
