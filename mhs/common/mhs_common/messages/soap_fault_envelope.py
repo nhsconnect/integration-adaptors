@@ -66,6 +66,7 @@ class SOAPFault(SoapEnvelope):
 
     @staticmethod
     def is_soap_fault(parsed_message: Element) -> bool:
+        logger.error('TEST', parsed_message)
         if parsed_message is not None and len(parsed_message.findall(f'*/{SOAP_FAULT}', NS)):
             return True
 
