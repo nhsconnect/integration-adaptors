@@ -13,7 +13,6 @@ pipeline {
     stages {
         stage('Build modules') {
             steps {
-                sh 'echo $BUILD_TAG_LOWER'
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
                 dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
