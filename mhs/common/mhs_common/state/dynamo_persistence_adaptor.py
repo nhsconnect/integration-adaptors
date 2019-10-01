@@ -46,7 +46,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :param data: The item to store in persistence.
         :return: The previous version of the item which has been replaced. (None if no previous item)
         """
-        logger.info('011', 'Adding {record} for {key}', {'record': data, 'key': key})
+        logger.info('011', 'Adding data for {key}', {'key': key})
         try:
             async with self.__get_dynamo_table() as table:
                 response = await table.put_item(
