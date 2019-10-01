@@ -40,7 +40,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                       work_description_object: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
         logger.info('001', 'Entered sync workflow for outbound message')
-        logger.audit('0100', 'Outbound Synchronous workflow invoked.', {})
+        logger.audit('0100', 'Outbound Synchronous workflow invoked.')
 
         wdo = wd.create_new_work_description(self.wd_store,
                                              message_id,

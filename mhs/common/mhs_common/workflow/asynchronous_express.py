@@ -54,7 +54,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
-        logger.audit('0100', 'Async-Express outbound workflow invoked.', {})
+        logger.audit('0100', 'Async-Express outbound workflow invoked.')
 
         if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store,

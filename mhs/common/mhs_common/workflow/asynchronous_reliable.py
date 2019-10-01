@@ -55,7 +55,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async reliable workflow to handle outbound message')
-        logger.audit('0100', 'Outbound Async-Reliable workflow invoked.', {})
+        logger.audit('0100', 'Outbound Async-Reliable workflow invoked.')
         if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store,
                                                  message_id,
@@ -177,7 +177,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0010', 'Entered async reliable workflow to handle inbound message')
-        logger.audit('0103', 'Async-Reliable inbound workflow invoked. Message received from Spine.', {})
+        logger.audit('0103', 'Async-Reliable inbound workflow invoked. Message received from Spine.')
 
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,

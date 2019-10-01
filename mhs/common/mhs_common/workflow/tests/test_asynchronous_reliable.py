@@ -242,8 +242,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         log_mock.audit.assert_called_once_with('0100',
-                                               'Outbound Async-Reliable workflow invoked.',
-                                               {})
+                                               'Outbound Async-Reliable workflow invoked.')
 
     @mock.patch.object(async_reliable, 'logger')
     @async_test
@@ -270,8 +269,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         log_mock.audit.assert_called_once_with('0100',
-                                               'Outbound Async-Reliable workflow invoked.',
-                                               {})
+                                               'Outbound Async-Reliable workflow invoked.')
 
     @mock.patch.object(async_reliable, 'logger')
     @async_test
@@ -324,8 +322,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         log_mock.audit.assert_called_once_with('0100',
-                                               'Outbound Async-Reliable workflow invoked.',
-                                               {})
+                                               'Outbound Async-Reliable workflow invoked.')
 
     ############################
     # Reliability tests
@@ -484,7 +481,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                          self.mock_work_description.set_inbound_status.call_args_list)
         # Should be called when invoked
         mock_log.audit.assert_called_once_with('0103', 'Async-Reliable inbound workflow invoked. Message '
-                                                       'received from Spine.', {})
+                                                       'received from Spine.')
 
     def setup_mock_work_description(self):
         self.mock_work_description = self.mock_create_new_work_description.return_value

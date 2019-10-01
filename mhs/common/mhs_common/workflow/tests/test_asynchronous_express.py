@@ -239,7 +239,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
 
         # This should be called at the start, regardless of error scenario
-        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.', {})
+        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.')
 
     @mock.patch.object(async_express, 'logger')
     @async_test
@@ -267,7 +267,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
 
         # This should be called at the start, regardless of error scenario
-        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.', {})
+        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.')
 
     @mock.patch.object(async_express, 'logger')
     @async_test
@@ -321,7 +321,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
 
         # This should be called at the start, regardless of error scenario
-        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.', {})
+        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.')
 
     ############################
     # Inbound tests
