@@ -1,10 +1,11 @@
 """This module defines the common base for all asynchronous workflows."""
 import asyncio
-from typing import Dict
+from typing import Dict, Callable, Tuple, Optional
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
+from tornado import httpclient
 from utilities import timing
 
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
@@ -65,13 +66,35 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
         except Exception as e:
-            logger.warning('0002', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
+            logger.warning('0004', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return (500, 'Error serialising outbound message'), None, None
 
-        logger.info('0003', 'Message serialised successfully')
+        logger.info('0005', 'Message serialised successfully')
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
+
+    async def _make_outbound_request_and_handle_response(
+            self, url: str, http_headers: Dict[str, str], message: str, wdo: wd.WorkDescription,
+            handle_error_response: Callable[[httpclient.HTTPResponse, str],
+                                            Tuple[int, str, Optional[wd.WorkDescription]]],
+            start_time: str, workflow_name: str):
+
+        logger.info('0006', 'About to make outbound request')
+        response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
+
+        if response.code == 202:
+            end_time = timing.get_time()
+            self._record_outbound_audit_log(workflow_name, end_time, start_time,
+                                            wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+            await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
+                                                wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+                                                self.store_retries)
+            return response.code, '', None
+
+        error_response = handle_error_response(response, start_time)
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        return error_response
 
     @timing.time_function
     async def _handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,

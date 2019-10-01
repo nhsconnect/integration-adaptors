@@ -1,11 +1,13 @@
 """This module defines the asynchronous reliable workflow."""
 import asyncio
-from typing import Tuple, Optional
+import functools
+from typing import Tuple, Optional, List, Dict
 from xml.etree import ElementTree as ET
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from isodate import isoerror
+from tornado import httpclient
 from utilities import timing
 from utilities.date_utilities import DateUtilities
 
@@ -42,6 +44,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                                           ack_requested=True,
                                                           ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
                                                           sync_reply=True)
+        self.workflow_name = workflow.ASYNC_RELIABLE
 
     @timing.time_function
     async def handle_outbound_message(self, from_asid: Optional[str],
@@ -51,7 +54,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async reliable workflow to handle outbound message')
-        wdo = await self._create_new_work_description_if_required(message_id, wdo, workflow.ASYNC_RELIABLE)
+        wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
 
         try:
             details = await self._lookup_endpoint_details(interaction_details)
@@ -77,77 +80,86 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error when converting retry interval: {} to seconds'.format(retry_interval_xml_datetime), None
 
+        return await self._make_outbound_request_with_retries_and_handle_response(url, http_headers, message, wdo,
+                                                                                  reliability_details, retry_interval)
+
+    async def _make_outbound_request_with_retries_and_handle_response(self, url: str, http_headers: Dict[str, str],
+                                                                      message: str, wdo: wd.WorkDescription,
+                                                                      reliability_details: dict, retry_interval: float):
         num_of_retries = reliability_details[common_asynchronous.MHS_RETRIES]
 
-        retries_remaining = num_of_retries
+        retries_remaining = [num_of_retries]
+
+        handle_error_response = functools.partial(self._handle_error_response,
+                                                  num_of_retries=num_of_retries, retries_remaining=retries_remaining)
 
         while True:
             start_time = timing.get_time()
-            logger.info('0004', 'About to make outbound request')
-            response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
-
-            if response.code == 202:
-                end_time = timing.get_time()
-                self._record_outbound_audit_log(workflow.ASYNC_RELIABLE, end_time, start_time,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
-                await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
-                                                    wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
-                                                    self.store_retries)
-                return response.code, '', None
 
             try:
-                parsed_body = ET.fromstring(response.body)
+                return await self._make_outbound_request_and_handle_response(url, http_headers, message, wdo,
+                                                                             handle_error_response, start_time,
+                                                                             self.workflow_name)
+            except _NeedToRetryException:
+                logger.info("0017", "Waiting for {retry_interval} milliseconds before next request "
+                                    "attempt.", {"retry_interval": retry_interval})
+                await asyncio.sleep(retry_interval)
+                continue
 
-                if EbxmlErrorEnvelope.is_ebxml_error(parsed_body):
-                    _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
-                                                                          response.headers,
-                                                                          response.body)
-                    logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
-                                   {'HTTPStatus': response.code, 'Errors': parsed_response})
+    def _handle_error_response(self, response: httpclient.HTTPResponse, start_time: str,
+                               num_of_retries: int, retries_remaining: List[int]):
+        try:
+            parsed_body = ET.fromstring(response.body)
 
-                elif SOAPFault.is_soap_fault(parsed_body):
-                    _, parsed_response, soap_fault_codes = handle_soap_error(response.code,
-                                                                             response.headers,
-                                                                             response.body)
-                    logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
-                                   {'HTTPStatus': response.code, 'Errors': parsed_response})
+            if EbxmlErrorEnvelope.is_ebxml_error(parsed_body):
+                _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
+                                                                      response.headers,
+                                                                      response.body)
+                logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
+                               {'HTTPStatus': response.code, 'Errors': parsed_response})
 
-                    if SOAPFault.is_soap_fault_retriable(soap_fault_codes):
-                        retries_remaining -= 1
-                        logger.warning("0015", "A retriable error was encountered {error} {retries_remaining} "
-                                               "{max_retries}",
-                                       {"error": parsed_response,
-                                        "retries_remaining": retries_remaining,
-                                        "max_retries": num_of_retries})
-                        if retries_remaining <= 0:
-                            # exceeded the number of retries so return the SOAP error response
-                            logger.error("0016",
-                                         "A request has exceeded the maximum number of retries, {max_retries} "
-                                         "retries", {"max_retries": num_of_retries})
-                        else:
-                            logger.info("0016", "Waiting for {retry_interval} milliseconds before next request "
-                                                "attempt.", {"retry_interval": retry_interval})
-                            await asyncio.sleep(retry_interval)
-                            continue
-                else:
-                    logger.warning('0017', "Received an unexpected response from Spine",
-                                   {'HTTPStatus': response.code})
-                    parsed_response = "Didn't get expected response from Spine"
+            elif SOAPFault.is_soap_fault(parsed_body):
+                _, parsed_response, soap_fault_codes = handle_soap_error(response.code,
+                                                                         response.headers,
+                                                                         response.body)
+                logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
+                               {'HTTPStatus': response.code, 'Errors': parsed_response})
 
-                self._record_outbound_audit_log(workflow.ASYNC_RELIABLE, timing.get_time(), start_time,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            except ET.ParseError as pe:
-                logger.warning('0010', 'Unable to parse response from Spine. {Exception}',
-                               {'Exception': repr(pe)})
-                parsed_response = 'Unable to handle response returned from Spine'
-                self._record_outbound_audit_log(workflow.ASYNC_RELIABLE, timing.get_time(), start_time,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+                if SOAPFault.is_soap_fault_retriable(soap_fault_codes):
+                    retries_remaining[0] -= 1
+                    logger.warning("0015", "A retriable error was encountered {error} {retries_remaining} "
+                                           "{max_retries}",
+                                   {"error": parsed_response,
+                                    "retries_remaining": retries_remaining[0],
+                                    "max_retries": num_of_retries})
+                    if retries_remaining[0] <= 0:
+                        # exceeded the number of retries so return the SOAP error response
+                        logger.error("0016",
+                                     "A request has exceeded the maximum number of retries, {max_retries} "
+                                     "retries", {"max_retries": num_of_retries})
+                    else:
+                        raise _NeedToRetryException()
+            else:
+                logger.warning('0017', "Received an unexpected response from Spine",
+                               {'HTTPStatus': response.code})
+                parsed_response = "Didn't get expected response from Spine"
 
-            return 500, parsed_response, None
+            self._record_outbound_audit_log(self.workflow_name, timing.get_time(), start_time,
+                                            wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+        except ET.ParseError as pe:
+            logger.warning('0010', 'Unable to parse response from Spine. {Exception}',
+                           {'Exception': repr(pe)})
+            parsed_response = 'Unable to handle response returned from Spine'
+            self._record_outbound_audit_log(self.workflow_name, timing.get_time(), start_time,
+                                            wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
+
+        return 500, parsed_response, None
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0010', 'Entered async reliable workflow to handle inbound message')
         await super()._handle_inbound_message(message_id, correlation_id, work_description, payload)
+
+
+class _NeedToRetryException(Exception):
+    pass

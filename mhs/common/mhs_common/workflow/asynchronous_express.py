@@ -4,6 +4,7 @@ from xml.etree import ElementTree as ET
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
+from tornado import httpclient
 from utilities import timing
 
 from mhs_common import workflow
@@ -39,6 +40,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                                           ack_requested=False,
                                                           ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
                                                           sync_reply=True)
+        self.workflow_name = workflow.ASYNC_EXPRESS
 
     @timing.time_function
     async def handle_outbound_message(self,
@@ -51,7 +53,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
-        wdo = await self._create_new_work_description_if_required(message_id, wdo, workflow.ASYNC_EXPRESS)
+        wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
 
         try:
             details = await self._lookup_endpoint_details(interaction_details)
@@ -70,18 +72,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             return error[0], error[1], None
 
         start_time = timing.get_time()
-        logger.info('0004', 'About to make outbound request')
-        response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
+        return await self._make_outbound_request_and_handle_response(url, http_headers, message, wdo,
+                                                                     self._handle_error_response, start_time,
+                                                                     self.workflow_name)
 
-        if response.code == 202:
-            end_time = timing.get_time()
-            self._record_outbound_audit_log(workflow.ASYNC_EXPRESS, end_time, start_time,
-                                            wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
-            await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
-                                                self.store_retries)
-            return response.code, '', None
-
+    def _handle_error_response(self, response: httpclient.HTTPResponse, start_time: str):
         try:
             parsed_body = ET.fromstring(response.body)
 
@@ -102,9 +97,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                {'HTTPStatus': response.code})
                 parsed_response = "Didn't get expected response from Spine"
 
-            self._record_outbound_audit_log(workflow.ASYNC_EXPRESS, timing.get_time(), start_time,
+            self._record_outbound_audit_log(self.workflow_name, timing.get_time(), start_time,
                                             wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
         except ET.ParseError as pe:
             logger.warning('0010', 'Unable to parse response from Spine. {Exception}', {'Exception': repr(pe)})
             parsed_response = 'Unable to handle response returned from Spine'
