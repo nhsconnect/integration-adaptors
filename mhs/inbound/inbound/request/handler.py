@@ -10,9 +10,7 @@ import mhs_common.workflow as workflow
 import tornado.web
 from mhs_common.configuration import configuration_manager
 from mhs_common.handler import base_handler
-from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID, \
-    CONTENT_TYPE_HEADER_NAME
-from mhs_common.messages.soap_envelope import SoapEnvelope, SoapParsingError
+from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID
 from mhs_common.state import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.state.persistence_adaptor import PersistenceAdaptor
@@ -127,19 +125,32 @@ class InboundHandler(base_handler.BaseHandler):
 
     def _send_ack(self, parsed_message: ebxml_envelope.EbxmlEnvelope):
         logger.info('012', 'Building and sending acknowledgement')
+        self._send_ebxml_message(parsed_message, is_positive_ack=True, additional_context={})
+
+    def _send_nack(self, parsed_message: ebxml_envelope.EbxmlEnvelope, nack_context):
+        logger.info('012', 'Building and sending negative acknowledgement')
+        self._send_ebxml_message(parsed_message, is_positive_ack=False, additional_context=nack_context)
+
+    def _send_ebxml_message(self, parsed_message, is_positive_ack, additional_context):
         message_details = parsed_message.message_dictionary
 
-        ack_context = {
+        base_context = {
             ebxml_envelope.FROM_PARTY_ID: self.party_id,
             ebxml_envelope.TO_PARTY_ID: message_details[ebxml_envelope.FROM_PARTY_ID],
             ebxml_envelope.CPA_ID: message_details[ebxml_envelope.CPA_ID],
             ebxml_envelope.CONVERSATION_ID: message_details[ebxml_envelope.CONVERSATION_ID],
-            ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP: message_details[ebxml_envelope.TIMESTAMP],
+            common_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP: message_details[ebxml_envelope.TIMESTAMP],
             ebxml_envelope.RECEIVED_MESSAGE_ID: message_details[ebxml_envelope.MESSAGE_ID]
         }
 
-        ack_message = ebxml_ack_envelope.EbxmlAckEnvelope(ack_context)
-        message_id, http_headers, serialized_message = ack_message.serialize()
+        base_context.update(additional_context)
+
+        if is_positive_ack:
+            message = ebxml_ack_envelope.EbxmlAckEnvelope(base_context)
+        else:
+            message = ebxml_nack_envelope.EbxmlNackEnvelope(base_context)
+
+        message_id, http_headers, serialized_message = message.serialize()
         for k, v in http_headers.items():
             self.set_header(k, v)
 
@@ -172,7 +183,7 @@ class InboundHandler(base_handler.BaseHandler):
         logger.info('010', 'Found message id on inbound message.')
         return message_id
 
-    def _extract_incoming_async_request_message(self):
+    def _extract_incoming_ebxml_request_message(self):
         try:
             request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
                                                                                       self.request.body.decode())
@@ -183,16 +194,29 @@ class InboundHandler(base_handler.BaseHandler):
 
         return request_message
 
-    def _extract_incoming_sync_request_message(self):
-        try:
-            request_message = SoapEnvelope.from_string(self.request.headers,
-                                                       self.request.body.decode())
-        except SoapParsingError as e:
-            logger.error('021', 'Failed to parse response: {exception}', {'exception': e})
-            raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
-                                        reason=f'Exception during inbound message parsing {e}') from e
+    def _is_message_intended_for_receiving_mhs(self, request_message):
+        """
+        Asserts whether the incoming message was intended for thi MHS instance given the to party key defined in the
+        message.
 
-        return request_message
+        error_code, severity and description defined as per the TMS Error Base v3.0 document
 
-    def _is_async_request(self):
-        return 'multipart/related' in self.request.headers[CONTENT_TYPE_HEADER_NAME]
+        :param request_message: the parsed ebxml request message
+        """
+        return self.party_id == request_message.message_dictionary[ebxml_envelope.TO_PARTY_ID]
+
+    def _return_message_to_message_initiator(self, request_message):
+
+        if self.party_id != request_message.message_dictionary[ebxml_envelope.TO_PARTY_ID]:
+            try:
+                nack_context = {
+                    ebxml_envelope.ERROR_CODE: "ValueNotRecognized",
+                    ebxml_envelope.DESCRIPTION: "501314:Invalid To Party Type attribute",
+                    ebxml_envelope.SEVERITY: "Error"
+                }
+                self._send_nack(request_message, nack_context)
+            except Exception as e:
+                logger.error('005', 'Exception when sending nack {exception}', {'exception': e})
+                raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
+                                                 ' failed to complete workflow',
+                                            reason=f'Exception in workflow') from e
