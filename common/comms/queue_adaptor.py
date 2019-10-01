@@ -14,12 +14,3 @@ class QueueAdaptor(abc.ABC):
         :param properties: Optional additional properties to send with the message.
         """
         pass
-
-    @abc.abstractmethod
-    def send_sync(self, message: dict, properties: Dict[str, Any] = None) -> None:
-        """
-        Sends a message and blocks waiting for the send to complete.
-        :param message: The message content to send. This will be serialised as JSON.
-        :param properties: Optional additional properties to send with the message.
-        """
-        pass
