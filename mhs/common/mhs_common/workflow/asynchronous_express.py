@@ -50,10 +50,12 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                       correlation_id: str,
                                       interaction_details: dict,
                                       payload: str,
-                                      wdo: Optional[wd.WorkDescription])\
+                                      wdo: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('0001', 'Entered async express workflow to handle outbound message')
+        logger.audit('0100', 'Async-Express outbound workflow invoked.')
+
         if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store,
                                                  message_id,
@@ -78,51 +80,23 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return error[0], error[1], None
 
-        start_time = timing.get_time()
         logger.info('0004', 'About to make outbound request')
         response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
 
         if response.code == 202:
-            end_time = timing.get_time()
-            self._record_outbound_audit_log(end_time, start_time, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
+            logger.audit('0101', 'Async-Express outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
+                                 'received.',
+                         {'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_ACKD})
+
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
                                                 self.store_retries)
             return response.code, '', None
         else:
-            try:
-                parsed_body = ET.fromstring(response.body)
-
-                if EbxmlErrorEnvelope.is_ebxml_error(parsed_body):
-                    _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
-                                                                          response.headers,
-                                                                          response.body)
-                    logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
-                                   {'HTTPStatus': response.code, 'Errors': parsed_response})
-                elif SOAPFault.is_soap_fault(parsed_body):
-                    _, parsed_response, _ = handle_soap_error(response.code,
-                                                              response.headers,
-                                                              response.body)
-                    logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
-                                   {'HTTPStatus': response.code, 'Errors': parsed_response})
-                else:
-                    logger.warning('0009', "Received an unexpected response from Spine",
-                                   {'HTTPStatus': response.code})
-                    parsed_response = "Didn't get expected response from Spine"
-
-                self._record_outbound_audit_log(timing.get_time(), start_time, wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-                await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
-            except ET.ParseError as pe:
-                logger.warning('0010', 'Unable to parse response from Spine. {Exception}', {'Exception': repr(pe)})
-                parsed_response = 'Unable to handle response returned from Spine'
+            parsed_response = self._parse_soap_error_response(response)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_NACKD)
 
             return 500, parsed_response, None
-
-    def _record_outbound_audit_log(self, end_time, start_time, acknowledgment):
-        logger.audit('0011', 'Async-express workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{RequestSentTime} {AcknowledgmentReceivedTime}',
-                     {'RequestSentTime': start_time, 'AcknowledgmentReceivedTime': end_time,
-                      'Acknowledgment': acknowledgment})
 
     async def _serialize_outbound_message(self, message_id, correlation_id, interaction_details, payload, wdo,
                                           to_party_key, cpa_id):
@@ -143,15 +117,57 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
 
+    def _parse_soap_error_response(self, response):
+        try:
+            parsed_body = ET.fromstring(response.body)
+
+            if EbxmlErrorEnvelope.is_ebxml_error(parsed_body):
+                _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
+                                                                      response.headers,
+                                                                      response.body)
+                logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
+                               {'HTTPStatus': response.code, 'Errors': parsed_response})
+            elif SOAPFault.is_soap_fault(parsed_body):
+                _, parsed_response, _ = handle_soap_error(response.code,
+                                                          response.headers,
+                                                          response.body)
+                logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
+                               {'HTTPStatus': response.code, 'Errors': parsed_response})
+            else:
+                logger.warning('0009', "Received an unexpected response from Spine",
+                               {'HTTPStatus': response.code})
+                parsed_response = "Didn't get expected response from Spine"
+        except ET.ParseError as pe:
+            logger.warning('0010', 'Unable to parse response from Spine. {Exception}', {'Exception': repr(pe)})
+            parsed_response = 'Unable to handle response returned from Spine'
+
+        return parsed_response
+
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
+
+        logger.audit('0103', 'Async-Express inbound workflow invoked. Message received from spine')
+
         logger.info('0010', 'Entered async express workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
                                             self.store_retries)
 
+        await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, payload)
+
+        logger.info('0015', 'Placed message onto inbound queue successfully')
+        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        logger.audit('0104', 'Async-Express inbound workflow completed. Message successfully processed, returning '
+                             '{Acknowledgement}  to spine',
+                     {'Acknowledgement': wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED})
+
+    async def _publish_message_to_inbound_queue(self,
+                                                message_id: str,
+                                                correlation_id: str,
+                                                work_description: wd.WorkDescription,
+                                                payload: str):
         retries_remaining = self.inbound_queue_max_retries
         while True:
             try:
@@ -172,9 +188,6 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                 logger.info("0014", "Waiting for {retry_delay} seconds before retrying putting message onto inbound "
                                     "queue", {"retry_delay": self.inbound_queue_retry_delay})
                 await asyncio.sleep(self.inbound_queue_retry_delay)
-
-        logger.info('0015', 'Placed message onto inbound queue successfully')
-        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         pass

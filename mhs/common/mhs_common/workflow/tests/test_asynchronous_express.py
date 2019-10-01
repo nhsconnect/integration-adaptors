@@ -25,7 +25,7 @@ ASID = 'asid-123'
 MESSAGE_ID = 'message-id'
 CORRELATION_ID = 'correlation-id'
 URL = 'a.a'
-ASID = '123456'
+
 HTTP_HEADERS = {
     "type": "a",
     "Content-Type": "b",
@@ -85,9 +85,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
     def test_construct_workflow_with_only_outbound_params(self):
         workflow = async_express.AsynchronousExpressWorkflow(party_key=mock.sentinel.party_key,
-                                                              persistence_store=mock.sentinel.persistence_store,
-                                                              transmission=mock.sentinel.transmission,
-                                                              routing=self.mock_routing_reliability)
+                                                             persistence_store=mock.sentinel.persistence_store,
+                                                             transmission=mock.sentinel.transmission,
+                                                             routing=self.mock_routing_reliability)
         self.assertIsNotNone(workflow)
 
     def test_construct_workflow_with_only_inbound_params(self):
@@ -138,7 +138,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
+        log_mock.audit.assert_called_with('0101', 'Async-Express outbound workflow invoked. Message sent to Spine and'
+                                                  ' {Acknowledgment} received.',
+                                          {'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD'})
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @mock.patch.object(async_express, 'logger')
@@ -235,7 +237,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+
+        # This should be called at the start, regardless of error scenario
+        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.')
 
     @mock.patch.object(async_express, 'logger')
     @async_test
@@ -261,7 +265,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+
+        # This should be called at the start, regardless of error scenario
+        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.')
 
     @mock.patch.object(async_express, 'logger')
     @async_test
@@ -313,14 +319,17 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_NACKD)
+
+        # This should be called at the start, regardless of error scenario
+        log_mock.audit.assert_called_with('0100', 'Async-Express outbound workflow invoked.')
 
     ############################
     # Inbound tests
     ############################
 
+    @mock.patch('mhs_common.workflow.asynchronous_express.logger')
     @async_test
-    async def test_successful_handle_inbound_message(self):
+    async def test_successful_handle_inbound_message(self, log_mock):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
@@ -332,6 +341,10 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
+        log_mock.audit.assert_called_with(
+            '0104', 'Async-Express inbound workflow completed. Message successfully processed, returning '
+                    '{Acknowledgement}  to spine',
+            {'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'})
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -379,11 +392,6 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_work_description.set_outbound_status.return_value = test_utilities.awaitable(None)
         self.mock_work_description.set_inbound_status.return_value = test_utilities.awaitable(None)
         self.mock_work_description.update.return_value = test_utilities.awaitable(None)
-
-    def assert_audit_log_recorded_with_message_status(self, log_mock, message_status):
-        log_mock.audit.assert_called_once()
-        audit_log_dict = log_mock.audit.call_args[0][2]
-        self.assertEqual(message_status, audit_log_dict['Acknowledgment'])
 
     def _setup_routing_mock(self):
         self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
