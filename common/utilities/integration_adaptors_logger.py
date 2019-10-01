@@ -11,7 +11,7 @@ AUDIT = 25
 message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', default=None)
 correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default=None)
 inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
-
+interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default=None)
 
 def _check_for_insecure_log_level(log_level: str):
     integer_level = logging.getLevelName(log_level)
@@ -90,6 +90,8 @@ class IntegrationAdaptorsLogger(object):
             message += f' CorrelationId={correlation_id.get()}'
         if inbound_message_id.get():
             message += f' InboundMessageId={inbound_message_id.get()}'
+        if interaction_id.get():
+            message += f' InteractionId={interaction_id.get()}'
 
         message += f' ProcessKey={self.process_key_tag + process_key_num}'
 
