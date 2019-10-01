@@ -67,7 +67,7 @@ pipeline {
                             export INBOUND_BUILD_TAG="inbound-${BUILD_TAG}"
                             export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
                             export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
-                            export WEB_SERVICE_BUILD_TAG="scr-${BUILD-TAG}"
+                            export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} up -d'''
                     }
