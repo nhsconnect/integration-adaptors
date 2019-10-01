@@ -68,7 +68,7 @@ pipeline {
                             export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
                             export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up -d'''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} up -d'''
                     }
                 }
                 stage('Component Tests') {
@@ -87,7 +87,7 @@ pipeline {
             }
             post {
                 always {
-                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network logs'
+                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} logs'
                     sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
                 }
             }
@@ -242,7 +242,7 @@ pipeline {
         always {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
-            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v'
+            sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG} down -v'
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
