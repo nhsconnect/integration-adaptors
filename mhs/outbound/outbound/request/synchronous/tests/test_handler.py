@@ -126,7 +126,12 @@ class TestSynchronousHandler(BaseHandlerTest):
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     @patch.object(log, "correlation_id")
     @patch.object(log, "message_id")
-    def test_post_message_with_correlation_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
+    @patch.object(log, 'interaction_id')
+    def test_post_message_with_correlation_id_passed_in(self,
+                                                        mock_interaction_id,
+                                                        mock_message_id,
+                                                        mock_correlation_id,
+                                                        mock_get_uuid):
         correlation_id = "correlation-id"
         expected_response = "Hello world!"
         self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, expected_response, None))
@@ -148,6 +153,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(correlation_id)
+        mock_interaction_id.set.assert_called_with(INTERACTION_NAME)
 
     def test_post_message_where_workflow_returns_error_response(self):
         for http_status in [400, 409, 500, 503]:
