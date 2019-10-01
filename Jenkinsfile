@@ -78,7 +78,7 @@ pipeline {
                     steps {
                         sh label: 'Running component tests', script: '''
                              docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
-                             docker run --rm --network ${BUILD_TAG} \
+                             docker run --rm --network "${BUILD_TAG}_default" \
                                 --env "MHS_ADDRESS=http://outbound" \
                                 --env "AWS_ACCESS_KEY_ID=test" \
                                 --env "AWS_SECRET_ACCESS_KEY=test" \
