@@ -18,7 +18,7 @@ DOCUMENT_TYPE = 'documentType'
 TO_ASID = 'to_asid'
 
 
-def build_message(template, patient_nhs_number, message_id: str = message_utilities.MessageUtilities.get_uuid()):
+def build_message(template, patient_nhs_number, message_id: str = None):
     """Build an upload message
 
     :param message_id: message id
@@ -33,6 +33,7 @@ def build_message(template, patient_nhs_number, message_id: str = message_utilit
     dissent_override = '0'
     use_date_filter = False
     document_type = '196971000000103'
+    message_id = message_id if message_id is not None else message_utilities.MessageUtilities.get_uuid()
 
     message = message_builder.MustacheMessageBuilder(template).build_message({
         UUID: message_id,
