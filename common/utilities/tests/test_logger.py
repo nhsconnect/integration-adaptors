@@ -15,6 +15,7 @@ class TestLogger(TestCase):
         logging.getLogger().handlers = []
         log.message_id.set(None)
         log.correlation_id.set(None)
+        log.interaction_id.set(None)
 
     def test_dictionary_formatting(self):
         # Tests both removing the spaces and surrounding values with quotes if needed
@@ -40,6 +41,20 @@ class TestLogger(TestCase):
         }
         output = log.IntegrationAdaptorsLogger('SYS')._format_values_in_map(input_dict)
         self.assertEqual(output, expected_output)
+
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_interaction_id_context_var_should_be_logged_when_set(self, mock_stdout):
+        # Arrange
+        log.configure_logging()
+        log.interaction_id.set('GP_101')
+        logger = log.IntegrationAdaptorsLogger('TES')
+
+        # Act
+        logger.audit('100', 'This log message should have interaction id ')
+        output = mock_stdout.getvalue()
+
+        # Assert
+        self.assertIn('InteractionId=GP_101', output)
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_custom_audit_level(self, mock_stdout):

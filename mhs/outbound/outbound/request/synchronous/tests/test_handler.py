@@ -124,9 +124,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         mock_correlation_id.set.assert_called_with(MOCK_UUID)
 
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    @patch.object(log, "correlation_id")
-    @patch.object(log, "message_id")
-    def test_post_message_with_correlation_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
+    def test_post_message_with_correlation_id_passed_in_should_call_workflow(self, mock_get_uuid):
         correlation_id = "correlation-id"
         expected_response = "Hello world!"
         self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, expected_response, None))
@@ -146,8 +144,31 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.workflow.handle_outbound_message.assert_called_with(None, MOCK_UUID, correlation_id, INTERACTION_DETAILS,
                                                                  REQUEST_BODY_PAYLOAD, None)
 
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(log, "correlation_id")
+    @patch.object(log, "message_id")
+    @patch.object(log, 'interaction_id')
+    def test_handler_should_set_logging_context_variables_on_successful_request(self,
+                                                                                mock_interaction_id,
+                                                                                mock_message_id,
+                                                                                mock_correlation_id,
+                                                                                mock_get_uuid):
+        correlation_id = "correlation-id"
+        expected_response = "Hello world!"
+        self.workflow.handle_outbound_message.return_value = test_utilities.awaitable(
+            (200, expected_response, None))
+        mock_get_uuid.return_value = MOCK_UUID
+        self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
+
+        self.fetch("/", method="POST",
+                   headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
+                            "Correlation-Id": correlation_id,
+                            'sync-async': 'false'},
+                   body=REQUEST_BODY)
+
         mock_message_id.set.assert_called_with(MOCK_UUID)
         mock_correlation_id.set.assert_called_with(correlation_id)
+        mock_interaction_id.set.assert_called_with(INTERACTION_NAME)
 
     def test_post_message_where_workflow_returns_error_response(self):
         for http_status in [400, 409, 500, 503]:
@@ -457,7 +478,7 @@ class TestSynchronousHandlerRequestBodyValidation(BaseHandlerTest):
                 response_body = self._make_request_and_check_invalid_request_response(sub_test)
                 self.assertTrue("Not a valid" in response_body or "Invalid type" in response_body,
                                 msg=f"Incorrect error response body when {sub_test['field_name']} is incorrect type: "
-                                    f"{response_body}")
+                                f"{response_body}")
 
     def test_post_with_is_base64_field_not_bool_but_bool_like_string_in_request_body(self):
         for bool_like_string in ["True", "t", "False", "f"]:
