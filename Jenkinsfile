@@ -63,6 +63,8 @@ pipeline {
                     steps {
                         sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
                         sh label: 'Export environment variables', script: '''
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
+                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
                             . ./component-test-source.sh
                             export INBOUND_BUILD_TAG="inbound-${BUILD_TAG}"
                             export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
