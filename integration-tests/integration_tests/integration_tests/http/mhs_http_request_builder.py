@@ -61,11 +61,31 @@ class MhsHttpRequestBuilder(object):
         """
         Execute a POST request against the MHS using the configured body and headers within this class.
         Asserts the response is successful.
-        :return: self
+        :return: response from MHS
         """
-        response = requests.post(self.mhs_host, headers=self.headers, data=self.body, verify=False)
+        response = self._execute_post_request()
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')
 
         return response
+
+    def execute_post_expecting_error_response(self) -> Response:
+        """
+        Execute a POST request against the MHS using the configured body and headers within this class.
+        Asserts the response is 500.
+        :return: response from MHS
+        """
+        response = self._execute_post_request()
+        self.assertor.assertTrue(
+            response.status_code == 500,
+            f'A non 500 error code was returned from server: {response.status_code}')
+
+        return response
+
+    def _execute_post_request(self) -> Response:
+        """
+        Execute a POST request against the MHS using the configured body and headers within this class.
+        :return: response from MHS
+        """
+        return requests.post(self.mhs_host, headers=self.headers, data=self.body, verify=False)
