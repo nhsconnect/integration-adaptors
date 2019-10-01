@@ -89,6 +89,8 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                                                       reliability_details: dict, retry_interval: float):
         num_of_retries = reliability_details[common_asynchronous.MHS_RETRIES]
 
+        # retries_remaining is a mutable integer. This is done by putting an (immutable) integer into
+        # a mutable container.
         retries_remaining = [num_of_retries]
 
         handle_error_response = functools.partial(self._handle_error_response,
