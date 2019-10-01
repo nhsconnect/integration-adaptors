@@ -86,7 +86,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         logger.audit('0101',
                      'Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
-                     {'Acknowledgment': True})
+                     {'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED})
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         return response.code, response.body.decode(), wdo
@@ -98,7 +98,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
 
         if exception.response:
-            code, response, fault_codes = handle_soap_error(exception.response.code,
+            code, response, _ = handle_soap_error(exception.response.code,
                                                             exception.response.headers,
                                                             exception.response.body)
             return code, response

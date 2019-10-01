@@ -160,7 +160,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
         logger.info('0015', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
         logger.audit('0104', 'Async-Express inbound workflow completed. Message successfully processed, returning '
-                             '{acknowledgement}  to spine', {'acknowledgement': True})
+                             '{Acknowledgement}  to spine',
+                     {'Acknowledgement': wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED})
 
     async def _publish_message_to_inbound_queue(self,
                                                 message_id: str,

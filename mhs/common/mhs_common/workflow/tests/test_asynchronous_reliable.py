@@ -139,7 +139,6 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
-        # self.assert_audit_log_recorded_with_message_status(log_mock, MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
         log_mock.audit.assert_called_with('0101',
                                           'Outbound Async-Reliable outbound workflow completed. Message sent to Spine'

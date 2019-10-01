@@ -327,11 +327,9 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
     # Inbound tests
     ############################
 
-    @mock.patch('utilities.timing.get_time')
     @mock.patch('mhs_common.workflow.asynchronous_express.logger')
     @async_test
     async def test_successful_handle_inbound_message(self, log_mock, time_mock):
-        time_mock.return_value = '10'
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
