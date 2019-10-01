@@ -101,8 +101,3 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             parsed_response = 'Unable to handle response returned from Spine'
 
         return 500, parsed_response, None
-
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
-        logger.info('0010', 'Entered async express workflow to handle inbound message')
-        await super()._handle_inbound_message(message_id, correlation_id, work_description, payload)

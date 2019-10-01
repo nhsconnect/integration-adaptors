@@ -149,11 +149,6 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
         return 500, parsed_response, None
 
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
-        logger.info('0010', 'Entered async reliable workflow to handle inbound message')
-        await super()._handle_inbound_message(message_id, correlation_id, work_description, payload)
-
 
 class _NeedToRetryException(Exception):
     pass

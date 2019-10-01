@@ -96,8 +96,10 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         return error_response
 
     @timing.time_function
-    async def _handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
+        logger.info('0010', 'Entered {WorkflowName} workflow to handle inbound message',
+                    {'WorkflowName': self.workflow_name})
         logger.audit('0103', '{WorkflowName} inbound workflow invoked. Message received from spine',
                      {'WorkflowName': self.workflow_name})
         await wd.update_status_with_retries(work_description,
