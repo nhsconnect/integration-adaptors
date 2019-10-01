@@ -53,17 +53,6 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         await tornado.ioloop.IOLoop.current() \
             .run_in_executor(executor=None, func=lambda: self.__send(payload))
 
-    def send_sync(self, message: str, properties: Dict[str, Any] = None) -> None:
-        """Builds and synchronously sends a message to the host defined when this adaptor was constructed.  Raises an
-        exception to indicate that the message could not be sent successfully.
-
-        :param message: The message body to send.
-        :param properties: Optional application properties to send with the message.
-        """
-        logger.info('009', 'Sending message synchronously.')
-        payload = self.__construct_message(message, properties=properties)
-        self.__send(payload)
-
     @staticmethod
     def __construct_message(message: str, properties: Dict[str, Any] = None) -> proton.Message:
         """
