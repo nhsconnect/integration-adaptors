@@ -81,7 +81,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
     async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str,
                                                  attachments: list):
         logger.info('0005', 'Entered async forward reliable workflow to handle unsolicited inbound message')
-        logger.audit('0100', 'Unsolicited inbound {WorkflowName} workflow invoked.',
+        logger.audit('0101', 'Unsolicited inbound {WorkflowName} workflow invoked.',
                      {'WorkflowName': self.workflow_name})
         work_description = wd.create_new_work_description(self.persistence_store, message_id, self.workflow_name,
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)

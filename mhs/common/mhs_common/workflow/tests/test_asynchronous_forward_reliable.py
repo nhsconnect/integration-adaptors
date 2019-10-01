@@ -585,7 +585,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             [mock.call(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS) for _ in range(INBOUND_QUEUE_MAX_RETRIES - 1)],
             mock_sleep.call_args_list)
 
-        audit_log_mock.assert_called_with('0100', 'Unsolicited inbound {WorkflowName} workflow invoked.',
+        audit_log_mock.assert_called_with('0101', 'Unsolicited inbound {WorkflowName} workflow invoked.',
                                           {'WorkflowName': 'forward-reliable'})
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
