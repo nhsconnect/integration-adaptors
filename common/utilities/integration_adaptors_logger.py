@@ -91,7 +91,7 @@ class IntegrationAdaptorsLogger(object):
         if inbound_message_id.get():
             message += f' InboundMessageId={inbound_message_id.get()}'
         if interaction_id.get():
-            message += f' InteractinId={interaction_id.get()}'
+            message += f' InteractionId={interaction_id.get()}'
 
         message += f' ProcessKey={self.process_key_tag + process_key_num}'
 

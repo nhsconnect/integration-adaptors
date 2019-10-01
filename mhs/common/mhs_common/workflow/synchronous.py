@@ -91,14 +91,6 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         return response.code, response.body.decode(), wdo
 
-    def _record_outbound_audit_log(self,
-                                   message_id,
-                                   interaction_id=None,
-                                   acknowledgment=None):
-        logger.audit('0011', 'Synchronous workflow invoked. Message sent to Spine and {Acknowledgment} received. '
-                             '{Message-ID} {Interaction-ID}',
-                     {'Acknowledgment': acknowledgment, 'Message-ID': message_id, 'Interaction-ID': interaction_id})
-
     async def _handle_http_exception(self, exception, wdo):
         logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                        {'HTTPStatus': exception.code, 'Exception': exception})

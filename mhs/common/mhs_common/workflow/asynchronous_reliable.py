@@ -177,7 +177,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
         logger.info('0010', 'Entered async reliable workflow to handle inbound message')
-        logger.audit('0103', 'Async-Reliable inbound workflow invoked. Message received from Spine received.', {})
+        logger.audit('0103', 'Async-Reliable inbound workflow invoked. Message received from Spine.', {})
 
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
@@ -208,8 +208,8 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
         logger.info('0014', 'Placed message onto inbound queue successfully')
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
         logger.audit('0104',
-                     'Inbound Async-Reliable outbound workflow completed. Message sent placed on queue, returning '
-                     '{Acknowledgement} to spine',
+                     'Inbound Async-Reliable outbound workflow completed. Message placed on queue, returning '
+                     'acknowledgement to spine {Acknowledgement}',
                      {'Acknowledgement': wd.MessageStatus.OUTBOUND_MESSAGE_ACKD})
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
