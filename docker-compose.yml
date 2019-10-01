@@ -2,7 +2,7 @@ version: '3'
 
 services:
   inbound:
-    image: local/mhs-inbound:${BUILD_TAG}
+    image: local/mhs-inbound:${INBOUND_BUILD_TAG}
     ports:
       - "443:443"
       - "8079:80"
@@ -23,7 +23,7 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
   outbound:
-    image: local/mhs-outbound:${BUILD_TAG}
+    image: local/mhs-outbound:${OUTBOUND_BUILD_TAG}
     ports:
       - "80:80"
     environment:
@@ -42,7 +42,7 @@ services:
       - MHS_SPINE_ROUTE_LOOKUP_URL=http://route
       - MHS_SPINE_ORG_CODE=YES
   route:
-    image: local/mhs-route:${BUILD_TAG}
+    image: local/mhs-route:${ROUTE_BUILD_TAG}
     ports:
       - "8080:80"
     environment:
