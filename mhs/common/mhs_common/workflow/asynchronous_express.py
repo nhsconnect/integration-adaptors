@@ -85,7 +85,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
         if response.code == 202:
             logger.audit('0101', 'Async-Express outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
-                                 'received. {Message-ID} {Interaction-ID}',
+                                 'received.',
                          {'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_ACKD})
 
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status,

@@ -139,8 +139,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
         log_mock.audit.assert_called_with('0101', 'Async-Express outbound workflow invoked. Message sent to Spine and'
-                                                  ' {Acknowledgment} received. {Message-ID} {Interaction-ID}',
-                                          {'Acknowledgment':'OUTBOUND_MESSAGE_ACKD'})
+                                                  ' {Acknowledgment} received.',
+                                          {'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD'})
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @mock.patch.object(async_express, 'logger')
