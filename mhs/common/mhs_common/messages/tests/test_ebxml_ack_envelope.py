@@ -2,6 +2,7 @@ import copy
 from unittest.mock import patch
 
 from mhs_common.messages import ebxml_ack_envelope
+from mhs_common.messages import common_ack_envelope
 from mhs_common.messages import ebxml_envelope
 from mhs_common.messages.tests import test_ebxml_envelope
 from builder import pystache_message_builder
@@ -12,7 +13,7 @@ from utilities import xml_utilities
 EXPECTED_EBXML = "ebxml_ack.xml"
 
 EXPECTED_VALUES = copy.deepcopy(test_ebxml_envelope.BASE_EXPECTED_VALUES)
-EXPECTED_VALUES[ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP] = EXPECTED_VALUES.pop(ebxml_envelope.TIMESTAMP)
+EXPECTED_VALUES[common_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP] = EXPECTED_VALUES.pop(ebxml_envelope.TIMESTAMP)
 EXPECTED_VALUES[ebxml_envelope.SERVICE] = 'urn:oasis:names:tc:ebxml-msg:service'
 EXPECTED_VALUES[ebxml_envelope.ACTION] = 'Acknowledgment'
 
@@ -23,7 +24,7 @@ def get_test_message_dictionary():
         ebxml_envelope.TO_PARTY_ID: "YEA-0000806",
         ebxml_envelope.CPA_ID: "S1001A1630",
         ebxml_envelope.CONVERSATION_ID: "79F49A34-9798-404C-AEC4-FD38DD81C138",
-        ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP: "2013-04-16T07:52:09Z",
+        common_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP: "2013-04-16T07:52:09Z",
         ebxml_envelope.RECEIVED_MESSAGE_ID: "0CDBA95F-74DA-47E9-8383-7B8E9167D146",
     }
 

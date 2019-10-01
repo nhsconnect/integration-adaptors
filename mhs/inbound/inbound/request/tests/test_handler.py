@@ -20,11 +20,12 @@ import inbound.request.handler as handler
 
 MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
-EXPECTED_ASYNC_RESPONSE_FILE = "ebxml_ack.xml"
-EXPECTED_SYNC_RESPONSE_FILE = "sync_message.xml"
+REQUEST_FILE_UNINTENDED = "ebxml_request_unintended.msg"
+EXPECTED_ASYNC_ACK_RESPONSE_FILE = "ebxml_ack.xml"
+EXPECTED_ASYNC_NACK_RESPONSE_FILE = "ebxml_nack.xml"
 UNSOLICITED_REQUEST_FILE = "ebxml_unsolicited.msg"
 NO_REF_FILE = "ebxml_no_reference.msg"
-FROM_PARTY_ID = "FROM-PARTY-ID"
+FROM_PARTY_ID = "FROM_PARTY_ID"
 ASYNC_CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
 SYNC_CONTENT_TYPE_HEADERS = {"Content-Type": 'text/xml'}
 REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
@@ -101,7 +102,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
         expected_ack_response = file_utilities.FileUtilities.get_file_string(
-            str(self.message_dir / EXPECTED_ASYNC_RESPONSE_FILE))
+            str(self.message_dir / EXPECTED_ASYNC_ACK_RESPONSE_FILE))
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
@@ -178,7 +179,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
         expected_ack_response = file_utilities.FileUtilities.get_file_string(
-            str(self.message_dir / EXPECTED_ASYNC_RESPONSE_FILE))
+            str(self.message_dir / EXPECTED_ASYNC_ACK_RESPONSE_FILE))
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
         self.mock_forward_reliable_workflow.handle_unsolicited_inbound_message.assert_called_once_with(
             UNSOLICITED_REF_TO_MESSAGE_ID, CORRELATION_ID, EXPECTED_MESSAGE, EXPECTED_UNSOLICITED_ATTACHMENTS)
@@ -214,3 +215,20 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(response.code, 500)
         self.assertIn("Exception in workflow", response.body.decode())
+
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_unsolicited_forward_reliable_message_unintended_for_receiver_mhs(self, mock_get_uuid, mock_get_timestamp):
+        mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
+        mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
+        expected_nack_response = file_utilities.FileUtilities.get_file_string(
+            str(self.message_dir / EXPECTED_ASYNC_NACK_RESPONSE_FILE))
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE_UNINTENDED))
+
+        nack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
+
+        self.assertEqual(nack_response.code, 200)
+        self.assertEqual(nack_response.headers["Content-Type"], "text/xml")
+        xml_utilities.XmlUtilities.assert_xml_equal(expected_nack_response, nack_response.body)
+        self.mock_workflow.handle_inbound_message.assert_not_called()
+
