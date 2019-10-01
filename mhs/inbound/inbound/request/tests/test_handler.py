@@ -14,7 +14,7 @@ import utilities.xml_utilities as xml_utilities
 from mhs_common.configuration import configuration_manager
 from mhs_common.messages import ebxml_request_envelope
 from mhs_common.state import work_description as wd
-from mhs_common.workflow import forward_reliable
+from mhs_common.workflow import asynchronous_forward_reliable as forward_reliable
 
 import inbound.request.handler as handler
 

@@ -10,8 +10,8 @@ from utilities import test_utilities
 from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
 
+import mhs_common.workflow.asynchronous_forward_reliable as forward_reliable
 import mhs_common.workflow.common_asynchronous as common_async
-import mhs_common.workflow.forward_reliable as forward_reliable
 from definitions import ROOT_DIR
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope

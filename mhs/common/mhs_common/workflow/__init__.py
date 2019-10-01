@@ -9,7 +9,7 @@ from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.asynchronous_express import AsynchronousExpressWorkflow
 from mhs_common.workflow.asynchronous_reliable import AsynchronousReliableWorkflow
 from mhs_common.workflow.common import CommonWorkflow
-from mhs_common.workflow.forward_reliable import AsynchronousForwardReliableWorkflow
+from mhs_common.workflow.asynchronous_forward_reliable import AsynchronousForwardReliableWorkflow
 from mhs_common.workflow.sync_async import SyncAsyncWorkflow
 from mhs_common.workflow.sync_async_resynchroniser import SyncAsyncResynchroniser
 from mhs_common.workflow.synchronous import SynchronousWorkflow
