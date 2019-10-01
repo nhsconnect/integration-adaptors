@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<soap:Envelope xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <eb:MessageHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="urn:hl7-org:v3" eb:version="2.0" soap:mustUnderstand="1">
+      <eb:From>
+        <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">TEST-PARTY-1</eb:PartyId>
+      </eb:From>
+      <eb:To>
+        <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">TEST-PARTY-2</eb:PartyId>
+      </eb:To>
+      <eb:CPAId>test123</eb:CPAId>
+      <eb:ConversationId>11111111-1111-1111-1111-111111111111</eb:ConversationId>
+      <eb:Service>urn:test:names:tc:ebxml-msg:service</eb:Service>
+      <eb:Action>MessageError</eb:Action>
+      <eb:MessageData>
+        <eb:MessageId>11111111-1111-1111-1111-111111111111</eb:MessageId>
+        <eb:Timestamp>2014-09-03T09:46:29.734375Z</eb:Timestamp>
+        <eb:RefToMessageId>11111111-1111-1111-1111-111111111111</eb:RefToMessageId>
+      </eb:MessageData>
+    </eb:MessageHeader>
+    <eb:ErrorList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="urn:hl7-org:v3" eb:version="2.0" soap:mustUnderstand="1" eb:highestSeverity="Error">
+      <eb:Error eb:errorCode="ValueNotRecognized" eb:severity="Error">
+        <eb:Description>501314:Invalid To Party Type attribute</eb:Description>
+      </eb:Error>
+    </eb:ErrorList>
+  </soap:Header>
+  <soap:Body />
+</soap:Envelope>
