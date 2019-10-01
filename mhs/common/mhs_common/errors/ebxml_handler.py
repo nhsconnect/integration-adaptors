@@ -12,7 +12,7 @@ ERROR_RESPONSE_DEFAULTS = {
 }
 
 
-def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Optional[AnyStr]]:
+def handle_ebxml_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, Optional[AnyStr]]:
     """
     Analyzes response from MHS and returns result of interpretation to external client
     Normally MHS doesn't return HTTP code 500 in case of ebXML error occurred. HTTP 200 will be returned instead
