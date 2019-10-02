@@ -23,10 +23,14 @@ class SpineRequestResponseMapper(object):
 
     def response_for_request(self, request: HTTPServerRequest) -> Tuple[int, str]:
         for request_matcher, response in self.request_matcher_to_response.items():
-            matches_response = request_matcher.does_match(request)
-            if matches_response:
-                logger.log(logging.INFO, f"request matched a configured matcher: {request_matcher.unique_identifier}")
-                return response.get_response()
+            try:
+                matches_response = request_matcher.does_match(request)
+                if matches_response:
+                    logger.log(logging.INFO,
+                               f"request matched a configured matcher: {request_matcher.unique_identifier}")
+                    return response.get_response()
+            except Exception:
+                logger.log(logging.INFO, "Matcher threw exception whilst trying to match")
 
         logger.log(logging.ERROR,
                    f"no matcher configured that matched request {request} with headers: {request.headers}")
