@@ -5,11 +5,11 @@ class ReliabilityResponse(object):
 
     def __init__(self):
         self.sync_reply_mode = "MSHSignalsOnly"
-        self.retries = '3'
+        self.retries = "3"
         self.persist_duration = "PT5M"
         self.ack_requested = "MSHSignalsOnly"
         self.duplicate_elimination = "always"
-        self.retry_interval = "PT0.5S"
+        self.retry_interval = "PT0.5S"  # 0.5 seconds
 
     def override_sync_reply_mode(self, reply_mode: str) -> ReliabilityResponse:
         self.sync_reply_mode = reply_mode
@@ -37,10 +37,10 @@ class ReliabilityResponse(object):
 
     def get_response(self) -> dict:
         return {
-            'nhsMHSSyncReplyMode': self.sync_reply_mode,
-            'nhsMHSRetries': self.retries,
-            'nhsMHSPersistDuration': self.persist_duration,
-            'nhsMHSAckRequested': self.ack_requested,
-            'nhsMHSDuplicateElimination': self.duplicate_elimination,
-            'nhsMHSRetryInterval': self.retry_interval
+            "nhsMHSSyncReplyMode": self.sync_reply_mode,
+            "nhsMHSRetries": self.retries,
+            "nhsMHSPersistDuration": self.persist_duration,
+            "nhsMHSAckRequested": self.ack_requested,
+            "nhsMHSDuplicateElimination": self.duplicate_elimination,
+            "nhsMHSRetryInterval": self.retry_interval
         }

@@ -47,7 +47,7 @@ class SpineMultiResponse(object):
         """
         Gets the response of the next `SpineResponse` object in the list, if the final response in the list has been
         reached, the count will reset to the first
-        :return: The next `SpineResponse` 
+        :return: The next `SpineResponse`
         """
         response = self.responses[self.current_response_count]
         self.current_response_count = (self.current_response_count + 1) % len(self.responses)
