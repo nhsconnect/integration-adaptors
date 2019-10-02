@@ -29,7 +29,7 @@ class TestNoDuplicateLogKeys(unittest.TestCase):
                         logger_name = logger_match.group('loggerName')
                         logger_names.append(logger_name)
 
-                        log_method_names_regex = r'info|audit|warn|error|critical'
+                        log_method_names_regex = r'info|audit|warning|error|critical'
                         log_keys_regex = rf'logger\.({log_method_names_regex})\([\'"](?P<logKey>\d+)[\'"]'
                         log_keys = [log_key for _, log_key in re.findall(log_keys_regex, file_contents)]
 
