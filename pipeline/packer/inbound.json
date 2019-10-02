@@ -79,6 +79,10 @@
         "type": "docker-tag",
         "repository": "local/mhs-inbound",
         "tag": "inbound-{{user `tag`}}"
+      },
+      {
+        "type": "docker-tag",
+        "repository": "local/mhs-inbound"
       }
     ]
   ]
