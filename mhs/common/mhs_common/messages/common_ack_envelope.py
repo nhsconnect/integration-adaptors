@@ -29,7 +29,7 @@ class CommonEbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         super().__init__(template_file, message_dictionary)
 
-    def serialize(self) -> Tuple[str, Dict[str, str], str]:
+    def serialize(self, _message_dictionary=None) -> Tuple[str, Dict[str, str], str]:
         message_id, http_headers, message = super().serialize()
         http_headers['Content-Type'] = 'text/xml'
         return message_id, http_headers, message
