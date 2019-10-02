@@ -127,9 +127,9 @@ class InboundHandler(base_handler.BaseHandler):
         logger.info('012', 'Building and sending acknowledgement')
         self._send_ebxml_message(parsed_message, is_positive_ack=True, additional_context={})
 
-    def _send_nack(self, parsed_message: ebxml_envelope.EbxmlEnvelope, nack_context):
+    def _send_nack(self, request_message: ebxml_envelope.EbxmlEnvelope, nack_context):
         logger.info('012', 'Building and sending negative acknowledgement')
-        self._send_ebxml_message(parsed_message, is_positive_ack=False, additional_context=nack_context)
+        self._send_ebxml_message(request_message, is_positive_ack=False, additional_context=nack_context)
 
     def _send_ebxml_message(self, parsed_message, is_positive_ack, additional_context):
         message_details = parsed_message.message_dictionary
