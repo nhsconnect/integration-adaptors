@@ -74,6 +74,11 @@
       },
       {
         "type": "docker-tag",
+        "repository": "local/scr-web-service",
+        "tag": "scr-{{user `tag`}}"
+      },
+      {
+        "type": "docker-tag",
         "repository": "local/scr-web-service"
       }
     ]
