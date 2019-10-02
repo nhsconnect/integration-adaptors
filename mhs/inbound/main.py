@@ -93,9 +93,7 @@ def main():
     secrets.setup_secret_config("MHS")
     log.configure_logging()
 
-    data_dir = pathlib.Path(definitions.ROOT_DIR) / 'data'
-
-    certificates = certs.Certs.create_certs_files(data_dir / '..',
+    certificates = certs.Certs.create_certs_files(definitions.ROOT_DIR,
                                                   private_key=secrets.get_secret_config('CLIENT_KEY'),
                                                   local_cert=secrets.get_secret_config('CLIENT_CERT'),
                                                   ca_certs=secrets.get_secret_config('CA_CERTS'))
@@ -104,8 +102,8 @@ def main():
     workflows = initialise_workflows()
     store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))
 
-    interactions_config_file = str(data_dir / "interactions" / "interactions.json")
-    config_manager = configuration_manager.ConfigurationManager(interactions_config_file)
+    interactions_config_file = pathlib.Path(definitions.ROOT_DIR) / 'data' / "interactions" / "interactions.json"
+    config_manager = configuration_manager.ConfigurationManager(str(interactions_config_file))
 
     start_inbound_server(certificates.local_cert_path, certificates.ca_certs_path, certificates.private_key_path,
                          party_key, workflows, store, config_manager)
