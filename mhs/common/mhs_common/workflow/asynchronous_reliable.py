@@ -88,7 +88,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error when converting retry interval: {} to seconds'.format(retry_interval_xml_datetime), None
 
-        num_of_retries = reliability_details[common_asynchronous.MHS_RETRIES]
+        num_of_retries = int(reliability_details[common_asynchronous.MHS_RETRIES])
 
         retries_remaining = num_of_retries
 
@@ -136,7 +136,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                              "A request has exceeded the maximum number of retries, {max_retries} "
                                              "retries", {"max_retries": num_of_retries})
                             else:
-                                logger.info("0016", "Waiting for {retry_interval} milliseconds before next request "
+                                logger.info("0016", "Waiting for {retry_interval} seconds before next request "
                                                     "attempt.", {"retry_interval": retry_interval})
                                 await asyncio.sleep(retry_interval)
                                 continue

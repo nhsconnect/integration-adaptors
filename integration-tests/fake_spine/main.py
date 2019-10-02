@@ -9,7 +9,7 @@ from fake_spine.certs import Certs
 from fake_spine.request_handler import SpineRequestHandler
 from fake_spine.request_matcher_wrappers import body_contains_message_id, ebxml_body_contains_message_id
 from fake_spine.request_matching import SpineRequestResponseMapper, RequestMatcher
-from fake_spine.spine_response import SpineResponse
+from fake_spine.spine_response import SpineResponse, SpineMultiResponse
 
 logger = logging.getLogger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,7 +28,13 @@ def build_application_configuration() -> SpineRequestResponseMapper:
         RequestMatcher('soap-fault-response', lambda x: body_contains_message_id(x.body.decode(), 'F5187FB6-B033-4A75-838B-9E7A1AFB3111')):
             SpineResponse().override_response_code(500).override_response('soap_fault_single_error.xml'),
         RequestMatcher('exml-fault-response', lambda x: ebxml_body_contains_message_id(x.body.decode(),'7AA57E38-8B20-4AE0-9E73-B9B0C0C42BDA')):
-            SpineResponse().override_response_code(500).override_response('ebxml_fault_single_error.xml')
+            SpineResponse().override_response_code(500).override_response('ebxml_fault_single_error.xml'),
+
+        RequestMatcher('async-reliable-retry-response', lambda x: ebxml_body_contains_message_id(x.body.decode(), '35586865-45B0-41A5-98F6-817CA6F1F5EF')):
+            SpineMultiResponse()
+                .with_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
+                .with_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
+                .with_response(SpineResponse().override_response_code(202).override_response('async_reliable_success_response.xml'))
     })
 
 

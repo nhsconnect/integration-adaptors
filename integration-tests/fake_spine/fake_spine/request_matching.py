@@ -29,8 +29,8 @@ class SpineRequestResponseMapper(object):
                     logger.log(logging.INFO,
                                f"request matched a configured matcher: {request_matcher.unique_identifier}")
                     return response.get_response()
-            except Exception:
-                logger.log(logging.INFO, "Matcher threw exception whilst trying to match")
+            except Exception as e:
+                logger.log(logging.ERROR, f"Matcher threw exception whilst trying to match: {e}")
 
         logger.log(logging.ERROR,
                    f"no matcher configured that matched request {request} with headers: {request.headers}")
