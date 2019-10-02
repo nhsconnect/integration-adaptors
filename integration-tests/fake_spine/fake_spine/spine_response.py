@@ -1,7 +1,7 @@
 import logging
 import pathlib
 import os
-from typing import Tuple, List
+from typing import Tuple
 
 logger = logging.getLogger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -27,16 +27,28 @@ class SpineResponse(object):
 
 
 class SpineMultiResponse(object):
+    """A class to control the response returned to the MHS depending on how many calls have been made previously"""
 
     def __init__(self):
         self.responses = []
-        self.current_response = 0
+        self.current_response_count = 0
 
-    def with_response(self, response: SpineResponse):
+    def with_ordered_response(self, response: SpineResponse):
+        """
+        Appends a given `SpineResponse` to the list, the order of the response list reflects the order in which
+        this method was called
+        :param response: A pre-configured SpineResponse instance
+        :return: self
+        """
         self.responses.append(response)
         return self
 
     def get_response(self) -> Tuple[int, str]:
-        response = self.responses[self.current_response]
-        self.current_response = (self.current_response + 1) % len(self.responses)
+        """
+        Gets the response of the next `SpineResponse` object in the list, if the final response in the list has been
+        reached, the count will reset to the first
+        :return: The next `SpineResponse` 
+        """
+        response = self.responses[self.current_response_count]
+        self.current_response_count = (self.current_response_count + 1) % len(self.responses)
         return response.get_response()

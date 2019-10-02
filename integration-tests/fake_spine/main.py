@@ -32,9 +32,9 @@ def build_application_configuration() -> SpineRequestResponseMapper:
 
         RequestMatcher('async-reliable-retry-response', lambda x: ebxml_body_contains_message_id(x.body.decode(), '35586865-45B0-41A5-98F6-817CA6F1F5EF')):
             SpineMultiResponse()
-                .with_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
-                .with_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
-                .with_response(SpineResponse().override_response_code(202).override_response('async_reliable_success_response.xml'))
+                .with_ordered_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
+                .with_ordered_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
+                .with_ordered_response(SpineResponse().override_response_code(202).override_response('async_reliable_success_response.xml'))
     })
 
 
