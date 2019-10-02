@@ -18,12 +18,15 @@ DOCUMENT_TYPE = 'documentType'
 TO_ASID = 'to_asid'
 
 
-def build_message(template, patient_nhs_number='9446245796', message_id: str = None, to_party_id='YES-0000806', to_asid='928942012545'):
+def build_message(template, patient_nhs_number='9446245796', message_id: str = None, to_party_id='YES-0000806',
+                  to_asid='928942012545'):
     """Build an upload message
 
     :param message_id: message id
     :param template: The Name of the template to be used.
     :param patient_nhs_number: The NHS number of the patient this record belongs to.
+    :param to_party_id: The to party key that the message will be sent to
+    :param to_asid: The to asid that the message will be sent to
     :return: A tuple of the message and the message id (UUID) used in it.
     """
     current_utc_time = datetime.datetime.utcnow()

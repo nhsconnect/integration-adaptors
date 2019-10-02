@@ -34,9 +34,12 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                          inbound_queue_retry_delay, persistence_store_max_retries,
                          routing)
 
-        self.workflow_specific_interaction_details.update(
+        self.workflow_specific_interaction_details = dict(
             ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:nextMSH",
+            duplicate_elimination=True,
+            ack_requested=True,
             sync_reply=False)
+
         self.workflow_name = workflow.FORWARD_RELIABLE
 
     @timing.time_function

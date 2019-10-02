@@ -40,7 +40,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                          inbound_queue_retry_delay, persistence_store_max_retries,
                          routing)
 
-        self.workflow_specific_interaction_details.update(duplicate_elimination=True,
+        self.workflow_specific_interaction_details = dict(duplicate_elimination=True,
                                                           ack_requested=True,
                                                           ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
                                                           sync_reply=True)
