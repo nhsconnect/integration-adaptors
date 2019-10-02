@@ -206,17 +206,15 @@ class InboundHandler(base_handler.BaseHandler):
         return self.party_id == request_message.message_dictionary[ebxml_envelope.TO_PARTY_ID]
 
     def _return_message_to_message_initiator(self, request_message):
-
-        if self.party_id != request_message.message_dictionary[ebxml_envelope.TO_PARTY_ID]:
-            try:
-                nack_context = {
-                    ebxml_envelope.ERROR_CODE: "ValueNotRecognized",
-                    ebxml_envelope.DESCRIPTION: "501314:Invalid To Party Type attribute",
-                    ebxml_envelope.SEVERITY: "Error"
-                }
-                self._send_nack(request_message, nack_context)
-            except Exception as e:
-                logger.error('005', 'Exception when sending nack {exception}', {'exception': e})
-                raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
-                                                 ' failed to complete workflow',
-                                            reason=f'Exception in workflow') from e
+        try:
+            nack_context = {
+                ebxml_envelope.ERROR_CODE: "ValueNotRecognized",
+                ebxml_envelope.DESCRIPTION: "501314:Invalid To Party Type attribute",
+                ebxml_envelope.SEVERITY: "Error"
+            }
+            self._send_nack(request_message, nack_context)
+        except Exception as e:
+            logger.error('005', 'Exception when sending nack {exception}', {'exception': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
+                                             ' failed to complete workflow',
+                                        reason=f'Exception in workflow') from e
