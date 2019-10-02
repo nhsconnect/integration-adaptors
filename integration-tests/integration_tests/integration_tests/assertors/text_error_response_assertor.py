@@ -46,7 +46,7 @@ class TextErrorResponseAssertor(object):
             raise Exception("No codeContext found in the returned string")
 
         matching_group = matches.group('codeContext')
-        self.assertor.assertEqual(matching_group, expected_code_context, 'Code context did not match expected value')
+        self.assertor.assertEqual(expected_code_context, matching_group, 'Code context did not match expected value')
         return self
 
     def assert_severity(self, expected_severity: str) -> TextErrorResponseAssertor:
@@ -62,4 +62,19 @@ class TextErrorResponseAssertor(object):
 
         matching_group = matches.group('severity')
         self.assertor.assertEqual(matching_group, expected_severity, 'Severity did not match expected value')
+        return self
+
+    def assert_error_type(self, expected_error_type) ->TextErrorResponseAssertor:
+        """
+        Asserts the `error_type` attribute of the message string
+        :param expected_error_type:  the expected error type
+        :return: self
+        """
+        expression = re.compile('(errorType=(?P<errorType>[a-zA-Z_]+))')
+        matches = expression.search(self.received_message)
+        if len(matches.groups()) != 2:
+            raise Exception("No error_type found in the returned string")
+
+        matching_group = matches.group('errorType')
+        self.assertor.assertEqual(matching_group, expected_error_type, 'error_type did not match expected value')
         return self
