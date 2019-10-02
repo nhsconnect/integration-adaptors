@@ -78,7 +78,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             response = await self.transmission.make_request(url, headers, message)
         except httpclient.HTTPClientError as e:
             code, error = await self._handle_http_exception(e, wdo)
-            return code, error, None
+            return code, error, wdo
 
         except Exception as e:
             logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
@@ -96,7 +96,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                        {'HTTPStatus': exception.code, 'Exception': exception})
 
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
 
         if exception.response:
             code, response, _ = handle_soap_error(exception.response.code,
