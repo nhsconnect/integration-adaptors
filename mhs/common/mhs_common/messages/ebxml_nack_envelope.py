@@ -13,6 +13,7 @@ import mhs_common.messages.common_ack_envelope as common_ack_envelope
 
 EBXML_TEMPLATE = "ebxml_nack"
 
+
 class EbxmlNackEnvelope(common_ack_envelope.CommonEbxmlAckEnvelope):
     """An envelope that contains a negative acknowledgement of an asynchronous request from a remote MHS."""
 

@@ -13,7 +13,10 @@ RECEIVED_MESSAGE_TIMESTAMP = "received_message_timestamp"
 
 
 class CommonEbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
-    """An envelope that contains a negative acknowledgement of an asynchronous request from a remote MHS."""
+    """
+    Common functionality for an envelope that contains a (positive or negative) acknowledgement of an
+    asynchronous request from a remote MHS.
+    """
 
     def __init__(self, template_file: str, message_dictionary: Dict[str, str]):
         """Create a new CommonEbxmlAckEnvelope that populates the message with the provided dictionary.
