@@ -37,7 +37,6 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
             .with_body(message) \
             .execute_post_expecting_error_response()
 
-        
         # Assert
         TextErrorResponseAssertor(response.text) \
             .assert_error_code(200) \
@@ -68,3 +67,34 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'SYNC_RESPONSE_SUCCESSFUL',
                 'WORKFLOW': 'sync'
             })
+
+    def test_should_return_bad_request_when_client_sends_invalid_message(self):
+        # Arrange
+        message, message_id = build_message('QUPA_IN040000UK32', '9689174606')
+
+        # Act
+        response = MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False, from_asid=None) \
+            .with_body(message) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        self.assertEqual(response.text, "`from_asid` header field required for sync messages")
+
+    def test_should_record_message_received_when_bad_request_returned_to_client(self):
+        # Arrange
+        message, message_id = build_message('QUPA_IN040000UK32', '9689174606')
+
+        # Act
+        MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False, from_asid=None) \
+            .with_body(message) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+            .assert_single_item_exists_with_key(message_id) \
+            .assert_item_contains_values({
+            'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_RECEIVED',
+            'WORKFLOW': 'sync'
+        })

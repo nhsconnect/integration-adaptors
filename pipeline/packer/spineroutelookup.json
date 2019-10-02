@@ -72,6 +72,10 @@
         "type": "docker-tag",
         "repository": "local/mhs-route",
         "tag": "route-{{user `tag`}}"
+      },
+      {
+        "type": "docker-tag",
+        "repository": "local/mhs-route"
       }
     ]
   ]
