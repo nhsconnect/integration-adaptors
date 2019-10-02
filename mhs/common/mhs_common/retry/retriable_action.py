@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Callable
+from typing import Callable, Awaitable
 
 from utilities import integration_adaptors_logger
 
@@ -11,7 +11,7 @@ logger = integration_adaptors_logger.IntegrationAdaptorsLogger('RETRIABLE_ACTION
 class RetriableAction(object):
     """Responsible for retrying an action a configurable number of times with a configurable delay"""
 
-    def __init__(self, action: Callable[[], object], retries: int, delay: float):
+    def __init__(self, action: Callable[[], Awaitable[object]], retries: int, delay: float):
         """
 
         :param action: The action to be retried.
@@ -60,7 +60,7 @@ class RetriableAction(object):
         :return: A RetriableActionResult that represents the result of the final attempt to perform the specified
         action.
         """
-        result = self._execute_action()
+        result = await self._execute_action()
 
         if self._retry_required(result):
             for i in range(self.retries):
@@ -68,7 +68,7 @@ class RetriableAction(object):
                             {"delay": self.delay, "action": self.action})
                 await asyncio.sleep(self.delay)
 
-                result = self._execute_action()
+                result = await self._execute_action()
 
                 if not self._retry_required(result):
                     break
@@ -79,12 +79,12 @@ class RetriableAction(object):
 
         return result
 
-    def _execute_action(self) -> RetriableActionResult:
+    async def _execute_action(self) -> RetriableActionResult:
         result = RetriableActionResult()
 
         try:
             logger.info("0006", "About to try {action}.", {"action": self.action})
-            action_result = self.action()
+            action_result = await self.action()
             logger.info("0007", "{action} completed. {is_successful}",
                         {"action": self.action, "is_successful": result.is_successful})
 

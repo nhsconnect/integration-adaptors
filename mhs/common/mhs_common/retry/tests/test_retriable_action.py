@@ -16,7 +16,7 @@ class TestRetriableAction(unittest.TestCase):
     @test_utilities.async_test
     async def test_should_only_try_once_if_action_succeeds(self):
         expected_result = "Result"
-        self.mock_action.return_value = expected_result
+        self.mock_action.return_value = test_utilities.awaitable(expected_result)
 
         result = await retriable_action.RetriableAction(self.mock_action, retries=DEFAULT_RETRIES, delay=DEFAULT_DELAY) \
             .execute()
@@ -29,7 +29,7 @@ class TestRetriableAction(unittest.TestCase):
     @test_utilities.async_test
     async def test_should_retry_if_action_fails(self):
         expected_result = "Result"
-        self.mock_action.side_effect = [Exception, expected_result]
+        self.mock_action.side_effect = [Exception, test_utilities.awaitable(expected_result)]
 
         result = await retriable_action.RetriableAction(self.mock_action, retries=DEFAULT_RETRIES,
                                                         delay=DEFAULT_DELAY) \
@@ -78,7 +78,7 @@ class TestRetriableAction(unittest.TestCase):
         action = retriable_action.RetriableAction(self.mock_action, retries=DEFAULT_RETRIES, delay=DEFAULT_DELAY) \
             .with_success_check(lambda r: r == "success")
 
-        self.mock_action.return_value = "success"
+        self.mock_action.return_value = test_utilities.awaitable("success")
 
         result = await action.execute()
 
@@ -90,7 +90,7 @@ class TestRetriableAction(unittest.TestCase):
         action = retriable_action.RetriableAction(self.mock_action, retries=DEFAULT_RETRIES, delay=DEFAULT_DELAY) \
             .with_success_check(lambda r: r == "success")
 
-        self.mock_action.return_value = "failure"
+        self.mock_action.return_value = test_utilities.awaitable("failure")
 
         result = await action.execute()
 
