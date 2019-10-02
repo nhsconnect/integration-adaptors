@@ -97,7 +97,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         try:
             await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: payload})
-            logger.info('004', 'Placed message onto inbound queue successfully')
+            logger.info('004', 'Placed message in sync-async store successfully')
             await work_description.set_inbound_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
         except Exception as e:
             logger.error('005', 'Failed to write to sync-async store')
