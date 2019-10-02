@@ -85,11 +85,11 @@ class RetriableAction(object):
         try:
             logger.info("0006", "About to try {action}.", {"action": self.action})
             action_result = await self.action()
-            logger.info("0007", "{action} completed. {is_successful}",
-                        {"action": self.action, "is_successful": result.is_successful})
 
             result.result = action_result
             result.is_successful = self.success_check(action_result)
+            logger.info("0007", "{action} completed. {is_successful}",
+                        {"action": self.action, "is_successful": result.is_successful})
         except Exception as e:
             logger.error("0008", "{action} raised an exception. {exception}",
                          {"action": self.action, "exception": e})
