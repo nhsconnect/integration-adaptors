@@ -65,3 +65,16 @@ class SynchronousMessagingPatternTests(TestCase):
             'OUTBOUND_STATUS': 'SYNC_RESPONSE_SUCCESSFUL',
             'WORKFLOW': 'sync'
         })
+
+    def test_should_return_bad_request_when_client_sends_invalid_message(self):
+        # Arrange
+        message, message_id = build_message('QUPA_IN040000UK32', '9689174606')
+
+        # Act
+        response = MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False, from_asid=None) \
+            .with_body(message) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        self.assertEqual(response.text, "`from_asid` header field required for sync messages")
