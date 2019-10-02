@@ -105,7 +105,7 @@ class TestRetriableAction(unittest.TestCase):
 
         result = await retriable_action.RetriableAction(self.mock_action, retries=DEFAULT_RETRIES,
                                                         delay=DEFAULT_DELAY) \
-            .with_non_retriable_exceptions(ValueError) \
+            .with_retriable_exception_check(lambda e: isinstance(e, TypeError)) \
             .execute()
 
         self.assertFalse(result.is_successful, "The action should be reported as unsuccessful.")

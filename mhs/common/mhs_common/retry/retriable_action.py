@@ -21,7 +21,7 @@ class RetriableAction(object):
         self.action = action
         self.retries = retries
         self.delay = delay
-        self.non_retriable_exceptions = ()
+        self.retriable_exception_check = lambda exception: True
         self.success_check = lambda result: True
 
         logger.info("0001", "Configuring a retriable action with {action}, {retries} and {delay}",
@@ -42,15 +42,16 @@ class RetriableAction(object):
         self.success_check = success_check
         return self
 
-    def with_non_retriable_exceptions(self, *exceptions) -> RetriableAction:
-        """Set a list of exception types that if raised by the action will not prompt a retry.
+    def with_retriable_exception_check(self, exception_check: Callable[[Exception], bool]) -> RetriableAction:
+        """Set a callable that can be used to determine whether an exception raised by the action will prompt a retry.
 
-        :param exceptions: The exception types that should not prompt a retry.
+        :param exception_check: The callable to use to check whether the exception raised by the action should prompt a
+        retry.
         :return self
         """
-        logger.info("0003", "Setting retriable action's non-retriable exceptions to {non_retriable_exceptions}",
-                    {"non_retriable_exceptions": exceptions})
-        self.non_retriable_exceptions = exceptions
+        logger.info("0003", "Setting retriable action's retriable exception check to {exception_check}",
+                    {"exception_check": exception_check})
+        self.retriable_exception_check = exception_check
         return self
 
     async def execute(self) -> RetriableActionResult:
@@ -103,7 +104,7 @@ class RetriableAction(object):
             logger.info("0009", "{action} was successful. Retry not required.", {"action": self.action})
             retry_required = False
 
-        if self._exception_is_not_retriable(action_result.exception):
+        if not self._exception_is_retriable(action_result.exception):
             logger.info("0010", "{action} raised a non-retriable exception. Retry not required.",
                         {"action": self.action})
             retry_required = False
@@ -111,8 +112,8 @@ class RetriableAction(object):
         logger.info("0011", "{retry_required} for {action}", {"retry_required": retry_required, "action": self.action})
         return retry_required
 
-    def _exception_is_not_retriable(self, exception: Exception):
-        return isinstance(exception, self.non_retriable_exceptions)
+    def _exception_is_retriable(self, exception: Exception) -> bool:
+        return self.retriable_exception_check(exception)
 
 
 class RetriableActionResult(object):
