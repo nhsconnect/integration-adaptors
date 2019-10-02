@@ -66,7 +66,7 @@ class TextErrorResponseAssertor(object):
 
     def assert_error_type(self, expected_error_type) ->TextErrorResponseAssertor:
         """
-        Asserts the `error_type` attribute of the message string
+        Asserts the `errorType` attribute of the message string
         :param expected_error_type:  the expected error type
         :return: self
         """
@@ -76,5 +76,5 @@ class TextErrorResponseAssertor(object):
             raise Exception("No error_type found in the returned string")
 
         matching_group = matches.group('errorType')
-        self.assertor.assertEqual(matching_group, expected_error_type, 'error_type did not match expected value')
+        self.assertor.assertEqual(matching_group, expected_error_type, 'errorType did not match expected value')
         return self
