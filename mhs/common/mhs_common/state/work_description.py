@@ -183,7 +183,7 @@ class WorkDescription(object):
         """
         json_store_data = await self.persistence_store.get(self.message_key)
         if json_store_data is None:
-            logger.error('003', 'Persistence store returned empty value for {key}', {'key': self.message_key})
+            logger.error('006', 'Persistence store returned empty value for {key}', {'key': self.message_key})
             raise EmptyWorkDescriptionError(f'Failed to find a value for key id {self.message_key}')
         self._deserialize_data(json_store_data)
 

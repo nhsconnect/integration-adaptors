@@ -136,7 +136,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                              "A request has exceeded the maximum number of retries, {max_retries} "
                                              "retries", {"max_retries": num_of_retries})
                             else:
-                                logger.info("0016", "Waiting for {retry_interval} milliseconds before next request "
+                                logger.info("0019", "Waiting for {retry_interval} milliseconds before next request "
                                                     "attempt.", {"retry_interval": retry_interval})
                                 await asyncio.sleep(retry_interval)
                                 continue
@@ -176,7 +176,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
-        logger.info('0010', 'Entered async reliable workflow to handle inbound message')
+        logger.info('0018', 'Entered async reliable workflow to handle inbound message')
         logger.audit('0103', 'Async-Reliable inbound workflow invoked. Message received from Spine.')
 
         await wd.update_status_with_retries(work_description,

@@ -149,7 +149,7 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
 
         logger.audit('0103', 'Async-Express inbound workflow invoked. Message received from spine')
 
-        logger.info('0010', 'Entered async express workflow to handle inbound message')
+        logger.info('0016', 'Entered async express workflow to handle inbound message')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
