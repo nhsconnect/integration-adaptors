@@ -78,6 +78,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
         return await self._make_outbound_request_with_retries_and_handle_response(url, http_headers, message, wdo,
                                                                                   reliability_details, retry_interval)
 
+    @timing.time_function
     async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str,
                                                  attachments: list):
         logger.info('0005', 'Entered async forward reliable workflow to handle unsolicited inbound message')
