@@ -11,8 +11,8 @@ from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilde
 
 class SynchronousMessagingPatternTests(unittest.TestCase):
     """
-         These tests show an asynchronous express response from Spine via the MHS for the example message interaction
-          of PSIS(Personal Spine Information Service).
+    These tests show an asynchronous express response from Spine via the MHS for the example message interaction
+    of PSIS(Personal Spine Information Service).
 
     They make use of the fake-spine service, which has known responses for certain message ids.
     They make use of the fake-spine-route-lookup service, which has known responses for certain interaction ids.
