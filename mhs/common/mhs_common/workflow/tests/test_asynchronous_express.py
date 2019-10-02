@@ -241,7 +241,6 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         audit_log_mock.assert_called_with('0100', '{WorkflowName} outbound workflow invoked.',
                                           {'WorkflowName': 'async-express'})
 
-    # TODO-use this approach in other places
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
     async def test_unhandled_response_from_spine(self, audit_log_mock):
