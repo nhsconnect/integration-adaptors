@@ -115,3 +115,4 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_NACKD',
                 'WORKFLOW': 'async-express'
             })
+
