@@ -109,3 +109,49 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_NACKD',
                 'WORKFLOW': 'async-reliable'
             })
+
+    def test_should_return_information_from_a_soap_fault_returned_from_spine_in_original_post_request__to_client_when_sync_async_requested(self):
+        """
+        Message ID: 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D' configured in fakespine to return a ebxml fault
+        """
+
+        # Arrange
+        message, message_id = build_message('REPC_IN150016UK05', '9689177923',
+                                            message_id='A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D'
+                                            )
+        # Act
+        response = MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=True) \
+            .with_body(message) \
+            .execute_post_expecting_error_response()
+
+        # Assert
+        TextErrorResponseAssertor(response.text) \
+            .assert_code_context('urn:oasis:names:tc:ebxml') \
+            .assert_severity('Error') \
+            .assert_error_type('ebxml_error')
+
+    def test_should_record_message_status_as_nackd_when_ebxml_error_response_returned_from_spine_when_sync_async_requested(self):
+        """
+        Message ID: 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D' configured in fakespine to return a ebxml fault
+        """
+
+        # Arrange
+        message, message_id = build_message('REPC_IN150016UK05', '9689177923',
+                                            message_id='A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D'
+                                            )
+        # Act
+        MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=True) \
+            .with_body(message) \
+            .execute_post_expecting_error_response()
+
+        # Assert
+        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+            .assert_single_item_exists_with_key(message_id) \
+            .assert_item_contains_values(
+            {
+                'INBOUND_STATUS': None,
+                'OUTBOUND_STATUS': 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED',
+                'WORKFLOW': 'sync-async'
+            })
