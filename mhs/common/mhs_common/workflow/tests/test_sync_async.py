@@ -8,8 +8,6 @@ from mhs_common.state import work_description as wd
 from mhs_common.workflow import sync_async
 from mhs_common.workflow import sync_async_resynchroniser as resynchroniser
 
-PARTY_ID = "PARTY-ID"
-
 
 class TestSyncAsyncWorkflowOutbound(TestCase):
 
@@ -18,8 +16,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         self.work_description = MagicMock()
         self.work_description_store = MagicMock()
         self.resync = MagicMock()
-        self.workflow = sync_async.SyncAsyncWorkflow(PARTY_ID,
-                                                     work_description_store=self.work_description_store,
+        self.workflow = sync_async.SyncAsyncWorkflow(work_description_store=self.work_description_store,
                                                      resynchroniser=self.resync,
                                                      persistence_store_max_retries=3)
 
