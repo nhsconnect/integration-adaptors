@@ -155,7 +155,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'async-reliable'
             })
 
-    def test_should_return_information_from_a_soap_fault_returned_from_spine_in_original_post_request_to_client_when_sync_async_requested(self):
+    def test_should_return_information_from_ebxml_fault_returned_from_spine_in_original_post_request_to_client_when_sync_async_requested(self):
         """
         Message ID: 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D' configured in fakespine to return a ebxml fault
         """
