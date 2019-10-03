@@ -24,9 +24,9 @@ def build_message(template, patient_nhs_number='9446245796', message_id: str = N
 
     :param message_id: message id
     :param template: The Name of the template to be used.
-    :param patient_nhs_number: The NHS number of the patient this record belongs to.
-    :param to_party_id: The to party key that the message will be sent to
-    :param to_asid: The to asid that the message will be sent to
+    :param patient_nhs_number: The NHS number of the patient this record belongs to (defaults to a known nhs number)
+    :param to_party_id: The to party key that the message will be sent to (defaults to a spines party key)
+    :param to_asid: The to asid that the message will be sent to (defaults to a known asid for all standard tests)
     :return: A tuple of the message and the message id (UUID) used in it.
     """
     current_utc_time = datetime.datetime.utcnow()

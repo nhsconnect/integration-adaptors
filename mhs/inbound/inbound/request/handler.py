@@ -207,6 +207,7 @@ class InboundHandler(base_handler.BaseHandler):
 
     def _return_message_to_message_initiator(self, request_message):
         try:
+            # these values are taken defined as per the TMS Error Base v3.0 document
             nack_context = {
                 ebxml_envelope.ERROR_CODE: "ValueNotRecognized",
                 ebxml_envelope.DESCRIPTION: "501314:Invalid To Party Type attribute",
