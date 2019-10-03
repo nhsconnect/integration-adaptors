@@ -91,16 +91,14 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         await work_description.publish()
 
-        retries_remaining = self.inbound_queue_max_retries
-        while True:
+        for retry_num in range(self.inbound_queue_max_retries + 1):
             try:
                 await self._put_message_onto_queue_with(message_id, correlation_id, payload, attachments=attachments)
                 break
             except Exception as e:
                 logger.warning('0006', 'Failed to put unsolicited message onto inbound queue due to {Exception}',
                                {'Exception': e})
-                retries_remaining -= 1
-                if retries_remaining <= 0:
+                if retry_num >= self.inbound_queue_max_retries:
                     logger.error("0020",
                                  "Exceeded the maximum number of retries, {max_retries} retries, when putting "
                                  "unsolicited message onto inbound queue",

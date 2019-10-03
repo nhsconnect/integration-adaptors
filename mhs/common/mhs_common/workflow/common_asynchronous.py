@@ -121,15 +121,13 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                                                 correlation_id: str,
                                                 work_description: wd.WorkDescription,
                                                 payload: str):
-        retries_remaining = self.inbound_queue_max_retries
-        while True:
+        for retry_num in range(self.inbound_queue_max_retries + 1):
             try:
                 await self._put_message_onto_queue_with(message_id, correlation_id, payload)
                 break
             except Exception as e:
                 logger.warning('0012', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
-                retries_remaining -= 1
-                if retries_remaining <= 0:
+                if retry_num >= self.inbound_queue_max_retries:
                     logger.error("0013",
                                  "Exceeded the maximum number of retries, {max_retries} retries, when putting "
                                  "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})

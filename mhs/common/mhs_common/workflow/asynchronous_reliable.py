@@ -101,6 +101,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                 return await self._make_outbound_request_and_handle_response(url, http_headers, message, wdo,
                                                                              handle_error_response)
             except _NeedToRetryException:
+                retries_remaining[0] -= 1
                 logger.info("0017", "Waiting for {retry_interval} seconds before next request "
                                     "attempt.", {"retry_interval": retry_interval})
                 await asyncio.sleep(retry_interval)
@@ -126,7 +127,6 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                {'HTTPStatus': response.code, 'Errors': parsed_response})
 
                 if SOAPFault.is_soap_fault_retriable(soap_fault_codes):
-                    retries_remaining[0] -= 1
                     logger.warning("0015", "A retriable error was encountered {error} {retries_remaining} "
                                            "{max_retries}",
                                    {"error": parsed_response,
