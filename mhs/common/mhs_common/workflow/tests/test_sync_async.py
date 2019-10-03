@@ -1,7 +1,6 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from exceptions import MaxRetriesExceeded
 from utilities import test_utilities
 
 from mhs_common import workflow
@@ -139,22 +138,43 @@ class TestSyncAsyncWorkflowInbound(TestCase):
     async def test_inbound_workflow_exception_in_store_retries(self, mock_sleep):
         mock_sleep.return_value = test_utilities.awaitable(None)
         self.work_description.update.return_value = test_utilities.awaitable(True)
+        max_retries = 3
 
-        def add_to_store_mock_throws_exception(key, value):
-            raise ValueError('Fake error')
-
-        self.persistence.add.side_effect = add_to_store_mock_throws_exception
+        self.persistence.add.side_effect = ValueError
         self.work_description.set_inbound_status.return_value = test_utilities.awaitable(True)
 
         self.workflow = sync_async.SyncAsyncWorkflow(sync_async_store=self.persistence,
-                                                     persistence_store_max_retries=3,
+                                                     persistence_store_max_retries=max_retries,
                                                      sync_async_store_retry_delay=100)
-        with self.assertRaises(MaxRetriesExceeded):
+        with self.assertRaises(ValueError):
             await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
 
         self.work_description.set_inbound_status.assert_called_with(
             wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
 
-        self.assertEqual(self.persistence.add.call_count, 3)
-        self.assertEqual(mock_sleep.call_count, 2)
+        self.assertEqual(self.persistence.add.call_count, max_retries + 1)
+        self.assertEqual(mock_sleep.call_count, max_retries)
+        mock_sleep.assert_called_with(100 / 1000)
+
+    @patch('asyncio.sleep')
+    @test_utilities.async_test
+    async def test_inbound_workflow_should_try_add_to_store_twice_if_max_retries_set_to_one(self, mock_sleep):
+        mock_sleep.return_value = test_utilities.awaitable(None)
+        self.work_description.update.return_value = test_utilities.awaitable(True)
+        max_retries = 1
+
+        self.persistence.add.side_effect = ValueError
+        self.work_description.set_inbound_status.return_value = test_utilities.awaitable(True)
+
+        self.workflow = sync_async.SyncAsyncWorkflow(sync_async_store=self.persistence,
+                                                     persistence_store_max_retries=max_retries,
+                                                     sync_async_store_retry_delay=100)
+        with self.assertRaises(ValueError):
+            await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, 'wqe')
+
+        self.work_description.set_inbound_status.assert_called_with(
+            wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
+
+        self.assertEqual(self.persistence.add.call_count, max_retries + 1)
+        self.assertEqual(mock_sleep.call_count, max_retries)
         mock_sleep.assert_called_with(100 / 1000)
