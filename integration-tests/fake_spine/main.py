@@ -29,15 +29,15 @@ def build_application_configuration() -> SpineRequestResponseMapper:
             SpineResponse().override_response_code(500).override_response('soap_fault_single_error.xml'),
         RequestMatcher('exml-fault-response', lambda x: ebxml_body_contains_message_id(x.body.decode(),'7AA57E38-8B20-4AE0-9E73-B9B0C0C42BDA')):
             SpineResponse().override_response_code(500).override_response('ebxml_fault_single_error.xml'),
-
         RequestMatcher('async-reliable-retry-response', lambda x: ebxml_body_contains_message_id(x.body.decode(), '35586865-45B0-41A5-98F6-817CA6F1F5EF')):
             SpineMultiResponse()
                 .with_ordered_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
                 .with_ordered_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
                 .with_ordered_response(SpineResponse().override_response_code(202).override_response('async_reliable_success_response.xml')),
-
         RequestMatcher('async-reliable-ebxml-fault', lambda x: ebxml_body_contains_message_id(x.body.decode(), 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D')):
-            SpineResponse().override_response_code(500).override_response('ebxml_fault_single_error.xml')
+            SpineResponse().override_response_code(500).override_response('ebxml_fault_single_error.xml'),
+        RequestMatcher('async-reliable-soap-fault', lambda x: body_contains_message_id(x.body.decode(), '3771F30C-A231-4D64-A46C-E7FB0D52C27C')):
+            SpineResponse().override_response_code(500).override_response('soap_fault_single_error.xml'),
     })
 
 
