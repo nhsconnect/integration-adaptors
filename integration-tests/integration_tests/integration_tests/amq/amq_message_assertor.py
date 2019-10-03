@@ -2,6 +2,8 @@
 Provides a way of asserting AMQ messages
 """
 from __future__ import annotations
+
+import json
 import unittest
 
 from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
@@ -28,9 +30,16 @@ class AMQMessageAssertor(object):
 
         return self
 
+    def assert_json_content_type(self) -> AMQMessageAssertor:
+        """Asserts the content type of the AMQ message is application/json"""
+        self.assertor.assertEqual(self.message.content_type, 'application/json')
+
+        return self
+
+
     def assertor_for_hl7_xml_message(self) -> Hl7XmlResponseAssertor:
         """
         Gets an assertor for the message body, when the message body is expected to be a HL7 XML message
         :return:
         """
-        return Hl7XmlResponseAssertor(self.message.body)
+        return Hl7XmlResponseAssertor(json.loads(self.message.body)['payload'])

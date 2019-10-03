@@ -1,3 +1,4 @@
+import copy
 import unittest
 from typing import Optional, Tuple
 from unittest import mock
@@ -11,9 +12,11 @@ from mhs_common.workflow import common
 SERVICE = 'service'
 ACTION = 'action'
 SERVICE_ID = SERVICE + ":" + ACTION
+ODS_CODE = 'ODS code'
 INTERACTION_DETAILS = {
     'service': SERVICE,
-    'action': ACTION
+    'action': ACTION,
+    'ods-code': ODS_CODE
 }
 
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
@@ -62,8 +65,28 @@ class TestCommonWorkflow(unittest.TestCase):
 
         details = await self.workflow._lookup_endpoint_details(INTERACTION_DETAILS)
 
-        self.mock_routing_reliability.get_end_point.assert_called_with(SERVICE_ID)
+        self.mock_routing_reliability.get_end_point.assert_called_with(SERVICE_ID, ODS_CODE)
         self.assertEqual(details['url'], MHS_END_POINT_VALUE)
+        self.assertEqual(details['party_key'], MHS_TO_PARTY_KEY_VALUE)
+        self.assertEqual(details['cpa_id'], MHS_CPA_ID_VALUE)
+        self.assertEqual(details['to_asid'], MHS_ASID_VALUE)
+
+    @async_test
+    async def test_lookup_endpoint_details_handles_no_ods_code_passed(self):
+        self.mock_routing_reliability.get_end_point.return_value = test_utilities.awaitable({
+            MHS_END_POINT_KEY: [MHS_END_POINT_VALUE],
+            MHS_TO_PARTY_KEY_KEY: MHS_TO_PARTY_KEY_VALUE,
+            MHS_CPA_ID_KEY: MHS_CPA_ID_VALUE,
+            MHS_TO_ASID: [MHS_ASID_VALUE]
+        })
+        interaction_details = copy.deepcopy(INTERACTION_DETAILS)
+        del interaction_details['ods-code']
+
+        details = await self.workflow._lookup_endpoint_details(interaction_details)
+
+        self.mock_routing_reliability.get_end_point.assert_called_with(SERVICE_ID, None)
+        self.assertEqual(details['url'], MHS_END_POINT_VALUE)
+
         self.assertEqual(details['party_key'], MHS_TO_PARTY_KEY_VALUE)
         self.assertEqual(details['cpa_id'], MHS_CPA_ID_VALUE)
         self.assertEqual(details['to_asid'], MHS_ASID_VALUE)
