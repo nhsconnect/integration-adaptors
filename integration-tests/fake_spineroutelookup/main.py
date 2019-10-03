@@ -8,21 +8,42 @@ from fake_spineroutelookup.request_handler import RoutingRequestHandler
 from fake_spineroutelookup.request_matching import SpineRouteLookupRequestResponseMapper, RequestMatcher
 from fake_spineroutelookup.request_matcher_wrappers import query_argument_contains_string
 from fake_spineroutelookup.routing_response import RoutingResponse
+from fake_spineroutelookup.reliability_response import ReliabilityResponse
 
 logger = logging.getLogger(__name__)
 
 
-def build_application(fake_response_handler: SpineRouteLookupRequestResponseMapper):
+def build_application(fake_routing_response_handler: SpineRouteLookupRequestResponseMapper,
+                      fake_reliability_response_handler: SpineRouteLookupRequestResponseMapper
+                      ):
     return tornado.web.Application([
-        (r"/routing", RoutingRequestHandler, dict(fake_response_handler=fake_response_handler)),
+        (r"/routing", RoutingRequestHandler, dict(fake_response_handler=fake_routing_response_handler)),
+        (r"/reliability", RoutingRequestHandler, dict(fake_response_handler=fake_reliability_response_handler))
     ])
 
 
-def build_application_configuration() -> SpineRouteLookupRequestResponseMapper:
+def build_routing_configuration() -> SpineRouteLookupRequestResponseMapper:
     return SpineRouteLookupRequestResponseMapper({
         RequestMatcher(
             'routing-QUPA_IN040000UK32',
-            lambda x: query_argument_contains_string(x, "service-id", "QUPA_IN040000UK32")): RoutingResponse()
+            lambda x: query_argument_contains_string(x, "service-id", "QUPA_IN040000UK32")): RoutingResponse(),
+
+        RequestMatcher(
+            'routing-QUPC_IN160101UK05',
+            lambda x: query_argument_contains_string(x, 'service-id', 'QUPC_IN160101UK05')): RoutingResponse(),
+
+        RequestMatcher(
+            'routing-REPC_IN150016UK05',
+            lambda x: query_argument_contains_string(x, 'service-id', 'REPC_IN150016UK05')): RoutingResponse()
+    })
+
+
+def build_reliability_configuration() -> SpineRouteLookupRequestResponseMapper:
+    return SpineRouteLookupRequestResponseMapper({
+        RequestMatcher(
+            'reliability-REPC_IN150016UK05',
+            lambda x: query_argument_contains_string(x, "service-id", "REPC_IN150016UK05")): ReliabilityResponse()
+
     })
 
 
@@ -31,8 +52,9 @@ if __name__ == "__main__":
 
     logger.log(logging.INFO, "Building fake spineroutelookup service configuration")
 
-    application_configuration = build_application_configuration()
-    application = build_application(application_configuration)
+    routing_configuration = build_routing_configuration()
+    reliability_configuration = build_reliability_configuration()
+    application = build_application(routing_configuration, reliability_configuration)
     server = tornado.httpserver.HTTPServer(application)
     server.listen(80)
 

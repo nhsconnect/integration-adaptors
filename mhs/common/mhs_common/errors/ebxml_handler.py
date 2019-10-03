@@ -49,7 +49,6 @@ def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Option
 
     Function checks for HTTP code 200, content-type text/xml and body for the structure as above.
     In case there is not HTTP code 200 passed in, `code` and `body` will be returned back.
-    In case HTTP code that is not 2xx is passed in, a `ValueError` exception will be raised.
     In case body isn't structured as ebXML error message passed `code` and `body` will be returned back.
     In case content-type is not presented or is not text/xml `ValueError` exception should be raised.
     In case the response actually is ebXML error all the error details like severity, description, error code and
@@ -60,16 +59,6 @@ def handle_ebxml_error(code: int, headers: Dict, body: str) -> Tuple[int, Option
     :param body: HTTP response body
     :return: Response to external client represented as HTTP status code and body
     """
-
-    if code != 200:
-        if code // 100 == 2:  # If code is 2xx
-            logger.info('0001', "HTTP {Code} success response code received. So can assume this isn't an ebXML error "
-                                "as they are HTTP 200.", {'Code': code})
-            return code, body
-        logger.error('0002', 'Non-HTTP 2xx response code received: {Code} . It is likely that there is a bug in the '
-                             'code.', {'Code': code})
-        raise ValueError(f'Non-HTTP-2xx code passed to ebxml_handler function: {code}')
-
     if not body:
         logger.info('0003',
                     "HTTP 200 success response received with empty body, so can assume this isn't an ebXML error.")
