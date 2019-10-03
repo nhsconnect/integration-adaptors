@@ -1,9 +1,9 @@
-from unittest import TestCase, skip
+from unittest import TestCase
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.scr_http_request_builder import ScrHttpRequestBuilder
 from integration_tests.json.json_assertor import JsonResponseAssertor
 
-@skip('TODO')
+
 class ScrAdaptorTests(TestCase):
     """
     These tests show a sync-async response from spine via the SCR adaptor (and transitively the MHS) for the
