@@ -41,7 +41,7 @@ services:
       - MAX_RESYNC_RETRIES=20
       - MHS_SPINE_ROUTE_LOOKUP_URL=http://route
       - MHS_SPINE_ORG_CODE=YES
-      - MHS_SPINE_REQUEST_MAX_SIZE=5000000
+      - MHS_SPINE_REQUEST_MAX_SIZE=4999600 # 5 000 000 - 400
   route:
     image: local/mhs-route:${ROUTE_BUILD_TAG}
     ports:
