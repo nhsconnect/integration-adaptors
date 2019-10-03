@@ -94,6 +94,6 @@ class SOAPFault(SoapEnvelope):
     def is_soap_fault_retriable(soap_fault_codes):
         # return True only if ALL error codes are retriable
         for soap_fault_code in soap_fault_codes:
-            if not soap_fault_code in SOAP_ERRORS_TO_RETRY:
+            if soap_fault_code not in SOAP_ERRORS_TO_RETRY:
                 return False
         return True
