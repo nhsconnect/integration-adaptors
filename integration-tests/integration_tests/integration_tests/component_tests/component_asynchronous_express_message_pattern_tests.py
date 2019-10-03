@@ -136,7 +136,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
             .assert_code_context('urn:nhs:names:error:tms') \
             .assert_severity('Error')
 
-    def test_should_record_message_status_as_nackd_when_soap_error_response_returned_from_spine_and_sync_async_requested(self):
+    def test_should_record_message_status_when_soap_error_response_returned_from_spine_and_sync_async_requested(self):
         """
         Message ID: AD7D39A8-1B6C-4520-8367-6B7BEBD7B842 configured in fakespine to return a SOAP Fault error.
         Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
