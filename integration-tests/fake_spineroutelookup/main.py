@@ -42,8 +42,11 @@ def build_reliability_configuration() -> SpineRouteLookupRequestResponseMapper:
     return SpineRouteLookupRequestResponseMapper({
         RequestMatcher(
             'reliability-REPC_IN150016UK05',
-            lambda x: query_argument_contains_string(x, "service-id", "REPC_IN150016UK05")): ReliabilityResponse()
+            lambda x: query_argument_contains_string(x, "service-id", "REPC_IN150016UK05")): ReliabilityResponse(),
 
+        RequestMatcher(
+            'reliability-COPC_IN000001UK01',
+            lambda x: query_argument_contains_string(x, "service-id", "COPC_IN000001UK01")): ReliabilityResponse()
     })
 
 
