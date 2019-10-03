@@ -49,36 +49,36 @@ class InboundHandler(base_handler.BaseHandler):
 
         if not self._is_message_intended_for_receiving_mhs(request_message):
             self._return_message_to_message_initiator(request_message)
-        else:
-            interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
-            log.interaction_id.set(interaction_id)
+            return
 
-            ref_to_message_id = self._extract_ref_message(request_message)
-            correlation_id = self._extract_correlation_id(request_message)
-            self._extract_message_id(request_message)
+        interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
+        log.interaction_id.set(interaction_id)
 
-            received_message = request_message.message_dictionary[MESSAGE]
+        ref_to_message_id = self._extract_ref_message(request_message)
+        correlation_id = self._extract_correlation_id(request_message)
+        self._extract_message_id(request_message)
 
-            try:
-                work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
-            except wd.EmptyWorkDescriptionError as e:
-                await self._handle_no_work_description_found_for_request(e, ref_to_message_id, correlation_id,
-                                                                         request_message, received_message)
-                return
+        received_message = request_message.message_dictionary[MESSAGE]
 
-            message_workflow = self.workflows[work_description.workflow]
-            logger.info('004', 'Retrieved work description from state store, forwarding message to {workflow}',
-                        {'workflow': message_workflow})
+        try:
+            work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
+        except wd.EmptyWorkDescriptionError as e:
+            await self._handle_no_work_description_found_for_request(e, ref_to_message_id, correlation_id,
+                                                                     request_message, received_message)
+            return
 
-            try:
-                await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
-                                                              received_message)
-                self._send_ack(request_message)
-            except Exception as e:
-                logger.error('006', 'Exception in workflow {exception}', {'exception': e})
-                raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
-                                                 ' failed to complete workflow',
-                                            reason=f'Exception in workflow') from e
+        message_workflow = self.workflows[work_description.workflow]
+        logger.info('004', 'Retrieved work description from state store, forwarding message to {workflow}',
+                    {'workflow': message_workflow})
+
+        try:
+            await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
+                                                          received_message)
+            self._send_ack(request_message)
+        except Exception as e:
+            logger.error('006', 'Exception in workflow {exception}', {'exception': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
+                                        reason=f'Exception in workflow') from e
 
     async def _handle_no_work_description_found_for_request(self, e: wd.EmptyWorkDescriptionError,
                                                             ref_to_message_id: str, correlation_id: str,
@@ -127,9 +127,9 @@ class InboundHandler(base_handler.BaseHandler):
         logger.info('012', 'Building and sending acknowledgement')
         self._send_ebxml_message(parsed_message, is_positive_ack=True, additional_context={})
 
-    def _send_nack(self, parsed_message: ebxml_envelope.EbxmlEnvelope, nack_context):
+    def _send_nack(self, request_message: ebxml_envelope.EbxmlEnvelope, nack_context):
         logger.info('012', 'Building and sending negative acknowledgement')
-        self._send_ebxml_message(parsed_message, is_positive_ack=False, additional_context=nack_context)
+        self._send_ebxml_message(request_message, is_positive_ack=False, additional_context=nack_context)
 
     def _send_ebxml_message(self, parsed_message, is_positive_ack, additional_context):
         message_details = parsed_message.message_dictionary

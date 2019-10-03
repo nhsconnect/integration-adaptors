@@ -5,9 +5,9 @@ from unittest.mock import patch, sentinel, call
 
 import definitions
 from tornado import httpclient
+from utilities.test_utilities import async_test, awaitable
 
 from outbound.transmission import outbound_transmission
-from utilities.test_utilities import async_test, awaitable
 
 URL_NAME = "url"
 URL_VALUE = "URL"
@@ -36,6 +36,7 @@ CLIENT_CERT_PATH = str(Path(CERTS_DIR) / "client.cert")
 CLIENT_KEY_PATH = str(Path(CERTS_DIR) / "client.key")
 CA_CERTS_PATH = str(Path(CERTS_DIR) / "client.pem")
 MAX_RETRIES = 3
+EXPECTED_MAX_HTTP_REQUESTS = MAX_RETRIES + 1
 RETRY_DELAY = 100
 RETRY_DELAY_IN_SECONDS = RETRY_DELAY / 1000
 HTTP_PROXY_HOST = "proxy_host"
@@ -48,7 +49,7 @@ class TestOutboundTransmission(TestCase):
                                                                        MAX_RETRIES, RETRY_DELAY)
 
     @async_test
-    async def test_make_request(self):
+    async def test_should_make_HTTP_request_with_default_parameters(self):
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
             sentinel.result.code = 200
             mock_fetch.return_value = awaitable(sentinel.result)
@@ -75,7 +76,7 @@ class TestOutboundTransmission(TestCase):
             self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
 
     @async_test
-    async def test_make_request_with_proxy(self):
+    async def test_should_use_proxy_details_if_provided(self):
         self.transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH,
                                                                        MAX_RETRIES, RETRY_DELAY, HTTP_PROXY_HOST,
                                                                        HTTP_PROXY_PORT)
@@ -105,13 +106,12 @@ class TestOutboundTransmission(TestCase):
             self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
 
     @async_test
-    async def test_make_request_non_retriable(self):
-        errors_and_expected = [
+    async def test_should_not_retry_request_if_non_retriable_exception_raised(self):
+        test_cases = [
             ("HTTPClientError 400", httpclient.HTTPClientError(code=400), httpclient.HTTPClientError),
-            ("SSLCertVerificationError", ssl.SSLCertVerificationError(), ssl.SSLCertVerificationError),
             ("SSLError", ssl.SSLError, ssl.SSLError)
         ]
-        for description, error, expected_result in errors_and_expected:
+        for description, error, expected_result in test_cases:
             with self.subTest(description):
                 with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
                     mock_fetch.side_effect = error
@@ -119,55 +119,50 @@ class TestOutboundTransmission(TestCase):
                     with self.assertRaises(expected_result):
                         await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
 
+    @async_test
+    async def test_should_retry_request_if_retriable_exception_raised(self):
+        test_cases = [
+            ("HTTPClientError 599", httpclient.HTTPClientError(code=599)),
+            ("Generic Exception", Exception)
+        ]
+
+        for description, error in test_cases:
+            with self.subTest(description):
+                with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
+                    sentinel.result.code = 200
+                    mock_fetch.side_effect = [error, awaitable(sentinel.result)]
+
+                    actual_response = await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
+
+                    self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
+
     @patch("asyncio.sleep")
     @async_test
-    async def test_make_request_retriable(self, mock_sleep):
+    async def test_should_try_request_twice_if_max_retries_set_to_one(self, mock_sleep):
+        transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH, 1,
+                                                                  RETRY_DELAY)
         mock_sleep.return_value = awaitable(None)
 
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
-            sentinel.result.code = 200
-            mock_fetch.side_effect = [httpclient.HTTPClientError(code=599), awaitable(sentinel.result)]
+            mock_fetch.side_effect = Exception
 
-            actual_response = await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
+            with self.assertRaises(Exception):
+                await transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
 
-            self.assertIs(actual_response, sentinel.result, "Expected content should be returned.")
-            mock_sleep.assert_called_once_with(RETRY_DELAY_IN_SECONDS)
+            self.assertEqual(mock_fetch.call_count, 2)
 
     @patch("asyncio.sleep")
     @async_test
-    async def test_make_request_max_retries(self, mock_sleep):
+    async def test_should_retry_request_up_to_configured_max_retries(self, mock_sleep):
         mock_sleep.return_value = awaitable(None)
 
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
-            mock_fetch.side_effect = httpclient.HTTPClientError(code=599)
+            exception_raised = Exception
+            mock_fetch.side_effect = exception_raised
 
-            with self.assertRaises(outbound_transmission.MaxRetriesExceeded) as cm:
+            with self.assertRaises(exception_raised):
                 await self.transmission.make_request(URL_VALUE, HEADERS, MESSAGE)
-            self.assertEqual(mock_fetch.side_effect, cm.exception.__cause__)
 
-            self.assertEqual(mock_fetch.call_count, MAX_RETRIES)
-            expected_sleep_arguments = [call(RETRY_DELAY_IN_SECONDS) for _ in range(MAX_RETRIES - 1)]
+            self.assertEqual(mock_fetch.call_count, EXPECTED_MAX_HTTP_REQUESTS)
+            expected_sleep_arguments = [call(RETRY_DELAY_IN_SECONDS) for _ in range(MAX_RETRIES)]
             self.assertEqual(expected_sleep_arguments, mock_sleep.call_args_list)
-
-    def test_is_tornado_network_error(self):
-        errors_and_expected = [("not HTTPClientError", ValueError(), False),
-                               ("HTTPClientError without code 599", httpclient.HTTPClientError(code=400), False),
-                               ("HTTPClientError with code 599", httpclient.HTTPClientError(code=599), True)
-                               ]
-        for description, error, expected_result in errors_and_expected:
-            with self.subTest(description):
-                result = self.transmission._is_tornado_network_error(error)
-
-                self.assertEqual(result, expected_result)
-
-    def test_is_retriable(self):
-        errors_and_expected = [("is a tornado network error", httpclient.HTTPClientError(code=599), True),
-                               ("is a HTTP error", httpclient.HTTPClientError(code=500), False),
-                               ("is a not a tornado error", IOError(), True)
-                               ]
-
-        for description, error, expected_result in errors_and_expected:
-            with self.subTest(description):
-                result = self.transmission._is_retriable(error)
-
-                self.assertEqual(result, expected_result)

@@ -97,14 +97,14 @@ class SynchronousHandler(base_handler.BaseHandler):
 
               Note that this correlation ID gets sent to/from Spine.
           - name: ods-code
-             in: header
-             required: false
-             schema:
-               type: string
-             description: >-
-               ODS Code receiving system. It defaults to Spines ODS Code if not porvided and is primarily used for
-               indirect messaging, i.e. forward reliable for example, where the destination system is not Spine. The
-               ODS Code is used to lookup the constract properties in SDS.
+            in: header
+            required: false
+            schema:
+              type: string
+            description: >-
+              ODS Code receiving system. It defaults to Spines ODS Code if not porvided and is primarily used for
+              indirect messaging, i.e. forward reliable for example, where the destination system is not Spine. The
+              ODS Code is used to lookup the constract properties in SDS.
         responses:
           200:
             description: Successful response from Spine.
