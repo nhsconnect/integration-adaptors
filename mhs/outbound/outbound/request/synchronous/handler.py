@@ -101,10 +101,10 @@ class SynchronousHandler(base_handler.BaseHandler):
             required: false
             schema:
               type: string
-              description: >-
-                ODS Code receiving system. It defaults to Spines ODS Code if not porvided and is primarily used for
-                indirect messaging, i.e. forward reliable for example, where the destination system is not Spine. The
-                ODS Code is used to lookup the constract properties in SDS.
+            description: >-
+              ODS Code receiving system. It defaults to Spines ODS Code if not porvided and is primarily used for
+              indirect messaging, i.e. forward reliable for example, where the destination system is not Spine. The
+              ODS Code is used to lookup the constract properties in SDS.
         responses:
           200:
             description: Successful response from Spine.
