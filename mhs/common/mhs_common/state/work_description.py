@@ -1,11 +1,13 @@
 from __future__ import annotations
-from typing import Optional
-import utilities.integration_adaptors_logger as log
 
+import enum
+from typing import Optional
+
+import utilities.integration_adaptors_logger as log
 from utilities import timing
 
+from mhs_common.retry import retriable_action
 from mhs_common.state import persistence_adaptor as pa
-import enum
 
 logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
 
@@ -50,23 +52,41 @@ class EmptyWorkDescriptionError(RuntimeError):
     pass
 
 
+class WorkDescriptionUpdateFailedError(RuntimeError):
+    """Exception thrown when a work description could not be updated."""
+    pass
+
+
 async def update_status_with_retries(wdo: WorkDescription,
                                      update_status_method,
                                      status: MessageStatus,
-                                     retries: int):
-    attempts = 1
-    while attempts < retries + 1:
-        try:
-            await wdo.update()
-            await update_status_method(status)
-            break
-        except OutOfDateVersionError as e:
-            logger.warning('0021', f'Failed attempt to update state store on retry {attempts} of {retries}')
-            if attempts == retries:
-                logger.error('0022', 'Maximum number of retries reached for attempting to update state store')
-                raise e
-            else:
-                attempts += 1
+                                     retries: int,
+                                     retry_delay=0) -> None:
+    """Update the status of the work description using the method provided. If the update fails, retries a configurable
+    number of times.
+
+    :param wdo: The work description object to be updated.
+    :param update_status_method: The method to use to update the status.
+    :param status: The new status to set.
+    :param retries: The number of times to retry updating the work description if the first attempt fails.
+    :raises: OutOfDateVersionError if the local version of the work description is behind the remote version.
+    :raises: WorkDescriptionUpdateFailedError if the work description could not be updated after retrying.
+    """
+
+    async def update_status():
+        await wdo.update()
+        await update_status_method(status)
+
+    retry_result = await retriable_action.RetriableAction(update_status, retries, retry_delay) \
+        .with_retriable_exception_check(lambda e: isinstance(e, OutOfDateVersionError)) \
+        .execute()
+
+    if not retry_result.is_successful:
+        exception_raised = retry_result.exception
+        if exception_raised:
+            raise exception_raised
+
+        raise WorkDescriptionUpdateFailedError
 
 
 async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> WorkDescription:
