@@ -34,7 +34,11 @@ def build_routing_configuration() -> SpineRouteLookupRequestResponseMapper:
 
         RequestMatcher(
             'routing-REPC_IN150016UK05',
-            lambda x: query_argument_contains_string(x, 'service-id', 'REPC_IN150016UK05')): RoutingResponse()
+            lambda x: query_argument_contains_string(x, 'service-id', 'REPC_IN150016UK05')): RoutingResponse(),
+        RequestMatcher(
+            'routing-COPC_IN000001UK01',
+            lambda x: query_argument_contains_string(x, 'service-id', 'COPC_IN000001UK01')): RoutingResponse()
+
     })
 
 
