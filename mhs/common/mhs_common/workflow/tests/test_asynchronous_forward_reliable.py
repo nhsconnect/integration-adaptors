@@ -397,10 +397,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-        response = httpclient.HTTPResponse
-        response.code = 500
-        response.headers = {'Content-Type': 'text/xml'}
-
         sub_tests = [
             ("a retriable soap 200 error code", 'soapfault_response_single_error.xml'),
             ("a retriable soap 206 error code", 'soapfault_response_single_error_206.xml'),
@@ -409,6 +405,9 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         for description, soap_fault_file_path in sub_tests:
             with self.subTest(description):
                 try:
+                    response = mock.MagicMock()
+                    response.code = 500
+                    response.headers = {'Content-Type': 'text/xml'}
                     response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
                     self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
@@ -470,25 +469,19 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-        response = httpclient.HTTPResponse
+        response = mock.MagicMock()
         response.code = 500
         response.headers = {'Content-Type': 'text/xml'}
+        # a non retriable soap 300 error code
+        response.body = FileUtilities.get_file_string(
+            Path(self.test_message_dir) / 'soapfault_response_single_error_300.xml')
+        self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
-        sub_tests = [
-            ("a non retriable soap 300 error code", 'soapfault_response_single_error_300.xml')
-        ]
-        for description, soap_fault_file_path in sub_tests:
-            with self.subTest(description):
-                response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
-                self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                             INTERACTION_DETAILS, PAYLOAD, None)
 
-                with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
-                    status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID,
-                                                                                     CORRELATION_ID,
-                                                                                     INTERACTION_DETAILS,
-                                                                                     PAYLOAD, None)
-
-                self.mock_transmission_adaptor.make_request.assert_called_once()
+        self.mock_transmission_adaptor.make_request.assert_called_once()
 
     ############################
     # Inbound tests
