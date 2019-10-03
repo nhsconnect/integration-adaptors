@@ -11,7 +11,7 @@ Content-Transfer-Encoding: 8bit
 			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YES-0000806</eb:PartyId>
 		</eb:From>
 		<eb:To>
-			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">A91424-9199121</eb:PartyId>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">FROM_PARTY_ID</eb:PartyId>
 		</eb:To>
 		<eb:CPAId>S1001A1630</eb:CPAId>
 		<eb:ConversationId>10F5A436-1913-43F0-9F18-95EA0E43E61A</eb:ConversationId>
@@ -34,6 +34,9 @@ Content-Transfer-Encoding: 8bit
 			<eb:Description xml:lang="en">HL7 payload</eb:Description>
 			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
 		</eb:Reference>
+		<eb:Reference xlink:href="cid:8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk">
+            <eb:Description xml:lang="en">Some description</eb:Description>
+        </eb:Reference>
 	</eb:Manifest>
 </SOAP:Body>
 </SOAP:Envelope>
@@ -44,4 +47,10 @@ Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 <hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>
+----=_MIME-Boundary
+Content-Id: <8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk>
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+
+Some payload
 ----=_MIME-Boundary--

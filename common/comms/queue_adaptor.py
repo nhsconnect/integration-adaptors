@@ -7,10 +7,10 @@ class QueueAdaptor(abc.ABC):
     """Interface for a message queue adaptor."""
 
     @abc.abstractmethod
-    async def send_async(self, message: str, properties: Dict[str, Any] = None) -> None:
+    async def send_async(self, message: dict, properties: Dict[str, Any] = None) -> None:
         """
         Sends a message which awaits using the async flow.
-        :param message: The message content to send.
+        :param message: The message content to send. This will be serialised as JSON.
         :param properties: Optional additional properties to send with the message.
         """
         pass
