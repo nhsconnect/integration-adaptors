@@ -97,6 +97,7 @@ connections to the Redis cache used by the Spine Route Lookup service. *Must* be
 disabled.
 * `MHS_RESYNC_INITIAL_DELAY` (Outbound service only) The initial delay (in seconds) before making the first poll to the sync-async
     store after the outbound service receives an acknowledgement from Spine
+* `MHS_SPINE_REQUEST_MAX_SIZE` (outbound service only) The maximum size that requests to Spine are allowed to be.
 
 Note that if you are using Opentest, you should use the credentials you were given when you got access to set `MHS_SECRET_PARTY_KEY`, `MHS_SECRET_CLIENT_CERT`, `MHS_SECRET_CLIENT_KEY` and `MHS_SECRET_CA_CERTS`.
 

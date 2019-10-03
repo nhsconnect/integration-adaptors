@@ -22,11 +22,13 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                  party_key: str = None,
                  work_description_store: pa.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
+                 max_request_size: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
         self.party_key = party_key
         self.wd_store = work_description_store
         self.transmission = transmission
+        self.max_request_size = max_request_size
         self.persistence_store_retries = persistence_store_max_retries
         super().__init__(routing)
 
@@ -69,6 +71,14 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             logger.error('002', 'Failed to prepare outbound message')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Failed message preparation', None
+
+        if len(message) > self.max_request_size:
+            logger.error('004', 'Request to send to Spine is too large after serialisation. '
+                                '{RequestSize} {MaxRequestSize}',
+                         {'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+            return 400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '\
+                        f'RequestSize={len(message)}', None
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
 

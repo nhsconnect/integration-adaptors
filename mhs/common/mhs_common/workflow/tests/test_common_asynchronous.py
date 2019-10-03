@@ -46,6 +46,7 @@ class TestCommonAsynchronousWorkflow(unittest.TestCase):
         queue_adaptor = mock.MagicMock()
         inbound_queue_max_retries = 3
         inbound_queue_retry_delay = 3
+        max_request_size = 5000
         persistence_store_max_retries = 3
         self.mock_routing_reliability = mock.MagicMock()
 
@@ -55,6 +56,7 @@ class TestCommonAsynchronousWorkflow(unittest.TestCase):
                                                         queue_adaptor,
                                                         inbound_queue_max_retries,
                                                         inbound_queue_retry_delay,
+                                                        max_request_size,
                                                         persistence_store_max_retries,
                                                         self.mock_routing_reliability)
 

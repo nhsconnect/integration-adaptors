@@ -225,3 +225,9 @@ variable "mhs_resync_initial_delay" {
   description = "The delay before the first poll to the sync async store after receiving an acknowledgement from Spine"
   default = 0.150
 }
+
+variable "mhs_spine_request_max_size" {
+  type = string
+  description = "The maximum size of the request body (in bytes) that MHS outbound sends to Spine. This should be set minus any HTTP headers and other stuff in the HTTP packets sent to Spine."
+  default = 5000000
+}
