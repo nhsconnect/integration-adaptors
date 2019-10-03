@@ -121,7 +121,10 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             if exception_raised:
                 raise exception_raised
 
-            raise SyncAsyncStoreFailure
+            raise SyncAsyncStoreFailure(
+                'Max number of retries exceeded whilst attempting to put the message on the sync-async store')
+
+        logger.info('0011', 'Successfully updated state store')
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         await wd.update_status_with_retries(wdo,
