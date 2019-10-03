@@ -23,11 +23,12 @@ def build_application(fake_response_handler: SpineRequestResponseMapper):
 
 def build_application_configuration() -> SpineRequestResponseMapper:
     return SpineRequestResponseMapper({
-        RequestMatcher('soap-fault-response',
-                       lambda x: ebxml_body_contains_message_id(x.body.decode(), 'AD7D39A8-1B6C-4520-8367-6B7BEBD7B842')):
+        RequestMatcher('soap-fault-response', lambda x: ebxml_body_contains_message_id(x.body.decode(), 'AD7D39A8-1B6C-4520-8367-6B7BEBD7B842')):
             SpineResponse().override_response_code(500).override_response('soap_fault_single_error.xml'),
         RequestMatcher('soap-fault-response', lambda x: body_contains_message_id(x.body.decode(), 'F5187FB6-B033-4A75-838B-9E7A1AFB3111')):
             SpineResponse().override_response_code(500).override_response('soap_fault_single_error.xml'),
+        RequestMatcher('exml-fault-response', lambda x: ebxml_body_contains_message_id(x.body.decode(),'7AA57E38-8B20-4AE0-9E73-B9B0C0C42BDA')):
+            SpineResponse().override_response_code(500).override_response('ebxml_fault_single_error.xml')
     })
 
 
