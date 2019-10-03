@@ -1,4 +1,4 @@
-"""Component tests related to the asynchronous-express message pattern"""
+"""Component tests related to the forward-reliable message pattern"""
 
 import unittest
 
@@ -11,8 +11,8 @@ from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilde
 
 class ForwardReliablesMessagingPatternTests(unittest.TestCase):
     """
-    These tests show an asynchronous express response from Spine via the MHS for the example message interaction
-    of PSIS(Personal Spine Information Service).
+    These tests show an forward-reliable response from Spine via the MHS for the example message interaction
+    of Common Content Forward Reliable GP2GP Large Message Attachment.
 
     They make use of the fake-spine service, which has known responses for certain message ids.
     They make use of the fake-spine-route-lookup service, which has known responses for certain interaction ids.
