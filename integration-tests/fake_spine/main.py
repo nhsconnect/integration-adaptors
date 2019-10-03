@@ -36,7 +36,7 @@ def build_application_configuration() -> SpineRequestResponseMapper:
                 .with_ordered_response(SpineResponse().override_response_code(202).override_response('async_reliable_success_response.xml')),
         RequestMatcher('async-reliable-ebxml-fault', lambda x: ebxml_body_contains_message_id(x.body.decode(), 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D')):
             SpineResponse().override_response_code(500).override_response('ebxml_fault_single_error.xml'),
-        RequestMatcher('async-reliable-soap-fault', lambda x: body_contains_message_id(x.body.decode(), '3771F30C-A231-4D64-A46C-E7FB0D52C27C')):
+        RequestMatcher('async-reliable-soap-fault', lambda x: ebxml_body_contains_message_id(x.body.decode(), '3771F30C-A231-4D64-A46C-E7FB0D52C27C')):
             SpineResponse().override_response_code(500).override_response('soap_fault_single_error.xml'),
     })
 

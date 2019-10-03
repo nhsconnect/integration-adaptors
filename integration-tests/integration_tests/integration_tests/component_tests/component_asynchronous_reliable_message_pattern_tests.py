@@ -70,8 +70,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
         Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
         """
         # Arrange
-        message, message_id = build_message('REPC_IN150016UK05', '9446245796',
-                                            message_id='3771F30C-A231-4D64-A46C-E7FB0D52C27C')
+        message, message_id = build_message('REPC_IN150016UK05', '9446245796', message_id='3771F30C-A231-4D64-A46C-E7FB0D52C27C')
 
         # Act
         response = MhsHttpRequestBuilder() \
