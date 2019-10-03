@@ -87,7 +87,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
     async def _make_outbound_request_with_retries_and_handle_response(self, url: str, http_headers: Dict[str, str],
                                                                       message: str, wdo: wd.WorkDescription,
                                                                       reliability_details: dict, retry_interval: float):
-        num_of_retries = reliability_details[common_asynchronous.MHS_RETRIES]
+        num_of_retries = int(reliability_details[common_asynchronous.MHS_RETRIES])
 
         # retries_remaining is a mutable integer. This is done by putting an (immutable) integer into
         # a mutable container.
@@ -101,7 +101,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                 return await self._make_outbound_request_and_handle_response(url, http_headers, message, wdo,
                                                                              handle_error_response)
             except _NeedToRetryException:
-                logger.info("0017", "Waiting for {retry_interval} milliseconds before next request "
+                logger.info("0017", "Waiting for {retry_interval} seconds before next request "
                                     "attempt.", {"retry_interval": retry_interval})
                 await asyncio.sleep(retry_interval)
                 continue

@@ -7,6 +7,7 @@ import json
 import os
 import unittest
 import uuid
+from typing import Optional
 
 import requests
 from integration_tests.helpers.asid_provider import get_asid
@@ -24,10 +25,15 @@ class MhsHttpRequestBuilder(object):
         self.mhs_host = os.environ.get('MHS_ADDRESS', 'http://localhost') + "/"
         self.assertor = unittest.TestCase('__init__')
 
-    def with_headers(self, interaction_id: str, message_id: str, sync_async: bool,
-                     correlation_id: str = str(uuid.uuid4()).upper(), ods_code: str = "YES") -> MhsHttpRequestBuilder:
+    def with_headers(self, interaction_id: str,
+                     message_id: str,
+                     sync_async: bool,
+                     correlation_id: str = str(uuid.uuid4()).upper(),
+                     ods_code: str = "YES",
+                     from_asid: Optional[str] = f'{get_asid()}') -> MhsHttpRequestBuilder:
         """
         Allows the setting of required headers for the MHS
+        :param from_asid: the identifier of the calling system
         :param ods_code: the ods code of the system you wish to communicate with (spine is YES)
         :param correlation_id: the correlation id used
         :param interaction_id: id of this interaction used within MHS to track this request lifecycle
@@ -40,7 +46,7 @@ class MhsHttpRequestBuilder(object):
             'Message-Id': message_id,
             'Correlation-Id': correlation_id,
             'sync-async': str(sync_async).lower(),
-            'from-asid': f'{get_asid()}',
+            'from-asid': from_asid,
             'Content-Type': 'application/json',
             'ods-code': ods_code
         }
@@ -80,6 +86,19 @@ class MhsHttpRequestBuilder(object):
         self.assertor.assertTrue(
             response.status_code == 500,
             f'A non 500 error code was returned from server: {response.status_code}')
+
+        return response
+
+    def execute_post_expecting_bad_request_response(self) -> Response:
+        """
+        Execute a POST request against the MHS using the configured body and headers within this class.
+        Asserts the response is 400.
+        :return: response from MHS
+        """
+        response = self._execute_post_request()
+        self.assertor.assertTrue(
+            response.status_code == 400,
+            f'A non 400 error code was returned from server: {response.status_code}')
 
         return response
 

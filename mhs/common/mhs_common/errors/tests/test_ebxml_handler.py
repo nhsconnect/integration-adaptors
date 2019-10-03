@@ -14,10 +14,6 @@ class TestEbxmlHandler(unittest.TestCase):
     def test_non_200(self):
         self.assertEqual(handle_ebxml_error(202, {'Content-Type': 'text/xml'}, ''), (202, ''))
 
-    def test_non_2xx(self):
-        with self.assertRaises(ValueError):
-            handle_ebxml_error(400, {'Content-Type': 'text/xml'}, 'Some body')
-
     def test_non_ebxml_fault(self):
         self.assertEqual(handle_ebxml_error(200, {'Content-Type': 'text/xml'}, '<a><b></b></a>'),
                          (200, '<a><b></b></a>'))
