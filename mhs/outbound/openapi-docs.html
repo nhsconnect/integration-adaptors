@@ -272,6 +272,9 @@ font-style: italic;
 <p>When performing async requests where the response is put on the inbound queue, the correlation ID will be put with the response on the queue.</p>
 <p>Note that this correlation ID gets sent to/from Spine.</p>
  default: null </div>
+<div class="param">ods-code (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Header Parameter</span> &mdash; ODS Code receiving system. It defaults to Spines ODS Code if not porvided and is primarily used for indirect messaging, i.e. forward reliable for example, where the destination system is not Spine. The ODS Code is used to lookup the constract properties in SDS. default: null </div>
 
     </div>  <!-- field-items -->
 
@@ -323,8 +326,8 @@ font-style: italic;
     <h3><a name="RequestBody"><code>RequestBody</code> - </a> <a class="up" href="#__Models">Up</a></h3>
     <div class='model-description'></div>
     <div class="field-items">
-      <div class="param">attachments (optional)</div><div class="param-desc"><span class="param-type"><a href="#Attachment">array[Attachment]</a></span> Optional attachments to send with the payload. Only for use for interactions that support sending attachments. </div>
-<div class="param">payload </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> HL7 Payload to send to Spine </div>
+      <div class="param">payload </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> HL7 Payload to send to Spine </div>
+<div class="param">attachments (optional)</div><div class="param-desc"><span class="param-type"><a href="#Attachment">array[Attachment]</a></span> Optional attachments to send with the payload. Only for use for interactions that support sending attachments. </div>
     </div>  <!-- field-items -->
   </div>
   </body>

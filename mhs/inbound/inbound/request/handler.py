@@ -2,38 +2,42 @@
 
 from typing import Dict
 
+import mhs_common.messages.common_ack_envelope as common_ack_envelope
 import mhs_common.messages.ebxml_ack_envelope as ebxml_ack_envelope
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
+import mhs_common.messages.ebxml_nack_envelope as ebxml_nack_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs_common.workflow as workflow
 import tornado.web
-from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID, \
-    CONTENT_TYPE_HEADER_NAME
-from mhs_common.messages.soap_envelope import SoapEnvelope, SoapParsingError
-
+from mhs_common.configuration import configuration_manager
+from mhs_common.handler import base_handler
+from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID
 from mhs_common.state import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.state.persistence_adaptor import PersistenceAdaptor
+from mhs_common.workflow import asynchronous_forward_reliable as forward_reliable
 from utilities import integration_adaptors_logger as log
 from utilities.timing import time_request
 
 logger = log.IntegrationAdaptorsLogger('INBOUND_HANDLER')
 
 
-class InboundHandler(tornado.web.RequestHandler):
+class InboundHandler(base_handler.BaseHandler):
     """A Tornado request handler intended to handle incoming HTTP requests from a remote MHS."""
     work_description_store: PersistenceAdaptor
     party_id: str
     workflows: Dict[str, workflow.CommonWorkflow]
 
     def initialize(self, workflows: Dict[str, workflow.CommonWorkflow],
+                   config_manager: configuration_manager.ConfigurationManager,
                    work_description_store: pa.PersistenceAdaptor, party_id: str):
         """Initialise this request handler with the provided dependencies.
         :param workflows:
+        :param config_manager: The object that can be used to obtain interaction details.
         :param work_description_store: The state store
         :param party_id: The party ID of this MHS. Sent in ebXML acknowledgements.
         """
-        self.workflows = workflows
+        super().initialize(workflows, config_manager)
         self.party_id = party_id
         self.work_description_store = work_description_store
 
@@ -41,10 +45,11 @@ class InboundHandler(tornado.web.RequestHandler):
     async def post(self):
         logger.info('001', 'Inbound POST received: {request}', {'request': self.request})
 
-        if self._is_async_request():
-            request_message = self._extract_incoming_async_request_message()
-        else:
-            request_message = self._extract_incoming_sync_request_message()
+        request_message = self._extract_incoming_ebxml_request_message()
+
+        if not self._is_message_intended_for_receiving_mhs(request_message):
+            self._return_message_to_message_initiator(request_message)
+            return
 
         interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
         log.interaction_id.set(interaction_id)
@@ -58,11 +63,9 @@ class InboundHandler(tornado.web.RequestHandler):
         try:
             work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
         except wd.EmptyWorkDescriptionError as e:
-            logger.warning('003', 'No work description found in state store with {messageId}',
-                           {'messageId': ref_to_message_id})
-            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
-                                             'received from spine',
-                                        reason="Unknown message reference") from e
+            await self._handle_no_work_description_found_for_request(e, ref_to_message_id, correlation_id,
+                                                                     request_message, received_message)
+            return
 
         message_workflow = self.workflows[work_description.workflow]
         logger.info('004', 'Retrieved work description from state store, forwarding message to {workflow}',
@@ -73,26 +76,81 @@ class InboundHandler(tornado.web.RequestHandler):
                                                           received_message)
             self._send_ack(request_message)
         except Exception as e:
-            logger.error('005', 'Exception in workflow {exception}', {'exception': e})
-            raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
-                                             ' failed to complete workflow',
+            logger.error('006', 'Exception in workflow {exception}', {'exception': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
+                                        reason=f'Exception in workflow') from e
+
+    async def _handle_no_work_description_found_for_request(self, e: wd.EmptyWorkDescriptionError,
+                                                            ref_to_message_id: str, correlation_id: str,
+                                                            request_message:
+                                                            ebxml_request_envelope.EbxmlRequestEnvelope,
+                                                            received_message: str):
+        # Lookup workflow for request
+        interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
+        interaction_details = self._get_interaction_details(interaction_id)
+        message_workflow = self._extract_default_workflow(interaction_details, interaction_id)
+
+        # If it matches forward reliable workflow, then this will be an unsolicited request from another GP system.
+        # So let the workflow handle this.
+        if isinstance(message_workflow, forward_reliable.AsynchronousForwardReliableWorkflow):
+            await self.handle_forward_reliable_unsolicited_request(correlation_id, message_workflow, received_message,
+                                                                   ref_to_message_id, request_message)
+
+        # If not, then something has gone wrong
+        else:
+            logger.error('003', 'No work description found in state store for message with {workflow} , unsolicited '
+                                  'message received unexpectedly from Spine.',
+                           {'workflow': interaction_details['workflow']})
+            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
+                                             'received from Spine',
+                                        reason="Unknown message reference") from e
+
+    async def handle_forward_reliable_unsolicited_request(self, correlation_id: str,
+                                                          forward_reliable_workflow:
+                                                          workflow.AsynchronousForwardReliableWorkflow,
+                                                          received_message: str, ref_to_message_id: str,
+                                                          request_message: ebxml_request_envelope.EbxmlRequestEnvelope):
+        logger.info('002', 'Received unsolicited inbound request for the forward-reliable workflow. Passing the '
+                           'request to forward-reliable workflow.')
+        attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
+        try:
+            await forward_reliable_workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id,
+                                                                               received_message,
+                                                                               attachments)
+            self._send_ack(request_message)
+        except Exception as e:
+            logger.error('011', 'Exception in workflow {exception}', {'exception': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
                                         reason=f'Exception in workflow') from e
 
     def _send_ack(self, parsed_message: ebxml_envelope.EbxmlEnvelope):
         logger.info('012', 'Building and sending acknowledgement')
+        self._send_ebxml_message(parsed_message, is_positive_ack=True, additional_context={})
+
+    def _send_nack(self, request_message: ebxml_envelope.EbxmlEnvelope, nack_context):
+        logger.info('012', 'Building and sending negative acknowledgement')
+        self._send_ebxml_message(request_message, is_positive_ack=False, additional_context=nack_context)
+
+    def _send_ebxml_message(self, parsed_message, is_positive_ack, additional_context):
         message_details = parsed_message.message_dictionary
 
-        ack_context = {
+        base_context = {
             ebxml_envelope.FROM_PARTY_ID: self.party_id,
             ebxml_envelope.TO_PARTY_ID: message_details[ebxml_envelope.FROM_PARTY_ID],
             ebxml_envelope.CPA_ID: message_details[ebxml_envelope.CPA_ID],
             ebxml_envelope.CONVERSATION_ID: message_details[ebxml_envelope.CONVERSATION_ID],
-            ebxml_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP: message_details[ebxml_envelope.TIMESTAMP],
+            common_ack_envelope.RECEIVED_MESSAGE_TIMESTAMP: message_details[ebxml_envelope.TIMESTAMP],
             ebxml_envelope.RECEIVED_MESSAGE_ID: message_details[ebxml_envelope.MESSAGE_ID]
         }
 
-        ack_message = ebxml_ack_envelope.EbxmlAckEnvelope(ack_context)
-        message_id, http_headers, serialized_message = ack_message.serialize()
+        base_context.update(additional_context)
+
+        if is_positive_ack:
+            message = ebxml_ack_envelope.EbxmlAckEnvelope(base_context)
+        else:
+            message = ebxml_nack_envelope.EbxmlNackEnvelope(base_context)
+
+        message_id, http_headers, serialized_message = message.serialize()
         for k, v in http_headers.items():
             self.set_header(k, v)
 
@@ -125,7 +183,7 @@ class InboundHandler(tornado.web.RequestHandler):
         logger.info('010', 'Found message id on inbound message.')
         return message_id
 
-    def _extract_incoming_async_request_message(self):
+    def _extract_incoming_ebxml_request_message(self):
         try:
             request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
                                                                                       self.request.body.decode())
@@ -136,16 +194,28 @@ class InboundHandler(tornado.web.RequestHandler):
 
         return request_message
 
-    def _extract_incoming_sync_request_message(self):
+    def _is_message_intended_for_receiving_mhs(self, request_message):
+        """
+        Asserts whether the incoming message was intended for thi MHS instance given the to party key defined in the
+        message.
+
+        error_code, severity and description defined as per the TMS Error Base v3.0 document
+
+        :param request_message: the parsed ebxml request message
+        """
+        return self.party_id == request_message.message_dictionary[ebxml_envelope.TO_PARTY_ID]
+
+    def _return_message_to_message_initiator(self, request_message):
         try:
-            request_message = SoapEnvelope.from_string(self.request.headers,
-                                                       self.request.body.decode())
-        except SoapParsingError as e:
-            logger.error('021', 'Failed to parse response: {exception}', {'exception': e})
-            raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
-                                        reason=f'Exception during inbound message parsing {e}') from e
-
-        return request_message
-
-    def _is_async_request(self):
-        return 'multipart/related' in self.request.headers[CONTENT_TYPE_HEADER_NAME]
+            # these values are taken defined as per the TMS Error Base v3.0 document
+            nack_context = {
+                ebxml_envelope.ERROR_CODE: "ValueNotRecognized",
+                ebxml_envelope.DESCRIPTION: "501314:Invalid To Party Type attribute",
+                ebxml_envelope.SEVERITY: "Error"
+            }
+            self._send_nack(request_message, nack_context)
+        except Exception as e:
+            logger.error('005', 'Exception when sending nack {exception}', {'exception': e})
+            raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
+                                             ' failed to complete workflow',
+                                        reason=f'Exception in workflow') from e

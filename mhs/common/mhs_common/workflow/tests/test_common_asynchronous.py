@@ -8,8 +8,10 @@ from utilities.test_utilities import async_test
 import mhs_common.state.work_description as wd
 from mhs_common.workflow import common_asynchronous
 
+
 SERVICE = 'service'
 ACTION = 'action'
+ODS_CODE = 'some-code'
 SERVICE_ID = SERVICE + ":" + ACTION
 INTERACTION_DETAILS = {
     'service': SERVICE,
@@ -63,9 +65,9 @@ class TestCommonAsynchronousWorkflow(unittest.TestCase):
         self.mock_routing_reliability.get_reliability.return_value = test_utilities.awaitable(
             EXPECTED_RELIABILITY_DETAILS)
 
-        reliability_details = await self.workflow._lookup_reliability_details(INTERACTION_DETAILS)
+        reliability_details = await self.workflow._lookup_reliability_details(INTERACTION_DETAILS, ODS_CODE)
 
-        self.mock_routing_reliability.get_reliability.assert_called_with(SERVICE_ID)
+        self.mock_routing_reliability.get_reliability.assert_called_with(SERVICE_ID, ODS_CODE)
         self.assertEqual(reliability_details, EXPECTED_RELIABILITY_DETAILS)
 
     @async_test

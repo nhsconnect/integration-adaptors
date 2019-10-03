@@ -64,7 +64,7 @@ class Hl7XmlResponseAssertor(object):
         :param xpath: the xpath of the element
         :return: the matching element
         """
-        hl7_xpath = re.sub(r"[\/]{2}", "//hl7:", xpath)
+        hl7_xpath = re.sub(r"[/]{2}", "//hl7:", xpath)
         element_matching_xpath = self.root_xml.find(hl7_xpath, namespaces={'hl7': 'urn:hl7-org:v3'})
         self.assertor.assertIsNotNone(element_matching_xpath,
                                       f"element with xpath: {hl7_xpath} not found in: {self.root_xml}")

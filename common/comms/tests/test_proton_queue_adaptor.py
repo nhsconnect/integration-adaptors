@@ -7,7 +7,9 @@ import comms.proton_queue_adaptor
 import utilities.test_utilities
 
 TEST_UUID = "TEST UUID"
-TEST_MESSAGE = "TEST MESSAGE"
+TEST_MESSAGE = {'test': 'message'}
+# Hardcoded serialisation as we use json.dumps in the code being tested, so want to avoid testing code with itself
+TEST_MESSAGE_SERIALISED = '{"test": "message"}'
 TEST_PROPERTIES = {'test-property-name': 'test-property-value'}
 TEST_PROTON_MESSAGE = unittest.mock.Mock()
 TEST_QUEUE_HOST = "TEST QUEUE HOST"
@@ -57,7 +59,7 @@ class TestProtonQueueAdaptor(unittest.TestCase):
         self.assertEqual(TEST_QUEUE_HOST, proton_messaging_handler._host)
         self.assertEqual(TEST_QUEUE_USERNAME, proton_messaging_handler._username)
         self.assertEqual(TEST_QUEUE_PASSWORD, proton_messaging_handler._password)
-        self.assertEqual(TEST_MESSAGE, proton_messaging_handler._message.body)
+        self.assertEqual(TEST_MESSAGE_SERIALISED, proton_messaging_handler._message.body)
         self.assertEqual(TEST_UUID, proton_messaging_handler._message.id)
         self.assertEqual(properties, proton_messaging_handler._message.properties)
 

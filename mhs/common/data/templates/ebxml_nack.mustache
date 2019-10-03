@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">{{from_party_id}}</eb:PartyId>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">{{to_party_id}}</eb:PartyId>
+            </eb:To>
+            <eb:CPAId>{{cpa_id}}</eb:CPAId>
+            <eb:ConversationId>{{conversation_id}}</eb:ConversationId>
+            <eb:Service>{{service}}</eb:Service>
+            <eb:Action>{{action}}</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>{{message_id}}</eb:MessageId>
+                <eb:Timestamp>{{received_message_timestamp}}</eb:Timestamp>
+                <eb:RefToMessageId>{{received_message_id}}</eb:RefToMessageId>
+            </eb:MessageData>
+        </eb:MessageHeader>
+        <eb:ErrorList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="urn:hl7-org:v3" eb:version="2.0" soap:mustUnderstand="1" eb:highestSeverity="Error">
+            <eb:Error eb:errorCode="{{error_code}}" eb:severity="{{severity}}">
+            <eb:Description>{{description}}</eb:Description>
+          </eb:Error>
+        </eb:ErrorList>
+    </soap:Header>
+    <soap:Body/>
+</soap:Envelope>
