@@ -19,15 +19,24 @@ class MessageStatus(str, enum.Enum):
     OUTBOUND_MESSAGE_ACKD = 'OUTBOUND_MESSAGE_ACKD'
     OUTBOUND_MESSAGE_TRANSMISSION_FAILED = 'OUTBOUND_MESSAGE_TRANSMISSION_FAILED'
     OUTBOUND_MESSAGE_NACKD = 'OUTBOUND_MESSAGE_NACKD'
+
     OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED = 'OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED'
     OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND = 'OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND'
     OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED = 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED'
+
     OUTBOUND_MESSAGE_RESPONSE_RECEIVED = 'OUTBOUND_MESSAGE_RESPONSE_RECEIVED'
+
     INBOUND_RESPONSE_RECEIVED = 'INBOUND_RESPONSE_RECEIVED'
     INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED = 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'
     INBOUND_RESPONSE_FAILED = 'INBOUND_RESPONSE_FAILED'
+
+    UNSOLICITED_INBOUND_RESPONSE_RECEIVED = 'UNSOLICITED_INBOUND_RESPONSE_RECEIVED'
+    UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED = 'UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'
+    UNSOLICITED_INBOUND_RESPONSE_FAILED = 'UNSOLICITED_INBOUND_RESPONSE_FAILED'
+
     INBOUND_SYNC_ASYNC_MESSAGE_STORED = 'INBOUND_SYNC_ASYNC_MESSAGE_STORED'
     INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED = 'INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED'
+
     SYNC_RESPONSE_SUCCESSFUL = "SYNC_RESPONSE_SUCCESSFUL"
     SYNC_RESPONSE_FAILED = "SYNC_RESPONSE_FAILED"
 
@@ -96,6 +105,9 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
     """
     Attempts to retrieve and deserialize a work description instance from the given persistence store to create
     a local work description
+    :param persistence_store: persistence store to search for work description instance in
+    :param key: key to look for
+    :raise EmptyWorkDescriptionError: when no work description is found for the given key
     """
 
     if persistence_store is None:
@@ -107,7 +119,7 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
 
     json_store_data = await persistence_store.get(key)
     if json_store_data is None:
-        logger.error('0004', 'Persistence store returned empty value for {key}', {'key': key})
+        logger.info('0004', 'Persistence store returned empty value for {key}', {'key': key})
         raise EmptyWorkDescriptionError(f'Failed to find a value for key id {key}')
 
     return WorkDescription(persistence_store, json_store_data)

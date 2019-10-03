@@ -70,6 +70,10 @@ locals {
     {
       name = "MHS_SPINE_ORG_CODE",
       value = var.mhs_spine_org_code
+    },
+    {
+      name = "MHS_FORWARD_RELIABLE_ENDPOINT_URL",
+      value = var.mhs_forward_reliable_endpoint_url
     }
   ]
   mhs_outbound_base_secrets = [

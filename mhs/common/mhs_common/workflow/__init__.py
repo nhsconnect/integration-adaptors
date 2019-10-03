@@ -9,7 +9,7 @@ from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.asynchronous_express import AsynchronousExpressWorkflow
 from mhs_common.workflow.asynchronous_reliable import AsynchronousReliableWorkflow
 from mhs_common.workflow.common import CommonWorkflow
-from mhs_common.workflow.intermediary_reliable import IntermediaryReliableWorkflow
+from mhs_common.workflow.asynchronous_forward_reliable import AsynchronousForwardReliableWorkflow
 from mhs_common.workflow.sync_async import SyncAsyncWorkflow
 from mhs_common.workflow.sync_async_resynchroniser import SyncAsyncResynchroniser
 from mhs_common.workflow.synchronous import SynchronousWorkflow
@@ -45,11 +45,15 @@ def get_workflow_map(party_key: str = None,
                                                    persistence_store_max_retries=persistence_store_max_retries,
                                                    routing=routing),
         ASYNC_RELIABLE: AsynchronousReliableWorkflow(party_key, work_description_store, transmission,
-                                                   inbound_async_queue, inbound_queue_max_retries,
-                                                   inbound_queue_retry_delay,
-                                                   persistence_store_max_retries=persistence_store_max_retries,
-                                                   routing=routing),
-        FORWARD_RELIABLE: IntermediaryReliableWorkflow(),
+                                                     inbound_async_queue, inbound_queue_max_retries,
+                                                     inbound_queue_retry_delay,
+                                                     persistence_store_max_retries=persistence_store_max_retries,
+                                                     routing=routing),
+        FORWARD_RELIABLE: AsynchronousForwardReliableWorkflow(party_key, work_description_store, transmission,
+                                                              inbound_async_queue, inbound_queue_max_retries,
+                                                              inbound_queue_retry_delay,
+                                                              persistence_store_max_retries=persistence_store_max_retries,
+                                                              routing=routing),
 
         SYNC_ASYNC: SyncAsyncWorkflow(sync_async_store=sync_async_store,
                                       sync_async_store_retry_delay=sync_async_store_retry_delay,

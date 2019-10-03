@@ -1,4 +1,5 @@
 import asyncio
+import functools
 
 
 def async_test(f):
@@ -10,6 +11,7 @@ def async_test(f):
     :param f:
     :return:
     """
+    functools.wraps(f)
     def wrapper(*args, **kwargs):
         coro = asyncio.coroutine(f)
         future = coro(*args, **kwargs)
