@@ -209,6 +209,7 @@ class InboundHandler(base_handler.BaseHandler):
 
         if self.party_id != request_message.message_dictionary[ebxml_envelope.TO_PARTY_ID]:
             try:
+                # these values are taken defined as per the TMS Error Base v3.0 document
                 nack_context = {
                     ebxml_envelope.ERROR_CODE: "ValueNotRecognized",
                     ebxml_envelope.DESCRIPTION: "501314:Invalid To Party Type attribute",
