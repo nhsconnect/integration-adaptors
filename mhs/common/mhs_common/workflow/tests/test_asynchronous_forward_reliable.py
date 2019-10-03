@@ -424,6 +424,45 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                     self.mock_transmission_adaptor.make_request.reset_mock()
                     mock_sleep.reset_mock()
 
+    @mock.patch('asyncio.sleep')
+    @async_test
+    async def test_soap_error_request_retry_logic_makes_two_requests_if_retry_is_set_to_one(self, mock_sleep):
+        self.workflow = forward_reliable.AsynchronousForwardReliableWorkflow(
+            party_key=FROM_PARTY_KEY,
+            persistence_store=self.mock_persistence_store,
+            transmission=self.mock_transmission_adaptor,
+            queue_adaptor=self.mock_queue_adaptor,
+            # Set number of retries to 1
+            inbound_queue_max_retries=1,
+            inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+            persistence_store_max_retries=3,
+            routing=self.mock_routing_reliability
+        )
+
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+        mock_sleep.return_value = test_utilities.awaitable(None)
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        error_response = mock.MagicMock()
+        error_response.code = 500
+        error_response.headers = {'Content-Type': 'text/xml'}
+        error_response.body = FileUtilities.get_file_string(
+            Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+
+        success_response = mock.MagicMock()
+        success_response.code = 202
+
+        self.mock_transmission_adaptor.make_request.side_effect = [test_utilities.awaitable(error_response),
+                                                                   test_utilities.awaitable(success_response)]
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                        INTERACTION_DETAILS, PAYLOAD, None)
+
+        self.assertEqual(self.mock_transmission_adaptor.make_request.call_count, 2)
+        mock_sleep.assert_called_once_with(MHS_RETRY_INTERVAL_VAL_IN_SECONDS)
+
     @async_test
     async def test_soap_error_request_is_non_retriable(self):
         self.setup_mock_work_description()
