@@ -206,3 +206,24 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED',
                 'WORKFLOW': 'sync-async'
             })
+
+    def test_should_record_message_received_when_bad_request_returned_to_client(self):
+        """
+        Generate bad request through providing an empty payload
+        """
+        # Arrange
+        message_id = "569DC3C6-C8B5-4A2E-8F81-1EF465DF25B5"
+
+        # Act
+        MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='BLAH', message_id=message_id, sync_async=False) \
+            .with_body(dict()) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+            .assert_single_item_exists_with_key(message_id) \
+            .assert_item_contains_values({
+            'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_RECEIVED',
+            'WORKFLOW': 'async-express'
+        })

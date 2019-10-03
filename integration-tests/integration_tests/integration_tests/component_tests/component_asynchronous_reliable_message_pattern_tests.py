@@ -200,3 +200,24 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED',
                 'WORKFLOW': 'sync-async'
             })
+
+    def test_should_record_message_received_when_bad_request_returned_to_client(self):
+        """
+        Generate bad request through providing invalid interaction_id
+        """
+        # Arrange
+        message, message_id = build_message('QUPC_IN160101UK05', message_id="DAC65DEE-5E16-42E2-B8B7-7A6412EE39BC")
+
+        # Act
+        MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='BLAH', message_id=message_id, sync_async=False) \
+            .with_body(message) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+            .assert_single_item_exists_with_key(message_id) \
+            .assert_item_contains_values({
+            'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_RECEIVED',
+            'WORKFLOW': 'async-reliable'
+        })
