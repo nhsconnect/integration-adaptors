@@ -107,7 +107,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
             {
                 'INBOUND_STATUS': None,
                 'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_NACKD',
-                'WORKFLOW': 'async-express'
+                'WORKFLOW': 'async-reliable'
             })
 
     def test_should_return_information_in_ebxml_fault_returned_from_spine_in_original_post_request_to_client(self):
