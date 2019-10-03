@@ -1,13 +1,14 @@
 """This module defines the sync-async workflow."""
-import asyncio
 from typing import Tuple, Optional
+
 from utilities import integration_adaptors_logger as log
-from mhs_common.state import work_description as wd
-from mhs_common.workflow import common_synchronous
-from mhs_common.state import persistence_adaptor as pa
-from exceptions import MaxRetriesExceeded
-from mhs_common.workflow import common
+
 from mhs_common import workflow
+from mhs_common.retry import retriable_action
+from mhs_common.state import persistence_adaptor as pa
+from mhs_common.state import work_description as wd
+from mhs_common.workflow import common
+from mhs_common.workflow import common_synchronous
 from mhs_common.workflow import sync_async_resynchroniser
 
 logger = log.IntegrationAdaptorsLogger('MHS_SYNC_ASYNC_WORKFLOW')
@@ -15,6 +16,11 @@ logger = log.IntegrationAdaptorsLogger('MHS_SYNC_ASYNC_WORKFLOW')
 ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 MESSAGE_DATA = 'data'
 CORRELATION_ID = 'correlation_id'
+
+
+class SyncAsyncStoreFailure(RuntimeError):
+    """Exception thrown when data could not be added to the sync async store."""
+    pass
 
 
 class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
@@ -62,7 +68,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                              )
 
         status_code, response, _ = await async_workflow.handle_outbound_message(from_asid, message_id, correlation_id,
-                                                                                  interaction_details, payload, wdo)
+                                                                                interaction_details, payload, wdo)
         if not status_code == 202:
             logger.warning('0002', 'No ACK received ')
             return status_code, response, wdo
@@ -104,22 +110,18 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
     async def _add_to_sync_async_store(self, key, data):
         logger.info('002', 'Attempting to add inbound message to sync-async store')
-        retry = self.persistence_store_retries
-        while True:
-            try:
-                await self.sync_async_store.add(key, data)
-                logger.info('003', 'Successfully updated state store')
-                break
-            except Exception as e:
-                logger.warning('021', 'Exception raised while adding to sync-async store {exception} {retry}',
-                               {'exception': e, 'retry': retry})
-                retry -= 1
-                if retry == 0:
-                    logger.error('022', 'Final retry has been attempted for adding message to sync async store')
-                    raise MaxRetriesExceeded('Max number of retries exceeded whilst attempting to put the message'
-                                             'on the sync-async store') from e
+        retry_result = await retriable_action.RetriableAction(lambda: self.sync_async_store.add(key, data),
+                                                              self.persistence_store_retries,
+                                                              self.sync_async_store_retry_delay).execute()
 
-                await asyncio.sleep(self.sync_async_store_retry_delay)
+        if not retry_result.is_successful:
+            logger.error('022', 'Final retry has been attempted for adding message to sync async store')
+
+            exception_raised = retry_result.exception
+            if exception_raised:
+                raise exception_raised
+
+            raise SyncAsyncStoreFailure
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         await wd.update_status_with_retries(wdo,
@@ -135,4 +137,3 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                             wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND,
                                             self.persistence_store_retries
                                             )
-
