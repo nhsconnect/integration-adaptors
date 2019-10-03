@@ -69,6 +69,7 @@ async def update_status_with_retries(wdo: WorkDescription,
     :param update_status_method: The method to use to update the status.
     :param status: The new status to set.
     :param retries: The number of times to retry updating the work description if the first attempt fails.
+    :param: retry_delay: The time (in seconds) to wait before retrying the update.
     :raises: OutOfDateVersionError if the local version of the work description is behind the remote version.
     :raises: WorkDescriptionUpdateFailedError if the work description could not be updated after retrying.
     """
