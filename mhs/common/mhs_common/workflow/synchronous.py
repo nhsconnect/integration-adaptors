@@ -59,7 +59,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             to_asid = endpoint_details[self.ENDPOINT_TO_ASID]
         except Exception:
             logger.error('009', 'Failed to retrieve details from spine route lookup')
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Error obtaining outbound URL', None
 
         try:
@@ -91,7 +91,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return code, error, wdo
 
         except Exception as e:
-            logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            logger.error('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
