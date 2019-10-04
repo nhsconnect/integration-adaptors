@@ -47,6 +47,7 @@ SERIALIZED_MESSAGE = 'serialized-message'
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
 INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
+MAX_REQUEST_SIZE=5_000_000
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
@@ -80,6 +81,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                                                                     queue_adaptor=self.mock_queue_adaptor,
                                                                     inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
                                                                     inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+                                                                    max_request_size=MAX_REQUEST_SIZE,
                                                                     persistence_store_max_retries=3,
                                                                     routing=self.mock_routing_reliability)
 
@@ -192,6 +194,25 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
         self.mock_work_description.publish.assert_called_once()
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED),
+                          mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+                         self.mock_work_description.set_outbound_status.call_args_list)
+        self.mock_transmission_adaptor.make_request.assert_not_called()
+
+    @async_test
+    async def test_handle_outbound_message_fails_with_serialised_message_too_large(self):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (
+            MESSAGE_ID, HTTP_HEADERS, 'e' * (MAX_REQUEST_SIZE + 1))
+
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
+
+        self.assertEqual(400, status)
+        self.assertIn('Request to send to Spine is too large', message)
         self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED),
                           mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
@@ -406,6 +427,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             # Set number of retries to 1
             inbound_queue_max_retries=1,
             inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+            max_request_size=MAX_REQUEST_SIZE,
             persistence_store_max_retries=3,
             routing=self.mock_routing_reliability
         )

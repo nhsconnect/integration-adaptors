@@ -447,18 +447,6 @@ class TestSynchronousHandlerRequestBodyValidation(BaseHandlerTest):
                 response_body = self._make_request_and_check_invalid_request_response(sub_test)
                 self.assertIn("Missing data for required field", response_body)
 
-    def test_post_with_empty_string_in_request_body(self):
-        sub_tests = [
-            {"request_body": {"payload": ""}, "field_name": "payload"},
-            {"request_body": {"payload": "test", "attachments": [
-                {"is_base64": False, "content_type": "text/plain", "payload": "some payload", "description": ""}]},
-             "field_name": "description"},
-        ]
-        for sub_test in sub_tests:
-            with self.subTest(field_with_empty_string=sub_test["field_name"]):
-                response_body = self._make_request_and_check_invalid_request_response(sub_test)
-                self.assertIn("Shorter than minimum length 1", response_body)
-
     def test_post_with_field_of_incorrect_type_in_request_body(self):
         sub_tests = [
             {"request_body": {"payload": True}, "field_name": "payload"},
@@ -517,6 +505,29 @@ class TestSynchronousHandlerRequestBodyValidation(BaseHandlerTest):
                 response_body = self._make_request_and_check_invalid_request_response(
                     {'request_body': request_body, 'field_name': "payload"})
                 self.assertIn("Length must be between 1 and 5000000", response_body)
+
+    def test_post_with_request_body_with_hl7_payload_wrong_size(self):
+        payloads = ["", "e" * 5_000_001]
+        for payload in payloads:
+            with self.subTest(payload_size=len(payload)):
+                request_body = {"payload": payload}
+                response_body = self._make_request_and_check_invalid_request_response(
+                    {'request_body': request_body, 'field_name': "payload"})
+                self.assertIn("Length must be between 1 and 5000000", response_body)
+
+    def test_post_with_request_body_with_attachment_description_wrong_size(self):
+        descriptions = ["", "e" * 101]
+        for description in descriptions:
+            with self.subTest(description_size=len(description)):
+                request_body = {"payload": "test",
+                                "attachments": [{
+                                    "is_base64": False,
+                                    "content_type": "text/plain",
+                                    "payload": "some payload",
+                                    "description": description}]}
+                response_body = self._make_request_and_check_invalid_request_response(
+                    {'request_body': request_body, 'field_name': "description"})
+                self.assertIn("Length must be between 1 and 100", response_body)
 
     def test_post_with_request_body_with_too_many_attachments(self):
         attachment = {
