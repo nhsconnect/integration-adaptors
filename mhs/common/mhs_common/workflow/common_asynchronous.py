@@ -92,7 +92,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         try:
             response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
         except Exception as e:
-            logger.error('0008', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            logger.error('0011', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
