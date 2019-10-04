@@ -104,7 +104,10 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         try:
             await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: payload})
             logger.info('0007', 'Placed message in sync-async store successfully')
-            await work_description.set_inbound_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
+            await wd.update_status_with_retries(work_description,
+                                                work_description.set_inbound_status,
+                                                wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED,
+                                                self.persistence_store_retries)
         except Exception as e:
             logger.error('0008', 'Failed to write to sync-async store')
             await work_description.set_inbound_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)

@@ -125,7 +125,10 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, payload)
 
         logger.info('0015', 'Placed message onto inbound queue successfully')
-        await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
+        await wd.update_status_with_retries(work_description,
+                                            work_description.set_inbound_status,
+                                            wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
+                                            self.store_retries)
         logger.audit('0104', '{WorkflowName} inbound workflow completed. Message placed on queue, returning '
                              '{Acknowledgement} to spine',
                      {'Acknowledgement': wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
@@ -146,7 +149,10 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                     logger.error("0013",
                                  "Exceeded the maximum number of retries, {max_retries} retries, when putting "
                                  "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
-                    await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
+                    await wd.update_status_with_retries(work_description,
+                                                        work_description.set_inbound_status,
+                                                        wd.MessageStatus.INBOUND_RESPONSE_FAILED,
+                                                        self.store_retries)
                     raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
                                              'been exceeded') from e
 
