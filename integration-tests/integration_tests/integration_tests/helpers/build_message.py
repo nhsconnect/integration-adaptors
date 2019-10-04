@@ -18,7 +18,10 @@ DOCUMENT_TYPE = 'documentType'
 TO_ASID = 'to_asid'
 
 
-def build_message(template, patient_nhs_number='9446245796', message_id: str = None, to_party_id='YES-0000806',
+def build_message(template,
+                  patient_nhs_number='9446245796',
+                  message_id: str = None,
+                  to_party_id='YES-0000806',
                   to_asid='928942012545'):
     """Build an upload message
 
