@@ -25,6 +25,8 @@ class CommonWorkflow(abc.ABC):
     ENDPOINT_SERVICE_ID = 'service_id'
     ENDPOINT_CPA_ID = 'cpa_id'
 
+    workflow_name: str
+
     def __init__(self, routing: routing_reliability.RoutingAndReliability = None):
         self.routing_reliability = routing
         self.workflow_specific_interaction_details = dict()
@@ -87,8 +89,12 @@ class CommonWorkflow(abc.ABC):
         try:
             service_id = await self._build_service_id(interaction_details)
 
+            ods_code = interaction_details.get('ods-code')
+            if ods_code:
+                logger.info('0020', 'Looking up endpoint details for ods code: {ods_code}.', {'ods_code': ods_code})
+
             logger.info('0001', 'Looking up endpoint details for {service_id}.', {'service_id': service_id})
-            endpoint_details = await self.routing_reliability.get_end_point(service_id)
+            endpoint_details = await self.routing_reliability.get_end_point(service_id, ods_code)
 
             url = CommonWorkflow._extract_endpoint_url(endpoint_details)
             to_party_key = endpoint_details[MHS_TO_PARTY_KEY_KEY]

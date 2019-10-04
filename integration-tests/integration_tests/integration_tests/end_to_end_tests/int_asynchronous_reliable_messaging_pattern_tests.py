@@ -53,6 +53,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
         AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
             .assert_property('message-id', message_id) \
             .assert_property('correlation-id', '1') \
+            .assert_json_content_type() \
             .assertor_for_hl7_xml_message() \
             .assert_element_exists_with_value('.//requestSuccessDetail//detail', 'GP Summary upload successful')
 

@@ -1,6 +1,9 @@
-from mhs_common.state import persistence_adaptor
-from utilities import integration_adaptors_logger as log
 import asyncio
+
+from utilities import integration_adaptors_logger as log
+
+from mhs_common.retry import retriable_action
+from mhs_common.state import persistence_adaptor
 
 logger = log.IntegrationAdaptorsLogger('RESYNCHRONISER')
 
@@ -28,21 +31,18 @@ class SyncAsyncResynchroniser(object):
         self.initial_delay = initial_delay
 
     async def pause_request(self, message_id: str) -> dict:
-        retries = 0
-        logger.info('001', 'Beginning async retrieval from sync-async store')
+        logger.info('0001', 'Beginning async retrieval from sync-async store')
 
         await asyncio.sleep(self.initial_delay)
 
-        while retries < self.max_retries:
-            item = await self.sync_async_store.get(message_id)
-            if item is not None:
-                logger.info('002', 'Message found in sync-async store, ending polling')
-                return item
-            logger.warning('003', f'Failed to find async response after {retries} of {self.max_retries}')
-            retries += 1
+        retry_result = await retriable_action.RetriableAction(lambda: self.sync_async_store.get(message_id),
+                                                              self.max_retries, self.retry_interval) \
+            .with_success_check(lambda i: i is not None) \
+            .with_retriable_exception_check(lambda e: e is None) \
+            .execute()
 
-            if not retries == self.max_retries:
-                await asyncio.sleep(self.retry_interval)
+        if not retry_result.is_successful:
+            logger.error('0002', 'Resync retries exceeded. {max_retries}', {'max_retries': self.max_retries})
+            raise SyncAsyncResponseException('Polling on the sync async store timed out')
 
-        logger.error('004', 'Resync retries exceeded, attempted {retries}', {'retries': retries})
-        raise SyncAsyncResponseException('Polling on the sync async store timed out')
+        return retry_result.result

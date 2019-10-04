@@ -1,11 +1,13 @@
 from __future__ import annotations
-from typing import Optional
-import utilities.integration_adaptors_logger as log
 
+import enum
+from typing import Optional
+
+import utilities.integration_adaptors_logger as log
 from utilities import timing
 
+from mhs_common.retry import retriable_action
 from mhs_common.state import persistence_adaptor as pa
-import enum
 
 logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
 
@@ -17,15 +19,24 @@ class MessageStatus(str, enum.Enum):
     OUTBOUND_MESSAGE_ACKD = 'OUTBOUND_MESSAGE_ACKD'
     OUTBOUND_MESSAGE_TRANSMISSION_FAILED = 'OUTBOUND_MESSAGE_TRANSMISSION_FAILED'
     OUTBOUND_MESSAGE_NACKD = 'OUTBOUND_MESSAGE_NACKD'
+
     OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED = 'OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED'
     OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND = 'OUTBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_RESPOND'
     OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED = 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED'
+
     OUTBOUND_MESSAGE_RESPONSE_RECEIVED = 'OUTBOUND_MESSAGE_RESPONSE_RECEIVED'
+
     INBOUND_RESPONSE_RECEIVED = 'INBOUND_RESPONSE_RECEIVED'
     INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED = 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'
     INBOUND_RESPONSE_FAILED = 'INBOUND_RESPONSE_FAILED'
+
+    UNSOLICITED_INBOUND_RESPONSE_RECEIVED = 'UNSOLICITED_INBOUND_RESPONSE_RECEIVED'
+    UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED = 'UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED'
+    UNSOLICITED_INBOUND_RESPONSE_FAILED = 'UNSOLICITED_INBOUND_RESPONSE_FAILED'
+
     INBOUND_SYNC_ASYNC_MESSAGE_STORED = 'INBOUND_SYNC_ASYNC_MESSAGE_STORED'
     INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED = 'INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED'
+
     SYNC_RESPONSE_SUCCESSFUL = "SYNC_RESPONSE_SUCCESSFUL"
     SYNC_RESPONSE_FAILED = "SYNC_RESPONSE_FAILED"
 
@@ -50,41 +61,65 @@ class EmptyWorkDescriptionError(RuntimeError):
     pass
 
 
+class WorkDescriptionUpdateFailedError(RuntimeError):
+    """Exception thrown when a work description could not be updated."""
+    pass
+
+
 async def update_status_with_retries(wdo: WorkDescription,
                                      update_status_method,
                                      status: MessageStatus,
-                                     retries: int):
-    attempts = 1
-    while attempts < retries + 1:
-        try:
-            await wdo.update()
-            await update_status_method(status)
-            break
-        except OutOfDateVersionError as e:
-            logger.warning('0021', f'Failed attempt to update state store on retry {attempts} of {retries}')
-            if attempts == retries:
-                logger.error('0022', 'Maximum number of retries reached for attempting to update state store')
-                raise e
-            else:
-                attempts += 1
+                                     retries: int,
+                                     retry_delay=0) -> None:
+    """Update the status of the work description using the method provided. If the update fails, retries a configurable
+    number of times.
+
+    :param wdo: The work description object to be updated.
+    :param update_status_method: The method to use to update the status.
+    :param status: The new status to set.
+    :param retries: The number of times to retry updating the work description if the first attempt fails.
+    :param: retry_delay: The time (in seconds) to wait before retrying the update.
+    :raises: OutOfDateVersionError if the local version of the work description is behind the remote version.
+    :raises: WorkDescriptionUpdateFailedError if the work description could not be updated after retrying.
+    """
+
+    async def update_status():
+        await wdo.update()
+        await update_status_method(status)
+
+    retry_result = await retriable_action.RetriableAction(update_status, retries, retry_delay) \
+        .with_retriable_exception_check(lambda e: isinstance(e, OutOfDateVersionError)) \
+        .execute()
+
+    if not retry_result.is_successful:
+        logger.error('0001', 'Failed to update work description.')
+
+        exception_raised = retry_result.exception
+        if exception_raised:
+            raise exception_raised
+
+        raise WorkDescriptionUpdateFailedError
 
 
 async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> WorkDescription:
     """
     Attempts to retrieve and deserialize a work description instance from the given persistence store to create
     a local work description
+    :param persistence_store: persistence store to search for work description instance in
+    :param key: key to look for
+    :raise EmptyWorkDescriptionError: when no work description is found for the given key
     """
 
     if persistence_store is None:
-        logger.error('001', 'Failed to get work description from store: persistence store is None')
+        logger.error('0002', 'Failed to get work description from store: persistence store is None')
         raise ValueError('Expected non-null persistence store')
     if key is None:
-        logger.error('002', 'Failed to get work description from store: key is None')
+        logger.error('0003', 'Failed to get work description from store: key is None')
         raise ValueError('Expected non-null key')
 
     json_store_data = await persistence_store.get(key)
     if json_store_data is None:
-        logger.error('003', 'Persistence store returned empty value for {key}', {'key': key})
+        logger.info('0004', 'Persistence store returned empty value for {key}', {'key': key})
         raise EmptyWorkDescriptionError(f'Failed to find a value for key id {key}')
 
     return WorkDescription(persistence_store, json_store_data)
@@ -101,17 +136,17 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     until a `publish` is executed
     """
     if persistence_store is None:
-        logger.error('004', 'Failed to build new work description, persistence store should not be null')
+        logger.error('0005', 'Failed to build new work description, persistence store should not be null')
         raise ValueError('Expected persistence store to not be None')
     if not key:
-        logger.error('005', 'Failed to build new work description, key should not be null or empty')
+        logger.error('0006', 'Failed to build new work description, key should not be null or empty')
         raise ValueError('Expected key to not be None or empty')
     if workflow is None:
-        logger.error('008', 'Failed to build new work description, workflow should not be null')
+        logger.error('0007', 'Failed to build new work description, workflow should not be null')
         raise ValueError('Expected workflow to not be None')
     if not inbound_status and not outbound_status:
-        logger.error('007', 'Failed to build work description, expected inbound or outbound status to be present:'
-                            '{inbound} {outbound}', {'inbound': inbound_status, 'outbound': outbound_status})
+        logger.error('0008', 'Failed to build work description, expected inbound or outbound status to be present:'
+                             '{inbound} {outbound}', {'inbound': inbound_status, 'outbound': outbound_status})
         raise ValueError('Expected inbound/outbound to not be null')
 
     timestamp = timing.get_time()
@@ -151,29 +186,29 @@ class WorkDescription(object):
         collisions
         :return:
         """
-        logger.info('011', 'Attempting to publish work description {key}', {'key': self.message_key})
-        logger.info('012', 'Retrieving latest work description to check version')
+        logger.info('0009', 'Attempting to publish work description {key}', {'key': self.message_key})
+        logger.info('0010', 'Retrieving latest work description to check version')
 
         latest_data = await self.persistence_store.get(self.message_key)
 
         if latest_data is not None:
-            logger.info('013', 'Retrieved previous version, comparing versions')
+            logger.info('0011', 'Retrieved previous version, comparing versions')
             latest_version = latest_data[DATA][VERSION_KEY]
             if latest_version == self.version:
-                logger.info('017', 'Local version matches remote, incrementing local version number')
+                logger.info('0012', 'Local version matches remote, incrementing local version number')
                 self.version += 1
             elif latest_version > self.version:
-                logger.error('014', 'Failed to update message {key}, local version out of date',
+                logger.error('0013', 'Failed to update message {key}, local version out of date',
                              {'key': self.message_key})
                 raise OutOfDateVersionError(f'Failed to update message {self.message_key}: local version out of date')
 
         else:
-            logger.info('015', 'No previous version found, continuing attempt to publish new version')
+            logger.info('0014', 'No previous version found, continuing attempt to publish new version')
         self.last_modified_timestamp = timing.get_time()
         serialised = self._serialise_data()
 
         old_data = await self.persistence_store.add(self.message_key, serialised)
-        logger.info('016', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
+        logger.info('0015', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
         return old_data
 
     async def update(self):
@@ -183,7 +218,7 @@ class WorkDescription(object):
         """
         json_store_data = await self.persistence_store.get(self.message_key)
         if json_store_data is None:
-            logger.error('006', 'Persistence store returned empty value for {key}', {'key': self.message_key})
+            logger.error('0016', 'Persistence store returned empty value for {key}', {'key': self.message_key})
             raise EmptyWorkDescriptionError(f'Failed to find a value for key id {self.message_key}')
         self._deserialize_data(json_store_data)
 
