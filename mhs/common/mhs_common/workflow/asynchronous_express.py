@@ -29,12 +29,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
                  inbound_queue_max_retries: int = None,
                  inbound_queue_retry_delay: int = None,
+                 max_request_size: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
         super().__init__(party_key, persistence_store, transmission,
-                                                          queue_adaptor, inbound_queue_max_retries,
-                                                          inbound_queue_retry_delay, persistence_store_max_retries,
-                                                          routing)
+                         queue_adaptor, inbound_queue_max_retries,
+                         inbound_queue_retry_delay, max_request_size,
+                         persistence_store_max_retries, routing)
 
         self.workflow_specific_interaction_details = dict(duplicate_elimination=False,
                                                           ack_requested=False,
@@ -62,14 +63,13 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
             to_party_key = details[self.ENDPOINT_PARTY_KEY]
             cpa_id = details[self.ENDPOINT_CPA_ID]
         except Exception:
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Error obtaining outbound URL', None
 
         error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
                                                                               interaction_details,
                                                                               payload, wdo, to_party_key, cpa_id)
         if error:
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return error[0], error[1], None
 
         return await self._make_outbound_request_and_handle_response(url, http_headers, message, wdo,

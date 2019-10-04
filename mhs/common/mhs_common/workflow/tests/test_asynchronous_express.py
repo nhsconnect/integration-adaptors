@@ -1,11 +1,11 @@
 import asyncio
+import ssl
 import unittest
 from pathlib import Path
 from unittest import mock
 
 import exceptions
 from comms import proton_queue_adaptor
-from tornado import httpclient
 from utilities import test_utilities
 from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
@@ -47,6 +47,7 @@ SERIALIZED_MESSAGE = 'serialized-message'
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
 INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
+MAX_REQUEST_SIZE=5_000_000
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
@@ -78,6 +79,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                                                   queue_adaptor=self.mock_queue_adaptor,
                                                                   inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
                                                                   inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
+                                                                  max_request_size=MAX_REQUEST_SIZE,
                                                                   persistence_store_max_retries=3,
                                                                   routing=self.mock_routing_reliability)
 
@@ -188,8 +190,25 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
         self.mock_work_description.publish.assert_called_once()
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED),
-                          mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
+                         self.mock_work_description.set_outbound_status.call_args_list)
+        self.mock_transmission_adaptor.make_request.assert_not_called()
+
+    @async_test
+    async def test_handle_outbound_message_fails_with_serialised_message_too_large(self):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (
+            MESSAGE_ID, HTTP_HEADERS, 'e' * (MAX_REQUEST_SIZE + 1))
+
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
+
+        self.assertEqual(400, status)
+        self.assertIn('Request to send to Spine is too large', message)
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
@@ -205,9 +224,32 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertEqual('Error obtaining outbound URL', message)
         self.mock_work_description.publish.assert_called_once()
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
+
+    @async_test
+    async def test_non_http_error_handled_when_making_request_to_spine(self):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        error_future = asyncio.Future()
+        error_future.set_exception(ssl.SSLError())
+        self.mock_transmission_adaptor.make_request.return_value = error_future
+
+        status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                         INTERACTION_DETAILS,
+                                                                         PAYLOAD, None)
+
+        self.assertEqual(500, status)
+        self.assertEqual("Error making outbound request", message)
+        self.mock_work_description.publish.assert_called_once()
+        self.assertEqual(
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
+             mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+            self.mock_work_description.set_outbound_status.call_args_list)
 
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
@@ -219,7 +261,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
-        response = httpclient.HTTPResponse
+        response = mock.MagicMock()
         response.code = 500
         response.body = message
         response.headers = {'Content-Type': 'text/xml'}

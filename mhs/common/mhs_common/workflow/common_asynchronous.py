@@ -32,6 +32,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
                  inbound_queue_max_retries: int = None,
                  inbound_queue_retry_delay: int = None,
+                 max_request_size: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
 
@@ -42,6 +43,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         self.store_retries = persistence_store_max_retries
         self.inbound_queue_max_retries = inbound_queue_max_retries
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
+        self.max_request_size = max_request_size
         super().__init__(routing)
 
     async def _create_new_work_description_if_required(self, message_id: str, wdo: wd.WorkDescription,
@@ -66,11 +68,19 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
         except Exception as e:
-            logger.warning('0004', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
+            logger.error('0009', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return (500, 'Error serialising outbound message'), None, None
 
-        logger.info('0005', 'Message serialised successfully')
+        if len(message) > self.max_request_size:
+            logger.error('0007', 'Request to send to Spine is too large after serialisation. '
+                                 '{RequestSize} {MaxRequestSize}',
+                         {'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+            return (400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '
+                         f'RequestSize={len(message)}'), None, None
+
+        logger.info('0008', 'Message serialised successfully')
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
 
@@ -79,7 +89,12 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             handle_error_response: Callable[[httpclient.HTTPResponse], Tuple[int, str, Optional[wd.WorkDescription]]]):
 
         logger.info('0006', 'About to make outbound request')
-        response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
+        try:
+            response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
+        except Exception as e:
+            logger.error('0011', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            return 500, 'Error making outbound request', None
 
         if response.code == 202:
             logger.audit('0101', '{WorkflowName} outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
@@ -146,11 +161,11 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             logger.info('0001', 'Looking up reliability details for {service_id}.', {'service_id': service_id})
             reliability_details = await self.routing_reliability.get_reliability(service_id, org_code)
 
-            logger.info('0002', 'Retrieved reliability details for {service_id}. {reliability_details}',
+            logger.info('0004', 'Retrieved reliability details for {service_id}. {reliability_details}',
                         {'service_id': service_id, 'reliability_details': reliability_details})
             return reliability_details
         except Exception as e:
-            logger.warning('0003', 'Error encountered whilst obtaining outbound URL. {exception}', {'exception': e})
+            logger.warning('0005', 'Error encountered whilst obtaining outbound URL. {exception}', {'exception': e})
             raise e
 
     async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments=None):

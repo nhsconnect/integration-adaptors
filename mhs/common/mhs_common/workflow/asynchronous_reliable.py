@@ -33,12 +33,13 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
                  inbound_queue_max_retries: int = None,
                  inbound_queue_retry_delay: int = None,
+                 max_request_size: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
         super().__init__(party_key, persistence_store, transmission,
                          queue_adaptor, inbound_queue_max_retries,
-                         inbound_queue_retry_delay, persistence_store_max_retries,
-                         routing)
+                         inbound_queue_retry_delay, max_request_size,
+                         persistence_store_max_retries, routing)
 
         self.workflow_specific_interaction_details = dict(duplicate_elimination=True,
                                                           ack_requested=True,
@@ -63,23 +64,22 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
             to_party_key = details[self.ENDPOINT_PARTY_KEY]
             cpa_id = details[self.ENDPOINT_CPA_ID]
         except Exception:
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Error obtaining outbound URL', None
-
-        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
-                                                                              interaction_details,
-                                                                              payload, wdo, to_party_key, cpa_id)
-        if error:
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
-            return error[0], error[1], None
 
         reliability_details = await self._lookup_reliability_details(interaction_details)
         retry_interval_xml_datetime = reliability_details[common_asynchronous.MHS_RETRY_INTERVAL]
         try:
             retry_interval = DateUtilities.convert_xml_date_time_format_to_seconds(retry_interval_xml_datetime)
         except isoerror.ISO8601Error:
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Error when converting retry interval: {} to seconds'.format(retry_interval_xml_datetime), None
+
+        error, http_headers, message = await self._serialize_outbound_message(message_id, correlation_id,
+                                                                              interaction_details,
+                                                                              payload, wdo, to_party_key, cpa_id)
+        if error:
+            return error[0], error[1], None
 
         return await self._make_outbound_request_with_retries_and_handle_response(url, http_headers, message, wdo,
                                                                                   reliability_details, retry_interval)
@@ -102,7 +102,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                                                              handle_error_response)
             except _NeedToRetryException:
                 retries_remaining[0] -= 1
-                logger.info("0017", "Waiting for {retry_interval} seconds before next request "
+                logger.info("0014", "Waiting for {retry_interval} seconds before next request "
                                     "attempt.", {"retry_interval": retry_interval})
                 await asyncio.sleep(retry_interval)
                 continue
