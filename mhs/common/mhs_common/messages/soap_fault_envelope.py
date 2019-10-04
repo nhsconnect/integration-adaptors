@@ -47,15 +47,11 @@ SOAP_ERRORS_TO_RETRY = [SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE,
                         FAILURE_STORING_VARIABLE_IN_MEMO]
 
 
-def _extract_tag_text(elem: ElementTree, path: AnyStr) -> AnyStr:
-    try:
-        return elem.find(path, NS).text
-    except AttributeError as e:
-        logger.error('0001', f'Error while extracting value of {path}')
-        raise e
-
-
 class SOAPFault(SoapEnvelope):
+    """
+    Class for handling SOAP faults within a SOAP message
+    """
+
     def __init__(self,
                  fault_code: AnyStr,
                  fault_string: AnyStr,
@@ -97,3 +93,11 @@ class SOAPFault(SoapEnvelope):
             if soap_fault_code not in SOAP_ERRORS_TO_RETRY:
                 return False
         return True
+
+    @staticmethod
+    def _extract_tag_text(elem: ElementTree, path: AnyStr) -> AnyStr:
+        try:
+            return elem.find(path, NS).text
+        except AttributeError as e:
+            logger.error('0001', f'Error while extracting value of {path}')
+            raise e

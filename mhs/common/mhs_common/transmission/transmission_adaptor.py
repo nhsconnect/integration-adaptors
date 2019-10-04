@@ -1,3 +1,4 @@
+""" Transmission adaptor provides the ability to make requests to external services """
 import abc
 from typing import Dict
 
@@ -5,6 +6,9 @@ from tornado import httpclient
 
 
 class TransmissionAdaptor(abc.ABC):
+    """
+    Transmission adaptor provides the ability to make requests to external services
+    """
 
     @abc.abstractmethod
     async def make_request(self, url: str, headers: Dict[str, str], message: str,

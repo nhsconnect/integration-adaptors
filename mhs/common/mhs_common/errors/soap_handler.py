@@ -1,3 +1,4 @@
+""" Handles the detection of SOAP errors within a message """
 from typing import Dict, AnyStr, Tuple
 
 from defusedxml import ElementTree

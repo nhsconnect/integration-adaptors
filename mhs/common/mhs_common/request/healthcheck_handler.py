@@ -1,3 +1,4 @@
+""" Provides a request handler that serves as a health check endpoint """
 import tornado.web
 
 

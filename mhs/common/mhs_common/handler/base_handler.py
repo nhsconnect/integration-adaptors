@@ -1,3 +1,4 @@
+""" Contains functions that can be used when handling HTTP requests for the inbound/outbound functionality """
 from typing import Any, Dict
 
 import tornado.web
@@ -22,8 +23,9 @@ class BaseHandler(tornado.web.RequestHandler):
         self.workflows = workflows
         self.config_manager = config_manager
 
-    def write_error(self, status_code: int, **kwargs: Any):
-        reason = self._reason  # Don't inline this, as self.set_status changes self._reason
+    def write_error(self, status_code: int):
+        # Don't inline this, as self.set_status changes self._reason
+        reason = self._reason
         self.set_status(status_code)
         self.set_header('Content-Type', 'text/plain')
         self.finish(f'{status_code}: {reason}')

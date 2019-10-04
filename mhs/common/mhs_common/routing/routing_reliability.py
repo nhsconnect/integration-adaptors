@@ -1,3 +1,4 @@
+""" Provides functionality to retrieve routing and reliability information """
 import json
 from typing import Dict
 
@@ -10,7 +11,7 @@ RELIABILITY_PATH = "reliability"
 logger = log.IntegrationAdaptorsLogger("MHS_ROUTING_RELIABILITY")
 
 
-class RoutingAndReliability:
+class RoutingAndReliability(object):
     """A tool that allows the routing and reliability information for a remote MHS to be retrieved."""
 
     def __init__(self, spine_route_lookup_url: str, spine_org_code: str, client_cert: str = None,

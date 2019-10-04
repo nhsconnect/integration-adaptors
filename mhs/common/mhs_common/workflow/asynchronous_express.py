@@ -37,10 +37,11 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                          inbound_queue_retry_delay, max_request_size,
                          persistence_store_max_retries, routing)
 
-        self.workflow_specific_interaction_details = dict(duplicate_elimination=False,
-                                                          ack_requested=False,
-                                                          ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-                                                          sync_reply=True)
+        self.workflow_specific_interaction_details = dict(
+            duplicate_elimination=False,
+            ack_requested=False,
+            ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
+            sync_reply=True)
         self.workflow_name = workflow.ASYNC_EXPRESS
 
     @timing.time_function

@@ -41,10 +41,11 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                          inbound_queue_retry_delay, max_request_size,
                          persistence_store_max_retries, routing)
 
-        self.workflow_specific_interaction_details = dict(duplicate_elimination=True,
-                                                          ack_requested=True,
-                                                          ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
-                                                          sync_reply=True)
+        self.workflow_specific_interaction_details = dict(
+            duplicate_elimination=True,
+            ack_requested=True,
+            ack_soap_actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH",
+            sync_reply=True)
         self.workflow_name = workflow.ASYNC_RELIABLE
 
     @timing.time_function
@@ -153,4 +154,5 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
 
 
 class _NeedToRetryException(Exception):
+    """ States whether a retry is required for the action """
     pass

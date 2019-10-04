@@ -1,3 +1,4 @@
+""" Contains functionality to store the state of a messages journey through the system """
 from __future__ import annotations
 
 import enum
@@ -13,6 +14,10 @@ logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
 
 
 class MessageStatus(str, enum.Enum):
+    """
+    Provides constants for the different states a message can enter
+    """
+
     OUTBOUND_MESSAGE_RECEIVED = 'OUTBOUND_MESSAGE_RECEIVED'
     OUTBOUND_MESSAGE_PREPARED = 'OUTBOUND_MESSAGE_PREPARED'
     OUTBOUND_MESSAGE_PREPARATION_FAILED = 'OUTBOUND_MESSAGE_PREPARATION_FAILED'

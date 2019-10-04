@@ -1,3 +1,4 @@
+""" Contains code for handling an EBXML error message """
 from typing import Dict, Tuple, List, AnyStr
 from xml.etree.ElementTree import Element
 
@@ -13,7 +14,11 @@ ERR_SEVERITY = 'severity'
 ERR_DESC = 'Description'
 
 
-class EbxmlErrorEnvelope:
+class EbxmlErrorEnvelope(object):
+    """
+    Class for detecting and parsing an EBXML error message
+    """
+
     def __init__(self, errors: List[Dict[AnyStr, str]]):
         """
         Constructor method creates ebXML envelope containing provided list of errors

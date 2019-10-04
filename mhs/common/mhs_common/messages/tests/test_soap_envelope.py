@@ -35,6 +35,7 @@ EXPECTED_HTTP_HEADERS = {
     'type': 'text/xml'
 }
 
+
 def get_test_message_dictionary():
     return {
         soap_envelope.FROM_ASID: "918999199111",

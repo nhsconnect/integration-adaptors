@@ -1,3 +1,4 @@
+""" Contains the root directory for the module """
 import os
 
 

@@ -38,6 +38,7 @@ class EbxmlEnvelope(envelope.Envelope):
     """An envelope that contains a message to be sent asynchronously to a remote MHS."""
 
     class _ElementToExtractWhenParsing(NamedTuple):
+        """ Tuple to contain information about finding an XML element """
         name: str
         xml_name: str
         xml_parent: str = None
@@ -157,6 +158,7 @@ class EbxmlEnvelope(envelope.Envelope):
                                      "EbXML message.", {'attribute_name': attribute_name, 'xpath': xpath})
                 raise EbXmlParsingError(f"Weren't able to find required attribute {attribute_name} during parsing of "
                                         f"EbXML message") from e
+
 
 class EbXmlParsingError(Exception):
     """Raised when an error was encountered during parsing of an ebXML message."""

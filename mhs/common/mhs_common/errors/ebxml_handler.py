@@ -1,3 +1,4 @@
+""" Handles the detection of ebxml errors within a message """
 from typing import Tuple, AnyStr, Dict, Optional
 
 from defusedxml import ElementTree as ET
@@ -19,7 +20,8 @@ def handle_ebxml_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, Opt
     with content-type text/xml and body represented as XML and having following structure:
 
     <?xml version="1.0" encoding="utf-8"?>
-    <SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
+    <SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
         <SOAP:Header>
             <eb:MessageHeader SOAP:mustUnderstand="1" eb:version="2.0">
                 <eb:From>
@@ -39,7 +41,8 @@ def handle_ebxml_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, Opt
                 </eb:MessageData>
             </eb:MessageHeader>
             <eb:ErrorList SOAP:mustUnderstand="1" eb:highestSeverity="Error" eb:version="2.0">
-                <eb:Error eb:codeContext="urn:oasis:names:tc:ebxml-msg:service:errors" eb:errorCode="ValueNotRecognized" eb:severity="Error">
+                <eb:Error eb:codeContext="urn:oasis:names:tc:ebxml-msg:service:errors"
+                    eb:errorCode="ValueNotRecognized" eb:severity="Error">
                     <eb:Description xml:lang="en-GB">501319:Unknown eb:CPAId</eb:Description>
                 </eb:Error>
             </eb:ErrorList>
