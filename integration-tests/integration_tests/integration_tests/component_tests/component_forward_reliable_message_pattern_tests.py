@@ -83,7 +83,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .assert_error_code(200) \
             .assert_code_context('urn:nhs:names:error:tms') \
             .assert_severity('Error')
-    
+
     def test_should_record_message_status_when_soap_fault_returned_from_spine(self):
         """
         Message ID: 3771F30C-A231-4D64-A46C-E7FB0D52C27C configured in fakespine to return a SOAP Fault error.
@@ -154,3 +154,28 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_NACKD',
                 'WORKFLOW': 'forward-reliable'
             })
+
+    def test_should_return_bad_request_when_client_sends_invalid_message(self):
+        # Arrange
+        message, message_id = build_message('COPC_IN000001UK01')
+
+        # attachment with content type that is not permitted
+        attachments = [{
+            'content_type': 'application/zip',
+            'is_base64': False,
+            'description': 'Some description',
+            'payload': 'Some payload'
+        }]
+
+        # Act
+        response = MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, sync_async=False) \
+            .with_body(message, attachments=attachments) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        self.assertEqual(response.text, "400: Invalid request. Validation errors: {'attachments': {0: "
+                                        "{'content_type': ['Must be one of: text/plain, text/html, application/pdf, "
+                                        "text/xml, application/xml, text/rtf, audio/basic, audio/mpeg, image/png, "
+                                        "image/gif, image/jpeg, image/tiff, video/mpeg, application/msword, "
+                                        "application/octet-stream.']}}}")

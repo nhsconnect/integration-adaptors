@@ -201,23 +201,16 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'sync-async'
             })
 
-    def test_should_record_message_received_when_bad_request_returned_to_client(self):
-        """
-        Generate bad request through providing invalid interaction_id
-        """
+    def test_should_return_bad_request_when_client_sends_invalid_message(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', message_id="DAC65DEE-5E16-42E2-B8B7-7A6412EE39BC")
+        message, message_id = build_message('QUPC_IN160101UK05', '9689174606')
 
         # Act
-        MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='BLAH', message_id=message_id, sync_async=False) \
-            .with_body(message) \
+        response = MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=False) \
+            .with_body(None) \
             .execute_post_expecting_bad_request_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
-            .assert_single_item_exists_with_key(message_id) \
-            .assert_item_contains_values({
-            'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_RECEIVED',
-            'WORKFLOW': 'async-reliable'
-        })
+        self.assertEqual(response.text,
+                         "400: Invalid request. Validation errors: {'payload': ['Field may not be null.']}")
