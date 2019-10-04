@@ -1,4 +1,5 @@
 import asyncio
+import ssl
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -215,8 +216,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
         self.mock_work_description.publish.assert_called_once()
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED),
-                          mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
@@ -235,8 +235,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.assertEqual(400, status)
         self.assertIn('Request to send to Spine is too large', message)
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED),
-                          mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
@@ -252,9 +251,33 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertEqual('Error obtaining outbound URL', message)
         self.mock_work_description.publish.assert_called_once()
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
+
+    @async_test
+    async def test_non_http_error_handled_when_making_request_to_spine(self):
+        self.setup_mock_work_description()
+        self._setup_routing_mock()
+
+        self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
+
+        error_future = asyncio.Future()
+        error_future.set_exception(ssl.SSLError())
+        self.mock_transmission_adaptor.make_request.return_value = error_future
+
+        with mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest'):
+            status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
+                                                                             INTERACTION_DETAILS,
+                                                                             PAYLOAD, None)
+
+        self.assertEqual(500, status)
+        self.assertEqual("Error making outbound request", message)
+        self.mock_work_description.publish.assert_called_once()
+        self.assertEqual(
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
+             mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+            self.mock_work_description.set_outbound_status.call_args_list)
 
     @mock.patch('asyncio.sleep')
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
@@ -406,8 +429,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertTrue('Error when converting retry interval' in message)
         self.assertEqual(
-            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
-             mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
             self.mock_work_description.set_outbound_status.call_args_list)
 
     @mock.patch('asyncio.sleep')
