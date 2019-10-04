@@ -41,21 +41,6 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .assertor_for_hl7_xml_message()\
             .assert_element_attribute(".//ControlActEvent//code", "displayName", "GP2GP Large Message Attachment Information")
 
-    def test_should_place_unsolicited_gp2gp_response_onto_queue_for_client_to_receive(self):
-        # Arrange
-        message, message_id = build_message('INBOUND_UNEXPECTED_GP2GP_MESSAGE', '9689177923', to_party_id="test-party-key")
-
-        # Act
-        InboundProxyHttpRequestBuilder() \
-            .with_body(message) \
-            .execute_post_expecting_success()
-
-        # Assert
-        AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
-            .assert_property('message-id', message_id) \
-            .assertor_for_hl7_xml_message() \
-            .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)
-
     def test_should_return_nack_when_forward_reliable_message_is_not_meant_for_the_mhs_system(self):
         # Arrange
         message, message_id = build_message('INBOUND_UNEXPECTED_MESSAGE', '9689177923', to_party_id="NOT_THE_MHS")
