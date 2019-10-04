@@ -68,7 +68,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
         except Exception as e:
-            logger.error('0004', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
+            logger.error('0009', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return (500, 'Error serialising outbound message'), None, None
 
@@ -80,7 +80,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             return (400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '
                          f'RequestSize={len(message)}'), None, None
 
-        logger.info('0005', 'Message serialised successfully')
+        logger.info('0008', 'Message serialised successfully')
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
 
@@ -92,7 +92,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         try:
             response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
         except Exception as e:
-            logger.error('0008', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            logger.error('0011', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
@@ -167,11 +167,11 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             logger.info('0001', 'Looking up reliability details for {service_id}.', {'service_id': service_id})
             reliability_details = await self.routing_reliability.get_reliability(service_id, org_code)
 
-            logger.info('0002', 'Retrieved reliability details for {service_id}. {reliability_details}',
+            logger.info('0004', 'Retrieved reliability details for {service_id}. {reliability_details}',
                         {'service_id': service_id, 'reliability_details': reliability_details})
             return reliability_details
         except Exception as e:
-            logger.warning('0003', 'Error encountered whilst obtaining outbound URL. {exception}', {'exception': e})
+            logger.warning('0005', 'Error encountered whilst obtaining outbound URL. {exception}', {'exception': e})
             raise e
 
     async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments=None):

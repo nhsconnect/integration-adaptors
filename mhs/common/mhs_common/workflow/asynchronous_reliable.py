@@ -102,7 +102,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                                                              handle_error_response)
             except _NeedToRetryException:
                 retries_remaining[0] -= 1
-                logger.info("0017", "Waiting for {retry_interval} seconds before next request "
+                logger.info("0014", "Waiting for {retry_interval} seconds before next request "
                                     "attempt.", {"retry_interval": retry_interval})
                 await asyncio.sleep(retry_interval)
                 continue
