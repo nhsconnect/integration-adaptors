@@ -33,7 +33,7 @@ class ScrAdaptorTests(TestCase):
 
     def test_should_return_success_response_from_spine_as_json(self):
         # Arrange
-        scr_json, message_id = build_message('json_16UK05', '9689174606')
+        scr_json, message_id = build_message('json_16UK05', patient_nhs_number='9689174606')
 
         # Act
         response = ScrHttpRequestBuilder() \

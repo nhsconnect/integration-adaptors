@@ -1,3 +1,4 @@
+import pathlib
 import ssl
 from typing import Dict
 
@@ -9,6 +10,7 @@ import utilities.config as config
 import utilities.integration_adaptors_logger as log
 from comms import proton_queue_adaptor
 from mhs_common import workflow
+from mhs_common.configuration import configuration_manager
 from mhs_common.request import healthcheck_handler
 from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
 from utilities import secrets, certs
@@ -47,7 +49,8 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
 
 def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: str, party_key: str,
                          workflows: Dict[str, workflow.CommonWorkflow],
-                         persistence_store: persistence_adaptor.PersistenceAdaptor
+                         persistence_store: persistence_adaptor.PersistenceAdaptor,
+                         config_manager: configuration_manager.ConfigurationManager
                          ) -> None:
     """
 
@@ -57,12 +60,14 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     ssl.SSLContext.load_verify_locations
     :param key_file: The filename of the private key for the certificate identified by local_certs_file.
     :param workflows: The workflows to be used to handle messages.
+    :param config_manager: The config manager used to obtain interaction details
     :param party_key: The party key to use to identify this MHS.
     """
 
     inbound_application = tornado.web.Application(
         [(r"/.*", async_request_handler.InboundHandler, dict(workflows=workflows, party_id=party_key,
-                                                             work_description_store=persistence_store))])
+                                                             work_description_store=persistence_store,
+                                                             config_manager=config_manager))])
 
     # Ensure Client authentication
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -97,8 +102,11 @@ def main():
     workflows = initialise_workflows()
     store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))
 
+    interactions_config_file = pathlib.Path(definitions.ROOT_DIR) / 'data' / "interactions" / "interactions.json"
+    config_manager = configuration_manager.ConfigurationManager(str(interactions_config_file))
+
     start_inbound_server(certificates.local_cert_path, certificates.ca_certs_path, certificates.private_key_path,
-                         party_key, workflows, store)
+                         party_key, workflows, store, config_manager)
 
 
 if __name__ == "__main__":

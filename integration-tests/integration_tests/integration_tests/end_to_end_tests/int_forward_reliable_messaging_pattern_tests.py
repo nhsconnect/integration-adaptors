@@ -34,10 +34,12 @@ class ForwardReliableMessagingPatternTests(TestCase):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
 
-    @skip('Run once implemented Forward Reliable Message Pattern')
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', '9446245796')
+        # The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.
+        # If failures are seen here, it is probably an issue with opentest SDS not being correctly configured for your
+        # account
+        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -53,13 +55,16 @@ class ForwardReliableMessagingPatternTests(TestCase):
         AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
             .assert_property('message-id', message_id) \
             .assert_property('correlation-id', '1') \
+            .assert_json_content_type() \
             .assertor_for_hl7_xml_message() \
-            .assert_element_exists('.//MCCI_IN010000UK13//Message//acknowledgement')
+            .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)
 
-    @skip('Run once implemented Forward Reliable Message Pattern')
     def test_should_record_forward_reliable_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', '9446245796')
+        # The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.
+        # If failures are seen here, it is probably an issue with opentest SDS not being correctly configured for your
+        # account
+        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -74,7 +79,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
         # Assert
         AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
             .assertor_for_hl7_xml_message() \
-            .assert_element_exists('.//MCCI_IN010000UK13//Message//acknowledgement')
+            .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)
 
         AssertWithRetries(retry_count=10) \
             .assert_condition_met(lambda: DynamoMhsTableStateAssertor.wait_for_inbound_response_processed(message_id))
@@ -86,38 +91,3 @@ class ForwardReliableMessagingPatternTests(TestCase):
             'OUTBOUND_STATUS': 'OUTBOUND_MESSAGE_ACKD',
             'WORKFLOW': 'forward-reliable'
         })
-
-    @skip('Run once implemented Forward Reliable Message Pattern')
-    def test_should_return_successful_response_from_spine_in_original_post_request_body_if_sync_async_requested(self):
-        # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', '9446245796')
-
-        # Act
-        response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, ods_code='X26', sync_async=True) \
-            .with_body(message) \
-            .execute_post_expecting_success()
-
-        # Assert
-        Hl7XmlResponseAssertor(response.text) \
-            .assert_element_exists('.//MCCI_IN010000UK13//Message//acknowledgement')
-
-    @skip('Run once implemented Forward Reliable Message Pattern')
-    def test_should_record_the_correct_response_between_the_inbound_and_outbound_components_if_sync_async_requested(self):
-        # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', '9446245796')
-
-        # Act
-        MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01',
-                          message_id=message_id,
-                          sync_async=True,
-                          correlation_id='1',
-                          ods_code='X26') \
-            .with_body(message) \
-            .execute_post_expecting_success()
-
-        # Assert
-        DynamoSyncAsyncMhsTableStateAssertor(MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
-            .assert_single_item_exists_with_key(message_id) \
-            .assert_element_exists('.//MCCI_IN010000UK13//Message//acknowledgement')

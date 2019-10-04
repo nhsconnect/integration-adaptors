@@ -25,12 +25,13 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                  max_request_size: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
+        super().__init__(routing)
         self.party_key = party_key
         self.wd_store = work_description_store
         self.transmission = transmission
         self.max_request_size = max_request_size
         self.persistence_store_retries = persistence_store_max_retries
-        super().__init__(routing)
+        self.workflow_name = workflow.ASYNC_EXPRESS
 
     @timing.time_function
     async def handle_outbound_message(self,
@@ -109,8 +110,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         if exception.response:
             code, response, _ = handle_soap_error(exception.response.code,
-                                                            exception.response.headers,
-                                                            exception.response.body)
+                                                  exception.response.headers,
+                                                  exception.response.body)
             return code, response
 
         return 500, f'Error(s) received from Spine: {exception}'

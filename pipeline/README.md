@@ -232,3 +232,4 @@ e.g. `ldaps://example.com`
 searches when querying SDS. e.g. `ou=services,o=nhs`. This value should not contain whitespace.
 - SPINEROUTELOOKUP_SERVICE_DISABLE_TLS: An optional flag. If set to exactly `True`, TLS will be disabled for SDS
 requests.
+* MHS_FORWARD_RELIABLE_ENDPOINT_URL: The URL for MHS outbound to communicate with Spine for Forward Reliable messaging

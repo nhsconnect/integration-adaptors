@@ -1,5 +1,5 @@
 """Module for Proton specific queue adaptor functionality. """
-
+import json
 from typing import Dict, Any
 
 import proton.handlers
@@ -41,11 +41,11 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         self.password = kwargs.get('password')
         logger.info('000', 'Initialized proton queue adaptor for {host}', {'host': self.host})
 
-    async def send_async(self, message: str, properties: Dict[str, Any] = None) -> None:
+    async def send_async(self, message: dict, properties: Dict[str, Any] = None) -> None:
         """Builds and asynchronously sends a message to the host defined when this adaptor was constructed. Raises an
         exception to indicate that the message could not be sent successfully.
 
-        :param message: The message body to send.
+        :param message: The message body to send. This will be serialised as JSON.
         :param properties: Optional application properties to send with the message.
         """
         logger.info('008', 'Sending message asynchronously.')
@@ -54,7 +54,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
             .run_in_executor(executor=None, func=lambda: self.__send(payload))
 
     @staticmethod
-    def __construct_message(message: str, properties: Dict[str, Any] = None) -> proton.Message:
+    def __construct_message(message: dict, properties: Dict[str, Any] = None) -> proton.Message:
         """
         Build a message with a generated uuid, and specified message body.
         :param message: The message body to be wrapped.
@@ -64,7 +64,8 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         message_id = utilities.message_utilities.MessageUtilities.get_uuid()
         logger.info('001', 'Constructing message with {id} and {applicationProperties}',
                     {'id': message_id, 'applicationProperties': properties})
-        return proton.Message(id=message_id, body=message, properties=properties)
+        return proton.Message(id=message_id, content_type='application/json', body=json.dumps(message),
+                              properties=properties)
 
     def __send(self, message: proton.Message) -> None:
         """

@@ -21,6 +21,9 @@ ACTION = "action"
 MESSAGE_ID = 'message_id'
 TIMESTAMP = 'timestamp'
 RECEIVED_MESSAGE_ID = "received_message_id"
+ERROR_CODE = "error_code"
+SEVERITY = "severity"
+DESCRIPTION = "description"
 
 EBXML_NAMESPACE = "eb"
 SOAP_NAMESPACE = "SOAP"
