@@ -76,7 +76,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', '9689177923',
-                                            message_id='96A8F79D-194D-4DCA-8D6E-6EDDC6A29F3F'
+                                            message_id='35586865-45B0-41A5-98F6-817CA6F1F5EF'
                                             )
         # Act/Assert: Response should be 202
         MhsHttpRequestBuilder() \
@@ -92,7 +92,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', '9689177923',
-                                            message_id='96A8F79D-194D-4DCA-8D6E-6EDDC6A29F3F'
+                                            message_id='35586865-45B0-41A5-98F6-817CA6F1F5EF'
                                             )
         # Act
         MhsHttpRequestBuilder() \
@@ -303,3 +303,28 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED',
                 'WORKFLOW': 'sync-async'
             })
+
+    def test_should_return_bad_request_when_client_sends_invalid_message(self):
+        # Arrange
+        message, message_id = build_message('COPC_IN000001UK01')
+
+        # attachment with content type that is not permitted
+        attachments = [{
+            'content_type': 'application/zip',
+            'is_base64': False,
+            'description': 'Some description',
+            'payload': 'Some payload'
+        }]
+
+        # Act
+        response = MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, sync_async=False) \
+            .with_body(message, attachments=attachments) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        self.assertEqual(response.text, "400: Invalid request. Validation errors: {'attachments': {0: "
+                                        "{'content_type': ['Must be one of: text/plain, text/html, application/pdf, "
+                                        "text/xml, application/xml, text/rtf, audio/basic, audio/mpeg, image/png, "
+                                        "image/gif, image/jpeg, image/tiff, video/mpeg, application/msword, "
+                                        "application/octet-stream.']}}}")
