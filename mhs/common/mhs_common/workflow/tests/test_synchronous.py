@@ -71,7 +71,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
                                                                                        payload="nice message",
                                                                                        work_description_object=None)
 
-        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error obtaining outbound URL')
         log_mock.error.assert_called_with('009', 'Failed to retrieve details from spine route lookup')

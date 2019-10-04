@@ -195,8 +195,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertEqual('Error serialising outbound message', message)
         self.mock_work_description.publish.assert_called_once()
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED),
-                          mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
@@ -214,8 +213,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
 
         self.assertEqual(400, status)
         self.assertIn('Request to send to Spine is too large', message)
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED),
-                          mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
@@ -231,7 +229,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertEqual('Error obtaining outbound URL', message)
         self.mock_work_description.publish.assert_called_once()
-        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
                          self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_transmission_adaptor.make_request.assert_not_called()
 
@@ -403,8 +401,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(500, status)
         self.assertTrue('Error when converting retry interval' in message)
         self.assertEqual(
-            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
-             mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)],
             self.mock_work_description.set_outbound_status.call_args_list)
 
     @mock.patch('asyncio.sleep')
