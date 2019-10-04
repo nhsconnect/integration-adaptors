@@ -2,11 +2,15 @@
 
 import unittest
 
+from integration_tests.amq.amq import MHS_INBOUND_QUEUE
+from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.text_error_response_assertor import TextErrorResponseAssertor
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
+from integration_tests.http.inbound_proxy_http_request_builder import InboundProxyHttpRequestBuilder
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
+from integration_tests.xml.eb_xml_assertor import EbXmlResponseAssertor
 
 
 class ForwardReliablesMessagingPatternTests(unittest.TestCase):
@@ -22,6 +26,48 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
 
+    def test_should_place_unsolicited_valid_message_onto_queue_for_client_to_receive(self):
+        # Arrange
+        message, message_id = build_message('INBOUND_UNEXPECTED_MESSAGE', '9689177923', to_party_id="test-party-key")
+
+        # Act
+        InboundProxyHttpRequestBuilder() \
+            .with_body(message) \
+            .execute_post_expecting_success()
+
+        # Assert
+        AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
+            .assert_property('message-id', message_id)\
+            .assertor_for_hl7_xml_message()\
+            .assert_element_attribute(".//ControlActEvent//code", "displayName", "GP2GP Large Message Attachment Information")
+
+    def test_should_return_nack_when_forward_reliable_message_is_not_meant_for_the_mhs_system(self):
+        # Arrange
+        message, message_id = build_message('INBOUND_UNEXPECTED_MESSAGE', '9689177923', to_party_id="NOT_THE_MHS")
+
+        # Act
+        response = InboundProxyHttpRequestBuilder()\
+            .with_body(message)\
+            .execute_post_expecting_success()
+
+        # Assert
+        EbXmlResponseAssertor(response.text)\
+            .assert_element_attribute(".//ErrorList//Error", "errorCode", "ValueNotRecognized")\
+            .assert_element_attribute(".//ErrorList//Error", "severity", "Error")\
+            .assert_element_exists_with_value(".//ErrorList//Error//Description", "501314:Invalid To Party Type attribute")
+
+    def test_should_return_500_response_when_inbound_service_receives_message_in_invalid_format(self):
+        # Arrange
+        message, message_id = build_message('INBOUND_UNEXPECTED_INVALID_MESSAGE', '9689177923')
+
+        # Act
+        response = InboundProxyHttpRequestBuilder() \
+            .with_body(message) \
+            .execute_post_expecting_error_response()
+
+        # Assert
+        self.assertIn('Exception during inbound message parsing', response.text)
+
     def test_should_return_successful_response_to_client_when_a_business_level_retry_is_required_and_succeeds(self):
         """
         Message ID: '35586865-45B0-41A5-98F6-817CA6F1F5EF' configured in fakespine to return a SOAP Fault error,
@@ -30,7 +76,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', '9689177923',
-                                            message_id='96A8F79D-194D-4DCA-8D6E-6EDDC6A29F3F'
+                                            message_id='35586865-45B0-41A5-98F6-817CA6F1F5EF'
                                             )
         # Act/Assert: Response should be 202
         MhsHttpRequestBuilder() \
@@ -46,7 +92,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', '9689177923',
-                                            message_id='96A8F79D-194D-4DCA-8D6E-6EDDC6A29F3F'
+                                            message_id='35586865-45B0-41A5-98F6-817CA6F1F5EF'
                                             )
         # Act
         MhsHttpRequestBuilder() \
@@ -257,3 +303,28 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED',
                 'WORKFLOW': 'sync-async'
             })
+
+    def test_should_return_bad_request_when_client_sends_invalid_message(self):
+        # Arrange
+        message, message_id = build_message('COPC_IN000001UK01')
+
+        # attachment with content type that is not permitted
+        attachments = [{
+            'content_type': 'application/zip',
+            'is_base64': False,
+            'description': 'Some description',
+            'payload': 'Some payload'
+        }]
+
+        # Act
+        response = MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, sync_async=False) \
+            .with_body(message, attachments=attachments) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        self.assertEqual(response.text, "400: Invalid request. Validation errors: {'attachments': {0: "
+                                        "{'content_type': ['Must be one of: text/plain, text/html, application/pdf, "
+                                        "text/xml, application/xml, text/rtf, audio/basic, audio/mpeg, image/png, "
+                                        "image/gif, image/jpeg, image/tiff, video/mpeg, application/msword, "
+                                        "application/octet-stream.']}}}")
