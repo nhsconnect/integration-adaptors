@@ -51,11 +51,33 @@ class ScrHttpRequestBuilder(object):
         """
         Execute a POST request against the SCR adaptor using the configured body and headers within this class.
         Asserts the response is successful.
-        :return: self
+        :return: Response
         """
-        response = requests.post(self.scr_host, headers=self.headers, data=self.body)
+        response = self.execute_post()
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')
 
+        return response
+
+    def execute_post_expecting_bad_request_response(self) -> Response:
+        """
+        Executes a POST request against the SCR Adaptor, asserts the response status code is 400 
+        :return: Response
+        """
+        response = requests.post(self.scr_host, headers=self.headers, data=self.body)
+        self.assertor.assertTrue(
+            response.status_code == 400,
+            f'A non 400 error code was returned from server: {response.status_code}')
+        return response
+    
+    def execute_post_expecting_internal_server_error(self) -> Response:
+        """
+        Executes a POST request against the SCR Adaptor, asserts the response status code is 500 
+        :return: Response
+        """
+        response = requests.post(self.scr_host, headers=self.headers, data=self.body)
+        self.assertor.assertTrue(
+            response.status_code == 500,
+            f'A non 400 error code was returned from server: {response.status_code}')
         return response

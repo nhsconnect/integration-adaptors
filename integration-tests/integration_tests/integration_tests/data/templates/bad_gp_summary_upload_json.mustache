@@ -1,0 +1,90 @@
+
+{
+  "Id": "{{uuid}}",
+  "creationTime": "{{timestamp}}",
+  "versionCode": "V3NPfIT4.2.00",
+  "communicationFunctionRcv": {
+    "device": {
+      "id": {
+        "extension": "227319907548"
+      }
+    }
+  },
+  "communicationFunctionSnd": {
+    "device": {
+      "id": {
+        "extension": "{{asid}}"
+      }
+    }
+  },
+  "controlActEvent": {
+    "author1": {
+      "agentSystemSDS": {
+        "id": {
+          "extension": "{{asid}}"
+        }
+      }
+    },
+    "author": {
+      "AgentPersonSDS": {
+        "id": {
+          "extension": "055888118514"
+        },
+        "agentPersonSDS": {
+          "id": {
+            "extension": "979603625513"
+          }
+        },
+        "part": {
+          "partSDSRole": {
+            "id": {
+              "extension": "R0260"
+            }
+          }
+        }
+      }
+    },
+    "subject": {
+      "GPSummary": {
+        "id": {
+          "root": "{{uuid}}"
+        },
+        "effectiveTime": "{{timestamp}}",
+        "author": {
+          "time": "{{timestamp}}",
+          "AgentPersonSDS": {
+            "id": {
+              "extension": "055888118514"
+            },
+            "agentPersonSDS": {
+              "id": {
+                "extension": "979603625513"
+              },
+              "name": "<family>NICA_Test_Automation_Healthchecks</family>"
+            }
+          }
+        },
+        "excerptForm": {
+          "CareDocs": {
+            "presentationText": {
+              "value": "<h1>header</h1>",
+              "id": {
+                "root": "EA3BCDEB-A439-4984-A519-2EE25EB3F24C"
+              },
+              "effectiveTime": {
+                "value": "{{timestamp}}"
+              }
+            }
+          }
+        },
+        "recordTarget": {
+          "patient": {
+            "id": {
+              "extension": "9446245796"
+            }
+          }
+        }
+      }
+    }
+  }
+}
