@@ -89,7 +89,12 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             handle_error_response: Callable[[httpclient.HTTPResponse], Tuple[int, str, Optional[wd.WorkDescription]]]):
 
         logger.info('0006', 'About to make outbound request')
-        response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
+        try:
+            response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
+        except Exception as e:
+            logger.error('0008', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
+            return 500, 'Error making outbound request', None
 
         if response.code == 202:
             logger.audit('0101', '{WorkflowName} outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
