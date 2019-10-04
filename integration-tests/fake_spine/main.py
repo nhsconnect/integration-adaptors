@@ -38,6 +38,12 @@ def build_application_configuration() -> SpineRequestResponseMapper:
             SpineResponse().override_response_code(500).override_response('ebxml_fault_single_error.xml'),
         RequestMatcher('async-reliable-soap-fault', lambda x: ebxml_body_contains_message_id(x.body.decode(), '3771F30C-A231-4D64-A46C-E7FB0D52C27C')):
             SpineResponse().override_response_code(500).override_response('soap_fault_single_error.xml'),
+
+        RequestMatcher('forward-reliable-retry-response', lambda x: ebxml_body_contains_message_id(x.body.decode(), '96A8F79D-194D-4DCA-8D6E-6EDDC6A29F3F')):
+            SpineMultiResponse()
+                .with_ordered_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
+                .with_ordered_response(SpineResponse().override_response_code(500).override_response('soap_fault_that_should_be_retried.xml'))
+                .with_ordered_response(SpineResponse().override_response_code(202).override_response('async_reliable_success_response.xml'))
     })
 
 
