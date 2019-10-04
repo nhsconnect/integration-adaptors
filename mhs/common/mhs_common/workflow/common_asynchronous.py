@@ -76,7 +76,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             logger.error('0007', 'Request to send to Spine is too large after serialisation. '
                                  '{RequestSize} {MaxRequestSize}',
                          {'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED) # TODO-test this
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return (400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '
                          f'RequestSize={len(message)}'), None, None
 
