@@ -94,7 +94,7 @@ class SoapEnvelope(envelope.Envelope):
             raise SoapParsingError(f"An unexpected error occurred when applying an XSLT to SOAP XML message") from e
 
         extracted_values = json.loads(soap_headers)
-        logger.info('0001', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
+        logger.info('0005', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
         extracted_values[MESSAGE] = soap_body
 
         for required_element in REQUIRED_SOAP_ELEMENTS:

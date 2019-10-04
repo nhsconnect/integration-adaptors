@@ -1,5 +1,5 @@
 import logging
-import tornado
+import tornado.web
 from fake_spine.request_matching import SpineRequestResponseMapper
 
 logger = logging.getLogger(__name__)

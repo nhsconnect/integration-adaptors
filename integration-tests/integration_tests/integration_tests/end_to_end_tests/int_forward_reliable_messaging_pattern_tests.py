@@ -1,17 +1,15 @@
 """
 Provides tests around the Forward Reliable workflow, including sync-async wrapping
 """
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from integration_tests.amq.amq import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
-from integration_tests.dynamo.dynamo_sync_async_mhs_table import DynamoSyncAsyncMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
-from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
 
 class ForwardReliableMessagingPatternTests(TestCase):
@@ -28,6 +26,9 @@ class ForwardReliableMessagingPatternTests(TestCase):
         -> 3.22 Common Content
             -> 3.22.1.1 (Request)
             -> 3.22.1.1 (Response)
+
+    The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.
+    If failures are seen here, it is probably an issue with opentest SDS not being correctly configured for your account.
     """
 
     def setUp(self):
@@ -36,9 +37,6 @@ class ForwardReliableMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        # The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.
-        # If failures are seen here, it is probably an issue with opentest SDS not being correctly configured for your
-        # account
         message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
 
         # Act
