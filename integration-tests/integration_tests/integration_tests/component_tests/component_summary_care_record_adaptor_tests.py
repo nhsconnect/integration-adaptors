@@ -32,7 +32,7 @@ class SummaryCareRecordAdaptorTests(unittest.TestCase):
 
     def test_should_return_a_500_to_client_when_mhs_returns_500_to_SCR(self):
         # Arrange
-        scr_json, message_id = build_message('json_16Uk05', patient_nhs_number='9689174606',
+        scr_json, message_id = build_message('json_16UK05', patient_nhs_number='9689174606',
                                              message_id='AD7D39A8-1B6C-4520-8367-6B7BEBD7B842')
 
         # Act

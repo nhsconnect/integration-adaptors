@@ -84,6 +84,7 @@ pipeline {
                                 --env "AWS_ACCESS_KEY_ID=test" \
                                 --env "AWS_SECRET_ACCESS_KEY=test" \
                                 --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
+                                --env "SCR_ADDRESS=http://scradaptor" \
                                 componenttest:$BUILD_TAG
                         '''
                     }
