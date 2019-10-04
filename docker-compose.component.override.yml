@@ -20,6 +20,7 @@ services:
       - MHS_SECRET_CLIENT_CERT=${INBOUND_CERTIFICATE}
       - MHS_SECRET_CLIENT_KEY=${INBOUND_PRIVATE_KEY}
       - MHS_SECRET_CA_CERTS=${INBOUND_CA_STORE}
+      - MHS_SECRET_PARTY_KEY=test-party-key
 
   outbound:
     environment:

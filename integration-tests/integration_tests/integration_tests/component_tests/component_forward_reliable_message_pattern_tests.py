@@ -2,6 +2,8 @@
 
 import unittest
 
+from integration_tests.amq.amq import MHS_INBOUND_QUEUE
+from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.text_error_response_assertor import TextErrorResponseAssertor
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
@@ -24,9 +26,24 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
 
+    def test_should_place_unsolicited_valid_message_onto_queue_for_client_to_receive(self):
+        # Arrange
+        message, message_id = build_message('INBOUND_UNEXPECTED_MESSAGE', '9689177923', to_party_id="test-party-key")
+
+        # Act
+        InboundProxyHttpRequestBuilder() \
+            .with_body(message) \
+            .execute_post_expecting_success()
+
+        # Assert
+        AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
+            .assert_property('message-id', message_id)\
+            .assertor_for_hl7_xml_message()\
+            .assert_element_attribute(".//ControlActEvent//code", "displayName", "GP2GP Large Message Attachment Information")
+
     def test_should_return_nack_when_forward_reliable_message_is_not_meant_for_the_mhs_system(self):
         # Arrange
-        message, message_id = build_message('INBOUND_UNEXPECTED_MESSAGE', '9689177923')
+        message, message_id = build_message('INBOUND_UNEXPECTED_MESSAGE', '9689177923', to_party_id="NOT_THE_MHS")
 
         # Act
         response = InboundProxyHttpRequestBuilder()\
@@ -38,6 +55,18 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .assert_element_attribute(".//ErrorList//Error", "errorCode", "ValueNotRecognized")\
             .assert_element_attribute(".//ErrorList//Error", "severity", "Error")\
             .assert_element_exists_with_value(".//ErrorList//Error//Description", "501314:Invalid To Party Type attribute")
+
+    def test_should_return_500_response_when_inbound_service_receives_message_in_invalid_format(self):
+        # Arrange
+        message, message_id = build_message('INBOUND_UNEXPECTED_INVALID_MESSAGE', '9689177923')
+
+        # Act
+        response = InboundProxyHttpRequestBuilder() \
+            .with_body(message) \
+            .execute_post_expecting_error_response()
+
+        # Assert
+        self.assertIn('Exception during inbound message parsing', response.text)
 
     def test_should_return_successful_response_to_client_when_a_business_level_retry_is_required_and_succeeds(self):
         """
