@@ -152,7 +152,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error making outbound request')
 
-        log_call = log_mock.warning.call_args
+        log_call = log_mock.error.call_args
         self.assertEqual(log_call[0][0], '0006')
         self.assertEqual(log_call[0][1], 'Error encountered whilst making outbound request. {Exception}')
 

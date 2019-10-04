@@ -91,7 +91,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return code, error, wdo
 
         except Exception as e:
-            logger.warning('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            logger.error('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
