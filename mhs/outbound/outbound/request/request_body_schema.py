@@ -48,7 +48,9 @@ class AttachmentSchema(marshmallow.Schema):
                                      # EIS section 2.5.4.2
                                      validate=marshmallow.validate.Length(min=1, max=5_000_000))
     description = marshmallow.fields.Str(required=True, description='Description of the attachment',
-                                         validate=marshmallow.validate.Length(min=1))
+                                         # Max length is a reasonable maximum as a maximum isn't explicitly documented
+                                         # in the EIS
+                                         validate=marshmallow.validate.Length(min=1, max=100))
 
     @marshmallow.post_load
     def make_attachment(self, data, **kwargs):
@@ -65,7 +67,11 @@ class RequestBody:
 class RequestBodySchema(marshmallow.Schema):
     """Schema for the request body that MHS accepts"""
     payload = marshmallow.fields.Str(required=True, description='HL7 Payload to send to Spine',
-                                     validate=marshmallow.validate.Length(min=1))
+                                     # No explicit documentation was found in the EIS as to the max size of this
+                                     # HL7 payload, but additional attachments have a max size of 5MB so just set to
+                                     # this. Note that the whole request body sent to Spine gets checked later to make
+                                     # sure it isn't too large.
+                                     validate=marshmallow.validate.Length(min=1, max=5_000_000))
     attachments = marshmallow.fields.Nested(AttachmentSchema, many=True, missing=[],
                                             description='Optional attachments to send with the payload. Only for use '
                                                         'for interactions that support sending attachments.',

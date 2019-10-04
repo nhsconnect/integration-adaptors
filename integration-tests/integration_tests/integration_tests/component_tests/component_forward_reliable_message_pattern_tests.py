@@ -155,8 +155,6 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'forward-reliable'
             })
 
-    # Sync-Async Message
-
     def test_should_return_information_from_soap_fault_returned_from_spine_in_original_post_request_when_sync_async_requested(self):
         """
         Message ID: 3771F30C-A231-4D64-A46C-E7FB0D52C27C configured in fakespine to return a SOAP Fault error.
