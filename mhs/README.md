@@ -99,7 +99,7 @@ disabled.
 * `MHS_RESYNC_INITIAL_DELAY` (Outbound service only) The initial delay (in seconds) before making the first poll to the sync-async
     store after the outbound service receives an acknowledgement from Spine
 * `MHS_SPINE_REQUEST_MAX_SIZE` (outbound service only) The maximum size (in bytes) that request bodies sent to Spine
-are allowed to be. This should be set minus any HTTP headers and other stuff in the HTTP packets sent to Spine.
+are allowed to be. This should be set minus any HTTP headers and other content in the HTTP packets sent to Spine.
 e.g. Setting this to ~400 bytes less than the maximum request body size should be roughly the correct value
 (calculating this value accurately is pretty much impossible as one of the HTTP headers is the Content-Length header
 which varies depending on the request body size).
