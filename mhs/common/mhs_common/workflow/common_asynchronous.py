@@ -32,6 +32,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
                  inbound_queue_max_retries: int = None,
                  inbound_queue_retry_delay: int = None,
+                 max_request_size: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
 
@@ -42,6 +43,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         self.store_retries = persistence_store_max_retries
         self.inbound_queue_max_retries = inbound_queue_max_retries
         self.inbound_queue_retry_delay = inbound_queue_retry_delay / 1000 if inbound_queue_retry_delay else None
+        self.max_request_size = max_request_size
         super().__init__(routing)
 
     async def _create_new_work_description_if_required(self, message_id: str, wdo: wd.WorkDescription,
@@ -66,9 +68,17 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
         except Exception as e:
-            logger.warning('0004', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
+            logger.error('0004', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return (500, 'Error serialising outbound message'), None, None
+
+        if len(message) > self.max_request_size:
+            logger.error('0007', 'Request to send to Spine is too large after serialisation. '
+                                 '{RequestSize} {MaxRequestSize}',
+                         {'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+            return (400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '
+                         f'RequestSize={len(message)}'), None, None
 
         logger.info('0005', 'Message serialised successfully')
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)

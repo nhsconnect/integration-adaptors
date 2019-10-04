@@ -16,6 +16,7 @@ LOOKUP_RESPONSE = {
     'url': 'url123',
     'to_asid': 'asid'
 }
+MAX_REQUEST_SIZE = 5000000
 
 
 class TestSynchronousWorkflow(unittest.TestCase):
@@ -28,6 +29,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
             PARTY_KEY,
             work_description_store=self.wd_store,
             transmission=self.transmission,
+            max_request_size=MAX_REQUEST_SIZE,
             persistence_store_max_retries=3,
             routing=self.routing_mock
         )
@@ -98,6 +100,31 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Failed message preparation')
         log_mock.error.assert_called_with('002', 'Failed to prepare outbound message')
+
+    @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope')
+    @mock.patch('mhs_common.state.work_description.create_new_work_description')
+    @async_test
+    async def test_prepare_message_success_but_message_too_large(self, wd_mock, mock_soap_envelope):
+        wdo = mock.MagicMock()
+        wdo.publish.return_value = test_utilities.awaitable(None)
+        wd_mock.return_value = wdo
+        self.wf._lookup_endpoint_details = mock.MagicMock()
+        self.wf._lookup_endpoint_details.return_value = test_utilities.awaitable(LOOKUP_RESPONSE)
+        wdo.set_outbound_status.return_value = test_utilities.awaitable(None)
+        mock_soap_envelope.return_value.serialize.return_value = ('message-id', {}, 'e' * (MAX_REQUEST_SIZE + 1))
+
+        test_interaction_details = {'service': 'test-service', 'action': 'test-action'}
+        error, text, work_description_response = await self.wf.handle_outbound_message(
+            from_asid="202020",
+            message_id="123",
+            correlation_id="qwe",
+            interaction_details=test_interaction_details,
+            payload="nice message",
+            work_description_object=None)
+
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
+        self.assertEqual(error, 400)
+        self.assertIn('Request to send to Spine is too large', text)
 
     @mock.patch.object(sync, 'logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
