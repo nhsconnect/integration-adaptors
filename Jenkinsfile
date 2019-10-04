@@ -86,6 +86,7 @@ pipeline {
                                 --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
                                 --env "FAKE_SPINE_ADDRESS=http://fakespine" \
                                 --env "MHS_INBOUND_QUEUE_URL=http://rabbitmq:5672" \
+                                --env "SCR_ADDRESS=http://scradaptor" \
                                 componenttest:$BUILD_TAG
                         '''
                     }

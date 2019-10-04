@@ -206,3 +206,16 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                 'OUTBOUND_STATUS': 'OUTBOUND_SYNC_ASYNC_MESSAGE_SUCCESSFULLY_RESPONDED',
                 'WORKFLOW': 'sync-async'
             })
+
+    def test_should_return_bad_request_when_client_sends_invalid_message(self):
+        # Arrange
+        message, message_id = build_message('QUPC_IN160101UK05', '9689174606')
+
+        # Act
+        response = MhsHttpRequestBuilder() \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=False) \
+            .with_body({'blah': '123'}) \
+            .execute_post_expecting_bad_request_response()
+
+        # Assert
+        self.assertEqual(response.text, "400: Invalid request. Validation errors: {'payload': ['Not a valid string.']}")
