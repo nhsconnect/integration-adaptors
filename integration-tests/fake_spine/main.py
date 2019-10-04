@@ -1,11 +1,14 @@
 import logging
 import os
 import ssl
+
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 from tornado.options import parse_command_line
+
 from fake_spine.certs import Certs
+from fake_spine.inbound_proxy_request_handler import InboundProxyRequestHandler
 from fake_spine.request_handler import SpineRequestHandler
 from fake_spine.request_matcher_wrappers import body_contains_message_id, ebxml_body_contains_message_id
 from fake_spine.request_matching import SpineRequestResponseMapper, RequestMatcher
@@ -13,6 +16,12 @@ from fake_spine.spine_response import SpineResponse, SpineMultiResponse
 
 logger = logging.getLogger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def build_proxy_application(inbound_certs: Certs):
+    return tornado.web.Application([
+        (r"/inbound-proxy", InboundProxyRequestHandler, dict(inbound_certs=inbound_certs)),
+    ])
 
 
 def build_application(fake_response_handler: SpineRequestResponseMapper):
@@ -58,8 +67,13 @@ if __name__ == "__main__":
 
     application_configuration = build_application_configuration()
     application = build_application(application_configuration)
-    server = tornado.httpserver.HTTPServer(application, ssl_options=ssl_ctx)
 
+    server = tornado.httpserver.HTTPServer(application, ssl_options=ssl_ctx)
     server.listen(443)
+
+    proxy_application = build_proxy_application(certs)
+    proxy = tornado.httpserver.HTTPServer(proxy_application)
+    proxy.listen(80)
+
     logger.log(logging.INFO, "Starting fakespine service")
     tornado.ioloop.IOLoop.current().start()

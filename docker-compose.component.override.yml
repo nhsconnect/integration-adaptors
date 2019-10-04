@@ -8,10 +8,12 @@ services:
     build: ./integration-tests/fake_spine
     ports:
       - "6061:443"
+      - "6062:80"
     environment: 
       - FAKE_SPINE_CERTIFICATE
       - FAKE_SPINE_PRIVATE_KEY
       - FAKE_SPINE_CA_STORE
+      - INBOUND_SERVER_BASE_URL=https://inbound
 
   inbound:
     environment:

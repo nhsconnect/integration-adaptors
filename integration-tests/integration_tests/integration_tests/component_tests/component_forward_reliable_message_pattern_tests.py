@@ -6,7 +6,9 @@ from integration_tests.assertors.text_error_response_assertor import TextErrorRe
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
+from integration_tests.http.inbound_proxy_http_request_builder import InboundProxyHttpRequestBuilder
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
+from integration_tests.xml.eb_xml_assertor import EbXmlResponseAssertor
 
 
 class ForwardReliablesMessagingPatternTests(unittest.TestCase):
@@ -21,6 +23,21 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
     def setUp(self):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+
+    def test_should_return_nack_when_forward_reliable_message_is_not_meant_for_the_mhs_system(self):
+        # Arrange
+        message, message_id = build_message('INBOUND_UNEXPECTED_MESSAGE', '9689177923')
+
+        # Act
+        response = InboundProxyHttpRequestBuilder()\
+            .with_body(message)\
+            .execute_post_expecting_success()
+
+        # Assert
+        EbXmlResponseAssertor(response.text)\
+            .assert_element_attribute(".//ErrorList//Error", "errorCode", "ValueNotRecognized")\
+            .assert_element_attribute(".//ErrorList//Error", "severity", "Error")\
+            .assert_element_exists_with_value(".//ErrorList//Error//Description", "501314:Invalid To Party Type attribute")
 
     def test_should_return_successful_response_to_client_when_a_business_level_retry_is_required_and_succeeds(self):
         """
