@@ -84,7 +84,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
             .with_body(message) \
             .execute_post_expecting_error_response()
 
-        # # Assert
+        # Assert
         TextErrorResponseAssertor(response.text) \
             .assert_code_context('urn:oasis:names:tc:ebxml') \
             .assert_severity('Error') \
