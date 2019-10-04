@@ -53,7 +53,7 @@ class ScrHttpRequestBuilder(object):
         Asserts the response is successful.
         :return: Response
         """
-        response = self.execute_post()
+        response = requests.post(self.scr_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code}')
