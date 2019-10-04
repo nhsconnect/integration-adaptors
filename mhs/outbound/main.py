@@ -32,6 +32,7 @@ def configure_http_client():
 def initialise_workflows(transmission: outbound_transmission.OutboundTransmission, party_key: str,
                          work_description_store: persistence_adaptor.PersistenceAdaptor,
                          sync_async_store: persistence_adaptor.PersistenceAdaptor,
+                         max_request_size: int,
                          persistence_store_retries: int,
                          routing: routing_reliability.RoutingAndReliability) \
         -> Dict[str, workflow.CommonWorkflow]:
@@ -40,6 +41,7 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
     :param party_key: The party key to use to identify this MHS.
     :param work_description_store: The persistence adaptor for the state database.
     :param sync_async_store: The persistence adaptor for the sync-async database.
+    :param max_request_size: The maximum size of the request body that gets sent to Spine.
     :param persistence_store_retries The number of times to retry storing values in the work description or sync-async
     databases.
     :param routing: The routing and reliability component to use to request routing/reliability details
@@ -56,6 +58,7 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
                                      work_description_store=work_description_store,
                                      transmission=transmission,
                                      resynchroniser=resynchroniser,
+                                     max_request_size=max_request_size,
                                      persistence_store_max_retries=persistence_store_retries,
                                      routing=routing
                                      )
@@ -139,8 +142,9 @@ def main():
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
     store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
-    workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store, store_retries,
-                                     routing)
+    max_request_size = int(config.get_config('SPINE_REQUEST_MAX_SIZE'))
+    workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store,
+                                     max_request_size, store_retries, routing)
     start_tornado_server(data_dir, workflows)
 
 
