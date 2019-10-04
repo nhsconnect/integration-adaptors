@@ -326,7 +326,7 @@ class TestWorkDescriptionStatusUpdateRetry(unittest.TestCase):
         self.assertEqual(wdo.set_outbound_status.call_count, 1)
 
     @test_utilities.async_test
-    async def test_update_correct_number_retries(self):
+    async def test_should_try_updating_outbound_status_expected_number_of_times(self):
         wdo = MagicMock()
         wdo.update.return_value = test_utilities.awaitable(True)
         wdo.set_outbound_status.side_effect = wd.OutOfDateVersionError
@@ -335,5 +335,18 @@ class TestWorkDescriptionStatusUpdateRetry(unittest.TestCase):
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
                                                 20)
 
-        self.assertEqual(wdo.update.call_count, 20)
-        self.assertEqual(wdo.set_outbound_status.call_count, 20)
+        self.assertEqual(wdo.update.call_count, 21)
+        self.assertEqual(wdo.set_outbound_status.call_count, 21)
+
+    @test_utilities.async_test
+    async def test_should_try_updating_outbound_status_twice_if_retries_set_to_one(self):
+        wdo = MagicMock()
+        wdo.update.return_value = test_utilities.awaitable(True)
+        wdo.set_outbound_status.side_effect = wd.OutOfDateVersionError
+        with self.assertRaises(wd.OutOfDateVersionError):
+            await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
+                                                wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+                                                1)
+
+        self.assertEqual(wdo.update.call_count, 2)
+        self.assertEqual(wdo.set_outbound_status.call_count, 2)
