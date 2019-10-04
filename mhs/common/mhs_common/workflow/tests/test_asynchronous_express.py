@@ -6,7 +6,6 @@ from unittest import mock
 
 import exceptions
 from comms import proton_queue_adaptor
-from tornado import httpclient
 from utilities import test_utilities
 from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
@@ -264,7 +263,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
-        response = httpclient.HTTPResponse
+        response = mock.MagicMock()
         response.code = 500
         response.body = message
         response.headers = {'Content-Type': 'text/xml'}
