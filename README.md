@@ -25,7 +25,7 @@ messaging and provides a simple interface to allow HL7 messages to be sent to th
 and provides a prototype FHIR interface for sending registration events taking place at the practice to NHAIS.
 - [OneOneOne](OneOneOne) - A proof-of-concept 111 receiver, also used to investigate use of the ITK testbench (the TKW).
 - [pipeline](pipeline) - Scripts and configuration files used to build container images for adaptors and deploy them to various
-environments. Intended for use as part of an automated build pipeline.
+environments. Intended for use as part of an automated build pipeline, or may be run seperately.
 - [SCR](SCR) - A package of assets that simplify the building of HL7 GP Summary Update request messages.
 - [SCRWebservice](SCRWebService) - An application that uses the SCR package to build GP summary upload HL7 messages,
  forwards the message to the MHS, parses the success response and returns the parsed details to the supplier  
@@ -36,28 +36,7 @@ how the adaptors can be used together to simplify integration.
 Each directory contains its own README.md file which provides more details.
 
 
-## Running a development cluster
-It is possible to run a local development cluster including the MHS. The following steps describe the process:
-* Pre-requisite: [Set up NHS Digital OpenTest connection](setup-opentest.md)
-* Requirements: `Docker`, [`Packer`](https://www.packer.io/)
-* Run the `./build.sh` script found in the top level directory of this project. This will build the inbound and outbound
-    containers ready for running
-* Run `docker-compose build`. This will build all the additional containers
-* Run `docker-compose up`. This will start the inbound and outbound services, along with an instance of RabbitMQ and
-    DynamoDb
-  * Note that the environment variables `MHS_SECRET_PARTY_KEY`, `MHS_SECRET_CLIENT_CERT`, `MHS_SECRET_CLIENT_KEY` and `MHS_SECRET_CA_CERTS` need to
-  be set when running this command. These variables should be set as described [here](mhs). A simple way of setting this
-  up once is to create a bash file `configure-env-vars.sh` that looks like:
-  ```sh
-  export MHS_SECRET_PARTY_KEY="your party key here"
-  export MHS_SECRET_CLIENT_CERT=$'client cert here'
-  export MHS_SECRET_CLIENT_KEY=$'client key here'
-  export MHS_SECRET_CA_CERTS=$'ca certs here'
-  ```
-  and then run `source configure-env-vars.sh` before running `docker-compose up`.
-* Depending on the OS the MHS is being run on, measures may have to be taken to allow public inbound traffic so that
-the async responses from Spine can access the MHS. For example on windows a inbound rule was required in windows
-firewall to allow inbound traffic through port 443. In the AWS test environment an inbound rule was added
-in the security groups for machine the MHS was deployed to
-* Note that the `MHS_LOG_LEVEL` environment variable (as documented [here](mhs)) is set by default to `NOTSET` in the
-`docker-compose.yml` file but should be changed if needed.
+## Running local MHS and SCR Adaptors
+
+It may be useful to run these adaptors in a local environment. Please refer to [running the MHS and SCR adators locall](mhs/running-mhs-adaptor-locally.md) 
+a step-by-step guide on how to set this up.
