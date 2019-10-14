@@ -38,6 +38,7 @@ Each directory contains its own README.md file which provides more details.
 
 ## Running a development cluster
 It is possible to run a local development cluster including the MHS. The following steps describe the process:
+* Pre-requisite: [Set up NHS Digital OpenTest connection](setup-opentest.md)
 * Requirements: `Docker`, [`Packer`](https://www.packer.io/)
 * Run the `./build.sh` script found in the top level directory of this project. This will build the inbound and outbound
     containers ready for running
