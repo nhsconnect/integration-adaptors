@@ -38,5 +38,5 @@ Each directory contains its own README.md file which provides more details.
 
 ## Running local MHS and SCR Adaptors
 
-It may be useful to run these adaptors in a local environment. Please refer to [running the MHS and SCR adators locall](mhs/running-mhs-adaptor-locally.md) 
+It may be useful to run these adaptors in a local environment. Please refer to [running the MHS and SCR adators locally](mhs/running-mhs-adaptor-locally.md) 
 a step-by-step guide on how to set this up.

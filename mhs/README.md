@@ -48,6 +48,60 @@ also demonstrated through Elasticache for Redis in AWS.
 
 The National Adaptors Common Module provides classes which implement common requirements leveraged by multiple services or modules.
 
+## AWS Exemplar
+
+It is expected that the MHS solution will be deployed in a number of differing public and private cloud environments.
+In view of this, an exemplar of one specific instance of deployment into a cloud environment has been
+create, based on AWS.
+
+This demonstrates a recommended blueprint of deployment of the necessary assets which results in a 
+security, scalable and highly available architecture. Automated deployment of this architecture has
+been implemented through Terraform.
+
+The diagram below illustrates the AWS exemplar:
+
+[MHS - AWS Exemplar Deployment](../documentation/MHSAWSDeploymentDiagram.pdf)
+
+Key points to note:
+ - The MHS Adaptor is deployed within a custom VPC
+ - A separate custom VPC, the "Supplier Client System" VPC represents the existing AWS resources which the supplier
+ runs in AWS - connectivity with the MHS VPC is via VPC peering. 
+ - A third VPC "OpenTest VPN VPC" is shown as an optional element in the exemplar where connectivity to
+ NHS Digital's OpenTest testing platform is required.
+ - ECS is used as the container orchestration service.
+ - ECS Fargate is used as the ECS launch type as this removes concerns around management of the underlying hosts 
+ on which services and tasks execute
+ - ECR is used to store docker images required by the Fargate clusters to run instances of the services.
+ - Each of the service described in the software architecture diagram above have been implemented as 
+ an ECS cluster. A configurable number of instances of each ECS Task can run in each cluster.
+ - Instances of ECS Tasks are balanced automatically across multiple Availability Zones
+ - Balancing of load across instances of the outbound service and the routing service has been implemented 
+ through the use of an Application Load Balancer
+ - Balancing of load across instances of the inbound service has been implemented throught the
+ use of a Network Load Balancer to enable the inbound service itself to implement TLS mututal
+ authentication.
+ - DynamoDB is used to implement the state database and sync-re-sync database.
+ - Elasticache for Redis HA is used to implement the routing and reliability cache which is a dependency
+ of the routing service.
+ - Cloudwatch is used as the logging
+ - VPC endpoints are used throughout to ensure traffic does not traverse the public internet.
+ - Amazon MQ is used as an example of an AMQP compliant message queue to which Spine messages 
+ can be sent. This will occur where an "unsolicited inbound" message is received from Spine which must be 
+ passed directly to the supplier system, or where a supplier has chosen to receive a response from Spine
+ asynchronously.
+
+### Terraform for AWS Exemplar
+
+The [pipeline](../pipeline/) directory contains Terraform resources which use the AWS provider for Terraform.
+
+## Further Exemplars
+
+A future phase of MHS adaptor work will deliver an Azure public cloud exemplar. This will be based on the 
+AWS blueprint architecture, with modifications focusing on differences in cloud services such as the use
+of ACS for container orchestration.
+
+  
+
 ## Note on Certificate Validation 
 
 **WARNING: Due to the limitations of NHS Digital OpenTest configuration, verification of the server certificate received when making a connection 
@@ -58,5 +112,5 @@ is re-enabled.
 
 ## Developer Setup
 
-For information targeted at developers making use of the MHS Adaptor, please refer to [MHS Adaptor deveoper notes](running-mhs-adaptor-locally.md)
+For information targeted at developers making use of the MHS Adaptor, please refer to [MHS Adaptor developer notes](running-mhs-adaptor-locally.md)
 

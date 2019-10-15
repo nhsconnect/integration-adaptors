@@ -1,16 +1,23 @@
 # Pipeline
 
-This directory contains resources related to the CI/CD pipeline used to build the artifacts contained within this repository.
+This directory contains infrastructure automation used to build the artifacts contained within this repository.
+
+These resources can be used to provide infrastructure automation in two ways:
+1. To enable a full software delivery pipeline where the MHS Alpha software itself is being developed. In
+this context, the terraform will likely to executed from a CI/CD solution such as Jenkins to enable
+automated integration testing to take place against a deployed instance.
+2. To stand up the AWS exemplar outside of the CI/CD pipeline. It will be necessary to set up various terraform variables using the `terraform.tfvars` 
+file.
 
 These resources consist of the following directories:
 - `packer` - [Packer](https://www.packer.io/) templates used to build container images used as part of the pipeline
-- `scripts`- Custom scripts that are used as part of the pipeline
-- `terraform` - [Terraform](https://www.terraform.io/) configurations used to deploy the test environments used as part
-of the pipeline
+- `scripts`- Custom scripts which support build and deployment of resources.
+- `terraform` - [Terraform](https://www.terraform.io/) contains Terraform assets which targeting AWS deployments through
+the AWS provider for Terraform.
 
 The pipeline itself is defined in the `Jenkinsfile` in the root of the repository.
 
-# Pre-Requisites
+# Pre-Requisites for build pipeline
 
 In order to run the build pipeline, the following resources must be created manually:
 
@@ -56,7 +63,7 @@ console, if available.
 with the trusted entity set to 'Elastic Container Service Autoscale' which has the AWS managed
 'AmazonEC2ContainerServiceAutoscaleRole' policy assigned to it. This can be created by following the AWS documentation
 on the [Amazon ECS Service Auto Scaling IAM Role](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/autoscale_IAM_role.html)
-- An IAM role for the MHS containers to use to run as (the `TASK_ROLE` mentioned [below](#global-variables)).
+- An IAM role for the MHS containers to use to run as (the `TASK_ROLE` mentioned [below](#global-variables-for-jenkins-pipeline)).
 This must be a service role (see the
 [AWS documentation on creating roles for AWS services](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-service.html))
 with the trusted entity set to 'Elastic Container Service Task' and have the policy:
@@ -102,10 +109,10 @@ containers to be published to ECR and the integration test environment to be sto
     Manager, or imported into it)
     - If you wish to use self-signed certificates, these can be generated using OpenSSL with the following command:
     `openssl req -x509 -subj //CN=<lb-hostname> -newkey rsa:<key-length> -nodes -keyout key.pem -out cert.pem -days <days-until-expiry>`
-        - Where route-lb-hostname is the DNS name of the loadbalancer. This is
-        `mhs-outbound.<environment-id>.<internal_root_domain>` for the outbound loadbalancer and
-        `mhs-route.<environment-id>.<internal_root_domain>` for the route loadbalancer, where `environment-id` and
-        `<internal_root_domain>` are the variables provided to Terraform when deploying the exmplar blueprint.
+        - Where route-lb-hostname is the DNS name of the load balancer. This is
+        `mhs-outbound.<environment-id>.<internal_root_domain>` for the outbound load balancer and
+        `mhs-route.<environment-id>.<internal_root_domain>` for the route load balancer, where `environment-id` and
+        `<internal_root_domain>` are the variables provided to Terraform when deploying the exemplar blueprint.
         - Where key-length is the length of the RSA key (in bits) to use for the certificate
         - Where days-until-expiry is the number of days the generated certificate should be valid for
         - e.g: `openssl req -x509 -subj //CN=mhs-outbound.example-environment.myteam.example.com -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365`
@@ -125,9 +132,11 @@ values should not be specified as JSON). The following secrets are required:
     the certificate you have used for the route load balancer (above) is not signed by a legitimate CA. If you have
     used a self-signed certificate, this value can be that certificate.
 
-# Jenkins
+# Jenkins based CI/CD pipeline setup
 
-We are running a Jenkins master instance as an ECS Docker container. This is configured to, via the [amazon-ecs plugin], spin up Jenkins worker ECS Docker containers to run the pipeline.
+The MHS Adaptor was built using Jenkins. To replicate this setup, follow the instructions below:
+
+Set up a master Jenkins instance as an ECS Docker container. This is configured to, via the [amazon-ecs plugin], spin up Jenkins worker ECS Docker containers to run the pipeline.
 
 In order to achieve this, a number of components are required:
 - there are some subfolders in the `packer` folder with files for creating the Docker images for the Jenkins master and workers.
@@ -162,37 +171,37 @@ I found I also needed to add a permission policy that looked like:
 }
 ```
 where `ecsTaskExecutionRole` is a default role created when creating task definitions.
-- The Jenkins worker EC2 instance must have an IAM role assigned, as described in [the pre-requisites](#pre-requisites)
+- The Jenkins worker EC2 instance must have an IAM role assigned, as described in [the pre-requisites](#pre-requisites-for-build-pipeline)
 section above.
 
 [amazon-ecs plugin]: https://wiki.jenkins.io/display/JENKINS/Amazon+EC2+Container+Service+Plugin
 
-## Global variables
+## Global variables for Jenkins pipeline
 
 Several global environment variables must be set within Jenkins for the scripts to work as part of the build pipeline:
 
-- INTEGRATION_TEST_ASID: The asid associated with the mhs instance (this is provided with opentest creds)
+- INTEGRATION_TEST_ASID: The asid associated with the mhs instance (this is provided with NHS Digital OpenTest credentials)
 - CLUSTER_ID: The arn of the ecs cluster the SCR application should be deployed into (as described in
-[Pre-Requisites](#pre-requisites))
+[Pre-Requisites](#pre-requisites-for-build-pipeline))
 - DOCKER_REGISTRY: The address of the Docker registry to publish built containers to. e.g. `randomid.dkr.ecr.eu-west-2.amazonaws.com` This should not include an `http://` prefix, or repository names/paths.
 - TASK_ROLE: The IAM role that will be applied to the running MHS container tasks (as described in
-[Pre-Requisites](#pre-requisites)).
+[Pre-Requisites](#pre-requisites-for-build-pipeline)).
 - TASK_EXECUTION_ROLE: The IAM role with the `AmazonECSTaskExecutionRolePolicy` attached to it (as described in
-[Pre-Requisites](#pre-requisites)).
+[Pre-Requisites](#pre-requisites-for-build-pipeline)).
 - TASK_SCALING_ROLE: The IAM role to grant ECS permissions to auto-scale services (as described in
-[Pre-Requisites](#pre-requisites)).
+[Pre-Requisites](#pre-requisites-for-build-pipeline)).
 - SCR_SERVICE_ADDRESS: The endpoint address the SCRWebService can be reached on e.g `http://192.168.41.129:9000`
 - SCR_SERVICE_PORT: The port the SCR endpoint is expected to be on
 - SONAR_HOST: The URL for the sonarqube server.
 - SONAR_TOKEN: The login token to use when submitting jobs to sonarqube.
 - TF_STATE_BUCKET: The name of an S3 bucket to use to store both MHS & SCR Terraform state in (as described in
-[Pre-Requisites](#pre-requisites)).
+[Pre-Requisites](#pre-requisites-for-build-pipeline)).
 - TF_STATE_BUCKET_REGION: The region that the Terraform state S3 bucket (as described in
-[Pre-Requisites](#pre-requisites)) resides in.
+[Pre-Requisites](#pre-requisites-for-build-pipeline)) resides in.
 - TF_MHS_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
-[Pre-Requisites](#pre-requisites)).
+[Pre-Requisites](#pre-requisites-for-build-pipeline)).
 - TF_SCR_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
-[Pre-Requisites](#pre-requisites)).
+[Pre-Requisites](#pre-requisites-for-build-pipeline)).
 - SUPPLIER_VPC_ID: The ID of the VPC that represents the supplier system that will connect to the MHS
 - OPENTEST_VPC_ID: The ID of the VPC that contains the machine which manages the Opentest connection to Spine
 - INTERNAL_ROOT_DOMAIN: The domain name to be used internally to refer to parts of the MHS (subdomains will be created
