@@ -1,4 +1,4 @@
-# MHS
+# MHS Adaptor
 
 This package contains a pre-assured implementation of a Message Handling Service (MHS), intended to encapsulate the
 details of Spine messaging and provide a simple interface to allow HL7 messages to be sent to a remote MHS.
@@ -14,8 +14,8 @@ A Message Handling Service (MHS) is a component which is required in order to co
 systems wishing to communicate with this hub need to implement an MHS. Technically speaking, the central hub is also a MHS, but is the central 
 hub in this hub-spoke architecture.
 
-The MHS implements a messaging standard called the External Interface Specification, which defines in some detail a number patterns for
-transport layer communication with the Spine. The intent of this MHS adaptor is to hide this implementation detail from the supplier, and so
+The MHS Adaptor implements a messaging standard called the External Interface Specification, which defines in some detail a number patterns for
+transport layer communication with the Spine. The intent of this MHS Adaptor is to hide this implementation detail from the supplier, and so
 make it easier to connect to Spine and perform business operations such as interacting with Spine services like PDS.
 
 ## Software Architecture
@@ -47,6 +47,47 @@ Network Load Balancers to implement this.
 also demonstrated through Elasticache for Redis in AWS.
 
 The National Adaptors Common Module provides classes which implement common requirements leveraged by multiple services or modules.
+
+## API Documentation
+
+The MHS Adaptor presents a simple HTTP synchronous interface which is used to make requests to Spine.
+
+Please refer to the [API Documentation](outbound/openapi-docs.html) for further details.
+
+Examples of how this API is called can be found in the [integration tests](../integration-tests/integration_tests/) module
+
+## Postman collection - example requests to the MHS Adaptor
+
+A [Postman collection](outbound/MHS_Adaptor_Requests_postman_collection.json) is available which illustrates how the MHS Adaptor API
+is called. Once imported into [Postman](https://www.getpostman.com/) this collection provides two API request examples:
+
+Before sending these requests, you will amend the details of the request as follows:
+ - Set the `from-asid` message header to the ASID of your spine endpoint, as provided to you by NHS Digital
+ - In the Body, replace two instances of the string `FROM_ASID` with the ASID of your spine endpoint as above.
+ - Set the URL to the address of the MHS Adaptor API in your environment. 
+
+1) `Async Express Pattern Message  - Synchronous Response` 
+
+The Asynchronous Express Messaging Pattern is one of the Spine messaging patterns which is defined in the Spine External Interface Specification. 
+In this pattern, a request is made to Spine, but the response is not provided on the same connection. Instead, spine initiates a connection back to your 
+MHS with the response. I.e the response from Spine is delivered like a call back to your MHS. The MHS Adaptor has hidden all this asynchronous callback 
+detail behind a synchronous interface, so your HTTP client just sees a simple HTTP request/response. This is what the MHS Adaptor has termed the "Sync-Async wrapper". 
+When you set the `sync-async` message header to `true` you are requesting the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the 
+same HTTP connection.
+
+In this example, the `QUPC_IN160101UK05` Spine message is used. This Spine message is used when requesting the Summary Care Record of a patient.
+ 
+2) `Async Express Pattern Message  - Asynchronous Response` 
+
+The Asynchronous Express Messaging Pattern is one of the Spine messaging patterns which is defined in the Spine External Interface Specification. 
+In this pattern, a request is made to Spine, but the response is not provided on the same connection. Instead, spine initiates a connection back 
+to your MHS with the response. I.e the response from Spine is delivered like a call back to your MHS.
+
+The MHS Adaptor has hidden all this asynchronous callback detail behind a synchronous interface, so your HTTP client just sees a simple HTTP 
+request/response. This is what the MHS Adpator has termed the Sync-Async wrapper. When you set the sync-async  message header you are requesting 
+the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the same hTTP connection.
+
+In this example, the `QUPC_IN160101UK05` Spine message is used again. 
 
 ## AWS Exemplar
 
