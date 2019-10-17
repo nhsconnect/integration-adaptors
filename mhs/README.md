@@ -66,7 +66,7 @@ Before sending these requests, you will amend the details of the request as foll
  - In the Body, replace two instances of the string `FROM_ASID` with the ASID of your spine endpoint as above.
  - Set the URL to the address of the MHS Adaptor API in your environment. 
 
-1) `Async Express Pattern Message  - Synchronous Response` 
+#### "Async Express Pattern Message  - Synchronous Response" 
 
 The Asynchronous Express Messaging Pattern is one of the Spine messaging patterns which is defined in the Spine External Interface Specification. 
 In this pattern, a request is made to Spine, but the response is not provided on the same connection. Instead, spine initiates a connection back to your 
@@ -77,7 +77,7 @@ same HTTP connection.
 
 In this example, the `QUPC_IN160101UK05` Spine message is used. This Spine message is used when requesting the Summary Care Record of a patient.
  
-2) `Async Express Pattern Message  - Asynchronous Response` 
+#### "Async Express Pattern Message  - Asynchronous Response" 
 
 The Asynchronous Express Messaging Pattern is one of the Spine messaging patterns which is defined in the Spine External Interface Specification. 
 In this pattern, a request is made to Spine, but the response is not provided on the same connection. Instead, spine initiates a connection back 

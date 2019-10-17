@@ -2,7 +2,7 @@
 
 It may be useful to run these adaptors in a local environment. The following is a step-by-step guide on how to set this up.
 
-* Pre-requisite: [Set up NHS Digital OpenTest connection](setup-opentest.md)
+* Pre-requisite: [Set up NHS Digital OpenTest connection](../setup-opentest.md)
 * Requirements: 
     - Docker - for example [Docker for Windows](https://docs.docker.com/docker-for-windows/)
     - [Packer](https://www.packer.io/)
@@ -22,7 +22,8 @@ are required to run the MHS Adaptor locally.
     - RabbitMQ (to drop asynchronous responses from spine onto a queue)
     
  * Set up Environment variables. The environment variables `MHS_SECRET_PARTY_KEY`, `MHS_SECRET_CLIENT_CERT`, `MHS_SECRET_CLIENT_KEY` and `MHS_SECRET_CA_CERTS` need to
-  be set when running this command. These variables should be set as described [here](mhs). A simple way of setting this up once is to create a bash file `configure-env-vars.sh` that looks like:
+  be set when running this command. These variables should be set as described [here](mhs-adaptor-dev-notes.md#environment-variables). 
+  A simple way of setting this up once is to create a bash file `configure-env-vars.sh` that looks like:
   ```sh
   export MHS_SECRET_PARTY_KEY="your party key from NHS Digital here"
   export MHS_SECRET_CLIENT_CERT=$'client cert from NHS Digital here'
@@ -39,7 +40,7 @@ are required to run the MHS Adaptor locally.
 the async responses from Spine can access the MHS. For example on windows a inbound rule may be required in windows
 firewall to allow inbound traffic from the Spine through port 443. 
 
-* Note that the `MHS_LOG_LEVEL` environment variable (as documented [here](mhs)) is set by default to `NOTSET` in the
+* Note that the `MHS_LOG_LEVEL` environment variable (as documented [here](mhs-adaptor-dev-notes.md#environment-variables)) is set by default to `NOTSET` in the
 `docker-compose.yml` file but should be changed if needed.
 
 ## Smoke Testing your local MHS and SCR adaptor
