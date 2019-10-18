@@ -141,17 +141,24 @@ A future phase of MHS adaptor work will deliver an Azure public cloud exemplar. 
 AWS blueprint architecture, with modifications focusing on differences in cloud services such as the use
 of ACS for container orchestration.
 
-  
+## Operating the MHS Adaptor in your infrastructure
+
+Refer to [Operating the MHS Adaptor](operating-mhs-adaptor.md) for information on how to operate the MHS Adaptor as it is deployed
+within the boundary of your infrastructure.
+
+## Developer Setup
+
+For information targeted at developers making use of the MHS Adaptor, please refer to [MHS Adaptor developer notes](running-mhs-adaptor-locally.md)
 
 ## Note on Certificate Validation 
 
 **WARNING: Due to the limitations of NHS Digital OpenTest configuration, verification of the server certificate received when making a connection 
 to the spine MHS is currently DISABLED (see the [OutboundTransmission](./outbound/outbound/transmission/outbound_transmission.py) class'
-`make_request` method).** This MHS should not be used in a production environment unless this certificate verification
-is re-enabled.
+`make_request` method). This MHS should not be used in a production environment unless this certificate verification
+is re-enabled.**
+
+As at 17 October 2019, a change is pending to the OpenTest environment which will enable service certificate verification. 
 
 
-## Developer Setup
 
-For information targeted at developers making use of the MHS Adaptor, please refer to [MHS Adaptor developer notes](running-mhs-adaptor-locally.md)
 
