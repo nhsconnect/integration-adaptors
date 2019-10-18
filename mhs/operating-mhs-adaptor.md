@@ -12,7 +12,7 @@ CloudWatch Logs service. Additionally logs produced by other cloud infrastructur
 so that logs are comprehensively captured across the whole solution allowing for joined up querying.
 
 ## Choice of Log analytics tooling
-The MHS Adaptor mya be deployed into various public or private cloud platforms. Irrespective of the platform, logs should be forwarded to a suitable log 
+The MHS Adaptor may be deployed into various public or private cloud platforms. Irrespective of the platform, logs should be forwarded to a suitable log 
 indexing service. 
 
 ### Key requirements for choice of logging tool
