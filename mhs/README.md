@@ -148,7 +148,8 @@ within the boundary of your infrastructure.
 
 ## Developer Setup
 
-For information targeted at developers making use of the MHS Adaptor, please refer to [MHS Adaptor developer notes](running-mhs-adaptor-locally.md)
+For information targeted at developers making use of the MHS Adaptor, please refer to [MHS Adaptor developer notes](mhs-adaptor-dev-notes.md). 
+This includes information on how to [test-drive the MHS Adaptor on a local development machine](running-mhs-adaptor-locally.md). 
 
 ## Note on Certificate Validation 
 

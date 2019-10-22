@@ -30,9 +30,9 @@ If the build fails due to dependency issues with proton, follow these instructio
 5) Once the installation has completed you may have to reboot.
 
 
-## Running MHS
-MHS is made up of multiple components, and running them all separately can be tedious. Instead, follow the steps described in
-[running an MHS locally](running-mhs-adaptor-locally.md) for how to do this.
+## Running the MHS Adaptor locally
+The MHS Adaptor is made up of multiple components, and running them all separately can be tedious. Instead, follow the steps described in
+[running an MHS Adaptor locally](running-mhs-adaptor-locally.md) for how to run the required set of docker containers locally.
 
 ## API docs
 MHS outbound (which is the API that suppliers use to make requests to the MHS) is documented using
