@@ -12,7 +12,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "python:3-slim",
+      "image": "python:3.7-slim",
       "commit": true,
       "changes": [
         "EXPOSE 80",
