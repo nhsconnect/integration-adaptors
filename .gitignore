@@ -132,3 +132,8 @@ mhs-reference-implementation/selenium_tests/data/local_asid
 
 # component test enviornment file
 **/component-test-source.sh
+
+# Local configuration
+/mhs/inbound/nhs-inbound-env.yaml
+/mhs/outbound/nhs-outbound-env.yaml
+/mhs/spineroutelookup/nhs-spineroutelookup-env.yaml
