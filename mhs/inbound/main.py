@@ -85,9 +85,10 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     healthcheck_application = tornado.web.Application([
         ("/healthcheck", healthcheck_handler.HealthcheckHandler)
     ])
-    healthcheck_application.listen(80)
+    server_port = int(config.get_config('SERVER_PORT', default='80'))
+    healthcheck_application.listen(server_port)
 
-    logger.info('011', 'Starting inbound server')
+    logger.info('011', 'Starting inbound server at port ' + str(server_port))
     tornado.ioloop.IOLoop.current().start()
 
 

@@ -101,13 +101,15 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
     # Note that the paths in generate_openapi.py should be updated if these
     # paths are changed
     supplier_application = tornado.web.Application(
-        [(r"/", client_request_handler.SynchronousHandler,
-          dict(config_manager=config_manager, workflows=workflows)),
-         (r"/healthcheck", healthcheck_handler.HealthcheckHandler)])
+        [
+            (r"/", client_request_handler.SynchronousHandler,dict(config_manager=config_manager, workflows=workflows)),
+            (r"/healthcheck", healthcheck_handler.HealthcheckHandler)
+        ])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
-    supplier_server.listen(80)
+    server_port = int(config.get_config('SERVER_PORT', default='80'))
+    supplier_server.listen(server_port)
 
-    logger.info('001', 'Starting servers')
+    logger.info('001', 'Starting outbound server at port ' + str(server_port))
     tornado.ioloop.IOLoop.current().start()
 
 
