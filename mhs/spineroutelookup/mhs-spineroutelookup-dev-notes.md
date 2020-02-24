@@ -33,7 +33,7 @@ After installing/configuring dependencies with pipenv, open PyCharm project usin
 ```
 Make sure project interpreter is configured as Pipenv (Preferences -> Project -> Project interpreter)
 
-Make a copy of `nhs-spineroutelookup-env-example.yaml` and fill it with data (mostly certificates - be vary of indentation for them) obtained earlier for OpenTest access
+Make a copy of `nhs-spineroutelookup-env-example.yaml` as `nhs-spineroutelookup-env.yaml` (this file has already been added to .gitignore) and fill it with data (mostly certificates - be vary of indentation for them) obtained earlier for OpenTest access
 
 Last step is to add new Python Run Configuration:
 1. Point script path to `main.py`
