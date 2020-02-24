@@ -17,6 +17,24 @@ brew install pipenv
 ```
 and available on your `$PATH`
 
+In case of error:
+```
+ImportError: pycurl: libcurl link-time ssl backend (openssl) is different from compile-time ssl backend (none/other)
+```
+follow these steps:
+
+```
+brew install openssl
+brew install curl-openssl
+
+export PYCURL_SSL_LIBRARY=openssl
+export LDFLAGS="-L/usr/local/opt/curl-openssl/lib"
+export CPPFLAGS="-I/usr/local/opt/curl-openssl/include"
+
+pip install --no-cache-dir --compile --ignore-installed --install-option="--with-openssl" --install-option="--openssl-dir=/usr/local/opt/openssl" pycurl
+
+```
+
 ### Set up
 
 Within root directory of outbound (`integration-adaptors/mhs/outbound`) project run:
