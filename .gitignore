@@ -5,6 +5,7 @@ __pycache__/
 
 # ide file
 .idea
+*.iml
 
 # C extensions
 *.so
