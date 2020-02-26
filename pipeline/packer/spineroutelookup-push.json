@@ -1,0 +1,32 @@
+{
+  "_description": "This template produces a Jenkins worker.",
+  "variables": {
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/mhs/route",
+    "tag": "{{env `BUILD_TAG`}}"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "temporary/spineroutelookup:latest",
+      "pull": false,
+      "commit": true
+    }
+  ],
+  "provisioners": [
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "{{user `registry`}}{{user `repository`}}",
+        "tag": "route-{{user `tag`}}"
+      },
+      {
+        "type": "docker-push",
+        "ecr_login": true,
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
+      }
+    ]
+  ]
+}

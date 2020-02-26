@@ -1,5 +1,5 @@
 pipeline {
-    agent{
+    agent {
         label 'jenkins-workers'
     }
 
@@ -46,12 +46,44 @@ pipeline {
             steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
         }
 
-        stage('Package') {
-            steps {
-                sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
-                sh label: 'Running Outbound Packer build', script: 'packer build -color=false pipeline/packer/outbound.json'
-                sh label: 'Running Spine Route Lookup Packer build', script: 'packer build -color=false pipeline/packer/spineroutelookup.json'
-                sh label: 'Running SCR service Packer build', script: 'packer build -color=false pipeline/packer/scr-web-service.json'
+        stage('Packaging') {
+            // agent {
+            //     dockerfile true
+            // }
+            stages {
+                stage('Package Inbound') {
+
+                    steps {
+                        script {
+                            docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
+                        }
+                        script {
+                            sh label: 'Running Inbound Packer build', script: "packer build -color=false pipeline/packer/inbound-push.json"
+                        }
+                    }
+                }
+                stage('Package Outbound') {
+
+                    steps {
+                        script {
+                            docker.build("temporary/outbound:latest", "-f dockers/mhs/outbound/Dockerfile .")
+                        }
+                        script {
+                            sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/outbound-push.json"
+                        }
+                    }
+                }
+                stage('Package Spine Route Lookup') {
+
+                    steps {
+                        script {
+                            docker.build("temporary/spineroutelookup:latest", "-f dockers/mhs/spineroutelookup/Dockerfile .")
+                        }
+                        script {
+                            sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
+                        }
+                    }
+                }
             }
         }
 
