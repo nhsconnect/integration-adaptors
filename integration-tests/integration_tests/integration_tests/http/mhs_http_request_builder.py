@@ -77,7 +77,7 @@ class MhsHttpRequestBuilder(object):
         response = self._execute_post_request()
         self.assertor.assertTrue(
             response.ok,
-            f'A non successful error code was returned from server: {response.status_code}')
+            f'A non successful error code was returned from server: {response.status_code} {response.text}')
 
         return response
 
@@ -90,7 +90,7 @@ class MhsHttpRequestBuilder(object):
         response = self._execute_post_request()
         self.assertor.assertTrue(
             response.status_code == 500,
-            f'A non 500 error code was returned from server: {response.status_code}')
+            f'A non 500 error code was returned from server: {response.status_code} {response.text}')
 
         return response
 
@@ -103,7 +103,7 @@ class MhsHttpRequestBuilder(object):
         response = self._execute_post_request()
         self.assertor.assertTrue(
             response.status_code == 400,
-            f'A non 400 error code was returned from server: {response.status_code}')
+            f'A non 400 error code was returned from server: {response.status_code} {response.text}')
 
         return response
 

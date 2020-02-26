@@ -62,8 +62,9 @@ class DynamoMhsTableStateAssertor(object):
         :return: an MhsItemAssertor that can be used to assert properties on the given item
         """
         items_with_key = [x for x in self.state['Items'] if x['key']['S'] == key]
-        self.assertor.assertTrue(len(items_with_key) == 1,
-                                 f'Expected an item with key: {key} but not exactly one found')
+        num_items = len(items_with_key)
+        self.assertor.assertTrue(len(items_with_key) == 1, f'Expected exactly one item with key {key} '
+                                                           f'but found {num_items}')
         return MhsItemAssertor(items_with_key[0])
 
     @staticmethod
@@ -71,3 +72,6 @@ class DynamoMhsTableStateAssertor(object):
         return DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .item_contains_value('INBOUND_STATUS', 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED')
+
+    def __str__(self):
+        return f'{self.state}'

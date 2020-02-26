@@ -3,8 +3,8 @@ Provides access to AMQ queues
 """
 import os
 
-from proton import Message
-from proton._utils import BlockingConnection
+from proton import Message, Timeout
+from proton.utils import BlockingConnection
 
 
 class AMQWrapper(object):
@@ -30,6 +30,21 @@ class AMQWrapper(object):
         connection.close()
 
         return message
+
+    def drain(self):
+        """
+        Drain the queue to prevent test failures caused by previous failing tests not ack'ing all of their messages
+        """
+        connection = BlockingConnection(self.queue_url, user=self.username, password=self.password)
+        receiver = connection.create_receiver(self.queue_name)
+        try:
+            while True:
+                receiver.receive(timeout=1)
+                receiver.accept()
+        except Timeout:
+            pass
+        finally:
+            connection.close()
 
 
 MHS_INBOUND_QUEUE = AMQWrapper(os.environ.get('MHS_SECRET_INBOUND_QUEUE_USERNAME', None),
