@@ -1,11 +1,11 @@
 """This module defines the asynchronous forward reliable workflow."""
-import asyncio
 from typing import Tuple, Optional
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from isodate import isoerror
+from mhs_common.retry import retriable_action
 from utilities import timing, config
 from utilities.date_utilities import DateUtilities
 
@@ -91,25 +91,20 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         await work_description.publish()
 
-        for retry_num in range(self.inbound_queue_max_retries + 1):
-            try:
-                await self._put_message_onto_queue_with(message_id, correlation_id, payload, attachments=attachments)
-                break
-            except Exception as e:
-                logger.warning('0006', 'Failed to put unsolicited message onto inbound queue due to {Exception}',
-                               {'Exception': e})
-                if retry_num >= self.inbound_queue_max_retries:
-                    logger.error("0020",
-                                 "Exceeded the maximum number of retries, {max_retries} retries, when putting "
-                                 "unsolicited message onto inbound queue",
-                                 {"max_retries": self.inbound_queue_max_retries})
-                    await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
-                    raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
-                                             'been exceeded') from e
+        result = await retriable_action.RetriableAction(
+            lambda: self._put_message_onto_queue_with(message_id, correlation_id, payload, attachments=attachments),
+            self.inbound_queue_max_retries,
+            self.inbound_queue_retry_delay)\
+            .execute()
 
-                logger.info("0021", "Waiting for {retry_delay} seconds before retrying putting unsolicited message "
-                                    "onto inbound queue", {"retry_delay": self.inbound_queue_retry_delay})
-                await asyncio.sleep(self.inbound_queue_retry_delay)
+        if not result.is_successful:
+            logger.error("0020",
+                         "Exceeded the maximum number of retries, {max_retries} retries, when putting "
+                         "unsolicited message onto inbound queue",
+                         {"max_retries": self.inbound_queue_max_retries})
+            await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
+            raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
+                                     'been exceeded') from result.exception
 
         logger.audit('0022', '{WorkflowName} workflow invoked for inbound unsolicited request. '
                              'Attempted to place message onto inbound queue with {Acknowledgement}.',
