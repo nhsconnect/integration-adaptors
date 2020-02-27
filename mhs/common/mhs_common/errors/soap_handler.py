@@ -1,3 +1,4 @@
+from json import dumps as dump_json
 from typing import Dict, AnyStr, Tuple
 
 from defusedxml import ElementTree
@@ -6,7 +7,6 @@ from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
 from mhs_common.messages.soap_fault_envelope import SOAPFault
 
 logger = IntegrationAdaptorsLogger('SOAP_ERROR_HANDLER')
-
 
 ERROR_RESPONSE_DEFAULTS = {
     'errorType': 'soap_fault'
@@ -43,14 +43,18 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
     assert SOAPFault.is_soap_fault(parsed_body), 'Not SOAP Fault response!'
     fault: SOAPFault = SOAPFault.from_parsed(headers, parsed_body)
 
-    errors_text = ''
+    error_data_response = {'error_message': 'Error(s) received from Spine. Contact system administrator.',
+                           'error_code': '0002',
+                           'process_key': 'SOAP_ERROR_HANDLER0002',
+                           'errors': []}
+
     for idx, error_fields in enumerate(fault.error_list):
         all_fields = {**error_fields, **ERROR_RESPONSE_DEFAULTS}
         if all_fields.get('errorCode'):
             soap_fault_codes.append(int(all_fields['errorCode']))
-        errors_text += '{}: {}\n'.format(idx, ' '.join([f'{k}={v}' for k, v in all_fields.items()]))
+        error_data_response['errors'].append(all_fields)
         logger.error('0002',
                      'SOAP Fault returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
                      all_fields)
 
-    return code, f'Error(s) received from Spine. Contact system administrator.\n{errors_text}', soap_fault_codes
+    return 500, dump_json(error_data_response), soap_fault_codes

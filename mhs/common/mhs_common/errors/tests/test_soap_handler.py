@@ -1,5 +1,6 @@
 import os
 import unittest
+from json import loads as load_json
 from pathlib import Path
 
 from utilities.file_utilities import FileUtilities
@@ -22,17 +23,19 @@ class TestOutboundSOAPHandler(unittest.TestCase):
             handle_soap_error(500, {'Content-Type': 'text/xml'}, '<a><b><b></a>')
 
     def test_single_error(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml' )
-        self.assertIn('System failure to process message - default',
-                      handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
+        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml')
+        resp_json = load_json(handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
+
+        self.assert_json_error_root(resp_json)
+        self.assert_json_with_first_error(resp_json)
 
     def test_multiple_errors(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
-        response = handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1]
+        resp_json = load_json(handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
 
-        self.assertIn('System failure to process message - default', response)
-        self.assertIn('The message is not well formed', response)
-        self.assertIn('errorType=soap_fault', response)
+        self.assert_json_error_root(resp_json)
+        self.assert_json_with_first_error(resp_json)
+        self.assert_json_with_second_error(resp_json)
 
     def test_no_content_type(self):
         with self.assertRaises(ValueError):
@@ -41,3 +44,22 @@ class TestOutboundSOAPHandler(unittest.TestCase):
     def test_non_xml_content_type(self):
         with self.assertRaises(ValueError):
             handle_soap_error(500, {'Content-Type': 'text/html'}, 'Some body')
+
+    def assert_json_error_root(self, resp_json):
+        self.assertEqual(resp_json['error_code'], "0002")
+        self.assertEqual(resp_json['error_message'], "Error(s) received from Spine. Contact system administrator.")
+        self.assertEqual(resp_json['process_key'], "SOAP_ERROR_HANDLER0002")
+
+    def assert_json_with_first_error(self, resp_json):
+        self.assertEqual(resp_json['errors'][0]['codeContext'], "urn:nhs:names:error:tms")
+        self.assertEqual(resp_json['errors'][0]['description'], "System failure to process message - default")
+        self.assertEqual(resp_json['errors'][0]['errorCode'], "200")
+        self.assertEqual(resp_json['errors'][0]['errorType'], "soap_fault")
+        self.assertEqual(resp_json['errors'][0]['severity'], "Error")
+
+    def assert_json_with_second_error(self, resp_json):
+        self.assertEqual(resp_json['errors'][1]['codeContext'], "urn:nhs:names:error:tms")
+        self.assertEqual(resp_json['errors'][1]['description'], "The message is not well formed")
+        self.assertEqual(resp_json['errors'][1]['errorCode'], "201")
+        self.assertEqual(resp_json['errors'][1]['errorType'], "soap_fault")
+        self.assertEqual(resp_json['errors'][1]['severity'], "Error")
