@@ -1,5 +1,4 @@
 """This module defines the common base for all asynchronous workflows."""
-import asyncio
 from typing import Dict, Callable, Tuple, Optional
 
 import utilities.integration_adaptors_logger as log
@@ -9,6 +8,7 @@ from tornado import httpclient
 from utilities import timing
 
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
+from mhs_common.retry import retriable_action
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
@@ -139,26 +139,23 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                                                 correlation_id: str,
                                                 work_description: wd.WorkDescription,
                                                 payload: str):
-        for retry_num in range(self.inbound_queue_max_retries + 1):
-            try:
-                await self._put_message_onto_queue_with(message_id, correlation_id, payload)
-                break
-            except Exception as e:
-                logger.warning('0012', 'Failed to put message onto inbound queue due to {Exception}', {'Exception': e})
-                if retry_num >= self.inbound_queue_max_retries:
-                    logger.error("0013",
-                                 "Exceeded the maximum number of retries, {max_retries} retries, when putting "
-                                 "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
-                    await wd.update_status_with_retries(work_description,
-                                                        work_description.set_inbound_status,
-                                                        wd.MessageStatus.INBOUND_RESPONSE_FAILED,
-                                                        self.store_retries)
-                    raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
-                                             'been exceeded') from e
 
-                logger.info("0014", "Waiting for {retry_delay} seconds before retrying putting message onto inbound "
-                                    "queue", {"retry_delay": self.inbound_queue_retry_delay})
-                await asyncio.sleep(self.inbound_queue_retry_delay)
+        result = await retriable_action.RetriableAction(
+            lambda: self._put_message_onto_queue_with(message_id, correlation_id, payload),
+            self.inbound_queue_max_retries,
+            self.inbound_queue_retry_delay) \
+            .execute()
+
+        if not result.is_successful:
+            logger.error("0013",
+                         "Exceeded the maximum number of retries, {max_retries} retries, when putting "
+                         "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
+            await wd.update_status_with_retries(work_description,
+                                                work_description.set_inbound_status,
+                                                wd.MessageStatus.INBOUND_RESPONSE_FAILED,
+                                                self.store_retries)
+            raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
+                                     'been exceeded') from result.exception
 
     async def _lookup_reliability_details(self, interaction_details: Dict, org_code: str = None) -> Dict:
         try:
