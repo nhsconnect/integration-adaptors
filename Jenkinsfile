@@ -94,7 +94,7 @@ pipeline {
             stages {
                 stage('Deploy component locally') {
                     steps {
-                        sh label: 'listing dir' script: 'ls -l'
+                        sh label: 'listing dir', script: 'ls -l'
                         sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
                         sh label: 'Export environment variables', script: '''
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
