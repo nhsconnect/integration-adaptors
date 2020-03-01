@@ -11,81 +11,81 @@ pipeline {
     }
 
     stages {
-        // stage('Build modules') {
-        //     steps {
-        //         dir('common'){ buildModules('Installing common dependencies') }
-        //         dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
-        //         dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
-        //         dir('mhs/outbound'){ buildModules('Installing outbound dependencies') }
-        //         dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
-        //         dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
-        //     }
-        // }
+        stage('Build modules') {
+            steps {
+                dir('common'){ buildModules('Installing common dependencies') }
+                dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
+                dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
+                dir('mhs/outbound'){ buildModules('Installing outbound dependencies') }
+                dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
+                dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
+            }
+        }
 
-        // stage('Common Module Unit Tests') {
-        //     steps { dir('common') { executeUnitTestsWithCoverage() } }
-        // }
-        // stage('MHS Common Unit Tests') {
-        //     steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-        // }
-        // stage('MHS Inbound Unit Tests') {
-        //     steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-        // }
-        // stage('MHS Outbound Unit Tests') {
-        //     steps {
-        //         dir('mhs/outbound') {
-        //             executeUnitTestsWithCoverage()
-        //             sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
-        //         }
-        //     }
-        // }
-        //  stage('Spine Route Lookup Unit Tests') {
-        //     steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
-        // }
-        // stage('SCR Web Service Unit Tests') {
-        //     steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
-        // }
+        stage('Common Module Unit Tests') {
+            steps { dir('common') { executeUnitTestsWithCoverage() } }
+        }
+        stage('MHS Common Unit Tests') {
+            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
+        }
+        stage('MHS Inbound Unit Tests') {
+            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
+        }
+        stage('MHS Outbound Unit Tests') {
+            steps {
+                dir('mhs/outbound') {
+                    executeUnitTestsWithCoverage()
+                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+                }
+            }
+        }
+         stage('Spine Route Lookup Unit Tests') {
+            steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
+        }
+        stage('SCR Web Service Unit Tests') {
+            steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
+        }
 
-        // stage('Packaging') {
-        //     // agent {
-        //     //     dockerfile true
-        //     // }
-        //     stages {
-        //         stage('Package Inbound') {
+        stage('Packaging') {
+            // agent {
+            //     dockerfile true
+            // }
+            stages {
+                stage('Package Inbound') {
 
-        //             steps {
-        //                 script {
-        //                     docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
-        //                 }
-        //                 script {
-        //                     sh label: 'Running Inbound Packer build', script: "packer build -color=false pipeline/packer/inbound-push.json"
-        //                 }
-        //             }
-        //         }
-        //         stage('Package Outbound') {
+                    steps {
+                        script {
+                            docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
+                        }
+                        script {
+                            sh label: 'Running Inbound Packer build', script: "packer build -color=false pipeline/packer/inbound-push.json"
+                        }
+                    }
+                }
+                stage('Package Outbound') {
 
-        //             steps {
-        //                 script {
-        //                     docker.build("temporary/outbound:latest", "-f dockers/mhs/outbound/Dockerfile .")
-        //                 }
-        //                 script {
-        //                     sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/outbound-push.json"
-        //                 }
-        //             }
-        //         }
-        //         stage('Package Spine Route Lookup') {
+                    steps {
+                        script {
+                            docker.build("temporary/outbound:latest", "-f dockers/mhs/outbound/Dockerfile .")
+                        }
+                        script {
+                            sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/outbound-push.json"
+                        }
+                    }
+                }
+                stage('Package Spine Route Lookup') {
 
-        //             steps {
-        //                 script {
-        //                     docker.build("temporary/spineroutelookup:latest", "-f dockers/mhs/spineroutelookup/Dockerfile .")
-        //                 }
-        //                 script {
-        //                     sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                    steps {
+                        script {
+                            docker.build("temporary/spineroutelookup:latest", "-f dockers/mhs/spineroutelookup/Dockerfile .")
+                        }
+                        script {
+                            sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
+                        }
+                    }
+                }
+            }
+        }
 
         stage('Run Component Tests') {
             options {
@@ -94,6 +94,7 @@ pipeline {
             stages {
                 stage('Deploy component locally') {
                     steps {
+                        sh label: 'listing dir', script: 'cat ./dockers/mhs/spineroutelookup/Dockerfile'
                         sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
                         sh label: 'Export environment variables', script: '''
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
