@@ -5,7 +5,7 @@ services:
     image: local/mhs-inbound:${INBOUND_BUILD_TAG}
     build:
       context: .
-      dockerfile: dockers/mhs/inbound/Dockerfile
+      dockerfile: ./dockers/mhs/inbound/Dockerfile
     ports:
       - "443:443"
       - "8079:80"
@@ -29,7 +29,7 @@ services:
     image: local/mhs-outbound:${OUTBOUND_BUILD_TAG}
     build:
       context: .
-      dockerfile: dockers/mhs/outbound/Dockerfile
+      dockerfile: ./dockers/mhs/outbound/Dockerfile
     ports:
       - "80:80"
     environment:
@@ -54,7 +54,7 @@ services:
     image: local/mhs-route:${ROUTE_BUILD_TAG}
     build:
       context: .
-      dockerfile: dockers/mhs/spineroutelookup/Dockerfile
+      dockerfile: ./dockers/mhs/spineroutelookup/Dockerfile
     ports:
       - "8080:80"
     environment:
