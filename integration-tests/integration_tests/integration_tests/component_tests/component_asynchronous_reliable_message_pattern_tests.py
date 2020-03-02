@@ -126,7 +126,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
 
         # Assert
         TextErrorResponseAssertor(response.text) \
-            .assert_code_context('urn:oasis:names:tc:ebxml') \
+            .assert_code_context('urn:oasis:names:tc:ebxml-msg:service:errors') \
             .assert_severity('Error') \
             .assert_error_type('ebxml_error')
 
@@ -172,7 +172,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
 
         # Assert
         TextErrorResponseAssertor(response.text) \
-            .assert_code_context('urn:oasis:names:tc:ebxml') \
+            .assert_code_context('urn:oasis:names:tc:ebxml-msg:service:errors') \
             .assert_severity('Error') \
             .assert_error_type('ebxml_error')
 
