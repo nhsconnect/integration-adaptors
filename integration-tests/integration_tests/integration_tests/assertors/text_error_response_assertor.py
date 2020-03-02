@@ -17,21 +17,21 @@ class TextErrorResponseAssertor(object):
         self.assertor = unittest.TestCase('__init__')
 
     def assert_error_code(self, expected_error_code: str) -> TextErrorResponseAssertor:
-        self.assertEqual(self.received_message['errors'][0]['errorCode'], expected_error_code,
-                         'Error code did not match expected value')
+        self.assertor.assertEqual(self.received_message['errors'][0]['errorCode'], expected_error_code,
+                                  'Error code did not match expected value')
         return self
 
     def assert_code_context(self, expected_code_context: str) -> TextErrorResponseAssertor:
-        self.assertEqual(self.received_message['errors'][0]['codeContext'], expected_code_context,
-                         'Code context did not match expected value')
+        self.assertor.assertEqual(self.received_message['errors'][0]['codeContext'], expected_code_context,
+                                  'Code context did not match expected value')
         return self
 
     def assert_severity(self, expected_severity: str) -> TextErrorResponseAssertor:
-        self.assertEqual(self.received_message['errors'][0]['severity'], expected_severity,
-                         'Severity did not match expected value')
+        self.assertor.assertEqual(self.received_message['errors'][0]['severity'], expected_severity,
+                                  'Severity did not match expected value')
         return self
 
     def assert_error_type(self, expected_error_type) -> TextErrorResponseAssertor:
-        self.assertEqual(self.received_message['errors'][0]['errorType'], expected_error_type,
-                         'errorType did not match expected value')
+        self.assertor.assertEqual(self.received_message['errors'][0]['errorType'], expected_error_type,
+                                  'errorType did not match expected value')
         return self
