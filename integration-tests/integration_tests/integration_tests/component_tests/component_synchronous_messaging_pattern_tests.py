@@ -37,6 +37,10 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
             .with_body(message) \
             .execute_post_expecting_error_response()
 
+        print("----------------------------------------------------------")
+        print(response.text)
+        print("----------------------------------------------------------")
+
         # Assert
         TextErrorResponseAssertor(response.text) \
             .assert_error_code(200) \
