@@ -73,7 +73,16 @@ def start_tornado_server(routing: routing_reliability.RoutingAndReliability) -> 
     server.listen(server_port)
 
     logger.info('003', 'Starting router server at port ' + str(server_port))
-    tornado.ioloop.IOLoop.current().start()
+    tornado_io_loop = tornado.ioloop.IOLoop.current()
+    try:
+        tornado_io_loop.start()
+    except KeyboardInterrupt:
+        logger.warning('004', 'Keyboard interrupt')
+        pass
+    finally:
+        tornado_io_loop.stop()
+        tornado_io_loop.close(True)
+    logger.info('004', 'Server shut down, exiting...')
 
 
 def main():

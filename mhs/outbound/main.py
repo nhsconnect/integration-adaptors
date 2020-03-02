@@ -110,7 +110,16 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
     supplier_server.listen(server_port)
 
     logger.info('001', 'Starting outbound server at port ' + str(server_port))
-    tornado.ioloop.IOLoop.current().start()
+    tornado_io_loop = tornado.ioloop.IOLoop.current()
+    try:
+        tornado_io_loop.start()
+    except KeyboardInterrupt:
+        logger.warning('002', 'Keyboard interrupt')
+        pass
+    finally:
+        tornado_io_loop.stop()
+        tornado_io_loop.close(True)
+    logger.info('002', 'Server shut down, exiting...')
 
 
 def main():

@@ -89,7 +89,16 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     healthcheck_application.listen(server_port)
 
     logger.info('011', 'Starting inbound server at port ' + str(server_port))
-    tornado.ioloop.IOLoop.current().start()
+    tornado_io_loop = tornado.ioloop.IOLoop.current()
+    try:
+        tornado_io_loop.start()
+    except KeyboardInterrupt:
+        logger.warning('012', 'Keyboard interrupt')
+        pass
+    finally:
+        tornado_io_loop.stop()
+        tornado_io_loop.close(True)
+    logger.info('012', 'Server shut down, exiting...')
 
 
 def main():
