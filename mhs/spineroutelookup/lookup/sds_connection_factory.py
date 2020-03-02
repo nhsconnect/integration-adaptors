@@ -1,17 +1,24 @@
 import ssl
 
 import ldap3
-from utilities import certs
+from utilities import certs, config, integration_adaptors_logger as log
 
 import definitions
+
+_LDAP_CONNECTION_RETRIES = int(config.get_config('LDAP_CONNECTION_RETRIES', default='3'))
+_LDAP_CONNECTION_TIMEOUT_IN_SECONDS = int(config.get_config('LDAP_CONNECTION_TIMEOUT_IN_SECONDS', default='5'))
+logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_SDS_CONNECTION_FACTORY')
 
 
 def build_sds_connection(ldap_address: str) -> ldap3.Connection:
     """
     Given an ldap service address this will return a ldap3 connection object
     """
-    server = ldap3.Server(ldap_address)
+    ldap3.set_config_parameter('RESTARTABLE_TRIES', _LDAP_CONNECTION_RETRIES)
+    server = ldap3.Server(ldap_address, connect_timeout=_LDAP_CONNECTION_TIMEOUT_IN_SECONDS)
+    logger.info('001', 'Opening LDAP connection without TLS')
     connection = ldap3.Connection(server, auto_bind=True, client_strategy=ldap3.REUSABLE)
+    logger.info('002', 'LDAP connection successful')
     return connection
 
 
@@ -32,5 +39,9 @@ def build_sds_connection_tls(ldap_address: str, private_key: str, local_cert: st
                          local_certificate_file=certificates.local_cert_path, validate=ssl.CERT_REQUIRED,
                          version=ssl.PROTOCOL_TLSv1, ca_certs_file=certificates.ca_certs_path)
 
-    server = ldap3.Server(ldap_address, use_ssl=True, tls=load_tls)
-    return ldap3.Connection(server, auto_bind=True, client_strategy=ldap3.REUSABLE)
+    ldap3.set_config_parameter('RESTARTABLE_TRIES', _LDAP_CONNECTION_RETRIES)
+    server = ldap3.Server(ldap_address, use_ssl=True, tls=load_tls, connect_timeout=_LDAP_CONNECTION_TIMEOUT_IN_SECONDS)
+    logger.info('003', 'Opening LDAP connection using TLS')
+    connection = ldap3.Connection(server, auto_bind=True, client_strategy=ldap3.REUSABLE)
+    logger.info('004', 'LDAP connection successful')
+    return connection
