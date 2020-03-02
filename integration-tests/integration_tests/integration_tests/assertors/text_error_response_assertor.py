@@ -17,7 +17,7 @@ class TextErrorResponseAssertor(object):
         self.assertor = unittest.TestCase('__init__')
 
     def assert_error_code(self, expected_error_code: int) -> TextErrorResponseAssertor:
-        self.assertor.assertEqual(self.received_message['errors'][0]['errorCode'], expected_error_code,
+        self.assertor.assertEqual(self.received_message['errors'][0]['errorCode'], str(expected_error_code),
                                   'Error code did not match expected value')
         return self
 
