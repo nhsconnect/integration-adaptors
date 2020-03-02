@@ -9,7 +9,6 @@ from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAsserto
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 
-
 class SynchronousMessagingPatternTests(unittest.TestCase):
     """
      These tests show a synchronous response from Spine via the MHS for the example message interaction of PDS
@@ -37,15 +36,12 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
             .with_body(message) \
             .execute_post_expecting_error_response()
 
-        print("----------------------------------------------------------")
-        print(response.text)
-        print("----------------------------------------------------------")
-
         # Assert
         TextErrorResponseAssertor(response.text) \
             .assert_error_code(200) \
             .assert_code_context('urn:nhs:names:error:tms') \
-            .assert_severity('Error')
+            .assert_severity('Error') \
+            .assert_error_type('soap_fault')
 
     def test_should_record_message_status_as_successful_when_error_response_returned_from_spine(self):
         """
