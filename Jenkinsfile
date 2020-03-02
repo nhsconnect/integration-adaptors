@@ -47,12 +47,8 @@ pipeline {
         }
 
         stage('Packaging') {
-            // agent {
-            //     dockerfile true
-            // }
             stages {
                 stage('Package Inbound') {
-
                     steps {
                         script {
                             docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
@@ -63,7 +59,6 @@ pipeline {
                     }
                 }
                 stage('Package Outbound') {
-
                     steps {
                         script {
                             docker.build("temporary/outbound:latest", "-f dockers/mhs/outbound/Dockerfile .")
@@ -74,7 +69,6 @@ pipeline {
                     }
                 }
                 stage('Package Spine Route Lookup') {
-
                     steps {
                         script {
                             docker.build("temporary/spineroutelookup:latest", "-f dockers/mhs/spineroutelookup/Dockerfile .")
@@ -94,7 +88,6 @@ pipeline {
             stages {
                 stage('Deploy component locally') {
                     steps {
-                        sh label: 'listing dir', script: 'cat ./dockers/mhs/spineroutelookup/Dockerfile'
                         sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
                         sh label: 'Export environment variables', script: '''
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
