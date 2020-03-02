@@ -72,17 +72,17 @@ def start_tornado_server(routing: routing_reliability.RoutingAndReliability) -> 
     server_port = int(config.get_config('SPINE_ROUTE_LOOKUP_SERVER_PORT', default='80'))
     server.listen(server_port)
 
-    logger.info('003', 'Starting router server at port ' + str(server_port))
+    logger.info('003', 'Starting router server at port {server_port}', {'server_port': server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
         tornado_io_loop.start()
     except KeyboardInterrupt:
-        logger.warning('004', 'Keyboard interrupt')
+        logger.warning('006', 'Keyboard interrupt')
         pass
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)
-    logger.info('004', 'Server shut down, exiting...')
+    logger.info('007', 'Server shut down, exiting...')
 
 
 def main():

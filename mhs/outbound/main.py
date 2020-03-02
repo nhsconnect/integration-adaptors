@@ -109,7 +109,7 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
     server_port = int(config.get_config('OUTBOUND_SERVER_PORT', default='80'))
     supplier_server.listen(server_port)
 
-    logger.info('001', 'Starting outbound server at port ' + str(server_port))
+    logger.info('001', 'Starting outbound server at port {server_port}', {'server_port': server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
         tornado_io_loop.start()
@@ -119,7 +119,7 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)
-    logger.info('002', 'Server shut down, exiting...')
+    logger.info('003', 'Server shut down, exiting...')
 
 
 def main():

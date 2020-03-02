@@ -88,7 +88,7 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     server_port = int(config.get_config('INBOUND_SERVER_PORT', default='80'))
     healthcheck_application.listen(server_port)
 
-    logger.info('011', 'Starting inbound server at port ' + str(server_port))
+    logger.info('011', 'Starting inbound server at port {server_port}', {'server_port': server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
         tornado_io_loop.start()
@@ -98,7 +98,7 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)
-    logger.info('012', 'Server shut down, exiting...')
+    logger.info('013', 'Server shut down, exiting...')
 
 
 def main():
