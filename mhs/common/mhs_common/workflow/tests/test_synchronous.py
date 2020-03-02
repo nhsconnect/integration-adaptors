@@ -212,7 +212,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
 
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         self.assertEqual(error, 500)
-        self.assertEqual(text, 'Error(s) received from Spine: HTTP 451: Unknown')
+        self.assertEqual(text[:40], 'Error(s) received from Spine: HTTP 451: ')
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
