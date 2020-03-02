@@ -17,6 +17,7 @@ from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
+from json import loads as load_json
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
@@ -271,9 +272,19 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
                                                                          INTERACTION_DETAILS,
                                                                          PAYLOAD, None)
+        resp_json = load_json(message)
 
         self.assertEqual(500, status)
-        self.assertTrue('description=System failure to process message' in message)
+        self.assertEqual(resp_json['error_code'], "0002")
+        self.assertEqual(resp_json['error_message'], "Error(s) received from Spine. Contact system administrator.")
+        self.assertEqual(resp_json['process_key'], "SOAP_ERROR_HANDLER0002")
+        self.assertEqual(resp_json['errors'][0]['codeContext'], "urn:nhs:names:error:tms")
+        self.assertEqual(resp_json['errors'][0]['description'], "System failure to process message - default")
+        self.assertEqual(resp_json['errors'][0]['errorCode'], "200")
+        self.assertEqual(resp_json['errors'][0]['errorType'], "soap_fault")
+        self.assertEqual(resp_json['errors'][0]['location'], "Not Supported")
+        self.assertEqual(resp_json['errors'][0]['severity'], "Error")
+
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
