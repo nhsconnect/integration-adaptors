@@ -22,6 +22,7 @@ REQUEST_BODY = json.dumps({"payload": REQUEST_BODY_PAYLOAD})
 WORKFLOW_NAME = "workflow name"
 INTERACTION_DETAILS = {'workflow': WORKFLOW_NAME, 'sync_async': True}
 SYNC_ASYNC_WORKFLOW = "sync-async"
+CORRELATION_ID = '12345'
 
 
 class BaseHandlerTest(tornado.testing.AsyncHTTPTestCase):
@@ -31,10 +32,10 @@ class BaseHandlerTest(tornado.testing.AsyncHTTPTestCase):
         log.correlation_id.set(None)
 
     def call_handler(self, content_type="application/json", interaction_id=INTERACTION_NAME, body=REQUEST_BODY,
-                     sync_async='false') -> tornado.httpclient.HTTPResponse:
+                     sync_async='false', correlation_id=CORRELATION_ID) -> tornado.httpclient.HTTPResponse:
         return self.fetch("/", method="POST",
                           headers={"Content-Type": content_type, "Interaction-Id": interaction_id,
-                                   'sync-async': sync_async},
+                                   'sync-async': sync_async, "Correlation-Id": correlation_id},
                           body=body)
 
 
@@ -60,10 +61,11 @@ class TestSynchronousHandler(BaseHandlerTest):
         mock_get_uuid.side_effect = [MOCK_UUID, MOCK_UUID_2]
         self.config_manager.get_interaction_details.return_value = INTERACTION_DETAILS
 
-        response = self.call_handler()
+        response = self.call_handler(correlation_id=MOCK_UUID_2)
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.headers["Content-Type"], "text/xml")
+        self.assertEqual(response.headers["Correlation-Id"], MOCK_UUID_2)
         self.assertEqual(response.body.decode(), expected_response)
 
         self.config_manager.get_interaction_details.assert_called_with(INTERACTION_NAME)
@@ -96,6 +98,7 @@ class TestSynchronousHandler(BaseHandlerTest):
                 response = self.call_handler(body=json.dumps(body))
 
                 self.assertEqual(response.code, 200)
+                self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
 
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     @patch.object(log, "correlation_id")
@@ -115,7 +118,8 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body.decode(), expected_response)
-        mock_get_uuid.assert_called_once()
+        self.assertEqual(response.headers["Correlation-Id"], MOCK_UUID)
+        mock_get_uuid.assert_called()
 
         self.workflow.handle_outbound_message.assert_called_with(None, message_id, MOCK_UUID, INTERACTION_DETAILS,
                                                                  REQUEST_BODY_PAYLOAD, None)
@@ -133,15 +137,16 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         response = self.fetch("/", method="POST",
                               headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
-                                       "Correlation-Id": correlation_id,
+                                       "Correlation-Id": CORRELATION_ID,
                                        'sync-async': 'false'},
                               body=REQUEST_BODY)
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body.decode(), expected_response)
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         mock_get_uuid.assert_called_once()
 
-        self.workflow.handle_outbound_message.assert_called_with(None, MOCK_UUID, correlation_id, INTERACTION_DETAILS,
+        self.workflow.handle_outbound_message.assert_called_with(None, MOCK_UUID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                  REQUEST_BODY_PAYLOAD, None)
 
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
@@ -182,6 +187,8 @@ class TestSynchronousHandler(BaseHandlerTest):
 
                 self.assertEqual(response.code, http_status)
                 self.assertEqual(response.headers["Content-Type"], "text/plain")
+                self.assertIn("Correlation-Id", response.headers, 'Correllation-Id header should be present in error response')
+                self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
                 self.assertEqual(response.body.decode(), expected_response)
 
     def test_post_message_where_workflow_not_found_on_interaction_details(self):
@@ -191,6 +198,8 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 500)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
+        self.assertIn("Correlation-Id", response.headers, 'Correllation-Id header should be present in error response')
         self.assertIn(f"Couldn't determine workflow to invoke for interaction ID: {INTERACTION_NAME}",
                       response.body.decode())
 
@@ -203,11 +212,12 @@ class TestSynchronousHandler(BaseHandlerTest):
         phrase on the status line (see https://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1). This test
         checks that this isn't being done.
         """
-        response = self.fetch("/", method="POST", body="A request")
+        response = self.fetch("/", method="POST", body="A request", headers={"Correlation-Id": CORRELATION_ID})
 
         self.assertEqual(response.code, 404)
         self.assertEqual(response.error.message, "Not Found")
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(CORRELATION_ID, response.headers["Correlation-Id"])
         self.assertIn('Required Interaction-Id header not found', response.body.decode())
 
     def test_post_message_where_interaction_detail_has_invalid_workflow(self):
@@ -217,6 +227,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 500)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn(f"Couldn't determine workflow to invoke for interaction ID: {INTERACTION_NAME}",
                       response.body.decode())
 
@@ -224,11 +235,27 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.workflow.handle_outbound_message.assert_not_called()
 
     def test_post_with_no_interaction_name(self):
-        response = self.fetch("/", method="POST", body="A request")
+        response = self.fetch("/", method="POST", body="A request", headers={"Correlation-Id": CORRELATION_ID})
 
         self.assertEqual(response.code, 404)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn('Required Interaction-Id header not found', response.body.decode())
+
+    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    def test_post_with_no_correlation_id_assigns_new_correlation_id(self, mock_get_uuid):
+
+        mock_get_uuid.return_value = MOCK_UUID
+        response = self.fetch("/", method="POST",
+                              headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
+                                       'sync-async': 'false'},
+                              body=REQUEST_BODY)
+
+        self.assertEqual(response.code, 500)
+        self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], MOCK_UUID)
+        self.assertIn("Correlation-Id", response.headers)
+
 
     def test_post_with_invalid_interaction_name(self):
         self.config_manager.get_interaction_details.return_value = None
@@ -237,6 +264,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 404)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn(f'Unknown interaction ID: {INTERACTION_NAME}', response.body.decode())
 
     @tornado.testing.gen_test
@@ -260,6 +288,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 400)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn("Body missing from request", response.body.decode())
 
     def test_post_with_non_json_body(self):
@@ -269,6 +298,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 415)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn("Unsupported content type", response.body.decode())
 
     def test_post_with_invalid_json_body(self):
@@ -278,6 +308,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 400)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn("Invalid JSON request body", response.body.decode())
 
     def test_handler_updates_store_for_sync_async(self):
@@ -326,6 +357,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_called_once()
         self.assertEqual(expected_response.encode(), response.body)
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
 
     def test_sync_async_workflow_not_invoked(self):
         expected_response = "Hello world!"
@@ -343,12 +375,15 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_called_once()
         self.assertEqual(expected_response.encode(), response.body)
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
 
     def test_error_when_no_sync_async_header_present(self):
-        response = self.fetch("/", method="POST", headers={"Interaction-Id": INTERACTION_NAME},
+        response = self.fetch("/", method="POST",
+                              headers={"Interaction-Id": INTERACTION_NAME, "Correlation-Id": CORRELATION_ID},
                               body=REQUEST_BODY)
 
         self.assertEqual(response.code, 400)
+        self.assertEqual(CORRELATION_ID, response.headers["Correlation-Id"])
         self.assertIn("Sync-Async header missing", response.body.decode())
 
     def test_error_when_sync_async_header_not_interactions(self):
@@ -357,6 +392,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         response = self.call_handler(sync_async='true')
 
         self.assertEqual(response.code, 500)
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn("Failed to find sync-async flag for the interaction within the interactions.json",
                       response.body.decode())
 
@@ -385,6 +421,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         response = self.call_handler(sync_async='true')
 
         self.assertEqual(response.code, 400)
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn("Message header requested sync-async wrap for a message pattern that does not support sync-async",
                       response.body.decode())
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
@@ -546,6 +583,7 @@ class TestSynchronousHandlerRequestBodyValidation(BaseHandlerTest):
 
         self.assertEqual(response.code, 400)
         self.assertEqual(response.headers["Content-Type"], "text/plain")
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         response_body = response.body.decode()
         self.assertIn("Invalid request", response_body)
         self.assertIn(sub_test["field_name"], response_body)
@@ -608,3 +646,4 @@ class TestSynchronousHandlerSyncMessage(BaseHandlerTest):
         response = self.call_handler()
 
         self.assertEqual(response.code, 200)
+        self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
