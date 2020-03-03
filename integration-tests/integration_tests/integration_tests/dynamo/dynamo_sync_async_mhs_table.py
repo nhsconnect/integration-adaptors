@@ -26,10 +26,14 @@ class DynamoSyncAsyncMhsTableStateAssertor(object):
         :return: an Hl7XmlResponseAssertor that can be used to the HL7 message within the table
         """
         items_with_key = [x for x in self.state['Items'] if x['key']['S'] == key]
-        self.assertor.assertTrue(len(items_with_key) == 1,
-                                 f'Expected an item with key: {key} but not exactly one found')
+        num_items = len(items_with_key)
+        self.assertor.assertTrue(len(items_with_key) == 1, f'Expected exactly one item with key {key} '
+                                                           f'but found {num_items}')
 
         json_string_value = items_with_key[0]['data']['S']
         xml_message = json.loads(json_string_value)['data']
 
         return Hl7XmlResponseAssertor(xml_message)
+
+    def __str__(self):
+        return f'{self.state}'
