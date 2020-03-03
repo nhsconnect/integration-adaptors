@@ -292,6 +292,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         else:
             content_type = "text/xml"
         self.set_header("Content-Type", content_type)
+        self.set_header("Correlation-Id", self._extract_correlation_id())
         self.write(message)
 
     def _retrieve_interaction_details(self, interaction_id):
