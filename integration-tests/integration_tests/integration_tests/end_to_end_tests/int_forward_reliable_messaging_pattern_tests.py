@@ -9,6 +9,7 @@ from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
+from integration_tests.end_to_end_tests.common_assertions import CommonAssertions
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 
@@ -35,6 +36,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
     def setUp(self):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+        self.assertions = CommonAssertions('forward-reliable')
 
     @skip('pipeline fix, to be investigated')
     def test_should_return_successful_response_from_spine_to_message_queue(self):

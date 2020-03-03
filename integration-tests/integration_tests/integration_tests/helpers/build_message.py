@@ -1,4 +1,5 @@
 import datetime
+from collections import namedtuple
 
 from utilities import message_utilities
 from integration_tests.helpers import message_builder
@@ -16,6 +17,8 @@ DISSENT_OVERRIDE = 'dissentOverride'
 USE_DATE_FILTER = 'useDateFilter'
 DOCUMENT_TYPE = 'documentType'
 TO_ASID = 'to_asid'
+
+MhsMessage = namedtuple('MhsMessage', 'message message_id')
 
 
 def build_message(template,
@@ -53,4 +56,4 @@ def build_message(template,
         DOCUMENT_TYPE: document_type
     })
 
-    return message, message_id
+    return MhsMessage(message, message_id)
