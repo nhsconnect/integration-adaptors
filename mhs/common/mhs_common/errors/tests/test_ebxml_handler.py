@@ -53,7 +53,6 @@ class TestEbxmlHandler(unittest.TestCase):
         self.assertEqual(body, '')
 
     def assert_json_error_root(self, resp_json):
-        self.assertEqual(resp_json['error_code'], "0005")
         self.assertEqual(resp_json['error_message'], "Error(s) received from Spine. Contact system administrator.")
         self.assertEqual(resp_json['process_key'], "EBXML_ERROR_HANDLER0005")
 

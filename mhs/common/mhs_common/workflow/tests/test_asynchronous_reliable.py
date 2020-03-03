@@ -282,7 +282,6 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         resp_json = load_json(message)
 
         self.assertEqual(500, status)
-        self.assertEqual(resp_json['error_code'], "0002")
         self.assertEqual(resp_json['error_message'], "Error(s) received from Spine. Contact system administrator.")
         self.assertEqual(resp_json['process_key'], "SOAP_ERROR_HANDLER0002")
         self.assertEqual(resp_json['errors'][0]['codeContext'], "urn:nhs:names:error:tms")

@@ -80,7 +80,6 @@ def handle_ebxml_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, Opt
     ebxml_error_envelope: EbxmlErrorEnvelope = EbxmlErrorEnvelope.from_string(body)
 
     error_data_response = {'error_message': 'Error(s) received from Spine. Contact system administrator.',
-                           'error_code': '0005',
                            'process_key': 'EBXML_ERROR_HANDLER0005',
                            'errors': []}
 

@@ -44,7 +44,6 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
     fault: SOAPFault = SOAPFault.from_parsed(headers, parsed_body)
 
     error_data_response = {'error_message': 'Error(s) received from Spine. Contact system administrator.',
-                           'error_code': '0002',
                            'process_key': 'SOAP_ERROR_HANDLER0002',
                            'errors': []}
 

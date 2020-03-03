@@ -46,7 +46,6 @@ class TestOutboundSOAPHandler(unittest.TestCase):
             handle_soap_error(500, {'Content-Type': 'text/html'}, 'Some body')
 
     def assert_json_error_root(self, resp_json):
-        self.assertEqual(resp_json['error_code'], "0002")
         self.assertEqual(resp_json['error_message'], "Error(s) received from Spine. Contact system administrator.")
         self.assertEqual(resp_json['process_key'], "SOAP_ERROR_HANDLER0002")
 
