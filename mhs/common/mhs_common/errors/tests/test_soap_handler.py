@@ -1,6 +1,6 @@
+import json
 import os
 import unittest
-from json import loads as load_json
 from pathlib import Path
 
 from utilities.file_utilities import FileUtilities
@@ -24,14 +24,14 @@ class TestOutboundSOAPHandler(unittest.TestCase):
 
     def test_single_error(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml')
-        resp_json = load_json(handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
+        resp_json = json.loads(handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
 
         self.assert_json_error_root(resp_json)
         self.assert_json_with_first_error(resp_json)
 
     def test_multiple_errors(self):
         message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
-        resp_json = load_json(handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
+        resp_json = json.loads(handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
 
         self.assert_json_error_root(resp_json)
         self.assert_json_with_first_error(resp_json)

@@ -1,4 +1,4 @@
-from json import dumps as dump_json
+import json
 from typing import Tuple, AnyStr, Dict, Optional
 
 from defusedxml import ElementTree as ET
@@ -90,4 +90,4 @@ def handle_ebxml_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, Opt
                      'ebXML error returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
                      all_fields)
 
-    return 500, dump_json(error_data_response)
+    return 500, json.dumps(error_data_response)

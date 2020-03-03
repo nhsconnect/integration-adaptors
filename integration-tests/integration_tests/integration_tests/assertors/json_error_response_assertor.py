@@ -3,8 +3,8 @@ Provides assertions over the json response format we get from the MHS when an er
 """
 from __future__ import annotations
 
+import json
 import unittest
-from json import loads as load_json
 
 
 class JsonErrorResponseAssertor(object):
@@ -13,7 +13,7 @@ class JsonErrorResponseAssertor(object):
     """
 
     def __init__(self, received_message: str):
-        self.received_message = load_json(received_message)
+        self.received_message = json.loads(received_message)
         self.assertor = unittest.TestCase('__init__')
 
     def assert_error_code(self, expected_error_code: int) -> JsonErrorResponseAssertor:

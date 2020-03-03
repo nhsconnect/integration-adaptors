@@ -1,4 +1,5 @@
 import asyncio
+import json
 import ssl
 import unittest
 from pathlib import Path
@@ -17,7 +18,6 @@ from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
-from json import loads as load_json
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
@@ -48,7 +48,7 @@ SERIALIZED_MESSAGE = 'serialized-message'
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
 INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
-MAX_REQUEST_SIZE=5_000_000
+MAX_REQUEST_SIZE = 5_000_000
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
@@ -272,7 +272,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
                                                                          INTERACTION_DETAILS,
                                                                          PAYLOAD, None)
-        resp_json = load_json(message)
+        resp_json = json.loads(message)
 
         self.assertEqual(500, status)
         self.assertEqual(resp_json['error_message'], "Error(s) received from Spine. Contact system administrator.")

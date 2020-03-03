@@ -1,4 +1,4 @@
-from json import dumps as dump_json
+import json
 from typing import Dict, AnyStr, Tuple
 
 from defusedxml import ElementTree
@@ -56,4 +56,4 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
                      'SOAP Fault returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
                      all_fields)
 
-    return 500, dump_json(error_data_response), soap_fault_codes
+    return 500, json.dumps(error_data_response), soap_fault_codes
