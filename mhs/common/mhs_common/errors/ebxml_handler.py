@@ -1,3 +1,4 @@
+import json
 from typing import Tuple, AnyStr, Dict, Optional
 
 from defusedxml import ElementTree as ET
@@ -78,12 +79,15 @@ def handle_ebxml_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, Opt
 
     ebxml_error_envelope: EbxmlErrorEnvelope = EbxmlErrorEnvelope.from_string(body)
 
-    errors_text = ''
+    error_data_response = {'error_message': 'Error(s) received from Spine. Contact system administrator.',
+                           'process_key': 'EBXML_ERROR_HANDLER0005',
+                           'errors': []}
+
     for idx, error_fields in enumerate(ebxml_error_envelope.errors):
         all_fields = {**error_fields, **ERROR_RESPONSE_DEFAULTS}
-        errors_text += '{}: {}\n'.format(idx, ' '.join([f'{k}={v}' for k, v in all_fields.items()]))
+        error_data_response['errors'].append(all_fields)
         logger.error('0005',
                      'ebXML error returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
                      all_fields)
 
-    return 500, f'Error(s) received from Spine. Contact system administrator.\n{errors_text}'
+    return 500, json.dumps(error_data_response)

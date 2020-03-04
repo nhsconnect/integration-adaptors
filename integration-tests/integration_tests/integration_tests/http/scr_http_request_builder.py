@@ -56,7 +56,7 @@ class ScrHttpRequestBuilder(object):
         response = requests.post(self.scr_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.ok,
-            f'A non successful error code was returned from server: {response.status_code}')
+            f'A non successful error code was returned from server: {response.status_code} {response.text}')
 
         return response
 
@@ -68,7 +68,7 @@ class ScrHttpRequestBuilder(object):
         response = requests.post(self.scr_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.status_code == 400,
-            f'A non 400 error code was returned from server: {response.status_code}')
+            f'A non 400 error code was returned from server: {response.status_code} {response.text}')
         return response
     
     def execute_post_expecting_internal_server_error(self) -> Response:
@@ -79,5 +79,5 @@ class ScrHttpRequestBuilder(object):
         response = requests.post(self.scr_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.status_code == 500,
-            f'A non 400 error code was returned from server: {response.status_code}')
+            f'A non 400 error code was returned from server: {response.status_code} {response.text}')
         return response

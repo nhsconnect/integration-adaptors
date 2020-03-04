@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 import tornado.web
 import utilities.integration_adaptors_logger as log
+import utilities.message_utilities as message_utilities
 
 from mhs_common import workflow
 from mhs_common.configuration import configuration_manager
@@ -26,6 +27,7 @@ class BaseHandler(tornado.web.RequestHandler):
         reason = self._reason  # Don't inline this, as self.set_status changes self._reason
         self.set_status(status_code)
         self.set_header('Content-Type', 'text/plain')
+        self.set_header('Correlation-Id', self._extract_correlation())
         self.finish(f'{status_code}: {reason}')
 
     def _extract_default_workflow(self, interaction_details, interaction_id):
@@ -49,3 +51,9 @@ class BaseHandler(tornado.web.RequestHandler):
                                         reason=f'Unknown interaction ID: {interaction_id}')
 
         return interaction_details
+
+    def _extract_correlation(self):
+        correlation_id = self.request.headers.get('Correlation-Id', None)
+        if correlation_id is None:
+            return message_utilities.MessageUtilities.get_uuid()
+        return correlation_id

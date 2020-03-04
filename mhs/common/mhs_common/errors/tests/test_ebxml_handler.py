@@ -1,3 +1,4 @@
+import json
 import os
 import unittest
 from pathlib import Path
@@ -23,16 +24,19 @@ class TestEbxmlHandler(unittest.TestCase):
             handle_ebxml_error(200, {'Content-Type': 'text/xml'}, '<a><b><b></a>')
 
     def test_single_error(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_single.xml' )
-        self.assertIn('501319:Unknown eb:CPAId', handle_ebxml_error(200, {'Content-Type': 'text/xml'}, message)[1])
+        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_single.xml')
+        resp_json = json.loads(handle_ebxml_error(200, {'Content-Type': 'text/xml'}, message)[1])
+
+        self.assert_json_error_root(resp_json)
+        self.assert_json_with_first_error(resp_json)
 
     def test_multiple_errors(self):
         message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_multiple.xml')
-        response = handle_ebxml_error(200, {'Content-Type': 'text/xml'}, message)[1]
+        resp_json = json.loads(handle_ebxml_error(200, {'Content-Type': 'text/xml'}, message)[1])
 
-        self.assertIn('501319:Unknown eb:CPAId', response)
-        self.assertIn('501320:Unknown something else', response)
-        self.assertIn('errorType=ebxml_error', response)
+        self.assert_json_error_root(resp_json)
+        self.assert_json_with_first_error(resp_json)
+        self.assert_json_with_second_error(resp_json)
 
     def test_no_content_type(self):
         with self.assertRaises(ValueError):
@@ -47,3 +51,21 @@ class TestEbxmlHandler(unittest.TestCase):
 
         self.assertEqual(code, 200)
         self.assertEqual(body, '')
+
+    def assert_json_error_root(self, resp_json):
+        self.assertEqual(resp_json['error_message'], "Error(s) received from Spine. Contact system administrator.")
+        self.assertEqual(resp_json['process_key'], "EBXML_ERROR_HANDLER0005")
+
+    def assert_json_with_first_error(self, resp_json):
+        self.assertEqual(resp_json['errors'][0]['Description'], "501319:Unknown eb:CPAId")
+        self.assertEqual(resp_json['errors'][0]['codeContext'], "urn:oasis:names:tc:ebxml-msg:service:errors")
+        self.assertEqual(resp_json['errors'][0]['errorCode'], "ValueNotRecognized")
+        self.assertEqual(resp_json['errors'][0]['errorType'], "ebxml_error")
+        self.assertEqual(resp_json['errors'][0]['severity'], "Error")
+
+    def assert_json_with_second_error(self, resp_json):
+        self.assertEqual(resp_json['errors'][1]['Description'], "501320:Unknown something else")
+        self.assertEqual(resp_json['errors'][1]['codeContext'], "urn:oasis:names:tc:ebxml-msg:service:errors")
+        self.assertEqual(resp_json['errors'][1]['errorCode'], "ValueNotRecognized")
+        self.assertEqual(resp_json['errors'][1]['errorType'], "ebxml_error")
+        self.assertEqual(resp_json['errors'][1]['severity'], "Error")
