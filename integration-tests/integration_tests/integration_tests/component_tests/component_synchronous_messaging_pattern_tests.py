@@ -3,12 +3,11 @@ Provides tests around the Synchronous workflow
 """
 import unittest
 
-from integration_tests.assertors.text_error_response_assertor import TextErrorResponseAssertor
+from integration_tests.assertors.json_error_response_assertor import JsonErrorResponseAssertor
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
-
 
 class SynchronousMessagingPatternTests(unittest.TestCase):
     """
@@ -38,10 +37,11 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        TextErrorResponseAssertor(response.text) \
+        JsonErrorResponseAssertor(response.text) \
             .assert_error_code(200) \
             .assert_code_context('urn:nhs:names:error:tms') \
-            .assert_severity('Error')
+            .assert_severity('Error') \
+            .assert_error_type('soap_fault')
 
     def test_should_record_message_status_as_successful_when_error_response_returned_from_spine(self):
         """

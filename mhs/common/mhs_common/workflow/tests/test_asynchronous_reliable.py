@@ -1,4 +1,5 @@
 import asyncio
+import json
 import ssl
 import unittest
 from pathlib import Path
@@ -278,9 +279,17 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         status, message, _ = await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
                                                                          INTERACTION_DETAILS,
                                                                          PAYLOAD, None)
+        resp_json = json.loads(message)
 
         self.assertEqual(500, status)
-        self.assertTrue('description=System failure to process message' in message)
+        self.assertEqual(resp_json['error_message'], "Error(s) received from Spine. Contact system administrator.")
+        self.assertEqual(resp_json['process_key'], "SOAP_ERROR_HANDLER0002")
+        self.assertEqual(resp_json['errors'][0]['codeContext'], "urn:nhs:names:error:tms")
+        self.assertEqual(resp_json['errors'][0]['description'], "System failure to process message - default")
+        self.assertEqual(resp_json['errors'][0]['errorCode'], "200")
+        self.assertEqual(resp_json['errors'][0]['errorType'], "soap_fault")
+        self.assertEqual(resp_json['errors'][0]['severity'], "Error")
+
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],

@@ -2,7 +2,7 @@
 
 import unittest
 
-from integration_tests.assertors.text_error_response_assertor import TextErrorResponseAssertor
+from integration_tests.assertors.json_error_response_assertor import JsonErrorResponseAssertor
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
@@ -79,7 +79,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        TextErrorResponseAssertor(response.text) \
+        JsonErrorResponseAssertor(response.text) \
             .assert_error_code(200) \
             .assert_code_context('urn:nhs:names:error:tms') \
             .assert_severity('Error')
@@ -125,8 +125,8 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        TextErrorResponseAssertor(response.text) \
-            .assert_code_context('urn:oasis:names:tc:ebxml') \
+        JsonErrorResponseAssertor(response.text) \
+            .assert_code_context('urn:oasis:names:tc:ebxml-msg:service:errors') \
             .assert_severity('Error') \
             .assert_error_type('ebxml_error')
 
@@ -171,8 +171,8 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        TextErrorResponseAssertor(response.text) \
-            .assert_code_context('urn:oasis:names:tc:ebxml') \
+        JsonErrorResponseAssertor(response.text) \
+            .assert_code_context('urn:oasis:names:tc:ebxml-msg:service:errors') \
             .assert_severity('Error') \
             .assert_error_type('ebxml_error')
 
@@ -217,7 +217,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        TextErrorResponseAssertor(response.text) \
+        JsonErrorResponseAssertor(response.text) \
             .assert_error_code(200) \
             .assert_code_context('urn:nhs:names:error:tms') \
             .assert_severity('Error')
