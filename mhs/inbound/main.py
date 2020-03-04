@@ -80,15 +80,27 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     ssl_ctx.load_verify_locations(ca_certs_file)
 
     inbound_server = tornado.httpserver.HTTPServer(inbound_application, ssl_options=ssl_ctx)
-    inbound_server.listen(443)
+    inbound_server_port = 443
+    inbound_server.listen(inbound_server_port)
 
     healthcheck_application = tornado.web.Application([
         ("/healthcheck", healthcheck_handler.HealthcheckHandler)
     ])
-    healthcheck_application.listen(80)
+    healthcheck_server_port = int(config.get_config('INBOUND_HEALTHCHECK_SERVER_PORT', default='80'))
+    healthcheck_application.listen(healthcheck_server_port)
 
-    logger.info('011', 'Starting inbound server')
-    tornado.ioloop.IOLoop.current().start()
+    logger.info('011', 'Starting inbound server at port {server_port} and healthcheck at {healthcheck_server_port}',
+                {'server_port': inbound_server_port, 'healthcheck_server_port': healthcheck_server_port})
+    tornado_io_loop = tornado.ioloop.IOLoop.current()
+    try:
+        tornado_io_loop.start()
+    except KeyboardInterrupt:
+        logger.warning('012', 'Keyboard interrupt')
+        pass
+    finally:
+        tornado_io_loop.stop()
+        tornado_io_loop.close(True)
+    logger.info('013', 'Server shut down, exiting...')
 
 
 def main():
