@@ -90,7 +90,7 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     healthcheck_application.listen(healthcheck_server_port)
 
     logger.info('Starting inbound server at port {server_port} and healthcheck at {healthcheck_server_port}',
-                {'server_port': inbound_server_port, 'healthcheck_server_port': healthcheck_server_port})
+                fparams={'server_port': inbound_server_port, 'healthcheck_server_port': healthcheck_server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
         tornado_io_loop.start()

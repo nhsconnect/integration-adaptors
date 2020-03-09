@@ -76,7 +76,7 @@ def start_tornado_server(routing: routing_reliability.RoutingAndReliability) -> 
     server_port = int(config.get_config('SPINE_ROUTE_LOOKUP_SERVER_PORT', default='80'))
     server.listen(server_port)
 
-    logger.info('Starting router server at port {server_port}', {'server_port': server_port})
+    logger.info('Starting router server at port {server_port}', fparams={'server_port': server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
         tornado_io_loop.start()
