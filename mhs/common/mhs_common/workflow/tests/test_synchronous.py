@@ -282,7 +282,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
             work_description_object=None)
 
         # audit log should be called at start
-        log_mock.audit('Outbound Synchronous workflow invoked.', {})
+        log_mock.audit('Outbound Synchronous workflow invoked.')
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test

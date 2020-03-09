@@ -1,7 +1,7 @@
 """This module defines the asynchronous forward reliable workflow."""
-import logging
 from typing import Tuple, Optional
 
+import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from isodate import isoerror
@@ -16,7 +16,7 @@ from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous, asynchronous_reliable
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReliableWorkflow):
@@ -51,7 +51,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
         logger.info('Entered async forward reliable workflow to handle outbound message')
-        logger.audit('Outbound {WorkflowName} workflow invoked.', {'WorkflowName': self.workflow_name})
+        logger.audit('Outbound {WorkflowName} workflow invoked.', fparams={'WorkflowName': self.workflow_name})
         wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
 
         try:
@@ -86,7 +86,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                                  attachments: list):
         logger.info('Entered async forward reliable workflow to handle unsolicited inbound message')
         logger.audit('Unsolicited inbound {WorkflowName} workflow invoked.',
-                     {'WorkflowName': self.workflow_name})
+                     fparams={'WorkflowName': self.workflow_name})
         work_description = wd.create_new_work_description(self.persistence_store, message_id, self.workflow_name,
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         await work_description.publish()
@@ -100,13 +100,15 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
         if not result.is_successful:
             logger.error("Exceeded the maximum number of retries, {max_retries} retries, when putting "
                          "unsolicited message onto inbound queue",
-                         {"max_retries": self.inbound_queue_max_retries})
+                         fparams={"max_retries": self.inbound_queue_max_retries})
             await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
             raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
                                      'been exceeded') from result.exception
 
         logger.audit('{WorkflowName} workflow invoked for inbound unsolicited request. '
-                             'Attempted to place message onto inbound queue with {Acknowledgement}.',
-                     {'Acknowledgement': wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
-                      'WorkflowName': self.workflow_name})
+                     'Attempted to place message onto inbound queue with {Acknowledgement}.',
+                     fparams={
+                        'Acknowledgement': wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
+                        'WorkflowName': self.workflow_name
+                     })
         await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)

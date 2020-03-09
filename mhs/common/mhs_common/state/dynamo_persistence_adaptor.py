@@ -1,14 +1,14 @@
 """Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
 import contextlib
 import json
-import logging
 
 import aioboto3
+import utilities.integration_adaptors_logger as log
 from utilities import config
 
 from mhs_common.state import persistence_adaptor
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class RecordCreationError(RuntimeError):
@@ -46,7 +46,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :param data: The item to store in persistence.
         :return: The previous version of the item which has been replaced. (None if no previous item)
         """
-        logger.info('Adding data for {key}', {'key': key})
+        logger.info('Adding data for {key}', fparams={'key': key})
         try:
             async with self.__get_dynamo_table() as table:
                 response = await table.put_item(
@@ -54,11 +54,11 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                     ReturnValues='ALL_OLD'
                 )
             if response.get('Attributes', {}).get('data') is None:
-                logger.info('No previous record found: {key}', {'key': key})
+                logger.info('No previous record found: {key}', fparams={'key': key})
                 return None
             return json.loads(response.get('Attributes', {}).get('data'))
         except Exception as e:
-            logger.error('Error creating record: {exception}', {'exception': e})
+            logger.error('Error creating record: {exception}', fparams={'exception': e})
             raise RecordCreationError from e
 
     async def get(self, key):
@@ -67,7 +67,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :param key: The key which identifies the item to get.
         :return: The item from the specified table with the given key. (None if no item found)
         """
-        logger.info('Getting record for {key}', {'key': key})
+        logger.info('Getting record for {key}', fparams={'key': key})
         try:
             async with self.__get_dynamo_table() as table:
                 response = await table.get_item(
@@ -75,11 +75,11 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 )
 
             if 'Item' not in response:
-                logger.info('No item found for record: {key}', {'key': key})
+                logger.info('No item found for record: {key}', fparams={'key': key})
                 return None
             return json.loads(response.get('Item', {}).get('data'))
         except Exception as e:
-            logger.error('Error getting record: {exception}', {'exception': e})
+            logger.error('Error getting record: {exception}', fparams={'exception': e})
             raise RecordRetrievalError from e
 
     async def delete(self, key):
@@ -88,7 +88,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :param key: The key of the item to delete.
         :return: The instance of the item which has been deleted from persistence. (None if no item found)
         """
-        logger.info('Deleting record for {key}', {'key': key})
+        logger.info('Deleting record for {key}', fparams={'key': key})
         try:
             async with self.__get_dynamo_table() as table:
                 response = await table.delete_item(
@@ -96,11 +96,11 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                     ReturnValues='ALL_OLD'
                 )
             if 'Attributes' not in response:
-                logger.info('No values found for record: {key}', {'key': key})
+                logger.info('No values found for record: {key}', fparams={'key': key})
                 return None
             return json.loads(response.get('Attributes', {}).get('data'))
         except Exception as e:
-            logger.error('Error deleting record: {exception}', {'exception': e})
+            logger.error('Error deleting record: {exception}', fparams={'exception': e})
             raise RecordDeletionError from e
 
     @contextlib.asynccontextmanager
@@ -111,5 +111,5 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         async with aioboto3.resource('dynamodb', region_name='eu-west-2',
                                      endpoint_url=config.get_config('DYNAMODB_ENDPOINT_URL', None)) as dynamo_resource:
-            logger.info('Establishing connection to {table_name}', {'table_name': self.table_name})
+            logger.info('Establishing connection to {table_name}', fparams={'table_name': self.table_name})
             yield dynamo_resource.Table(self.table_name)

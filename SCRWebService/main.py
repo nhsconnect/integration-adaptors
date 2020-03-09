@@ -41,6 +41,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logger.critical('Fatal exception in main application: {exception}', {'exception': e})
+        logger.critical('Fatal exception in main application: {exception}', fparams={'exception': e})
     finally:
         logger.info('Exiting application')

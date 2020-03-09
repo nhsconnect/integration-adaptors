@@ -1,14 +1,14 @@
 """This module defines the envelope used to wrap asynchronous messages to be sent to a remote MHS."""
 import copy
-import logging
 from typing import Dict, Tuple, Any, Optional, NamedTuple
 from xml.etree.ElementTree import Element
 
 import utilities.message_utilities as message_utilities
+from utilities import integration_adaptors_logger as log
 
 from mhs_common.messages import envelope
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 TEMPLATES_DIR = "data/templates"
 
@@ -75,7 +75,7 @@ class EbxmlEnvelope(envelope.Envelope):
         timestamp = message_utilities.MessageUtilities.get_timestamp()
         ebxml_message_dictionary[TIMESTAMP] = timestamp
         logger.info('Creating ebXML message with {MessageId} and {Timestamp}',
-                    {'MessageId': message_id, 'Timestamp': timestamp})
+                    fparams={'MessageId': message_id, 'Timestamp': timestamp})
 
         message = self.message_builder.build_message(ebxml_message_dictionary)
         http_headers = {
@@ -129,7 +129,7 @@ class EbxmlEnvelope(envelope.Envelope):
         value = xml_tree.find(xpath, namespaces=NAMESPACES)
         if value is None and required:
             logger.error("Weren't able to find required element {xpath} during parsing of EbXML message.",
-                         {'xpath': xpath})
+                         fparams={'xpath': xpath})
             raise EbXmlParsingError(f"Weren't able to find required element {xpath} during parsing of EbXML message")
         return value
 
@@ -154,7 +154,7 @@ class EbxmlEnvelope(envelope.Envelope):
                 values_dict[key] = element.attrib["{" + NAMESPACES[attribute_namespace] + "}" + attribute_name]
             except KeyError as e:
                 logger.error("Weren't able to find required {attribute_name} of {xpath} during parsing of "
-                                     "EbXML message.", {'attribute_name': attribute_name, 'xpath': xpath})
+                             "EbXML message.", fparams={'attribute_name': attribute_name, 'xpath': xpath})
                 raise EbXmlParsingError(f"Weren't able to find required attribute {attribute_name} during parsing of "
                                         f"EbXML message") from e
 

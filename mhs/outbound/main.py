@@ -8,7 +8,6 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import utilities.integration_adaptors_logger as log
-import logging
 from mhs_common import workflow
 from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
@@ -20,7 +19,7 @@ from utilities import secrets
 import outbound.request.synchronous.handler as client_request_handler
 from outbound.transmission import outbound_transmission
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 def configure_http_client():

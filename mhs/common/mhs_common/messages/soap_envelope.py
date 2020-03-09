@@ -1,12 +1,11 @@
 """This module defines the envelope used to wrap synchronous messages to be sent to a remote MHS."""
 import copy
 import json
-import logging
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
 import lxml.etree as ET
-from utilities import message_utilities
+from utilities import integration_adaptors_logger as log, message_utilities
 
 from definitions import ROOT_DIR
 from mhs_common.messages import envelope
@@ -29,7 +28,7 @@ REQUIRED_SOAP_ELEMENTS = [FROM_ASID, TO_ASID, MESSAGE_ID, SERVICE, ACTION, MESSA
 
 SOAP_TEMPLATE = "soap_request"
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 soap_header_transformer_path = str(Path(ROOT_DIR) / XSLT_DIR / SOAP_HEADER_XSLT)
 soap_body_transformer_path = str(Path(ROOT_DIR) / XSLT_DIR / SOAP_BODY_XSLT)
@@ -62,7 +61,7 @@ class SoapEnvelope(envelope.Envelope):
         soap_message_dictionary[TIMESTAMP] = timestamp
 
         logger.info('Creating SOAP message with {MessageId} and {Timestamp}',
-                    {'MessageId': message_id, 'Timestamp': timestamp})
+                    fparams={'MessageId': message_id, 'Timestamp': timestamp})
 
         message = self.message_builder.build_message(soap_message_dictionary)
         http_headers = {'charset': 'UTF-8',
@@ -95,14 +94,15 @@ class SoapEnvelope(envelope.Envelope):
             raise SoapParsingError(f"An unexpected error occurred when applying an XSLT to SOAP XML message") from e
 
         extracted_values = json.loads(soap_headers)
-        logger.info('Extracted {extracted_values} from message', {'extracted_values': extracted_values})
+        logger.info('Extracted {extracted_values} from message', fparams={'extracted_values': extracted_values})
         extracted_values[MESSAGE] = soap_body
 
         for required_element in REQUIRED_SOAP_ELEMENTS:
             if not extracted_values[required_element]:
                 logger.error("Weren't able to find required element {required_param} during parsing of SOAP "
-                                     "message.", {'required_param': required_element})
-                raise SoapParsingError(f"Weren't able to find required element {required_element} during parsing of SOAP message")
+                             "message.", fparams={'required_param': required_element})
+                raise SoapParsingError(f"Weren't able to find required element {required_element} during parsing "
+                                       f"of SOAP message")
 
         return SoapEnvelope(extracted_values)
 

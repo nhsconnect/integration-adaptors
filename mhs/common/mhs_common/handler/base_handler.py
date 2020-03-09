@@ -1,13 +1,13 @@
-import logging
 from typing import Any, Dict
 
 import tornado.web
 import utilities.message_utilities as message_utilities
+import utilities.integration_adaptors_logger as log
 
 from mhs_common import workflow
 from mhs_common.configuration import configuration_manager
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -35,7 +35,8 @@ class BaseHandler(tornado.web.RequestHandler):
             wf = self.workflows[interaction_details['workflow']]
         except KeyError as e:
             logger.error("Wasn't able to determine workflow for {InteractionId} . This likely is due to a "
-                                 "misconfiguration in interactions.json", {"InteractionId": interaction_id})
+                         "misconfiguration in interactions.json",
+                         fparams={"InteractionId": interaction_id})
             raise tornado.web.HTTPError(500,
                                         f"Couldn't determine workflow to invoke for interaction ID: {interaction_id}",
                                         reason=f"Couldn't determine workflow to invoke for interaction ID: "
@@ -46,7 +47,7 @@ class BaseHandler(tornado.web.RequestHandler):
         interaction_details = self.config_manager.get_interaction_details(interaction_id)
 
         if interaction_details is None:
-            logger.error('Unknown {InteractionId} in request', {'InteractionId': interaction_id})
+            logger.error('Unknown {InteractionId} in request', fparams={'InteractionId': interaction_id})
             raise tornado.web.HTTPError(404, f'Unknown interaction ID: {interaction_id}',
                                         reason=f'Unknown interaction ID: {interaction_id}')
 

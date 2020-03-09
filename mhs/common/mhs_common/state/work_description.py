@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import enum
-import logging
 from typing import Optional
 
+import utilities.integration_adaptors_logger as log
 from utilities import timing
 
 from mhs_common.retry import retriable_action
 from mhs_common.state import persistence_adaptor as pa
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class MessageStatus(str, enum.Enum):
@@ -119,7 +119,7 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
 
     json_store_data = await persistence_store.get(key)
     if json_store_data is None:
-        logger.info('Persistence store returned empty value for {key}', {'key': key})
+        logger.info('Persistence store returned empty value for {key}', fparams={'key': key})
         raise EmptyWorkDescriptionError(f'Failed to find a value for key id {key}')
 
     return WorkDescription(persistence_store, json_store_data)
@@ -146,7 +146,7 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
         raise ValueError('Expected workflow to not be None')
     if not inbound_status and not outbound_status:
         logger.error('Failed to build work description, expected inbound or outbound status to be present:'
-                             '{inbound} {outbound}', {'inbound': inbound_status, 'outbound': outbound_status})
+                    '{inbound} {outbound}', fparams={'inbound': inbound_status, 'outbound': outbound_status})
         raise ValueError('Expected inbound/outbound to not be null')
 
     timestamp = timing.get_time()
@@ -186,7 +186,7 @@ class WorkDescription(object):
         collisions
         :return:
         """
-        logger.info('Attempting to publish work description {key}', {'key': self.message_key})
+        logger.info('Attempting to publish work description {key}', fparams={'key': self.message_key})
         logger.info('Retrieving latest work description to check version')
 
         latest_data = await self.persistence_store.get(self.message_key)
@@ -199,7 +199,7 @@ class WorkDescription(object):
                 self.version += 1
             elif latest_version > self.version:
                 logger.error('Failed to update message {key}, local version out of date',
-                             {'key': self.message_key})
+                             fparams={'key': self.message_key})
                 raise OutOfDateVersionError(f'Failed to update message {self.message_key}: local version out of date')
 
         else:
@@ -208,7 +208,8 @@ class WorkDescription(object):
         serialised = self._serialise_data()
 
         old_data = await self.persistence_store.add(self.message_key, serialised)
-        logger.info('Successfully updated work description to state store for {key}', {'key': self.message_key})
+        logger.info('Successfully updated work description to state store for {key}',
+                    fparams={'key': self.message_key})
         return old_data
 
     async def update(self):
@@ -218,7 +219,7 @@ class WorkDescription(object):
         """
         json_store_data = await self.persistence_store.get(self.message_key)
         if json_store_data is None:
-            logger.error('Persistence store returned empty value for {key}', {'key': self.message_key})
+            logger.error('Persistence store returned empty value for {key}', fparams={'key': self.message_key})
             raise EmptyWorkDescriptionError(f'Failed to find a value for key id {self.message_key}')
         self._deserialize_data(json_store_data)
 

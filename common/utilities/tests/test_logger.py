@@ -23,7 +23,7 @@ class TestLogger(TestCase):
 
         log.configure_logging()
         log.correlation_id.set('2')
-        logging.getLogger('TES').audit('Some audit message with %s %s', 'additional', 'parameters')
+        log.IntegrationAdaptorsLogger('TES').audit('Some audit message with %s %s', 'additional', 'parameters')
 
         output = mock_stdout.getvalue()
         log_entry = LogEntry(output)
@@ -37,7 +37,7 @@ class TestLogger(TestCase):
 
         config.config['LOG_LEVEL'] = 'AUDIT'
         log.configure_logging()
-        logging.getLogger('TES').info('Test message')
+        log.IntegrationAdaptorsLogger('TES').info('Test message')
         config.config['LOG_LEVEL'] = 'INFO'
 
         output = mock_stdout.getvalue()
@@ -53,7 +53,7 @@ class TestLogger(TestCase):
         log.inbound_message_id.set('20')
         log.interaction_id.set('25')
 
-        logging.getLogger('SYS').info('%s %s', 'yes', 'no')
+        log.IntegrationAdaptorsLogger('SYS').info('%s %s', 'yes', 'no')
 
         log_entry = LogEntry(mock_stdout.getvalue())
 

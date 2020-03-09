@@ -1,6 +1,5 @@
 """This module defines the outbound synchronous request handler component."""
 import json
-import logging
 
 import marshmallow
 import mhs_common.state.work_description as wd
@@ -14,7 +13,7 @@ from utilities import integration_adaptors_logger as log, message_utilities, tim
 
 from outbound.request import request_body_schema
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class SynchronousHandler(base_handler.BaseHandler):
@@ -130,7 +129,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         from_asid = self._extract_from_asid()
         ods_code = self._extract_ods_code()
 
-        logger.info('Outbound POST received. {Request}', {'Request': str(self.request)})
+        logger.info('Outbound POST received. {Request}', fparams={'Request': str(self.request)})
 
         body = self._parse_body()
 
@@ -154,7 +153,7 @@ class SynchronousHandler(base_handler.BaseHandler):
             raise tornado.web.HTTPError(400, 'Missing Content-Type header', reason='Missing Content-Type header') from e
         if content_type != 'application/json':
             logger.error('Unsupported content type in request. {ExpectedContentType} {ActualContentType}',
-                         {'ExpectedContentType': 'application/json', 'ActualContentType': content_type})
+                         fparams={'ExpectedContentType': 'application/json', 'ActualContentType': content_type})
             raise tornado.web.HTTPError(415,
                                         'Unsupported content type. Only application/json request bodies are supported.',
                                         reason='Unsupported content type. Only application/json request bodies are '
@@ -172,7 +171,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         except marshmallow.ValidationError as e:
             # e.messages is a nested dict of all the validation errors
             validation_errors = str(e.messages)
-            logger.error('Invalid request. {ValidationErrors}', {'ValidationErrors': validation_errors})
+            logger.error('Invalid request. {ValidationErrors}', fparams={'ValidationErrors': validation_errors})
             raise tornado.web.HTTPError(400, f'Invalid request. Validation errors: {validation_errors}',
                                         reason=f'Invalid request. Validation errors: {validation_errors}') from e
         return parsed_body.payload
@@ -195,8 +194,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         if not message_id:
             message_id = message_utilities.MessageUtilities.get_uuid()
             log.message_id.set(message_id)
-            logger.info("Didn't receive message id in incoming request from supplier, so have generated a new "
-                                "one.")
+            logger.info("Didn't receive message id in incoming request from supplier, so have generated a new one.")
         else:
             log.message_id.set(message_id)
             logger.info('Found message id on incoming request.')
@@ -207,8 +205,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
             log.correlation_id.set(correlation_id)
-            logger.info("Didn't receive correlation id in incoming request from supplier, so have generated a "
-                                "new one.")
+            logger.info("Didn't receive correlation id in incoming request from supplier, so have generated a new one.")
         else:
             log.correlation_id.set(correlation_id)
             logger.info('Found correlation id on incoming request.')
@@ -269,7 +266,7 @@ class SynchronousHandler(base_handler.BaseHandler):
                 await wf.set_successful_message_response(wdo)
             self._write_response(status, response)
         except Exception as e:
-            logger.error('Failed to respond to supplier system {exception}', {'exception': e})
+            logger.error('Failed to respond to supplier system {exception}', fparams={'exception': e})
             if wdo:
                 await wf.set_failure_message_response(wdo)
 
@@ -286,7 +283,7 @@ class SynchronousHandler(base_handler.BaseHandler):
 
         :param message: The message to write to the response.
         """
-        logger.info('Returning response with {HttpStatus}', {'HttpStatus': status})
+        logger.info('Returning response with {HttpStatus}', fparams={'HttpStatus': status})
         self.set_status(status)
         if 400 <= status:
             content_type = "text/plain"

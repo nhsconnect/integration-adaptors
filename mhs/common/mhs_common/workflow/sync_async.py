@@ -1,6 +1,7 @@
 """This module defines the sync-async workflow."""
-import logging
 from typing import Tuple, Optional
+
+from utilities import integration_adaptors_logger as log
 
 from mhs_common import workflow
 from mhs_common.retry import retriable_action
@@ -10,7 +11,7 @@ from mhs_common.workflow import common
 from mhs_common.workflow import common_synchronous
 from mhs_common.workflow import sync_async_resynchroniser
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 MESSAGE_DATA = 'data'
@@ -89,7 +90,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return 200, response[MESSAGE_DATA]
         except sync_async_resynchroniser.SyncAsyncResponseException:
             logger.error('No async response placed on async store within timeout for {messageId}',
-                         {'messageId': message_id})
+                         fparams={'messageId': message_id})
             return 500, "No async response received from sync-async store"
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,

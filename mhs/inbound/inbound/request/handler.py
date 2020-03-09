@@ -1,5 +1,4 @@
 """This module defines the inbound request handler component."""
-import logging
 
 from typing import Dict
 
@@ -20,7 +19,7 @@ from mhs_common.workflow import asynchronous_forward_reliable as forward_reliabl
 from utilities import integration_adaptors_logger as log
 from utilities.timing import time_request
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class InboundHandler(base_handler.BaseHandler):
@@ -44,7 +43,7 @@ class InboundHandler(base_handler.BaseHandler):
 
     @time_request
     async def post(self):
-        logger.info('Inbound POST received: {request}', {'request': self.request})
+        logger.info('Inbound POST received: {request}', fparams={'request': self.request})
 
         request_message = self._extract_incoming_ebxml_request_message()
 
@@ -70,14 +69,14 @@ class InboundHandler(base_handler.BaseHandler):
 
         message_workflow = self.workflows[work_description.workflow]
         logger.info('Retrieved work description from state store, forwarding message to {workflow}',
-                    {'workflow': message_workflow})
+                    fparams={'workflow': message_workflow})
 
         try:
             await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
                                                           received_message)
             self._send_ack(request_message)
         except Exception as e:
-            logger.error('Exception in workflow {exception}', {'exception': e})
+            logger.error('Exception in workflow {exception}', fparams={'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
                                         reason=f'Exception in workflow') from e
 
@@ -100,8 +99,8 @@ class InboundHandler(base_handler.BaseHandler):
         # If not, then something has gone wrong
         else:
             logger.error('No work description found in state store for message with {workflow} , unsolicited '
-                                  'message received unexpectedly from Spine.',
-                           {'workflow': interaction_details['workflow']})
+                         'message received unexpectedly from Spine.',
+                         fparams={'workflow': interaction_details['workflow']})
             raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
                                              'received from Spine',
                                         reason="Unknown message reference") from e
@@ -112,7 +111,7 @@ class InboundHandler(base_handler.BaseHandler):
                                                           received_message: str, ref_to_message_id: str,
                                                           request_message: ebxml_request_envelope.EbxmlRequestEnvelope):
         logger.info('Received unsolicited inbound request for the forward-reliable workflow. Passing the '
-                           'request to forward-reliable workflow.')
+                    'request to forward-reliable workflow.')
         attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
         try:
             await forward_reliable_workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id,
@@ -120,7 +119,7 @@ class InboundHandler(base_handler.BaseHandler):
                                                                                attachments)
             self._send_ack(request_message)
         except Exception as e:
-            logger.error('Exception in workflow {exception}', {'exception': e})
+            logger.error('Exception in workflow {exception}', fparams={'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
                                         reason=f'Exception in workflow') from e
 
@@ -189,7 +188,7 @@ class InboundHandler(base_handler.BaseHandler):
             request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
                                                                                       self.request.body.decode())
         except ebxml_envelope.EbXmlParsingError as e:
-            logger.error('Failed to parse response: {exception}', {'exception': e})
+            logger.error('Failed to parse response: {exception}', fparams={'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
                                         reason=f'Exception during inbound message parsing {e}') from e
 
@@ -216,7 +215,7 @@ class InboundHandler(base_handler.BaseHandler):
             }
             self._send_nack(request_message, nack_context)
         except Exception as e:
-            logger.error('Exception when sending nack {exception}', {'exception': e})
+            logger.error('Exception when sending nack {exception}', fparams={'exception': e})
             raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
                                              ' failed to complete workflow',
                                         reason=f'Exception in workflow') from e

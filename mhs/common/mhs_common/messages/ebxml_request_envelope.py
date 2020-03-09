@@ -7,17 +7,16 @@ import copy
 import email
 import email.message
 import email.policy
-import logging
 from typing import Dict, Tuple, Union, List, Sequence, Generator
 from xml.etree.ElementTree import Element
 
 from builder import pystache_message_builder
 from defusedxml import ElementTree
-from utilities import message_utilities
+from utilities import integration_adaptors_logger as log, message_utilities
 
 from mhs_common.messages import ebxml_envelope
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 EBXML_TEMPLATE = "ebxml_request"
 
@@ -106,8 +105,11 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                     else '8bit'
             except KeyError as e:
                 logger.error('Failed to find {Key} when generating message from {TemplateFile} . {ErrorMessage}',
-                             {'Key': f'{ATTACHMENTS}[].{ATTACHMENT_BASE64}', 'TemplateFile': EBXML_TEMPLATE,
-                              'ErrorMessage': e})
+                             fparams={
+                                 'Key': f'{ATTACHMENTS}[].{ATTACHMENT_BASE64}',
+                                 'TemplateFile': EBXML_TEMPLATE,
+                                 'ErrorMessage': e
+                             })
                 raise pystache_message_builder.MessageGenerationError(f'Failed to find '
                                                                       f'key:{ATTACHMENTS}[].{ATTACHMENT_BASE64} when '
                                                                       f'generating message from template '
@@ -131,7 +133,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         cls._add_descriptions_to_attachments(xml_tree, attachments)
         extracted_values[ATTACHMENTS] = attachments
 
-        logger.info('Extracted {extracted_values} from message', {'extracted_values': extracted_values})
+        logger.info('Extracted {extracted_values} from message', fparams={'extracted_values': extracted_values})
 
         if payload_part:
             extracted_values[MESSAGE] = payload_part
@@ -153,10 +155,11 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                 f"/{ebxml_envelope.EBXML_NAMESPACE}:Description",
                 ebxml_envelope.NAMESPACES)
             if description_element is None:
-                logger.info("{Attachment} with {ContentType} found with no description. "
-                                    "Setting description to ''",
-                            {'Attachment': attachment[ATTACHMENT_CONTENT_ID],
-                             'ContentType': attachment[ATTACHMENT_CONTENT_TYPE]})
+                logger.info("{Attachment} with {ContentType} found with no description. Setting description to ''",
+                            fparams={
+                                'Attachment': attachment[ATTACHMENT_CONTENT_ID],
+                                'ContentType': attachment[ATTACHMENT_CONTENT_TYPE]
+                            })
                 attachment[ATTACHMENT_DESCRIPTION] = ''
             else:
                 attachment[ATTACHMENT_DESCRIPTION] = description_element.text
@@ -192,7 +195,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         if msg.defects:
             logger.warning('Found defects in MIME message during parsing. {Defects}',
-                           {'Defects': msg.defects})
+                           fparams={'Defects': msg.defects})
 
         return msg
 
@@ -233,7 +236,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         for i, part in enumerate(message_parts):
             if part.defects:
                 logger.warning('Found defects in {PartIndex} of MIME message during parsing. {Defects}',
-                               {'PartIndex': i, 'Defects': part.defects})
+                               fparams={'PartIndex': i, 'Defects': part.defects})
 
     @staticmethod
     def _extract_ebxml_part(message_part: email.message.EmailMessage) -> str:
@@ -273,22 +276,22 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         logger_dict = {'ContentType': content_type, 'ContentTransferEncoding': content_transfer_encoding}
 
         if isinstance(content, str):
-            logger.info('Successfully decoded message part with {ContentType} {ContentTransferEncoding} as '
-                                'string', logger_dict)
+            logger.info('Successfully decoded message part with {ContentType} {ContentTransferEncoding} as string',
+                        fparams=logger_dict)
             return content, False
         try:
             if content_type == 'application/xml':
                 decoded_content = content.decode()
-                logger.info('Successfully decoded message part with {ContentType} {ContentTransferEncoding} as a '
-                            'string', logger_dict)
+                logger.info('Successfully decoded message part with {ContentType} {ContentTransferEncoding} '
+                            'as a string', fparams=logger_dict)
                 return decoded_content, False
             decoded_content = base64.b64encode(content).decode()
             logger.info('Successfully encoded binary message part with {ContentType} {ContentTransferEncoding} as '
-                        'a base64 string', logger_dict)
+                        'a base64 string', fparams=logger_dict)
             return decoded_content, True
         except UnicodeDecodeError as e:
             logger.error('Failed to decode ebXML message part with {ContentType} {ContentTransferEncoding}.',
-                         logger_dict)
+                         fparams=logger_dict)
             raise ebxml_envelope.EbXmlParsingError(f'Failed to decode ebXML message part with '
                                                    f'Content-Type: {content_type} and '
                                                    f'Content-Transfer-Encoding: {content_transfer_encoding}') from e

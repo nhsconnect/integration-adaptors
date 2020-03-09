@@ -1,7 +1,8 @@
 """This module defines the common base of all workflows."""
 import abc
-import logging
 from typing import Tuple, Optional, Dict, List
+
+import utilities.integration_adaptors_logger as log
 
 import mhs_common.state.work_description as wd
 from mhs_common.messages import ebxml_envelope
@@ -12,7 +13,7 @@ MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_TO_ASID_KEY = 'uniqueIdentifier'
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class CommonWorkflow(abc.ABC):
@@ -90,9 +91,9 @@ class CommonWorkflow(abc.ABC):
 
             ods_code = interaction_details.get('ods-code')
             if ods_code:
-                logger.info('Looking up endpoint details for ods code: {ods_code}.', {'ods_code': ods_code})
+                logger.info('Looking up endpoint details for ods code: {ods_code}.', fparams={'ods_code': ods_code})
 
-            logger.info('Looking up endpoint details for {service_id}.', {'service_id': service_id})
+            logger.info('Looking up endpoint details for {service_id}.', fparams={'service_id': service_id})
             endpoint_details = await self.routing_reliability.get_end_point(service_id, ods_code)
 
             url = CommonWorkflow._extract_endpoint_url(endpoint_details)
@@ -105,11 +106,11 @@ class CommonWorkflow(abc.ABC):
                        self.ENDPOINT_CPA_ID: cpa_id,
                        self.ENDPOINT_TO_ASID: to_asid
                        }
-            logger.info('Retrieved endpoint details for {details}', {'details': details})
+            logger.info('Retrieved endpoint details for {details}', fparams={'details': details})
             return details
         except Exception as e:
             logger.warning('Error encountered whilst retrieving endpoint details. {Exception}',
-                           {'Exception': e})
+                           fparams={'Exception': e})
             raise e
 
     @staticmethod
@@ -123,8 +124,8 @@ class CommonWorkflow(abc.ABC):
         url = endpoint_urls[0]
 
         if len(endpoint_urls) > 1:
-            logger.warning('Received more than one URL when looking up endpoint details. Using {url}. '
-                                   '{urls_received}', {'url': url, 'urls_received': endpoint_urls})
+            logger.warning('Received more than one URL when looking up endpoint details. Using {url}. {urls_received}',
+                           fparams={'url': url, 'urls_received': endpoint_urls})
 
         return url
 

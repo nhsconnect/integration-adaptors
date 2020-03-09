@@ -1,6 +1,6 @@
 """This module defines the synchronous workflow."""
-import logging
 from typing import Tuple, Optional
+import utilities.integration_adaptors_logger as log
 from tornado import httpclient
 from utilities import timing
 from mhs_common import workflow
@@ -12,7 +12,7 @@ from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_synchronous
 from mhs_common.routing import routing_reliability
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
@@ -74,9 +74,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return 500, 'Failed message preparation', None
 
         if len(message) > self.max_request_size:
-            logger.error('Request to send to Spine is too large after serialisation. '
-                                '{RequestSize} {MaxRequestSize}',
-                         {'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
+            logger.error('Request to send to Spine is too large after serialisation. {RequestSize} {MaxRequestSize}',
+                         fparams={'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '\
                         f'RequestSize={len(message)}', None
@@ -91,19 +90,19 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return code, error, wdo
 
         except Exception as e:
-            logger.error('Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            logger.error('Error encountered whilst making outbound request. {Exception}', fparams={'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
         logger.audit('Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
-                     {'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED})
+                     fparams={'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED})
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         return response.code, response.body.decode(), wdo
 
     async def _handle_http_exception(self, exception, wdo):
         logger.warning('Received HTTP errors from Spine. {HTTPStatus} {Exception}',
-                       {'HTTPStatus': exception.code, 'Exception': exception})
+                       fparams={'HTTPStatus': exception.code, 'Exception': exception})
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
 

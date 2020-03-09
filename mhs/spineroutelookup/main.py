@@ -1,5 +1,3 @@
-import logging
-
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -11,7 +9,7 @@ from lookup import cache_adaptor, redis_cache, sds_connection_factory, sds_clien
     routing_reliability
 from request import routing_handler, reliability_handler, routing_reliability_handler
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 def load_cache_implementation():
@@ -23,8 +21,12 @@ def load_cache_implementation():
     use_tls = disable_tls_flag != "True"
 
     logger.info('Using the Redis cache with {redis_host}, {redis_port}, {cache_expiry_time}, {use_tls}',
-                {'redis_host': redis_host, 'redis_port': redis_port, 'cache_expiry_time': cache_expiry_time,
-                 'use_tls': use_tls})
+                fparams={
+                    'redis_host': redis_host,
+                    'redis_port': redis_port,
+                    'cache_expiry_time': cache_expiry_time,
+                    'use_tls': use_tls
+                })
     return redis_cache.RedisCache(redis_host, redis_port, cache_expiry_time, use_tls)
 
 
@@ -36,7 +38,7 @@ def initialise_routing(sds_url: str, search_base: str, tls: bool = True) -> rout
     :param tls: A flag to indicate whether TLS should be enabled for the SDS connection.
     :return:
     """
-    logger.info('Configuring connection to SDS using {url} {tls}', {"url": sds_url, "tls": tls})
+    logger.info('Configuring connection to SDS using {url} {tls}', fparams={"url": sds_url, "tls": tls})
 
     cache = load_cache_implementation()
 
@@ -105,6 +107,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logger.critical('Fatal exception in main application: {exception}', {'exception': e})
+        logger.critical('Fatal exception in main application: {exception}', fparams={'exception': e})
     finally:
         logger.info('Exiting application')

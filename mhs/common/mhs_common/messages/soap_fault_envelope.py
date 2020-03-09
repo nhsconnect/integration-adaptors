@@ -1,9 +1,9 @@
 """ Module defines a class representing SOAP Fault response from NHS Spine """
-import logging
 from typing import Tuple, Dict, AnyStr, List
 from xml.etree.ElementTree import Element
 
 from defusedxml import ElementTree
+import utilities.integration_adaptors_logger as log
 
 from mhs_common.messages.soap_envelope import SoapEnvelope
 
@@ -36,7 +36,7 @@ ERR_CODE_CONTEXT = 'codeContext'
 
 ERR_FIELDS = [ERR_CODE, ERR_SEVERITY, ERR_LOCATION, ERR_DESCRIPTION, ERR_CODE_CONTEXT]
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE = 200
 ROUTING_DELIVERY_FAILURE_ERROR_CODE = 206
@@ -51,7 +51,7 @@ def _extract_tag_text(elem: ElementTree, path: AnyStr) -> AnyStr:
     try:
         return elem.find(path, NS).text
     except AttributeError as e:
-        logger.error(f'Error while extracting value of {path}')
+        logger.error('Error while extracting value of {path}', fparams={'path': path})
         raise e
 
 

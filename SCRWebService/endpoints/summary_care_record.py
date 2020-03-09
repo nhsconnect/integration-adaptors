@@ -61,12 +61,12 @@ class SummaryCareRecord(tornado.web.RequestHandler):
                                                                  )
             return result
         except MessageGenerationError as e:
-            logger.error('Failed to generate message {exception}', {'exception': e})
+            logger.error('Failed to generate message {exception}', fparams={'exception': e})
             raise tornado.web.HTTPError(400, 'Error whilst generating message',
                                         reason=f'Error whilst generating message: {str(e)}')
         except MessageSendingError as e:
             logger.error('Exception raised whilst attempting to send the message to the MHS {exception}',
-                         {'exception': e})
+                         fparams={'exception': e})
             raise tornado.web.HTTPError(500, f'Error whilst attempting to send the message to the MHS: {str(e)}',
                                         reason=f'Error whilst attempting to send the message to the MHS: {str(e)}')
 
@@ -89,7 +89,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         try:
             return json.loads(self.request.body)
         except json.decoder.JSONDecodeError as e:
-            logger.error('Exception raised whilst parsing message body: {exception}', {'exception': e})
+            logger.error('Exception raised whilst parsing message body: {exception}', fparams={'exception': e})
             raise tornado.web.HTTPError(400, 'Failed to parse json body from request',
                                         reason=f'Exception raised while parsing message body: {str(e)}')
 

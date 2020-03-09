@@ -1,9 +1,11 @@
 from typing import Dict
 
 from tornado import httpclient
-import logging
 
-logger = logging.getLogger(__name__)
+from utilities import integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger(__name__)
+
 
 class CommonHttps(object):
 
@@ -27,8 +29,13 @@ class CommonHttps(object):
         """
 
         logger.info("About to send {method} request with {headers} to {url} using {proxy_host} & {proxy_port}",
-                    {"method": method, "headers": headers, "url": url, "proxy_host": http_proxy_host,
-                     "proxy_port": http_proxy_port})
+                    fparams={
+                        "method": method,
+                        "headers": headers,
+                        "url": url,
+                        "proxy_host": http_proxy_host,
+                        "proxy_port": http_proxy_port
+                    })
 
         if not validate_cert:
             logger.warning("Server certificate validation has been disabled.")
@@ -46,6 +53,12 @@ class CommonHttps(object):
                                                             proxy_port=http_proxy_port)
         logger.info("Sent {method} request with {headers} to {url} using {proxy_host} & {proxy_port}, and "
                     "received status code {code}",
-                    {"method": method, "headers": headers, "url": url, "proxy_host": http_proxy_host,
-                     "proxy_port": http_proxy_port, "code": response.code})
+                    fparams={
+                        "method": method,
+                        "headers": headers,
+                        "url": url,
+                        "proxy_host": http_proxy_host,
+                        "proxy_port": http_proxy_port,
+                        "code": response.code
+                    })
         return response

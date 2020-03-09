@@ -76,7 +76,8 @@ class GpSummaryUpload(object):
         try:
             return ET.ElementTree(ET.fromstring(message)).getroot()
         except ET.ParseError as e:
-            logger.error('Exception raised while creating XML object from string {exception}', {'exception': e})
+            logger.error('Exception raised while creating XML object from string {exception}',
+                         fparams={'exception': e})
             return None
 
     def _find_hl7_element_attribute(self, root: ET.Element, element_name: str, attribute: str) -> Optional[str]:
@@ -92,7 +93,7 @@ class GpSummaryUpload(object):
             return self._get_element(root, element_name, lambda x: x.attrib[attribute])
         except KeyError:
             logger.info('Failed to find attribute on {element} {attribute}',
-                        {'element': element_name, 'attribute': attribute})
+                        fparams={'element': element_name, 'attribute': attribute})
             return None
 
     def _find_hl7_element_text(self, root: ET.Element, element_name: str):
@@ -136,12 +137,12 @@ class GpSummaryUpload(object):
             }
         else:
             logger.error('Failed to parse all necessary elements from xml {message_id} {message_reference}'
-                                ' {creation_time} {message_details}',
+                         ' {creation_time} {message_details}',
                          {
                              'message_id': message_id,
                              'message_reference': message_ref,
                              'creation_time': creation_time,
                              'message_details': message_detail
-                         })
+                          })
             return {'error': 'Failed to parse all the necessary elements from xml returned from MHS'}
 

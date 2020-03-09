@@ -1,11 +1,9 @@
-import logging
-
 import tornado.web
-from utilities import timing
+from utilities import timing, integration_adaptors_logger as log
 
 from lookup import routing_reliability
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class ReliabilityRequestHandler(tornado.web.RequestHandler):
@@ -24,9 +22,9 @@ class ReliabilityRequestHandler(tornado.web.RequestHandler):
         service_id = self.get_query_argument("service-id")
 
         logger.info("Looking up reliability information. {org_code}, {service_id}",
-                    {"org_code": org_code, "service_id": service_id})
+                    fparams={"org_code": org_code, "service_id": service_id})
         reliability_info = await self.routing.get_reliability(org_code, service_id)
         logger.info("Obtained reliability information. {reliability_information}",
-                    {"reliability_information": reliability_info})
+                    fparams={"reliability_information": reliability_info})
 
         self.write(reliability_info)

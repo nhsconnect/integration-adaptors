@@ -1,5 +1,3 @@
-import logging
-
 import pathlib
 import ssl
 from typing import Dict
@@ -19,7 +17,7 @@ from utilities import secrets, certs
 
 import inbound.request.handler as async_request_handler
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 ASYNC_TIMEOUT = 30
 
@@ -130,6 +128,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logger.critical('Fatal exception in main application: {exception}', {'exception': e})
+        logger.critical('Fatal exception in main application: {exception}', fparams={'exception': e})
     finally:
         logger.info('Exiting application')
