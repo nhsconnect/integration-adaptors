@@ -2,9 +2,6 @@ import contextvars
 import datetime as dt
 import logging
 import sys
-import traceback
-from logging import Logger
-from typing import Mapping, Any
 from logging import LogRecord
 from typing import Optional
 
@@ -17,6 +14,7 @@ correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlatio
 inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
 interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default=None)
 
+
 def _check_for_insecure_log_level(log_level: str):
     integer_level = logging.getLevelName(log_level)
     if integer_level < logging.INFO:
@@ -25,6 +23,7 @@ def _check_for_insecure_log_level(log_level: str):
                         'by this application sometimes log out clinical patient data at DEBUG level. '
                         'The log level provided MUST NOT be used in a production environment.',
                         log_level)
+
 
 class CustomFormatter(logging.Formatter):
     def __init__(self):
