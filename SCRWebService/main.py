@@ -9,7 +9,7 @@ import definitions
 from endpoints import summary_care_record
 from message_handling import message_forwarder, message_sender
 
-logger = log.IntegrationAdaptorsLogger('SCR-WEB')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 def build_app():

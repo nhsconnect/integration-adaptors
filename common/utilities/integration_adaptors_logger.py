@@ -33,7 +33,8 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
         super().__init__(logging.getLogger(name), None)
 
     def log(self, level: int, msg: Any, *args: Any, **kwargs: Any) -> None:
-        msg = self._format_using_custom_params(msg, kwargs        super().log(level, msg, *args, **kwargs)
+        msg = self._format_using_custom_params(msg, kwargs)
+        super().log(level, msg, *args, **kwargs)
 
     def audit(self, msg: str, *args: Any, **kwargs: Any) -> None:
         if self.isEnabledFor(AUDIT):

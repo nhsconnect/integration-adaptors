@@ -5,7 +5,7 @@ from builder.pystache_message_builder import MessageGenerationError
 from message_handling.message_sender import MessageSender
 import xml.etree.ElementTree as ET
 
-logger = log.IntegrationAdaptorsLogger('MSG-HANDLER')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class MessageSendingError(Exception):

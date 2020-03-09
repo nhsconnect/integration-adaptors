@@ -7,7 +7,7 @@ from typing import Dict, Optional, Callable
 import xml.etree.ElementTree as ET
 from utilities import integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class GpSummaryUpload(object):

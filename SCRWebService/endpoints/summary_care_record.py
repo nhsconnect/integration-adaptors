@@ -10,7 +10,7 @@ from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
 from message_handling.message_forwarder import MessageSendingError
 
-logger = log.IntegrationAdaptorsLogger('SCR_ENDPOINT')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class SummaryCareRecord(tornado.web.RequestHandler):

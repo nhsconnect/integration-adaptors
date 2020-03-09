@@ -5,7 +5,7 @@ from typing import Optional
 from comms.common_https import CommonHttps
 from utilities import integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('MSG_SENDER')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class MessageSender(object):
