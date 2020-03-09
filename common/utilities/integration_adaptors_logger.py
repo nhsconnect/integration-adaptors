@@ -2,8 +2,8 @@ import contextvars
 import datetime as dt
 import logging
 import sys
-from logging import LogRecord, Logger
-from typing import Optional, Any, Mapping, MutableMapping, Tuple, Dict
+from logging import LogRecord
+from typing import Optional, Any
 
 from utilities import config
 
@@ -66,7 +66,6 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
         """
         formatted_values = self._format_values_in_map(dict_values)
         return message.format(**formatted_values)
-
 
 
 class CustomFormatter(logging.Formatter):

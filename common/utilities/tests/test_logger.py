@@ -62,7 +62,6 @@ class TestLogger(TestCase):
         self.assertEqual('20', log_entry.inbound_message_id)
         self.assertEqual('25', log_entry.interaction_id)
         self.assertEqual('SYS', log_entry.name)
-        self.assertIn('test_logger.py', log_entry.file)
         self.assertEqual('INFO', log_entry.level)
         self.assertEqual('yes no', log_entry.message)
         time.strptime(log_entry.time, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -110,7 +109,6 @@ class LogEntry:
             self.correlation_id,
             self.inbound_message_id,
             self.name,
-            self.file,
             self.message
         ) = log_elements
         self.message = self.message[:-1]
