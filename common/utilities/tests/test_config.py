@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import utilities.config as config
 from utilities import integration_adaptors_logger
+from utilities.tests.test_logger import LogEntry
 
 
 @patch.dict(config.config)
@@ -60,5 +61,6 @@ class TestConfig(unittest.TestCase):
             config.get_config("BLAH")
 
         output = mock_stdout.getvalue()
-        self.assertIn('Failed to get config ConfigName="BLAH" ProcessKey=CONFIG003', output)
-        self.assertIn("LogLevel=ERROR", output)
+        log_entry = LogEntry(output)
+        self.assertEqual('Failed to get config ConfigName="BLAH" ProcessKey=CONFIG003', log_entry.message)
+        self.assertEqual('ERROR', log_entry.level)
