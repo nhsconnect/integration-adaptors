@@ -54,9 +54,9 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                       wdo: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
-        logger.info('0001', 'Entered async reliable workflow to handle outbound message')
+        logger.info('Entered async reliable workflow to handle outbound message')
         wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
-        logger.audit('0100', 'Outbound {WorkflowName} workflow invoked.', {'WorkflowName': self.workflow_name})
+        logger.audit('Outbound {WorkflowName} workflow invoked.', {'WorkflowName': self.workflow_name})
 
         try:
             details = await self._lookup_endpoint_details(interaction_details)
@@ -102,7 +102,7 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                                                                              handle_error_response)
             except _NeedToRetryException:
                 retries_remaining[0] -= 1
-                logger.info("0014", "Waiting for {retry_interval} seconds before next request "
+                logger.info("Waiting for {retry_interval} seconds before next request "
                                     "attempt.", {"retry_interval": retry_interval})
                 await asyncio.sleep(retry_interval)
                 continue
@@ -116,36 +116,35 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                 _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
                                                                       response.headers,
                                                                       response.body)
-                logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
+                logger.warning('Received ebxml errors from Spine. {HTTPStatus} {Errors}',
                                {'HTTPStatus': response.code, 'Errors': parsed_response})
 
             elif SOAPFault.is_soap_fault(parsed_body):
                 _, parsed_response, soap_fault_codes = handle_soap_error(response.code,
                                                                          response.headers,
                                                                          response.body)
-                logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
+                logger.warning('Received soap errors from Spine. {HTTPStatus} {Errors}',
                                {'HTTPStatus': response.code, 'Errors': parsed_response})
 
                 if SOAPFault.is_soap_fault_retriable(soap_fault_codes):
-                    logger.warning("0015", "A retriable error was encountered {error} {retries_remaining} "
+                    logger.warning("A retriable error was encountered {error} {retries_remaining} "
                                            "{max_retries}",
                                    {"error": parsed_response,
                                     "retries_remaining": retries_remaining[0],
                                     "max_retries": num_of_retries})
                     if retries_remaining[0] <= 0:
                         # exceeded the number of retries so return the SOAP error response
-                        logger.error("0016",
-                                     "A request has exceeded the maximum number of retries, {max_retries} "
+                        logger.error("A request has exceeded the maximum number of retries, {max_retries} "
                                      "retries", {"max_retries": num_of_retries})
                     else:
                         raise _NeedToRetryException()
             else:
-                logger.warning('0017', "Received an unexpected response from Spine",
+                logger.warning("Received an unexpected response from Spine",
                                {'HTTPStatus': response.code})
                 parsed_response = "Didn't get expected response from Spine"
 
         except ET.ParseError as pe:
-            logger.warning('0010', 'Unable to parse response from Spine. {Exception}',
+            logger.warning('Unable to parse response from Spine. {Exception}',
                            {'Exception': repr(pe)})
             parsed_response = 'Unable to handle response returned from Spine'
 

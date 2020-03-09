@@ -105,8 +105,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                 attachment[ATTACHMENT_CONTENT_TRANSFER_ENCODING] = 'base64' if attachment.pop(ATTACHMENT_BASE64) \
                     else '8bit'
             except KeyError as e:
-                logger.error('0001',
-                             'Failed to find {Key} when generating message from {TemplateFile} . {ErrorMessage}',
+                logger.error('Failed to find {Key} when generating message from {TemplateFile} . {ErrorMessage}',
                              {'Key': f'{ATTACHMENTS}[].{ATTACHMENT_BASE64}', 'TemplateFile': EBXML_TEMPLATE,
                               'ErrorMessage': e})
                 raise pystache_message_builder.MessageGenerationError(f'Failed to find '
@@ -132,7 +131,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         cls._add_descriptions_to_attachments(xml_tree, attachments)
         extracted_values[ATTACHMENTS] = attachments
 
-        logger.info('0002', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
+        logger.info('Extracted {extracted_values} from message', {'extracted_values': extracted_values})
 
         if payload_part:
             extracted_values[MESSAGE] = payload_part
@@ -154,7 +153,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
                 f"/{ebxml_envelope.EBXML_NAMESPACE}:Description",
                 ebxml_envelope.NAMESPACES)
             if description_element is None:
-                logger.info('0003', "{Attachment} with {ContentType} found with no description. "
+                logger.info("{Attachment} with {ContentType} found with no description. "
                                     "Setting description to ''",
                             {'Attachment': attachment[ATTACHMENT_CONTENT_ID],
                              'ContentType': attachment[ATTACHMENT_CONTENT_TYPE]})
@@ -192,7 +191,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         msg = email.message_from_string(content_type_header + message, policy=email.policy.HTTP)
 
         if msg.defects:
-            logger.warning('0004', 'Found defects in MIME message during parsing. {Defects}',
+            logger.warning('Found defects in MIME message during parsing. {Defects}',
                            {'Defects': msg.defects})
 
         return msg
@@ -208,7 +207,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         # (if present) must be the first additional attachment.
 
         if not msg.is_multipart():
-            logger.error('0005', 'Non-multipart message received')
+            logger.error('Non-multipart message received')
             raise ebxml_envelope.EbXmlParsingError("Non-multipart message received")
 
         message_parts: Sequence[email.message.EmailMessage] = tuple(msg.iter_parts())
@@ -233,14 +232,14 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     def _report_any_defects_in_message_parts(message_parts: Sequence[email.message.EmailMessage]):
         for i, part in enumerate(message_parts):
             if part.defects:
-                logger.warning('0006', 'Found defects in {PartIndex} of MIME message during parsing. {Defects}',
+                logger.warning('Found defects in {PartIndex} of MIME message during parsing. {Defects}',
                                {'PartIndex': i, 'Defects': part.defects})
 
     @staticmethod
     def _extract_ebxml_part(message_part: email.message.EmailMessage) -> str:
         ebxml_part, is_base64_ebxml_part = EbxmlRequestEnvelope._convert_message_part_to_str(message_part)
         if is_base64_ebxml_part:
-            logger.error('0007', 'Failed to decode ebXML header part of message as text')
+            logger.error('Failed to decode ebXML header part of message as text')
             raise ebxml_envelope.EbXmlParsingError("Failed to decode ebXML header part of message as text")
         return ebxml_part
 
@@ -248,7 +247,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
     def _extract_hl7_payload_part(message_part: email.message.EmailMessage) -> str:
         payload_part, is_base64_payload = EbxmlRequestEnvelope._convert_message_part_to_str(message_part)
         if is_base64_payload:
-            logger.error('0008', 'Failed to decode HL7 payload part of message as text')
+            logger.error('Failed to decode HL7 payload part of message as text')
             raise ebxml_envelope.EbXmlParsingError("Failed to decode HL7 payload part of message as text")
         return payload_part
 
@@ -274,23 +273,21 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         logger_dict = {'ContentType': content_type, 'ContentTransferEncoding': content_transfer_encoding}
 
         if isinstance(content, str):
-            logger.info('0009', 'Successfully decoded message part with {ContentType} {ContentTransferEncoding} as '
+            logger.info('Successfully decoded message part with {ContentType} {ContentTransferEncoding} as '
                                 'string', logger_dict)
             return content, False
         try:
             if content_type == 'application/xml':
                 decoded_content = content.decode()
-                logger.info('0010',
-                            'Successfully decoded message part with {ContentType} {ContentTransferEncoding} as a '
+                logger.info('Successfully decoded message part with {ContentType} {ContentTransferEncoding} as a '
                             'string', logger_dict)
                 return decoded_content, False
             decoded_content = base64.b64encode(content).decode()
-            logger.info('0011',
-                        'Successfully encoded binary message part with {ContentType} {ContentTransferEncoding} as '
+            logger.info('Successfully encoded binary message part with {ContentType} {ContentTransferEncoding} as '
                         'a base64 string', logger_dict)
             return decoded_content, True
         except UnicodeDecodeError as e:
-            logger.error('0012', 'Failed to decode ebXML message part with {ContentType} {ContentTransferEncoding}.',
+            logger.error('Failed to decode ebXML message part with {ContentType} {ContentTransferEncoding}.',
                          logger_dict)
             raise ebxml_envelope.EbXmlParsingError(f'Failed to decode ebXML message part with '
                                                    f'Content-Type: {content_type} and '

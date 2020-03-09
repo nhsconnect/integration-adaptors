@@ -130,7 +130,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         from_asid = self._extract_from_asid()
         ods_code = self._extract_ods_code()
 
-        logger.info('0006', 'Outbound POST received. {Request}', {'Request': str(self.request)})
+        logger.info('Outbound POST received. {Request}', {'Request': str(self.request)})
 
         body = self._parse_body()
 
@@ -150,10 +150,10 @@ class SynchronousHandler(base_handler.BaseHandler):
         try:
             content_type = self.request.headers['Content-Type']
         except KeyError as e:
-            logger.error('0011', 'Missing Content-Type header')
+            logger.error('Missing Content-Type header')
             raise tornado.web.HTTPError(400, 'Missing Content-Type header', reason='Missing Content-Type header') from e
         if content_type != 'application/json':
-            logger.error('0012', 'Unsupported content type in request. {ExpectedContentType} {ActualContentType}',
+            logger.error('Unsupported content type in request. {ExpectedContentType} {ActualContentType}',
                          {'ExpectedContentType': 'application/json', 'ActualContentType': content_type})
             raise tornado.web.HTTPError(415,
                                         'Unsupported content type. Only application/json request bodies are supported.',
@@ -161,18 +161,18 @@ class SynchronousHandler(base_handler.BaseHandler):
                                                'supported.')
         body = self.request.body.decode()
         if not body:
-            logger.error('0009', 'Body missing from request')
+            logger.error('Body missing from request')
             raise tornado.web.HTTPError(400, 'Body missing from request', reason='Body missing from request')
         try:
             # Parse the body as JSON and validate it against RequestBodySchema
             parsed_body: request_body_schema.RequestBody = request_body_schema.RequestBodySchema().loads(body)
         except json.JSONDecodeError as e:
-            logger.error('0013', 'Invalid JSON request body')
+            logger.error('Invalid JSON request body')
             raise tornado.web.HTTPError(400, 'Invalid JSON request body', reason='Invalid JSON request body') from e
         except marshmallow.ValidationError as e:
             # e.messages is a nested dict of all the validation errors
             validation_errors = str(e.messages)
-            logger.error('0014', 'Invalid request. {ValidationErrors}', {'ValidationErrors': validation_errors})
+            logger.error('Invalid request. {ValidationErrors}', {'ValidationErrors': validation_errors})
             raise tornado.web.HTTPError(400, f'Invalid request. Validation errors: {validation_errors}',
                                         reason=f'Invalid request. Validation errors: {validation_errors}') from e
         return parsed_body.payload
@@ -180,7 +180,7 @@ class SynchronousHandler(base_handler.BaseHandler):
     def _extract_sync_async_header(self):
         sync_async_header = self.request.headers.get('sync-async', None)
         if not sync_async_header:
-            logger.error('0031', 'Failed to parse sync-async header from message')
+            logger.error('Failed to parse sync-async header from message')
             raise tornado.web.HTTPError(400, 'Sync-Async header missing', reason='Sync-Async header missing')
         if sync_async_header == 'true':
             return True
@@ -195,11 +195,11 @@ class SynchronousHandler(base_handler.BaseHandler):
         if not message_id:
             message_id = message_utilities.MessageUtilities.get_uuid()
             log.message_id.set(message_id)
-            logger.info('0001', "Didn't receive message id in incoming request from supplier, so have generated a new "
+            logger.info("Didn't receive message id in incoming request from supplier, so have generated a new "
                                 "one.")
         else:
             log.message_id.set(message_id)
-            logger.info('0002', 'Found message id on incoming request.')
+            logger.info('Found message id on incoming request.')
         return message_id
 
     def _extract_correlation_id(self):
@@ -207,20 +207,20 @@ class SynchronousHandler(base_handler.BaseHandler):
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
             log.correlation_id.set(correlation_id)
-            logger.info('0003', "Didn't receive correlation id in incoming request from supplier, so have generated a "
+            logger.info("Didn't receive correlation id in incoming request from supplier, so have generated a "
                                 "new one.")
         else:
             log.correlation_id.set(correlation_id)
-            logger.info('0004', 'Found correlation id on incoming request.')
+            logger.info('Found correlation id on incoming request.')
         return correlation_id
 
     def _extract_interaction_id(self):
         try:
             interaction_id = self.request.headers['Interaction-Id']
             log.interaction_id.set(interaction_id)
-            logger.info('0021', 'Found Interaction-Id in message headers')
+            logger.info('Found Interaction-Id in message headers')
         except KeyError as e:
-            logger.error('0005', 'Required Interaction-Id header not passed in request')
+            logger.error('Required Interaction-Id header not passed in request')
             raise tornado.web.HTTPError(404, 'Required Interaction-Id header not found',
                                         reason='Required Interaction-Id header not found') from e
         return interaction_id
@@ -235,7 +235,7 @@ class SynchronousHandler(base_handler.BaseHandler):
     def _extract_sync_async_from_interaction_details(self, interaction_details):
         is_sync_async = interaction_details.get('sync_async')
         if is_sync_async is None:
-            logger.error('0032', 'Failed to retrieve sync-async flag from interactions.json')
+            logger.error('Failed to retrieve sync-async flag from interactions.json')
             raise tornado.web.HTTPError(500, f'Failed to parse sync-async flag from interactions.json file',
                                         reason='Failed to find sync-async flag for the interaction within the '
                                                'interactions.json')
@@ -245,7 +245,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         if interaction_config and sync_async_header:
             return True
         elif (not interaction_config) and sync_async_header:
-            logger.error('0033', 'Message header requested sync-async wrap for un-supported sync-async')
+            logger.error('Message header requested sync-async wrap for un-supported sync-async')
             raise tornado.web.HTTPError(400, f'Message header requested sync-async wrap for un-supported sync-async',
                                         reason='Message header requested sync-async wrap for a message pattern '
                                                'that does not support sync-async')
@@ -269,7 +269,7 @@ class SynchronousHandler(base_handler.BaseHandler):
                 await wf.set_successful_message_response(wdo)
             self._write_response(status, response)
         except Exception as e:
-            logger.error('0015', 'Failed to respond to supplier system {exception}', {'exception': e})
+            logger.error('Failed to respond to supplier system {exception}', {'exception': e})
             if wdo:
                 await wf.set_failure_message_response(wdo)
 
@@ -286,7 +286,7 @@ class SynchronousHandler(base_handler.BaseHandler):
 
         :param message: The message to write to the response.
         """
-        logger.info('0010', 'Returning response with {HttpStatus}', {'HttpStatus': status})
+        logger.info('Returning response with {HttpStatus}', {'HttpStatus': status})
         self.set_status(status)
         if 400 <= status:
             content_type = "text/plain"

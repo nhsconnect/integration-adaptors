@@ -23,10 +23,10 @@ class ReliabilityRequestHandler(tornado.web.RequestHandler):
         org_code = self.get_query_argument("org-code")
         service_id = self.get_query_argument("service-id")
 
-        logger.info("001", "Looking up reliability information. {org_code}, {service_id}",
+        logger.info("Looking up reliability information. {org_code}, {service_id}",
                     {"org_code": org_code, "service_id": service_id})
         reliability_info = await self.routing.get_reliability(org_code, service_id)
-        logger.info("002", "Obtained reliability information. {reliability_information}",
+        logger.info("Obtained reliability information. {reliability_information}",
                     {"reliability_information": reliability_info})
 
         self.write(reliability_info)

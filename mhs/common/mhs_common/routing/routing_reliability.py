@@ -48,14 +48,14 @@ class RoutingAndReliability:
         """
         if org_code is None:
             org_code = self.spine_org_code
-            logger.info("0007", "No org code provided when obtaining endpoint details. Using {spine_org_code}",
+            logger.info("No org code provided when obtaining endpoint details. Using {spine_org_code}",
                         {"spine_org_code": org_code})
 
         url = self._build_request_url(ROUTING_PATH, org_code, service_id)
 
         try:
 
-            logger.info("0001", "Requesting endpoint details from Spine route lookup service for {org_code} & "
+            logger.info("Requesting endpoint details from Spine route lookup service for {org_code} & "
                                 "{service_id}.", {"org_code": org_code, "service_id": service_id})
             http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None,
                                                                         client_cert=self._client_cert,
@@ -65,13 +65,12 @@ class RoutingAndReliability:
                                                                         http_proxy_port=self._proxy_port)
             endpoint_details = json.loads(http_response.body)
 
-            logger.info("0002", "Received endpoint details from Spine route lookup service for {org_code} & "
+            logger.info("Received endpoint details from Spine route lookup service for {org_code} & "
                                 "{service_id}. {endpoint_details}",
                         {"org_code": org_code, "service_id": service_id, "endpoint_details": endpoint_details})
             return endpoint_details
         except Exception as e:
-            logger.error("0003",
-                         "Couldn't obtain endpoint details from Spine route lookup service for {org_code} & "
+            logger.error("Couldn't obtain endpoint details from Spine route lookup service for {org_code} & "
                          "{service_id}. {exception}", {"org_code": org_code, "service_id": service_id, "exception": e})
             raise e
 
@@ -86,13 +85,13 @@ class RoutingAndReliability:
         """
         if org_code is None:
             org_code = self.spine_org_code
-            logger.info("0008", "No org code provided when obtaining reliability details. Using {spine_org_code}",
+            logger.info("No org code provided when obtaining reliability details. Using {spine_org_code}",
                         {"spine_org_code": org_code})
 
         url = self._build_request_url(RELIABILITY_PATH, org_code, service_id)
 
         try:
-            logger.info("0004", "Requesting reliability details from Spine route lookup service for {org_code} & "
+            logger.info("Requesting reliability details from Spine route lookup service for {org_code} & "
                                 "{service_id}.", {"org_code": org_code, "service_id": service_id})
             http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None,
                                                                         client_cert=self._client_cert,
@@ -102,13 +101,12 @@ class RoutingAndReliability:
                                                                         http_proxy_port=self._proxy_port)
             reliability_details = json.loads(http_response.body)
 
-            logger.info("0005", "Received reliability details from Spine route lookup service for {org_code} & "
+            logger.info("Received reliability details from Spine route lookup service for {org_code} & "
                                 "{service_id}. {reliability_details}",
                         {"org_code": org_code, "service_id": service_id, "reliability_details": reliability_details})
             return reliability_details
         except Exception as e:
-            logger.error("0006",
-                         "Couldn't obtain reliability details from Spine route lookup service for {org_code} & "
+            logger.error("Couldn't obtain reliability details from Spine route lookup service for {org_code} & "
                          "{service_id}. {exception}", {"org_code": org_code, "service_id": service_id, "exception": e})
             raise e
 

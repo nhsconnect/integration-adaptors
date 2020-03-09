@@ -62,7 +62,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                                  async_workflow: common.CommonWorkflow
                                                  ) -> Tuple[int, str, wd.WorkDescription]:
 
-        logger.info('0001', 'Entered sync-async workflow to handle outbound message')
+        logger.info('Entered sync-async workflow to handle outbound message')
         wdo = wd.create_new_work_description(self.work_description_store, message_id,
                                              workflow.SYNC_ASYNC,
                                              outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
@@ -71,30 +71,30 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         status_code, response, _ = await async_workflow.handle_outbound_message(from_asid, message_id, correlation_id,
                                                                                 interaction_details, payload, wdo)
         if not status_code == 202:
-            logger.warning('0002', 'No ACK received ')
+            logger.warning('No ACK received ')
             return status_code, response, wdo
 
         status_code, response = await self._retrieve_async_response(message_id, wdo)
         return status_code, response, wdo
 
     async def _retrieve_async_response(self, message_id, wdo: wd.WorkDescription):
-        logger.info('0003', 'Attempting to retrieve the async response from the async store')
+        logger.info('Attempting to retrieve the async response from the async store')
         try:
             response = await self.resynchroniser.pause_request(message_id)
-            logger.info('0004', 'Retrieved async response from sync-async store')
+            logger.info('Retrieved async response from sync-async store')
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
                                                 wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED,
                                                 self.persistence_store_retries
                                                 )
             return 200, response[MESSAGE_DATA]
         except sync_async_resynchroniser.SyncAsyncResponseException:
-            logger.error('0005', 'No async response placed on async store within timeout for {messageId}',
+            logger.error('No async response placed on async store within timeout for {messageId}',
                          {'messageId': message_id})
             return 500, "No async response received from sync-async store"
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
-        logger.info('0006', 'Entered sync-async inbound workflow')
+        logger.info('Entered sync-async inbound workflow')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
@@ -102,24 +102,24 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         try:
             await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: payload})
-            logger.info('0007', 'Placed message in sync-async store successfully')
+            logger.info('Placed message in sync-async store successfully')
             await wd.update_status_with_retries(work_description,
                                                 work_description.set_inbound_status,
                                                 wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED,
                                                 self.persistence_store_retries)
         except Exception as e:
-            logger.error('0008', 'Failed to write to sync-async store')
+            logger.error('Failed to write to sync-async store')
             await work_description.set_inbound_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
             raise e
 
     async def _add_to_sync_async_store(self, key, data):
-        logger.info('0009', 'Attempting to add inbound message to sync-async store')
+        logger.info('Attempting to add inbound message to sync-async store')
         retry_result = await retriable_action.RetriableAction(lambda: self.sync_async_store.add(key, data),
                                                               self.persistence_store_retries,
                                                               self.sync_async_store_retry_delay).execute()
 
         if not retry_result.is_successful:
-            logger.error('0010', 'Final retry has been attempted for adding message to sync async store')
+            logger.error('Final retry has been attempted for adding message to sync async store')
 
             exception_raised = retry_result.exception
             if exception_raised:
@@ -128,7 +128,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             raise SyncAsyncStoreFailure(
                 'Max number of retries exceeded whilst attempting to put the message on the sync-async store')
 
-        logger.info('0011', 'Successfully updated state store')
+        logger.info('Successfully updated state store')
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         await wd.update_status_with_retries(wdo,

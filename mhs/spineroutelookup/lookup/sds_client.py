@@ -52,12 +52,12 @@ class SDSClient(object):
         accredited_system_lookup = await self._accredited_system_lookup(ods_code, interaction_id)
 
         if not accredited_system_lookup:
-            logger.error("0001", "Failed to find accredited system details for {ods_code} & {interaction_id}",
+            logger.error("Failed to find accredited system details for {ods_code} & {interaction_id}",
                          {"ods_code": ods_code, "interaction_id": interaction_id})
             raise sds_exception.SDSException('No response from accredited system lookup')
 
         if len(accredited_system_lookup) > 1:
-            logger.warning("0002", "More than one accredited system details returned on inputs: {ods_code} & "
+            logger.warning("More than one accredited system details returned on inputs: {ods_code} & "
                                    "{interaction_id}", {"ods_code": ods_code, "interaction_id": interaction_id})
 
         # As per the spec exactly one result should be returned
@@ -69,12 +69,12 @@ class SDSClient(object):
         details = await self._mhs_details_lookup(party_key, interaction_id)
 
         if not details:
-            logger.error("0003", "No mhs details returned for {party_key} & {interaction_id}",
+            logger.error("No mhs details returned for {party_key} & {interaction_id}",
                          {"party_key": party_key, "interaction_id": interaction_id})
             raise sds_exception.SDSException(f'No mhs details returned for party key: '
                                              f'{party_key} and interaction id : {interaction_id}')
         if len(details) > 1:
-            logger.warning("0004", "More than one mhs details returned on inputs: {ods_code} & {interaction_id}",
+            logger.warning("More than one mhs details returned on inputs: {ods_code} & {interaction_id}",
                            {"ods_code": ods_code, "interaction_id": interaction_id})
 
         details[0]['attributes'][MHS_ASID] = asid
@@ -92,11 +92,11 @@ class SDSClient(object):
         message_id = self.connection.search(search_base=self.search_base,
                                             search_filter=search_filter,
                                             attributes=[MHS_PARTY_KEY, MHS_ASID])
-        logger.info("0005", "{message_id} - for query: {ods_code} {interaction_id}",
+        logger.info("{message_id} - for query: {ods_code} {interaction_id}",
                     {"message_id": message_id, "ods_code": ods_code, "interaction_id": interaction_id})
 
         response = await self._get_query_result(message_id)
-        logger.info("0006", "Found accredited supplier details for {message_id}", {"message_id": message_id})
+        logger.info("Found accredited supplier details for {message_id}", {"message_id": message_id})
 
         return response
 
@@ -113,11 +113,11 @@ class SDSClient(object):
                                             search_filter=search_filter,
                                             attributes=mhs_attributes)
 
-        logger.info("0007", "{message_id} - for query: {party_key} {interaction_id}",
+        logger.info("{message_id} - for query: {party_key} {interaction_id}",
                     {"message_id": message_id, "party_key": party_key, "interaction_id": interaction_id})
 
         response = await self._get_query_result(message_id)
-        logger.info("0008", "Found mhs details for {message_id}", {"message_id": message_id})
+        logger.info("Found mhs details for {message_id}", {"message_id": message_id})
 
         return response
 
@@ -127,6 +127,6 @@ class SDSClient(object):
         try:
             response, result = await loop.run_in_executor(None, self.connection.get_response, message_id, self.timeout)
         except ldap_exceptions.LDAPResponseTimeoutError:
-            logger.error("0009", "LDAP query timed out for {message_id}", {"message_id": message_id})
+            logger.error("LDAP query timed out for {message_id}", {"message_id": message_id})
 
         return response

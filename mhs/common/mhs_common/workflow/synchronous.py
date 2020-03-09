@@ -42,8 +42,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                       payload: str,
                                       work_description_object: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
-        logger.info('001', 'Entered sync workflow for outbound message')
-        logger.audit('0100', 'Outbound Synchronous workflow invoked.')
+        logger.info('Entered sync workflow for outbound message')
+        logger.audit('Outbound Synchronous workflow invoked.')
 
         wdo = wd.create_new_work_description(self.wd_store,
                                              message_id,
@@ -58,7 +58,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             url = endpoint_details[self.ENDPOINT_URL]
             to_asid = endpoint_details[self.ENDPOINT_TO_ASID]
         except Exception:
-            logger.error('009', 'Failed to retrieve details from spine route lookup')
+            logger.error('Failed to retrieve details from spine route lookup')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Error obtaining outbound URL', None
 
@@ -69,12 +69,12 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                                                                 interaction_details=interaction_details,
                                                                                 message=payload)
         except Exception:
-            logger.error('002', 'Failed to prepare outbound message')
+            logger.error('Failed to prepare outbound message')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Failed message preparation', None
 
         if len(message) > self.max_request_size:
-            logger.error('004', 'Request to send to Spine is too large after serialisation. '
+            logger.error('Request to send to Spine is too large after serialisation. '
                                 '{RequestSize} {MaxRequestSize}',
                          {'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
@@ -83,7 +83,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
 
-        logger.info('003', 'About to make outbound request')
+        logger.info('About to make outbound request')
         try:
             response = await self.transmission.make_request(url, headers, message)
         except httpclient.HTTPClientError as e:
@@ -91,19 +91,18 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return code, error, wdo
 
         except Exception as e:
-            logger.error('0006', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+            logger.error('Error encountered whilst making outbound request. {Exception}', {'Exception': e})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
-        logger.audit('0101',
-                     'Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
+        logger.audit('Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
                      {'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED})
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         return response.code, response.body.decode(), wdo
 
     async def _handle_http_exception(self, exception, wdo):
-        logger.warning('0005', 'Received HTTP errors from Spine. {HTTPStatus} {Exception}',
+        logger.warning('Received HTTP errors from Spine. {HTTPStatus} {Exception}',
                        {'HTTPStatus': exception.code, 'Exception': exception})
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)

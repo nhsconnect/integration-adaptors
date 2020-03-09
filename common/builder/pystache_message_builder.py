@@ -32,7 +32,7 @@ class PystacheMessageBuilder(object):
         try:
             return self._renderer.render(self._parsed_template, message_dictionary)
         except pystache_context.KeyNotFoundError as e:
-            logger.error('0001', 'Failed to find {Key} when generating message from {TemplateFile} . {ErrorMessage}',
+            logger.error('Failed to find {Key} when generating message from {TemplateFile} . {ErrorMessage}',
                          {'Key': e.key, 'TemplateFile': self.template_file, 'ErrorMessage': e})
             raise MessageGenerationError(f'Failed to find key:{e.key} when generating message from'
                                          f' template file:{self.template_file}') from e

@@ -128,10 +128,6 @@ def main():
     secrets.setup_secret_config("MHS")
     log.configure_logging()
 
-    # import os
-    # ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
 
     configure_http_client()

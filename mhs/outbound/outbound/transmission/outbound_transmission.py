@@ -49,7 +49,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                            raise_error_response: bool = True) -> httpclient.HTTPResponse:
 
         async def make_http_request():
-            logger.info("0001", "About to send message with {headers} to {url} using {proxy_host} & {proxy_port}",
+            logger.info("About to send message with {headers} to {url} using {proxy_host} & {proxy_port}",
                         {"headers": headers, "url": url, "proxy_host": self._proxy_host,
                          "proxy_port": self._proxy_port})
             # ******************************************************************************************************
@@ -63,7 +63,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                                       http_proxy_host=self._proxy_host,
                                                       http_proxy_port=self._proxy_port,
                                                       raise_error_response=raise_error_response)
-            logger.info("0002", "Sent message with {headers} to {url} using {proxy_host} & {proxy_port} and "
+            logger.info("Sent message with {headers} to {url} using {proxy_host} & {proxy_port} and "
                                 "received status code {code}",
                         {"headers": headers, "url": url, "proxy_host": self._proxy_host,
                          "proxy_port": self._proxy_port, "code": response.code})
@@ -76,7 +76,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
             .execute()
 
         if not retry_result.is_successful:
-            logger.error("0003", "Failed to make outbound HTTP request to {url}", {"url": url})
+            logger.error("Failed to make outbound HTTP request to {url}", {"url": url})
 
             exception_raised = retry_result.exception
             if exception_raised:

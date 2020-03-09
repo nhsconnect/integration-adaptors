@@ -655,11 +655,13 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                                                                       MessageStatus.
                                                                       UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         self.mock_work_description.publish.assert_called_once()
-        audit_log_mock.assert_called_with('0022', '{WorkflowName} workflow invoked for inbound unsolicited request. '
-                                                  'Attempted to place message onto inbound queue with '
-                                                  '{Acknowledgement}.', {
+        audit_log_mock.assert_called_with('{WorkflowName} workflow invoked for inbound unsolicited request. '
+                                          'Attempted to place message onto inbound queue with '
+                                          '{Acknowledgement}.',
+                                          {
                                               'Acknowledgement': 'UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',
-                                              'WorkflowName': 'forward-reliable'})
+                                              'WorkflowName': 'forward-reliable'
+                                          })
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
 

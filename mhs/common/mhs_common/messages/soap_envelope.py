@@ -61,7 +61,7 @@ class SoapEnvelope(envelope.Envelope):
         timestamp = message_utilities.MessageUtilities.get_timestamp()
         soap_message_dictionary[TIMESTAMP] = timestamp
 
-        logger.info('0001', 'Creating SOAP message with {MessageId} and {Timestamp}',
+        logger.info('Creating SOAP message with {MessageId} and {Timestamp}',
                     {'MessageId': message_id, 'Timestamp': timestamp})
 
         message = self.message_builder.build_message(soap_message_dictionary)
@@ -88,22 +88,21 @@ class SoapEnvelope(envelope.Envelope):
             soap_headers = str(soap_header_transformer(xml_message, **headers))
             soap_body = str(soap_body_transformer(xml_message, **headers))
         except ET.XSLTApplyError as ae:
-            logger.error('0002', "An error occurred when transforming the SOAP XML message")
+            logger.error("An error occurred when transforming the SOAP XML message")
             raise SoapParsingError(f"An error occurred when transforming the SOAP XML message") from ae
         except Exception as e:
-            logger.error('0003', "An unexpected error occurred when applying an XSLT to SOAP XML message")
+            logger.error("An unexpected error occurred when applying an XSLT to SOAP XML message")
             raise SoapParsingError(f"An unexpected error occurred when applying an XSLT to SOAP XML message") from e
 
         extracted_values = json.loads(soap_headers)
-        logger.info('0005', 'Extracted {extracted_values} from message', {'extracted_values': extracted_values})
+        logger.info('Extracted {extracted_values} from message', {'extracted_values': extracted_values})
         extracted_values[MESSAGE] = soap_body
 
         for required_element in REQUIRED_SOAP_ELEMENTS:
             if not extracted_values[required_element]:
-                logger.error('0004', "Weren't able to find required element {required_param} during parsing of SOAP "
+                logger.error("Weren't able to find required element {required_param} during parsing of SOAP "
                                      "message.", {'required_param': required_element})
-                raise SoapParsingError(
-                    f"Weren't able to find required element {required_element} during parsing of SOAP message")
+                raise SoapParsingError(f"Weren't able to find required element {required_element} during parsing of SOAP message")
 
         return SoapEnvelope(extracted_values)
 

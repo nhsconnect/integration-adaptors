@@ -51,7 +51,7 @@ def _extract_tag_text(elem: ElementTree, path: AnyStr) -> AnyStr:
     try:
         return elem.find(path, NS).text
     except AttributeError as e:
-        logger.error('0001', f'Error while extracting value of {path}')
+        logger.error(f'Error while extracting value of {path}')
         raise e
 
 

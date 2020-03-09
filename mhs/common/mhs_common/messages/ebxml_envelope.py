@@ -74,7 +74,7 @@ class EbxmlEnvelope(envelope.Envelope):
             ebxml_message_dictionary[MESSAGE_ID] = message_id
         timestamp = message_utilities.MessageUtilities.get_timestamp()
         ebxml_message_dictionary[TIMESTAMP] = timestamp
-        logger.info('0001', 'Creating ebXML message with {MessageId} and {Timestamp}',
+        logger.info('Creating ebXML message with {MessageId} and {Timestamp}',
                     {'MessageId': message_id, 'Timestamp': timestamp})
 
         message = self.message_builder.build_message(ebxml_message_dictionary)
@@ -128,7 +128,7 @@ class EbxmlEnvelope(envelope.Envelope):
         xpath = EbxmlEnvelope._path_to_ebxml_element(element_name, parent=parent)
         value = xml_tree.find(xpath, namespaces=NAMESPACES)
         if value is None and required:
-            logger.error('0002', "Weren't able to find required element {xpath} during parsing of EbXML message.",
+            logger.error("Weren't able to find required element {xpath} during parsing of EbXML message.",
                          {'xpath': xpath})
             raise EbXmlParsingError(f"Weren't able to find required element {xpath} during parsing of EbXML message")
         return value
@@ -153,7 +153,7 @@ class EbxmlEnvelope(envelope.Envelope):
             try:
                 values_dict[key] = element.attrib["{" + NAMESPACES[attribute_namespace] + "}" + attribute_name]
             except KeyError as e:
-                logger.error('0003', "Weren't able to find required {attribute_name} of {xpath} during parsing of "
+                logger.error("Weren't able to find required {attribute_name} of {xpath} during parsing of "
                                      "EbXML message.", {'attribute_name': attribute_name, 'xpath': xpath})
                 raise EbXmlParsingError(f"Weren't able to find required attribute {attribute_name} during parsing of "
                                         f"EbXML message") from e

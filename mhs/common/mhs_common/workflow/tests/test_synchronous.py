@@ -74,7 +74,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error obtaining outbound URL')
-        log_mock.error.assert_called_with('009', 'Failed to retrieve details from spine route lookup')
+        log_mock.error.assert_called_with('Failed to retrieve details from spine route lookup')
 
     @mock.patch.object(sync, 'logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -99,7 +99,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Failed message preparation')
-        log_mock.error.assert_called_with('002', 'Failed to prepare outbound message')
+        log_mock.error.assert_called_with('Failed to prepare outbound message')
 
     @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -282,7 +282,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
             work_description_object=None)
 
         # audit log should be called at start
-        log_mock.audit('0100', 'Outbound Synchronous workflow invoked.', {})
+        log_mock.audit('Outbound Synchronous workflow invoked.', {})
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test

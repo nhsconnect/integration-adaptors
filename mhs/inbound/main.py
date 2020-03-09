@@ -91,7 +91,7 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     healthcheck_server_port = int(config.get_config('INBOUND_HEALTHCHECK_SERVER_PORT', default='80'))
     healthcheck_application.listen(healthcheck_server_port)
 
-    logger.info('011', 'Starting inbound server at port {server_port} and healthcheck at {healthcheck_server_port}',
+    logger.info('Starting inbound server at port {server_port} and healthcheck at {healthcheck_server_port}',
                 {'server_port': inbound_server_port, 'healthcheck_server_port': healthcheck_server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
@@ -130,6 +130,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+        logger.critical('Fatal exception in main application: {exception}', {'exception': e})
     finally:
-        logger.info('002', 'Exiting application')
+        logger.info('Exiting application')

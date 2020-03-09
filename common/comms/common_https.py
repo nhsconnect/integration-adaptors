@@ -26,12 +26,12 @@ class CommonHttps(object):
         :param raise_error_response: Return an error response
         """
 
-        logger.info("0001", "About to send {method} request with {headers} to {url} using {proxy_host} & {proxy_port}",
+        logger.info("About to send {method} request with {headers} to {url} using {proxy_host} & {proxy_port}",
                     {"method": method, "headers": headers, "url": url, "proxy_host": http_proxy_host,
                      "proxy_port": http_proxy_port})
 
         if not validate_cert:
-            logger.warning("0003", "Server certificate validation has been disabled.")
+            logger.warning("Server certificate validation has been disabled.")
 
         response = await httpclient.AsyncHTTPClient().fetch(url,
                                                             raise_error=raise_error_response,
@@ -44,8 +44,7 @@ class CommonHttps(object):
                                                             validate_cert=validate_cert,
                                                             proxy_host=http_proxy_host,
                                                             proxy_port=http_proxy_port)
-        logger.info("0002",
-                    "Sent {method} request with {headers} to {url} using {proxy_host} & {proxy_port}, and "
+        logger.info("Sent {method} request with {headers} to {url} using {proxy_host} & {proxy_port}, and "
                     "received status code {code}",
                     {"method": method, "headers": headers, "url": url, "proxy_host": http_proxy_host,
                      "proxy_port": http_proxy_port, "code": response.code})

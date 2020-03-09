@@ -30,7 +30,7 @@ class SyncAsyncResynchroniser(object):
         self.initial_delay = initial_delay
 
     async def pause_request(self, message_id: str) -> dict:
-        logger.info('0001', 'Beginning async retrieval from sync-async store')
+        logger.info('Beginning async retrieval from sync-async store')
 
         await asyncio.sleep(self.initial_delay)
 
@@ -41,7 +41,7 @@ class SyncAsyncResynchroniser(object):
             .execute()
 
         if not retry_result.is_successful:
-            logger.error('0002', 'Resync retries exceeded. {max_retries}', {'max_retries': self.max_retries})
+            logger.error('Resync retries exceeded. {max_retries}', {'max_retries': self.max_retries})
             raise SyncAsyncResponseException('Polling on the sync async store timed out')
 
         return retry_result.result

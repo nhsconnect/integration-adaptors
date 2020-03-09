@@ -3,7 +3,7 @@ import datetime as dt
 import logging
 import sys
 import traceback
-from logging import Logger, LoggerAdapter
+from logging import Logger
 from typing import Mapping, Any
 from logging import LogRecord
 from typing import Optional
@@ -29,8 +29,15 @@ def _check_for_insecure_log_level(log_level: str):
 class CustomFormatter(logging.Formatter):
     def __init__(self):
         super().__init__(
-            fmt='%(asctime)sZ | %(levelname)s | %(process)d | %(message_id)s | %(name)s | %(filename)s:%(lineno)d | %(message)s',
+            fmt='%(asctime)sZ | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s | %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(filename)s:%(lineno)d | %(message)s',
             datefmt='%Y-%m-%dT%H:%M:%S.%f')
+
+    def format(self, record: LogRecord) -> str:
+        record.message_id = message_id.get() or ''
+        record.correlation_id = correlation_id.get() or ''
+        record.inbound_message_id = inbound_message_id.get() or ''
+        record.interaction_id = interaction_id.get() or ''
+        return super().format(record)
 
     def formatTime(self, record: LogRecord, datefmt: Optional[str] = ...) -> str:
         converter = dt.datetime.utcfromtimestamp
@@ -45,13 +52,6 @@ def configure_logging():
     to stdout and sets the default log levels and format. This is expected to be called once at the start of a
     application.
     """
-    old_factory = logging.getLogRecordFactory()
-    def record_factory(*args, **kwargs):
-        record = old_factory(*args, **kwargs)
-        record.message_id = message_id.get() or ''
-        return record
-    logging.setLogRecordFactory(record_factory)
-
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
     log_level = config.get_config('LOG_LEVEL')
@@ -63,5 +63,10 @@ def configure_logging():
     handler.setFormatter(formatter)
     logger.handlers = []
     logger.addHandler(handler)
+
+    def audit(self, message, *args, **kwargs):
+        if self.isEnabledFor(AUDIT):
+            self._log(AUDIT, message, args, **kwargs)
+    logging.Logger.audit = audit
 
     _check_for_insecure_log_level(log_level)

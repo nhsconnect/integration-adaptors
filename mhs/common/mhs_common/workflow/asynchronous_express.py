@@ -53,8 +53,8 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                                       wdo: Optional[wd.WorkDescription]) \
             -> Tuple[int, str, Optional[wd.WorkDescription]]:
 
-        logger.info('0001', 'Entered async express workflow to handle outbound message')
-        logger.audit('0100', '{WorkflowName} outbound workflow invoked.', {'WorkflowName': self.workflow_name})
+        logger.info('Entered async express workflow to handle outbound message')
+        logger.audit('{WorkflowName} outbound workflow invoked.', {'WorkflowName': self.workflow_name})
         wdo = await self._create_new_work_description_if_required(message_id, wdo, self.workflow_name)
 
         try:
@@ -83,21 +83,21 @@ class AsynchronousExpressWorkflow(common_asynchronous.CommonAsynchronousWorkflow
                 _, parsed_response = ebxml_handler.handle_ebxml_error(response.code,
                                                                       response.headers,
                                                                       response.body)
-                logger.warning('0007', 'Received ebxml errors from Spine. {HTTPStatus} {Errors}',
+                logger.warning('Received ebxml errors from Spine. {HTTPStatus} {Errors}',
                                {'HTTPStatus': response.code, 'Errors': parsed_response})
             elif SOAPFault.is_soap_fault(parsed_body):
                 _, parsed_response, _ = handle_soap_error(response.code,
                                                           response.headers,
                                                           response.body)
-                logger.warning('0008', 'Received soap errors from Spine. {HTTPStatus} {Errors}',
+                logger.warning('Received soap errors from Spine. {HTTPStatus} {Errors}',
                                {'HTTPStatus': response.code, 'Errors': parsed_response})
             else:
-                logger.warning('0009', "Received an unexpected response from Spine",
+                logger.warning("Received an unexpected response from Spine",
                                {'HTTPStatus': response.code})
                 parsed_response = "Didn't get expected response from Spine"
 
         except ET.ParseError as pe:
-            logger.warning('0010', 'Unable to parse response from Spine. {Exception}', {'Exception': repr(pe)})
+            logger.warning('Unable to parse response from Spine. {Exception}', {'Exception': repr(pe)})
             parsed_response = 'Unable to handle response returned from Spine'
 
         return 500, parsed_response, None
