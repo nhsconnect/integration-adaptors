@@ -1,13 +1,14 @@
 import asyncio
 import json
+import logging
 from typing import Dict, Optional
 
 import redis
-from utilities import integration_adaptors_logger as log, timing
+from utilities import timing
 
 from lookup import cache_adaptor
 
-logger = log.IntegrationAdaptorsLogger('REDIS_CACHE')
+logger = logging.getLogger(__name__)
 
 
 class RedisCache(cache_adaptor.CacheAdaptor):

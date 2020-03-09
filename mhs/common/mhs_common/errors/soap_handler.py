@@ -1,12 +1,12 @@
 import json
+import logging
 from typing import Dict, AnyStr, Tuple
 
 from defusedxml import ElementTree
-from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
 
 from mhs_common.messages.soap_fault_envelope import SOAPFault
 
-logger = IntegrationAdaptorsLogger('SOAP_ERROR_HANDLER')
+logger = logging.getLogger(__name__)
 
 ERROR_RESPONSE_DEFAULTS = {
     'errorType': 'soap_fault'

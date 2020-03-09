@@ -1,10 +1,10 @@
 """This module defines the asynchronous reliable workflow."""
 import asyncio
 import functools
+import logging
 from typing import Tuple, Optional, List, Dict
 from xml.etree import ElementTree as ET
 
-import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from isodate import isoerror
 from tornado import httpclient
@@ -22,7 +22,7 @@ from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous
 
-logger = log.IntegrationAdaptorsLogger('ASYNC_RELIABLE_WORKFLOW')
+logger = logging.getLogger(__name__)
 
 
 class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflow):

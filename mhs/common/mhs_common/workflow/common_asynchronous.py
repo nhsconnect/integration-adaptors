@@ -1,7 +1,7 @@
 """This module defines the common base for all asynchronous workflows."""
+import logging
 from typing import Dict, Callable, Tuple, Optional
 
-import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from tornado import httpclient
@@ -15,7 +15,7 @@ from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.common import CommonWorkflow
 
-logger = log.IntegrationAdaptorsLogger('COMMON_ASYNC_WORKFLOW')
+logger = logging.getLogger(__name__)
 
 MHS_SYNC_REPLY_MODE = "nhsMHSSyncReplyMode"
 MHS_RETRY_INTERVAL = "nhsMHSRetryInterval"

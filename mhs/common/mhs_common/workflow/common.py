@@ -1,8 +1,7 @@
 """This module defines the common base of all workflows."""
 import abc
+import logging
 from typing import Tuple, Optional, Dict, List
-
-import utilities.integration_adaptors_logger as log
 
 import mhs_common.state.work_description as wd
 from mhs_common.messages import ebxml_envelope
@@ -13,7 +12,7 @@ MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_TO_ASID_KEY = 'uniqueIdentifier'
 
-logger = log.IntegrationAdaptorsLogger('COMMON_WORKFLOW')
+logger = logging.getLogger(__name__)
 
 
 class CommonWorkflow(abc.ABC):

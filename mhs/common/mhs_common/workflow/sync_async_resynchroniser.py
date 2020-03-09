@@ -1,11 +1,10 @@
 import asyncio
-
-from utilities import integration_adaptors_logger as log
+import logging
 
 from mhs_common.retry import retriable_action
 from mhs_common.state import persistence_adaptor
 
-logger = log.IntegrationAdaptorsLogger('RESYNCHRONISER')
+logger = logging.getLogger(__name__)
 
 
 class SyncAsyncResponseException(Exception):

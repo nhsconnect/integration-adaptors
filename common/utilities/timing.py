@@ -1,12 +1,10 @@
 import datetime
 import inspect
+import logging
 import time
 from functools import wraps
 
-import utilities.integration_adaptors_logger as log
-
-logger = log.IntegrationAdaptorsLogger('TIMING')
-
+logger = logging.getLogger(__name__)
 
 class Stopwatch(object):
 

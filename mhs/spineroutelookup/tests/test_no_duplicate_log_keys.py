@@ -4,6 +4,7 @@ import re
 import unittest
 
 
+@unittest.skip("not needed after logging library refactor")
 class TestNoDuplicateLogKeys(unittest.TestCase):
 
     def setUp(self):

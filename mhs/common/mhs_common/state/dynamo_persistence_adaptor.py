@@ -1,14 +1,14 @@
 """Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
 import contextlib
 import json
+import logging
 
 import aioboto3
-import utilities.integration_adaptors_logger as log
 from utilities import config
 
 from mhs_common.state import persistence_adaptor
 
-logger = log.IntegrationAdaptorsLogger('DYNAMO_PERSISTENCE')
+logger = logging.getLogger(__name__)
 
 
 class RecordCreationError(RuntimeError):

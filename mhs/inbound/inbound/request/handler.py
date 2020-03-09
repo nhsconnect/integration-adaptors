@@ -1,4 +1,5 @@
 """This module defines the inbound request handler component."""
+import logging
 
 from typing import Dict
 
@@ -19,7 +20,7 @@ from mhs_common.workflow import asynchronous_forward_reliable as forward_reliabl
 from utilities import integration_adaptors_logger as log
 from utilities.timing import time_request
 
-logger = log.IntegrationAdaptorsLogger('INBOUND_HANDLER')
+logger = logging.getLogger(__name__)
 
 
 class InboundHandler(base_handler.BaseHandler):

@@ -1,6 +1,6 @@
 """This module defines the synchronous workflow."""
+import logging
 from typing import Tuple, Optional
-import utilities.integration_adaptors_logger as log
 from tornado import httpclient
 from utilities import timing
 from mhs_common import workflow
@@ -12,7 +12,7 @@ from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_synchronous
 from mhs_common.routing import routing_reliability
 
-logger = log.IntegrationAdaptorsLogger('SYNC_WORKFLOW')
+logger = logging.getLogger(__name__)
 
 
 class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):

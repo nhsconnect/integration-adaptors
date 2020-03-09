@@ -7,16 +7,17 @@ import copy
 import email
 import email.message
 import email.policy
+import logging
 from typing import Dict, Tuple, Union, List, Sequence, Generator
 from xml.etree.ElementTree import Element
 
 from builder import pystache_message_builder
 from defusedxml import ElementTree
-from utilities import integration_adaptors_logger as log, message_utilities
+from utilities import message_utilities
 
 from mhs_common.messages import ebxml_envelope
 
-logger = log.IntegrationAdaptorsLogger('COMMON_EBXML_REQUEST_ENVELOPE')
+logger = logging.getLogger(__name__)
 
 EBXML_TEMPLATE = "ebxml_request"
 

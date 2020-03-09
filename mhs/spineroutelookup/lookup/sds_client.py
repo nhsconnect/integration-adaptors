@@ -1,15 +1,14 @@
 """This module contains the client used to make requests to SDS."""
 
 import asyncio
+import logging
 from typing import Dict, List
 
 import ldap3
 import ldap3.core.exceptions as ldap_exceptions
-from utilities import integration_adaptors_logger as log
-
 import lookup.sds_exception as sds_exception
 
-logger = log.IntegrationAdaptorsLogger('SRL_CLIENT')
+logger = logging.getLogger(__name__)
 
 MHS_OBJECT_CLASS = "nhsMhs"
 AS_OBJECT_CLASS = "nhsAs"

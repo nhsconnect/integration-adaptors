@@ -1,5 +1,6 @@
 """This module defines the outbound synchronous request handler component."""
 import json
+import logging
 
 import marshmallow
 import mhs_common.state.work_description as wd
@@ -13,7 +14,7 @@ from utilities import integration_adaptors_logger as log, message_utilities, tim
 
 from outbound.request import request_body_schema
 
-logger = log.IntegrationAdaptorsLogger('MHS_OUTBOUND_HANDLER')
+logger = logging.getLogger(__name__)
 
 
 class SynchronousHandler(base_handler.BaseHandler):

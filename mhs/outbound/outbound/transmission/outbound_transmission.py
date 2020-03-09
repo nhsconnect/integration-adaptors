@@ -1,4 +1,5 @@
 """This module defines the outbound transmission component."""
+import logging
 
 from ssl import SSLError
 from typing import Dict
@@ -7,9 +8,8 @@ from comms.common_https import CommonHttps
 from mhs_common.retry import retriable_action
 from mhs_common.transmission import transmission_adaptor
 from tornado import httpclient
-from utilities import integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger("OUTBOUND_TRANSMISSION")
+logger = logging.getLogger(__name__)
 
 
 class OutboundTransmissionError(Exception):

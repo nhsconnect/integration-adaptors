@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import enum
+import logging
 from typing import Optional
 
-import utilities.integration_adaptors_logger as log
 from utilities import timing
 
 from mhs_common.retry import retriable_action
 from mhs_common.state import persistence_adaptor as pa
 
-logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
+logger = logging.getLogger(__name__)
 
 
 class MessageStatus(str, enum.Enum):

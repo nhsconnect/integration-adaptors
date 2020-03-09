@@ -1,9 +1,9 @@
 """ Module defines a class representing SOAP Fault response from NHS Spine """
+import logging
 from typing import Tuple, Dict, AnyStr, List
 from xml.etree.ElementTree import Element
 
 from defusedxml import ElementTree
-from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
 
 from mhs_common.messages.soap_envelope import SoapEnvelope
 
@@ -36,7 +36,7 @@ ERR_CODE_CONTEXT = 'codeContext'
 
 ERR_FIELDS = [ERR_CODE, ERR_SEVERITY, ERR_LOCATION, ERR_DESCRIPTION, ERR_CODE_CONTEXT]
 
-logger = IntegrationAdaptorsLogger('SOAP_FAULT_PARSER')
+logger = logging.getLogger(__name__)
 
 SYSTEM_FAILURE_TO_PROCESS_MESSAGE_ERROR_CODE = 200
 ROUTING_DELIVERY_FAILURE_ERROR_CODE = 206

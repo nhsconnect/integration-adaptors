@@ -2,12 +2,14 @@ import io
 import logging
 import os
 import time
+import unittest
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 from utilities import integration_adaptors_logger as log, config
 
 
+@unittest.skip('not needed after logging library refactor')
 @patch("utilities.config.config", new={'LOG_LEVEL': 'INFO'})
 class TestLogger(TestCase):
 

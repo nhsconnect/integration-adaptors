@@ -1,7 +1,6 @@
 """This module defines the sync-async workflow."""
+import logging
 from typing import Tuple, Optional
-
-from utilities import integration_adaptors_logger as log
 
 from mhs_common import workflow
 from mhs_common.retry import retriable_action
@@ -11,7 +10,7 @@ from mhs_common.workflow import common
 from mhs_common.workflow import common_synchronous
 from mhs_common.workflow import sync_async_resynchroniser
 
-logger = log.IntegrationAdaptorsLogger('MHS_SYNC_ASYNC_WORKFLOW')
+logger = logging.getLogger(__name__)
 
 ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
 MESSAGE_DATA = 'data'

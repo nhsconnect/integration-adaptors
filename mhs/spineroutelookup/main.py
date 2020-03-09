@@ -1,3 +1,5 @@
+import logging
+
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -9,7 +11,7 @@ from lookup import cache_adaptor, redis_cache, sds_connection_factory, sds_clien
     routing_reliability
 from request import routing_handler, reliability_handler, routing_reliability_handler
 
-logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_MAIN')
+logger = logging.getLogger(__name__)
 
 
 def load_cache_implementation():

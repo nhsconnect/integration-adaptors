@@ -1,14 +1,14 @@
 import json
+import logging
 from typing import Dict
 
 from comms import common_https
-from utilities import integration_adaptors_logger as log, timing
+from utilities import timing
 
 ROUTING_PATH = "routing"
 RELIABILITY_PATH = "reliability"
 
-logger = log.IntegrationAdaptorsLogger("MHS_ROUTING_RELIABILITY")
-
+logger = logging.getLogger(__name__)
 
 class RoutingAndReliability:
     """A tool that allows the routing and reliability information for a remote MHS to be retrieved."""

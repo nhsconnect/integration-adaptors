@@ -1,13 +1,14 @@
+import logging
 import ssl
 
 import ldap3
-from utilities import certs, config, integration_adaptors_logger as log
+from utilities import certs, config
 
 import definitions
 
 _LDAP_CONNECTION_RETRIES = int(config.get_config('LDAP_CONNECTION_RETRIES', default='3'))
 _LDAP_CONNECTION_TIMEOUT_IN_SECONDS = int(config.get_config('LDAP_CONNECTION_TIMEOUT_IN_SECONDS', default='5'))
-logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_SDS_CONNECTION_FACTORY')
+logger = logging.getLogger(__name__)
 
 
 def build_sds_connection(ldap_address: str) -> ldap3.Connection:

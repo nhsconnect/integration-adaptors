@@ -1,11 +1,9 @@
 from typing import Dict
 
 from tornado import httpclient
+import logging
 
-from utilities import integration_adaptors_logger as log
-
-logger = log.IntegrationAdaptorsLogger("COMMON_HTTPS")
-
+logger = logging.getLogger(__name__)
 
 class CommonHttps(object):
 

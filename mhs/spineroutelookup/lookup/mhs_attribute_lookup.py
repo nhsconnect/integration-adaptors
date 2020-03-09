@@ -1,14 +1,12 @@
 """This module defines the component used to orchestrate the retrieval and caching of routing and reliability
 information for a remote MHS."""
-
+import logging
 from typing import Dict
-
-from utilities import integration_adaptors_logger as log
 
 import lookup.cache_adaptor as cache_adaptor
 import lookup.sds_client as sds_client
 
-logger = log.IntegrationAdaptorsLogger('SRL_ATTRIBUTE_LOOKUP')
+logger = logging.getLogger(__name__)
 
 
 class MHSAttributeLookup(object):

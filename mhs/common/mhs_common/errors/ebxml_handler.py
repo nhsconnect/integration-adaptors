@@ -1,12 +1,12 @@
 import json
+import logging
 from typing import Tuple, AnyStr, Dict, Optional
 
 from defusedxml import ElementTree as ET
-from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
 
 from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
 
-logger = IntegrationAdaptorsLogger('EBXML_ERROR_HANDLER')
+logger = logging.getLogger(__name__)
 
 ERROR_RESPONSE_DEFAULTS = {
     'errorType': 'ebxml_error'

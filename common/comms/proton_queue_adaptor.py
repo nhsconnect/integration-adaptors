@@ -1,5 +1,6 @@
 """Module for Proton specific queue adaptor functionality. """
 import json
+import logging
 from typing import Dict, Any
 
 import proton.handlers
@@ -7,10 +8,9 @@ import proton.reactor
 import tornado.ioloop
 
 import comms.queue_adaptor
-import utilities.integration_adaptors_logger as log
 import utilities.message_utilities
 
-logger = log.IntegrationAdaptorsLogger('PROTON_QUEUE')
+logger = logging.getLogger(__name__)
 
 
 class MessageSendingError(RuntimeError):

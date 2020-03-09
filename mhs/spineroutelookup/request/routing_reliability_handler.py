@@ -1,9 +1,11 @@
+import logging
+
 import tornado.web
-from utilities import timing, integration_adaptors_logger as log
+from utilities import timing
 
 from lookup import routing_reliability
 
-logger = log.IntegrationAdaptorsLogger('SRL_ROUTING_RELIABILITY_REQUEST_HANDLER')
+logger = logging.getLogger(__name__)
 
 
 class RoutingReliabilityRequestHandler(tornado.web.RequestHandler):

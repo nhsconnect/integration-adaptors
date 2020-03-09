@@ -1,13 +1,13 @@
+import logging
 from typing import Any, Dict
 
 import tornado.web
-import utilities.integration_adaptors_logger as log
 import utilities.message_utilities as message_utilities
 
 from mhs_common import workflow
 from mhs_common.configuration import configuration_manager
 
-logger = log.IntegrationAdaptorsLogger('BASE_HANDLER')
+logger = logging.getLogger(__name__)
 
 
 class BaseHandler(tornado.web.RequestHandler):

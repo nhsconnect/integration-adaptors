@@ -1,7 +1,7 @@
 """This module defines the asynchronous forward reliable workflow."""
+import logging
 from typing import Tuple, Optional
 
-import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from isodate import isoerror
@@ -16,7 +16,7 @@ from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous, asynchronous_reliable
 
-logger = log.IntegrationAdaptorsLogger('ASYNC_FORWARD_WORKFLOW')
+logger = logging.getLogger(__name__)
 
 
 class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReliableWorkflow):

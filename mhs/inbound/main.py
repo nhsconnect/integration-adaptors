@@ -1,3 +1,5 @@
+import logging
+
 import pathlib
 import ssl
 from typing import Dict
@@ -17,7 +19,7 @@ from utilities import secrets, certs
 
 import inbound.request.handler as async_request_handler
 
-logger = log.IntegrationAdaptorsLogger('INBOUND_MAIN')
+logger = logging.getLogger(__name__)
 
 ASYNC_TIMEOUT = 30
 

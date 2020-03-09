@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from typing import Callable, Awaitable
 
-from utilities import integration_adaptors_logger
-
-logger = integration_adaptors_logger.IntegrationAdaptorsLogger('RETRIABLE_ACTION')
+logger = logging.getLogger(__name__)
 
 
 class RetriableAction(object):

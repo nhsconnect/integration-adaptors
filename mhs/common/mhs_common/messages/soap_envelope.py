@@ -1,11 +1,12 @@
 """This module defines the envelope used to wrap synchronous messages to be sent to a remote MHS."""
 import copy
 import json
+import logging
 from pathlib import Path
 from typing import Dict, Tuple, Union
 
 import lxml.etree as ET
-from utilities import integration_adaptors_logger as log, message_utilities
+from utilities import message_utilities
 
 from definitions import ROOT_DIR
 from mhs_common.messages import envelope
@@ -28,7 +29,7 @@ REQUIRED_SOAP_ELEMENTS = [FROM_ASID, TO_ASID, MESSAGE_ID, SERVICE, ACTION, MESSA
 
 SOAP_TEMPLATE = "soap_request"
 
-logger = log.IntegrationAdaptorsLogger('SOAP_ENVELOPE')
+logger = logging.getLogger(__name__)
 
 soap_header_transformer_path = str(Path(ROOT_DIR) / XSLT_DIR / SOAP_HEADER_XSLT)
 soap_body_transformer_path = str(Path(ROOT_DIR) / XSLT_DIR / SOAP_BODY_XSLT)

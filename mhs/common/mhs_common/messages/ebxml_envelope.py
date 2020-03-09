@@ -1,14 +1,14 @@
 """This module defines the envelope used to wrap asynchronous messages to be sent to a remote MHS."""
 import copy
+import logging
 from typing import Dict, Tuple, Any, Optional, NamedTuple
 from xml.etree.ElementTree import Element
 
 import utilities.message_utilities as message_utilities
-from utilities import integration_adaptors_logger as log
 
 from mhs_common.messages import envelope
 
-logger = log.IntegrationAdaptorsLogger('COMMON_EBXML_ENVELOPE')
+logger = logging.getLogger(__name__)
 
 TEMPLATES_DIR = "data/templates"
 
