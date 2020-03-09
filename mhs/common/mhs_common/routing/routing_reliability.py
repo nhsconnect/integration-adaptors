@@ -69,9 +69,9 @@ class RoutingAndReliability:
                         fparams={"org_code": org_code, "service_id": service_id, "endpoint_details": endpoint_details})
             return endpoint_details
         except Exception:
-            logger.error("Couldn't obtain endpoint details from Spine route lookup service for {org_code} & "
+            logger.exception("Couldn't obtain endpoint details from Spine route lookup service for {org_code} & "
                          "{service_id}.",
-                         fparams={"org_code": org_code, "service_id": service_id}, exc_info=True)
+                         fparams={"org_code": org_code, "service_id": service_id})
             raise
 
     @timing.time_function

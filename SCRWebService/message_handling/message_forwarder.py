@@ -74,7 +74,7 @@ class MessageForwarder(object):
         try:
             return template_populator.populate_template(supplier_message_parameters)
         except Exception as e:
-            logger.error('Message generation failed', exc_info=True)
+            logger.exception('Message generation failed')
             raise MessageGenerationError(str(e))
 
     async def _send_message_to_mhs(self, interaction_id: str,
@@ -90,5 +90,5 @@ class MessageForwarder(object):
         try:
             return await self.message_sender.send_message_to_mhs(interaction_id, message, message_id, correlation_id)
         except Exception as e:
-            logger.error('Exception raised during message sending', exc_info=True)
+            logger.exception('Exception raised during message sending')
             raise MessageSendingError(str(e))

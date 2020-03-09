@@ -266,7 +266,7 @@ class SynchronousHandler(base_handler.BaseHandler):
                 await wf.set_successful_message_response(wdo)
             self._write_response(status, response)
         except Exception:
-            logger.error('Failed to respond to supplier system', exc_info=True)
+            logger.exception('Failed to respond to supplier system')
             if wdo:
                 await wf.set_failure_message_response(wdo)
 

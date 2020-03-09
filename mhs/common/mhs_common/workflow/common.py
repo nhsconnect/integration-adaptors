@@ -109,7 +109,7 @@ class CommonWorkflow(abc.ABC):
             logger.info('Retrieved endpoint details for {details}', fparams={'details': details})
             return details
         except Exception:
-            logger.warning('Error encountered whilst retrieving endpoint details.', exc_info=True)
+            logger.exception('Error encountered whilst retrieving endpoint details.')
             raise
 
     @staticmethod
