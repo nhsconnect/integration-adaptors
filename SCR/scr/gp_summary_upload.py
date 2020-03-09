@@ -75,9 +75,8 @@ class GpSummaryUpload(object):
         """
         try:
             return ET.ElementTree(ET.fromstring(message)).getroot()
-        except ET.ParseError as e:
-            logger.error('Exception raised while creating XML object from string {exception}',
-                         fparams={'exception': e})
+        except ET.ParseError:
+            logger.error('Exception raised while creating XML object from string', exc_info=True)
             return None
 
     def _find_hl7_element_attribute(self, root: ET.Element, element_name: str, attribute: str) -> Optional[str]:

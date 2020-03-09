@@ -42,9 +42,9 @@ class MHSAttributeLookup(object):
                 logger.info('MHS details found in cache for {ods_code} & {interaction_id}',
                             fparams={'ods_code': ods_code, 'interaction_id': interaction_id})
                 return cache_value
-        except Exception as e:
-            logger.error('Failed to retrieve value from cache for {ods_code} & {interaction_id}. {exception}',
-                         fparams={'ods_code': ods_code, 'interaction_id': interaction_id, 'exception': e})
+        except Exception:
+            logger.error('Failed to retrieve value from cache for {ods_code} & {interaction_id}',
+                         fparams={'ods_code': ods_code, 'interaction_id': interaction_id})
 
         endpoint_details = await self.sds_client.get_mhs_details(ods_code, interaction_id)
         logger.info('MHS details obtained from sds, adding to cache for {ods_code} & {interaction_id}',
@@ -52,8 +52,8 @@ class MHSAttributeLookup(object):
 
         try:
             await self.cache.add_cache_value(ods_code, interaction_id, endpoint_details)
-        except Exception as e:
-            logger.error('Failed to store value in cache for {ods_code} & {interaction_id}. {exception}',
-                         fparams={'ods_code': ods_code, 'interaction_id': interaction_id, 'exception': e})
+        except Exception:
+            logger.error('Failed to store value in cache for {ods_code} & {interaction_id}.',
+                         fparams={'ods_code': ods_code, 'interaction_id': interaction_id})
 
         return endpoint_details

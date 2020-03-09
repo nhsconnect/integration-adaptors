@@ -68,11 +68,11 @@ class RoutingAndReliability:
                         "{service_id}. {endpoint_details}",
                         fparams={"org_code": org_code, "service_id": service_id, "endpoint_details": endpoint_details})
             return endpoint_details
-        except Exception as e:
+        except Exception:
             logger.error("Couldn't obtain endpoint details from Spine route lookup service for {org_code} & "
-                         "{service_id}. {exception}",
-                         fparams={"org_code": org_code, "service_id": service_id, "exception": e})
-            raise e
+                         "{service_id}.",
+                         fparams={"org_code": org_code, "service_id": service_id}, exc_info=True)
+            raise
 
     @timing.time_function
     async def get_reliability(self, service_id: str, org_code: str = None) -> Dict:
@@ -110,11 +110,11 @@ class RoutingAndReliability:
                             "reliability_details": reliability_details
                         })
             return reliability_details
-        except Exception as e:
+        except Exception:
             logger.error("Couldn't obtain reliability details from Spine route lookup service for {org_code} & "
-                         "{service_id}. {exception}",
-                         fparams={"org_code": org_code, "service_id": service_id, "exception": e})
-            raise e
+                         "{service_id}.",
+                         fparams={"org_code": org_code, "service_id": service_id}, exc_info=True)
+            raise
 
     def _build_request_url(self, path: str, org_code: str, service_id: str) -> str:
         return self.url + "/" + path + "?org-code=" + org_code + "&service-id=" + service_id

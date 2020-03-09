@@ -143,9 +143,8 @@ class AsynchronousReliableWorkflow(common_asynchronous.CommonAsynchronousWorkflo
                 logger.warning("Received an unexpected response from Spine", fparams={'HTTPStatus': response.code})
                 parsed_response = "Didn't get expected response from Spine"
 
-        except ET.ParseError as pe:
-            logger.warning('Unable to parse response from Spine. {Exception}',
-                           fparams={'Exception': repr(pe)})
+        except ET.ParseError:
+            logger.warning('Unable to parse response from Spine.', exc_info=True)
             parsed_response = 'Unable to handle response returned from Spine'
 
         return 500, parsed_response, None

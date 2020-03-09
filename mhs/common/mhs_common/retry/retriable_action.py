@@ -91,8 +91,7 @@ class RetriableAction(object):
             logger.info("{action} completed. {is_successful}",
                         fparams={"action": self.action, "is_successful": result.is_successful})
         except Exception as e:
-            logger.error("{action} raised an exception. {exception}",
-                         fparams={"action": self.action, "exception": e})
+            logger.error("{action} raised an exception", fparams={"action": self.action}, exc_info=True)
             result.exception = e
 
         return result

@@ -57,8 +57,7 @@ class RedisCache(cache_adaptor.CacheAdaptor):
 
             return value
         except redis.RedisError as re:
-            logger.error("An error occurred when attempting to load {key}. {exception}",
-                         fparams={"key": key, "exception": re})
+            logger.error("An error occurred when attempting to load {key}.", fparams={"key": key}, exc_info=True)
             raise re
 
     @timing.time_function
@@ -83,8 +82,7 @@ class RedisCache(cache_adaptor.CacheAdaptor):
             logger.info("Successfully stored {value} in the cache using {key}",
                         fparams={"value": json_value, "key": key})
         except redis.RedisError as re:
-            logger.error("An error occurred when caching {value}. {exception}",
-                         fparams={"value": json_value, "exception": re})
+            logger.error("An error occurred when caching {value}.", fparams={"value": json_value}, exc_info=True)
             raise re
 
     @staticmethod

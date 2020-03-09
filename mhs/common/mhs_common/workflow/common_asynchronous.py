@@ -67,8 +67,8 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
             interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
-        except Exception as e:
-            logger.error('Failed to serialise outbound message. {Exception}', fparams={'Exception': e})
+        except Exception:
+            logger.error('Failed to serialise outbound message.', exc_info=True)
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return (500, 'Error serialising outbound message'), None, None
 
@@ -90,8 +90,8 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         logger.info('About to make outbound request')
         try:
             response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
-        except Exception as e:
-            logger.error('Error encountered whilst making outbound request. {Exception}', fparams={'Exception': e})
+        except Exception:
+            logger.error('Error encountered whilst making outbound request.', exc_info=True)
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
@@ -171,9 +171,9 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             logger.info('Retrieved reliability details for {service_id}. {reliability_details}',
                         fparams={'service_id': service_id, 'reliability_details': reliability_details})
             return reliability_details
-        except Exception as e:
-            logger.warning('Error encountered whilst obtaining outbound URL. {exception}', fparams={'exception': e})
-            raise e
+        except Exception:
+            logger.warning('Error encountered whilst obtaining outbound URL.', exc_info=True)
+            raise
 
     async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments=None):
         await self.queue_adaptor.send_async({'payload': payload, 'attachments': attachments or []},

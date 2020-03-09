@@ -89,8 +89,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             code, error = await self._handle_http_exception(e, wdo)
             return code, error, wdo
 
-        except Exception as e:
-            logger.error('Error encountered whilst making outbound request. {Exception}', fparams={'Exception': e})
+        except Exception:
+            logger.error('Error encountered whilst making outbound request.', exc_info=True)
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
@@ -101,8 +101,8 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         return response.code, response.body.decode(), wdo
 
     async def _handle_http_exception(self, exception, wdo):
-        logger.warning('Received HTTP errors from Spine. {HTTPStatus} {Exception}',
-                       fparams={'HTTPStatus': exception.code, 'Exception': exception})
+        logger.warning('Received HTTP errors from Spine. {HTTPStatus}',
+                       fparams={'HTTPStatus': exception.code}, exc_info=True)
 
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
 

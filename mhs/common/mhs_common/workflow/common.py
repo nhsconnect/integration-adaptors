@@ -108,10 +108,9 @@ class CommonWorkflow(abc.ABC):
                        }
             logger.info('Retrieved endpoint details for {details}', fparams={'details': details})
             return details
-        except Exception as e:
-            logger.warning('Error encountered whilst retrieving endpoint details. {Exception}',
-                           fparams={'Exception': e})
-            raise e
+        except Exception:
+            logger.warning('Error encountered whilst retrieving endpoint details.', exc_info=True)
+            raise
 
     @staticmethod
     def _extract_endpoint_url(endpoint_details: Dict[str, List[str]]) -> str:

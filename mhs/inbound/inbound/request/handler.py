@@ -76,7 +76,7 @@ class InboundHandler(base_handler.BaseHandler):
                                                           received_message)
             self._send_ack(request_message)
         except Exception as e:
-            logger.error('Exception in workflow {exception}', fparams={'exception': e})
+            logger.error('Exception in workflow', exc_info=True)
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
                                         reason=f'Exception in workflow') from e
 
@@ -119,7 +119,7 @@ class InboundHandler(base_handler.BaseHandler):
                                                                                attachments)
             self._send_ack(request_message)
         except Exception as e:
-            logger.error('Exception in workflow {exception}', fparams={'exception': e})
+            logger.error('Exception in workflow', exc_info=True)
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
                                         reason=f'Exception in workflow') from e
 
@@ -188,7 +188,7 @@ class InboundHandler(base_handler.BaseHandler):
             request_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(self.request.headers,
                                                                                       self.request.body.decode())
         except ebxml_envelope.EbXmlParsingError as e:
-            logger.error('Failed to parse response: {exception}', fparams={'exception': e})
+            logger.error('Failed to parse response', exc_info=True)
             raise tornado.web.HTTPError(500, 'Error occurred during message parsing',
                                         reason=f'Exception during inbound message parsing {e}') from e
 
@@ -215,7 +215,7 @@ class InboundHandler(base_handler.BaseHandler):
             }
             self._send_nack(request_message, nack_context)
         except Exception as e:
-            logger.error('Exception when sending nack {exception}', fparams={'exception': e})
+            logger.error('Exception when sending nack {exception}', exc_info=True)
             raise tornado.web.HTTPError(500, 'Error occurred during message processing,'
                                              ' failed to complete workflow',
                                         reason=f'Exception in workflow') from e
