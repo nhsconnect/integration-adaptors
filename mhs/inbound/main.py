@@ -97,12 +97,12 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     try:
         tornado_io_loop.start()
     except KeyboardInterrupt:
-        logger.warning('012', 'Keyboard interrupt')
+        logger.warning('Keyboard interrupt')
         pass
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)
-    logger.info('013', 'Server shut down, exiting...')
+    logger.info('Server shut down, exiting...')
 
 
 def main():
