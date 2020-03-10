@@ -58,12 +58,10 @@ pipeline {
         stage('run-parallel-tests') {
             steps {
                 parallel(
-                    component-tests: {
+                    ('component-tests'): {
                         options {
                             lock('local-docker-compose-environment')
                         }
-                        stages {
-                            stage('Deploy component locally') {
                                 steps {
                                     sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
                                     sh label: 'Export environment variables', script: '''
@@ -77,8 +75,6 @@ pipeline {
                                         docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
                                         docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
                                 }
-                            }
-                            stage('Component Tests') {
                                 steps {
                                     sh label: 'Running component tests', script: '''
                                          docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
@@ -93,8 +89,6 @@ pipeline {
                                             componenttest:$BUILD_TAG
                                     '''
                                 }
-                            }
-                        }
                         post {
                             always {
                                 sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
@@ -102,13 +96,11 @@ pipeline {
                             }
                         }
                     },
-                    integration-tests: {
+                    ('integration-tests'): {
                         options {
                             lock('exemplar-test-environment')
                         }
 
-                        stages {
-                            stage('Deploy MHS') {
                                 steps {
                                     dir('pipeline/terraform/mhs-environment') {
                                         sh label: 'Initialising Terraform', script: """
@@ -194,9 +186,8 @@ pipeline {
                                         }
                                     }
                                 }
-                            }
 
-                            stage('Deploy SCR') {
+
                                 steps {
                                     dir('pipeline/terraform/scr-environment') {
                                         sh label: 'Initialising Terraform', script: """
@@ -220,9 +211,8 @@ pipeline {
                                             """
                                     }
                                 }
-                            }
 
-                            stage('Integration Tests') {
+
                                 steps {
                                     dir('integration-tests/integration_tests') {
                                         sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
@@ -243,12 +233,12 @@ pipeline {
                                         sh label: 'Running integration tests', script: 'pipenv run inttests'
                                     }
                                 }
-                            }
-                        }
+
                     }
                 )
             }
         }
+    }
 
     post {
         always {
