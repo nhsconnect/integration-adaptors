@@ -31,4 +31,4 @@ def create_spec() -> apispec.APISpec:
 
 
 if __name__ == '__main__':
-    print(json.dumps(create_spec().to_dict()))
+    print(json.dumps(create_spec().to_dict(), indent=4))
