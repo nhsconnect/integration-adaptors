@@ -76,7 +76,7 @@ services:
     ports:
       - "6379:6379"
   scradaptor:
-    image: local/scr-web-service:scr-
+    image: local/scr-web-service:${WEB_SERVICE_BUILD_TAG}
     ports:
       - "9000:80"
     environment:
