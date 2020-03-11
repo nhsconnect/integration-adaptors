@@ -64,7 +64,9 @@ class TestLogger(TestCase):
         self.assertEqual('SYS', log_entry.name)
         self.assertEqual('INFO', log_entry.level)
         self.assertEqual('yes no', log_entry.message)
-        time.strptime(log_entry.time, '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.assertEqual(log_entry.time[0], '[')
+        self.assertEqual(log_entry.time[-1], ']')
+        time.strptime(log_entry.time[1:-1], '%Y-%m-%dT%H:%M:%S.%fZ')
 
     @patch('utilities.config.get_config')
     @patch('sys.stdout', new_callable=io.StringIO)
