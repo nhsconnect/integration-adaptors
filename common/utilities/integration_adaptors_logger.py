@@ -80,7 +80,7 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
 class CustomFormatter(logging.Formatter):
     def __init__(self):
         super().__init__(
-            fmt='%(asctime)sZ | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s | %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s',
+            fmt='[%(asctime)sZ] | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s | %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s',
             datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
     def formatException(self, exc_info) -> str:
