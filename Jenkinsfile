@@ -59,9 +59,6 @@ pipeline {
             steps {
             parallel (
                 'Run Component Tests': {
-                    options {
-                        lock('local-docker-compose-environment')
-                    }
                     steps {
                         sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
                         sh label: 'Export environment variables', script: '''
@@ -99,10 +96,6 @@ pipeline {
                 },
 
                 'Run Integration Tests': {
-                    options {
-                        lock('exemplar-test-environment')
-                    }
-
                     steps {
                         dir('pipeline/terraform/mhs-environment') {
                             sh label: 'Initialising Terraform', script: """
