@@ -258,9 +258,9 @@ font-style: italic;
 <p>If set to false for an async interaction, then the response from Spine will be put onto the inbound queue and the HTTP response will just acknowledge sending the request successfully to Spine.</p>
 <p>For sync interactions or async interactions that don't support sync-async, this header must be set to false.</p>
  default: null </div>
-<div class="param">from-asid (required)</div>
+<div class="param">from-asid (optional)</div>
 
-      <div class="param-desc"><span class="param-type">Header Parameter</span> &mdash; The ASID of the sending system. This should be the same as the from-asid value within the HL7 payload.</div>
+      <div class="param-desc"><span class="param-type">Header Parameter</span> &mdash; The ASID of the sending system. This should be the same as the from-asid value within the HL7 payload. This header is optional and only required/used for interactions that use the sync workflow. default: null </div>
 <div class="param">Message-Id (optional)</div>
 
       <div class="param-desc"><span class="param-type">Header Parameter</span> &mdash; <p>Message ID of the message to send to Spine. If not sent, the MHS generates a random message ID.</p>
@@ -314,20 +314,20 @@ font-style: italic;
     <h3><a name="Attachment"><code>Attachment</code> - </a> <a class="up" href="#__Models">Up</a></h3>
     <div class='model-description'></div>
     <div class="field-items">
-      <div class="param">is_base64 </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Whether the attachment payload is base64-encoded or not. This is only required for binary attachments eg images. </div>
-<div class="param">payload </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The attachment, possibly base64-encoded as per is_base64. </div>
-<div class="param">description </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Description of the attachment </div>
+      <div class="param">payload </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The attachment, possibly base64-encoded as per is_base64. </div>
+<div class="param">is_base64 </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Whether the attachment payload is base64-encoded or not. This is only required for binary attachments eg images. </div>
 <div class="param">content_type </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Content type of the attachment </div>
         <div class="param-enum-header">Enum:</div>
         <div class="param-enum">text/plain</div><div class="param-enum">text/html</div><div class="param-enum">application/pdf</div><div class="param-enum">text/xml</div><div class="param-enum">application/xml</div><div class="param-enum">text/rtf</div><div class="param-enum">audio/basic</div><div class="param-enum">audio/mpeg</div><div class="param-enum">image/png</div><div class="param-enum">image/gif</div><div class="param-enum">image/jpeg</div><div class="param-enum">image/tiff</div><div class="param-enum">video/mpeg</div><div class="param-enum">application/msword</div><div class="param-enum">application/octet-stream</div>
+<div class="param">description </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Description of the attachment </div>
     </div>  <!-- field-items -->
   </div>
   <div class="model">
     <h3><a name="RequestBody"><code>RequestBody</code> - </a> <a class="up" href="#__Models">Up</a></h3>
     <div class='model-description'></div>
     <div class="field-items">
-      <div class="param">payload </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> HL7 Payload to send to Spine </div>
-<div class="param">attachments (optional)</div><div class="param-desc"><span class="param-type"><a href="#Attachment">array[Attachment]</a></span> Optional attachments to send with the payload. Only for use for interactions that support sending attachments. </div>
+      <div class="param">attachments (optional)</div><div class="param-desc"><span class="param-type"><a href="#Attachment">array[Attachment]</a></span> Optional attachments to send with the payload. Only for use for interactions that support sending attachments. </div>
+<div class="param">payload </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> HL7 Payload to send to Spine </div>
     </div>  <!-- field-items -->
   </div>
   </body>
