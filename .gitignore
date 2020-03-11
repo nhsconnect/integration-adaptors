@@ -139,5 +139,5 @@ mhs-reference-implementation/selenium_tests/data/local_asid
 /mhs/outbound/nhs-outbound-env.yaml
 /mhs/spineroutelookup/nhs-spineroutelookup-env.yaml
 
+# system
 .DS_Store
-.vscode/
