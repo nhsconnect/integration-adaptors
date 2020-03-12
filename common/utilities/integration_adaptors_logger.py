@@ -1,4 +1,3 @@
-import os
 import contextvars
 import datetime as dt
 import logging
@@ -15,7 +14,6 @@ correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlatio
 inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
 interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default=None)
 
-_cloudwatch_message_format = config.get_config('CLOUDWATCH_MESSAGE_FORMAT', default=True)
 
 def _check_for_insecure_log_level(log_level: str):
     integer_level = logging.getLevelName(log_level)
@@ -26,12 +24,6 @@ def _check_for_insecure_log_level(log_level: str):
                         'The log level provided MUST NOT be used in a production environment.',
                         log_level)
 
-def _fix_multiline(msg: str) -> str:
-    """
-    If log message has multiple lines, each new line has to be prepended by space or tab for
-    AWS CloudWatch to properly parse entry
-    """
-    return f"{os.linesep}\t".join(msg.split(os.linesep)) if _cloudwatch_message_format else msg
 
 class IntegrationAdaptorsLogger(logging.LoggerAdapter):
     """
@@ -42,7 +34,6 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
 
     def log(self, level: int, msg: Any, *args: Any, **kwargs: Any) -> None:
         msg = self._format_using_custom_params(msg, kwargs)
-        msg = _fix_multiline(msg)
         super().log(level, msg, *args, **kwargs)
 
     def audit(self, msg: str, *args: Any, **kwargs: Any) -> None:
@@ -80,16 +71,9 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
 class CustomFormatter(logging.Formatter):
     def __init__(self):
         super().__init__(
-            fmt='[%(asctime)sZ] | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s | %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s',
+            fmt='[%(asctime)sZ] | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s | %(correlation_id)s '
+                '| %(inbound_message_id)s | %(name)s | %(message)s',
             datefmt='%Y-%m-%dT%H:%M:%S.%f')
-
-    def formatException(self, exc_info) -> str:
-        msg = super().formatException(exc_info)
-        return f"\t{_fix_multiline(msg)}" if _cloudwatch_message_format else msg
-
-    def formatStack(self, stack_info: str) -> str:
-        msg = super().formatStack(stack_info)
-        return _fix_multiline(msg)
 
     def format(self, record: LogRecord) -> str:
         record.message_id = message_id.get() or ''
