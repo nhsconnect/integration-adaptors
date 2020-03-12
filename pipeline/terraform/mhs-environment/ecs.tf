@@ -131,6 +131,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
           awslogs-group = aws_cloudwatch_log_group.mhs_outbound_log_group.name
           awslogs-region = var.region
           awslogs-stream-prefix = var.build_id
+          awslogs-datetime-format = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
         }
       }
       portMappings = [
@@ -216,6 +217,7 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
           awslogs-group = aws_cloudwatch_log_group.mhs_inbound_log_group.name
           awslogs-region = var.region
           awslogs-stream-prefix = var.build_id
+          awslogs-datetime-format = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
         }
       }
       portMappings = [
@@ -304,6 +306,7 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
           awslogs-group = aws_cloudwatch_log_group.mhs_route_log_group.name
           awslogs-region = var.region
           awslogs-stream-prefix = var.build_id
+          awslogs-datetime-format = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
         }
       }
       portMappings = [
