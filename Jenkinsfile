@@ -57,7 +57,7 @@ pipeline {
 
         stage('Component and Integration Tests') {
             steps {
-            parallel (
+            parallel {
                 'Run Component Tests': {
                     steps {
                         sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
@@ -227,7 +227,6 @@ pipeline {
                         }
                     }
                 }
-            )
             }
         }
     }
