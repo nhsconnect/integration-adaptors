@@ -92,7 +92,7 @@ pipeline {
                             sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
                         }
                     }
-                },
+                }
 
                 stage('Run Integration Tests') {
                     steps {
