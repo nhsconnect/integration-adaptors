@@ -56,7 +56,6 @@ pipeline {
         }
 
         stage('Component and Integration Tests') {
-           steps {
              parallel (
                 'Run Component Tests': {
                     steps {
@@ -228,7 +227,6 @@ pipeline {
                     }
                 }
              )
-           }
         }
     }
 
