@@ -1,5 +1,5 @@
 pipeline {
-    agent{
+    agent {
         label 'jenkins-workers'
     }
 
@@ -12,13 +12,67 @@ pipeline {
 
     stages {
         stage('Build modules') {
-            steps {
-                dir('common'){ buildModules('Installing common dependencies') }
-                dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
-                dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
-                dir('mhs/outbound'){ buildModules('Installing outbound dependencies') }
-                dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
-                dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
+            parallel {
+                stage('Build Common') {
+                    stages {
+                        String buildAction = 'Installing common dependencies';
+                        stage(buildAction) {
+                            steps {
+                                dir('common') { buildModules(buildAction) }
+                            }
+                        }
+                    }
+                }
+                stage('Build MHS Common') {
+                    stages {
+                        String buildAction = 'Installing mhs common dependencies';
+                        stage(buildAction) {
+                            steps {
+                                dir('mhs/common') { buildModules(buildAction) }
+                            }
+                        }
+                    }
+                }
+                stage('Build MHS Inbound') {
+                    stages {
+                        String buildAction = 'Installing inbound dependencies';
+                        stage(buildAction) {
+                            steps {
+                                dir('mhs/inbound') { buildModules(buildAction) }
+                            }
+                        }
+                    }
+                }
+                stage('Build MHS Outbound') {
+                    stages {
+                        String buildAction = 'Installing outbound dependencies';
+                        stage(buildAction) {
+                            steps {
+                                dir('mhs/outbound') { buildModules(buildAction) }
+                            }
+                        }
+                    }
+                }
+                stage('Build MHS Spine Route Lookup') {
+                    stages {
+                        String buildAction = 'Installing route lookup dependencies';
+                        stage(buildAction) {
+                            steps {
+                                dir('mhs/spineroutelookup') { buildModules(buildAction) }
+                            }
+                        }
+                    }
+                }
+                stage('Build SCR') {
+                    stages {
+                        String buildAction = 'Installing SCR web service dependencies';
+                        stage(buildAction) {
+                            steps {
+                                dir('SCRWebService') { buildModules(buildAction) }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -39,7 +93,7 @@ pipeline {
                 }
             }
         }
-         stage('Spine Route Lookup Unit Tests') {
+        stage('Spine Route Lookup Unit Tests') {
             steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
         }
         stage('SCR Web Service Unit Tests') {
@@ -159,35 +213,35 @@ pipeline {
                                     -var mhs_forward_reliable_endpoint_url=${MHS_FORWARD_RELIABLE_ENDPOINT_URL}
                                 """
                             script {
-                                env.MHS_ADDRESS = sh (
-                                    label: 'Obtaining outbound LB DNS name',
-                                    returnStdout: true,
-                                    script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
+                                env.MHS_ADDRESS = sh(
+                                        label: 'Obtaining outbound LB DNS name',
+                                        returnStdout: true,
+                                        script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
                                 ).trim()
-                                env.MHS_OUTBOUND_TARGET_GROUP = sh (
-                                    label: 'Obtaining outbound LB target group ARN',
-                                    returnStdout: true,
-                                    script: "terraform output outbound_lb_target_group_arn"
+                                env.MHS_OUTBOUND_TARGET_GROUP = sh(
+                                        label: 'Obtaining outbound LB target group ARN',
+                                        returnStdout: true,
+                                        script: "terraform output outbound_lb_target_group_arn"
                                 ).trim()
-                                env.MHS_INBOUND_TARGET_GROUP = sh (
-                                    label: 'Obtaining inbound LB target group ARN',
-                                    returnStdout: true,
-                                    script: "terraform output inbound_lb_target_group_arn"
+                                env.MHS_INBOUND_TARGET_GROUP = sh(
+                                        label: 'Obtaining inbound LB target group ARN',
+                                        returnStdout: true,
+                                        script: "terraform output inbound_lb_target_group_arn"
                                 ).trim()
-                                env.MHS_ROUTE_TARGET_GROUP = sh (
-                                    label: 'Obtaining route LB target group ARN',
-                                    returnStdout: true,
-                                    script: "terraform output route_lb_target_group_arn"
+                                env.MHS_ROUTE_TARGET_GROUP = sh(
+                                        label: 'Obtaining route LB target group ARN',
+                                        returnStdout: true,
+                                        script: "terraform output route_lb_target_group_arn"
                                 ).trim()
-                                env.MHS_DYNAMODB_TABLE_NAME = sh (
-                                    label: 'Obtaining the dynamodb table name used for the MHS state',
-                                    returnStdout: true,
-                                    script: "terraform output mhs_state_table_name"
+                                env.MHS_DYNAMODB_TABLE_NAME = sh(
+                                        label: 'Obtaining the dynamodb table name used for the MHS state',
+                                        returnStdout: true,
+                                        script: "terraform output mhs_state_table_name"
                                 ).trim()
-                                env.MHS_SYNC_ASYNC_TABLE_NAME = sh (
-                                    label: 'Obtaining the dynamodb table name used for the MHS sync/async state',
-                                    returnStdout: true,
-                                    script: "terraform output mhs_sync_async_table_name"
+                                env.MHS_SYNC_ASYNC_TABLE_NAME = sh(
+                                        label: 'Obtaining the dynamodb table name used for the MHS sync/async state',
+                                        returnStdout: true,
+                                        script: "terraform output mhs_sync_async_table_name"
                                 ).trim()
                             }
                         }
