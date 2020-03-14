@@ -21,13 +21,16 @@ pipeline {
                 dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
             }
         }
-        stage('Module Unit Tests') {
+
+        stage('All Module Unit Tests') {
             parallel {
                 stage('Common Module Unit Tests') {
                     stages {
                         stage('Run Unit Tests') {
                             steps { dir('common') { executeUnitTestsWithCoverage() } }
                         }
+                    }
+                }
                         stage('MHS Common Unit Tests') {
                             stages {
                                 stage('Run Unit Tests') {
@@ -54,7 +57,6 @@ pipeline {
                                 }
                             }
                         }
-                    }
                     stage('Spine Route Lookup Unit Tests') {
                         stages {
                             stage('Run Unit Tests') {
@@ -71,7 +73,8 @@ pipeline {
                     }
                 }
             }
-        }
+
+
             stage('Package') {
                 steps {
                     sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
