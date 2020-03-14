@@ -24,28 +24,28 @@ pipeline {
 
         stage('All Module Unit Tests') {
             parallel {
-                stage('Run') {
+                stage('Run Common Module') {
                     stages {
                         stage('Common Module Unit Tests') {
                             steps { dir('common') { executeUnitTestsWithCoverage() } }
                         }
                     }
                 }
-                        stage('Run') {
+                        stage('Run MHS Common') {
                             stages {
                                 stage('MHS Common Unit Tests') {
                                     steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
                                 }
                             }
                         }
-                        stage('Run') {
+                        stage('Run MHS Inbound') {
                             stages {
                                 stage('MHS Inbound Unit Tests') {
                                     steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
                                 }
                             }
                         }
-                        stage('Run') {
+                        stage('Run MHS Outbound') {
                             stages {
                                 stage('MHS Outbound Unit Tests') {
                                     steps {
@@ -57,14 +57,14 @@ pipeline {
                                 }
                             }
                         }
-                    stage('Run') {
+                    stage('Run Spine Route Lookup') {
                         stages {
                             stage('Spine Route Lookup Unit Tests') {
                                 steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
                             }
                         }
                     }
-                    stage('Run') {
+                    stage('Run SCR Web Service') {
                         stages {
                             stage('SCR Web Service Unit Tests') {
                                 steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
