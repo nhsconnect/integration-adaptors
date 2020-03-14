@@ -21,21 +21,26 @@ pipeline {
                 dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
             }
         }
-
-        stage('Common Module Unit Tests') {
-            steps { dir('common') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Common Unit Tests') {
-            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Inbound Unit Tests') {
-            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Outbound Unit Tests') {
-            steps {
-                dir('mhs/outbound') {
-                    executeUnitTestsWithCoverage()
-                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+        parallel {
+            stage('Unit Tests') {
+                stages {
+                    stage('Common Module Unit Tests') {
+                        steps { dir('common') { executeUnitTestsWithCoverage() } }
+                    }
+                    stage('MHS Common Unit Tests') {
+                        steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
+                    }
+                    stage('MHS Inbound Unit Tests') {
+                        steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
+                    }
+                    stage('MHS Outbound Unit Tests') {
+                        steps {
+                            dir('mhs/outbound') {
+                                executeUnitTestsWithCoverage()
+                                sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -56,13 +61,13 @@ pipeline {
         }
 
         stage('Component and Integration Tests') {
-           parallel {
-              stage('Run Component Tests') {
-                  stages {
-                      stage('Setup environment') {
-                          steps {
-                              sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
-                              sh label: 'Export environment variables', script: '''
+            parallel {
+                stage('Run Component Tests') {
+                    stages {
+                        stage('Setup environment') {
+                            steps {
+                                sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
+                                sh label: 'Export environment variables', script: '''
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
                             . ./component-test-source.sh
@@ -72,11 +77,11 @@ pipeline {
                             export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
-                          }
-                      }
-                      stage('Run tests') {
-                          steps {
-                              sh label: 'Running component tests', script: '''
+                            }
+                        }
+                        stage('Run tests') {
+                            steps {
+                                sh label: 'Running component tests', script: '''
                             docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
                             docker run --rm --network "${BUILD_TAG_LOWER}_default" \
                                 --env "MHS_ADDRESS=http://outbound" \
@@ -88,17 +93,17 @@ pipeline {
                                 --env "SCR_ADDRESS=http://scradaptor" \
                                 componenttest:$BUILD_TAG
                         '''
-                          }
+                            }
 
-                          post {
-                              always {
-                                  sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
-                                  sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
-                              }
-                          }
-                      }
-                  }
-              }
+                            post {
+                                always {
+                                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
+                                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
+                                }
+                            }
+                        }
+                    }
+                }
 
                 stage('Run Integration Tests') {
                     stages {
