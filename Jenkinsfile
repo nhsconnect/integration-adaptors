@@ -58,9 +58,11 @@ pipeline {
         stage('Component and Integration Tests') {
            parallel {
               stage('Run Component Tests') {
-                    steps {
-                        sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
-                        sh label: 'Export environment variables', script: '''
+                  stages {
+                      stage('Setup environment') {
+                          steps {
+                              sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
+                              sh label: 'Export environment variables', script: '''
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
                             . ./component-test-source.sh
@@ -70,9 +72,11 @@ pipeline {
                             export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
                             docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
-                    }
-                    steps {
-                        sh label: 'Running component tests', script: '''
+                          }
+                      }
+                      stage('Run tests') {
+                          steps {
+                              sh label: 'Running component tests', script: '''
                             docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
                             docker run --rm --network "${BUILD_TAG_LOWER}_default" \
                                 --env "MHS_ADDRESS=http://outbound" \
@@ -84,27 +88,31 @@ pipeline {
                                 --env "SCR_ADDRESS=http://scradaptor" \
                                 componenttest:$BUILD_TAG
                         '''
-                    }
+                          }
+                      }
 
-                    post {
-                        always {
-                            sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
-                            sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
-                        }
-                    }
-                }
+                      post {
+                          always {
+                              sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
+                              sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
+                          }
+                      }
+                  }
+              }
 
                 stage('Run Integration Tests') {
-                    steps {
-                        dir('pipeline/terraform/mhs-environment') {
-                            sh label: 'Initialising Terraform', script: """
+                    stages {
+                        stage('MHS Terraform') {
+                            steps {
+                                dir('pipeline/terraform/mhs-environment') {
+                                    sh label: 'Initialising Terraform', script: """
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
                                     -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
                                     -input=false -no-color
                                 """
-                            sh label: 'Applying Terraform configuration', script: """
+                                    sh label: 'Applying Terraform configuration', script: """
                                     terraform apply -no-color -auto-approve \
                                     -var environment_id=${ENVIRONMENT_ID} \
                                     -var build_id=${BUILD_TAG} \
@@ -146,51 +154,52 @@ pipeline {
                                     -var elasticache_node_type="cache.t2.micro" \
                                     -var mhs_forward_reliable_endpoint_url=${MHS_FORWARD_RELIABLE_ENDPOINT_URL}
                                 """
-                            script {
-                                env.MHS_ADDRESS = sh(
-                                        label: 'Obtaining outbound LB DNS name',
-                                        returnStdout: true,
-                                        script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
-                                ).trim()
-                                env.MHS_OUTBOUND_TARGET_GROUP = sh(
-                                        label: 'Obtaining outbound LB target group ARN',
-                                        returnStdout: true,
-                                        script: "terraform output outbound_lb_target_group_arn"
-                                ).trim()
-                                env.MHS_INBOUND_TARGET_GROUP = sh(
-                                        label: 'Obtaining inbound LB target group ARN',
-                                        returnStdout: true,
-                                        script: "terraform output inbound_lb_target_group_arn"
-                                ).trim()
-                                env.MHS_ROUTE_TARGET_GROUP = sh(
-                                        label: 'Obtaining route LB target group ARN',
-                                        returnStdout: true,
-                                        script: "terraform output route_lb_target_group_arn"
-                                ).trim()
-                                env.MHS_DYNAMODB_TABLE_NAME = sh(
-                                        label: 'Obtaining the dynamodb table name used for the MHS state',
-                                        returnStdout: true,
-                                        script: "terraform output mhs_state_table_name"
-                                ).trim()
-                                env.MHS_SYNC_ASYNC_TABLE_NAME = sh(
-                                        label: 'Obtaining the dynamodb table name used for the MHS sync/async state',
-                                        returnStdout: true,
-                                        script: "terraform output mhs_sync_async_table_name"
-                                ).trim()
+                                    script {
+                                        env.MHS_ADDRESS = sh(
+                                                label: 'Obtaining outbound LB DNS name',
+                                                returnStdout: true,
+                                                script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
+                                        ).trim()
+                                        env.MHS_OUTBOUND_TARGET_GROUP = sh(
+                                                label: 'Obtaining outbound LB target group ARN',
+                                                returnStdout: true,
+                                                script: "terraform output outbound_lb_target_group_arn"
+                                        ).trim()
+                                        env.MHS_INBOUND_TARGET_GROUP = sh(
+                                                label: 'Obtaining inbound LB target group ARN',
+                                                returnStdout: true,
+                                                script: "terraform output inbound_lb_target_group_arn"
+                                        ).trim()
+                                        env.MHS_ROUTE_TARGET_GROUP = sh(
+                                                label: 'Obtaining route LB target group ARN',
+                                                returnStdout: true,
+                                                script: "terraform output route_lb_target_group_arn"
+                                        ).trim()
+                                        env.MHS_DYNAMODB_TABLE_NAME = sh(
+                                                label: 'Obtaining the dynamodb table name used for the MHS state',
+                                                returnStdout: true,
+                                                script: "terraform output mhs_state_table_name"
+                                        ).trim()
+                                        env.MHS_SYNC_ASYNC_TABLE_NAME = sh(
+                                                label: 'Obtaining the dynamodb table name used for the MHS sync/async state',
+                                                returnStdout: true,
+                                                script: "terraform output mhs_sync_async_table_name"
+                                        ).trim()
+                                    }
+                                }
                             }
                         }
-                    }
-
-                    steps {
-                        dir('pipeline/terraform/scr-environment') {
-                            sh label: 'Initialising Terraform', script: """
+                        stage('SCR Terraform') {
+                            steps {
+                                dir('pipeline/terraform/scr-environment') {
+                                    sh label: 'Initialising Terraform', script: """
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
                                     -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
                                     -input=false -no-color
                                 """
-                            sh label: 'Applying Terraform configuration', script: """
+                                    sh label: 'Applying Terraform configuration', script: """
                                     terraform apply -no-color -auto-approve \
                                     -var environment_id=${ENVIRONMENT_ID} \
                                     -var build_id=${BUILD_TAG} \
@@ -202,27 +211,30 @@ pipeline {
                                     -var scr_mhs_address=${MHS_ADDRESS} \
                                     -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
                                 """
-                        }
-                    }
-
-                    steps {
-                        dir('integration-tests/integration_tests') {
-                            sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-
-                            // Wait for MHS load balancers to have healthy targets
-                            dir('../../pipeline/scripts/check-target-group-health') {
-                                sh script: 'pipenv install'
-
-                                timeout(13) {
-                                    waitUntil {
-                                        script {
-                                            def r = sh script: 'sleep 10; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
-                                            return (r == 0);
-                                        }
-                                    }
                                 }
                             }
-                            sh label: 'Running integration tests', script: 'pipenv run inttests'
+                        }
+                        stage('Run Tests') {
+                            steps {
+                                dir('integration-tests/integration_tests') {
+                                    sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+
+                                    // Wait for MHS load balancers to have healthy targets
+                                    dir('../../pipeline/scripts/check-target-group-health') {
+                                        sh script: 'pipenv install'
+
+                                        timeout(13) {
+                                            waitUntil {
+                                                script {
+                                                    def r = sh script: 'sleep 10; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
+                                                    return (r == 0);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    sh label: 'Running integration tests', script: 'pipenv run inttests'
+                                }
+                            }
                         }
                     }
                 }
