@@ -15,60 +15,54 @@ pipeline {
             parallel {
                 stage('Build Common') {
                     stages {
-                        def buildAction = 'Installing common dependencies';
-                        stage(buildAction) {
+                        stage('Installing common dependencies') {
                             steps {
-                                dir('common') { buildModules(buildAction) }
+                                dir('common') { buildModules('Installing common dependencies') }
                             }
                         }
                     }
                 }
                 stage('Build MHS Common') {
                     stages {
-                        def buildAction = 'Installing mhs common dependencies';
-                        stage(buildAction) {
+                        stage('Installing mhs common dependencies') {
                             steps {
-                                dir('mhs/common') { buildModules(buildAction) }
+                                dir('mhs/common') { buildModules('Installing mhs common dependencies') }
                             }
                         }
                     }
                 }
                 stage('Build MHS Inbound') {
                     stages {
-                        def buildAction = 'Installing inbound dependencies';
-                        stage(buildAction) {
+                        stage('Installing inbound dependencies') {
                             steps {
-                                dir('mhs/inbound') { buildModules(buildAction) }
+                                dir('mhs/inbound') { buildModules('Installing inbound dependencies') }
                             }
                         }
                     }
                 }
                 stage('Build MHS Outbound') {
                     stages {
-                        def buildAction = 'Installing outbound dependencies';
-                        stage(buildAction) {
+                        stage('Installing outbound dependencies') {
                             steps {
-                                dir('mhs/outbound') { buildModules(buildAction) }
+                                dir('mhs/outbound') { buildModules('Installing outbound dependencies') }
                             }
                         }
                     }
                 }
                 stage('Build MHS Spine Route Lookup') {
                     stages {
-                        def buildAction = 'Installing route lookup dependencies';
-                        stage(buildAction) {
+                        stage('Installing route lookup dependencies') {
                             steps {
-                                dir('mhs/spineroutelookup') { buildModules(buildAction) }
+                                dir('mhs/spineroutelookup') { buildModules('Installing route lookup dependencies') }
                             }
                         }
                     }
                 }
                 stage('Build SCR') {
                     stages {
-                        def buildAction = 'Installing SCR web service dependencies';
-                        stage(buildAction) {
+                        stage('Installing SCR web service dependencies') {
                             steps {
-                                dir('SCRWebService') { buildModules(buildAction) }
+                                dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
                             }
                         }
                     }
