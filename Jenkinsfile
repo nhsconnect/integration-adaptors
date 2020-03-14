@@ -15,7 +15,7 @@ pipeline {
             parallel {
                 stage('Build Common') {
                     stages {
-                        String buildAction = 'Installing common dependencies';
+                        def buildAction = 'Installing common dependencies';
                         stage(buildAction) {
                             steps {
                                 dir('common') { buildModules(buildAction) }
@@ -25,7 +25,7 @@ pipeline {
                 }
                 stage('Build MHS Common') {
                     stages {
-                        String buildAction = 'Installing mhs common dependencies';
+                        def buildAction = 'Installing mhs common dependencies';
                         stage(buildAction) {
                             steps {
                                 dir('mhs/common') { buildModules(buildAction) }
@@ -35,7 +35,7 @@ pipeline {
                 }
                 stage('Build MHS Inbound') {
                     stages {
-                        String buildAction = 'Installing inbound dependencies';
+                        def buildAction = 'Installing inbound dependencies';
                         stage(buildAction) {
                             steps {
                                 dir('mhs/inbound') { buildModules(buildAction) }
@@ -45,7 +45,7 @@ pipeline {
                 }
                 stage('Build MHS Outbound') {
                     stages {
-                        String buildAction = 'Installing outbound dependencies';
+                        def buildAction = 'Installing outbound dependencies';
                         stage(buildAction) {
                             steps {
                                 dir('mhs/outbound') { buildModules(buildAction) }
@@ -55,7 +55,7 @@ pipeline {
                 }
                 stage('Build MHS Spine Route Lookup') {
                     stages {
-                        String buildAction = 'Installing route lookup dependencies';
+                        def buildAction = 'Installing route lookup dependencies';
                         stage(buildAction) {
                             steps {
                                 dir('mhs/spineroutelookup') { buildModules(buildAction) }
@@ -65,7 +65,7 @@ pipeline {
                 }
                 stage('Build SCR') {
                     stages {
-                        String buildAction = 'Installing SCR web service dependencies';
+                        def buildAction = 'Installing SCR web service dependencies';
                         stage(buildAction) {
                             steps {
                                 dir('SCRWebService') { buildModules(buildAction) }
