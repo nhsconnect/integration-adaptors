@@ -24,30 +24,30 @@ pipeline {
 
         stage('All Module Unit Tests') {
             parallel {
-                stage('Common Module Unit Tests') {
+                stage('Run') {
                     stages {
-                        stage('Run Unit Tests') {
+                        stage('Common Module Unit Tests') {
                             steps { dir('common') { executeUnitTestsWithCoverage() } }
                         }
                     }
                 }
-                        stage('MHS Common Unit Tests') {
+                        stage('Run') {
                             stages {
-                                stage('Run Unit Tests') {
+                                stage('MHS Common Unit Tests') {
                                     steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
                                 }
                             }
                         }
-                        stage('MHS Inbound Unit Tests') {
+                        stage('Run') {
                             stages {
-                                stage('Run Unit Tests') {
+                                stage('MHS Inbound Unit Tests') {
                                     steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
                                 }
                             }
                         }
-                        stage('MHS Outbound Unit Tests') {
+                        stage('Run') {
                             stages {
-                                stage('Run Unit Tests') {
+                                stage('MHS Outbound Unit Tests') {
                                     steps {
                                         dir('mhs/outbound') {
                                             executeUnitTestsWithCoverage()
@@ -57,16 +57,16 @@ pipeline {
                                 }
                             }
                         }
-                    stage('Spine Route Lookup Unit Tests') {
+                    stage('Run') {
                         stages {
-                            stage('Run Unit Tests') {
+                            stage('Spine Route Lookup Unit Tests') {
                                 steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
                             }
                         }
                     }
-                    stage('SCR Web Service Unit Tests') {
+                    stage('Run') {
                         stages {
-                            stage('Run Unit Tests') {
+                            stage('SCR Web Service Unit Tests') {
                                 steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
                             }
                         }
