@@ -341,7 +341,7 @@ pipeline {
                                         timeout(10) {
                                             waitUntil {
                                                 script {
-                                                    def r = sh script: 'sleep 3; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
+                                                    def r = sh script: 'sleep 1; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
                                                     return (r == 0);
                                                 }
                                             }
