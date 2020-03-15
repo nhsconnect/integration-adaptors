@@ -122,16 +122,46 @@ pipeline {
             }
         }
 
-        stage('Package') {
-            steps {
-                sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
-                sh label: 'Running Outbound Packer build', script: 'packer build -color=false pipeline/packer/outbound.json'
-                sh label: 'Running Spine Route Lookup Packer build', script: 'packer build -color=false pipeline/packer/spineroutelookup.json'
-                sh label: 'Running SCR service Packer build', script: 'packer build -color=false pipeline/packer/scr-web-service.json'
+        stage('Package Modules') {
+            parallel {
+                stage('Package Inbound') {
+                    stages {
+                        stage('Running Inbound Packer build') {
+                            steps {
+                                sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
+                            }
+                        }
+                    }
+                }
+                stage('Package Outbound') {
+                    stages {
+                        stage('Running Outbound Packer build') {
+                            steps {
+                                sh label: 'Running Outbound Packer build', script: 'packer build -color=false pipeline/packer/outbound.json'
+                            }
+                        }
+                    }
+                }
+                stage('Package Spine Route Lookup') {
+                    stages {
+                        stage('Running Spine Route Lookup Packer build') {
+                            steps {
+                                sh label: 'Running Spine Route Lookup Packer build', script: 'packer build -color=false pipeline/packer/spineroutelookup.json'
+                            }
+                        }
+                    }
+                }
+                stage('Package SCR Service') {
+                    stages {
+                        stage('Running SCR service Packer build') {
+                            steps {
+                                sh label: 'Running SCR service Packer build', script: 'packer build -color=false pipeline/packer/scr-web-service.json'
+                            }
+                        }
+                    }
+                }
             }
         }
-
-        // START OF INTEGRATION TESTS =================================================
 
         stage('Component and Integration Tests') {
             parallel {
@@ -180,11 +210,7 @@ pipeline {
                     }
                 }
 
-                // END OF COMPONENT TESTS =================================================
-
-                // START OF INTEGRATION TESTS =================================================
-
-                stage('Run Integration Tests') {
+                stage('Integration Tests') {
                     options {
                         lock('exemplar-test-environment')
                     }
@@ -330,9 +356,6 @@ pipeline {
             }
         }
     }
-
-// END OF INTEGRATION TESTS =================================================
-
 
     post {
         always {
