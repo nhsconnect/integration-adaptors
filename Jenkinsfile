@@ -136,9 +136,6 @@ pipeline {
         stage('Component and Integration Tests') {
             parallel {
                 stage('Component Tests') {
-                    options {
-                        lock('local-docker-compose-environment')
-                    }
                     stages {
                         stage('Deploy component locally') {
                             steps {
