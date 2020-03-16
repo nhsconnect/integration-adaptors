@@ -7,7 +7,7 @@ from typing import Dict, Optional, Callable
 import xml.etree.ElementTree as ET
 from utilities import integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('GP_SUM_UP')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class GpSummaryUpload(object):
@@ -75,9 +75,8 @@ class GpSummaryUpload(object):
         """
         try:
             return ET.ElementTree(ET.fromstring(message)).getroot()
-        except ET.ParseError as e:
-            logger.error('001', 'Exception raised while creating XML object from string {exception}',
-                         {'exception': e})
+        except ET.ParseError:
+            logger.exception('Exception raised while creating XML object from string')
             return None
 
     def _find_hl7_element_attribute(self, root: ET.Element, element_name: str, attribute: str) -> Optional[str]:
@@ -92,9 +91,8 @@ class GpSummaryUpload(object):
         try:
             return self._get_element(root, element_name, lambda x: x.attrib[attribute])
         except KeyError:
-            logger.info('002', 'Failed to find attribute on {element} {attribute}',
-                        {'element': element_name, 'attribute': attribute}
-                        )
+            logger.info('Failed to find attribute on {element} {attribute}',
+                        fparams={'element': element_name, 'attribute': attribute})
             return None
 
     def _find_hl7_element_text(self, root: ET.Element, element_name: str):
@@ -137,13 +135,13 @@ class GpSummaryUpload(object):
                 'messageDetail': message_detail
             }
         else:
-            logger.error('003', 'Failed to parse all necessary elements from xml {message_id} {message_reference}'
-                                ' {creation_time} {message_details}',
-                         {'message_id': message_id,
-                          'message_reference': message_ref,
-                          'creation_time': creation_time,
-                          'message_details': message_detail
-                          }
-                         )
+            logger.error('Failed to parse all necessary elements from xml {message_id} {message_reference}'
+                         ' {creation_time} {message_details}',
+                         {
+                             'message_id': message_id,
+                             'message_reference': message_ref,
+                             'creation_time': creation_time,
+                             'message_details': message_detail
+                          })
             return {'error': 'Failed to parse all the necessary elements from xml returned from MHS'}
 

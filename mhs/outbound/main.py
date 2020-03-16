@@ -19,7 +19,7 @@ from utilities import secrets
 import outbound.request.synchronous.handler as client_request_handler
 from outbound.transmission import outbound_transmission
 
-logger = log.IntegrationAdaptorsLogger('OUTBOUND_MAIN')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 def configure_http_client():
@@ -109,23 +109,24 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
     server_port = int(config.get_config('OUTBOUND_SERVER_PORT', default='80'))
     supplier_server.listen(server_port)
 
-    logger.info('001', 'Starting outbound server at port {server_port}', {'server_port': server_port})
+    logger.info('Starting outbound server at port {server_port}', fparams={'server_port': server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
         tornado_io_loop.start()
     except KeyboardInterrupt:
-        logger.warning('002', 'Keyboard interrupt')
+        logger.warning('Keyboard interrupt')
         pass
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)
-    logger.info('003', 'Server shut down, exiting...')
+    logger.info('Server shut down, exiting...')
 
 
 def main():
     config.setup_config("MHS")
     secrets.setup_secret_config("MHS")
-    log.configure_logging()
+    log.configure_logging("outbound")
+
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
 
     configure_http_client()
@@ -162,7 +163,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
-        logger.critical('002', 'Fatal exception in main application: {exception}', {'exception': e})
+    except Exception:
+        logger.critical('Fatal exception in main application', exc_info=True)
     finally:
-        logger.info('003', 'Exiting application')
+        logger.info('Exiting application')

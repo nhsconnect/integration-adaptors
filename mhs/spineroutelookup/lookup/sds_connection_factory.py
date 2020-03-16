@@ -7,7 +7,7 @@ import definitions
 
 _LDAP_CONNECTION_RETRIES = int(config.get_config('LDAP_CONNECTION_RETRIES', default='3'))
 _LDAP_CONNECTION_TIMEOUT_IN_SECONDS = int(config.get_config('LDAP_CONNECTION_TIMEOUT_IN_SECONDS', default='5'))
-logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_SDS_CONNECTION_FACTORY')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 def build_sds_connection(ldap_address: str) -> ldap3.Connection:
@@ -16,9 +16,9 @@ def build_sds_connection(ldap_address: str) -> ldap3.Connection:
     """
     ldap3.set_config_parameter('RESTARTABLE_TRIES', _LDAP_CONNECTION_RETRIES)
     server = ldap3.Server(ldap_address, connect_timeout=_LDAP_CONNECTION_TIMEOUT_IN_SECONDS)
-    logger.info('001', 'Opening LDAP connection without TLS')
+    logger.info('Opening LDAP connection without TLS')
     connection = ldap3.Connection(server, auto_bind=True, client_strategy=ldap3.REUSABLE)
-    logger.info('002', 'LDAP connection successful')
+    logger.info('LDAP connection successful')
     return connection
 
 
@@ -41,7 +41,7 @@ def build_sds_connection_tls(ldap_address: str, private_key: str, local_cert: st
 
     ldap3.set_config_parameter('RESTARTABLE_TRIES', _LDAP_CONNECTION_RETRIES)
     server = ldap3.Server(ldap_address, use_ssl=True, tls=load_tls, connect_timeout=_LDAP_CONNECTION_TIMEOUT_IN_SECONDS)
-    logger.info('003', 'Opening LDAP connection using TLS')
+    logger.info('Opening LDAP connection using TLS')
     connection = ldap3.Connection(server, auto_bind=True, client_strategy=ldap3.REUSABLE)
-    logger.info('004', 'LDAP connection successful')
+    logger.info('LDAP connection successful')
     return connection

@@ -26,12 +26,12 @@ class TestTimeUtilities(TestCase):
     def test_invoke_with_time_rounding(self, log_mock):
         with self.subTest("Default"):
             timing._log_time(5.1236, "yes")
-            log_mock.info.assert_called_with('0001', '{FuncName} took {Duration} seconds',
-                                             {'FuncName': 'yes', 'Duration': 5.124})
+            log_mock.info.assert_called_with('{FuncName} took {Duration} seconds',
+                                             fparams={'FuncName': 'yes', 'Duration': 5.124})
         with self.subTest("Tornado"):
             timing._log_tornado_time(5.1236, "yes", "methodName")
-            log_mock.info.assert_called_with('0002', '{FuncName} from {Handler} took {Duration} seconds',
-                                             {'FuncName': 'methodName', 'Handler': 'yes', 'Duration': 5.124})
+            log_mock.info.assert_called_with('{FuncName} from {Handler} took {Duration} seconds',
+                                             fparams={'FuncName': 'methodName', 'Handler': 'yes', 'Duration': 5.124})
 
     @patch('utilities.timing._log_time')
     @patch('utilities.timing.Stopwatch.stop_timer')
@@ -71,14 +71,14 @@ class TestTimeUtilities(TestCase):
         with self.subTest("Sync"):
             time_mock.return_value = 5
             res = self.take_parameters("whew", 1, [2], {3: 3})
-            log_mock.info.assert_called_with('0001', '{FuncName} took {Duration} seconds',
-                                             {'FuncName': 'take_parameters', 'Duration': 5})
+            log_mock.info.assert_called_with('{FuncName} took {Duration} seconds',
+                                             fparams={'FuncName': 'take_parameters', 'Duration': 5})
             self.assertEqual("whew1", res)
         with self.subTest("Async"):
             time_mock.return_value = 5
             res = await self.take_parameters_async("whew", 1, [2], {3: 3})
-            log_mock.info.assert_called_with('0001', '{FuncName} took {Duration} seconds',
-                                             {'FuncName': 'take_parameters_async', 'Duration': 5})
+            log_mock.info.assert_called_with('{FuncName} took {Duration} seconds',
+                                             fparams={'FuncName': 'take_parameters_async', 'Duration': 5})
             self.assertEqual("whew1", res)
 
     @patch('utilities.timing.Stopwatch.stop_timer')
@@ -93,8 +93,8 @@ class TestTimeUtilities(TestCase):
 
         await task
 
-        log_mock.info.assert_called_with('0001', '{FuncName} took {Duration} seconds',
-                                         {'FuncName': 'default_method_async', 'Duration': 2})
+        log_mock.info.assert_called_with('{FuncName} took {Duration} seconds',
+                                         fparams={'FuncName': 'default_method_async', 'Duration': 2})
 
     @patch('utilities.timing.Stopwatch.stop_timer')
     @patch.object(timing, 'logger')
@@ -103,14 +103,14 @@ class TestTimeUtilities(TestCase):
         with self.subTest("Sync"):
             time_mock.return_value = 5
             res = self.var_parameters("whew", 1, 2, 3, 4, 5)
-            log_mock.info.assert_called_with('0001', '{FuncName} took {Duration} seconds',
-                                             {'FuncName': 'var_parameters', 'Duration': 5})
+            log_mock.info.assert_called_with('{FuncName} took {Duration} seconds',
+                                             fparams={'FuncName': 'var_parameters', 'Duration': 5})
             self.assertEqual("whew12345", res)
         with self.subTest("Async"):
             time_mock.return_value = 5
             res = await self.var_parameters_async("whew", 1, "three", 4)
-            log_mock.info.assert_called_with('0001', '{FuncName} took {Duration} seconds',
-                                             {'FuncName': 'var_parameters_async', 'Duration': 5})
+            log_mock.info.assert_called_with('{FuncName} took {Duration} seconds',
+                                             fparams={'FuncName': 'var_parameters_async', 'Duration': 5})
             self.assertEqual("whew1three4", res)
 
     @patch('utilities.timing.datetime')
@@ -188,9 +188,12 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
         self.assertEqual(response.code, expected_code)
         if expected_body:
             self.assertEqual(response.body.decode('utf8'), expected_body)
-        log_mock.info.assert_called_with('0002', '{FuncName} from {Handler} took {Duration} seconds',
-                                         {'FuncName': expected_func_name, 'Handler': 'FakeRequestHandler',
-                                          'Duration': self.duration})
+        log_mock.info.assert_called_with('{FuncName} from {Handler} took {Duration} seconds',
+                                         fparams={
+                                             'FuncName': expected_func_name,
+                                             'Handler': 'FakeRequestHandler',
+                                             'Duration': self.duration
+                                         })
 
     @patch('utilities.timing.Stopwatch.stop_timer')
     def test_post_synchronous_message(self, time_mock, log_mock):

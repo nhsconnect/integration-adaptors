@@ -9,7 +9,7 @@ from mhs_common.transmission import transmission_adaptor
 from tornado import httpclient
 from utilities import integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger("OUTBOUND_TRANSMISSION")
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class OutboundTransmissionError(Exception):
@@ -49,9 +49,13 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                            raise_error_response: bool = True) -> httpclient.HTTPResponse:
 
         async def make_http_request():
-            logger.info("0001", "About to send message with {headers} to {url} using {proxy_host} & {proxy_port}",
-                        {"headers": headers, "url": url, "proxy_host": self._proxy_host,
-                         "proxy_port": self._proxy_port})
+            logger.info("About to send message with {headers} to {url} using {proxy_host} & {proxy_port}",
+                        fparams={
+                            "headers": headers,
+                            "url": url,
+                            "proxy_host": self._proxy_host,
+                            "proxy_port": self._proxy_port
+                        })
             # ******************************************************************************************************
             # TLS CERTIFICATE VALIDATION HAS BEEN TEMPORARILY DISABLED! This is required because Opentest's SDS
             # instance currently returns endpoints as IP addresses. This MUST be changed before this code is used in
@@ -63,10 +67,15 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                                       http_proxy_host=self._proxy_host,
                                                       http_proxy_port=self._proxy_port,
                                                       raise_error_response=raise_error_response)
-            logger.info("0002", "Sent message with {headers} to {url} using {proxy_host} & {proxy_port} and "
-                                "received status code {code}",
-                        {"headers": headers, "url": url, "proxy_host": self._proxy_host,
-                         "proxy_port": self._proxy_port, "code": response.code})
+            logger.info("Sent message with {headers} to {url} using {proxy_host} & {proxy_port} and "
+                        "received status code {code}",
+                        fparams={
+                            "headers": headers,
+                            "url": url,
+                            "proxy_host": self._proxy_host,
+                            "proxy_port": self._proxy_port,
+                            "code": response.code
+                        })
             return response
 
         retry_result = await retriable_action.RetriableAction(make_http_request, self._max_retries,
@@ -76,7 +85,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
             .execute()
 
         if not retry_result.is_successful:
-            logger.error("0003", "Failed to make outbound HTTP request to {url}", {"url": url})
+            logger.error("Failed to make outbound HTTP request to {url}", fparams={"url": url})
 
             exception_raised = retry_result.exception
             if exception_raised:

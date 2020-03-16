@@ -17,7 +17,7 @@ from utilities import secrets, certs
 
 import inbound.request.handler as async_request_handler
 
-logger = log.IntegrationAdaptorsLogger('INBOUND_MAIN')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 ASYNC_TIMEOUT = 30
 
@@ -89,24 +89,24 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     healthcheck_server_port = int(config.get_config('INBOUND_HEALTHCHECK_SERVER_PORT', default='80'))
     healthcheck_application.listen(healthcheck_server_port)
 
-    logger.info('011', 'Starting inbound server at port {server_port} and healthcheck at {healthcheck_server_port}',
-                {'server_port': inbound_server_port, 'healthcheck_server_port': healthcheck_server_port})
+    logger.info('Starting inbound server at port {server_port} and healthcheck at {healthcheck_server_port}',
+                fparams={'server_port': inbound_server_port, 'healthcheck_server_port': healthcheck_server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
         tornado_io_loop.start()
     except KeyboardInterrupt:
-        logger.warning('012', 'Keyboard interrupt')
+        logger.warning('Keyboard interrupt')
         pass
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)
-    logger.info('013', 'Server shut down, exiting...')
+    logger.info('Server shut down, exiting...')
 
 
 def main():
     config.setup_config("MHS")
     secrets.setup_secret_config("MHS")
-    log.configure_logging()
+    log.configure_logging("inbound")
 
     certificates = certs.Certs.create_certs_files(definitions.ROOT_DIR,
                                                   private_key=secrets.get_secret_config('CLIENT_KEY'),
@@ -127,7 +127,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
-        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+    except Exception:
+        logger.critical('Fatal exception in main application', exc_info=True)
     finally:
-        logger.info('002', 'Exiting application')
+        logger.info('Exiting application')

@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import utilities.config as config
 from utilities import integration_adaptors_logger, secrets
+from utilities.tests.test_logger import LogEntry
 
 
 @patch.dict(secrets.secret_config)
@@ -63,8 +64,9 @@ class TestSecrets(unittest.TestCase):
             secrets.get_secret_config("BLAH")
 
         output = mock_stdout.getvalue()
-        self.assertIn('Failed to get secret config ConfigName="BLAH" ProcessKey=SECRET_CONFIG003', output)
-        self.assertIn("LogLevel=ERROR", output)
+        log_entry = LogEntry(output)
+        self.assertEqual('Failed to get secret config ConfigName="BLAH" ProcessKey=SECRET_CONFIG003', log_entry.message)
+        self.assertEqual("ERROR", log_entry.level)
 
     def setup_logger(self, mock_environ):
         mock_environ["PREFIX_LOG_LEVEL"] = "INFO"

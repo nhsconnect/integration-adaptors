@@ -9,7 +9,7 @@ import definitions
 from endpoints import summary_care_record
 from message_handling import message_forwarder, message_sender
 
-logger = log.IntegrationAdaptorsLogger('SCR-WEB')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 def build_app():
@@ -40,7 +40,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
-        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+    except:
+        logger.critical('Fatal exception in main application', exc_info=True)
     finally:
-        logger.info('002', 'Exiting application')
+        logger.info('Exiting application')

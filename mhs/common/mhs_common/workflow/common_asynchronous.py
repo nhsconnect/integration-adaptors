@@ -15,7 +15,7 @@ from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.common import CommonWorkflow
 
-logger = log.IntegrationAdaptorsLogger('COMMON_ASYNC_WORKFLOW')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 MHS_SYNC_REPLY_MODE = "nhsMHSSyncReplyMode"
 MHS_RETRY_INTERVAL = "nhsMHSRetryInterval"
@@ -67,20 +67,19 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             interaction_details[ebxml_envelope.TO_PARTY_ID] = to_party_key
             interaction_details[ebxml_envelope.CPA_ID] = cpa_id
             _, http_headers, message = ebxml_request_envelope.EbxmlRequestEnvelope(interaction_details).serialize()
-        except Exception as e:
-            logger.error('0009', 'Failed to serialise outbound message. {Exception}', {'Exception': e})
+        except Exception:
+            logger.exception('Failed to serialise outbound message.')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return (500, 'Error serialising outbound message'), None, None
 
         if len(message) > self.max_request_size:
-            logger.error('0007', 'Request to send to Spine is too large after serialisation. '
-                                 '{RequestSize} {MaxRequestSize}',
-                         {'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
+            logger.error('Request to send to Spine is too large after serialisation. {RequestSize} {MaxRequestSize}',
+                         fparams={'RequestSize': len(message), 'MaxRequestSize': self.max_request_size})
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return (400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '
                          f'RequestSize={len(message)}'), None, None
 
-        logger.info('0008', 'Message serialised successfully')
+        logger.info('Message serialised successfully')
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
         return None, http_headers, message
 
@@ -88,18 +87,21 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             self, url: str, http_headers: Dict[str, str], message: str, wdo: wd.WorkDescription,
             handle_error_response: Callable[[httpclient.HTTPResponse], Tuple[int, str, Optional[wd.WorkDescription]]]):
 
-        logger.info('0006', 'About to make outbound request')
+        logger.info('About to make outbound request')
         try:
             response = await self.transmission.make_request(url, http_headers, message, raise_error_response=False)
-        except Exception as e:
-            logger.error('0011', 'Error encountered whilst making outbound request. {Exception}', {'Exception': e})
+        except Exception:
+            logger.exception('Error encountered whilst making outbound request.')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)
             return 500, 'Error making outbound request', None
 
         if response.code == 202:
-            logger.audit('0101', '{WorkflowName} outbound workflow invoked. Message sent to Spine and {Acknowledgment} '
-                                 'received.',
-                         {'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_ACKD, 'WorkflowName': self.workflow_name})
+            logger.audit('{WorkflowName} outbound workflow invoked. Message sent to Spine '
+                         'and {Acknowledgment} received.',
+                         fparams={
+                             'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
+                             'WorkflowName': self.workflow_name
+                         })
 
             await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
                                                 wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
@@ -113,10 +115,10 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
                                      payload: str):
-        logger.info('0010', 'Entered {WorkflowName} workflow to handle inbound message',
-                    {'WorkflowName': self.workflow_name})
-        logger.audit('0103', '{WorkflowName} inbound workflow invoked. Message received from spine',
-                     {'WorkflowName': self.workflow_name})
+        logger.info('Entered {WorkflowName} workflow to handle inbound message',
+                    fparams={'WorkflowName': self.workflow_name})
+        logger.audit('{WorkflowName} inbound workflow invoked. Message received from spine',
+                     fparams={'WorkflowName': self.workflow_name})
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
@@ -124,15 +126,17 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
 
         await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, payload)
 
-        logger.info('0015', 'Placed message onto inbound queue successfully')
+        logger.info('Placed message onto inbound queue successfully')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
                                             wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
                                             self.store_retries)
-        logger.audit('0104', '{WorkflowName} inbound workflow completed. Message placed on queue, returning '
-                             '{Acknowledgement} to spine',
-                     {'Acknowledgement': wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
-                      'WorkflowName': self.workflow_name})
+        logger.audit('{WorkflowName} inbound workflow completed. Message placed on queue, '
+                     'returning {Acknowledgement} to spine',
+                     fparams={
+                         'Acknowledgement': wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
+                         'WorkflowName': self.workflow_name
+                     })
 
     async def _publish_message_to_inbound_queue(self,
                                                 message_id: str,
@@ -147,9 +151,9 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             .execute()
 
         if not result.is_successful:
-            logger.error("0013",
-                         "Exceeded the maximum number of retries, {max_retries} retries, when putting "
-                         "message onto inbound queue", {"max_retries": self.inbound_queue_max_retries})
+            logger.error("Exceeded the maximum number of retries, {max_retries} retries, when putting "
+                         "message onto inbound queue",
+                         fparams={"max_retries": self.inbound_queue_max_retries})
             await wd.update_status_with_retries(work_description,
                                                 work_description.set_inbound_status,
                                                 wd.MessageStatus.INBOUND_RESPONSE_FAILED,
@@ -161,15 +165,15 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         try:
             service_id = await self._build_service_id(interaction_details)
 
-            logger.info('0001', 'Looking up reliability details for {service_id}.', {'service_id': service_id})
+            logger.info('Looking up reliability details for {service_id}.', fparams={'service_id': service_id})
             reliability_details = await self.routing_reliability.get_reliability(service_id, org_code)
 
-            logger.info('0004', 'Retrieved reliability details for {service_id}. {reliability_details}',
-                        {'service_id': service_id, 'reliability_details': reliability_details})
+            logger.info('Retrieved reliability details for {service_id}. {reliability_details}',
+                        fparams={'service_id': service_id, 'reliability_details': reliability_details})
             return reliability_details
-        except Exception as e:
-            logger.warning('0005', 'Error encountered whilst obtaining outbound URL. {exception}', {'exception': e})
-            raise e
+        except Exception:
+            logger.exception('Error encountered whilst obtaining outbound URL.')
+            raise
 
     async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments=None):
         await self.queue_adaptor.send_async({'payload': payload, 'attachments': attachments or []},

@@ -145,10 +145,13 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
 
-        audit_log_mock.assert_called_with('0101',
-                                          '{WorkflowName} outbound workflow invoked. Message sent to Spine'
+        audit_log_mock.assert_called_with('{WorkflowName} outbound workflow invoked. Message sent to Spine'
                                           ' and {Acknowledgment} received.',
-                                          {'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD', 'WorkflowName': 'async-reliable'})
+                                          fparams=
+                                          {
+                                              'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD',
+                                              'WorkflowName': 'async-reliable'
+                                          })
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
@@ -294,9 +297,8 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        audit_log_mock.assert_called_once_with('0100',
-                                               'Outbound {WorkflowName} workflow invoked.',
-                                               {'WorkflowName': 'async-reliable'})
+        audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
+                                               fparams={'WorkflowName': 'async-reliable'})
 
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
@@ -322,9 +324,8 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        audit_log_mock.assert_called_once_with('0100',
-                                               'Outbound {WorkflowName} workflow invoked.',
-                                               {'WorkflowName': 'async-reliable'})
+        audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
+                                               fparams={'WorkflowName': 'async-reliable'})
 
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
@@ -376,9 +377,8 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        audit_log_mock.assert_called_once_with('0100',
-                                               'Outbound {WorkflowName} workflow invoked.',
-                                               {'WorkflowName': 'async-reliable'})
+        audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
+                                               fparams={'WorkflowName': 'async-reliable'})
 
     ############################
     # Reliability tests
@@ -524,11 +524,12 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
-        audit_log_mock.assert_called_with('0104',
-                                          '{WorkflowName} inbound workflow completed. Message placed on queue,'
+        audit_log_mock.assert_called_with('{WorkflowName} inbound workflow completed. Message placed on queue,'
                                           ' returning {Acknowledgement} to spine',
-                                          {'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',
-                                           'WorkflowName': 'async-reliable'})
+                                          fparams={
+                                              'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',
+                                              'WorkflowName': 'async-reliable'
+                                          })
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -572,8 +573,8 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
         # Should be called when invoked
-        audit_log_mock.assert_called_once_with('0103', '{WorkflowName} inbound workflow invoked. Message '
-                                                       'received from spine', {'WorkflowName': 'async-reliable'})
+        audit_log_mock.assert_called_once_with('{WorkflowName} inbound workflow invoked. Message '
+                                               'received from spine', fparams={'WorkflowName': 'async-reliable'})
 
     @mock.patch('asyncio.sleep')
     @async_test

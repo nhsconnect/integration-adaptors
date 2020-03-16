@@ -5,7 +5,7 @@ from functools import wraps
 
 import utilities.integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('TIMING')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class Stopwatch(object):
@@ -29,13 +29,13 @@ def _begin_stopwatch():
 
 def _log_time(duration, func_name):
     duration = round(duration, 3)
-    logger.info('0001', '{FuncName} took {Duration} seconds', {'FuncName': func_name, 'Duration': duration})
+    logger.info('{FuncName} took {Duration} seconds', fparams={'FuncName': func_name, 'Duration': duration})
 
 
 def _log_tornado_time(duration, handler, func_name):
     duration = round(duration, 3)
-    logger.info('0002', '{FuncName} from {Handler} took {Duration} seconds',
-                {'FuncName': func_name, 'Handler': handler, 'Duration': duration})
+    logger.info('{FuncName} from {Handler} took {Duration} seconds',
+                fparams={'FuncName': func_name, 'Handler': handler, 'Duration': duration})
 
 
 def time_function(func):

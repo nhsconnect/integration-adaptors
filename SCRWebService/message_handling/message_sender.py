@@ -5,7 +5,7 @@ from typing import Optional
 from comms.common_https import CommonHttps
 from utilities import integration_adaptors_logger as log
 
-logger = log.IntegrationAdaptorsLogger('MSG_SENDER')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class MessageSender(object):
@@ -33,7 +33,7 @@ class MessageSender(object):
         :param correlation_id
         :return:
         """
-        logger.info('001', 'Preparing message headers to send to mhs address')
+        logger.info('Preparing message headers to send to mhs address')
         headers = self._build_headers(interaction_id, message_id, correlation_id)
 
         response = await CommonHttps.make_request(url=self.mhs_address,

@@ -7,8 +7,7 @@ from utilities import integration_adaptors_logger as log, timing
 ROUTING_PATH = "routing"
 RELIABILITY_PATH = "reliability"
 
-logger = log.IntegrationAdaptorsLogger("MHS_ROUTING_RELIABILITY")
-
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 class RoutingAndReliability:
     """A tool that allows the routing and reliability information for a remote MHS to be retrieved."""
@@ -48,15 +47,15 @@ class RoutingAndReliability:
         """
         if org_code is None:
             org_code = self.spine_org_code
-            logger.info("0007", "No org code provided when obtaining endpoint details. Using {spine_org_code}",
-                        {"spine_org_code": org_code})
+            logger.info("No org code provided when obtaining endpoint details. Using {spine_org_code}",
+                        fparams={"spine_org_code": org_code})
 
         url = self._build_request_url(ROUTING_PATH, org_code, service_id)
 
         try:
 
-            logger.info("0001", "Requesting endpoint details from Spine route lookup service for {org_code} & "
-                                "{service_id}.", {"org_code": org_code, "service_id": service_id})
+            logger.info("Requesting endpoint details from Spine route lookup service for {org_code} & {service_id}.",
+                        fparams={"org_code": org_code, "service_id": service_id})
             http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None,
                                                                         client_cert=self._client_cert,
                                                                         client_key=self._client_key,
@@ -65,15 +64,15 @@ class RoutingAndReliability:
                                                                         http_proxy_port=self._proxy_port)
             endpoint_details = json.loads(http_response.body)
 
-            logger.info("0002", "Received endpoint details from Spine route lookup service for {org_code} & "
-                                "{service_id}. {endpoint_details}",
-                        {"org_code": org_code, "service_id": service_id, "endpoint_details": endpoint_details})
+            logger.info("Received endpoint details from Spine route lookup service for {org_code} & "
+                        "{service_id}. {endpoint_details}",
+                        fparams={"org_code": org_code, "service_id": service_id, "endpoint_details": endpoint_details})
             return endpoint_details
-        except Exception as e:
-            logger.error("0003",
-                         "Couldn't obtain endpoint details from Spine route lookup service for {org_code} & "
-                         "{service_id}. {exception}", {"org_code": org_code, "service_id": service_id, "exception": e})
-            raise e
+        except Exception:
+            logger.exception("Couldn't obtain endpoint details from Spine route lookup service for {org_code} & "
+                         "{service_id}.",
+                         fparams={"org_code": org_code, "service_id": service_id})
+            raise
 
     @timing.time_function
     async def get_reliability(self, service_id: str, org_code: str = None) -> Dict:
@@ -86,14 +85,15 @@ class RoutingAndReliability:
         """
         if org_code is None:
             org_code = self.spine_org_code
-            logger.info("0008", "No org code provided when obtaining reliability details. Using {spine_org_code}",
-                        {"spine_org_code": org_code})
+            logger.info("No org code provided when obtaining reliability details. Using {spine_org_code}",
+                        fparams={"spine_org_code": org_code})
 
         url = self._build_request_url(RELIABILITY_PATH, org_code, service_id)
 
         try:
-            logger.info("0004", "Requesting reliability details from Spine route lookup service for {org_code} & "
-                                "{service_id}.", {"org_code": org_code, "service_id": service_id})
+            logger.info("Requesting reliability details from Spine route lookup service for {org_code} & "
+                        "{service_id}.",
+                        fparams={"org_code": org_code, "service_id": service_id})
             http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None,
                                                                         client_cert=self._client_cert,
                                                                         client_key=self._client_key,
@@ -102,15 +102,19 @@ class RoutingAndReliability:
                                                                         http_proxy_port=self._proxy_port)
             reliability_details = json.loads(http_response.body)
 
-            logger.info("0005", "Received reliability details from Spine route lookup service for {org_code} & "
-                                "{service_id}. {reliability_details}",
-                        {"org_code": org_code, "service_id": service_id, "reliability_details": reliability_details})
+            logger.info("Received reliability details from Spine route lookup service for {org_code} & "
+                        "{service_id}. {reliability_details}",
+                        fparams={
+                            "org_code": org_code,
+                            "service_id": service_id,
+                            "reliability_details": reliability_details
+                        })
             return reliability_details
-        except Exception as e:
-            logger.error("0006",
-                         "Couldn't obtain reliability details from Spine route lookup service for {org_code} & "
-                         "{service_id}. {exception}", {"org_code": org_code, "service_id": service_id, "exception": e})
-            raise e
+        except Exception:
+            logger.exception("Couldn't obtain reliability details from Spine route lookup service for {org_code} & "
+                             "{service_id}.",
+                             fparams={"org_code": org_code, "service_id": service_id}, exc_info=True)
+            raise
 
     def _build_request_url(self, path: str, org_code: str, service_id: str) -> str:
         return self.url + "/" + path + "?org-code=" + org_code + "&service-id=" + service_id

@@ -10,7 +10,7 @@ import comms.queue_adaptor
 import utilities.integration_adaptors_logger as log
 import utilities.message_utilities
 
-logger = log.IntegrationAdaptorsLogger('PROTON_QUEUE')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class MessageSendingError(RuntimeError):
@@ -39,7 +39,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         self.host = kwargs.get('host')
         self.username = kwargs.get('username')
         self.password = kwargs.get('password')
-        logger.info('000', 'Initialized proton queue adaptor for {host}', {'host': self.host})
+        logger.info('Initialized proton queue adaptor for {host}', fparams={'host': self.host})
 
     async def send_async(self, message: dict, properties: Dict[str, Any] = None) -> None:
         """Builds and asynchronously sends a message to the host defined when this adaptor was constructed. Raises an
@@ -48,7 +48,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         :param message: The message body to send. This will be serialised as JSON.
         :param properties: Optional application properties to send with the message.
         """
-        logger.info('008', 'Sending message asynchronously.')
+        logger.info('Sending message asynchronously.')
         payload = self.__construct_message(message, properties=properties)
         await tornado.ioloop.IOLoop.current() \
             .run_in_executor(executor=None, func=lambda: self.__send(payload))
@@ -62,8 +62,8 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         :return: The Message in the correct format with generated uuid.
         """
         message_id = utilities.message_utilities.MessageUtilities.get_uuid()
-        logger.info('001', 'Constructing message with {id} and {applicationProperties}',
-                    {'id': message_id, 'applicationProperties': properties})
+        logger.info('Constructing message with {id} and {applicationProperties}',
+                    fparams={'id': message_id, 'applicationProperties': properties})
         return proton.Message(id=message_id, content_type='application/json', body=json.dumps(message),
                               properties=properties)
 
@@ -100,7 +100,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The start event.
         """
-        logger.info('002', 'Establishing connection to {host} for sending messages.', {'host': self._host})
+        logger.info('Establishing connection to {host} for sending messages.', fparams={'host': self._host})
         self._sender = event.container.create_sender(proton.Url(self._host, username=self._username,
                                                                 password=self._password))
 
@@ -112,10 +112,10 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         if event.sender.credit:
             if not self._sent:
                 event.sender.send(self._message)
-                logger.info('003', 'Message sent to {host}.', {'host': self._host})
+                logger.info('Message sent to {host}.', fparams={'host': self._host})
                 self._sent = True
         else:
-            logger.error('004', 'Failed to send message as no available credit.')
+            logger.error('Failed to send message as no available credit.')
             raise MessageSendingError()
 
     def on_accepted(self, event: proton.Event) -> None:
@@ -123,7 +123,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The accepted event.
         """
-        logger.info('005', 'Message received by {host}.', {'host': self._host})
+        logger.info('Message received by {host}.', fparams={'host': self._host})
         event.connection.close()
 
     def on_disconnected(self, event: proton.Event) -> None:
@@ -131,9 +131,9 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The disconnect event.
         """
-        logger.info('006', 'Disconnected from {host}.', {'host': self._host})
+        logger.info('Disconnected from {host}.', fparams={'host': self._host})
         if not self._sent:
-            logger.error('010', 'Disconnected before message could be sent.')
+            logger.error('Disconnected before message could be sent.')
             raise EarlyDisconnectError()
 
     def on_rejected(self, event: proton.Event) -> None:
@@ -142,7 +142,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         :param event:
         :return:
         """
-        logger.warning('007', 'Message rejected by {host}.', {'host': self._host})
+        logger.warning('Message rejected by {host}.', fparams={'host': self._host})
         self._sent = False
 
     def on_transport_error(self, event: proton.Event) -> None:
@@ -150,8 +150,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The transport error event.
         """
-        logger.error('011', "There was an error with the transport used for the connection to {host}.",
-                     {'host': self._host})
+        logger.error("There was an error with the transport used for the connection to {host}.",
+                     fparams={'host': self._host})
         super().on_transport_error(event)
         raise EarlyDisconnectError()
 
@@ -160,8 +160,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The connection error event.
         """
-        logger.error('012', "{host} closed the connection with an error. {remote_condition}",
-                     {'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error("{host} closed the connection with an error. {remote_condition}",
+                     fparams={'host': self._host, 'remote_condition': event.context.remote_condition})
         super().on_connection_error(event)
         raise EarlyDisconnectError()
 
@@ -170,8 +170,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The session error event.
         """
-        logger.error('013', "{host} closed the session with an error. {remote_condition}",
-                     {'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error("{host} closed the session with an error. {remote_condition}",
+                     fparams={'host': self._host, 'remote_condition': event.context.remote_condition})
         super().on_session_error(event)
         raise EarlyDisconnectError()
 
@@ -180,7 +180,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The link error event.
         """
-        logger.error('014', "{host} closed the link with an error. {remote_condition}",
-                     {'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error("{host} closed the link with an error. {remote_condition}",
+                     fparams={'host': self._host, 'remote_condition': event.context.remote_condition})
         super().on_link_error(event)
         raise EarlyDisconnectError()

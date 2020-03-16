@@ -7,7 +7,7 @@ from utilities import integration_adaptors_logger as log, timing
 
 from lookup import cache_adaptor
 
-logger = log.IntegrationAdaptorsLogger('REDIS_CACHE')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class RedisCache(cache_adaptor.CacheAdaptor):
@@ -27,8 +27,8 @@ class RedisCache(cache_adaptor.CacheAdaptor):
         self.expiry_time = expiry_time
 
         self._redis_client = redis.Redis(host=redis_host, port=redis_port, ssl=use_tls)
-        logger.info("0001", "Redis client configured. {host}, {port}, {ssl}",
-                    {"host": redis_host, "port": redis_port, "ssl": use_tls})
+        logger.info("Redis client configured. {host}, {port}, {ssl}",
+                    fparams={"host": redis_host, "port": redis_port, "ssl": use_tls})
 
     @timing.time_function
     async def retrieve_mhs_attributes_value(self, ods_code: str, interaction_id: str) -> Optional[Dict]:
@@ -44,21 +44,20 @@ class RedisCache(cache_adaptor.CacheAdaptor):
 
         event_loop = asyncio.get_event_loop()
         try:
-            logger.info("0002", "Attempting to retrieve cache entry for {key}", {"key": key})
+            logger.info("Attempting to retrieve cache entry for {key}", fparams={"key": key})
             cached_json_value = await event_loop.run_in_executor(None, self._redis_client.get, key)
 
             if cached_json_value is None:
-                logger.info("0003", "No cache entry found for {key}.", {"key": key})
+                logger.info("No cache entry found for {key}.", fparams={"key": key})
                 return None
 
             value = json.loads(cached_json_value)
 
-            logger.info("0004", "Retrieved cache entry for {key}. {value}", {"key": key, "value": value})
+            logger.info("Retrieved cache entry for {key}. {value}", fparams={"key": key, "value": value})
 
             return value
         except redis.RedisError as re:
-            logger.error("0005", "An error occurred when attempting to load {key}. {exception}",
-                         {"key": key, "exception": re})
+            logger.exception("An error occurred when attempting to load {key}.", fparams={"key": key})
             raise re
 
     @timing.time_function
@@ -77,14 +76,13 @@ class RedisCache(cache_adaptor.CacheAdaptor):
 
         event_loop = asyncio.get_event_loop()
         try:
-            logger.info("0006", "Attempting to store {value} in the cache using {key}",
-                        {"value": json_value, "key": key})
+            logger.info("Attempting to store {value} in the cache using {key}",
+                        fparams={"value": json_value, "key": key})
             await event_loop.run_in_executor(None, self._redis_client.setex, key, self.expiry_time, json_value)
-            logger.info("0007", "Successfully stored {value} in the cache using {key}",
-                        {"value": json_value, "key": key})
+            logger.info("Successfully stored {value} in the cache using {key}",
+                        fparams={"value": json_value, "key": key})
         except redis.RedisError as re:
-            logger.error("0008", "An error occurred when caching {value}. {exception}",
-                         {"value": json_value, "exception": re})
+            logger.exception("An error occurred when caching {value}.", fparams={"value": json_value})
             raise re
 
     @staticmethod
