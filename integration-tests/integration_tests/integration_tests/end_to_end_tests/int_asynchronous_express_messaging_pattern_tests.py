@@ -66,7 +66,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_and_record_spline_reply_in_resync_table_if_sync_async_requested(self):
         # Arrange
-        messages = [build_message('QUPC_IN160101UK05', '9689177923') for _ in range(100)]
+        messages = [build_message('QUPC_IN160101UK05', '9689177923') for _ in range(20)]
 
         # Act
         responses = send_messages_concurrently(messages, interaction_id='QUPC_IN160101UK05', sync_async=True)
