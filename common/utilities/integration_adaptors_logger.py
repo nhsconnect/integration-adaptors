@@ -16,6 +16,7 @@ correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlatio
 inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default='')
 interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default='')
 
+_project_name = None
 
 def _check_for_insecure_log_level(log_level: str):
     integer_level = logging.getLevelName(log_level)
@@ -32,6 +33,8 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
     Allows using dictonaries to format message
     """
     def __init__(self, name: str):
+        if not name:
+            raise ValueError("Name cannot be empty")
         super().__init__(logging.getLogger(name), extra=None)
 
     def log(self, level: int, msg: Any, *args: Any, **kwargs: Any) -> None:
@@ -79,6 +82,9 @@ class CustomFormatter(logging.Formatter):
         record.correlation_id = correlation_id.get()
         record.inbound_message_id = inbound_message_id.get()
         record.interaction_id = interaction_id.get()
+
+        record.name = f'{_project_name}.{record.name}' if _project_name else record.name
+
         return super().format(record)
 
     def formatTime(self, record: LogRecord, datefmt: Optional[str] = ...) -> str:
@@ -88,12 +94,14 @@ class CustomFormatter(logging.Formatter):
         return s
 
 
-def configure_logging():
+def configure_logging(project_name: str = None):
     """
     A general method to load the overall config of the system, specifically it modifies the root handler to output
     to stdout and sets the default log levels and format. This is expected to be called once at the start of a
     application.
     """
+    global _project_name
+    _project_name = project_name
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
     log_level = config.get_config('LOG_LEVEL')

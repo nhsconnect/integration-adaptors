@@ -106,7 +106,7 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
 def main():
     config.setup_config("MHS")
     secrets.setup_secret_config("MHS")
-    log.configure_logging()
+    log.configure_logging("inbound")
 
     certificates = certs.Certs.create_certs_files(definitions.ROOT_DIR,
                                                   private_key=secrets.get_secret_config('CLIENT_KEY'),

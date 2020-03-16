@@ -92,7 +92,7 @@ def start_tornado_server(routing: routing_reliability.RoutingAndReliability) -> 
 def main():
     config.setup_config("MHS")
     secrets.setup_secret_config("MHS")
-    log.configure_logging()
+    log.configure_logging('spineroutelookup')
 
     sds_url = config.get_config("SDS_URL")
     disable_tls_flag = config.get_config("DISABLE_SDS_TLS", None)
