@@ -3,6 +3,12 @@ version: '3'
 services:
   inbound:
     image: local/mhs-inbound:${INBOUND_BUILD_TAG}
+    # build:
+    #   context: .
+    #   dockerfile: ./dockers/mhs/inbound/Dockerfile
+    ports:
+      - "443:443"
+      - "8079:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SECRET_PARTY_KEY
@@ -21,6 +27,11 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
   outbound:
     image: local/mhs-outbound:${OUTBOUND_BUILD_TAG}
+    # build:
+    #   context: .
+    #   dockerfile: ./dockers/mhs/outbound/Dockerfile
+    ports:
+      - "80:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SECRET_PARTY_KEY
@@ -41,6 +52,9 @@ services:
       - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable
   route:
     image: local/mhs-route:${ROUTE_BUILD_TAG}
+    # build:
+    #   context: .
+    #   dockerfile: ./dockers/mhs/spineroutelookup/Dockerfile
     ports:
       - "8080:80"
     environment:

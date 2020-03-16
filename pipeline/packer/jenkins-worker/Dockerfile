@@ -1,4 +1,4 @@
-FROM jenkins/jnlp-slave:3.29-1
+FROM jenkins/jnlp-slave:3.40-1
 
 # Need to be root to install packages
 USER root
