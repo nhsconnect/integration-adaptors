@@ -11,8 +11,6 @@ from typing import Dict, Optional
 
 secret_config: Dict[str, str] = {}
 
-_LOG_TAG = 'SECRET_CONFIG'
-
 
 def setup_secret_config(component_name: str):
     """
@@ -41,13 +39,12 @@ def get_secret_config(key: str, default: Optional[str] = _config_default) -> str
 
     if key in secret_config:
         # Can't use IntegrationAdaptorsLogger due to circular dependency
-        logging.info(f'Obtained secret config ConfigName="{key}" ProcessKey={_LOG_TAG}001')
+        logging.info(f'Obtained secret config ConfigName="{key}"')
         return secret_config[key]
     elif default is not _config_default:
-        logging.info(f'Failed to get secret config ConfigName="{key}". Returning a default value. '
-                     f'ProcessKey={_LOG_TAG}002')
+        logging.info(f'Failed to get secret config ConfigName="{key}". Returning a default value.')
         return default
     else:
         # Can't use IntegrationAdaptorsLogger due to circular dependency
-        logging.error(f'Failed to get secret config ConfigName="{key}" ProcessKey={_LOG_TAG}003')
+        logging.error(f'Failed to get secret config ConfigName="{key}"')
         raise KeyError

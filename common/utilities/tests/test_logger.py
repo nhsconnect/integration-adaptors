@@ -122,6 +122,12 @@ class TestLogger(TestCase):
 class LogEntry:
     def __init__(self, log_line: str):
         super().__init__()
+        try:
+            self._unpack(log_line)
+        except ValueError as e:
+            raise ValueError("Failed parsing log line '%s'", log_line, e)
+
+    def _unpack(self, log_line: str):
         log_elements = log_line.split(' | ')
         (
             self.time,

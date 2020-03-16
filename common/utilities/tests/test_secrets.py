@@ -65,7 +65,7 @@ class TestSecrets(unittest.TestCase):
 
         output = mock_stdout.getvalue()
         log_entry = LogEntry(output)
-        self.assertEqual('Failed to get secret config ConfigName="BLAH" ProcessKey=SECRET_CONFIG003', log_entry.message)
+        self.assertEqual('Failed to get secret config ConfigName="BLAH"', log_entry.message)
         self.assertEqual("ERROR", log_entry.level)
 
     def setup_logger(self, mock_environ):
