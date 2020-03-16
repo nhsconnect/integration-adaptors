@@ -18,6 +18,7 @@ interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interactio
 
 _project_name = None
 
+
 def _check_for_insecure_log_level(log_level: str):
     integer_level = logging.getLevelName(log_level)
     if integer_level < logging.INFO:
