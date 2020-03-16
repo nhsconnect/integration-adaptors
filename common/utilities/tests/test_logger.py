@@ -44,10 +44,21 @@ class TestLogger(TestCase):
         self.assertEqual("", output)
 
     @patch('sys.stdout', new_callable=io.StringIO)
-    def test_message_format_and_log_entry_parts(self, mock_stdout):
+    def test_name_can_be_empty(self, mock_stdout):
         mock_stdout.truncate(0)
 
         log.configure_logging()
+
+        log.IntegrationAdaptorsLogger('SYS').info('%s %s', 'yes', 'no')
+
+        log_entry = LogEntry(mock_stdout.getvalue())
+        self.assertEqual('SYS', log_entry.name)
+
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_message_format_and_log_entry_parts(self, mock_stdout):
+        mock_stdout.truncate(0)
+
+        log.configure_logging('TEST')
         log.message_id.set('10')
         log.correlation_id.set('15')
         log.inbound_message_id.set('20')
@@ -61,12 +72,10 @@ class TestLogger(TestCase):
         self.assertEqual('15', log_entry.correlation_id)
         self.assertEqual('20', log_entry.inbound_message_id)
         self.assertEqual('25', log_entry.interaction_id)
-        self.assertEqual('SYS', log_entry.name)
+        self.assertEqual('TEST.SYS', log_entry.name)
         self.assertEqual('INFO', log_entry.level)
         self.assertEqual('yes no', log_entry.message)
-        self.assertEqual(log_entry.time[0], '[')
-        self.assertEqual(log_entry.time[-1], ']')
-        time.strptime(log_entry.time[1:-1], '%Y-%m-%dT%H:%M:%S.%fZ')
+        time.strptime(log_entry.time, '%Y-%m-%dT%H:%M:%S.%fZ')
 
     @patch('utilities.config.get_config')
     @patch('sys.stdout', new_callable=io.StringIO)

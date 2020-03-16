@@ -8,11 +8,15 @@ from typing import Optional, Any
 from utilities import config
 
 AUDIT = 25
+LOG_FORMAT_STRING = "%(asctime)sZ | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s " \
+                    "| %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s"
 
-message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', default=None)
-correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default=None)
-inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default=None)
-interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default=None)
+message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', default='')
+correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default='')
+inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default='')
+interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default='')
+
+_project_name = None
 
 
 def _check_for_insecure_log_level(log_level: str):
@@ -30,7 +34,9 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
     Allows using dictonaries to format message
     """
     def __init__(self, name: str):
-        super().__init__(logging.getLogger(name), None)
+        if not name:
+            raise ValueError("Name cannot be empty")
+        super().__init__(logging.getLogger(name), extra=None)
 
     def log(self, level: int, msg: Any, *args: Any, **kwargs: Any) -> None:
         msg = self._format_using_custom_params(msg, kwargs)
@@ -70,16 +76,16 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
 
 class CustomFormatter(logging.Formatter):
     def __init__(self):
-        super().__init__(
-            fmt='[%(asctime)sZ] | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s | %(correlation_id)s '
-                '| %(inbound_message_id)s | %(name)s | %(message)s',
-            datefmt='%Y-%m-%dT%H:%M:%S.%f')
+        super().__init__(fmt=LOG_FORMAT_STRING, datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
     def format(self, record: LogRecord) -> str:
-        record.message_id = message_id.get() or ''
-        record.correlation_id = correlation_id.get() or ''
-        record.inbound_message_id = inbound_message_id.get() or ''
-        record.interaction_id = interaction_id.get() or ''
+        record.message_id = message_id.get()
+        record.correlation_id = correlation_id.get()
+        record.inbound_message_id = inbound_message_id.get()
+        record.interaction_id = interaction_id.get()
+
+        record.name = f'{_project_name}.{record.name}' if _project_name else record.name
+
         return super().format(record)
 
     def formatTime(self, record: LogRecord, datefmt: Optional[str] = ...) -> str:
@@ -89,12 +95,14 @@ class CustomFormatter(logging.Formatter):
         return s
 
 
-def configure_logging():
+def configure_logging(project_name: str = None):
     """
     A general method to load the overall config of the system, specifically it modifies the root handler to output
     to stdout and sets the default log levels and format. This is expected to be called once at the start of a
     application.
     """
+    global _project_name
+    _project_name = project_name
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
     log_level = config.get_config('LOG_LEVEL')

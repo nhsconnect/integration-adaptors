@@ -111,9 +111,9 @@ class RoutingAndReliability:
                         })
             return reliability_details
         except Exception:
-            logger.error("Couldn't obtain reliability details from Spine route lookup service for {org_code} & "
-                         "{service_id}.",
-                         fparams={"org_code": org_code, "service_id": service_id}, exc_info=True)
+            logger.exception("Couldn't obtain reliability details from Spine route lookup service for {org_code} & "
+                             "{service_id}.",
+                             fparams={"org_code": org_code, "service_id": service_id}, exc_info=True)
             raise
 
     def _build_request_url(self, path: str, org_code: str, service_id: str) -> str:

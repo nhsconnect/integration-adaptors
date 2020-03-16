@@ -125,7 +125,7 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
 def main():
     config.setup_config("MHS")
     secrets.setup_secret_config("MHS")
-    log.configure_logging()
+    log.configure_logging("outbound")
 
     data_dir = pathlib.Path(definitions.ROOT_DIR) / "data"
 
@@ -163,7 +163,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
+    except Exception:
         logger.critical('Fatal exception in main application', exc_info=True)
     finally:
         logger.info('Exiting application')
