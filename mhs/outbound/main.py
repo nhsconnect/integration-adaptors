@@ -163,7 +163,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
+    except Exception:
         logger.critical('Fatal exception in main application', exc_info=True)
     finally:
         logger.info('Exiting application')
