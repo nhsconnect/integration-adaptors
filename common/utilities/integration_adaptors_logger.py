@@ -76,7 +76,7 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
 
 class CustomFormatter(logging.Formatter):
     def __init__(self):
-        super().__init__(fmt=LOG_FORMAT_STRING, datefmt='%Y-%m-%dT%H:%M:%S.%f')
+        super().__init__(fmt=config.get_config("LOG_FORMAT", default=LOG_FORMAT_STRING), datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
     def format(self, record: LogRecord) -> str:
         record.message_id = message_id.get()
