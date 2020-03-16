@@ -59,3 +59,39 @@ To setup the test environment locally, run the following commands from the root 
 source ./component-test-source.sh
 docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up --build
 ```
+
+## Running scalable docker cluster
+
+By default docker-compose starts 1 instance per service. 
+To be able scale up, a load balance has to be added to the cluster, 
+target service has to have internal port to ephemeral binding
+and and environment variable has to be set for HTTPS comm.
+
+The `docker-compose.lb.override.yml` contains additional definitions for 2 load balancers - inbound + ourbound services.
+
+To run the scalable environment:
+1. export env vars (assuming that you have 3 test spine cert files in current folder `cat mhs_client_cert` `cat mhs_client_key` `cat mhs_client_cacerts`)
+```
+export MHS_INBOUND_QUEUE_URL="rabbitmq:5672/inbound/"
+export MHS_SECRET_INBOUND_QUEUE_USERNAME="guest"
+export MHS_SECRET_INBOUND_QUEUE_PASSWORD="guest"
+export MHS_STATE_TABLE_NAME="mhs_state"
+export MHS_SYNC_ASYNC_STATE_TABLE_NAME="sync_async_state"
+export MHS_DYNAMODB_ENDPOINT_URL="http://dynamodb:8000"
+export AWS_ACCESS_KEY_ID="test"
+export AWS_SECRET_ACCESS_KEY="test"
+export MHS_SECRET_PARTY_KEY="A91563-9198977"
+export MHS_SECRET_CLIENT_CERT=`cat mhs_client_cert`
+export MHS_SECRET_CLIENT_KEY=`cat mhs_client_key`
+export MHS_SECRET_CA_CERTS=`cat mhs_client_cacerts`
+```
+2. run:
+```
+docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml stop;
+docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml build; 
+docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml up
+```
+3. to scale up run: 
+```.env
+docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml scale inbound=3 outbound=3
+```
