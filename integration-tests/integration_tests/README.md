@@ -80,7 +80,7 @@ export MHS_SYNC_ASYNC_STATE_TABLE_NAME="sync_async_state"
 export MHS_DYNAMODB_ENDPOINT_URL="http://dynamodb:8000"
 export AWS_ACCESS_KEY_ID="test"
 export AWS_SECRET_ACCESS_KEY="test"
-export MHS_SECRET_PARTY_KEY="A91563-9198977"
+export MHS_SECRET_PARTY_KEY="<party key received from opentest>"
 export MHS_SECRET_CLIENT_CERT=`cat mhs_client_cert`
 export MHS_SECRET_CLIENT_KEY=`cat mhs_client_key`
 export MHS_SECRET_CA_CERTS=`cat mhs_client_cacerts`
@@ -92,6 +92,6 @@ docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml build;
 docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml up
 ```
 3. to scale up run: 
-```.env
+```
 docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml scale inbound=3 outbound=3
 ```
