@@ -70,7 +70,7 @@ pipeline {
             }
         }
 
-        stage('Unit, Component and Integration Tests') {
+        stage('Module Unit Tests') {
             parallel {
                 stage('Run Common') {
                     stages {
@@ -119,6 +119,52 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+
+        stage('Package Modules') {
+            parallel {
+                stage('Package Inbound') {
+                    stages {
+                        stage('Running Inbound Packer build') {
+                            steps {
+                                sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
+                            }
+                        }
+                    }
+                }
+                stage('Package Outbound') {
+                    stages {
+                        stage('Running Outbound Packer build') {
+                            steps {
+                                sh label: 'Running Outbound Packer build', script: 'packer build -color=false pipeline/packer/outbound.json'
+                            }
+                        }
+                    }
+                }
+                stage('Package Spine Route Lookup') {
+                    stages {
+                        stage('Running Spine Route Lookup Packer build') {
+                            steps {
+                                sh label: 'Running Spine Route Lookup Packer build', script: 'packer build -color=false pipeline/packer/spineroutelookup.json'
+                            }
+                        }
+                    }
+                }
+                stage('Package SCR Service') {
+                    stages {
+                        stage('Running SCR service Packer build') {
+                            steps {
+                                sh label: 'Running SCR service Packer build', script: 'packer build -color=false pipeline/packer/scr-web-service.json'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Component and Integration Tests') {
+            parallel {
                 stage('Component Tests') {
                     options {
                         lock('local-docker-compose-environment')
@@ -309,48 +355,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Package Modules') {
-            parallel {
-                stage('Package Inbound') {
-                    stages {
-                        stage('Running Inbound Packer build') {
-                            steps {
-                                sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
-                            }
-                        }
-                    }
-                }
-                stage('Package Outbound') {
-                    stages {
-                        stage('Running Outbound Packer build') {
-                            steps {
-                                sh label: 'Running Outbound Packer build', script: 'packer build -color=false pipeline/packer/outbound.json'
-                            }
-                        }
-                    }
-                }
-                stage('Package Spine Route Lookup') {
-                    stages {
-                        stage('Running Spine Route Lookup Packer build') {
-                            steps {
-                                sh label: 'Running Spine Route Lookup Packer build', script: 'packer build -color=false pipeline/packer/spineroutelookup.json'
-                            }
-                        }
-                    }
-                }
-                stage('Package SCR Service') {
-                    stages {
-                        stage('Running SCR service Packer build') {
-                            steps {
-                                sh label: 'Running SCR service Packer build', script: 'packer build -color=false pipeline/packer/scr-web-service.json'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
     post {
