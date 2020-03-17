@@ -7,7 +7,7 @@ class RoutingResponse(object):
     def __init__(self):
         fakespine_port = os.environ.get("FAKE_SPINE_PORT", default='')
 
-        self.mhs_endpoint = f"https://fakespine:{fakespine_port}" if fakespine_port else 'https://fakespine'
+        self.mhs_endpoint = f"https://fakespine:{fakespine_port or '443'}"
         self.mhs_party_key = "party-key-default"
         self.mhs_cpa_id = "cpa-id-default"
         self.unique_identifier = "123456"
