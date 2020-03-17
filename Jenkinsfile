@@ -122,6 +122,8 @@ pipeline {
             }
         }
 
+
+
         stage('Component and Integration Tests') {
             parallel {
                 stage('Component Tests') {
@@ -171,6 +173,41 @@ pipeline {
                         }
                     }
                 }
+                stage('Packaging') {
+                    stages {
+                        stage('Package Inbound') {
+                            steps {
+                                script {
+                                    docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
+                                }
+                                script {
+                                    sh label: 'Running Inbound Packer build', script: "packer build -color=false pipeline/packer/inbound-push.json"
+                                }
+                            }
+                        }
+                        stage('Package Outbound') {
+                            steps {
+                                script {
+                                    docker.build("temporary/outbound:latest", "-f dockers/mhs/outbound/Dockerfile .")
+                                }
+                                script {
+                                    sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/outbound-push.json"
+                                }
+                            }
+                        }
+                        stage('Package Spine Route Lookup') {
+                            steps {
+                                script {
+                                    docker.build("temporary/spineroutelookup:latest", "-f dockers/mhs/spineroutelookup/Dockerfile .")
+                                }
+                                script {
+                                    sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                 stage('Integration Tests') {
                     options {
