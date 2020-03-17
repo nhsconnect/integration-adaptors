@@ -82,9 +82,15 @@ class TestLogger(TestCase):
     def test_should_log_critical_message_if_log_level_is_below_info(self, mock_stdout, mock_config):
         unsafe_log_levels = ['NOTSET', 'DEBUG']
         for level in unsafe_log_levels:
+            def config_values(*args, **kwargs):
+                return {
+                    "LOG_LEVEL": level,
+                    "LOG_FORMAT": log.LOG_FORMAT_STRING
+                }[args[0]]
+
             mock_stdout.truncate(0)
             with self.subTest(f'Log level {level} should result in critical log message being logged out'):
-                mock_config.return_value = level
+                mock_config.side_effect = config_values
                 log.configure_logging()
                 output = mock_stdout.getvalue()
                 log_entry = LogEntry(output)
@@ -100,8 +106,14 @@ class TestLogger(TestCase):
     def test_should_not_log_critical_message_if_log_level_is_above_debug(self, mock_stdout, mock_config):
         safe_log_levels = ['INFO', 'AUDIT', 'WARNING', 'ERROR', 'CRITICAL']
         for level in safe_log_levels:
+            def config_values(*args, **kwargs):
+                return {
+                    "LOG_LEVEL": level,
+                    "LOG_FORMAT": log.LOG_FORMAT_STRING
+                }[args[0]]
+
             with self.subTest(f'Log level {level} should not result in critical log message being logged out'):
-                mock_config.return_value = level
+                mock_config.side_effect = config_values
                 log.configure_logging()
                 output = mock_stdout.getvalue()
                 self.assertEqual('', output)
@@ -110,6 +122,12 @@ class TestLogger(TestCase):
 class LogEntry:
     def __init__(self, log_line: str):
         super().__init__()
+        try:
+            self._unpack(log_line)
+        except ValueError as e:
+            raise ValueError("Failed parsing log line '%s'", log_line, e)
+
+    def _unpack(self, log_line: str):
         log_elements = log_line.split(' | ')
         (
             self.time,

@@ -17,6 +17,7 @@ inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inboun
 interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default='')
 
 _project_name = None
+_log_format = LOG_FORMAT_STRING
 
 
 def _check_for_insecure_log_level(log_level: str):
@@ -76,7 +77,7 @@ class IntegrationAdaptorsLogger(logging.LoggerAdapter):
 
 class CustomFormatter(logging.Formatter):
     def __init__(self):
-        super().__init__(fmt=LOG_FORMAT_STRING, datefmt='%Y-%m-%dT%H:%M:%S.%f')
+        super().__init__(fmt=_log_format, datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
     def format(self, record: LogRecord) -> str:
         record.message_id = message_id.get()
@@ -101,8 +102,10 @@ def configure_logging(project_name: str = None):
     to stdout and sets the default log levels and format. This is expected to be called once at the start of a
     application.
     """
-    global _project_name
+    global _project_name, _log_format
     _project_name = project_name
+    _log_format = config.get_config("LOG_FORMAT", default=LOG_FORMAT_STRING)
+
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
     log_level = config.get_config('LOG_LEVEL')
