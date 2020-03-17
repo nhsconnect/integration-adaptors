@@ -163,11 +163,12 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(mock_url, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
-        audit_log_mock.assert_called_with('0101',
-                                          '{WorkflowName} outbound workflow invoked. Message sent to Spine'
+        audit_log_mock.assert_called_with('{WorkflowName} outbound workflow invoked. Message sent to Spine'
                                           ' and {Acknowledgment} received.',
-                                          {'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD',
-                                           'WorkflowName': 'forward-reliable'})
+                                          fparams={
+                                              'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD',
+                                              'WorkflowName': 'forward-reliable'
+                                          })
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @mock.patch('utilities.config.get_config', return_value='localhost/reliablemessaging/queryrequest')
@@ -318,9 +319,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        audit_log_mock.assert_called_once_with('0100',
-                                               'Outbound {WorkflowName} workflow invoked.',
-                                               {'WorkflowName': 'forward-reliable'})
+        audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
+                                               fparams={'WorkflowName': 'forward-reliable'})
 
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
@@ -347,9 +347,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        audit_log_mock.assert_called_once_with('0100',
-                                               'Outbound {WorkflowName} workflow invoked.',
-                                               {'WorkflowName': 'forward-reliable'})
+        audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
+                                               fparams={'WorkflowName': 'forward-reliable'})
 
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
@@ -402,9 +401,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual(
             [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
-        audit_log_mock.assert_called_once_with('0100',
-                                               'Outbound {WorkflowName} workflow invoked.',
-                                               {'WorkflowName': 'forward-reliable'})
+        audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
+                                               fparams={'WorkflowName': 'forward-reliable'})
 
     ############################
     # Reliability tests
@@ -555,11 +553,12 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
-        audit_log_mock.assert_called_with('0104',
-                                          '{WorkflowName} inbound workflow completed. Message placed on queue,'
+        audit_log_mock.assert_called_with('{WorkflowName} inbound workflow completed. Message placed on queue,'
                                           ' returning {Acknowledgement} to spine',
-                                          {'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',
-                                           'WorkflowName': 'forward-reliable'})
+                                          fparams={
+                                              'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',
+                                              'WorkflowName': 'forward-reliable'
+                                          })
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -603,8 +602,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
         # Should be called when invoked
-        audit_log_mock.assert_called_once_with('0103', '{WorkflowName} inbound workflow invoked. Message '
-                                                       'received from spine', {'WorkflowName': 'forward-reliable'})
+        audit_log_mock.assert_called_once_with('{WorkflowName} inbound workflow invoked. Message '
+                                               'received from spine', fparams={'WorkflowName': 'forward-reliable'})
 
     @mock.patch('asyncio.sleep')
     @async_test
@@ -655,11 +654,13 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                                                                       MessageStatus.
                                                                       UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         self.mock_work_description.publish.assert_called_once()
-        audit_log_mock.assert_called_with('0022', '{WorkflowName} workflow invoked for inbound unsolicited request. '
-                                                  'Attempted to place message onto inbound queue with '
-                                                  '{Acknowledgement}.', {
+        audit_log_mock.assert_called_with('{WorkflowName} workflow invoked for inbound unsolicited request. '
+                                          'Attempted to place message onto inbound queue with '
+                                          '{Acknowledgement}.',
+                                          fparams={
                                               'Acknowledgement': 'UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',
-                                              'WorkflowName': 'forward-reliable'})
+                                              'WorkflowName': 'forward-reliable'
+                                          })
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
 
@@ -700,8 +701,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             [mock.call(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS) for _ in range(INBOUND_QUEUE_MAX_RETRIES)],
             mock_sleep.call_args_list)
 
-        audit_log_mock.assert_called_with('0101', 'Unsolicited inbound {WorkflowName} workflow invoked.',
-                                          {'WorkflowName': 'forward-reliable'})
+        audit_log_mock.assert_called_with('Unsolicited inbound {WorkflowName} workflow invoked.',
+                                          fparams={'WorkflowName': 'forward-reliable'})
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
 

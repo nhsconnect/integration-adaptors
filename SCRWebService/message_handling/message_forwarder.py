@@ -5,7 +5,7 @@ from builder.pystache_message_builder import MessageGenerationError
 from message_handling.message_sender import MessageSender
 import xml.etree.ElementTree as ET
 
-logger = log.IntegrationAdaptorsLogger('MSG-HANDLER')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class MessageSendingError(Exception):
@@ -59,8 +59,8 @@ class MessageForwarder(object):
         """
         interaction_template_populator = self.interactions.get(interaction_name)
         if not interaction_template_populator:
-            logger.error('001', 'Failed to find interaction templator for interaction name: {name}',
-                         {'name': interaction_name})
+            logger.error('Failed to find interaction templator for interaction name: {name}',
+                         fparams={'name': interaction_name})
             raise MessageGenerationError(f'Failed to find interaction with interaction name: {interaction_name}')
         return interaction_template_populator
 
@@ -74,7 +74,7 @@ class MessageForwarder(object):
         try:
             return template_populator.populate_template(supplier_message_parameters)
         except Exception as e:
-            logger.error('002', 'Message generation failed {exception}', {'exception': e})
+            logger.exception('Message generation failed')
             raise MessageGenerationError(str(e))
 
     async def _send_message_to_mhs(self, interaction_id: str,
@@ -90,5 +90,5 @@ class MessageForwarder(object):
         try:
             return await self.message_sender.send_message_to_mhs(interaction_id, message, message_id, correlation_id)
         except Exception as e:
-            logger.error('003', 'Exception raised during message sending: {exception}', {'exception': e})
+            logger.exception('Exception raised during message sending')
             raise MessageSendingError(str(e))

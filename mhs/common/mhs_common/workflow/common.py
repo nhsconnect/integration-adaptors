@@ -13,7 +13,7 @@ MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
 MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_TO_ASID_KEY = 'uniqueIdentifier'
 
-logger = log.IntegrationAdaptorsLogger('COMMON_WORKFLOW')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class CommonWorkflow(abc.ABC):
@@ -91,9 +91,9 @@ class CommonWorkflow(abc.ABC):
 
             ods_code = interaction_details.get('ods-code')
             if ods_code:
-                logger.info('0020', 'Looking up endpoint details for ods code: {ods_code}.', {'ods_code': ods_code})
+                logger.info('Looking up endpoint details for ods code: {ods_code}.', fparams={'ods_code': ods_code})
 
-            logger.info('0001', 'Looking up endpoint details for {service_id}.', {'service_id': service_id})
+            logger.info('Looking up endpoint details for {service_id}.', fparams={'service_id': service_id})
             endpoint_details = await self.routing_reliability.get_end_point(service_id, ods_code)
 
             url = CommonWorkflow._extract_endpoint_url(endpoint_details)
@@ -106,26 +106,25 @@ class CommonWorkflow(abc.ABC):
                        self.ENDPOINT_CPA_ID: cpa_id,
                        self.ENDPOINT_TO_ASID: to_asid
                        }
-            logger.info('0002','Retrieved endpoint details for {details}', {'details': details})
+            logger.info('Retrieved endpoint details for {details}', fparams={'details': details})
             return details
-        except Exception as e:
-            logger.warning('0003', 'Error encountered whilst retrieving endpoint details. {Exception}',
-                           {'Exception': e})
-            raise e
+        except Exception:
+            logger.exception('Error encountered whilst retrieving endpoint details.')
+            raise
 
     @staticmethod
     def _extract_endpoint_url(endpoint_details: Dict[str, List[str]]) -> str:
         endpoint_urls = endpoint_details[MHS_END_POINT_KEY]
 
         if len(endpoint_urls) == 0:
-            logger.error('0004', 'Did not receive any endpoint URLs when looking up endpoint details.')
+            logger.error('Did not receive any endpoint URLs when looking up endpoint details.')
             raise IndexError("Did not receive any endpoint URLs when looking up endpoint details.")
 
         url = endpoint_urls[0]
 
         if len(endpoint_urls) > 1:
-            logger.warning('0005', 'Received more than one URL when looking up endpoint details. Using {url}. '
-                                   '{urls_received}', {'url': url, 'urls_received': endpoint_urls})
+            logger.warning('Received more than one URL when looking up endpoint details. Using {url}. {urls_received}',
+                           fparams={'url': url, 'urls_received': endpoint_urls})
 
         return url
 
@@ -134,13 +133,13 @@ class CommonWorkflow(abc.ABC):
         unique_identifiers = endpoint_details.get(MHS_TO_ASID_KEY)
 
         if not unique_identifiers:
-            logger.error('0024', 'Did not retrieve any unique identifiers from endpoint details')
+            logger.error('Did not retrieve any unique identifiers from endpoint details')
             raise IndexError()
 
         asid = unique_identifiers[0]
 
         if len(unique_identifiers) > 1:
-            logger.warning('0025', 'Received more than one ASID during endpoint lookup')
+            logger.warning('Received more than one ASID during endpoint lookup')
 
         return asid
 

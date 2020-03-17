@@ -11,8 +11,6 @@ from typing import Dict, Optional
 
 config: Dict[str, str] = {}
 
-_LOG_TAG = 'CONFIG'
-
 
 def setup_config(component_name: str):
     """
@@ -41,12 +39,11 @@ def get_config(key: str, default: Optional[str] = _config_default) -> str:
 
     if key in config:
         # Can't use IntegrationAdaptorsLogger due to circular dependency
-        logging.info(f'Obtained config ConfigName="{key}" ConfigValue="{config[key]}" ProcessKey={_LOG_TAG}001')
+        logging.info(f'Obtained config ConfigName="{key}" ConfigValue="{config[key]}"')
         return config[key]
     elif default is not _config_default:
-        logging.info(f'Failed to get config ConfigName="{key}". Returning DefaultValue="{default}". '
-                     f'ProcessKey={_LOG_TAG}002')
+        logging.info(f'Failed to get config ConfigName="{key}". Returning DefaultValue="{default}".')
         return default
     else:
-        logging.error(f'Failed to get config ConfigName="{key}" ProcessKey={_LOG_TAG}003')
+        logging.error(f'Failed to get config ConfigName="{key}"')
         raise KeyError

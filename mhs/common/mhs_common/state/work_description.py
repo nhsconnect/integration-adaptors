@@ -9,7 +9,7 @@ from utilities import timing
 from mhs_common.retry import retriable_action
 from mhs_common.state import persistence_adaptor as pa
 
-logger = log.IntegrationAdaptorsLogger('STATE_MANAGER')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class MessageStatus(str, enum.Enum):
@@ -92,7 +92,7 @@ async def update_status_with_retries(wdo: WorkDescription,
         .execute()
 
     if not retry_result.is_successful:
-        logger.error('0001', 'Failed to update work description.')
+        logger.error('Failed to update work description.')
 
         exception_raised = retry_result.exception
         if exception_raised:
@@ -111,15 +111,15 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
     """
 
     if persistence_store is None:
-        logger.error('0002', 'Failed to get work description from store: persistence store is None')
+        logger.error('Failed to get work description from store: persistence store is None')
         raise ValueError('Expected non-null persistence store')
     if key is None:
-        logger.error('0003', 'Failed to get work description from store: key is None')
+        logger.error('Failed to get work description from store: key is None')
         raise ValueError('Expected non-null key')
 
     json_store_data = await persistence_store.get(key)
     if json_store_data is None:
-        logger.info('0004', 'Persistence store returned empty value for {key}', {'key': key})
+        logger.info('Persistence store returned empty value for {key}', fparams={'key': key})
         raise EmptyWorkDescriptionError(f'Failed to find a value for key id {key}')
 
     return WorkDescription(persistence_store, json_store_data)
@@ -136,17 +136,17 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     until a `publish` is executed
     """
     if persistence_store is None:
-        logger.error('0005', 'Failed to build new work description, persistence store should not be null')
+        logger.error('Failed to build new work description, persistence store should not be null')
         raise ValueError('Expected persistence store to not be None')
     if not key:
-        logger.error('0006', 'Failed to build new work description, key should not be null or empty')
+        logger.error('Failed to build new work description, key should not be null or empty')
         raise ValueError('Expected key to not be None or empty')
     if workflow is None:
-        logger.error('0007', 'Failed to build new work description, workflow should not be null')
+        logger.error('Failed to build new work description, workflow should not be null')
         raise ValueError('Expected workflow to not be None')
     if not inbound_status and not outbound_status:
-        logger.error('0008', 'Failed to build work description, expected inbound or outbound status to be present:'
-                             '{inbound} {outbound}', {'inbound': inbound_status, 'outbound': outbound_status})
+        logger.error('Failed to build work description, expected inbound or outbound status to be present:'
+                    '{inbound} {outbound}', fparams={'inbound': inbound_status, 'outbound': outbound_status})
         raise ValueError('Expected inbound/outbound to not be null')
 
     timestamp = timing.get_time()
@@ -186,29 +186,30 @@ class WorkDescription(object):
         collisions
         :return:
         """
-        logger.info('0009', 'Attempting to publish work description {key}', {'key': self.message_key})
-        logger.info('0010', 'Retrieving latest work description to check version')
+        logger.info('Attempting to publish work description {key}', fparams={'key': self.message_key})
+        logger.info('Retrieving latest work description to check version')
 
         latest_data = await self.persistence_store.get(self.message_key)
 
         if latest_data is not None:
-            logger.info('0011', 'Retrieved previous version, comparing versions')
+            logger.info('Retrieved previous version, comparing versions')
             latest_version = latest_data[DATA][VERSION_KEY]
             if latest_version == self.version:
-                logger.info('0012', 'Local version matches remote, incrementing local version number')
+                logger.info('Local version matches remote, incrementing local version number')
                 self.version += 1
             elif latest_version > self.version:
-                logger.error('0013', 'Failed to update message {key}, local version out of date',
-                             {'key': self.message_key})
+                logger.error('Failed to update message {key}, local version out of date',
+                             fparams={'key': self.message_key})
                 raise OutOfDateVersionError(f'Failed to update message {self.message_key}: local version out of date')
 
         else:
-            logger.info('0014', 'No previous version found, continuing attempt to publish new version')
+            logger.info('No previous version found, continuing attempt to publish new version')
         self.last_modified_timestamp = timing.get_time()
         serialised = self._serialise_data()
 
         old_data = await self.persistence_store.add(self.message_key, serialised)
-        logger.info('0015', 'Successfully updated work description to state store for {key}', {'key': self.message_key})
+        logger.info('Successfully updated work description to state store for {key}',
+                    fparams={'key': self.message_key})
         return old_data
 
     async def update(self):
@@ -218,7 +219,7 @@ class WorkDescription(object):
         """
         json_store_data = await self.persistence_store.get(self.message_key)
         if json_store_data is None:
-            logger.error('0016', 'Persistence store returned empty value for {key}', {'key': self.message_key})
+            logger.error('Persistence store returned empty value for {key}', fparams={'key': self.message_key})
             raise EmptyWorkDescriptionError(f'Failed to find a value for key id {self.message_key}')
         self._deserialize_data(json_store_data)
 

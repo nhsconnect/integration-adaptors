@@ -9,7 +9,7 @@ from lookup import cache_adaptor, redis_cache, sds_connection_factory, sds_clien
     routing_reliability
 from request import routing_handler, reliability_handler, routing_reliability_handler
 
-logger = log.IntegrationAdaptorsLogger('SPINE_ROUTE_LOOKUP_MAIN')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 def load_cache_implementation():
@@ -20,9 +20,13 @@ def load_cache_implementation():
     disable_tls_flag = config.get_config("SDS_REDIS_DISABLE_TLS", None)
     use_tls = disable_tls_flag != "True"
 
-    logger.info('005', 'Using the Redis cache with {redis_host}, {redis_port}, {cache_expiry_time}, {use_tls}',
-                {'redis_host': redis_host, 'redis_port': redis_port, 'cache_expiry_time': cache_expiry_time,
-                 'use_tls': use_tls})
+    logger.info('Using the Redis cache with {redis_host}, {redis_port}, {cache_expiry_time}, {use_tls}',
+                fparams={
+                    'redis_host': redis_host,
+                    'redis_port': redis_port,
+                    'cache_expiry_time': cache_expiry_time,
+                    'use_tls': use_tls
+                })
     return redis_cache.RedisCache(redis_host, redis_port, cache_expiry_time, use_tls)
 
 
@@ -34,7 +38,7 @@ def initialise_routing(sds_url: str, search_base: str, tls: bool = True) -> rout
     :param tls: A flag to indicate whether TLS should be enabled for the SDS connection.
     :return:
     """
-    logger.info('004', 'Configuring connection to SDS using {url} {tls}', {"url": sds_url, "tls": tls})
+    logger.info('Configuring connection to SDS using {url} {tls}', fparams={"url": sds_url, "tls": tls})
 
     cache = load_cache_implementation()
 
@@ -72,23 +76,23 @@ def start_tornado_server(routing: routing_reliability.RoutingAndReliability) -> 
     server_port = int(config.get_config('SPINE_ROUTE_LOOKUP_SERVER_PORT', default='80'))
     server.listen(server_port)
 
-    logger.info('003', 'Starting router server at port {server_port}', {'server_port': server_port})
+    logger.info('Starting router server at port {server_port}', fparams={'server_port': server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
     try:
         tornado_io_loop.start()
     except KeyboardInterrupt:
-        logger.warning('006', 'Keyboard interrupt')
+        logger.warning('Keyboard interrupt')
         pass
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)
-    logger.info('007', 'Server shut down, exiting...')
+    logger.info('Server shut down, exiting...')
 
 
 def main():
     config.setup_config("MHS")
     secrets.setup_secret_config("MHS")
-    log.configure_logging()
+    log.configure_logging('spineroutelookup')
 
     sds_url = config.get_config("SDS_URL")
     disable_tls_flag = config.get_config("DISABLE_SDS_TLS", None)
@@ -102,7 +106,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
-        logger.critical('001', 'Fatal exception in main application: {exception}', {'exception': e})
+    except Exception:
+        logger.critical('Fatal exception in main application', exc_info=True)
     finally:
-        logger.info('002', 'Exiting application')
+        logger.info('Exiting application')

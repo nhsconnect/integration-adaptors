@@ -74,7 +74,6 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error obtaining outbound URL')
-        log_mock.error.assert_called_with('009', 'Failed to retrieve details from spine route lookup')
 
     @mock.patch.object(sync, 'logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -99,7 +98,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Failed message preparation')
-        log_mock.error.assert_called_with('002', 'Failed to prepare outbound message')
+        log_mock.error.assert_called_with('Failed to prepare outbound message')
 
     @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -152,9 +151,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error making outbound request')
 
-        log_call = log_mock.error.call_args
-        self.assertEqual(log_call[0][0], '0006')
-        self.assertEqual(log_call[0][1], 'Error encountered whilst making outbound request. {Exception}')
+        log_call = log_mock.exception.call_args
+        self.assertEqual(log_call[0][0], 'Error encountered whilst making outbound request.')
 
     @mock.patch.object(sync, 'logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -183,11 +181,6 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error(s) received from Spine: HTTP 409: Conflict')
-
-        log_call = log_mock.warning.call_args
-        self.assertEqual(log_call[0][0], '0005')
-        self.assertEqual(log_call[0][1], 'Received HTTP errors from Spine. {HTTPStatus} {Exception}')
-        self.assertEqual(log_call[0][2]['HTTPStatus'], 409)
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
@@ -255,9 +248,8 @@ class TestSynchronousWorkflow(unittest.TestCase):
             work_description_object=None)
 
         log_mock.audit.assert_called_with(
-            '0101',
             'Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
-            {'Acknowledgment': 'OUTBOUND_MESSAGE_RESPONSE_RECEIVED'})
+            fparams={'Acknowledgment': 'OUTBOUND_MESSAGE_RESPONSE_RECEIVED'})
 
     @mock.patch('mhs_common.workflow.synchronous.logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
@@ -282,7 +274,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
             work_description_object=None)
 
         # audit log should be called at start
-        log_mock.audit('0100', 'Outbound Synchronous workflow invoked.', {})
+        log_mock.audit('Outbound Synchronous workflow invoked.')
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test

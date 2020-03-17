@@ -141,9 +141,12 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
         self.mock_transmission_adaptor.make_request.assert_called_once_with(URL, HTTP_HEADERS, SERIALIZED_MESSAGE,
                                                                             raise_error_response=False)
-        audit_log_mock.assert_called_with('0101', '{WorkflowName} outbound workflow invoked. Message sent to Spine and'
-                                                  ' {Acknowledgment} received.',
-                                          {'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD', 'WorkflowName': 'async-express'})
+        audit_log_mock.assert_called_with('{WorkflowName} outbound workflow invoked. Message sent to Spine and'
+                                          ' {Acknowledgment} received.',
+                                          fparams={
+                                              'Acknowledgment': 'OUTBOUND_MESSAGE_ACKD',
+                                              'WorkflowName': 'async-express'
+                                          })
 
     @mock.patch('mhs_common.state.work_description.create_new_work_description')
     @async_test
@@ -290,8 +293,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
 
         # This should be called at the start, regardless of error scenario
-        audit_log_mock.assert_called_with('0100', '{WorkflowName} outbound workflow invoked.',
-                                          {'WorkflowName': 'async-express'})
+        audit_log_mock.assert_called_with('{WorkflowName} outbound workflow invoked.',
+                                          fparams={'WorkflowName': 'async-express'})
 
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
@@ -319,8 +322,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
 
         # This should be called at the start, regardless of error scenario
-        audit_log_mock.assert_called_with('0100', '{WorkflowName} outbound workflow invoked.',
-                                          {'WorkflowName': 'async-express'})
+        audit_log_mock.assert_called_with('{WorkflowName} outbound workflow invoked.',
+                                          fparams={'WorkflowName': 'async-express'})
 
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @async_test
@@ -374,8 +377,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
             self.mock_work_description.set_outbound_status.call_args_list)
 
         # This should be called at the start, regardless of error scenario
-        audit_log_mock.assert_called_with('0100', '{WorkflowName} outbound workflow invoked.',
-                                          {'WorkflowName': 'async-express'})
+        audit_log_mock.assert_called_with('{WorkflowName} outbound workflow invoked.',
+                                          fparams={'WorkflowName': 'async-express'})
 
     ############################
     # Inbound tests
@@ -396,9 +399,8 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
         audit_log_mock.assert_called_with(
-            '0104', '{WorkflowName} inbound workflow completed. Message placed on queue, returning '
-                    '{Acknowledgement} to spine',
-            {'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED', 'WorkflowName': 'async-express'})
+            '{WorkflowName} inbound workflow completed. Message placed on queue, returning {Acknowledgement} to spine',
+            fparams={'Acknowledgement': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED', 'WorkflowName': 'async-express'})
 
     @mock.patch('asyncio.sleep')
     @async_test

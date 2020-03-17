@@ -1,12 +1,13 @@
 import json
+
 from typing import Dict, AnyStr, Tuple
 
 from defusedxml import ElementTree
-from utilities.integration_adaptors_logger import IntegrationAdaptorsLogger
+import utilities.integration_adaptors_logger as log
 
 from mhs_common.messages.soap_fault_envelope import SOAPFault
 
-logger = IntegrationAdaptorsLogger('SOAP_ERROR_HANDLER')
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 ERROR_RESPONSE_DEFAULTS = {
     'errorType': 'soap_fault'
@@ -26,7 +27,7 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
     soap_fault_codes = []
 
     if code != 500:
-        logger.warning('0001', 'Not HTTP 500 response. {Code} {Body}', {'Code': code, 'Body': body})
+        logger.warning('Not HTTP 500 response. {Code} {Body}', fparams={'Code': code, 'Body': body})
         return code, body, soap_fault_codes
 
     if 'Content-Type' not in headers:
@@ -52,8 +53,7 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
         if all_fields.get('errorCode'):
             soap_fault_codes.append(int(all_fields['errorCode']))
         error_data_response['errors'].append(all_fields)
-        logger.error('0002',
-                     'SOAP Fault returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
-                     all_fields)
+        logger.error('SOAP Fault returned: {}'.format(' '.join(f'{{{i}}}' for i in all_fields.keys())),
+                     fparams=all_fields)
 
     return 500, json.dumps(error_data_response), soap_fault_codes
