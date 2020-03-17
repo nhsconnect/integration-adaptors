@@ -71,7 +71,7 @@ mailer:1.23
 build-timeout:1.19
 token-macro:2.8
 workflow-support:3.3
-docker-workflow:1.18
+docker-workflow:1.23
 github-api:1.95
 momentjs:1.1.1
 jdk-tool:1.2
