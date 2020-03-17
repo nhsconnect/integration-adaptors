@@ -75,11 +75,15 @@ if __name__ == "__main__":
     application = build_application(application_configuration)
 
     server = tornado.httpserver.HTTPServer(application, ssl_options=ssl_ctx)
-    server.listen(443)
+    fake_spine_port = os.environ.get('FAKE_SPINE_PORT', default='443')
+    logger.info('Fake spine starting on port %s', fake_spine_port)
+    server.listen(int(fake_spine_port))
 
     proxy_application = build_proxy_application(certs)
     proxy = tornado.httpserver.HTTPServer(proxy_application)
-    proxy.listen(80)
+    inbound_proxy_port = os.environ.get('INBOUND_PROXY_PORT', default='80')
+    logger.info('Inbound proxy starting on port %s', inbound_proxy_port)
+    proxy.listen(int(inbound_proxy_port))
 
     logger.log(logging.INFO, "Starting fakespine service")
     tornado.ioloop.IOLoop.current().start()

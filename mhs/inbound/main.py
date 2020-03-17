@@ -29,8 +29,8 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
 
     queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
         host=config.get_config('INBOUND_QUEUE_URL'),
-        username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME'),
-        password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD'))
+        username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME', default=None),
+        password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD', default=None))
     sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
         table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
