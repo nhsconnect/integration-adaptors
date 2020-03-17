@@ -1,10 +1,13 @@
 from __future__ import annotations
+import os
 
 
 class RoutingResponse(object):
 
     def __init__(self):
-        self.mhs_endpoint = "https://fakespine"
+        fakespine_port = os.environ.get("FAKE_SPINE_PORT", default='')
+
+        self.mhs_endpoint = f"https://fakespine:{fakespine_port}" if fakespine_port else 'https://fakespine'
         self.mhs_party_key = "party-key-default"
         self.mhs_cpa_id = "cpa-id-default"
         self.unique_identifier = "123456"
