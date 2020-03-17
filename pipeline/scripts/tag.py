@@ -28,6 +28,7 @@ def _parse_arguments():
 
     parser.add_argument("branch_name", help="The name of the branch this build is being performed for.")
     parser.add_argument("build_id", help="The identifier of the build being performed.")
+    parser.add_argument("git_hash", help="The git hash of commit used.")
 
     return parser.parse_args()
 
@@ -35,4 +36,4 @@ def _parse_arguments():
 if __name__ == "__main__":
     args = _parse_arguments()
 
-    print(generate_tag(args.branch_name, args.build_id), end="")
+    print(generate_tag(args.branch_name, args.build_id, args.git_hash), end="")
