@@ -1,0 +1,3 @@
+SCR_MHS_ADDRESS: http://outbound
+SCR_PORT: '9000'
+SCR_LOG_LEVEL: NOTSET
