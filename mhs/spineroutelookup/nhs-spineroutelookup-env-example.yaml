@@ -6,6 +6,7 @@ MHS_SDS_SEARCH_BASE: ou=services,o=nhs
 MHS_DISABLE_SDS_TLS: "True"
 MHS_SDS_REDIS_CACHE_HOST: redis
 MHS_SDS_REDIS_DISABLE_TLS: "True"
+MHS_LDAP_CONNECTION_RETRIES: "3"
 
 #User-specific env variables
 MHS_SECRET_PARTY_KEY: AXXXXX-XXXXXXX #put your party key here (OpenTest)
