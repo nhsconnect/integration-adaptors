@@ -122,6 +122,52 @@ pipeline {
             }
         }
 
+        stage('Package Modules') {
+            parallel {
+                stage('Inbound Packer Build') {
+                    stages {
+                        stage('Package Inbound') {
+                            steps {
+                                script {
+                                    docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
+                                }
+                                script {
+                                    sh label: 'Running Inbound Packer build', script: "packer build -color=false pipeline/packer/inbound-push.json"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Outbound Packer Build') {
+                    stages {
+                        stage('Package Outbound') {
+                            steps {
+                                script {
+                                    docker.build("temporary/outbound:latest", "-f dockers/mhs/outbound/Dockerfile .")
+                                }
+                                script {
+                                    sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/outbound-push.json"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Spine Route Lookup Packer Build') {
+                    stages {
+                        stage('Package Spine Route Lookup') {
+                            steps {
+                                script {
+                                    docker.build("temporary/spineroutelookup:latest", "-f dockers/mhs/spineroutelookup/Dockerfile .")
+                                }
+                                script {
+                                    sh label: 'Running Spine Route Lookup Packer build', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 
         stage('Component and Integration Tests') {
@@ -147,7 +193,7 @@ pipeline {
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
                                     pwd
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
-                                }
+                            }
                         }
                         stage('Run Component Tests') {
                             steps {
@@ -170,40 +216,6 @@ pipeline {
                         always {
                             sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
                             sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
-                        }
-                    }
-                }
-                stage('Packaging') {
-                    stages {
-                        stage('Package Inbound') {
-                            steps {
-                                script {
-                                    docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
-                                }
-                                script {
-                                    sh label: 'Running Inbound Packer build', script: "packer build -color=false pipeline/packer/inbound-push.json"
-                                }
-                            }
-                        }
-                        stage('Package Outbound') {
-                            steps {
-                                script {
-                                    docker.build("temporary/outbound:latest", "-f dockers/mhs/outbound/Dockerfile .")
-                                }
-                                script {
-                                    sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/outbound-push.json"
-                                }
-                            }
-                        }
-                        stage('Package Spine Route Lookup') {
-                            steps {
-                                script {
-                                    docker.build("temporary/spineroutelookup:latest", "-f dockers/mhs/spineroutelookup/Dockerfile .")
-                                }
-                                script {
-                                    sh label: 'Running Outbound Packer build', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
-                                }
-                            }
                         }
                     }
                 }
