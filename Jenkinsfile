@@ -11,116 +11,116 @@ pipeline {
     }
 
     stages {
-        stage('Build modules') {
-            parallel {
-                stage('Build Common') {
-                    stages {
-                        stage('Installing common dependencies') {
-                            steps {
-                                dir('common') { buildModules('Installing common dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build MHS Common') {
-                    stages {
-                        stage('Installing mhs common dependencies') {
-                            steps {
-                                dir('mhs/common') { buildModules('Installing mhs common dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build MHS Inbound') {
-                    stages {
-                        stage('Installing inbound dependencies') {
-                            steps {
-                                dir('mhs/inbound') { buildModules('Installing inbound dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build MHS Outbound') {
-                    stages {
-                        stage('Installing outbound dependencies') {
-                            steps {
-                                dir('mhs/outbound') { buildModules('Installing outbound dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build MHS Spine Route Lookup') {
-                    stages {
-                        stage('Installing route lookup dependencies') {
-                            steps {
-                                dir('mhs/spineroutelookup') { buildModules('Installing route lookup dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build SCR') {
-                    stages {
-                        stage('Installing SCR web service dependencies') {
-                            steps {
-                                dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Module Unit Tests') {
-            parallel {
-                stage('Run Common') {
-                    stages {
-                        stage('Common Module Unit Tests') {
-                            steps { dir('common') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-                stage('Run MHS Common ') {
-                    stages {
-                        stage('MHS Common Unit Tests') {
-                            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-                stage('Run MHS Inbound') {
-                    stages {
-                        stage('MHS Inbound Unit Tests') {
-                            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-                stage('Run MHS Outbound') {
-                    stages {
-                        stage('MHS Outbound Unit Tests') {
-                            steps {
-                                dir('mhs/outbound') {
-                                    executeUnitTestsWithCoverage()
-                                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
-                                }
-                            }
-                        }
-                    }
-                }
-                stage('Run Spine Route Lookup') {
-                    stages {
-                        stage('Spine Route Lookup Unit Tests') {
-                            steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-                stage('Run SCR Web Service') {
-                    stages {
-                        stage('SCR Web Service Unit Tests') {
-                            steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-            }
-        }
+//        stage('Build modules') {
+//            parallel {
+//                stage('Build Common') {
+//                    stages {
+//                        stage('Installing common dependencies') {
+//                            steps {
+//                                dir('common') { buildModules('Installing common dependencies') }
+//                            }
+//                        }
+//                    }
+//                }
+//                stage('Build MHS Common') {
+//                    stages {
+//                        stage('Installing mhs common dependencies') {
+//                            steps {
+//                                dir('mhs/common') { buildModules('Installing mhs common dependencies') }
+//                            }
+//                        }
+//                    }
+//                }
+//                stage('Build MHS Inbound') {
+//                    stages {
+//                        stage('Installing inbound dependencies') {
+//                            steps {
+//                                dir('mhs/inbound') { buildModules('Installing inbound dependencies') }
+//                            }
+//                        }
+//                    }
+//                }
+//                stage('Build MHS Outbound') {
+//                    stages {
+//                        stage('Installing outbound dependencies') {
+//                            steps {
+//                                dir('mhs/outbound') { buildModules('Installing outbound dependencies') }
+//                            }
+//                        }
+//                    }
+//                }
+//                stage('Build MHS Spine Route Lookup') {
+//                    stages {
+//                        stage('Installing route lookup dependencies') {
+//                            steps {
+//                                dir('mhs/spineroutelookup') { buildModules('Installing route lookup dependencies') }
+//                            }
+//                        }
+//                    }
+//                }
+//                stage('Build SCR') {
+//                    stages {
+//                        stage('Installing SCR web service dependencies') {
+//                            steps {
+//                                dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        stage('Module Unit Tests') {
+//            parallel {
+//                stage('Run Common') {
+//                    stages {
+//                        stage('Common Module Unit Tests') {
+//                            steps { dir('common') { executeUnitTestsWithCoverage() } }
+//                        }
+//                    }
+//                }
+//                stage('Run MHS Common ') {
+//                    stages {
+//                        stage('MHS Common Unit Tests') {
+//                            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
+//                        }
+//                    }
+//                }
+//                stage('Run MHS Inbound') {
+//                    stages {
+//                        stage('MHS Inbound Unit Tests') {
+//                            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
+//                        }
+//                    }
+//                }
+//                stage('Run MHS Outbound') {
+//                    stages {
+//                        stage('MHS Outbound Unit Tests') {
+//                            steps {
+//                                dir('mhs/outbound') {
+//                                    executeUnitTestsWithCoverage()
+//                                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                stage('Run Spine Route Lookup') {
+//                    stages {
+//                        stage('Spine Route Lookup Unit Tests') {
+//                            steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
+//                        }
+//                    }
+//                }
+//                stage('Run SCR Web Service') {
+//                    stages {
+//                        stage('SCR Web Service Unit Tests') {
+//                            steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         stage('Package Modules') {
             parallel {
@@ -129,7 +129,8 @@ pipeline {
                         stage('Package Inbound') {
                             steps {
                                 script {
-                                    docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
+                                    sh label: 'Building inbound image', script: "docker build -t temporary/inbound:latest -f dockers/mhs/inbound/Dockerfile ."
+//                                    docker.build("temporary/inbound:latest", "-f dockers/mhs/inbound/Dockerfile .")
                                 }
                                 script {
                                     sh label: 'Running Inbound Packer build', script: "packer build -color=false pipeline/packer/inbound-push.json"
