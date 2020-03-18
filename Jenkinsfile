@@ -222,10 +222,10 @@ pipeline {
 
 
                 stage('Integration Tests') {
+                    options {
+                        lock('exemplar-test-environment')
+                    }
                     parallel {
-                        options {
-                            lock('exemplar-test-environment')
-                        }
                         stages {
                             stage('Deploy MHS') {
                                 stages {
