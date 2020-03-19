@@ -34,7 +34,7 @@ def main():
     log.configure_logging()
     app = build_app()
     scr_port = config.get_config('PORT', default='80')
-    logger.info(f'Startind SCR web service on port {scr_port}')
+    logger.info(f'Starting SCR web service on port {scr_port}')
     app.listen(int(scr_port))
     tornado.ioloop.IOLoop.current().start()
 
