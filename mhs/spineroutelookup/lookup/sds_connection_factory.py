@@ -4,7 +4,9 @@ import ldap3
 from utilities import certs
 
 import definitions
+from utilities import integration_adaptors_logger as log
 
+logger = log.IntegrationAdaptorsLogger('SDS_CONNECTION_LOGGER')
 
 def build_sds_connection(ldap_address: str) -> ldap3.Connection:
     """
@@ -29,8 +31,9 @@ def build_sds_connection_tls(ldap_address: str, private_key: str, local_cert: st
                                                   ca_certs=ca_certs)
 
     load_tls = ldap3.Tls(local_private_key_file=certificates.private_key_path,
-                         local_certificate_file=certificates.local_cert_path, validate=ssl.CERT_REQUIRED,
+                         local_certificate_file=certificates.local_cert_path, validate=ssl.CERT_NONE,
                          version=ssl.PROTOCOL_TLSv1, ca_certs_file=certificates.ca_certs_path)
 
     server = ldap3.Server(ldap_address, use_ssl=True, tls=load_tls)
-    return ldap3.Connection(server, auto_bind=True, client_strategy=ldap3.REUSABLE)
+    logger.info('0004', 'Creating ldaps connection')
+    return ldap3.Connection(server, auto_bind=True, auto_referrals=False, client_strategy=ldap3.REUSABLE)

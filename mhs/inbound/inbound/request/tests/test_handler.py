@@ -79,9 +79,13 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.mock_workflow = unittest.mock.MagicMock()
         self.mock_workflow.handle_inbound_message.return_value = test_utilities.awaitable(None)
 
+        self.mock_raw_queue = unittest.mock.MagicMock()
+        self.mock_raw_queue.send_raw_async.return_value = test_utilities.awaitable(None)
+
         self.mock_forward_reliable_workflow = unittest.mock.create_autospec(
             forward_reliable.AsynchronousForwardReliableWorkflow)
         self.mocked_workflows = {
+            workflow.RAW_QUEUE: self.mock_raw_queue,
             workflow.ASYNC_EXPRESS: self.mock_workflow,
             workflow.FORWARD_RELIABLE: self.mock_forward_reliable_workflow
         }
@@ -121,6 +125,14 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(ack_response.code, 200)
 
+    def test_raw_message_queue(self):
+        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+
+        ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
+        self.mocked_workflows[workflow.RAW_QUEUE].send_raw_async.assert_called_with(request_body.encode('utf-8'), 'multipart/related; boundary="--=_MIME-Boundary"')
+
+        self.assertEqual(ack_response.code, 200)
+
     def test_workflow_throws_exception(self):
         self.mock_workflow.handle_inbound_message.side_effect = Exception("what a failure")
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
@@ -129,13 +141,6 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(response.code, 500)
         self.assertEqual('500: Exception in workflow', response.body.decode())
-
-    def test_no_reference_to_id(self):
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / NO_REF_FILE))
-
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
-
-        self.assertEqual(ack_response.code, 500)
 
     @unittest.mock.patch.object(log, "inbound_message_id")
     @unittest.mock.patch.object(log, "correlation_id")

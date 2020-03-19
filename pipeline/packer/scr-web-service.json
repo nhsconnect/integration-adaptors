@@ -17,7 +17,7 @@
       "changes": [
         "EXPOSE 80",
         "WORKDIR {{user `app_dir`}}/{{user `scr_service_dir`}}",
-        "ENTRYPOINT pipenv run scr-server"
+        "ENTRYPOINT {{user `app_dir`}}/common/set-dns-servers.sh pipenv run scr-server"
       ]
     }
   ],
@@ -32,6 +32,15 @@
       "type": "file",
       "source": "{{user `common_dir`}}",
       "destination": "{{user `app_dir`}}"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "apt-get update",
+        "apt-get install -y ca-certificates",
+        "cp {{user `app_dir`}}/common/certs/ca.crt /usr/local/share/ca-certificates/nhs-deductions.crt",
+        "update-ca-certificates"
+      ]
     },
     {
       "type": "file",

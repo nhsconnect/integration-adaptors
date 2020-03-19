@@ -103,11 +103,19 @@ class EbxmlEnvelope(envelope.Envelope):
         extracted_values = {}
 
         for element_to_extract in EbxmlEnvelope._elements_to_extract_when_parsing:
-            EbxmlEnvelope._add_if_present(extracted_values, element_to_extract.name,
-                                          EbxmlEnvelope._extract_ebxml_text_value(xml_tree,
-                                                                                  element_to_extract.xml_name,
-                                                                                  parent=element_to_extract.xml_parent,
-                                                                                  required=True))
+
+            if element_to_extract.xml_name == "RefToMessageId":
+                extracted_value = EbxmlEnvelope._extract_ebxml_text_value(xml_tree,
+                                                                         element_to_extract.xml_name,
+                                                                         parent=element_to_extract.xml_parent,
+                                                                         required=False)
+            else:
+                extracted_value = EbxmlEnvelope._extract_ebxml_text_value(xml_tree,
+                                                                         element_to_extract.xml_name,
+                                                                         parent=element_to_extract.xml_parent,
+                                                                         required=True)
+
+            EbxmlEnvelope._add_if_present(extracted_values, element_to_extract.name, extracted_value)
 
         return extracted_values
 

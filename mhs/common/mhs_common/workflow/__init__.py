@@ -19,12 +19,14 @@ ASYNC_RELIABLE = 'async-reliable'
 FORWARD_RELIABLE = 'forward-reliable'
 SYNC = 'sync'
 SYNC_ASYNC = 'sync-async'
+RAW_QUEUE = 'raw-queue'
 
 
 def get_workflow_map(party_key: str = None,
                      work_description_store: persistence_adaptor.PersistenceAdaptor = None,
                      sync_async_store: persistence_adaptor.PersistenceAdaptor = None,
                      transmission: transmission_adaptor.TransmissionAdaptor = None,
+                     raw_queue_adaptor: queue_adaptor.QueueAdaptor = None,
                      inbound_async_queue: queue_adaptor.QueueAdaptor = None,
                      persistence_store_max_retries: int = None,
                      sync_async_store_retry_delay: int = None,
@@ -40,6 +42,7 @@ def get_workflow_map(party_key: str = None,
     :return: a map of workflows
     """
     return {
+        RAW_QUEUE: raw_queue_adaptor,
         ASYNC_EXPRESS: AsynchronousExpressWorkflow(party_key, work_description_store, transmission,
                                                    inbound_async_queue, inbound_queue_max_retries,
                                                    inbound_queue_retry_delay,

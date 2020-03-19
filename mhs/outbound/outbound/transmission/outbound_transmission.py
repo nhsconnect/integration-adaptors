@@ -64,9 +64,9 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                                                       http_proxy_port=self._proxy_port,
                                                       raise_error_response=raise_error_response)
             logger.info("0002", "Sent message with {headers} to {url} using {proxy_host} & {proxy_port} and "
-                                "received status code {code}",
+                                "received status code {code}; body: {body}",
                         {"headers": headers, "url": url, "proxy_host": self._proxy_host,
-                         "proxy_port": self._proxy_port, "code": response.code})
+                         "proxy_port": self._proxy_port, "code": response.code, "body": response.body})
             return response
 
         retry_result = await retriable_action.RetriableAction(make_http_request, self._max_retries,

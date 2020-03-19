@@ -50,7 +50,7 @@ services:
       - "8080:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
-      - MHS_SDS_URL=ldap://msg.opentest.hscic.gov.uk
+      - MHS_SDS_URL=ldap://192.168.128.11:389
       - MHS_SDS_SEARCH_BASE=ou=services,o=nhs
       - MHS_DISABLE_SDS_TLS=True
       - MHS_SDS_REDIS_CACHE_HOST=redis

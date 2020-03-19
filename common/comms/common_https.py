@@ -43,12 +43,12 @@ class CommonHttps(object):
                                                             client_cert=client_cert,
                                                             client_key=client_key,
                                                             ca_certs=ca_certs,
-                                                            validate_cert=validate_cert,
+                                                            validate_cert=False,
                                                             proxy_host=http_proxy_host,
                                                             proxy_port=http_proxy_port)
         logger.info("0002",
                     "Sent {method} request with {headers} to {url} using {proxy_host} & {proxy_port}, and "
-                    "received status code {code}",
+                    "received status code {code}; body: {body}",
                     {"method": method, "headers": headers, "url": url, "proxy_host": http_proxy_host,
-                     "proxy_port": http_proxy_port, "code": response.code})
+                     "proxy_port": http_proxy_port, "code": response.code, "body": response.body})
         return response

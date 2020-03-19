@@ -90,11 +90,17 @@ class SDSClient(object):
 
         search_filter = f"(&(nhsIDCode={ods_code}) (objectClass={AS_OBJECT_CLASS}) (nhsAsSvcIA={interaction_id}))"
 
+        attributes = [MHS_PARTY_KEY, MHS_ASID]
         message_id = self.connection.search(search_base=self.search_base,
                                             search_filter=search_filter,
-                                            attributes=[MHS_PARTY_KEY, MHS_ASID])
-        logger.info("0005", "{message_id} - for query: {ods_code} {interaction_id}",
-                    {"message_id": message_id, "ods_code": ods_code, "interaction_id": interaction_id})
+                                            attributes=attributes)
+
+        logger.info("1005", "Connection: {connection}",
+        {"connection": self.connection})
+
+        logger.info("0005", "{message_id} - for query: {ods_code} {interaction_id}. Search base: {search_base}, Search filter: {search_filter}, Attribs: {attributes}",
+                    {"message_id": message_id, "ods_code": ods_code, "interaction_id": interaction_id, "search_base": self.search_base, "search_filter": search_filter, "attributes": attributes})
+
 
         response = await self._get_query_result(message_id)
         logger.info("0006", "Found accredited supplier details for {message_id}", {"message_id": message_id})
@@ -114,8 +120,9 @@ class SDSClient(object):
                                             search_filter=search_filter,
                                             attributes=mhs_attributes)
 
-        logger.info("0007", "{message_id} - for query: {party_key} {interaction_id}",
-                    {"message_id": message_id, "party_key": party_key, "interaction_id": interaction_id})
+        logger.info("0007", "{message_id} - for query: {party_key} {interaction_id}; Search base: {search_base}, Search filter: {search_filter}, Attributes: {attributes}",
+                    {"message_id": message_id, "party_key": party_key, "interaction_id": interaction_id,
+                    "search_base" : self.search_base, "search_filter": search_filter, "attributes": mhs_attributes})
 
         response = await self._get_query_result(message_id)
         logger.info("0008", "Found mhs details for {message_id}", {"message_id": message_id})
@@ -127,6 +134,7 @@ class SDSClient(object):
         response = []
         try:
             response, result = await loop.run_in_executor(None, self.connection.get_response, message_id, self.timeout)
+            logger.info("1009", "Getting LDAP query result ({result}) and response ({response})", {"result": result, "response": response})
         except ldap_exceptions.LDAPResponseTimeoutError:
             logger.error("0009", "LDAP query timed out for {message_id}", {"message_id": message_id})
 

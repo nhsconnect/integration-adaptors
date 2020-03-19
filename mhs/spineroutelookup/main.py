@@ -42,15 +42,18 @@ def initialise_routing(sds_url: str, search_base: str, tls: bool = True) -> rout
         client_key = secrets.get_secret_config('CLIENT_KEY')
         client_cert = secrets.get_secret_config('CLIENT_CERT')
         ca_certs = secrets.get_secret_config('CA_CERTS')
-
+        logger.info('004', 'Creating sds connection - TLS')
         sds_connection = sds_connection_factory.build_sds_connection_tls(ldap_address=sds_url,
                                                                          private_key=client_key,
                                                                          local_cert=client_cert,
                                                                          ca_certs=ca_certs)
     else:
+        logger.info('004', 'Creating sds connection - non TLS')
         sds_connection = sds_connection_factory.build_sds_connection(ldap_address=sds_url)
 
+    logger.info('004', 'Creating SDS client')
     client = sds_client.SDSClient(sds_connection, search_base)
+    logger.info('004', 'Creating MHS attribute lookup')
     attribute_lookup = mhs_attribute_lookup.MHSAttributeLookup(client=client, cache=cache)
     routing = routing_reliability.RoutingAndReliability(attribute_lookup)
     return routing
