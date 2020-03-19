@@ -1,5 +1,5 @@
 #Common env variables for outbound
-MHS_SPINE_ROUTE_LOOKUP_SERVER_PORT: "8080"
+MHS_SPINE_ROUTE_LOOKUP_SERVER_PORT: "8088"
 MHS_LOG_LEVEL: NOTSET
 MHS_SDS_URL: ldap://192.168.128.11 #SDS address from OpenTest
 MHS_SDS_SEARCH_BASE: ou=services,o=nhs
