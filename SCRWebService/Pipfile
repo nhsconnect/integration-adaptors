@@ -9,7 +9,7 @@ unittest-xml-reporting = "~=2.5"
 
 [packages]
 requests = "*"
-integration-adaptors-common = {editable = true,path = "./../common"}
+integration-adaptors-common = {path = "./../common"}
 scr = {editable = true,path = "./../SCR"}
 tornado = "*"
 
@@ -24,5 +24,3 @@ coverage-report-xml = 'coverage xml'
 coverage-report-html = 'coverage html'
 inttests = 'python -m xmlrunner discover -o test-reports -p "int_*" -v'
 scr-server = "python main.py"
-
-

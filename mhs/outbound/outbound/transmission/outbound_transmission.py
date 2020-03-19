@@ -49,6 +49,10 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                            raise_error_response: bool = True) -> httpclient.HTTPResponse:
 
         async def make_http_request():
+            # FIXME: REMOVE
+            header_string = '\n'.join([f'{key}: {value}' for key, value in headers.items()])
+            logger.debug(f'\nPOST {url}\n======= HEADERS ========\n{header_string}\n====== BODY =======\n{message}')
+            # END FIXME
             logger.info("About to send message with {headers} to {url} using {proxy_host} & {proxy_port}",
                         fparams={
                             "headers": headers,

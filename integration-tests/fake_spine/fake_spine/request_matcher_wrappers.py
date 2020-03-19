@@ -25,6 +25,7 @@ def body_contains_message_id(body: str, message_id: str) -> bool:
 
 
 def ebxml_body_contains_message_id(body: str, message_id: str) -> bool:
+    # TODO: precompile
     expression = re.compile('(<eb:MessageId>(?P<messageId>.+)</eb:MessageId>)')
     matches = expression.search(body)
     if matches is None or len(matches.groups()) != 2:
