@@ -1,0 +1,2 @@
+DOJO_DOCKER_IMAGE="nhsdev/deductions-infra-dojo:5a3106a1603b26a96214f14f45d5ffbac63add9c"
+DOJO_DOCKER_OPTIONS="-v /var/run/docker.sock:/var/run/docker.sock"

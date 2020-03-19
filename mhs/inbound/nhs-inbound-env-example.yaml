@@ -1,0 +1,27 @@
+#Common env variables for inbound
+MHS_LOG_LEVEL: NOTSET
+MHS_INBOUND_QUEUE_URL: rabbitmq:5672/inbound
+MHS_SECRET_INBOUND_QUEUE_USERNAME: guest
+MHS_SECRET_INBOUND_QUEUE_PASSWORD: guest
+MHS_STATE_TABLE_NAME: mhs_state
+MHS_SYNC_ASYNC_STATE_TABLE_NAME: sync_async_state
+MHS_DYNAMODB_ENDPOINT_URL: http://dynamodb:8000
+AWS_ACCESS_KEY_ID: test
+AWS_SECRET_ACCESS_KEY: test
+#User-specific env variables
+MHS_SECRET_PARTY_KEY: AXXXXX-XXXXXXX #put your party key here (OpenTest)
+MHS_SECRET_CLIENT_CERT: |
+  -----BEGIN CERTIFICATE-----
+#put your endpoint certificate here (OpenTest) - remember to put two spaces of indentation for the whole length of certificate (see line above)
+  -----END CERTIFICATE-----
+MHS_SECRET_CLIENT_KEY: |
+  -----BEGIN RSA PRIVATE KEY-----
+#put your endpoint private key here (OpenTest)
+  -----END RSA PRIVATE KEY-----
+MHS_SECRET_CA_CERTS: |
+  -----BEGIN CERTIFICATE-----
+#put your Endpoint issuing subCA certificate here (OpenTest)
+  -----END CERTIFICATE-----
+  -----BEGIN CERTIFICATE-----
+#put your Root CA certificate here (OpenTest)
+  -----END CERTIFICATE-----

@@ -1,0 +1,57 @@
+format_version: 4
+pipelines:
+  "mhs-docker-images":
+    group: mhs
+    label_template: "${git[:8]}"
+    materials:
+      git:
+        type: configrepo
+      mhs:
+        pipeline: mhs
+        stage: test
+    stages:
+      - build:
+          clean_workspace: true
+          jobs:
+            inbound:
+              resources:
+                - docker
+              tasks:
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks build_docker inbound
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks test_docker inbound
+            outbound:
+              resources:
+                - docker
+              tasks:
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks build_docker outbound
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks test_docker outbound
+            route:
+              resources:
+                - docker
+              tasks:
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks build_docker route
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks test_docker route
