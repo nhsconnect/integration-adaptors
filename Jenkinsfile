@@ -22,29 +22,29 @@ pipeline {
             }
         }
 
-        stage('Common Module Unit Tests') {
-            steps { dir('common') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Common Unit Tests') {
-            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Inbound Unit Tests') {
-            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Outbound Unit Tests') {
-            steps {
-                dir('mhs/outbound') {
-                    executeUnitTestsWithCoverage()
-                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
-                }
-            }
-        }
-         stage('Spine Route Lookup Unit Tests') {
-            steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
-        }
-        stage('SCR Web Service Unit Tests') {
-            steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
-        }
+        // stage('Common Module Unit Tests') {
+        //     steps { dir('common') { executeUnitTestsWithCoverage() } }
+        // }
+        // stage('MHS Common Unit Tests') {
+        //     steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
+        // }
+        // stage('MHS Inbound Unit Tests') {
+        //     steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
+        // }
+        // stage('MHS Outbound Unit Tests') {
+        //     steps {
+        //         dir('mhs/outbound') {
+        //             executeUnitTestsWithCoverage()
+        //             sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+        //         }
+        //     }
+        // }
+        // stage('Spine Route Lookup Unit Tests') {
+        //     steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
+        // }
+        // stage('SCR Web Service Unit Tests') {
+        //     steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
+        // }
 
         stage('Package') {
             steps {
@@ -55,50 +55,50 @@ pipeline {
             }
         }
 
-        stage('Run Component Tests') {
-            options {
-                lock('local-docker-compose-environment')
-            }
-            stages {
-                stage('Deploy component locally') {
-                    steps {
-                        sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
-                        sh label: 'Export environment variables', script: '''
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
-                            . ./component-test-source.sh
-                            export INBOUND_BUILD_TAG="inbound-${BUILD_TAG}"
-                            export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
-                            export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
-                            export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
-                    }
-                }
-                stage('Component Tests') {
-                    steps {
-                        sh label: 'Running component tests', script: '''
-                             docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
-                             docker run --rm --network "${BUILD_TAG_LOWER}_default" \
-                                --env "MHS_ADDRESS=http://outbound" \
-                                --env "AWS_ACCESS_KEY_ID=test" \
-                                --env "AWS_SECRET_ACCESS_KEY=test" \
-                                --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
-                                --env "FAKE_SPINE_ADDRESS=http://fakespine" \
-                                --env "MHS_INBOUND_QUEUE_URL=http://rabbitmq:5672" \
-                                --env "SCR_ADDRESS=http://scradaptor" \
-                                componenttest:$BUILD_TAG
-                        '''
-                    }
-                }
-            }
-            post {
-                always {
-                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
-                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
-                }
-            }
-        }
+        // stage('Run Component Tests') {
+        //     options {
+        //         lock('local-docker-compose-environment')
+        //     }
+        //     stages {
+        //         stage('Deploy component locally') {
+        //             steps {
+        //                 sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
+        //                 sh label: 'Export environment variables', script: '''
+        //                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
+        //                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
+        //                     . ./component-test-source.sh
+        //                     export INBOUND_BUILD_TAG="inbound-${BUILD_TAG}"
+        //                     export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
+        //                     export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
+        //                     export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
+        //                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
+        //                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
+        //             }
+        //         }
+        //         stage('Component Tests') {
+        //             steps {
+        //                 sh label: 'Running component tests', script: '''
+        //                      docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
+        //                      docker run --rm --network "${BUILD_TAG_LOWER}_default" \
+        //                         --env "MHS_ADDRESS=http://outbound" \
+        //                         --env "AWS_ACCESS_KEY_ID=test" \
+        //                         --env "AWS_SECRET_ACCESS_KEY=test" \
+        //                         --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
+        //                         --env "FAKE_SPINE_ADDRESS=http://fakespine" \
+        //                         --env "MHS_INBOUND_QUEUE_URL=http://rabbitmq:5672" \
+        //                         --env "SCR_ADDRESS=http://scradaptor" \
+        //                         componenttest:$BUILD_TAG
+        //                 '''
+        //             }
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
+        //             sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
+        //         }
+        //     }
+        // }
 
         stage('Run Integration Tests') {
             options {
@@ -194,31 +194,31 @@ pipeline {
                     }
                 }
 
-                stage('Deploy SCR') {
-                    steps {
-                        dir('pipeline/terraform/scr-environment') {
-                            sh label: 'Initialising Terraform', script: """
-                                    terraform init \
-                                    -backend-config="bucket=${TF_STATE_BUCKET}" \
-                                    -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                                    -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
-                                    -input=false -no-color
-                                """
-                            sh label: 'Applying Terraform configuration', script: """
-                                    terraform apply -no-color -auto-approve \
-                                    -var environment_id=${ENVIRONMENT_ID} \
-                                    -var build_id=${BUILD_TAG} \
-                                    -var cluster_id=${CLUSTER_ID} \
-                                    -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                                    -var ecr_address=${DOCKER_REGISTRY} \
-                                    -var scr_log_level=DEBUG \
-                                    -var scr_service_port=${SCR_SERVICE_PORT} \
-                                    -var scr_mhs_address=${MHS_ADDRESS} \
-                                    -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
-                                """
-                        }
-                    }
-                }
+                // stage('Deploy SCR') {
+                //     steps {
+                //         dir('pipeline/terraform/scr-environment') {
+                //             sh label: 'Initialising Terraform', script: """
+                //                     terraform init \
+                //                     -backend-config="bucket=${TF_STATE_BUCKET}" \
+                //                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                //                     -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
+                //                     -input=false -no-color
+                //                 """
+                //             sh label: 'Applying Terraform configuration', script: """
+                //                     terraform apply -no-color -auto-approve \
+                //                     -var environment_id=${ENVIRONMENT_ID} \
+                //                     -var build_id=${BUILD_TAG} \
+                //                     -var cluster_id=${CLUSTER_ID} \
+                //                     -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                //                     -var ecr_address=${DOCKER_REGISTRY} \
+                //                     -var scr_log_level=DEBUG \
+                //                     -var scr_service_port=${SCR_SERVICE_PORT} \
+                //                     -var scr_mhs_address=${MHS_ADDRESS} \
+                //                     -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
+                //                 """
+                //         }
+                //     }
+                // }
 
                 stage('Integration Tests') {
                     steps {
