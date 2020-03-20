@@ -124,7 +124,7 @@ pipeline {
 
         stage('Package Modules') {
             parallel {
-                stage('Inbound Packer Build') {
+                stage('Inbound Module Package') {
                     stages {
                         stage('Package Inbound') {
                             steps {
@@ -138,7 +138,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Outbound Packer Build') {
+                stage('Outbound Module Package') {
                     stages {
                         stage('Package Outbound') {
                             steps {
@@ -152,15 +152,26 @@ pipeline {
                         }
                     }
                 }
-                stage('Spine Route Lookup Packer Build') {
+                stage('Spine Route Lookup Module Package') {
                     stages {
                         stage('Package Spine Route Lookup') {
                             steps {
                                 script {
-                                    sh label: 'Building Outbound Image Build', script: "docker build -t temporary/spineroutelookup:latest -f dockers/mhs/spineroutelookup/Dockerfile ."
+                                    sh label: 'Building Spine Route Lookup Image Build', script: "docker build -t temporary/spineroutelookup:latest -f dockers/mhs/spineroutelookup/Dockerfile ."
                                 }
                                 script {
                                     sh label: 'Running Spine Route Lookup Packer Image Push', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('SCR Module Package') {
+                    stages {
+                        stage('Package SCR Web Service') {
+                            steps {
+                                script {
+                                    sh label: 'Running SCR service Packer build', script: 'packer build -color=false pipeline/packer/scr-web-service.json'
                                 }
                             }
                         }
