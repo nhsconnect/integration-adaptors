@@ -2,7 +2,7 @@
   "_description": "This template produces a Jenkins worker.",
   "variables": {
     "registry": "{{env `DOCKER_REGISTRY`}}",
-    "repository": "/mhs/outbound",
+    "repository": "/mhs-outbound",
     "tag": "{{env `BUILD_TAG`}}"
   },
   "builders": [
