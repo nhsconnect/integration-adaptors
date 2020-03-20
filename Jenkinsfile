@@ -200,9 +200,10 @@ pipeline {
                                     export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
                                     export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
                                     export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
-                                    pwd
+                                    docker tag temporary/spineroutelookup:latest local/mhs-route:${ROUTE_BUILD_TAG}
+                                    docker tag temporary/inbound:latest local/mhs-inbound:${INBOUND_BUILD_TAG}
+                                    docker tag temporary/outbound:latest local/mhs-outbound:${OUTBOUND_BUILD_TAG}
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                                    pwd
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
                             }
                         }
