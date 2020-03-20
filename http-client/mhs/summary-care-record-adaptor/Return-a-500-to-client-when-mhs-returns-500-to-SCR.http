@@ -1,0 +1,108 @@
+// Error whilst attempting to send the message to the MHS
+
+# @name Return_a_500_to_client_when_mhs_returns_500_to_SCR
+
+POST {{LOCAL_SCR_URL}} HTTP/1.1
+Interaction-name: SCR_GP_SUMMARY_UPLOAD,
+Message-Id: AD7D39A8-1B6C-4520-8367-6B7BEBD7B842,
+Correlation-Id: 2
+
+{
+  "Id": "{{GUID-idRoot}}",
+  "creationTime": "{{SHORT-TIMESTAMP}}",
+  "versionCode": "V3NPfIT4.2.00",
+  "communicationFunctionRcv": {
+    "device": {
+      "id": {
+        "extension": "227319907548"
+      }
+    }
+  },
+  "communicationFunctionSnd": {
+    "device": {
+      "id": {
+        "extension": "{{ASID}}"
+      }
+    }
+  },
+  "controlActEvent": {
+    "author1": {
+      "agentSystemSDS": {
+        "id": {
+          "extension": "{{ASID}}"
+        }
+      }
+    },
+    "author": {
+      "AgentPersonSDS": {
+        "id": {
+          "extension": "055888118514"
+        },
+        "agentPersonSDS": {
+          "id": {
+            "extension": "979603625513"
+          }
+        },
+        "part": {
+          "partSDSRole": {
+            "id": {
+              "extension": "R0260"
+            }
+          }
+        }
+      }
+    },
+    "subject": {
+      "GPSummary": {
+        "id": {
+          "root": "{{GUID-idRoot}}"
+        },
+        "effectiveTime": "{{SHORT-TIMESTAMP}}",
+        "author": {
+          "time": "{{SHORT-TIMESTAMP}}",
+          "AgentPersonSDS": {
+            "id": {
+              "extension": "055888118514"
+            },
+            "agentPersonSDS": {
+              "id": {
+                "extension": "979603625513"
+              },
+              "name": "<family>NICA_Test_Automation_Healthchecks</family>"
+            }
+          }
+        },
+        "excerptForm": {
+          "CareDocs": {
+            "presentationText": {
+              "value": "<h1>header</h1>",
+              "id": {
+                "root": "EA3BCDEB-A439-4984-A519-2EE25EB3F24C"
+              },
+              "effectiveTime": {
+                "value": "{{SHORT-TIMESTAMP}}"
+              }
+            }
+          }
+        },
+        "recordTarget": {
+          "patient": {
+            "id": {
+              "extension": "9446245796"
+            }
+          }
+        },
+        "replacementOf": [
+          {
+            "priorMessageRef": {
+              "id": {
+                "root": "A05B9416-F700-48F1-99D8-98874D3406B9"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+
