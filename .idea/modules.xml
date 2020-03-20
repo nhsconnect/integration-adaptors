@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SCRWebService/SCRWebService.iml" filepath="$PROJECT_DIR$/SCRWebService/SCRWebService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/all_common.iml" filepath="$PROJECT_DIR$/common/all_common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/integration-tests/fake_spine/fake_spine.iml" filepath="$PROJECT_DIR$/integration-tests/fake_spine/fake_spine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/integration-tests/fake_spineroutelookup/fake_spineroutelookup.iml" filepath="$PROJECT_DIR$/integration-tests/fake_spineroutelookup/fake_spineroutelookup.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mhs/inbound/inbound.iml" filepath="$PROJECT_DIR$/mhs/inbound/inbound.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/integration-adaptors.iml" filepath="$PROJECT_DIR$/.idea/integration-adaptors.iml" />
+      <module fileurl="file://$PROJECT_DIR$/integration-tests/integration_tests/integration_tests.iml" filepath="$PROJECT_DIR$/integration-tests/integration_tests/integration_tests.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mhs/common/mhs_common.iml" filepath="$PROJECT_DIR$/mhs/common/mhs_common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mhs/outbound/outbound.iml" filepath="$PROJECT_DIR$/mhs/outbound/outbound.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mhs/spineroutelookup/spineroutelookup.iml" filepath="$PROJECT_DIR$/mhs/spineroutelookup/spineroutelookup.iml" />
+    </modules>
+  </component>
+</project>
