@@ -2,7 +2,7 @@
 Provides tests around the Asynchronous Reliable workflow, including sync-async wrapping
 """
 import json
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from integration_tests.amq.amq import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
@@ -18,7 +18,6 @@ from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilde
 from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
 
-@skip
 class AsynchronousReliableMessagingPatternTests(TestCase):
     """
      These tests show an asynchronous reliable response from Spine via the MHS for the example message interaction of

@@ -1,7 +1,7 @@
 """
 Provides tests around the Synchronous workflow
 """
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER
 from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
@@ -10,7 +10,6 @@ from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilde
 from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
 
-@skip
 class SynchronousMessagingPatternTests(TestCase):
     """
     These tests show a synchronous response from Spine via the MHS for the example message interaction of PDS

@@ -2,7 +2,6 @@
 Provides tests around the Forward Reliable workflow, including sync-async wrapping
 """
 from unittest import TestCase
-from unittest import skip
 
 from integration_tests.amq.amq import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
@@ -60,7 +59,6 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .assertor_for_hl7_xml_message() \
             .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)
 
-    @skip
     def test_should_record_forward_reliable_message_status_as_successful(self):
         # Arrange
         # The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.

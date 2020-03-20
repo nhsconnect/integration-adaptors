@@ -2,7 +2,7 @@
 Provides tests around the Asynchronous Express workflow, including sync-async wrapping
 """
 import json
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from integration_tests.amq.amq import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
@@ -17,7 +17,6 @@ from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 
 
-@skip
 class AsynchronousExpressMessagingPatternTests(TestCase):
     """
      These tests show an asynchronous express response from Spine via the MHS for the example message interaction of PSIS
