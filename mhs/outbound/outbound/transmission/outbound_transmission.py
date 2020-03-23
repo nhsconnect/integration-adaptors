@@ -56,14 +56,9 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                             "proxy_host": self._proxy_host,
                             "proxy_port": self._proxy_port
                         })
-            # ******************************************************************************************************
-            # TLS CERTIFICATE VALIDATION HAS BEEN TEMPORARILY DISABLED! This is required because Opentest's SDS
-            # instance currently returns endpoints as IP addresses. This MUST be changed before this code is used in
-            # a production environment
-            # ******************************************************************************************************
             response = await CommonHttps.make_request(url=url, method="POST", headers=headers, body=message,
                                                       client_cert=self._client_cert, client_key=self._client_key,
-                                                      ca_certs=self._ca_certs, validate_cert=False,
+                                                      ca_certs=self._ca_certs, validate_cert=True,
                                                       http_proxy_host=self._proxy_host,
                                                       http_proxy_port=self._proxy_port,
                                                       raise_error_response=raise_error_response)

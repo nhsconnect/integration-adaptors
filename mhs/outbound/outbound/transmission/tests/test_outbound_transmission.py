@@ -64,11 +64,7 @@ class TestOutboundTransmission(TestCase):
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
-                                          # ****************************************************************************
-                                          # This SHOULD be true, but we must temporarily set it to false due to Opentest
-                                          # limitations.
-                                          # ****************************************************************************
-                                          validate_cert=False,
+                                          validate_cert=True,
                                           proxy_host=None,
                                           proxy_port=None
                                           )
@@ -95,11 +91,7 @@ class TestOutboundTransmission(TestCase):
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
-                                          # ****************************************************************************
-                                          # This SHOULD be true, but we must temporarily set it to false due to Opentest
-                                          # limitations.
-                                          # ****************************************************************************
-                                          validate_cert=False,
+                                          validate_cert=True,
                                           proxy_host=HTTP_PROXY_HOST,
                                           proxy_port=HTTP_PROXY_PORT)
 
