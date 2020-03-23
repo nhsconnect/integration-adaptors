@@ -16,6 +16,7 @@ setup(
         'lxml',
         'python-qpid-proton',
         'tornado',
-        'isodate'
+        'isodate',
+        'http-constants'
     ]
 )
