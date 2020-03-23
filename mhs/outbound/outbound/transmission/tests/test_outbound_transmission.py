@@ -39,6 +39,7 @@ MAX_RETRIES = 3
 EXPECTED_MAX_HTTP_REQUESTS = MAX_RETRIES + 1
 RETRY_DELAY = 100
 RETRY_DELAY_IN_SECONDS = RETRY_DELAY / 1000
+VALIDATE_CERT = True
 HTTP_PROXY_HOST = "proxy_host"
 HTTP_PROXY_PORT = 3128
 
@@ -64,7 +65,7 @@ class TestOutboundTransmission(TestCase):
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
-                                          validate_cert=True,
+                                          validate_cert=VALIDATE_CERT,
                                           proxy_host=None,
                                           proxy_port=None
                                           )
@@ -91,7 +92,7 @@ class TestOutboundTransmission(TestCase):
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
-                                          validate_cert=True,
+                                          validate_cert=VALIDATE_CERT,
                                           proxy_host=HTTP_PROXY_HOST,
                                           proxy_port=HTTP_PROXY_PORT)
 

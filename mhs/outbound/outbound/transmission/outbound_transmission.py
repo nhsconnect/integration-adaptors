@@ -25,7 +25,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
     """A component that sends HTTP requests to a remote MHS."""
 
     def __init__(self, client_cert: str, client_key: str, ca_certs: str, max_retries: int,
-                 retry_delay: int, http_proxy_host: str = None, http_proxy_port: int = None):
+                 retry_delay: int, validate_cert: bool, http_proxy_host: str = None, http_proxy_port: int = None):
         """Create a new OutboundTransmission that loads certificates from the specified directory.
 
         :param client_cert: A string containing the filepath of the client certificate file.
@@ -41,6 +41,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
         self._ca_certs = ca_certs
         self._max_retries = max_retries
         self._retry_delay = retry_delay
+        self._validate_cert = validate_cert
 
         self._proxy_host = http_proxy_host
         self._proxy_port = http_proxy_port
@@ -58,7 +59,7 @@ class OutboundTransmission(transmission_adaptor.TransmissionAdaptor):
                         })
             response = await CommonHttps.make_request(url=url, method="POST", headers=headers, body=message,
                                                       client_cert=self._client_cert, client_key=self._client_key,
-                                                      ca_certs=self._ca_certs, validate_cert=True,
+                                                      ca_certs=self._ca_certs, validate_cert=self._validate_cert,
                                                       http_proxy_host=self._proxy_host,
                                                       http_proxy_port=self._proxy_port,
                                                       raise_error_response=raise_error_response)
