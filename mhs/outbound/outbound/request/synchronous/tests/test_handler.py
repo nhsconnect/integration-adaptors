@@ -8,8 +8,10 @@ import tornado.httpclient
 import tornado.testing
 import tornado.util
 import tornado.web
+
+from utilities import mdc
 from mhs_common.workflow import synchronous
-from utilities import integration_adaptors_logger as log, test_utilities
+from utilities import test_utilities
 from utilities import message_utilities
 
 from outbound.request.synchronous import handler
@@ -28,8 +30,8 @@ CORRELATION_ID = '12345'
 class BaseHandlerTest(tornado.testing.AsyncHTTPTestCase):
 
     def tearDown(self):
-        log.message_id.set(None)
-        log.correlation_id.set(None)
+        mdc.message_id.set(None)
+        mdc.correlation_id.set(None)
 
     def call_handler(self, content_type="application/json", interaction_id=INTERACTION_NAME, body=REQUEST_BODY,
                      sync_async='false', correlation_id=CORRELATION_ID) -> tornado.httpclient.HTTPResponse:
@@ -53,8 +55,8 @@ class TestSynchronousHandler(BaseHandlerTest):
         ])
 
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    @patch.object(log, "correlation_id")
-    @patch.object(log, "message_id")
+    @patch.object(mdc, "correlation_id")
+    @patch.object(mdc, "message_id")
     def test_post_message(self, mock_message_id, mock_correlation_id, mock_get_uuid):
         expected_response = "Hello world!"
         self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, expected_response, None))
@@ -101,8 +103,8 @@ class TestSynchronousHandler(BaseHandlerTest):
                 self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
 
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    @patch.object(log, "correlation_id")
-    @patch.object(log, "message_id")
+    @patch.object(mdc, "correlation_id")
+    @patch.object(mdc, "message_id")
     def test_post_message_with_message_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
         message_id = "message-id"
         expected_response = "Hello world!"
@@ -129,7 +131,6 @@ class TestSynchronousHandler(BaseHandlerTest):
 
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
     def test_post_message_with_correlation_id_passed_in_should_call_workflow(self, mock_get_uuid):
-        correlation_id = "correlation-id"
         expected_response = "Hello world!"
         self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, expected_response, None))
         mock_get_uuid.return_value = MOCK_UUID
@@ -150,9 +151,9 @@ class TestSynchronousHandler(BaseHandlerTest):
                                                                  REQUEST_BODY_PAYLOAD, None)
 
     @patch.object(message_utilities.MessageUtilities, "get_uuid")
-    @patch.object(log, "correlation_id")
-    @patch.object(log, "message_id")
-    @patch.object(log, 'interaction_id')
+    @patch.object(mdc, "correlation_id")
+    @patch.object(mdc, "message_id")
+    @patch.object(mdc, 'interaction_id')
     def test_handler_should_set_logging_context_variables_on_successful_request(self,
                                                                                 mock_interaction_id,
                                                                                 mock_message_id,

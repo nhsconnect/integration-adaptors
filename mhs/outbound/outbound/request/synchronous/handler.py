@@ -7,6 +7,8 @@ import mhs_common.workflow as workflow
 import tornado.escape
 import tornado.locks
 import tornado.web
+
+from utilities import mdc
 from mhs_common.handler import base_handler
 from mhs_common.messages import ebxml_envelope
 from utilities import integration_adaptors_logger as log, message_utilities, timing
@@ -193,10 +195,10 @@ class SynchronousHandler(base_handler.BaseHandler):
         message_id = self.request.headers.get('Message-Id', None)
         if not message_id:
             message_id = message_utilities.MessageUtilities.get_uuid()
-            log.message_id.set(message_id)
+            mdc.message_id.set(message_id)
             logger.info("Didn't receive message id in incoming request from supplier, so have generated a new one.")
         else:
-            log.message_id.set(message_id)
+            mdc.message_id.set(message_id)
             logger.info('Found message id on incoming request.')
         return message_id
 
@@ -204,17 +206,17 @@ class SynchronousHandler(base_handler.BaseHandler):
         correlation_id = self.request.headers.get('Correlation-Id', None)
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
-            log.correlation_id.set(correlation_id)
+            mdc.correlation_id.set(correlation_id)
             logger.info("Didn't receive correlation id in incoming request from supplier, so have generated a new one.")
         else:
-            log.correlation_id.set(correlation_id)
+            mdc.correlation_id.set(correlation_id)
             logger.info('Found correlation id on incoming request.')
         return correlation_id
 
     def _extract_interaction_id(self):
         try:
             interaction_id = self.request.headers['Interaction-Id']
-            log.interaction_id.set(interaction_id)
+            mdc.interaction_id.set(interaction_id)
             logger.info('Found Interaction-Id in message headers')
         except KeyError as e:
             logger.error('Required Interaction-Id header not passed in request')

@@ -1,4 +1,3 @@
-import contextvars
 import datetime as dt
 import logging
 import sys
@@ -6,15 +5,11 @@ from logging import LogRecord
 from typing import Optional, Any
 
 from utilities import config
+from utilities.mdc import message_id, correlation_id, inbound_message_id, interaction_id
 
 AUDIT = 25
 LOG_FORMAT_STRING = "%(asctime)sZ | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s " \
                     "| %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s"
-
-message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', default='')
-correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default='')
-inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default='')
-interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default='')
 
 _project_name = None
 _log_format = LOG_FORMAT_STRING

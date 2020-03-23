@@ -9,6 +9,8 @@ import mhs_common.messages.ebxml_nack_envelope as ebxml_nack_envelope
 import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs_common.workflow as workflow
 import tornado.web
+
+from utilities import mdc
 from mhs_common.configuration import configuration_manager
 from mhs_common.handler import base_handler
 from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID
@@ -52,7 +54,7 @@ class InboundHandler(base_handler.BaseHandler):
             return
 
         interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
-        log.interaction_id.set(interaction_id)
+        mdc.interaction_id.set(interaction_id)
 
         ref_to_message_id = self._extract_ref_message(request_message)
         correlation_id = self._extract_correlation_id(request_message)
@@ -158,7 +160,7 @@ class InboundHandler(base_handler.BaseHandler):
 
     def _extract_correlation_id(self, message):
         correlation_id = message.message_dictionary[CONVERSATION_ID]
-        log.correlation_id.set(correlation_id)
+        mdc.correlation_id.set(correlation_id)
         logger.info('Set correlation id from inbound request.')
         return correlation_id
 
@@ -169,7 +171,7 @@ class InboundHandler(base_handler.BaseHandler):
         :return:
         """
         message_id = message.message_dictionary[MESSAGE_ID]
-        log.inbound_message_id.set(message_id)
+        mdc.inbound_message_id.set(message_id)
         logger.info('Found inbound message id on request.')
 
     def _extract_ref_message(self, message):
@@ -179,7 +181,7 @@ class InboundHandler(base_handler.BaseHandler):
         :return: the message id the inbound message is a response to
         """
         message_id = message.message_dictionary[RECEIVED_MESSAGE_ID]
-        log.message_id.set(message_id)
+        mdc.message_id.set(message_id)
         logger.info('Found message id on inbound message.')
         return message_id
 
