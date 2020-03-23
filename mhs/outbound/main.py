@@ -139,7 +139,7 @@ def main():
                                                   ca_certs=secrets.get_secret_config('CA_CERTS'))
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
-    validate_cert = bool(config.get_config('OUTBOUND_VALIDATE_CERTIFICATE', default=True))
+    validate_cert = bool(config.get_config('OUTBOUND_VALIDATE_CERTIFICATE', default="True"))
     http_proxy_host = config.get_config('OUTBOUND_HTTP_PROXY', default=None)
     http_proxy_port = None
     if http_proxy_host is not None:

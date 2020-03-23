@@ -47,7 +47,7 @@ HTTP_PROXY_PORT = 3128
 class TestOutboundTransmission(TestCase):
     def setUp(self):
         self.transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH,
-                                                                       MAX_RETRIES, RETRY_DELAY)
+                                                                       MAX_RETRIES, RETRY_DELAY, VALIDATE_CERT)
 
     @async_test
     async def test_should_make_HTTP_request_with_default_parameters(self):
@@ -75,7 +75,7 @@ class TestOutboundTransmission(TestCase):
     @async_test
     async def test_should_use_proxy_details_if_provided(self):
         self.transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH,
-                                                                       MAX_RETRIES, RETRY_DELAY, HTTP_PROXY_HOST,
+                                                                       MAX_RETRIES, RETRY_DELAY, VALIDATE_CERT, HTTP_PROXY_HOST,
                                                                        HTTP_PROXY_PORT)
 
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
@@ -133,7 +133,7 @@ class TestOutboundTransmission(TestCase):
     @async_test
     async def test_should_try_request_twice_if_max_retries_set_to_one(self, mock_sleep):
         transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH, 1,
-                                                                  RETRY_DELAY)
+                                                                  RETRY_DELAY, VALIDATE_CERT)
         mock_sleep.return_value = awaitable(None)
 
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
