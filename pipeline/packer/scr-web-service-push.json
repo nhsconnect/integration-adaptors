@@ -1,0 +1,32 @@
+{
+  "_description": "This template produces a Jenkins worker.",
+  "variables": {
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/scr-web-service",
+    "tag": "{{env `BUILD_TAG`}}"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "temporary/scr-web-service:latest",
+      "pull": false,
+      "commit": true
+    }
+  ],
+  "provisioners": [
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "{{user `registry`}}{{user `repository`}}",
+        "tag": "scr-web-service-{{user `tag`}}"
+      },
+      {
+        "type": "docker-push",
+        "ecr_login": true,
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
+      }
+    ]
+  ]
+}
