@@ -142,5 +142,6 @@ mhs-reference-implementation/selenium_tests/data/local_asid
 
 # system
 .DS_Store
-integration-tests/integration_tests/integration-test-env.yaml
-integration-tests/integration_tests/integration-test-env.yaml
+
+# enviornment file
+integration-tests/integration_tests/integration-tests-env.yaml
