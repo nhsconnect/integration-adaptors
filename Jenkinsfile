@@ -192,7 +192,6 @@ pipeline {
                             steps {
                                 sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
                                 sh label: 'Export environment variables', script: '''
-                                    pwd
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
                                     . ./component-test-source.sh
