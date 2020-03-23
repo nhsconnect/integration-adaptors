@@ -205,6 +205,7 @@ pipeline {
                                     docker tag temporary/spineroutelookup:latest local/mhs-route:${ROUTE_BUILD_TAG}
                                     docker tag temporary/inbound:latest local/mhs-inbound:${INBOUND_BUILD_TAG}
                                     docker tag temporary/outbound:latest local/mhs-outbound:${OUTBOUND_BUILD_TAG}
+                                    docker tag temporary/scr-web-service:latest local/scr-web-service:${WEB_SERVICE_BUILD_TAG}
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
                             }
