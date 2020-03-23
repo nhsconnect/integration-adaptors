@@ -20,7 +20,7 @@
       {
         "type": "docker-tag",
         "repository": "{{user `registry`}}{{user `repository`}}",
-        "tag": "scr-web-service-{{user `tag`}}"
+        "tag": "scr-{{user `tag`}}"
       },
       {
         "type": "docker-push",
