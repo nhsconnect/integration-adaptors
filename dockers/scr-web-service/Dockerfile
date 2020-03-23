@@ -16,7 +16,7 @@ RUN pip install pipenv
 
 
 COPY common/ /usr/src/app/common/
-COPY SCR/ /usr/src/app/SRC/
+COPY SCR/ /usr/src/app/SCR/
 COPY SCRWebService/ /usr/src/app/SCRWebService
 
 
