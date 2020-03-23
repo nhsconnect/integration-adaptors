@@ -13,6 +13,7 @@ MHS_SPINE_ROUTE_LOOKUP_URL: http://localhost:8088
 MHS_SPINE_ORG_CODE: "YES"
 MHS_SPINE_REQUEST_MAX_SIZE: "4999600"
 MHS_FORWARD_RELIABLE_ENDPOINT_URL: https://192.168.128.11/reliablemessaging/forwardreliable #OpenTest specific
+MHS_VALIDATE_CERT: "True"
 #User-specific env variables
 MHS_SECRET_PARTY_KEY: AXXXXX-XXXXXXX #put your party key here (OpenTest)
 MHS_SECRET_CLIENT_CERT: |
