@@ -25,8 +25,6 @@
     {
       "type": "shell",
       "inline": [
-        "apt-get update",
-        "apt-get install -y build-essential libssl-dev swig pkg-config",
         "mkdir -p {{user `app_dir`}}"
       ]
     },
@@ -48,13 +46,16 @@
     {
       "type": "shell",
       "inline": [
+        "echo shell step 1",
         "sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
       ]
     },
     {
       "type": "shell",
       "inline": [
+        "echo shell step 2",
         "pip install pipenv",
+        "echo shell step 3",
         "cd {{user `app_dir`}}/{{user `scr_service_dir`}}",
         "pipenv install --deploy --ignore-pipfile"
       ]
