@@ -170,8 +170,11 @@ pipeline {
                     stages {
                         stage('Package SCR Web Service') {
                             steps {
+                                script{
+                                    sh label: 'Building SCR Web Service Image Build', script: "docker build -t temporary/scr-web-service:latest -f dockers/scr-web-service/Dockerfile ."
+                                }
                                 script {
-                                    sh label: 'Running SCR service Packer build', script: "packer build -color=false pipeline/packer/scr-web-service.json"
+                                    sh label: 'Running SCR Web Service Packer Image Push', script: "packer build -color=false pipeline/packer/scr-web-service-push.json"
                                 }
                             }
                         }

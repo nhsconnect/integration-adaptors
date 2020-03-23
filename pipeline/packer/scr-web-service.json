@@ -25,7 +25,6 @@
     {
       "type": "shell",
       "inline": [
-        "echo shell step 1",
         "mkdir -p {{user `app_dir`}}"
       ]
     },
@@ -47,16 +46,13 @@
     {
       "type": "shell",
       "inline": [
-        "echo shell step 2",
         "sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
       ]
     },
     {
       "type": "shell",
       "inline": [
-        "echo shell step 3",
         "pip install pipenv",
-        "echo shell step 4",
         "cd {{user `app_dir`}}/{{user `scr_service_dir`}}",
         "pipenv install --deploy --ignore-pipfile"
       ]
