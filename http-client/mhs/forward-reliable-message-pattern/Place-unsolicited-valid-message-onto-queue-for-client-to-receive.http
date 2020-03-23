@@ -3,11 +3,10 @@
 
 @party_id = test-party-key
 
-POST http://localhost:6062/inbound-proxy HTTP/1.1
+POST http://localhost:8082/inbound-proxy HTTP/1.1
 Content-Type: multipart/related; boundary="--=_MIME-Boundary"
 
-{
-    "payload": "
+
     ----=_MIME-Boundary
     Content-Id: <ebXMLHeader@spine.nhs.uk>
     Content-Type: text/xml; charset=UTF-8
@@ -110,5 +109,4 @@ Content-Type: multipart/related; boundary="--=_MIME-Boundary"
         </ControlActEvent>
     </COPC_IN000001UK01>
     ----=_MIME-Boundary--
-    "
-}
+    

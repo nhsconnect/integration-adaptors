@@ -2,12 +2,10 @@
 
 # @name Return_500_response_when_inbound_service_receives_message_in_invalid_format
 
-POST http://localhost:6062/inbound-proxy HTTP/1.1
+POST http://localhost:8082/inbound-proxy HTTP/1.1
 Content-Type: multipart/related; boundary="--=_MIME-Boundary"
 
-{
-    "payload": "
-    ----=_MIME-Boundary
+----=_MIME-Boundary
 Content-Id: <ebXMLHeader@spine.nhs.uk>
 Content-Type: text/xml; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -53,5 +51,3 @@ Content-Transfer-Encoding: 8bit
 
 <COPC_IN000001UK01 xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:hl7-org:v3\" />
 ----=_MIME-Boundary--
-"
-}
