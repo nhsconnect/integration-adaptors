@@ -5,6 +5,7 @@ import tornado.web
 import tornado.ioloop
 import utilities.integration_adaptors_logger as log
 from utilities import message_utilities
+from utilities import mdc
 
 from message_handling import message_forwarder as mh
 from builder.pystache_message_builder import MessageGenerationError
@@ -101,10 +102,10 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         correlation_id = self.request.headers.get('Correlation-Id', None)
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
-            log.correlation_id.set(correlation_id)
+            mdc.correlation_id.set(correlation_id)
             logger.info("No correlation-id header found in message, generated a new one")
         else:
-            log.correlation_id.set(correlation_id)
+            mdc.correlation_id.set(correlation_id)
             logger.info('Found correlation id on incoming request.')
         return correlation_id
 
@@ -116,6 +117,6 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         """
         message_id = self.request.headers.get('Message-Id', None)
         if message_id:
-            log.message_id.set(message_id)
+            mdc.message_id.set(message_id)
             logger.info("Found message id on incoming request")
         return message_id
