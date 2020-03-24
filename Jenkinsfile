@@ -391,6 +391,7 @@ pipeline {
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
+            sh 'docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'
             sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
         }
     }
