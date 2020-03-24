@@ -367,7 +367,7 @@ pipeline {
                                         timeout(10) {
                                             waitUntil {
                                                 script {
-                                                    def r = sh script: 'sleep 1; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
+                                                    def r = sh script: 'sleep 3; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
                                                     return (r == 0)
                                                 }
                                             }
@@ -391,7 +391,8 @@ pipeline {
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
-            sh 'docker rmi -f $(docker images --filter "dangling=true" -q --no-trunc)'
+            // Test child dependant image removal first
+            sh 'bash <(curl -s https://raw.githubusercontent.com/dmuth/docker-remove-dependent-child-images/master/docker-remove-image) $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q)'
             sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
         }
     }
