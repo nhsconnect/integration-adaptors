@@ -123,7 +123,7 @@ variable "mhs_outbound_http_proxy" {
   default = ""
 }
 
-variable "mhs_outbound_validate_certificate" {
+variable "mhs_validate_cert" {
   type = bool
   description = "Verification of the server certificate received when making a connection to the spine MHS"
   default = False
