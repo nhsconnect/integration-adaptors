@@ -2,9 +2,6 @@ import unittest
 
 from lxml import etree
 from lxml import objectify
-import xml
-from xml import dom
-from xml.dom.minidom import parseString
 
 
 class XmlUtilities(object):
@@ -17,23 +14,9 @@ class XmlUtilities(object):
         :param actual:
         """
         obj1 = objectify.fromstring(expected)
-        # expected = etree.tostring(obj1)
+        expected = etree.tostring(obj1)
         obj2 = objectify.fromstring(actual)
-        # actual = etree.tostring(obj2)
-
-        # expected = parseString(expected).toprettyxml(indent='', newl='', encoding='UTF-8').decode('utf-8')
-        # actual = parseString(actual).toprettyxml(indent='', newl='', encoding='UTF-8').decode('utf-8')
-
-        parser = etree.XMLParser(remove_blank_text=True)
-        # xml_str = '''<root>
-        #     <head></head>
-        #     <content></content>
-        # </root>'''
-        # elem = etree.XML(xml_str, parser=parser)
-        # sss = etree.tostring(elem)
-
-        s1 = etree.tostring(etree.XML(expected, parser=parser))
-        s2 = etree.tostring(etree.XML(actual, parser=parser))
+        actual = etree.tostring(obj2)
 
         unittest.TestCase().assertEqual(expected, actual)
 
