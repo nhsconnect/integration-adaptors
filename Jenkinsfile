@@ -398,9 +398,9 @@ pipeline {
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
             // Test child dependant image removal first
-            sh label: 'List docker containers' script: 'docker ps'
-            sh label: 'List all docker containers' script: 'docker ps -a'
-            sh label: 'List all docker images' script: 'docker images'
+            sh label: 'List docker containers', script: 'docker ps'
+            sh label: 'List all docker containers', script: 'docker ps -a'
+            sh label: 'List all docker images', script: 'docker images'
             sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
         }
     }
