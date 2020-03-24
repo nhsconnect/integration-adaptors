@@ -8,6 +8,7 @@ import tornado.escape
 import tornado.locks
 import tornado.web
 
+from comms.http_headers import HttpHeaders
 from utilities import mdc
 from mhs_common.handler import base_handler
 from mhs_common.messages import ebxml_envelope
@@ -149,7 +150,7 @@ class SynchronousHandler(base_handler.BaseHandler):
 
     def _parse_body(self):
         try:
-            content_type = self.request.headers['Content-Type']
+            content_type = self.request.headers[HttpHeaders.CONTENT_TYPE]
         except KeyError as e:
             logger.error('Missing Content-Type header')
             raise tornado.web.HTTPError(400, 'Missing Content-Type header', reason='Missing Content-Type header') from e
@@ -179,7 +180,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         return parsed_body.payload
 
     def _extract_sync_async_header(self):
-        sync_async_header = self.request.headers.get('sync-async', None)
+        sync_async_header = self.request.headers.get(HttpHeaders.SYNC_ASYNC, None)
         if not sync_async_header:
             logger.error('Failed to parse sync-async header from message')
             raise tornado.web.HTTPError(400, 'Sync-Async header missing', reason='Sync-Async header missing')
@@ -189,10 +190,10 @@ class SynchronousHandler(base_handler.BaseHandler):
             return False
 
     def _extract_from_asid(self):
-        return self.request.headers.get('from-asid', None)
+        return self.request.headers.get(HttpHeaders.FROM_ASID, None)
 
     def _extract_message_id(self):
-        message_id = self.request.headers.get('Message-Id', None)
+        message_id = self.request.headers.get(HttpHeaders.MESSAGE_ID, None)
         if not message_id:
             message_id = message_utilities.MessageUtilities.get_uuid()
             mdc.message_id.set(message_id)
@@ -203,7 +204,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         return message_id
 
     def _extract_correlation_id(self):
-        correlation_id = self.request.headers.get('Correlation-Id', None)
+        correlation_id = self.request.headers.get(HttpHeaders.CORRELATION_ID, None)
         if not correlation_id:
             correlation_id = message_utilities.MessageUtilities.get_uuid()
             mdc.correlation_id.set(correlation_id)
@@ -215,7 +216,7 @@ class SynchronousHandler(base_handler.BaseHandler):
 
     def _extract_interaction_id(self):
         try:
-            interaction_id = self.request.headers['Interaction-Id']
+            interaction_id = self.request.headers[HttpHeaders.INTERACTION_ID]
             mdc.interaction_id.set(interaction_id)
             logger.info('Found Interaction-Id in message headers')
         except KeyError as e:
@@ -225,7 +226,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         return interaction_id
 
     def _extract_ods_code(self):
-        return self.request.headers.get('ods-code', None)
+        return self.request.headers.get(HttpHeaders.ODS_CODE, None)
 
     def _extend_interaction_details(self, wf, interaction_details):
         if wf.workflow_specific_interaction_details:
@@ -291,8 +292,8 @@ class SynchronousHandler(base_handler.BaseHandler):
             content_type = "text/plain"
         else:
             content_type = "text/xml"
-        self.set_header("Content-Type", content_type)
-        self.set_header("Correlation-Id", self._extract_correlation_id())
+        self.set_header(HttpHeaders.CONTENT_TYPE, content_type)
+        self.set_header(HttpHeaders.CORRELATION_ID, self._extract_correlation_id())
         self.write(message)
 
     def _retrieve_interaction_details(self, interaction_id):

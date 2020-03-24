@@ -3,6 +3,7 @@ from typing import Tuple, AnyStr, Dict, Optional
 
 from defusedxml import ElementTree as ET
 import utilities.integration_adaptors_logger as log
+from comms.http_headers import HttpHeaders
 
 from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
 
@@ -64,10 +65,10 @@ def handle_ebxml_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, Opt
         logger.info("HTTP 200 success response received with empty body, so can assume this isn't an ebXML error.")
         return code, body
 
-    if 'Content-Type' not in headers:
+    if HttpHeaders.CONTENT_TYPE not in headers:
         raise ValueError('No Content-Type header in Spine response, response cannot be handled!')
 
-    if headers['Content-Type'] != 'text/xml':
+    if headers[HttpHeaders.CONTENT_TYPE] != 'text/xml':
         raise ValueError('Unexpected Content-Type {}!'.format(headers['Content-Type']))
 
     parsed_body = ET.fromstring(body)

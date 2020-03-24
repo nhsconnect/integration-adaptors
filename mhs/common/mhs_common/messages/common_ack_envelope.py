@@ -8,6 +8,7 @@ from abc import abstractmethod
 from typing import Dict, Tuple
 
 import mhs_common.messages.ebxml_envelope as ebxml_envelope
+from comms.http_headers import HttpHeaders
 
 RECEIVED_MESSAGE_TIMESTAMP = "received_message_timestamp"
 
@@ -31,7 +32,7 @@ class CommonEbxmlAckEnvelope(ebxml_envelope.EbxmlEnvelope):
 
     def serialize(self, _message_dictionary=None) -> Tuple[str, Dict[str, str], str]:
         message_id, http_headers, message = super().serialize()
-        http_headers['Content-Type'] = 'text/xml'
+        http_headers[HttpHeaders.CONTENT_TYPE] = 'text/xml'
         return message_id, http_headers, message
 
     @abstractmethod
