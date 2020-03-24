@@ -5,7 +5,7 @@ from logging import LogRecord
 from typing import Optional, Any
 
 from utilities import config
-from utilities.mdc import message_id, correlation_id, inbound_message_id, interaction_id
+from utilities import mdc
 
 AUDIT = 25
 LOG_FORMAT_STRING = "%(asctime)sZ | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s " \
@@ -75,10 +75,10 @@ class CustomFormatter(logging.Formatter):
         super().__init__(fmt=_log_format, datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
     def format(self, record: LogRecord) -> str:
-        record.message_id = message_id.get()
-        record.correlation_id = correlation_id.get()
-        record.inbound_message_id = inbound_message_id.get()
-        record.interaction_id = interaction_id.get()
+        record.message_id = mdc.message_id.get()
+        record.correlation_id = mdc.correlation_id.get()
+        record.inbound_message_id = mdc.inbound_message_id.get()
+        record.interaction_id = mdc.interaction_id.get()
 
         record.name = f'{_project_name}.{record.name}' if _project_name else record.name
 
