@@ -6,6 +6,7 @@ __pycache__/
 # ide file
 .idea
 *.iml
+.vscode/
 
 # C extensions
 *.so

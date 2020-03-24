@@ -183,7 +183,6 @@ pipeline {
             }
         }
 
-
         stage('Component and Integration Tests') {
             parallel {
                 stage('Component Tests') {
