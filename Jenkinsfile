@@ -392,7 +392,6 @@ pipeline {
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
             // Test child dependant image removal first
-            sh 'bash <(curl -s https://raw.githubusercontent.com/dmuth/docker-remove-dependent-child-images/master/docker-remove-image) $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q)'
             sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
         }
     }
