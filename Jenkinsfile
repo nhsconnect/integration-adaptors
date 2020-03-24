@@ -354,10 +354,9 @@ pipeline {
                             }
                         }
 
-                        stage('Integration Tests') {
+                        stage('Waiting for MHS load balancers') {
                             steps {
                                 dir('integration-tests/integration_tests') {
-                                    sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
 
                                     // Wait for MHS load balancers to have healthy targets
                                     dir('../../pipeline/scripts/check-target-group-health') {
@@ -366,12 +365,20 @@ pipeline {
                                         timeout(10) {
                                             waitUntil {
                                                 script {
-                                                    def r = sh script: 'sleep 3; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
+                                                    def r = sh label: 'Waiting for load balancer...' script: 'sleep 3; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
                                                     return (r == 0)
                                                 }
                                             }
                                         }
                                     }
+                                }
+                            }
+                        }
+
+                        stage('Integration Tests') {
+                            steps {
+                                dir('integration-tests/integration_tests') {
+                                    sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                                     sh label: 'Running integration tests', script: 'pipenv run inttests'
                                 }
                             }
@@ -391,6 +398,9 @@ pipeline {
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
             // Test child dependant image removal first
+            sh label: 'List docker containers' script: 'docker ps'
+            sh label: 'List all docker containers' script: 'docker ps -a'
+            sh label: 'List all docker images' script: 'docker images'
             sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
         }
     }
