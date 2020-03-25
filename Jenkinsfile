@@ -127,8 +127,8 @@ pipeline {
 
         stage('Build images') {
             parallel {
-                // stage('Inbound Module Package') {
-                    // stages {
+                stage('Inbound Module Package') {
+                    stages {
                         stage('Package Inbound') {
                             steps {
                                 script {
@@ -139,10 +139,10 @@ pipeline {
                                 }
                             }
                         }
-                    // }
-                // }
-                // stage('Outbound Module Package') {
-                    // stages {
+                    }
+                }
+                stage('Outbound Module Package') {
+                    stages {
                         stage('Package Outbound') {
                             steps {
                                 script {
@@ -153,10 +153,10 @@ pipeline {
                                 }
                             }
                         }
-                    // }
-                // }
-                // stage('Spine Route Lookup Module Package') {
-                    // stages {
+                    }
+                }
+                stage('Spine Route Lookup Module Package') {
+                    stages {
                         stage('Package Spine Route Lookup') {
                             steps {
                                 script {
@@ -167,10 +167,10 @@ pipeline {
                                 }
                             }
                         }
-                    // }
-                // }
-                // stage('SCR Module Package') {
-                    // stages {
+                    }
+                }
+                stage('SCR Module Package') {
+                    stages {
                         stage('Package SCR Web Service') {
                             steps {
                                 script{
@@ -181,8 +181,8 @@ pipeline {
                                 }
                             }
                         }
-                    // }
-                // }
+                    }
+                }
             }
         }
 
