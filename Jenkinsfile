@@ -15,8 +15,8 @@ pipeline {
             steps {
                 sh label: 'List all docker containers', script: 'docker ps -a'
                 sh label: 'List all docker images', script: 'docker images'
-                sh label: 'Kill', script: 'docker kill 54ade1db4fed'
-                sh label: 'Kill', script: 'docker kill f893e0829773'
+                // sh label: 'Kill', script: 'docker kill 54ade1db4fed'
+                // sh label: 'Kill', script: 'docker kill f893e0829773'
                 // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*componenttest*" -q)'
                 // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*mhs-route*" -q)'
                 // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="local/mhs-outbound" -q)'
