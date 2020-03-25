@@ -379,11 +379,11 @@ pipeline {
             cobertura coberturaReportFile: '**/coverage.xml'
             junit '**/test-reports/*.xml'
             sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
-            sh 'docker volume prune --force'
+            // sh 'docker volume prune --force'
             // Prune Docker images for current CI build.
             // Note that the * in the glob patterns doesn't match /
             // Test child dependant image removal first
-            sh 'docker image rm -f $(docker images "*/*:*${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
+            sh 'docker image rm -f $(docker images "*/*:${BUILD_TAG}" -q) $(docker images "*/*/*:*${BUILD_TAG}" -q) || true'
             sh label: 'List docker containers', script: 'docker ps'
             sh label: 'List all docker containers', script: 'docker ps -a'
             sh label: 'List all docker images', script: 'docker images'
