@@ -75,13 +75,13 @@ pipeline {
 
         stage('Module Unit Tests') {
             parallel {
-                // stage('Run Common') {
-                //     stages {
-                //         stage('Common Module Unit Tests') {
-                //             steps { dir('common') { executeUnitTestsWithCoverage() } }
-                //         }
-                //     }
-                // }
+                stage('Run Common') {
+                    stages {
+                        stage('Common Module Unit Tests') {
+                            steps { dir('common') { executeUnitTestsWithCoverage() } }
+                        }
+                    }
+                }
                 stage('Run MHS Common ') {
                     stages {
                         stage('MHS Common Unit Tests') {
