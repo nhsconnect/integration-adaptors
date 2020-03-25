@@ -29,108 +29,27 @@ pipeline {
                     stages {
                         stage('Installing mhs common dependencies') {
                             steps {
-                                dir('mhs/common') { buildModules('Installing mhs common dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build MHS Inbound') {
-                    stages {
-                        stage('Installing inbound dependencies') {
-                            steps {
-                                dir('mhs/inbound') { buildModules('Installing inbound dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build MHS Outbound') {
-                    stages {
-                        stage('Installing outbound dependencies') {
-                            steps {
-                                dir('mhs/outbound') { buildModules('Installing outbound dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build MHS Spine Route Lookup') {
-                    stages {
-                        stage('Installing route lookup dependencies') {
-                            steps {
-                                dir('mhs/spineroutelookup') { buildModules('Installing route lookup dependencies') }
-                            }
-                        }
-                    }
-                }
-                stage('Build SCR') {
-                    stages {
-                        stage('Installing SCR web service dependencies') {
-                            steps {
-                                dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Module Unit Tests') {
-            parallel {
-                stage('Run Common') {
-                    stages {
-                        stage('Common Module Unit Tests') {
-                            steps { dir('common') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-                stage('Run MHS Common ') {
-                    stages {
-                        stage('MHS Common Unit Tests') {
-                            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-                stage('Run MHS Inbound') {
-                    stages {
-                        stage('MHS Inbound Unit Tests') {
-                            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-                stage('Run MHS Outbound') {
-                    stages {
-                        stage('MHS Outbound Unit Tests') {
-                            steps {
-                                dir('mhs/outbound') {
+                                dir('mhs/common') {
+                                    buildModules('Installing mhs common dependencies')
                                     executeUnitTestsWithCoverage()
-                                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
                                 }
                             }
                         }
                     }
                 }
-                stage('Run Spine Route Lookup') {
-                    stages {
-                        stage('Spine Route Lookup Unit Tests') {
-                            steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
-                stage('Run SCR Web Service') {
-                    stages {
-                        stage('SCR Web Service Unit Tests') {
-                            steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
             }
         }
 
-        stage('Build images') {
+        stage('Build') {
             parallel {
-                stage('Inbound') {
+                stage('MHS Inbound') {
                     stages {
-                        stage('Package Inbound') {
+                        stage('Installing inbound dependencies') {
                             steps {
+                                dir('mhs/inbound') {
+                                    buildModules('Installing inbound dependencies')
+                                    executeUnitTestsWithCoverage()
+                                }
                                 script {
                                     sh label: 'Building inbound image', script: "docker build -t local/mhs-inbound:${BUILD_TAG} -f dockers/mhs/inbound/Dockerfile ."
                                 }
@@ -141,10 +60,14 @@ pipeline {
                         }
                     }
                 }
-                stage('Outbound') {
+                stage('MHS Outbound') {
                     stages {
-                        stage('Package Outbound') {
+                        stage('Installing outbound dependencies') {
                             steps {
+                                dir('mhs/outbound') {
+                                    buildModules('Installing outbound dependencies')
+                                    executeUnitTestsWithCoverage()
+                                }
                                 script {
                                     sh label: 'Building outbound iamge', script: "docker build -t local/mhs-outbound:${BUILD_TAG} -f dockers/mhs/outbound/Dockerfile ."
                                 }
@@ -155,10 +78,14 @@ pipeline {
                         }
                     }
                 }
-                stage('Spine Route Lookup') {
+                stage('MHS Spine Route Lookup') {
                     stages {
-                        stage('Package Spine Route Lookup') {
+                        stage('Installing route lookup dependencies') {
                             steps {
+                                dir('mhs/spineroutelookup') {
+                                    buildModules('Installing route lookup dependencies')
+                                    executeUnitTestsWithCoverage()
+                                }
                                 script {
                                     sh label: 'Building spine route lookup image', script: "docker build -t local/mhs-spineroutelookup:${BUILD_TAG} -f dockers/mhs/spineroutelookup/Dockerfile ."
                                 }
@@ -169,10 +96,14 @@ pipeline {
                         }
                     }
                 }
-                stage('SCR Module Package') {
+                stage('SCR') {
                     stages {
-                        stage('Package SCR Web Service') {
+                        stage('Installing SCR web service dependencies') {
                             steps {
+                                dir('SCRWebService') {
+                                    buildModules('Installing SCR web service dependencies')
+                                    executeUnitTestsWithCoverage()
+                                }
                                 script{
                                     sh label: 'Building SCR web service image', script: "docker build -t local/scr-web-service:${BUILD_TAG} -f dockers/scr-web-service/Dockerfile ."
                                 }
@@ -185,6 +116,119 @@ pipeline {
                 }
             }
         }
+
+        // stage('Module Unit Tests') {
+        //     parallel {
+        //         stage('Run Common') {
+        //             stages {
+        //                 stage('Common Module Unit Tests') {
+        //                     steps { dir('common') { executeUnitTestsWithCoverage() } }
+        //                 }
+        //             }
+        //         }
+        //         stage('Run MHS Common ') {
+        //             stages {
+        //                 stage('MHS Common Unit Tests') {
+        //                     steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
+        //                 }
+        //             }
+        //         }
+        //         stage('Run MHS Inbound') {
+        //             stages {
+        //                 stage('MHS Inbound Unit Tests') {
+        //                     steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
+        //                 }
+        //             }
+        //         }
+        //         stage('Run MHS Outbound') {
+        //             stages {
+        //                 stage('MHS Outbound Unit Tests') {
+        //                     steps {
+        //                         dir('mhs/outbound') {
+        //                             executeUnitTestsWithCoverage()
+        //                             sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         stage('Run Spine Route Lookup') {
+        //             stages {
+        //                 stage('Spine Route Lookup Unit Tests') {
+        //                     steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
+        //                 }
+        //             }
+        //         }
+        //         stage('Run SCR Web Service') {
+        //             stages {
+        //                 stage('SCR Web Service Unit Tests') {
+        //                     steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        // stage('Build images') {
+            // parallel {
+                // stage('Inbound') {
+                //     stages {
+                //         stage('Package Inbound') {
+                //             steps {
+                //                 script {
+                //                     sh label: 'Building inbound image', script: "docker build -t local/mhs-inbound:${BUILD_TAG} -f dockers/mhs/inbound/Dockerfile ."
+                //                 }
+                //                 script {
+                //                     sh label: 'Pushing inbound image', script: "packer build -color=false pipeline/packer/inbound-push.json"
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+                // stage('Outbound') {
+                //     stages {
+                //         stage('Package Outbound') {
+                //             steps {
+                //                 script {
+                //                     sh label: 'Building outbound iamge', script: "docker build -t local/mhs-outbound:${BUILD_TAG} -f dockers/mhs/outbound/Dockerfile ."
+                //                 }
+                //                 script {
+                //                     sh label: 'Pushing outbound image', script: "packer build -color=false pipeline/packer/outbound-push.json"
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+                // stage('Spine Route Lookup') {
+                //     stages {
+                //         stage('Package Spine Route Lookup') {
+                //             steps {
+                //                 script {
+                //                     sh label: 'Building spine route lookup image', script: "docker build -t local/mhs-spineroutelookup:${BUILD_TAG} -f dockers/mhs/spineroutelookup/Dockerfile ."
+                //                 }
+                //                 script {
+                //                     sh label: 'Pushing spine route lookup image', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+                // stage('SCR Module Package') {
+                //     stages {
+                //         stage('Package SCR Web Service') {
+                //             steps {
+                //                 script{
+                //                     sh label: 'Building SCR web service image', script: "docker build -t local/scr-web-service:${BUILD_TAG} -f dockers/scr-web-service/Dockerfile ."
+                //                 }
+                //                 script {
+                //                     sh label: 'Oushing SCR web service image', script: "packer build -color=false pipeline/packer/scr-web-service-push.json"
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+            // }
+        // }
 
         stage('Component and Integration Tests') {
             parallel {
