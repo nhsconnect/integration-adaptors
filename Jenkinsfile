@@ -14,12 +14,11 @@ pipeline {
         stage('cleanup') {
             steps {
                 // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*componenttest*" -q)'
-                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*mhs-route*" -q)'
+                // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*mhs-route*" -q)'
                 sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*outbound*" -q)'
                 sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*inbound*" -q)'
                 sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*scr-web-service*" -q)'
-                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*sspineroutelookup*" -q)'
-                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*fakespine*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*spine*" -q)'
                 sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*_dynamodb*" -q)'
                 sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*_rabbitmq*" -q)'
                 sh label: 'List docker containers', script: 'docker ps'
