@@ -13,19 +13,19 @@ pipeline {
     stages {
         stage('cleanup') {
             steps {
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep 'componenttest')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep 'mhs-route')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep 'outbound')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep 'inbound')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep 'scr-web-service')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep 'sspineroutelookup')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep 'fakespine')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep '_dynamodb')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep '_rabbitmq')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep '_dynamodb')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep '_dynamodb')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep '_dynamodb')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep '_dynamodb')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'componenttest\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'mhs-route\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'outbound\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'inbound\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'scr-web-service\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'sspineroutelookup\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'fakespine\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_rabbitmq\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
             }
         }
     }
