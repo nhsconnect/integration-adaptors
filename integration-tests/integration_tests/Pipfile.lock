@@ -239,9 +239,9 @@
         },
         "python-qpid-proton": {
             "hashes": [
-                "sha256:cec7360e5c20adb8fea60ce24f544c3a27c6d5d34280ebbd70f96d3f491db04d"
+                "sha256:1bbf12b79b0f84af96dce3518701a1a3c6dcd9c6a0f0b718886b2d40ef38315c"
             ],
-            "version": "==0.30.0"
+            "version": "==0.28.0"
         },
         "requests": {
             "hashes": [
