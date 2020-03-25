@@ -377,9 +377,10 @@ pipeline {
                             }
                         }
 
-                        stage('Waiting for MHS load balancers') {
+                        stage('Run integration tests') {
                             steps {
                                 dir('integration-tests/integration_tests') {
+                                    sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
 
                                     // Wait for MHS load balancers to have healthy targets
                                     dir('../../pipeline/scripts/check-target-group-health') {
@@ -394,14 +395,6 @@ pipeline {
                                             }
                                         }
                                     }
-                                }
-                            }
-                        }
-
-                        stage('Integration Tests') {
-                            steps {
-                                dir('integration-tests/integration_tests') {
-                                    sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
                                     sh label: 'Running integration tests', script: 'pipenv run inttests'
                                 }
                             }
