@@ -366,8 +366,8 @@ pipeline {
                                             }
                                         }
                                     }
+                                    sh label: 'Running integration tests', script: 'pipenv run inttests'
                                 }
-                                sh label: 'Running integration tests', script: 'pipenv run inttests'
                             }
                         }
                     }
