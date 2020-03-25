@@ -13,19 +13,15 @@ pipeline {
     stages {
         stage('cleanup') {
             steps {
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'componenttest\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'mhs-route\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'outbound\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'inbound\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'scr-web-service\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'sspineroutelookup\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'fakespine\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_rabbitmq\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
-                sh label: 'deleting images', script: 'docker rmi $(docker images |grep \'_dynamodb\')'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*componenttest*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*mhs-route*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*outbound*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*inbound*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*scr-web-service*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*sspineroutelookup*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*fakespine*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*_dynamodb*" -q)'
+                sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*_rabbitmq*" -q)'
             }
         }
     }
