@@ -12,7 +12,8 @@ from comms import proton_queue_adaptor
 from mhs_common import workflow
 from mhs_common.configuration import configuration_manager
 from mhs_common.request import healthcheck_handler
-from mhs_common.state import persistence_adaptor, dynamo_persistence_adaptor
+from mhs_common.state import persistence_adaptor
+from mhs_common.state.persistence_adaptor_factory import get_persistence_adaptor
 from utilities import secrets, certs
 
 import inbound.request.handler as async_request_handler
@@ -31,15 +32,13 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
         host=config.get_config('INBOUND_QUEUE_URL'),
         username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME', default=None),
         password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD', default=None))
-    sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
-        table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
+    sync_async_store = get_persistence_adaptor(table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
     inbound_queue_max_retries = int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3'))
     inbound_queue_retry_delay = int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100'))
     persistence_store_max_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
     sync_async_delay = int(config.get_config('SYNC_ASYNC_STORE_RETRY_DELAY', default='100'))
-    work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
-        table_name=config.get_config('STATE_TABLE_NAME'))
+    work_description_store = get_persistence_adaptor(table_name=config.get_config('STATE_TABLE_NAME'))
     return workflow.get_workflow_map(inbound_async_queue=queue_adaptor,
                                      work_description_store=work_description_store,
                                      sync_async_store=sync_async_store,
@@ -115,7 +114,7 @@ def main():
     party_key = secrets.get_secret_config('PARTY_KEY')
 
     workflows = initialise_workflows()
-    store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(table_name=config.get_config('STATE_TABLE_NAME'))
+    store = get_persistence_adaptor(table_name=config.get_config('STATE_TABLE_NAME'))
 
     interactions_config_file = pathlib.Path(definitions.ROOT_DIR) / 'data' / "interactions" / "interactions.json"
     config_manager = configuration_manager.ConfigurationManager(str(interactions_config_file))
