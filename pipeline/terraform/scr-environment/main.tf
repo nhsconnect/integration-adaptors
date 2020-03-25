@@ -15,7 +15,6 @@ provider "aws" {
 # SCR ECS task definition
 resource "aws_ecs_task_definition" "scr-service-task" {
   family = "${var.environment_id}-scr-service-task"
-
   container_definitions = jsonencode(
   [
     {
@@ -73,7 +72,7 @@ resource "aws_ecs_task_definition" "scr-service-task" {
 
 # SCR ECS service
 resource "aws_ecs_service" "test-scr-service-environment" {
-  name = "${var.build_id}-scr-service"
+  name = "${var.environment_id}-scr-service"
   cluster = var.cluster_id
   task_definition = aws_ecs_task_definition.scr-service-task.arn
   desired_count = 1
