@@ -22,6 +22,9 @@ pipeline {
                 sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*fakespine*" -q)'
                 sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*_dynamodb*" -q)'
                 sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*_rabbitmq*" -q)'
+                sh label: 'List docker containers', script: 'docker ps'
+                sh label: 'List all docker containers', script: 'docker ps -a'
+                sh label: 'List all docker images', script: 'docker images'
             }
         }
     }
