@@ -88,15 +88,29 @@ pipeline {
                 }
                 stage('Outbound') {
                     stages {
-                        stage('Installing outbound dependencies') {
+                        stage('Build') {
                             steps {
                                 dir('mhs/outbound') {
                                     buildModules('Installing outbound dependencies')
+                                }
+                            }
+                        }
+                        stage('Unit test') {
+                            steps {
+                                dir('mhs/outbound') {
                                     executeUnitTestsWithCoverage()
                                 }
+                            }
+                        }
+                        stage('Build image') {
+                            steps {
                                 script {
                                     sh label: 'Building outbound iamge', script: "docker build -t local/mhs-outbound:${BUILD_TAG} -f dockers/mhs/outbound/Dockerfile ."
                                 }
+                            }
+                        }
+                        stage('Push image') {
+                            steps {
                                 script {
                                     sh label: 'Pushing outbound image', script: "packer build -color=false pipeline/packer/outbound-push.json"
                                 }
@@ -106,15 +120,29 @@ pipeline {
                 }
                 stage('Spine Route Lookup') {
                     stages {
-                        stage('Installing route lookup dependencies') {
+                        stage('Build') {
                             steps {
                                 dir('mhs/spineroutelookup') {
                                     buildModules('Installing route lookup dependencies')
+                                }
+                            }
+                        }
+                        stage('Unit test') {
+                            steps {
+                                dir('mhs/spineroutelookup') {
                                     executeUnitTestsWithCoverage()
                                 }
+                            }
+                        }
+                        stage('Build image') {
+                            steps {
                                 script {
                                     sh label: 'Building spine route lookup image', script: "docker build -t local/mhs-spineroutelookup:${BUILD_TAG} -f dockers/mhs/spineroutelookup/Dockerfile ."
                                 }
+                            }
+                        }
+                        stage('Push image') {
+                            steps {
                                 script {
                                     sh label: 'Pushing spine route lookup image', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
                                 }
@@ -124,15 +152,29 @@ pipeline {
                 }
                 stage('SCR') {
                     stages {
-                        stage('Installing SCR web service dependencies') {
+                        stage('Build') {
                             steps {
                                 dir('SCRWebService') {
                                     buildModules('Installing SCR web service dependencies')
+                                }
+                            }
+                        }
+                        stage('Unit test') {
+                            steps {
+                                dir('SCRWebService') {
                                     executeUnitTestsWithCoverage()
                                 }
+                            }
+                        }
+                        stage('Build image') {
+                            steps {
                                 script{
                                     sh label: 'Building SCR web service image', script: "docker build -t local/scr-web-service:${BUILD_TAG} -f dockers/scr-web-service/Dockerfile ."
                                 }
+                            }
+                        }
+                        stage('Push image') {
+                            steps {
                                 script {
                                     sh label: 'Oushing SCR web service image', script: "packer build -color=false pipeline/packer/scr-web-service-push.json"
                                 }
@@ -142,119 +184,6 @@ pipeline {
                 }
             }
         }
-
-        // stage('Module Unit Tests') {
-        //     parallel {
-        //         stage('Run Common') {
-        //             stages {
-        //                 stage('Common Module Unit Tests') {
-        //                     steps { dir('common') { executeUnitTestsWithCoverage() } }
-        //                 }
-        //             }
-        //         }
-        //         stage('Run MHS Common ') {
-        //             stages {
-        //                 stage('MHS Common Unit Tests') {
-        //                     steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-        //                 }
-        //             }
-        //         }
-        //         stage('Run MHS Inbound') {
-        //             stages {
-        //                 stage('MHS Inbound Unit Tests') {
-        //                     steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-        //                 }
-        //             }
-        //         }
-        //         stage('Run MHS Outbound') {
-        //             stages {
-        //                 stage('MHS Outbound Unit Tests') {
-        //                     steps {
-        //                         dir('mhs/outbound') {
-        //                             executeUnitTestsWithCoverage()
-        //                             sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //         stage('Run Spine Route Lookup') {
-        //             stages {
-        //                 stage('Spine Route Lookup Unit Tests') {
-        //                     steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
-        //                 }
-        //             }
-        //         }
-        //         stage('Run SCR Web Service') {
-        //             stages {
-        //                 stage('SCR Web Service Unit Tests') {
-        //                     steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('Build images') {
-            // parallel {
-                // stage('Inbound') {
-                //     stages {
-                //         stage('Package Inbound') {
-                //             steps {
-                //                 script {
-                //                     sh label: 'Building inbound image', script: "docker build -t local/mhs-inbound:${BUILD_TAG} -f dockers/mhs/inbound/Dockerfile ."
-                //                 }
-                //                 script {
-                //                     sh label: 'Pushing inbound image', script: "packer build -color=false pipeline/packer/inbound-push.json"
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
-                // stage('Outbound') {
-                //     stages {
-                //         stage('Package Outbound') {
-                //             steps {
-                //                 script {
-                //                     sh label: 'Building outbound iamge', script: "docker build -t local/mhs-outbound:${BUILD_TAG} -f dockers/mhs/outbound/Dockerfile ."
-                //                 }
-                //                 script {
-                //                     sh label: 'Pushing outbound image', script: "packer build -color=false pipeline/packer/outbound-push.json"
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
-                // stage('Spine Route Lookup') {
-                //     stages {
-                //         stage('Package Spine Route Lookup') {
-                //             steps {
-                //                 script {
-                //                     sh label: 'Building spine route lookup image', script: "docker build -t local/mhs-spineroutelookup:${BUILD_TAG} -f dockers/mhs/spineroutelookup/Dockerfile ."
-                //                 }
-                //                 script {
-                //                     sh label: 'Pushing spine route lookup image', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
-                // stage('SCR Module Package') {
-                //     stages {
-                //         stage('Package SCR Web Service') {
-                //             steps {
-                //                 script{
-                //                     sh label: 'Building SCR web service image', script: "docker build -t local/scr-web-service:${BUILD_TAG} -f dockers/scr-web-service/Dockerfile ."
-                //                 }
-                //                 script {
-                //                     sh label: 'Oushing SCR web service image', script: "packer build -color=false pipeline/packer/scr-web-service-push.json"
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
-            // }
-        // }
 
         stage('Component and Integration Tests') {
             parallel {
@@ -472,8 +401,3 @@ void executeUnitTestsWithCoverage() {
 void buildModules(String action) {
     sh label: action, script: 'pipenv install --dev --deploy --ignore-pipfile'
 }
-
-void buildDockerImage(String action, String repository, String dockerfile) {
-    sh label: action, script: "docker build -t " + repository + ":${BUILD_TAG} -f " + dockerFile + " ."
-}
-
