@@ -9,7 +9,7 @@ unittest-xml-reporting = "~=2.5"
 
 [packages]
 tornado = "*"
-python-qpid-proton = "==0.28.0"
+python-qpid-proton = "*"
 pystache = "*"
 lxml = "*"
 isodate = "*"
