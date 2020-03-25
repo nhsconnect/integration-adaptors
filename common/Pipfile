@@ -13,7 +13,6 @@ python-qpid-proton = "*"
 pystache = "*"
 lxml = "*"
 isodate = "*"
-http-constants = "*"
 
 [requires]
 python_version = "3.7"

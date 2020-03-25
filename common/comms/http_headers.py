@@ -1,7 +1,5 @@
-from http_constants import headers
-
-
-class HttpHeaders(headers.HttpHeaders):
+class HttpHeaders:
+    CONTENT_TYPE = "Content-Type"
     CORRELATION_ID = "Correlation-Id"
     MESSAGE_ID = "Message-Id"
     INTERACTION_ID = "Interaction-Id"
