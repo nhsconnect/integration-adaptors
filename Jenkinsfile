@@ -13,6 +13,7 @@ pipeline {
     stages {
         stage('cleanup') {
             steps {
+                sh label: 'List all docker containers', script: 'docker ps -a'
                 sh label: 'List all docker images', script: 'docker images'
                 // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*componenttest*" -q)'
                 // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*mhs-route*" -q)'
