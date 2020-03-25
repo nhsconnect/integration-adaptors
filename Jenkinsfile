@@ -13,24 +13,36 @@ pipeline {
     stages {
         stage('Build modules') {
             parallel {
-                stage('Build Common') {
+                stage('Common') {
                     stages {
-                        stage('Installing common dependencies') {
+                        stage('Build') {
                             steps {
                                 dir('common') {
                                     buildModules('Installing common dependencies')
+                                }
+                            }
+                        }
+                        stage('Unit test') {
+                            steps {
+                                dir('common') {
                                     executeUnitTestsWithCoverage()
                                 }
                             }
                         }
                     }
                 }
-                stage('Build MHS Common') {
+                stage('MHS Common') {
                     stages {
-                        stage('Installing mhs common dependencies') {
+                        stage('Build') {
                             steps {
                                 dir('mhs/common') {
                                     buildModules('Installing mhs common dependencies')
+                                }
+                            }
+                        }
+                        stage('Unit test') {
+                            steps {
+                                dir('mhs/common') {
                                     executeUnitTestsWithCoverage()
                                 }
                             }
@@ -40,19 +52,33 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build MHS') {
             parallel {
-                stage('MHS Inbound') {
+                stage('Inbound') {
                     stages {
-                        stage('Installing inbound dependencies') {
+                        stage('Build') {
                             steps {
                                 dir('mhs/inbound') {
                                     buildModules('Installing inbound dependencies')
+                                }
+                            }
+                        }
+                        stage('Unit test') {
+                            steps {
+                                dir('mhs/inbound') {
                                     executeUnitTestsWithCoverage()
                                 }
+                            }
+                        }
+                        stage('Build image') {
+                            steps {
                                 script {
                                     sh label: 'Building inbound image', script: "docker build -t local/mhs-inbound:${BUILD_TAG} -f dockers/mhs/inbound/Dockerfile ."
                                 }
+                            }
+                        }
+                        stage('Push image') {
+                            steps {
                                 script {
                                     sh label: 'Pushing inbound image', script: "packer build -color=false pipeline/packer/inbound-push.json"
                                 }
@@ -60,7 +86,7 @@ pipeline {
                         }
                     }
                 }
-                stage('MHS Outbound') {
+                stage('Outbound') {
                     stages {
                         stage('Installing outbound dependencies') {
                             steps {
@@ -78,7 +104,7 @@ pipeline {
                         }
                     }
                 }
-                stage('MHS Spine Route Lookup') {
+                stage('Spine Route Lookup') {
                     stages {
                         stage('Installing route lookup dependencies') {
                             steps {
@@ -245,7 +271,6 @@ pipeline {
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
                                     . ./component-test-source.sh
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up --build -d'''
-                                sh label: 'List all docker processes', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml ps'
                             }
                         }
                         stage('Run Component Tests') {
@@ -447,3 +472,8 @@ void executeUnitTestsWithCoverage() {
 void buildModules(String action) {
     sh label: action, script: 'pipenv install --dev --deploy --ignore-pipfile'
 }
+
+void buildDockerImage(String action, String repository, String dockerfile) {
+    sh label: action, script: "docker build -t " + repository + ":${BUILD_TAG} -f " + dockerFile + " ."
+}
+
