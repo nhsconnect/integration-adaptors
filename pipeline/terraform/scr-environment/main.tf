@@ -13,8 +13,8 @@ provider "aws" {
 }
 
 # SCR ECS task definition
-resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
-  family = "scr-service-task-${var.build_id}"
+resource "aws_ecs_task_definition" "scr-service-task" {
+  family = "${var.environment_id}-scr-service-task"
 
   container_definitions = jsonencode(
   [
@@ -75,7 +75,7 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
 resource "aws_ecs_service" "test-scr-service-environment" {
   name = "${var.build_id}-scr-service"
   cluster = var.cluster_id
-  task_definition = aws_ecs_task_definition.test-environment-scr-service-task.arn
+  task_definition = aws_ecs_task_definition.scr-service-task.arn
   desired_count = 1
   launch_type = "EC2"
 }
