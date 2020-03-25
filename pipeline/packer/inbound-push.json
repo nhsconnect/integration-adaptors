@@ -8,7 +8,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "local/inbound:{{user `tag`}}",
+      "image": "local/mhs-inbound:{{user `tag`}}",
       "pull": false,
       "commit": true
     }
