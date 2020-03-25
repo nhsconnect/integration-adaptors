@@ -10,29 +10,6 @@ pipeline {
         MHS_INBOUND_QUEUE_NAME = "${ENVIRONMENT_ID}-inbound"
     }
 
-    // stages {
-    //     stage('cleanup') {
-    //         steps {
-    //             sh label: 'List all docker containers', script: 'docker ps -a'
-    //             sh label: 'List all docker images', script: 'docker images'
-    //             sh label: 'Prune', script: 'docker system prune --all --force'
-                // sh label: 'Kill', script: 'docker kill f893e0829773'
-                // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*componenttest*" -q)'
-                // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*mhs-route*" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="local/mhs-outbound" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="temporary/outbound" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="temporary/spineroutelookup" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="local/mhs-inbound" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="temporary/inbound" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="*scr-web-service*" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="*spine*" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="*_dynamodb*" -q)'
-                // sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="*_rabbitmq*" -q)'
-    //             sh label: 'List docker containers', script: 'docker ps'
-    //             sh label: 'List all docker containers', script: 'docker ps -a'
-    //         }
-    //     }
-    // }
     stages {
         stage('Build modules') {
             parallel {
@@ -40,7 +17,10 @@ pipeline {
                     stages {
                         stage('Installing common dependencies') {
                             steps {
-                                dir('common') { buildModules('Installing common dependencies') }
+                                dir('common') {
+                                    buildModules('Installing common dependencies')
+                                    executeUnitTestsWithCoverage()
+                                }
                             }
                         }
                     }
@@ -95,13 +75,13 @@ pipeline {
 
         stage('Module Unit Tests') {
             parallel {
-                stage('Run Common') {
-                    stages {
-                        stage('Common Module Unit Tests') {
-                            steps { dir('common') { executeUnitTestsWithCoverage() } }
-                        }
-                    }
-                }
+                // stage('Run Common') {
+                //     stages {
+                //         stage('Common Module Unit Tests') {
+                //             steps { dir('common') { executeUnitTestsWithCoverage() } }
+                //         }
+                //     }
+                // }
                 stage('Run MHS Common ') {
                     stages {
                         stage('MHS Common Unit Tests') {
@@ -145,19 +125,18 @@ pipeline {
             }
         }
 
-        stage('Package Modules') {
+        stage('Build images') {
             parallel {
                 stage('Inbound Module Package') {
                     stages {
                         stage('Package Inbound') {
                             steps {
                                 script {
-                                    sh label: 'Building Inbound Image Build', script: "docker build -t temporary/inbound:latest -f dockers/mhs/inbound/Dockerfile ."
+                                    sh label: 'Building inbound image', script: "docker build -t local/inbound:${BUILD_TAG} -f dockers/mhs/inbound/Dockerfile ."
                                 }
                                 script {
-                                    sh label: 'Running Inbound Packer Image Push', script: "packer build -color=false pipeline/packer/inbound-push.json"
-                                }
-                            }
+                                    sh label: 'Pushing inbound image', script: "packer build -color=false pipeline/packer/inbound-push.json"
+                                }         }
                         }
                     }
                 }
@@ -166,10 +145,10 @@ pipeline {
                         stage('Package Outbound') {
                             steps {
                                 script {
-                                    sh label: 'Building Outbound Image Build', script: "docker build -t temporary/outbound:latest -f dockers/mhs/outbound/Dockerfile ."
+                                    sh label: 'Building outbound iamge', script: "docker build -t local/outbound:${BUILD_TAG} -f dockers/mhs/outbound/Dockerfile ."
                                 }
                                 script {
-                                    sh label: 'Running Outbound Packer Image Push', script: "packer build -color=false pipeline/packer/outbound-push.json"
+                                    sh label: 'Pushing outbound image', script: "packer build -color=false pipeline/packer/outbound-push.json"
                                 }
                             }
                         }
@@ -180,10 +159,10 @@ pipeline {
                         stage('Package Spine Route Lookup') {
                             steps {
                                 script {
-                                    sh label: 'Building Spine Route Lookup Image Build', script: "docker build -t temporary/spineroutelookup:latest -f dockers/mhs/spineroutelookup/Dockerfile ."
+                                    sh label: 'Building spine route lookup image', script: "docker build -t local/spineroutelookup:${BUILD_TAG} -f dockers/mhs/spineroutelookup/Dockerfile ."
                                 }
                                 script {
-                                    sh label: 'Running Spine Route Lookup Packer Image Push', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
+                                    sh label: 'Pushing spine route lookup image', script: "packer build -color=false pipeline/packer/spineroutelookup-push.json"
                                 }
                             }
                         }
@@ -194,10 +173,10 @@ pipeline {
                         stage('Package SCR Web Service') {
                             steps {
                                 script{
-                                    sh label: 'Building SCR Web Service Image Build', script: "docker build -t temporary/scr-web-service:latest -f dockers/scr-web-service/Dockerfile ."
+                                    sh label: 'Building SCR web service image', script: "docker build -t local/scr-web-service:${BUILD_TAG} -f dockers/scr-web-service/Dockerfile ."
                                 }
                                 script {
-                                    sh label: 'Running SCR Web Service Packer Image Push', script: "packer build -color=false pipeline/packer/scr-web-service-push.json"
+                                    sh label: 'Oushing SCR web service image', script: "packer build -color=false pipeline/packer/scr-web-service-push.json"
                                 }
                             }
                         }
@@ -220,14 +199,6 @@ pipeline {
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
                                     . ./component-test-source.sh
-                                    export INBOUND_BUILD_TAG="inbound-${BUILD_TAG}"
-                                    export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
-                                    export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
-                                    export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
-                                    docker tag temporary/spineroutelookup:latest local/mhs-route:${ROUTE_BUILD_TAG}
-                                    docker tag temporary/inbound:latest local/mhs-inbound:${INBOUND_BUILD_TAG}
-                                    docker tag temporary/outbound:latest local/mhs-outbound:${OUTBOUND_BUILD_TAG}
-                                    docker tag temporary/scr-web-service:latest local/scr-web-service:${WEB_SERVICE_BUILD_TAG}
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
                             }
@@ -257,150 +228,149 @@ pipeline {
                     }
                 }
 
+                // stage('Integration Tests') {
+                //     options {
+                //         lock('exemplar-test-environment')
+                //     }
+                //     stages {
+                //         stage('Deploy MHS') {
+                //             steps {
+                //                 dir('pipeline/terraform/mhs-environment') {
+                //                     sh label: 'Initialising Terraform', script: """
+                //                     terraform init \
+                //                     -backend-config="bucket=${TF_STATE_BUCKET}" \
+                //                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                //                     -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
+                //                     -input=false -no-color
+                //                 """
+                //                     sh label: 'Applying Terraform configuration', script: """
+                //                     terraform apply -no-color -auto-approve \
+                //                     -var environment_id=${ENVIRONMENT_ID} \
+                //                     -var build_id=${BUILD_TAG} \
+                //                     -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
+                //                     -var opentest_vpc_id=${OPENTEST_VPC_ID} \
+                //                     -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
+                //                     -var mhs_outbound_service_minimum_instance_count=3 \
+                //                     -var mhs_outbound_service_maximum_instance_count=9 \
+                //                     -var mhs_inbound_service_minimum_instance_count=3 \
+                //                     -var mhs_inbound_service_maximum_instance_count=9 \
+                //                     -var mhs_route_service_minimum_instance_count=3 \
+                //                     -var mhs_route_service_maximum_instance_count=9 \
+                //                     -var task_role_arn=${TASK_ROLE} \
+                //                     -var execution_role_arn=${TASK_EXECUTION_ROLE} \
+                //                     -var task_scaling_role_arn=${TASK_SCALING_ROLE} \
+                //                     -var ecr_address=${DOCKER_REGISTRY} \
+                //                     -var mhs_log_level=DEBUG \
+                //                     -var mhs_outbound_http_proxy=${MHS_OUTBOUND_HTTP_PROXY} \
+                //                     -var mhs_state_table_read_capacity=5 \
+                //                     -var mhs_state_table_write_capacity=5 \
+                //                     -var mhs_sync_async_table_read_capacity=5 \
+                //                     -var mhs_sync_async_table_write_capacity=5 \
+                //                     -var mhs_spine_org_code=${SPINE_ORG_CODE} \
+                //                     -var inbound_queue_host="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
+                //                     -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
+                //                     -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
+                //                     -var party_key_arn=${PARTY_KEY_ARN} \
+                //                     -var client_cert_arn=${CLIENT_CERT_ARN} \
+                //                     -var client_key_arn=${CLIENT_KEY_ARN} \
+                //                     -var ca_certs_arn=${CA_CERTS_ARN} \
+                //                     -var route_ca_certs_arn=${ROUTE_CA_CERTS_ARN} \
+                //                     -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
+                //                     -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
+                //                     -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
+                //                     -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
+                //                     -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
+                //                     -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
+                //                     -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
+                //                     -var elasticache_node_type="cache.t2.micro" \
+                //                     -var mhs_forward_reliable_endpoint_url=${MHS_FORWARD_RELIABLE_ENDPOINT_URL}
+                //                 """
+                //                     script {
+                //                         env.MHS_ADDRESS = sh(
+                //                                 label: 'Obtaining outbound LB DNS name',
+                //                                 returnStdout: true,
+                //                                 script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
+                //                         ).trim()
+                //                         env.MHS_OUTBOUND_TARGET_GROUP = sh(
+                //                                 label: 'Obtaining outbound LB target group ARN',
+                //                                 returnStdout: true,
+                //                                 script: "terraform output outbound_lb_target_group_arn"
+                //                         ).trim()
+                //                         env.MHS_INBOUND_TARGET_GROUP = sh(
+                //                                 label: 'Obtaining inbound LB target group ARN',
+                //                                 returnStdout: true,
+                //                                 script: "terraform output inbound_lb_target_group_arn"
+                //                         ).trim()
+                //                         env.MHS_ROUTE_TARGET_GROUP = sh(
+                //                                 label: 'Obtaining route LB target group ARN',
+                //                                 returnStdout: true,
+                //                                 script: "terraform output route_lb_target_group_arn"
+                //                         ).trim()
+                //                         env.MHS_DYNAMODB_TABLE_NAME = sh(
+                //                                 label: 'Obtaining the dynamodb table name used for the MHS state',
+                //                                 returnStdout: true,
+                //                                 script: "terraform output mhs_state_table_name"
+                //                         ).trim()
+                //                         env.MHS_SYNC_ASYNC_TABLE_NAME = sh(
+                //                                 label: 'Obtaining the dynamodb table name used for the MHS sync/async state',
+                //                                 returnStdout: true,
+                //                                 script: "terraform output mhs_sync_async_table_name"
+                //                         ).trim()
+                //                     }
+                //                 }
+                //             }
+                //         }
 
-                stage('Integration Tests') {
-                    options {
-                        lock('exemplar-test-environment')
-                    }
-                    stages {
-                        stage('Deploy MHS') {
-                            steps {
-                                dir('pipeline/terraform/mhs-environment') {
-                                    sh label: 'Initialising Terraform', script: """
-                                    terraform init \
-                                    -backend-config="bucket=${TF_STATE_BUCKET}" \
-                                    -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                                    -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
-                                    -input=false -no-color
-                                """
-                                    sh label: 'Applying Terraform configuration', script: """
-                                    terraform apply -no-color -auto-approve \
-                                    -var environment_id=${ENVIRONMENT_ID} \
-                                    -var build_id=${BUILD_TAG} \
-                                    -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
-                                    -var opentest_vpc_id=${OPENTEST_VPC_ID} \
-                                    -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
-                                    -var mhs_outbound_service_minimum_instance_count=3 \
-                                    -var mhs_outbound_service_maximum_instance_count=9 \
-                                    -var mhs_inbound_service_minimum_instance_count=3 \
-                                    -var mhs_inbound_service_maximum_instance_count=9 \
-                                    -var mhs_route_service_minimum_instance_count=3 \
-                                    -var mhs_route_service_maximum_instance_count=9 \
-                                    -var task_role_arn=${TASK_ROLE} \
-                                    -var execution_role_arn=${TASK_EXECUTION_ROLE} \
-                                    -var task_scaling_role_arn=${TASK_SCALING_ROLE} \
-                                    -var ecr_address=${DOCKER_REGISTRY} \
-                                    -var mhs_log_level=DEBUG \
-                                    -var mhs_outbound_http_proxy=${MHS_OUTBOUND_HTTP_PROXY} \
-                                    -var mhs_state_table_read_capacity=5 \
-                                    -var mhs_state_table_write_capacity=5 \
-                                    -var mhs_sync_async_table_read_capacity=5 \
-                                    -var mhs_sync_async_table_write_capacity=5 \
-                                    -var mhs_spine_org_code=${SPINE_ORG_CODE} \
-                                    -var inbound_queue_host="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
-                                    -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
-                                    -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
-                                    -var party_key_arn=${PARTY_KEY_ARN} \
-                                    -var client_cert_arn=${CLIENT_CERT_ARN} \
-                                    -var client_key_arn=${CLIENT_KEY_ARN} \
-                                    -var ca_certs_arn=${CA_CERTS_ARN} \
-                                    -var route_ca_certs_arn=${ROUTE_CA_CERTS_ARN} \
-                                    -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
-                                    -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
-                                    -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
-                                    -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
-                                    -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
-                                    -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
-                                    -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
-                                    -var elasticache_node_type="cache.t2.micro" \
-                                    -var mhs_forward_reliable_endpoint_url=${MHS_FORWARD_RELIABLE_ENDPOINT_URL}
-                                """
-                                    script {
-                                        env.MHS_ADDRESS = sh(
-                                                label: 'Obtaining outbound LB DNS name',
-                                                returnStdout: true,
-                                                script: "echo \"https://\$(terraform output outbound_lb_domain_name)\""
-                                        ).trim()
-                                        env.MHS_OUTBOUND_TARGET_GROUP = sh(
-                                                label: 'Obtaining outbound LB target group ARN',
-                                                returnStdout: true,
-                                                script: "terraform output outbound_lb_target_group_arn"
-                                        ).trim()
-                                        env.MHS_INBOUND_TARGET_GROUP = sh(
-                                                label: 'Obtaining inbound LB target group ARN',
-                                                returnStdout: true,
-                                                script: "terraform output inbound_lb_target_group_arn"
-                                        ).trim()
-                                        env.MHS_ROUTE_TARGET_GROUP = sh(
-                                                label: 'Obtaining route LB target group ARN',
-                                                returnStdout: true,
-                                                script: "terraform output route_lb_target_group_arn"
-                                        ).trim()
-                                        env.MHS_DYNAMODB_TABLE_NAME = sh(
-                                                label: 'Obtaining the dynamodb table name used for the MHS state',
-                                                returnStdout: true,
-                                                script: "terraform output mhs_state_table_name"
-                                        ).trim()
-                                        env.MHS_SYNC_ASYNC_TABLE_NAME = sh(
-                                                label: 'Obtaining the dynamodb table name used for the MHS sync/async state',
-                                                returnStdout: true,
-                                                script: "terraform output mhs_sync_async_table_name"
-                                        ).trim()
-                                    }
-                                }
-                            }
-                        }
+                //         stage('Deploy SCR') {
+                //             steps {
+                //                 dir('pipeline/terraform/scr-environment') {
+                //                     sh label: 'Initialising Terraform', script: """
+                //                     terraform init \
+                //                     -backend-config="bucket=${TF_STATE_BUCKET}" \
+                //                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                //                     -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
+                //                     -input=false -no-color
+                //                 """
+                //                     sh label: 'Applying Terraform configuration', script: """
+                //                     terraform apply -no-color -auto-approve \
+                //                     -var environment_id=${ENVIRONMENT_ID} \
+                //                     -var build_id=${BUILD_TAG} \
+                //                     -var cluster_id=${CLUSTER_ID} \
+                //                     -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                //                     -var ecr_address=${DOCKER_REGISTRY} \
+                //                     -var scr_log_level=DEBUG \
+                //                     -var scr_service_port=${SCR_SERVICE_PORT} \
+                //                     -var scr_mhs_address=${MHS_ADDRESS} \
+                //                     -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
+                //                 """
+                //                 }
+                //             }
+                //         }
 
-                        stage('Deploy SCR') {
-                            steps {
-                                dir('pipeline/terraform/scr-environment') {
-                                    sh label: 'Initialising Terraform', script: """
-                                    terraform init \
-                                    -backend-config="bucket=${TF_STATE_BUCKET}" \
-                                    -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                                    -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
-                                    -input=false -no-color
-                                """
-                                    sh label: 'Applying Terraform configuration', script: """
-                                    terraform apply -no-color -auto-approve \
-                                    -var environment_id=${ENVIRONMENT_ID} \
-                                    -var build_id=${BUILD_TAG} \
-                                    -var cluster_id=${CLUSTER_ID} \
-                                    -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                                    -var ecr_address=${DOCKER_REGISTRY} \
-                                    -var scr_log_level=DEBUG \
-                                    -var scr_service_port=${SCR_SERVICE_PORT} \
-                                    -var scr_mhs_address=${MHS_ADDRESS} \
-                                    -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
-                                """
-                                }
-                            }
-                        }
+                //         stage('Run integration tests') {
+                //             steps {
+                //                 dir('integration-tests/integration_tests') {
+                //                     sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
 
-                        stage('Run integration tests') {
-                            steps {
-                                dir('integration-tests/integration_tests') {
-                                    sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+                //                     // Wait for MHS load balancers to have healthy targets
+                //                     dir('../../pipeline/scripts/check-target-group-health') {
+                //                         sh script: 'pipenv install'
 
-                                    // Wait for MHS load balancers to have healthy targets
-                                    dir('../../pipeline/scripts/check-target-group-health') {
-                                        sh script: 'pipenv install'
-
-                                        timeout(13) {
-                                            waitUntil {
-                                                script {
-                                                    def r = sh label: 'Waiting for load balancer...', script: 'sleep 3; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
-                                                    return (r == 0)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    sh label: 'Running integration tests', script: 'pipenv run inttests'
-                                }
-                            }
-                        }
-                    }
-                }
+                //                         timeout(13) {
+                //                             waitUntil {
+                //                                 script {
+                //                                     def r = sh label: 'Waiting for load balancer...', script: 'sleep 3; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
+                //                                     return (r == 0)
+                //                                 }
+                //                             }
+                //                         }
+                //                     }
+                //                     sh label: 'Running integration tests', script: 'pipenv run inttests'
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
             }
         }
     }

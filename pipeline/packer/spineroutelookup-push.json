@@ -8,7 +8,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "temporary/spineroutelookup:latest",
+      "image": "local/spineroutelookup:{{user `tag`}}",
       "pull": false,
       "commit": true
     }
@@ -20,7 +20,7 @@
       {
         "type": "docker-tag",
         "repository": "{{user `registry`}}{{user `repository`}}",
-        "tag": "route-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "type": "docker-push",
