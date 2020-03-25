@@ -14,6 +14,7 @@ pipeline {
         stage('cleanup') {
             steps {
                 sh label: 'List all docker images', script: 'docker images'
+                sh label: 'Remove dangling images', script: 'docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'
                 // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*componenttest*" -q)'
                 // sh label: 'deleting images', script: 'docker rmi $(docker images --filter=reference="*mhs-route*" -q)'
                 sh label: 'deleting images', script: 'docker rmi --force $(docker images --filter=reference="local/mhs-outbound" -q)'
