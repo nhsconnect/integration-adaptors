@@ -211,3 +211,73 @@ resource "aws_lb_listener" "inbound_nlb_listener" {
     target_group_arn = aws_lb_target_group.inbound_nlb_target_group.arn
   }
 }
+
+##############
+# fake-spine load balancer
+##############
+
+# Application load balancer for MHS outbound
+resource "aws_lb" "fake_spine_alb" {
+  internal = true
+  load_balancer_type = "application"
+  subnets = aws_subnet.mhs_subnet.*.id
+  security_groups = [
+    aws_security_group.alb_fake_spine_security_group.id
+  ]
+
+  access_logs {
+    bucket = aws_s3_bucket.mhs_access_logs_bucket.bucket
+    prefix = "fake_spine-${var.build_id}"
+    enabled = true
+  }
+
+  # We need the S3 bucket to have the policy set in order for the
+  # load balancer to have access to store access logs
+  depends_on = [
+    aws_s3_bucket_policy.mhs_access_logs_bucket_policy
+  ]
+
+  tags = {
+    Name = "${var.environment_id}-fake-spine-alb"
+    EnvironmentId = var.environment_id
+  }
+}
+
+# Target group for the application load balancer for MHS outbound
+# The MHS outbound ECS service registers it's tasks here.
+resource "aws_lb_target_group" "fake_spine_alb_target_group" {
+  port = 80
+  protocol = "HTTP"
+  target_type = "ip"
+  vpc_id = aws_vpc.mhs_vpc.id
+
+  health_check {
+    path = "/healthcheck"
+    matcher = "200"
+  }
+
+  tags = {
+    Name = "${var.environment_id}-fake-spine-alb-target-group"
+    EnvironmentId = var.environment_id
+  }
+}
+
+# Terraform output variable of the fake-spine load balancer's target group ARN
+output "fake_spine_lb_target_group_arn" {
+  value = aws_lb_target_group.fake_spine_alb_target_group.arn
+  description = "The ARN of the fake-spine service load balancers's target group."
+}
+
+# Listener for MHS outbound load balancer that forwards requests to the correct target group
+resource "aws_lb_listener" "fake_spine_alb_listener" {
+  load_balancer_arn = aws_lb.fake_spine_alb.arn
+  port = 443
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = var.fake_spine_alb_certificate_arn
+
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.fake_spine_alb_target_group.arn
+  }
+}

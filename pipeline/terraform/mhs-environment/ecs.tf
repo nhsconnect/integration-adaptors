@@ -39,6 +39,16 @@ resource "aws_cloudwatch_log_group" "mhs_route_log_group" {
   }
 }
 
+# Cloudwatch log group for fake-spine service to log to
+# TODO: how to make this optional for non-vnp environments
+resource "aws_cloudwatch_log_group" "fake_spine_log_group" {
+  name = "/ecs/${var.environment_id}-fake-spine"
+  tags = {
+    Name = "${var.environment_id}-fake-spine-log-group"
+    EnvironmentId = var.environment_id
+  }
+}
+
 # This locals block is used in mhs_outbound_task below to define the
 # environment variables
 locals {
@@ -97,6 +107,36 @@ locals {
       name = "MHS_SECRET_CA_CERTS"
       valueFrom = var.ca_certs_arn
     }
+  ]
+  fake_spine_base_environment_variables = [
+    {
+    name = "FAKE_SPINE_PRIVATE_KEY",
+    value = "TODO"
+    },{
+      name = "FAKE_SPINE_CERTIFICATE",
+      value = "TODO"
+    },
+    {
+      name = "FAKE_SPINE_CA_STORE",
+      value = "TODO"
+    },
+    {
+      name = "INBOUND_SERVER_BASE_URL",
+      value = "TODO"
+    },
+    {
+      name = "FAKE_SPINE_OUTBOUND_DELAY_MS",
+      value = "TODO"
+    },
+    {
+      name = "FAKE_SPINE_INBOUND_DELAY_MS",
+      value = "TODO"
+    },
+    {
+      name = "MHS_SECRET_PARTY_KEY",
+      valueFrom = var.party_key_arn
+    },
+
   ]
 }
 
@@ -333,6 +373,50 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
   execution_role_arn = var.execution_role_arn
 }
 
+# Fake Spine ECS task definition
+resource "aws_ecs_task_definition" "fake_spine_task" {
+  family = "${var.environment_id}-fake-spine"
+  container_definitions = jsonencode(
+  [
+    {
+      name = "mhs-outbound"
+      image = "${var.ecr_address}/fake-spine:fake-spine-${var.build_id}"
+      environment = local.fake_spine_base_environment_variables
+      secrets = []
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group = aws_cloudwatch_log_group.fake_spine_log_group.name
+          awslogs-region = var.region
+          awslogs-stream-prefix = var.build_id
+          awslogs-datetime-format = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
+        }
+      }
+      portMappings = [
+        {
+          containerPort = 443
+          hostPort = 443
+          protocol = "tcp"
+        }
+      ]
+    }
+  ]
+  )
+  cpu = "512"
+  memory = "1024"
+  network_mode = "awsvpc"
+  requires_compatibilities = [
+    "FARGATE"
+  ]
+  tags = {
+    Name = "${var.environment_id}-fake-spine-task"
+    EnvironmentId = var.environment_id
+  }
+  task_role_arn = var.task_role_arn
+  execution_role_arn = var.execution_role_arn
+}
+
 
 # MHS outbound service that runs multiple of the MHS outbound task definition
 # defined above
@@ -535,6 +619,74 @@ resource "aws_appautoscaling_policy" "mhs_route_autoscaling_policy" {
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
       resource_label = "${aws_lb.route_alb.arn_suffix}/${aws_lb_target_group.route_alb_target_group.arn_suffix}"
+    }
+  }
+}
+
+# Create an ECS service that runs a configurable number of instances of the fake-spine service container across all of the
+# VPC's subnets. Each container is register with the route service's LB's target group.
+resource "aws_ecs_service" "fake_spine_service" {
+  name = "${var.environment_id}-fake-spine"
+  cluster = aws_ecs_cluster.mhs_cluster.id
+  deployment_maximum_percent = 200
+  deployment_minimum_healthy_percent = 100
+  desired_count = var.fake_spine_service_minimum_instance_count
+  launch_type = "FARGATE"
+  scheduling_strategy = "REPLICA"
+  task_definition = aws_ecs_task_definition.fake_spine_task.arn
+
+  network_configuration {
+    assign_public_ip = false
+    security_groups = [
+      aws_security_group.fake_spine_security_group.id
+    ]
+    subnets = aws_subnet.mhs_subnet.*.id
+  }
+
+  load_balancer {
+    # In the MHS route task definition, we define only 1 container, and for that container, we expose only 1 port
+    # That is why in these 2 lines below we do "[0]" to reference that one container and port definition.
+    container_name = jsondecode(aws_ecs_task_definition.fake_spine_task.container_definitions)[0].name
+    container_port = jsondecode(aws_ecs_task_definition.fake_spine_task.container_definitions)[0].portMappings[0].hostPort
+    target_group_arn = aws_lb_target_group.route_alb_target_group.arn
+  }
+
+  depends_on = [
+    aws_lb.route_alb
+  ]
+
+  # Preserve the autoscaled instance count when this service is updated
+  lifecycle {
+    ignore_changes = [
+      "desired_count"
+    ]
+  }
+}
+
+# The autoscaling target that configures autoscaling for the MHS route ECS service.
+resource "aws_appautoscaling_target" "fake_spine_autoscaling_target" {
+  max_capacity = var.fake_spine_service_maximum_instance_count
+  min_capacity = var.fake_spine_service_minimum_instance_count
+  resource_id = "service/${aws_ecs_cluster.mhs_cluster.name}/${aws_ecs_service.fake_spine_service.name}"
+  role_arn = var.task_scaling_role_arn
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace = "ecs"
+}
+
+# An autoscaling policy for the MHS route ECS service that scales services so that each instance handles the desired
+# number of requests per minute.
+resource "aws_appautoscaling_policy" "fake_spine_autoscaling_policy" {
+  name = "${var.environment_id}-fake-spine-autoscaling-policy"
+  policy_type = "TargetTrackingScaling"
+  resource_id = aws_appautoscaling_target.fake_spine_autoscaling_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.fake_spine_autoscaling_target.scalable_dimension
+  service_namespace = aws_appautoscaling_target.fake_spine_autoscaling_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = var.fake_spine_service_target_request_count
+    predefined_metric_specification {
+      predefined_metric_type = "ALBRequestCountPerTarget"
+      resource_label = "${aws_lb.fake_spine_alb.arn_suffix}/${aws_lb_target_group.fake_spine_alb_target_group.arn_suffix}"
     }
   }
 }
