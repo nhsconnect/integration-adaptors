@@ -10,6 +10,8 @@ import uuid
 from typing import Optional
 
 import requests
+
+from comms.http_headers import HttpHeaders
 from integration_tests.helpers.asid_provider import get_asid
 from requests import Response
 
@@ -42,13 +44,13 @@ class MhsHttpRequestBuilder(object):
         :return: self
         """
         self.headers = {
-            'Interaction-Id': interaction_id,
-            'Message-Id': message_id,
-            'Correlation-Id': correlation_id,
-            'sync-async': str(sync_async).lower(),
-            'from-asid': from_asid,
-            'Content-Type': 'application/json',
-            'ods-code': ods_code
+            HttpHeaders.INTERACTION_ID: interaction_id,
+            HttpHeaders.MESSAGE_ID: message_id,
+            HttpHeaders.CORRELATION_ID: correlation_id,
+            HttpHeaders.SYNC_ASYNC: str(sync_async).lower(),
+            HttpHeaders.FROM_ASID: from_asid,
+            HttpHeaders.CONTENT_TYPE: 'application/json',
+            HttpHeaders.ODS_CODE: ods_code
         }
 
         return self
