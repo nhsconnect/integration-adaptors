@@ -5,13 +5,14 @@ from pathlib import Path
 from typing import Dict, Tuple, Union
 
 import lxml.etree as ET
+
+from comms.http_headers import HttpHeaders
 from utilities import integration_adaptors_logger as log, message_utilities
 
 from definitions import ROOT_DIR
 from mhs_common.messages import envelope
 
 SOAP_CONTENT_TYPE_VALUE = 'text/xml'
-CONTENT_TYPE_HEADER_NAME = "Content-Type"
 
 XSLT_DIR = 'mhs_common/messages/xslt'
 SOAP_HEADER_XSLT = 'soap_header.xslt'
@@ -66,7 +67,7 @@ class SoapEnvelope(envelope.Envelope):
         message = self.message_builder.build_message(soap_message_dictionary)
         http_headers = {'charset': 'UTF-8',
                         'SOAPAction': soap_message_dictionary[ACTION],
-                        'Content-Type': SOAP_CONTENT_TYPE_VALUE,
+                        HttpHeaders.CONTENT_TYPE: SOAP_CONTENT_TYPE_VALUE,
                         'type': SOAP_CONTENT_TYPE_VALUE}
 
         return message_id, http_headers, message
