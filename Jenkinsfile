@@ -19,7 +19,7 @@ pipeline {
                 }
             }
         }
-        stage('Build & tets MHS Common') {
+        stage('Build & test MHS Common') {
             steps {
                 dir('mhs/common') {
                     buildModules('Installing mhs common dependencies')
