@@ -25,6 +25,14 @@
     {
       "type": "shell",
       "inline": [
+        "apt-get update",
+        "apt-get install -y build-essential libssl-dev swig pkg-config",
+        "mkdir -p {{user `app_dir`}}/mhs"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
         "mkdir -p {{user `app_dir`}}"
       ]
     },
