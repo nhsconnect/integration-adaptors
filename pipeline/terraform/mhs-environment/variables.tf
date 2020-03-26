@@ -119,8 +119,14 @@ variable "mhs_resynchroniser_interval" {
 
 variable "mhs_outbound_http_proxy" {
   type = string
-  description = "Address of the HTTP proxy to proxy downstream requests from MHS outbound via."
+  description = "Address of the HTTP proxy to proxy downstream requests from MHS outbound."
   default = ""
+}
+
+variable "mhs_validate_cert" {
+  type = bool
+  description = "Verification of the server certificate received when making a connection to the spine MHS"
+  default = True
 }
 
 variable "mhs_state_table_read_capacity" {
