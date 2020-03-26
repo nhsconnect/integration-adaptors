@@ -98,3 +98,21 @@ Audit messages are produced with the log level of AUDIT.
 
 See above for details of `RequestId`, `CorrelationId`, `ProcessKey`, `pid`, `LogLevel`, and `LoggerName`.
 
+### Cloud Watch
+
+See below example to write CloudWatch queries to parse logs and search for a given correlation id and filter out healthchecks. 
+
+ `parse '* | * | * | * | * | * | * | * | *' as timestamp, level, correlation_id, message_id, interaction_id, inbound_message_id, process, name, text `<br>
+ `| display timestamp, level, correlation_id, name, text, message_id`<br>
+ `| filter text not like 'healthcheck'`<br>
+ `| filter correlation_id = '7'`<br>
+ `| filter level = 'INFO'`<br>
+ `| limit 10`<br>
+ 
+ Parse query in Cloud Watch add `*` for each value wanted such as timestamp, correlation id etc. Multiple values selected are separated by `|`.
+ 
+ Display selected values columns by using keyword `display` and selecting values such as `timestamp`.
+ 
+ Filter search by given value, use keyword `filter` select a value `correlation_id`, choose an operator `=` and add correlation id value wanted `7`.
+ 
+ Limit number of results return using keyword `limit` and the number of results needed, in this example `10`.
