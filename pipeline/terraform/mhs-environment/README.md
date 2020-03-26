@@ -48,7 +48,7 @@ terraform apply \
     -var ecr_address=<docker_registry> \
     -var mhs_log_level=<mhs_log_level> \
     -var mhs_outbound_http_proxy=<optional_MHS_http_proxy_host> \
-    -var mhs_outbound_validate_certificate=??? \
+    -var mhs_outbound_validate_certificate=<True/False> \
     -var mhs_state_table_read_capacity=<dynamodb_state_table_read_capacity> \
     -var mhs_state_table_write_capacity=<dynamodb_state_table_write_capacity> \
     -var mhs_sync_async_table_read_capacity=<dynamodb_sync_async_table_read_capacity> \
@@ -79,7 +79,7 @@ terraform destroy \
     -var ecr_address=<docker_registry> \
     -var mhs_log_level=<mhs_log_level> \
     -var mhs_outbound_http_proxy=<optional_MHS_http_proxy_host> \
-    -var mhs_outbound_validate_certificate=??? \
+    -var mhs_outbound_validate_certificate=<True/False> \
     -var mhs_state_table_read_capacity=<dynamodb_state_table_read_capacity> \
     -var mhs_state_table_write_capacity=<dynamodb_state_table_write_capacity> \
     -var mhs_sync_async_table_read_capacity=<dynamodb_sync_async_table_read_capacity> \
