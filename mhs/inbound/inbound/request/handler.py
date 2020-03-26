@@ -44,7 +44,6 @@ class InboundHandler(base_handler.BaseHandler):
     @time_request
     async def post(self):
         logger.info('Inbound POST received: {request}', fparams={'request': self.request})
-
         request_message = self._extract_incoming_ebxml_request_message()
 
         if not self._is_message_intended_for_receiving_mhs(request_message):

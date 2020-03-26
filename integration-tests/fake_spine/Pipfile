@@ -7,6 +7,7 @@ verify_ssl = true
 
 [packages]
 tornado = "*"
+pystache = "*"
 
 [requires]
 python_version = "3.7"

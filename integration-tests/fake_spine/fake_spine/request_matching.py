@@ -1,7 +1,11 @@
 import logging
-from typing import Callable, Dict, Tuple
+import traceback
+from typing import Callable, List
+from typing import NamedTuple
+
 from tornado.httputil import HTTPServerRequest
-from fake_spine.spine_response import SpineResponse
+
+from fake_spine.spine_responses import SpineResponse
 
 logger = logging.getLogger(__name__)
 
@@ -15,23 +19,33 @@ class RequestMatcher(object):
     def does_match(self, request: HTTPServerRequest) -> bool:
         return self.matcher(request)
 
+    def __str__(self):
+        return self.unique_identifier
+
+
+class MatcherAndResponses(NamedTuple):
+    request_matcher: RequestMatcher
+    response: SpineResponse
+
 
 class SpineRequestResponseMapper(object):
 
-    def __init__(self, request_matcher_to_response: Dict[RequestMatcher, SpineResponse]):
+    def __init__(self, request_matcher_to_response: List[MatcherAndResponses]):
+        """
+        :param request_matcher_to_response: An ordered list of matchers and response
+        """
         self.request_matcher_to_response = request_matcher_to_response
 
-    def response_for_request(self, request: HTTPServerRequest) -> Tuple[int, str]:
-        for request_matcher, response in self.request_matcher_to_response.items():
+    def response_for_request(self, request: HTTPServerRequest) -> SpineResponse:
+        for request_matcher, responses in self.request_matcher_to_response:
             try:
                 matches_response = request_matcher.does_match(request)
                 if matches_response:
-                    logger.log(logging.INFO,
-                               f"request matched a configured matcher: {request_matcher.unique_identifier}")
-                    return response.get_response()
-            except Exception as e:
-                logger.log(logging.ERROR, f"Matcher threw exception whilst trying to match: {e}")
+                    logger.info(f'request matched a configured matcher: {request_matcher.unique_identifier}')
+                    return responses
+            except Exception:
+                tb = traceback.format_exc()
+                logger.warning(f'Matcher threw exception: {tb}')
 
-        logger.log(logging.ERROR,
-                   f"no matcher configured that matched request {request} with headers: {request.headers}")
-        raise Exception(f"no response configured matching the request")
+        logger.exception(f'No matcher configured that matched the request.\nHEADERS{request.headers}\nBODY{request.body.decode()}')
+        raise Exception(f'No matcher configured that matched the request.')
