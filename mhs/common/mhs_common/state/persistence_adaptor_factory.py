@@ -1,6 +1,7 @@
 import utilities.config as config
 from mhs_common.state.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
 import utilities.integration_adaptors_logger as log
+from mhs_common.state.persistence_adaptor import PersistenceAdaptor
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -10,7 +11,7 @@ _PERSISTENCE_ADAPTOR_TYPES = {
 }
 
 
-def get_persistence_adaptor(*args, **kwargs):
+def get_persistence_adaptor(*args, **kwargs) -> PersistenceAdaptor:
     """
     Builds a new persistence adaptor of type defined in environment variable PERSISTENCE_ADAPTOR
     Must be one of the defined in mhs.common.state.persistence_adaptor_factory._PERSISTENCE_ADAPTOR_TYPES
