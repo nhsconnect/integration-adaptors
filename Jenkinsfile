@@ -11,39 +11,19 @@ pipeline {
     }
 
     stages {
-        stage('Common') {
-            stages {
-                stage('Build') {
-                    steps {
-                        dir('common') {
-                            buildModules('Installing common dependencies')
-                        }
-                    }
-                }
-                stage('Unit test') {
-                    steps {
-                        dir('common') {
-                            executeUnitTestsWithCoverage()
-                        }
-                    }
+        stage('Build & test Common') {
+            steps {
+                dir('common') {
+                    buildModules('Installing common dependencies')
+                    executeUnitTestsWithCoverage()
                 }
             }
         }
-        stage('MHS Common') {
-            stages {
-                stage('Build') {
-                    steps {
-                        dir('mhs/common') {
-                            buildModules('Installing mhs common dependencies')
-                        }
-                    }
-                }
-                stage('Unit test') {
-                    steps {
-                        dir('mhs/common') {
-                            executeUnitTestsWithCoverage()
-                        }
-                    }
+        stage('Build & tets MHS Common') {
+            steps {
+                dir('mhs/common') {
+                    buildModules('Installing mhs common dependencies')
+                    executeUnitTestsWithCoverage()
                 }
             }
         }
