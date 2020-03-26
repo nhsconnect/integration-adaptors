@@ -152,7 +152,7 @@ pipeline {
                         stage('Push image') {
                             steps {
                                 script {
-                                    sh label: 'Oushing SCR web service image', script: "packer build -color=false pipeline/packer/scr-web-service-push.json"
+                                    sh label: 'Pushing SCR web service image', script: "packer build -color=false pipeline/packer/scr-web-service-push.json"
                                 }
                             }
                         }

@@ -102,7 +102,7 @@ locals {
 
 # MHS outbound ECS task definition
 resource "aws_ecs_task_definition" "mhs_outbound_task" {
-  family = "${var.environment_id}-mhs-outbound-task"
+  family = "${var.environment_id}-mhs-outbound"
   container_definitions = jsonencode(
   [
     {
@@ -160,7 +160,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
 
 # MHS inbound ECS task definition
 resource "aws_ecs_task_definition" "mhs_inbound_task" {
-  family = "${var.environment_id}-mhs-inbound-task"
+  family = "${var.environment_id}-mhs-inbound"
   container_definitions = jsonencode(
   [
     {
@@ -253,7 +253,7 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
 
 # Create an ECS task definition for the MHS route service container image.
 resource "aws_ecs_task_definition" "mhs_route_task" {
-  family = "${var.environment_id}-mhs-route-task"
+  family = "${var.environment_id}-mhs-route"
   container_definitions = jsonencode(
   [
     {
