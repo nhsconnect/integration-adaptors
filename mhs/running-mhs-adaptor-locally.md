@@ -61,7 +61,10 @@ To run the MHS services using docker containers follow the steps below:
 2. Populate the file with the following information:
   ```sh
 #!/bin/bash
-echo -e "\033[1;32mExporting environment variables\033[0m"
+LIGHT_GREEN='\033[1;32m'
+NC='\033[0m'
+
+echo -e "${LIGHT_GREEN}Exporting environment variables${NC}"
 
 # Your Party key here
 export MHS_SECRET_PARTY_KEY=""
