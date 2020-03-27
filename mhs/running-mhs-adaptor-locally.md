@@ -52,3 +52,11 @@ Each of these services exposes a `/healthcheck` URL which, when called indicates
 
 In order to determine the ports on `localhost` which these health-check endpoints are listening on, examine your local copy
 of the [docker-compose](../docker-compose.yml) file.
+
+## Running MHS components and load balancer with docker
+
+To run the MHS services using docker containers follow the steps below:
+
+1. Make a copy of the file [docker-build-components-example.sh](../docker-build-components-example.sh) and rename to `docker-build-components.sh`
+2. Populate the environment variables with the certificate details received from NHS OpenTest
+3. Execute the script

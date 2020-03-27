@@ -139,6 +139,7 @@ mhs-reference-implementation/selenium_tests/data/local_asid
 /mhs/outbound/nhs-outbound-env.yaml
 /mhs/spineroutelookup/nhs-spineroutelookup-env.yaml
 /integration-tests/integration_tests/integration-tests-env.yaml
+docker-build-components.sh
 
 # system
 .DS_Store
