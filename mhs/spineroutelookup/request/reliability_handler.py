@@ -1,20 +1,11 @@
-import tornado.web
+from request.base_handler import BaseHandler
 from utilities import timing, integration_adaptors_logger as log
-
-from lookup import routing_reliability
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 
-class ReliabilityRequestHandler(tornado.web.RequestHandler):
+class ReliabilityRequestHandler(BaseHandler):
     """A handler for requests to obtain reliability information."""
-
-    def initialize(self, routing: routing_reliability.RoutingAndReliability) -> None:
-        """Initialise this request handler with the provided configuration values.
-
-        :param routing: The routing and reliability component to use to look up values in SDS.
-        """
-        self.routing = routing
 
     @timing.time_request
     async def get(self):
