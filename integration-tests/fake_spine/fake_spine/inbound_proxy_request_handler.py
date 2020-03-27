@@ -1,10 +1,10 @@
 import logging
-import os
 
 import tornado.web
 from tornado import httpclient
 
 from fake_spine.certs import Certs
+from fake_spine import config
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class InboundProxyRequestHandler(tornado.web.RequestHandler):
         logger.log(logging.INFO, f"request being proxied to inbound service")
 
         response = await httpclient.AsyncHTTPClient()\
-            .fetch(os.environ.get('INBOUND_SERVER_BASE_URL'),
+            .fetch(config.INBOUND_SERVER_BASE_URL,
                    raise_error=False,
                    method="POST",
                    body=self.request.body,

@@ -1,4 +1,3 @@
-import contextvars
 import datetime as dt
 import logging
 import sys
@@ -6,15 +5,11 @@ from logging import LogRecord
 from typing import Optional, Any
 
 from utilities import config
+from utilities import mdc
 
 AUDIT = 25
 LOG_FORMAT_STRING = "%(asctime)sZ | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s " \
                     "| %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s"
-
-message_id: contextvars.ContextVar[str] = contextvars.ContextVar('message_id', default='')
-correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar('correlation_id', default='')
-inbound_message_id: contextvars.ContextVar[str] = contextvars.ContextVar('inbound_message_id', default='')
-interaction_id: contextvars.ContextVar[str] = contextvars.ContextVar('interaction_id', default='')
 
 _project_name = None
 _log_format = LOG_FORMAT_STRING
@@ -80,10 +75,10 @@ class CustomFormatter(logging.Formatter):
         super().__init__(fmt=_log_format, datefmt='%Y-%m-%dT%H:%M:%S.%f')
 
     def format(self, record: LogRecord) -> str:
-        record.message_id = message_id.get()
-        record.correlation_id = correlation_id.get()
-        record.inbound_message_id = inbound_message_id.get()
-        record.interaction_id = interaction_id.get()
+        record.message_id = mdc.message_id.get()
+        record.correlation_id = mdc.correlation_id.get()
+        record.inbound_message_id = mdc.inbound_message_id.get()
+        record.interaction_id = mdc.interaction_id.get()
 
         record.name = f'{_project_name}.{record.name}' if _project_name else record.name
 
