@@ -2,7 +2,10 @@ version: '3'
 
 services:
   inbound:
-    image: local/mhs-inbound:${INBOUND_BUILD_TAG}
+    image: local/mhs-inbound:${BUILD_TAG}
+    # build:
+    #   context: .
+    #   dockerfile: ./dockers/mhs/inbound/Dockerfile
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SECRET_PARTY_KEY
@@ -20,7 +23,10 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
   outbound:
-    image: local/mhs-outbound:${OUTBOUND_BUILD_TAG}
+    image: local/mhs-outbound:${BUILD_TAG}
+    # build:
+    #   context: .
+    #   dockerfile: ./dockers/mhs/outbound/Dockerfile
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SECRET_PARTY_KEY
@@ -40,9 +46,12 @@ services:
       # Note that this endpoint URL is Opentest-specific
       - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable
   route:
-    image: local/mhs-route:${ROUTE_BUILD_TAG}
+    image: local/mhs-route:${BUILD_TAG}
+    # build:
+    #   context: .
+    #   dockerfile: ./dockers/mhs/spineroutelookup/Dockerfile
     ports:
-      - "8080:80"
+        - "8080:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SDS_URL=ldap://192.168.128.11
@@ -64,10 +73,3 @@ services:
     image: redis
     ports:
       - "6379:6379"
-  scradaptor:
-    image: local/scr-web-service:${WEB_SERVICE_BUILD_TAG}
-    ports:
-      - "9000:80"
-    environment:
-      - SCR_LOG_LEVEL=NOTSET
-      - SCR_MHS_ADDRESS=http://outbound

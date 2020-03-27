@@ -60,7 +60,7 @@
         "name": "publish",
         "type": "docker-tag",
         "repository": "{{user `registry`}}{{user `repository`}}",
-        "tag": "route-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "name": "publish",
@@ -71,7 +71,7 @@
       {
         "type": "docker-tag",
         "repository": "local/mhs-route",
-        "tag": "route-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "type": "docker-tag",

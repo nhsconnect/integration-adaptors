@@ -143,3 +143,5 @@ export-env-vars-and-run-mhs-docker.sh
 
 # system
 .DS_Store
+
+.vscode/
