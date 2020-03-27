@@ -4,6 +4,7 @@ import time
 from unittest import TestCase
 from unittest.mock import patch
 
+from utilities import mdc
 from utilities import integration_adaptors_logger as log, config
 
 
@@ -12,17 +13,17 @@ class TestLogger(TestCase):
 
     def tearDown(self) -> None:
         logging.getLogger().handlers = []
-        log.message_id.set(None)
-        log.correlation_id.set(None)
-        log.interaction_id.set(None)
-        log.inbound_message_id.set(None)
+        mdc.message_id.set(None)
+        mdc.correlation_id.set(None)
+        mdc.interaction_id.set(None)
+        mdc.inbound_message_id.set(None)
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_custom_audit_level(self, mock_stdout):
         mock_stdout.truncate(0)
 
         log.configure_logging()
-        log.correlation_id.set('2')
+        mdc.correlation_id.set('2')
         log.IntegrationAdaptorsLogger('TES').audit('Some audit message with %s %s', 'additional', 'parameters')
 
         output = mock_stdout.getvalue()
@@ -59,10 +60,10 @@ class TestLogger(TestCase):
         mock_stdout.truncate(0)
 
         log.configure_logging('TEST')
-        log.message_id.set('10')
-        log.correlation_id.set('15')
-        log.inbound_message_id.set('20')
-        log.interaction_id.set('25')
+        mdc.message_id.set('10')
+        mdc.correlation_id.set('15')
+        mdc.inbound_message_id.set('20')
+        mdc.interaction_id.set('25')
 
         log.IntegrationAdaptorsLogger('SYS').info('%s %s', 'yes', 'no')
 

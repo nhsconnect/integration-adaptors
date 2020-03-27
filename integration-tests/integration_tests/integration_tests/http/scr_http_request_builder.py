@@ -8,6 +8,8 @@ import uuid
 import requests
 from requests import Response
 
+from comms.http_headers import HttpHeaders
+
 
 class ScrHttpRequestBuilder(object):
     """
@@ -31,8 +33,8 @@ class ScrHttpRequestBuilder(object):
         """
         self.headers = {
             'Interaction-name': interaction_name,
-            'Message-Id': message_id,
-            'Correlation-Id': correlation_id
+            HttpHeaders.MESSAGE_ID: message_id,
+            HttpHeaders.CORRELATION_ID: correlation_id
         }
 
         return self

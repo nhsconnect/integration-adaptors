@@ -1,8 +1,10 @@
 import logging
 import re
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 
 logger = logging.getLogger(__name__)
+
+MESSAGE_ID_EXPRESSION = re.compile('(<eb:MessageId>(?P<messageId>.+)</eb:MessageId>)')
 
 
 def body_contains_message_id(body: str, message_id: str) -> bool:
@@ -13,20 +15,24 @@ def body_contains_message_id(body: str, message_id: str) -> bool:
     :return: true if message_id was found in the SOAP request
     """
     logger.log(logging.INFO, f"Attempting to parse body: {body}")
-    root_xml = ET.fromstring(body)
-    element_matching_xpath = root_xml.find('.//wsa:MessageID', namespaces={'wsa': 'http://schemas.xmlsoap.org/ws/2004/08/addressing'})
-
-    if element_matching_xpath is None:
-        logger.log(logging.INFO, f'message id {message_id} not found')
+    try:
+        root_xml = ElementTree.fromstring(body)
+    except ElementTree.ParseError:
+        logger.info('Unable to parse XML: some request types are not parsed as XML')
         return False
+    else:
+        element_matching_xpath = root_xml.find('.//wsa:MessageID', namespaces={'wsa': 'http://schemas.xmlsoap.org/ws/2004/08/addressing'})
 
-    logger.log(logging.INFO, f'Element matching xpath found with value: {element_matching_xpath.text}')
-    return f'uuid:{message_id}' == element_matching_xpath.text
+        if element_matching_xpath is None:
+            logger.log(logging.INFO, f'message id {message_id} not found')
+            return False
+
+        logger.log(logging.INFO, f'Element matching xpath found with value: {element_matching_xpath.text}')
+        return f'uuid:{message_id}' == element_matching_xpath.text
 
 
 def ebxml_body_contains_message_id(body: str, message_id: str) -> bool:
-    expression = re.compile('(<eb:MessageId>(?P<messageId>.+)</eb:MessageId>)')
-    matches = expression.search(body)
+    matches = MESSAGE_ID_EXPRESSION.search(body)
     if matches is None or len(matches.groups()) != 2:
         logger.log(logging.INFO, f'message id {message_id} not found')
         return False
