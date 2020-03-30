@@ -10,7 +10,7 @@
 terraform {
   # Store the Terraform state in an S3 bucket
   backend "s3" {
-    key = "${var.environment_id}-mhs.tfstate"
+    # key = "${var.environment_id}-mhs.tfstate"
   }
 }
 

@@ -11,94 +11,94 @@ pipeline {
     }
 
     stages {
-        stage('Build modules') {
-            steps {
-                dir('common'){ buildModules('Installing common dependencies') }
-                dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
-                dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
-                dir('mhs/outbound'){ buildModules('Installing outbound dependencies') }
-                dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
-                dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
-            }
-        }
+        // stage('Build modules') {
+        //     steps {
+        //         dir('common'){ buildModules('Installing common dependencies') }
+        //         dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
+        //         dir('mhs/inbound'){ buildModules('Installing inbound dependencies') }
+        //         dir('mhs/outbound'){ buildModules('Installing outbound dependencies') }
+        //         dir('mhs/spineroutelookup'){ buildModules('Installing route lookup dependencies')}
+        //         dir('SCRWebService') { buildModules('Installing SCR web service dependencies') }
+        //     }
+        // }
 
-        stage('Common Module Unit Tests') {
-            steps { dir('common') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Common Unit Tests') {
-            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Inbound Unit Tests') {
-            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Outbound Unit Tests') {
-            steps {
-                dir('mhs/outbound') {
-                    executeUnitTestsWithCoverage()
-                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
-                }
-            }
-        }
-         stage('Spine Route Lookup Unit Tests') {
-            steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
-        }
-        stage('SCR Web Service Unit Tests') {
-            steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
-        }
+        // stage('Common Module Unit Tests') {
+        //     steps { dir('common') { executeUnitTestsWithCoverage() } }
+        // }
+        // stage('MHS Common Unit Tests') {
+        //     steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
+        // }
+        // stage('MHS Inbound Unit Tests') {
+        //     steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
+        // }
+        // stage('MHS Outbound Unit Tests') {
+        //     steps {
+        //         dir('mhs/outbound') {
+        //             executeUnitTestsWithCoverage()
+        //             sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+        //         }
+        //     }
+        // }
+        //  stage('Spine Route Lookup Unit Tests') {
+        //     steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
+        // }
+        // stage('SCR Web Service Unit Tests') {
+        //     steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
+        // }
 
-        stage('Package') {
-            steps {
-                sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
-                sh label: 'Running Outbound Packer build', script: 'packer build -color=false pipeline/packer/outbound.json'
-                sh label: 'Running Spine Route Lookup Packer build', script: 'packer build -color=false pipeline/packer/spineroutelookup.json'
-                sh label: 'Running SCR service Packer build', script: 'packer build -color=false pipeline/packer/scr-web-service.json'
-            }
-        }
+        // stage('Package') {
+        //     steps {
+        //         sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
+        //         sh label: 'Running Outbound Packer build', script: 'packer build -color=false pipeline/packer/outbound.json'
+        //         sh label: 'Running Spine Route Lookup Packer build', script: 'packer build -color=false pipeline/packer/spineroutelookup.json'
+        //         sh label: 'Running SCR service Packer build', script: 'packer build -color=false pipeline/packer/scr-web-service.json'
+        //     }
+        // }
 
-        stage('Run Component Tests') {
-            options {
-                lock('local-docker-compose-environment')
-            }
-            stages {
-                stage('Deploy component locally') {
-                    steps {
-                        sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
-                        sh label: 'Export environment variables', script: '''
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
-                            . ./component-test-source.sh
-                            export INBOUND_BUILD_TAG="inbound-${BUILD_TAG}"
-                            export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
-                            export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
-                            export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                            docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
-                    }
-                }
-                stage('Component Tests') {
-                    steps {
-                        sh label: 'Running component tests', script: '''
-                             docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
-                             docker run --rm --network "${BUILD_TAG_LOWER}_default" \
-                                --env "MHS_ADDRESS=http://outbound" \
-                                --env "AWS_ACCESS_KEY_ID=test" \
-                                --env "AWS_SECRET_ACCESS_KEY=test" \
-                                --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
-                                --env "FAKE_SPINE_ADDRESS=http://fakespine" \
-                                --env "MHS_INBOUND_QUEUE_URL=http://rabbitmq:5672" \
-                                --env "SCR_ADDRESS=http://scradaptor" \
-                                componenttest:$BUILD_TAG
-                        '''
-                    }
-                }
-            }
-            post {
-                always {
-                    sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
-                    sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
-                }
-            }
-        }
+        // stage('Run Component Tests') {
+        //     options {
+        //         lock('local-docker-compose-environment')
+        //     }
+        //     stages {
+        //         stage('Deploy component locally') {
+        //             steps {
+        //                 sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
+        //                 sh label: 'Export environment variables', script: '''
+        //                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
+        //                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
+        //                     . ./component-test-source.sh
+        //                     export INBOUND_BUILD_TAG="inbound-${BUILD_TAG}"
+        //                     export OUTBOUND_BUILD_TAG="outbound-${BUILD_TAG}"
+        //                     export ROUTE_BUILD_TAG="route-${BUILD_TAG}"
+        //                     export WEB_SERVICE_BUILD_TAG="scr-${BUILD_TAG}"
+        //                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
+        //                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
+        //             }
+        //         }
+        //         stage('Component Tests') {
+        //             steps {
+        //                 sh label: 'Running component tests', script: '''
+        //                      docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
+        //                      docker run --rm --network "${BUILD_TAG_LOWER}_default" \
+        //                         --env "MHS_ADDRESS=http://outbound" \
+        //                         --env "AWS_ACCESS_KEY_ID=test" \
+        //                         --env "AWS_SECRET_ACCESS_KEY=test" \
+        //                         --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
+        //                         --env "FAKE_SPINE_ADDRESS=http://fakespine" \
+        //                         --env "MHS_INBOUND_QUEUE_URL=http://rabbitmq:5672" \
+        //                         --env "SCR_ADDRESS=http://scradaptor" \
+        //                         componenttest:$BUILD_TAG
+        //                 '''
+        //             }
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
+        //             sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
+        //         }
+        //     }
+        // }
 
         stage('Run Integration Tests') {
             options {
@@ -113,6 +113,7 @@ pipeline {
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                                    -backend-config="key=${ENVIRONMENT_ID}-mhs.tfstate" \
                                     -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
                                     -input=false -no-color
                                 """
@@ -201,6 +202,7 @@ pipeline {
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                                    -backend-config="key=${ENVIRONMENT_ID}-scr.tfstate" \
                                     -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
                                     -input=false -no-color
                                 """
