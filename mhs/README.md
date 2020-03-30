@@ -89,6 +89,34 @@ the MHS Adaptor to hide this asynchronous response from you, and deliver the res
 
 In this example, the `QUPC_IN160101UK05` Spine message is used again. 
 
+## VSCode Rest Client
+
+### Set Up
+
+Download VSCode: https://code.visualstudio.com/download
+
+Download VSCode Rest Client: https://marketplace.visualstudio.com/items?itemName=humao.rest-client 
+
+Download VSCode GUID Insert: https://marketplace.visualstudio.com/items?itemName=heaths.vscode-guid
+
+Open workspace and ensure Rest Client and GUID Insert are enabled on workspace. Go to `Preferences` > `Extensions` and search for above extensions to VSCode and select enable. 
+
+### Environment Variables 
+
+When in http file, shortcut: `cmd` + `,`.
+
+Environment variables are store in `settings.json` file located in `.vscode` folder. An example can be seen [here](../.vscode/settings.json) of how to set up json. 
+
+In http file, ensure at the bttom right corner the environment you wish to use is selected. As default this is set to `no environment`. 
+
+Enironment variables can be used in a class by surounding text with `{{}}` and the name of variable inside {{GUID}}.
+
+### Using VSCode Rest Client
+
+Shortcut: `cmd` + `option` + `R`.
+
+To generator new UUID, `fn` + `F1` and type `Insert GUID`.
+
 ## AWS Exemplar
 
 It is expected that the MHS solution will be deployed in a number of differing public and private cloud environments.
