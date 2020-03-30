@@ -1,7 +1,7 @@
 terraform {
   # Store the Terraform state in an S3 bucket
   backend "s3" {
-    key = "scr.tfstate"
+    # Intentionally blank - all parameters provided in command line
   }
 }
 
