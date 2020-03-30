@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, skip
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.scr_http_request_builder import ScrHttpRequestBuilder
 from integration_tests.json.json_assertor import JsonResponseAssertor
@@ -31,6 +31,7 @@ class ScrAdaptorTests(TestCase):
                 -> 4.2 (Response)
     """
 
+    @skip('SCR test is not part of MHS adapter')
     def test_should_return_success_response_from_spine_as_json(self):
         # Arrange
         scr_json, message_id = build_message('json_16UK05', patient_nhs_number='9689174606')
