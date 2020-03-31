@@ -26,8 +26,6 @@
     {
       "type": "shell",
       "inline": [
-        "apt-get update",
-        "apt-get install -y build-essential libssl-dev swig pkg-config",
         "mkdir -p {{user `app_dir`}}/mhs"
       ]
     },
@@ -45,12 +43,6 @@
       "type": "file",
       "source": "{{user `inbound_dir`}}",
       "destination": "{{user `app_dir`}}/{{user `inbound_dir`}}"
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
-      ]
     },
     {
       "type": "shell",

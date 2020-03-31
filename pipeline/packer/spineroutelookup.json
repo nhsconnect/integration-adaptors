@@ -25,8 +25,6 @@
     {
       "type": "shell",
       "inline": [
-        "apt-get update",
-        "apt-get install build-essential -y",
         "mkdir -p {{user `app_dir`}}/mhs"
       ]
     },
