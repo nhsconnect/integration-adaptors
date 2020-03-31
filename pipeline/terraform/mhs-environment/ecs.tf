@@ -333,6 +333,7 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
   execution_role_arn = var.execution_role_arn
 }
 
+
 # MHS outbound service that runs multiple of the MHS outbound task definition
 # defined above
 resource "aws_ecs_service" "mhs_outbound_service" {
