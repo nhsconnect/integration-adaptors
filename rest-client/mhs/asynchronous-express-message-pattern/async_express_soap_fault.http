@@ -1,4 +1,4 @@
-
+// Message ID formatted in Fake Spine to return soap error message.                     
 @PATIENT_NHS_NUMBER = 9446245796
 
 # @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client

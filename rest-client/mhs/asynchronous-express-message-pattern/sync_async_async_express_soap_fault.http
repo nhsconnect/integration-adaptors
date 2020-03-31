@@ -1,4 +1,4 @@
-
+// Message ID formatted in Fake Spine to return ebxml error message.                     
 @PATIENT_NHS_NUMBER = 9689177923
 
 # @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client
