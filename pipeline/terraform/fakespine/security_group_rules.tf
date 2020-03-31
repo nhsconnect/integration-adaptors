@@ -31,3 +31,25 @@ resource "aws_security_group_rule" "fake_spine_security_group_route_egress_rule"
   source_security_group_id = aws_security_group.alb_mhs_inbound_security_group.id
   description = "Allow HTTPS outbound connections to MHS Route service LB."
 }
+
+# Egress rule to allow requests to ECR (to pull the MHS outbound image to run)
+resource "aws_security_group_rule" "mhs_outbound_security_group_ecr_egress_rule" {
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.ecr_security_group.id
+  description = "HTTPS connections to ECR endpoint."
+}
+
+# Egress rule to allow writing logs to Cloudwatch
+resource "aws_security_group_rule" "mhs_outbound_security_group_cloudwatch_egress_rule" {
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.cloudwatch_security_group.id
+  description = "HTTPS connections to Cloudwatch endpoint"
+}
