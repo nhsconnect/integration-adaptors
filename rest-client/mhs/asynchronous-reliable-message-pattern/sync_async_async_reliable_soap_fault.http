@@ -1,5 +1,4 @@
-
-@PATIENT_NHS_NUMBER = 9689177923
+// Message ID: '3771F30C-A231-4D64-A46C-E7FB0D52C27C' configured in fakespine to return a soap fault @PATIENT_NHS_NUMBER = 9689177923
 
 # @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client_when_sync_async_requested
 POST {{HOSTNAME}} HTTP/1.1

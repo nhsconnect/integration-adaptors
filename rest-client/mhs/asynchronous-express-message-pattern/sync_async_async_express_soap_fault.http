@@ -1,4 +1,4 @@
-// Message ID formatted in Fake Spine to return ebxml error message.                     
+// Message ID: 'AD7D39A8-1B6C-4520-8367-6B7BEBD7B842' configured in fakespine to return a soap fault               
 @PATIENT_NHS_NUMBER = 9689177923
 
 # @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client

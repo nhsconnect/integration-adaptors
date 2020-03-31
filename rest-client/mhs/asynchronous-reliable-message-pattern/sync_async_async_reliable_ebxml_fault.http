@@ -1,4 +1,4 @@
-
+// Message ID: 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D' configured in fakespine to return a ebxml fault 
 @PATIENT_NHS_NUMBER = 9689177923
 
 # @name Return_information_in_ebxml_fault_returned_from_spine_in_original_post_request_to_client_when_sync_async_requested

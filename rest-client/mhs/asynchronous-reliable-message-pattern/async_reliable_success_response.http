@@ -1,4 +1,5 @@
-
+// Message ID: '35586865-45B0-41A5-98F6-817CA6F1F5EF' configured in fakespine to return a SOAP Fault error,
+// after 2 retries fakespine will return a success response.
 @PATIENT_NHS_NUMBER = 9689177923
 
 # @name Return_success_response_to_the_client_when_a_business_level_retry_is_required_and_succeeds

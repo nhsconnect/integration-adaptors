@@ -1,4 +1,4 @@
-// Message ID formatted in Fake Spine to return soap error message.                     
+// Message ID: 'AD7D39A8-1B6C-4520-8367-6B7BEBD7B842' configured in fakespine to return a soap fault                   
 @PATIENT_NHS_NUMBER = 9446245796
 
 # @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client
