@@ -12,7 +12,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "python:3.7-slim",
+      "image": "nhsdev/nia-mhs-outbound-base:latest",
       "container_dir": "/packer-files",
       "commit": true,
       "changes": [

@@ -1,7 +1,4 @@
-FROM python:3.7-slim
-
-RUN apt-get update
-RUN apt-get install build-essential -y
+FROM nhsdev/nia-sds-base:latest
 
 WORKDIR /app
 

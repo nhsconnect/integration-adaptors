@@ -12,7 +12,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "python:3.7-slim",
+      "image": "nhsdev/nia-sds-base:latest",
       "commit": true,
       "changes": [
         "EXPOSE 80",
