@@ -18,7 +18,7 @@ Open workspace, ensure Rest Client and GUID Insert are enabled on workspace. Go 
 
 ### Request Variables
 
-Think of request variable as attaching a name metadata to the underlying request. This counts as a empty line. Format, either `//` or `#` followed my space and `@name` then space and the name of your request as seen below:
+Think of request variables as attaching a name metadata to the underlying request. This counts as a empty line. Format, either `//` or `#` followed my space and `@name` then space and the name of your request as seen below:
 
 ```http
 # @name nameOfRequest
@@ -71,7 +71,7 @@ Content-Type: application/json
 
 Add a blank line after the Request Headers, all content after it will be treated as Request Body. 
 
-Json example:
+JSON example:
 
 ```http
 POST https://example.com/comments HTTP/1.1
@@ -121,23 +121,23 @@ Specify file path to use as a body:
 
 Environment variables are store in `settings.json` file located in `.vscode` folder. An example can be seen [here](../.vscode/settings.json) of how to set up file. 
 
-In http file, ensure at the bottom right corner the environment you wish to use is selected. As default this is set to `no environment`. `$shared` variables will be available even when no environment is selected. 
+When in selected http file, ensure at the bottom right corner the environment you wish to use is selected. As default this is set to `no environment`. In this repo a `sample-mhs-environment` has been created in the settings file, to be used as sample content. It will be listed in the environment list. `$shared` variables will be available when no environment is selected. 
 
-Enironment variables can be used in a class by surounding text with curly braces and the name of variable inside `{{GUID}}`.
+Enironment variables can be used in a http file by surrounding text with curly braces and the name of variable inside `{{GUID}}`.
 
-In this repo a `sample-mhs-environment` has been created in the settings file, to be used as sample content. 
+
 
 </br>
 
 ### File Variables
 
-Only available to file declared in, example below:
+File variable are available to the file its declared in, example of format below:
 
 ```http
 @baseUrl = https://example.com
 ```
 
-Can be used in file as shown below:
+Can be used in file as shown below in the Request Line:
 
 ```http
 POST {{baseUrl}}:80 HTTP/1.1
@@ -153,7 +153,7 @@ Currently it is only possible to generate UUID manual using an extension. To gen
 
 ### Response Panel 
 
-Response panel appear on the right side on a seperate tab once a request has been sent and a response returned. 
+Response panel appears when a request has been sent in a seperate panel to the right when a response returned. 
 
 In response panel click More Actions to:
 - Fold body
@@ -161,11 +161,11 @@ In response panel click More Actions to:
 
 #### Save Response
 
-Save response, click save icon in response panel:
-- Click the Open button to open the saved response file in current workspace<br>
-- Click Copy Path to copy the saved response path to clipboard
+Save response, click `save` icon in response panel:
+- Click the `Open` button to open the saved response file in current workspace<br>
+- Click `Copy Path` to copy the saved response path to clipboard
 
-Save response body, click Save Response Body button
+Save response body, click `Save Response Body` button
 - As default this will save according to the response MIME type, i.e. content-type: application/json, will save as json
 - Overwrite the MIME type and extension mapping with below setting:
     <br>
