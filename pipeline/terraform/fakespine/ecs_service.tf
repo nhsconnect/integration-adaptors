@@ -2,7 +2,8 @@
 # VPC's subnets. Each container is register with the route service's LB's target group.
 resource "aws_ecs_service" "fake_spine_service" {
   name = "${var.environment_id}-fake-spine"
-  cluster = aws_ecs_cluster.mhs_cluster.id
+  //cluster = aws_ecs_cluster.mhs_cluster.id
+  cluster = data.terraform_remote_state.mhs.cluster_id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
   desired_count = var.fake_spine_service_minimum_instance_count
@@ -15,7 +16,7 @@ resource "aws_ecs_service" "fake_spine_service" {
     security_groups = [
       aws_security_group.fake_spine_security_group.id
     ]
-    subnets = aws_subnet.mhs_subnet.*.id
+    subnets = data.terraform_remote_state.mhs.subnet_ids
   }
 
   load_balancer {
@@ -23,7 +24,7 @@ resource "aws_ecs_service" "fake_spine_service" {
     # That is why in these 2 lines below we do "[0]" to reference that one container and port definition.
     container_name = jsondecode(aws_ecs_task_definition.fake_spine_task.container_definitions)[0].name
     container_port = jsondecode(aws_ecs_task_definition.fake_spine_task.container_definitions)[0].portMappings[0].hostPort
-    target_group_arn = aws_lb_target_group.route_alb_target_group.arn
+    target_group_arn = aws_lb_target_group.fake_spine_route_alb_target_group.arn
   }
 
   depends_on = [

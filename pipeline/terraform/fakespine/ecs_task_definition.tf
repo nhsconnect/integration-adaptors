@@ -4,7 +4,7 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
   container_definitions = jsonencode(
   [
     {
-      name = "mhs-outbound"
+      name = "fake-spine"
       image = "${var.ecr_address}/fake-spine:fake-spine-${var.build_id}"
       environment = local.fake_spine_base_environment_variables
       secrets = []
