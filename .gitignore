@@ -142,3 +142,6 @@ mhs-reference-implementation/selenium_tests/data/local_asid
 
 # system
 .DS_Store
+
+# mock ldap data
+/mhs/spineroutelookup/mock_ldap_data/*.json
