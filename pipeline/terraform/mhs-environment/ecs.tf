@@ -81,7 +81,7 @@ locals {
     },
     {
       name = "mhs_outbound_validate_certificate"
-      value = bool(var.mhs_outbound_validate_certificate)
+      value = tobool(var.mhs_outbound_validate_certificate)
     }
   ]
   mhs_outbound_base_secrets = [
