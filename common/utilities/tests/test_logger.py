@@ -141,4 +141,5 @@ class LogEntry:
             self.name,
             self.message
         ) = log_elements
+        self.time = self.time[1:-1]
         self.message = self.message[:-1]
