@@ -113,7 +113,8 @@ pipeline {
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                                    -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
+                                    -backend-config="key=${ENVIRONMENT_ID}-mhs.tfstate" \
+                                    -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_MHS_LOCK_TABLE_NAME}" \
                                     -input=false -no-color
                                 """
                             sh label: 'Applying Terraform configuration', script: """
@@ -202,7 +203,8 @@ pipeline {
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                                    -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
+                                    -backend-config="key=${ENVIRONMENT_ID}-scr.tfstate" \
+                                    -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_SCR_LOCK_TABLE_NAME}" \
                                     -input=false -no-color
                                 """
                             sh label: 'Applying Terraform configuration', script: """
