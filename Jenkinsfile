@@ -6,46 +6,46 @@ pipeline {
     environment {
         BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER} ${GIT_COMMIT}'
         BUILD_TAG_LOWER = sh label: 'Lowercase build tag', returnStdout: true, script: "echo -n ${BUILD_TAG} | tr '[:upper:]' '[:lower:]'"
-        ENVIRONMENT_ID = "build"
+        ENVIRONMENT_ID = "ptl"
         MHS_INBOUND_QUEUE_NAME = "${ENVIRONMENT_ID}-inbound"
     }
 
     stages {
-        stage('Build & test common') {
-            steps {
-                dir('common') {
-                    buildModules('Installing common dependencies')
-                    executeUnitTestsWithCoverage()
-                }
-            }
-        }
-        stage('Build & test MHS Common') {
-            steps {
-                dir('mhs/common') {
-                    buildModules('Installing mhs common dependencies')
-                    executeUnitTestsWithCoverage()
-                }
-            }
-        }
+//         stage('Build & test common') {
+//             steps {
+//                 dir('common') {
+//                     buildModules('Installing common dependencies')
+//                     executeUnitTestsWithCoverage()
+//                 }
+//             }
+//         }
+//         stage('Build & test MHS Common') {
+//             steps {
+//                 dir('mhs/common') {
+//                     buildModules('Installing mhs common dependencies')
+//                     executeUnitTestsWithCoverage()
+//                 }
+//             }
+//         }
 
         stage('Build MHS') {
             parallel {
                 stage('Inbound') {
                     stages {
-                        stage('Build') {
-                            steps {
-                                dir('mhs/inbound') {
-                                    buildModules('Installing inbound dependencies')
-                                }
-                            }
-                        }
-                        stage('Unit test') {
-                            steps {
-                                dir('mhs/inbound') {
-                                    executeUnitTestsWithCoverage()
-                                }
-                            }
-                        }
+//                         stage('Build') {
+//                             steps {
+//                                 dir('mhs/inbound') {
+//                                     buildModules('Installing inbound dependencies')
+//                                 }
+//                             }
+//                         }
+//                         stage('Unit test') {
+//                             steps {
+//                                 dir('mhs/inbound') {
+//                                     executeUnitTestsWithCoverage()
+//                                 }
+//                             }
+//                         }
                         stage('Push image') {
                             steps {
                                 script {
@@ -57,27 +57,27 @@ pipeline {
                 }
                 stage('Outbound') {
                     stages {
-                        stage('Build') {
-                            steps {
-                                dir('mhs/outbound') {
-                                    buildModules('Installing outbound dependencies')
-                                }
-                            }
-                        }
-                        stage('Unit test') {
-                            steps {
-                                dir('mhs/outbound') {
-                                    executeUnitTestsWithCoverage()
-                                }
-                            }
-                        }
-                        stage('Check documentation') {
-                            steps {
-                                dir('mhs/outbound') {
-                                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
-                                }
-                            }
-                        }
+//                         stage('Build') {
+//                             steps {
+//                                 dir('mhs/outbound') {
+//                                     buildModules('Installing outbound dependencies')
+//                                 }
+//                             }
+//                         }
+//                         stage('Unit test') {
+//                             steps {
+//                                 dir('mhs/outbound') {
+//                                     executeUnitTestsWithCoverage()
+//                                 }
+//                             }
+//                         }
+//                         stage('Check documentation') {
+//                             steps {
+//                                 dir('mhs/outbound') {
+//                                     sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+//                                 }
+//                             }
+//                         }
                         stage('Push image') {
                             steps {
                                 script {
@@ -89,20 +89,20 @@ pipeline {
                 }
                 stage('Route') {
                     stages {
-                        stage('Build') {
-                            steps {
-                                dir('mhs/spineroutelookup') {
-                                    buildModules('Installing route lookup dependencies')
-                                }
-                            }
-                        }
-                        stage('Unit test') {
-                            steps {
-                                dir('mhs/spineroutelookup') {
-                                    executeUnitTestsWithCoverage()
-                                }
-                            }
-                        }
+//                         stage('Build') {
+//                             steps {
+//                                 dir('mhs/spineroutelookup') {
+//                                     buildModules('Installing route lookup dependencies')
+//                                 }
+//                             }
+//                         }
+//                         stage('Unit test') {
+//                             steps {
+//                                 dir('mhs/spineroutelookup') {
+//                                     executeUnitTestsWithCoverage()
+//                                 }
+//                             }
+//                         }
                         stage('Push image') {
                             steps {
                                 script {
@@ -117,66 +117,66 @@ pipeline {
 
         stage('Test') {
             // NIAD-189: Parallel component and integration tests disabled due to intermittent build failures
-            //parallel {
-            stages {
-                stage('Run Component Tests') {
-                    options {
-                        lock('local-docker-compose-environment')
-                    }
-                    stages {
-                        stage('Deploy component locally') {
-                            steps {
-                                sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
-                                sh label: 'Start containers', script: '''
-                                    docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
-                                    docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
-                                    . ./component-test-source.sh
-                                    docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
-                                    docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
-                            }
-                        }
-                        stage('Component Tests') {
-                            steps {
-                                sh label: 'Run component tests', script: '''
-                                    docker build -t local/mhs-componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
-                                    docker run --rm --network "${BUILD_TAG_LOWER}_default" \
-                                        --env "MHS_ADDRESS=http://outbound" \
-                                        --env "AWS_ACCESS_KEY_ID=test" \
-                                        --env "AWS_SECRET_ACCESS_KEY=test" \
-                                        --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
-                                        --env "FAKE_SPINE_ADDRESS=http://fakespine" \
-                                        --env "MHS_INBOUND_QUEUE_BROKERS=amqp://rabbitmq:5672" \
-                                        --env "MHS_INBOUND_QUEUE_NAME=inbound" \
-                                        --env "SCR_ADDRESS=http://scradaptor" \
-                                        local/mhs-componenttest:$BUILD_TAG
-                                '''
-                            }
-                        }
-                    }
-                    post {
-                        always {
-                            sh label: 'Docker status', script: 'docker ps --all'
-                            sh label: 'Dump container logs to files', script: '''
-                                mkdir logs
-                                docker logs ${BUILD_TAG_LOWER}_route_1 > logs/route.log
-                                docker logs ${BUILD_TAG_LOWER}_outbound_1 > logs/outbound.log
-                                docker logs ${BUILD_TAG_LOWER}_inbound_1 > logs/inbound.log
-                                docker logs ${BUILD_TAG_LOWER}_fakespine_1 > logs/fakespine.log
-                                docker logs ${BUILD_TAG_LOWER}_rabbitmq_1 > logs/rabbitmq.log
-                                docker logs ${BUILD_TAG_LOWER}_redis_1 > logs/redis.log
-                                docker logs ${BUILD_TAG_LOWER}_dynamodb_1 > logs/dynamodb.log
-                            '''
-                            archiveArtifacts artifacts: 'logs/*.log', fingerprint: true
-                            sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
-                            sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
-                        }
-                    }
-                }
+            parallel {
+//             stages {
+//                 stage('Run Component Tests') {
+//                     options {
+//                         lock('local-docker-compose-environment')
+//                     }
+//                     stages {
+//                         stage('Deploy component locally') {
+//                             steps {
+//                                 sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
+//                                 sh label: 'Start containers', script: '''
+//                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
+//                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
+//                                     . ./component-test-source.sh
+//                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml build
+//                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} up -d'''
+//                             }
+//                         }
+//                         stage('Component Tests') {
+//                             steps {
+//                                 sh label: 'Run component tests', script: '''
+//                                     docker build -t local/mhs-componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
+//                                     docker run --rm --network "${BUILD_TAG_LOWER}_default" \
+//                                         --env "MHS_ADDRESS=http://outbound" \
+//                                         --env "AWS_ACCESS_KEY_ID=test" \
+//                                         --env "AWS_SECRET_ACCESS_KEY=test" \
+//                                         --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
+//                                         --env "FAKE_SPINE_ADDRESS=http://fakespine" \
+//                                         --env "MHS_INBOUND_QUEUE_BROKERS=amqp://rabbitmq:5672" \
+//                                         --env "MHS_INBOUND_QUEUE_NAME=inbound" \
+//                                         --env "SCR_ADDRESS=http://scradaptor" \
+//                                         local/mhs-componenttest:$BUILD_TAG
+//                                 '''
+//                             }
+//                         }
+//                     }
+//                     post {
+//                         always {
+//                             sh label: 'Docker status', script: 'docker ps --all'
+//                             sh label: 'Dump container logs to files', script: '''
+//                                 mkdir logs
+//                                 docker logs ${BUILD_TAG_LOWER}_route_1 > logs/route.log
+//                                 docker logs ${BUILD_TAG_LOWER}_outbound_1 > logs/outbound.log
+//                                 docker logs ${BUILD_TAG_LOWER}_inbound_1 > logs/inbound.log
+//                                 docker logs ${BUILD_TAG_LOWER}_fakespine_1 > logs/fakespine.log
+//                                 docker logs ${BUILD_TAG_LOWER}_rabbitmq_1 > logs/rabbitmq.log
+//                                 docker logs ${BUILD_TAG_LOWER}_redis_1 > logs/redis.log
+//                                 docker logs ${BUILD_TAG_LOWER}_dynamodb_1 > logs/dynamodb.log
+//                             '''
+//                             archiveArtifacts artifacts: 'logs/*.log', fingerprint: true
+//                             sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
+//                             sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
+//                         }
+//                     }
+//                 }
 
                 stage('Run Integration Tests') {
-                    options {
-                        lock('exemplar-test-environment')
-                    }
+//                     options {
+//                         lock('exemplar-test-environment')
+//                     }
                     stages {
                         stage('Deploy MHS') {
                             steps {
@@ -218,20 +218,20 @@ pipeline {
                                             -var inbound_queue_name="${MHS_INBOUND_QUEUE_NAME}" \
                                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                                             -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
-                                            -var party_key_arn=${PARTY_KEY_ARN} \
-                                            -var client_cert_arn=${CLIENT_CERT_ARN} \
-                                            -var client_key_arn=${CLIENT_KEY_ARN} \
-                                            -var ca_certs_arn=${CA_CERTS_ARN} \
-                                            -var route_ca_certs_arn=${ROUTE_CA_CERTS_ARN} \
+                                            -var party_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_PARTY_KEY-FbOTJn \
+                                            -var client_cert_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
+                                            -var client_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PLT_INT_Endpoint_PrivateKey-Fu1jb6 \
+                                            -var ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
+                                            -var route_ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
                                             -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
                                             -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
                                             -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                             -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
-                                            -var spineroutelookup_service_sds_url=${SPINEROUTELOOKUP_SERVICE_LDAP_URL} \
+                                            -var spineroutelookup_service_sds_url=ldaps://ldap.nis1.national.ncrs.nhs.uk \
                                             -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
-                                            -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
+                                            -var spineroutelookup_service_disable_sds_tls=False \
                                             -var elasticache_node_type="cache.t2.micro" \
-                                            -var mhs_forward_reliable_endpoint_url=${MHS_FORWARD_RELIABLE_ENDPOINT_URL}
+                                            -var mhs_forward_reliable_endpoint_url=https://msg.int.spine2.ncrs.nhs.uk/reliablemessaging/reliablerequest
                                         """
                                     script {
                                         env.MHS_ADDRESS = sh (
@@ -269,28 +269,28 @@ pipeline {
                             }
                         }
 
-                        stage('Integration Tests') {
-                            steps {
-                                dir('integration-tests/integration_tests') {
-                                    sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
-
-                                    // Wait for MHS load balancers to have healthy targets
-                                    dir('../../pipeline/scripts/check-target-group-health') {
-                                        sh script: 'pipenv install'
-
-                                        timeout(13) {
-                                            waitUntil {
-                                                script {
-                                                    def r = sh script: 'sleep 10; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
-                                                    return (r == 0);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    sh label: 'Running integration tests', script: 'pipenv run inttests'
-                                }
-                            }
-                        }
+//                         stage('Integration Tests') {
+//                             steps {
+//                                 dir('integration-tests/integration_tests') {
+//                                     sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
+//
+//                                     // Wait for MHS load balancers to have healthy targets
+//                                     dir('../../pipeline/scripts/check-target-group-health') {
+//                                         sh script: 'pipenv install'
+//
+//                                         timeout(13) {
+//                                             waitUntil {
+//                                                 script {
+//                                                     def r = sh script: 'sleep 10; AWS_DEFAULT_REGION=eu-west-2 pipenv run main ${MHS_OUTBOUND_TARGET_GROUP} ${MHS_INBOUND_TARGET_GROUP}  ${MHS_ROUTE_TARGET_GROUP}', returnStatus: true
+//                                                     return (r == 0);
+//                                                 }
+//                                             }
+//                                         }
+//                                     }
+//                                     sh label: 'Running integration tests', script: 'pipenv run inttests'
+//                                 }
+//                             }
+//                         }
                     }
                 }
             } // parallel
@@ -299,8 +299,8 @@ pipeline {
 
     post {
         always {
-            cobertura coberturaReportFile: '**/coverage.xml'
-            junit '**/test-reports/*.xml'
+//             cobertura coberturaReportFile: '**/coverage.xml'
+//             junit '**/test-reports/*.xml'
             sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.

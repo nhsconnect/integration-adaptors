@@ -17,7 +17,7 @@ variable "build_id" {
 variable "mhs_vpc_cidr_block" {
   type = string
   description = "The CIDR block to use for the MHS VPC that is created. Should be a /16 block. Note that this cidr block must not overlap with the cidr blocks of the VPCs that the MHS VPC is to be peered with."
-  default = "10.0.0.0/16"
+  default = "10.239.66.128/25"
 }
 
 variable "supplier_vpc_id" {
