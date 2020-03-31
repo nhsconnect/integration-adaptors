@@ -1,9 +1,24 @@
+// Global variables - to be moved to parameters
+// Options to switch off certain steps if needed
+Boolean buildModules    = false
+Boolean unitTests       = false
+Boolean buildPackage    = false
+Boolean componentTest   = false
+Boolean runTerraform    = true
+Boolean integrationTest = false
+Boolean deployFakespine = true
+
 pipeline {
 
    PLEASE DONT BUILD THIS NOW
 
     agent{
         label 'jenkins-workers'
+    }
+
+    options {
+        ansiColor('xterm')
+        timestamps()
     }
 
     environment {
@@ -15,6 +30,9 @@ pipeline {
 
     stages {
         stage('Build modules') {
+            when {
+              expression { buildModules }
+            }
             steps {
                 dir('common'){ buildModules('Installing common dependencies') }
                 dir('mhs/common'){ buildModules('Installing mhs common dependencies') }
@@ -25,31 +43,41 @@ pipeline {
             }
         }
 
-        stage('Common Module Unit Tests') {
-            steps { dir('common') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Common Unit Tests') {
-            steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Inbound Unit Tests') {
-            steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
-        }
-        stage('MHS Outbound Unit Tests') {
-            steps {
-                dir('mhs/outbound') {
-                    executeUnitTestsWithCoverage()
-                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+        stage ('Unit tests') {
+            when {
+              expression { unitTests }
+            }
+            stages {
+                stage('Common Module Unit Tests') {
+                    steps { dir('common') { executeUnitTestsWithCoverage() } }
+                }
+                stage('MHS Common Unit Tests') {
+                    steps { dir('mhs/common') { executeUnitTestsWithCoverage() } }
+                }
+                stage('MHS Inbound Unit Tests') {
+                    steps { dir('mhs/inbound') { executeUnitTestsWithCoverage() } }
+                }
+                stage('MHS Outbound Unit Tests') {
+                    steps {
+                        dir('mhs/outbound') {
+                            executeUnitTestsWithCoverage()
+                            sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+                        }
+                    }
+                }
+                stage('Spine Route Lookup Unit Tests') {
+                    steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
+                }
+                stage('SCR Web Service Unit Tests') {
+                    steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
                 }
             }
         }
-         stage('Spine Route Lookup Unit Tests') {
-            steps { dir('mhs/spineroutelookup') { executeUnitTestsWithCoverage() } }
-        }
-        stage('SCR Web Service Unit Tests') {
-            steps { dir('SCRWebService') { executeUnitTestsWithCoverage() } }
-        }
 
         stage('Package') {
+            when {
+              expression { buildPackage }
+            }
             steps {
                 sh label: 'Running Inbound Packer build', script: 'packer build -color=false pipeline/packer/inbound.json'
                 sh label: 'Running Outbound Packer build', script: 'packer build -color=false pipeline/packer/outbound.json'
@@ -61,6 +89,9 @@ pipeline {
         stage('Run Component Tests') {
             options {
                 lock('local-docker-compose-environment')
+            }
+            when {
+              expression { componentTest }
             }
             stages {
                 stage('Deploy component locally') {
@@ -110,6 +141,9 @@ pipeline {
 
             stages {
                 stage('Deploy MHS') {
+                    when {
+                        expression { runTerraform }
+                    }
                     steps {
                         dir('pipeline/terraform/mhs-environment') {
                             sh label: 'Initialising Terraform', script: """
@@ -197,8 +231,57 @@ pipeline {
                         }
                     }
                 }
+                stage('Deploy FakeSpine') {
+                    when {
+                        expression { deployFakespine && runTerraform }
+                    }
+                    steps {
+                        dir ('pipeline/terraform/fakespine'){
+                            String initCommand = """
+                                terraform init \
+                                    -backend-config="bucket=${TF_STATE_BUCKET}" \
+                                    -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                                    -backend-config="key=${ENVIRONMENT_ID}-fakespine.tfstate" \
+                                    -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_FSP_LOCK_TABLE_NAME}" \
+                                    -input=false -no-color
+                            """
+                            String planCommand = """
+                                terraform plan -no-color -auto-approve \
+                                    -var environment_id=${ENVIRONMENT_ID} \
+                                    -var build_id=${BUILD_TAG} \
+                                    -var cluster_id=${CLUSTER_ID} \
+                                    -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                                    -var ecr_address=${DOCKER_REGISTRY} \
+                                    -var scr_log_level=DEBUG \
+                                    -var scr_service_port=${SCR_SERVICE_PORT} \
+                                    -var scr_mhs_address=${MHS_ADDRESS} \
+                                    -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
+                            """
+                            String applyCommand = """
+                                terraform apply -no-color -auto-approve \
+                                    -var environment_id=${ENVIRONMENT_ID} \
+                                    -var build_id=${BUILD_TAG} \
+                                    -var cluster_id=${CLUSTER_ID} \
+                                    -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                                    -var ecr_address=${DOCKER_REGISTRY} \
+                                    -var scr_log_level=DEBUG \
+                                    -var scr_service_port=${SCR_SERVICE_PORT} \
+                                    -var scr_mhs_address=${MHS_ADDRESS} \
+                                    -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
+                            """
+
+                            sh(label:"Initialising Terraform", script: initCommand)
+                            sh(label:"Planning Terraform", script: planCommand)
+                            //sh(label:"Applying Terraform", script: applyCommand)
+
+                        }
+                    }
+                }
 
                 stage('Deploy SCR') {
+                    when {
+                        expression { runTerraform }
+                    }
                     steps {
                         dir('pipeline/terraform/scr-environment') {
                             sh label: 'Initialising Terraform', script: """
@@ -226,6 +309,9 @@ pipeline {
                 }
 
                 stage('Integration Tests') {
+                    when {
+                        expression { integrationTest }
+                    }
                     steps {
                         dir('integration-tests/integration_tests') {
                             sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
