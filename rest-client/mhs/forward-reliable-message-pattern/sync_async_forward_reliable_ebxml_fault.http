@@ -1,9 +1,5 @@
-// Message ID: 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D' configured in fakespine to return a ebxml fault
-// Here we use 'PRSC_IN080000UK07' which is an eRS slot polling call, it is a forward reliable message type that
-// an be wrapped in sync-async
 
 # @name Return_information_from_an_ebxml_fault_returned_from_spine_in_original_post_request_when_sync_async_requested
-
 POST {{HOSTNAME}} HTTP/1.1
 interaction_id: PRSC_IN080000UK07
 message-id: A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D

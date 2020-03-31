@@ -1,14 +1,12 @@
 
-// Message ID: 3771F30C-A231-4D64-A46C-E7FB0D52C27C configured in fakespine to return a SOAP Fault error
-
 @PATIENT_NHS_NUMBER = 9689177923
 
-# @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client_when_sync_async_requested
+# @name Return_success_response_to_the_client_when_a_business_level_retry_is_required_and_succeeds
 
 POST {{HOSTNAME}} HTTP/1.1
 interaction-id: REPC_IN150016UK05
-message-id: 3771F30C-A231-4D64-A46C-E7FB0D52C27C
-sync-async: true
+message-id: 35586865-45B0-41A5-98F6-817CA6F1F5EF
+sync-async: false
 from-asid: {{ASID}}
 Content-Type: application/json
 ods-code: YES

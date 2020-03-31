@@ -1,14 +1,10 @@
 
-//Message ID: '35586865-45B0-41A5-98F6-817CA6F1F5EF' configured in fakespine to return a SOAP Fault error
-// after 2 retries fakespine will return a success response.
+@PATIENT_NHS_NUMBER = 9446245796
 
-@PATIENT_NHS_NUMBER = 9689177923
-
-# @name Return_success_response_to_the_client_when_a_business_level_retry_is_required_and_succeeds
-
+# @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client
 POST {{HOSTNAME}} HTTP/1.1
 interaction-id: REPC_IN150016UK05
-message-id: 35586865-45B0-41A5-98F6-817CA6F1F5EF
+message-id: 3771F30C-A231-4D64-A46C-E7FB0D52C27C
 sync-async: false
 from-asid: {{ASID}}
 Content-Type: application/json

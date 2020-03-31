@@ -1,5 +1,3 @@
-// Message ID: F5187FB6-B033-4A75-838B-9E7A1AFB3111 configured in fakespine to return a SOAP Fault error.
-// Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
 
 @PATIENT_NHS_NUMBER = 9689174606
 

@@ -1,6 +1,4 @@
-// Message ID: '7AA57E38-8B20-4AE0-9E73-B9B0C0C42BDA' configured in fakespine to return a ebxml Fault error.
-// Error found here: fake_spine/fake_spine/configured_responses/ebxml_fault_single_error.xml
-                        
+                    
 @PATIENT_NHS_NUMBER = 9689177923
 
 # @name Return_information_from_ebxml_fault_returned_from_spine_in_original_post_request

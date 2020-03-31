@@ -1,7 +1,5 @@
-// Error whilst attempting to send the message to the MHS
 
 # @name Return_a_500_to_client_when_mhs_returns_500_to_SCR
-
 POST {{LOCAL_SCR_URL}} HTTP/1.1
 Interaction-name: SCR_GP_SUMMARY_UPLOAD
 Message-Id: AD7D39A8-1B6C-4520-8367-6B7BEBD7B842

@@ -121,9 +121,11 @@ Specify file path to use as a body:
 
 Environment variables are store in `settings.json` file located in `.vscode` folder. An example can be seen [here](../.vscode/settings.json) of how to set up file. 
 
-In http file, ensure at the bttom right corner the environment you wish to use is selected. As default this is set to `no environment`. `$shared` variables will be available even when no environment is selected. 
+In http file, ensure at the bottom right corner the environment you wish to use is selected. As default this is set to `no environment`. `$shared` variables will be available even when no environment is selected. 
 
 Enironment variables can be used in a class by surounding text with curly braces and the name of variable inside `{{GUID}}`.
+
+In this repo a `sample-mhs-environment` has been created in the settings file, to be used as sample content. 
 
 </br>
 
@@ -145,7 +147,7 @@ POST {{baseUrl}}:80 HTTP/1.1
 
 ### Generate UUID
 
-Currently it is only possible to generate UUID manual using an extension. To generator new UUID, `fn` + `F1` and type `Insert GUID`. 
+Currently it is only possible to generate UUID manual using an extension. To generator new UUID, `fn` + `F1` and type `Insert GUID` where needed. Currently an environment variable is used in settings.json for this to be easily changed in all http files. 
 
 </br>
 

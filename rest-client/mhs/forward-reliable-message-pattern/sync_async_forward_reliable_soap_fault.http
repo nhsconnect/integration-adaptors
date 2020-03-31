@@ -1,10 +1,5 @@
-// Message ID: 3771F30C-A231-4D64-A46C-E7FB0D52C27C configured in fakespine to return a SOAP Fault error.
-// Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
-// Here we use 'PRSC_IN080000UK07' which is an eRS slot polling call, it is a forward reliable message type that
-// can be wrapped in sync-async
 
 # @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_when_sync_async_requested
-
 POST {{HOSTNAME}} HTTP/1.1
 interaction-id: PRSC_IN080000UK07
 message-id: 3771F30C-A231-4D64-A46C-E7FB0D52C27C
