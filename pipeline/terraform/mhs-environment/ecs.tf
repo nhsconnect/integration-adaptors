@@ -111,7 +111,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
   [
     {
       name = "mhs-outbound"
-      image = "${var.ecr_address}/mhs/outbound:outbound-${var.build_id}"
+      image = "${var.ecr_address}/mhs/outbound:${var.build_id}"
       environment = var.mhs_outbound_http_proxy == "" ? local.mhs_outbound_base_environment_vars : concat(local.mhs_outbound_base_environment_vars, [
         {
           name = "MHS_OUTBOUND_HTTP_PROXY"
@@ -169,7 +169,7 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
   [
     {
       name = "mhs-inbound"
-      image = "${var.ecr_address}/mhs/inbound:inbound-${var.build_id}"
+      image = "${var.ecr_address}/mhs/inbound:${var.build_id}"
       environment = [
         {
           name = "MHS_LOG_LEVEL"
@@ -262,7 +262,7 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
   [
     {
       name = "mhs-route"
-      image = "${var.ecr_address}/mhs/route:route-${var.build_id}"
+      image = "${var.ecr_address}/mhs/route:${var.build_id}"
       environment = [
         {
           name = "MHS_LOG_LEVEL"

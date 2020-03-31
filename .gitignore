@@ -144,3 +144,5 @@ export-env-vars-and-run-mhs-docker.sh
 # system
 .DS_Store
 integration-tests/integration_tests/integration-tests-env.yaml
+
+.vscode/

@@ -67,7 +67,7 @@
         "name": "publish",
         "type": "docker-tag",
         "repository": "{{user `registry`}}{{user `repository`}}",
-        "tag": "outbound-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "name": "publish",
@@ -78,7 +78,7 @@
       {
         "type": "docker-tag",
         "repository": "local/mhs-outbound",
-        "tag": "outbound-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "type": "docker-tag",
