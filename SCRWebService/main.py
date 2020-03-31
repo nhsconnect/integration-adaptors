@@ -33,7 +33,9 @@ def main():
     secrets.setup_secret_config("SCR")
     log.configure_logging()
     app = build_app()
-    app.listen(80)
+    scr_port = config.get_config('PORT', default='80')
+    logger.info(f'Starting SCR web service on port {scr_port}')
+    app.listen(int(scr_port))
     tornado.ioloop.IOLoop.current().start()
 
 

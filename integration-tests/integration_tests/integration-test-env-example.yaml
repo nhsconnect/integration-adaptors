@@ -1,0 +1,8 @@
+#common
+MHS_LOG_FORMAT: "%(asctime)sZ | %(levelname)s | %(message)s | %(name)s | %(interaction_id)s | %(message_id)s | %(correlation_id)s | %(inbound_message_id)s"
+INTEGRATION_TEST_ASID: '' #put your ASID from OpenTest credentials
+MHS_ADDRESS: http://localhost
+SCR_ADDRESS: http://localhost:9000/
+AWS_ACCESS_KEY_ID: test
+AWS_SECRET_ACCESS_KEY: test
+MHS_DYNAMODB_ENDPOINT_URL: http://localhost:8000

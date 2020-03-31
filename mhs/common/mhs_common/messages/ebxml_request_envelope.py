@@ -12,6 +12,8 @@ from xml.etree.ElementTree import Element
 
 from builder import pystache_message_builder
 from defusedxml import ElementTree
+
+from comms.http_headers import HttpHeaders
 from utilities import integration_adaptors_logger as log, message_utilities
 
 from mhs_common.messages import ebxml_envelope
@@ -21,8 +23,6 @@ logger = log.IntegrationAdaptorsLogger(__name__)
 EBXML_TEMPLATE = "ebxml_request"
 
 MESSAGE = "hl7_message"
-
-CONTENT_TYPE_HEADER_NAME = "Content-Type"
 
 DUPLICATE_ELIMINATION = "duplicate_elimination"
 ACK_REQUESTED = "ack_requested"
@@ -87,7 +87,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         message_id, http_headers, message = super().serialize(_message_dictionary=message_dictionary)
 
-        http_headers[CONTENT_TYPE_HEADER_NAME] = EBXML_CONTENT_TYPE_VALUE
+        http_headers[HttpHeaders.CONTENT_TYPE] = EBXML_CONTENT_TYPE_VALUE
         return message_id, http_headers, message
 
     @staticmethod
@@ -189,7 +189,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         :param message: The message (as a string) to be parsed.
         :return: a Message that represents the message received.
         """
-        content_type_header = f'{CONTENT_TYPE_HEADER_NAME}: {headers[CONTENT_TYPE_HEADER_NAME]}\r\n\r\n'
+        content_type_header = f'{HttpHeaders.CONTENT_TYPE}: {headers[HttpHeaders.CONTENT_TYPE]}\r\n\r\n'
 
         msg = email.message_from_string(content_type_header + message, policy=email.policy.HTTP)
 

@@ -6,6 +6,7 @@ import os
 import unittest
 import requests
 from requests import Response
+from comms.http_headers import HttpHeaders
 
 
 class InboundProxyHttpRequestBuilder(object):
@@ -15,10 +16,10 @@ class InboundProxyHttpRequestBuilder(object):
 
     def __init__(self):
         self.headers = {
-            'Content-Type': 'multipart/related; boundary="--=_MIME-Boundary"'
+            HttpHeaders.CONTENT_TYPE: 'multipart/related; boundary="--=_MIME-Boundary"'
         }
         self.body = None
-        self.inbound_proxy_host = os.environ.get('FAKE_SPINE_ADDRESS', 'http://localhost:6062') + "/inbound-proxy"
+        self.inbound_proxy_host = os.environ.get('INBOUND_PROXY_HOST', 'http://fakespine') + "/inbound-proxy"
         self.assertor = unittest.TestCase('__init__')
 
     def with_body(self, body) -> InboundProxyHttpRequestBuilder:

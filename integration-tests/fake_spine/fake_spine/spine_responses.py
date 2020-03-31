@@ -1,39 +1,67 @@
+import abc
 import logging
 import pathlib
-import os
-from typing import Tuple
+from typing import Tuple, NamedTuple, Union
+
+from tornado.httputil import HTTPServerRequest
+
+from fake_spine.config import ROOT_DIR
 
 logger = logging.getLogger(__name__)
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-class SpineResponse(object):
+class InboundRequest(NamedTuple):
+    body: str
+    headers: dict
+
+
+class OutboundResponse(NamedTuple):
+    status: int
+    body: str
+
+
+class SpineResponse(abc.ABC):
+
+    @abc.abstractmethod
+    def get_outbound_response(self, request: HTTPServerRequest) -> OutboundResponse:
+        pass
+
+    def get_inbound_request(self, request: HTTPServerRequest) -> Union[InboundRequest, None]:
+        return None
+
+
+class SpineResponseBuilder(SpineResponse):
 
     def __init__(self):
         self.response_file_location = None
-        self.response_code = 200
+        self.inbound_request_file_location = None
+        self.response_code = 202
 
     def override_response(self, response_file_location: str):
         self.response_file_location = response_file_location
+        return self
+
+    def override_inbound_request(self, inbound_request_file_location: str):
+        self.inbound_request_file_location = inbound_request_file_location
         return self
 
     def override_response_code(self, response_code: int):
         self.response_code = response_code
         return self
 
-    def get_response(self) -> Tuple[int, str]:
+    def get_outbound_response(self, request: HTTPServerRequest) -> OutboundResponse:
         response_from_file = pathlib.Path(ROOT_DIR) / "configured_responses" / self.response_file_location
-        return self.response_code, response_from_file.read_text()
+        return OutboundResponse(self.response_code, response_from_file.read_text())
 
 
-class SpineMultiResponse(object):
+class SpineMultiResponse(SpineResponse):
     """A class to control the response returned to the MHS depending on how many calls have been made previously"""
 
     def __init__(self):
         self.responses = []
         self.current_response_count = 0
 
-    def with_ordered_response(self, response: SpineResponse):
+    def with_ordered_response(self, response: SpineResponseBuilder):
         """
         Appends a given `SpineResponse` to the list, the order of the response list reflects the order in which
         this method was called
@@ -43,7 +71,7 @@ class SpineMultiResponse(object):
         self.responses.append(response)
         return self
 
-    def get_response(self) -> Tuple[int, str]:
+    def get_outbound_response(self, request: HTTPServerRequest) -> Tuple[int, str]:
         """
         Gets the response of the next `SpineResponse` object in the list, if the final response in the list has been
         reached, the count will reset to the first
@@ -51,4 +79,4 @@ class SpineMultiResponse(object):
         """
         response = self.responses[self.current_response_count]
         self.current_response_count = (self.current_response_count + 1) % len(self.responses)
-        return response.get_response()
+        return response.get_outbound_response(request)

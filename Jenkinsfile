@@ -4,7 +4,7 @@ pipeline {
     }
 
     environment {
-      BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER}'
+      BUILD_TAG = sh label: 'Generating build tag', returnStdout: true, script: 'python3 pipeline/scripts/tag.py ${GIT_BRANCH} ${BUILD_NUMBER} ${GIT_COMMIT}'
       BUILD_TAG_LOWER = sh label: 'Lowercase build tag', returnStdout: true, script: "echo -n ${BUILD_TAG} | tr '[:upper:]' '[:lower:]'"
       ENVIRONMENT_ID = "build"
       MHS_INBOUND_QUEUE_NAME = "${ENVIRONMENT_ID}-inbound"
@@ -113,7 +113,8 @@ pipeline {
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                                    -backend-config="dynamodb_table=${TF_MHS_LOCK_TABLE_NAME}" \
+                                    -backend-config="key=${ENVIRONMENT_ID}-mhs.tfstate" \
+                                    -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_MHS_LOCK_TABLE_NAME}" \
                                     -input=false -no-color
                                 """
                             sh label: 'Applying Terraform configuration', script: """
@@ -201,7 +202,8 @@ pipeline {
                                     terraform init \
                                     -backend-config="bucket=${TF_STATE_BUCKET}" \
                                     -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                                    -backend-config="dynamodb_table=${TF_SCR_LOCK_TABLE_NAME}" \
+                                    -backend-config="key=${ENVIRONMENT_ID}-scr.tfstate" \
+                                    -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_SCR_LOCK_TABLE_NAME}" \
                                     -input=false -no-color
                                 """
                             sh label: 'Applying Terraform configuration', script: """
@@ -263,7 +265,7 @@ void executeUnitTestsWithCoverage() {
     sh label: 'Running unit tests', script: 'pipenv run unittests-cov'
     sh label: 'Displaying code coverage report', script: 'pipenv run coverage-report'
     sh label: 'Exporting code coverage report', script: 'pipenv run coverage-report-xml'
-    // sh label: 'Running SonarQube analysis', script: "sonar-scanner -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}"
+    sh label: 'Running SonarQube analysis', script: "sonar-scanner -Dsonar.host.url=${SONAR_HOST} -Dsonar.login=${SONAR_TOKEN}"
 }
 
 void buildModules(String action) {

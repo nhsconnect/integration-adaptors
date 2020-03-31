@@ -11,7 +11,8 @@ import utilities.integration_adaptors_logger as log
 from mhs_common import workflow
 from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
-from mhs_common.state import dynamo_persistence_adaptor, persistence_adaptor
+from mhs_common.state import persistence_adaptor
+from mhs_common.state.persistence_adaptor_factory import get_persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
 from utilities import config, certs
 from utilities import secrets
@@ -149,10 +150,8 @@ def main():
                                                               http_proxy_port)
 
     party_key = secrets.get_secret_config('PARTY_KEY')
-    work_description_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
-        table_name=config.get_config('STATE_TABLE_NAME'))
-    sync_async_store = dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
-        table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
+    work_description_store = get_persistence_adaptor(table_name=config.get_config('STATE_TABLE_NAME'))
+    sync_async_store = get_persistence_adaptor(table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
     store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
     max_request_size = int(config.get_config('SPINE_REQUEST_MAX_SIZE'))
     workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store,

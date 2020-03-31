@@ -3,6 +3,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.log
 import tornado.web
+import os
 from tornado.options import parse_command_line
 from fake_spineroutelookup.request_handler import RoutingRequestHandler
 from fake_spineroutelookup.request_matching import SpineRouteLookupRequestResponseMapper, RequestMatcher
@@ -68,7 +69,9 @@ if __name__ == "__main__":
     reliability_configuration = build_reliability_configuration()
     application = build_application(routing_configuration, reliability_configuration)
     server = tornado.httpserver.HTTPServer(application)
-    server.listen(80)
+    spine_route_lookup_port = os.environ.get('SPINE_ROUTE_LOOKUP_PORT', default='80')
+    logger.info('Fake spine route lookup starting on port %s', spine_route_lookup_port)
+    server.listen(int(spine_route_lookup_port))
 
     logger.log(logging.INFO, "Starting fake spineroutelookup service")
     tornado.ioloop.IOLoop.current().start()
