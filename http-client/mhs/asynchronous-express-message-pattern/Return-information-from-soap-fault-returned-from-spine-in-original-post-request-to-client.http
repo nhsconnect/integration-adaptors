@@ -4,7 +4,7 @@
 @PATIENT_NHS_NUMBER = 9446245796
 
 # @name Return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client
-POST http://localhost HTTP/1.1
+POST {{HOSTNAME}} HTTP/1.1
 interaction-id: QUPC_IN160101UK05
 message-id: AD7D39A8-1B6C-4520-8367-6B7BEBD7B842
 sync-async: false

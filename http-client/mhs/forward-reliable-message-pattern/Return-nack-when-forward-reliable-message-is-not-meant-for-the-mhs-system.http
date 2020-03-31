@@ -3,7 +3,7 @@
 
 @party_id = NOT_THE_MHS 
 
-POST http://localhost:8082/inbound-proxy HTTP/1.1
+POST {{HOSTNAME}}:8082/inbound-proxy HTTP/1.1
 Content-Type: multipart/related; boundary="--=_MIME-Boundary"
 
 

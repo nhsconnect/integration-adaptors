@@ -1,6 +1,6 @@
 # @name Async_Express_Pattern_Message_Synchronous_Response
 
-POST http://localhost:80 HTTP/1.1
+POST {{HOSTNAME}}:80 HTTP/1.1
 content-type: application/json
 Interaction-Id: QUPC_IN160101UK05
 sync-async: true

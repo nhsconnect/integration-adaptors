@@ -2,7 +2,7 @@
 
 # @name Return_500_response_when_inbound_service_receives_message_in_invalid_format
 
-POST http://localhost:8082/inbound-proxy HTTP/1.1
+POST {{HOSTNAME}}:8082/inbound-proxy HTTP/1.1
 Content-Type: multipart/related; boundary="--=_MIME-Boundary"
 
 ----=_MIME-Boundary

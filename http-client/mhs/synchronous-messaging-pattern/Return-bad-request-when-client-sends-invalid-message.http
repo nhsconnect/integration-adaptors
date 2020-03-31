@@ -4,7 +4,7 @@
 
 # @name return_bad_request_when_client_sends_invalid_message
 
-POST http://localhost HTTP/1.1
+POST {{HOSTNAME}} HTTP/1.1
 interaction-id: QUPA_IN040000UK32
 message-id: {{MESSAGE_ID}}
 sync-async: false

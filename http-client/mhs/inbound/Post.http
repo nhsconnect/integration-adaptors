@@ -1,4 +1,4 @@
 
 # @name Post
-POST https://localhost:8082/ HTTP/1.1
+POST {{HOSTNAME}}:8082/ HTTP/1.1
 
