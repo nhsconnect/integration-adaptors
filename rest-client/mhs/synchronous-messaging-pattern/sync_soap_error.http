@@ -1,11 +1,12 @@
-
+// Message ID: F5187FB6-B033-4A75-838B-9E7A1AFB3111 configured in fakespine to return a SOAP Fault error.
+// Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
 @PATIENT_NHS_NUMBER = 9689174606
 
 # @name Return_error_response_to_client_when_error_response_returned_from_spine
 POST {{HOSTNAME}} HTTP/1.1
-interaction_id: QUPA_IN040000UK32
+interaction-id: QUPA_IN040000UK32
 message-id: F5187FB6-B033-4A75-838B-9E7A1AFB3111
-sync_async: false
+sync-async: false
 from-asid: {{ASID}}
 Content-Type: application/json
 ods-code: YES
