@@ -80,8 +80,8 @@ locals {
       value = var.mhs_forward_reliable_endpoint_url
     },
     {
-      name = "MHS_VALIDATE_CERT"
-      value = var.mhs_validate_cert
+      name = "mhs_outbound_validate_certificate"
+      value = var.mhs_outbound_validate_certificate
     }
   ]
   mhs_outbound_base_secrets = [
