@@ -191,7 +191,7 @@ pipeline {
                                             -var execution_role_arn=${TASK_EXECUTION_ROLE} \
                                             -var task_scaling_role_arn=${TASK_SCALING_ROLE} \
                                             -var ecr_address=${DOCKER_REGISTRY} \
-                                            
+                                            -var mhs_outbound_validate_certificate=${MHS_OUTBOUND_VALIDATE_CERTIFICATE} \
                                             -var mhs_log_level=DEBUG \
                                             -var mhs_outbound_http_proxy=${MHS_OUTBOUND_HTTP_PROXY} \
                                             -var mhs_state_table_read_capacity=5 \
