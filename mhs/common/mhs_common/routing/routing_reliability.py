@@ -2,12 +2,14 @@ import json
 from typing import Dict
 
 from comms import common_https
+from utilities.mdc import build_tracking_headers
 from utilities import integration_adaptors_logger as log, timing
 
 ROUTING_PATH = "routing"
 RELIABILITY_PATH = "reliability"
 
 logger = log.IntegrationAdaptorsLogger(__name__)
+
 
 class RoutingAndReliability:
     """A tool that allows the routing and reliability information for a remote MHS to be retrieved."""
@@ -56,7 +58,9 @@ class RoutingAndReliability:
 
             logger.info("Requesting endpoint details from Spine route lookup service for {org_code} & {service_id}.",
                         fparams={"org_code": org_code, "service_id": service_id})
-            http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None,
+            http_response = await common_https.CommonHttps.make_request(url=url, method="GET",
+                                                                        headers=build_tracking_headers(),
+                                                                        body=None,
                                                                         client_cert=self._client_cert,
                                                                         client_key=self._client_key,
                                                                         ca_certs=self._ca_certs,
@@ -94,7 +98,9 @@ class RoutingAndReliability:
             logger.info("Requesting reliability details from Spine route lookup service for {org_code} & "
                         "{service_id}.",
                         fparams={"org_code": org_code, "service_id": service_id})
-            http_response = await common_https.CommonHttps.make_request(url=url, method="GET", headers=None, body=None,
+            http_response = await common_https.CommonHttps.make_request(url=url, method="GET",
+                                                                        headers=build_tracking_headers(),
+                                                                        body=None,
                                                                         client_cert=self._client_cert,
                                                                         client_key=self._client_key,
                                                                         ca_certs=self._ca_certs,

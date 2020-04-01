@@ -29,15 +29,15 @@ class RecordRetrievalError(RuntimeError):
 class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
     """Class responsible for persisting items into a DynamoDB."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, table_name):
         """
         Constructs a DynamoDB version of a
         :class:`PersistenceAdaptor <mhs.common.state.persistence_adaptor.PersistenceAdaptor>`.
         The kwargs provided should contain the following information:
           * table_name: The Table Name used to identify the dynamo table containing required items.
-        :param kwargs: The key word arguments required for this constructor.
+        :param table_name: Table name to be used in this adaptor.
         """
-        self.table_name = kwargs.get('table_name')
+        self.table_name = table_name
 
     async def add(self, key, data):
         """Add an item to a specified table, using a provided key.

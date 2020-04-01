@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SOAP-ENV:Envelope xmlns:crs="http://national.carerecords.nhs.uk/schema/crs/"
+                   xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+                   xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns="urn:hl7-org:v3"
+                   xmlns:hl7="urn:hl7-org:v3">
+    <SOAP-ENV:Header>
+        <wsa:MessageID>uuid:{{message_id}}</wsa:MessageID>
+        <wsa:Action>urn:nhs:names:services:pdsquery/QUPA_IN050000UK32</wsa:Action>
+        <wsa:To/>
+        <wsa:From>
+            <wsa:Address>urn:nhs:names:services:pdsquery</wsa:Address>
+        </wsa:From>
+        <communicationFunctionRcv typeCode="RCV">
+            <device classCode="DEV" determinerCode="INSTANCE">
+                <id root="1.2.826.0.1285.0.2.0.107" extension="918999198975"/>
+            </device>
+        </communicationFunctionRcv>
+        <communicationFunctionSnd typeCode="SND">
+            <device classCode="DEV" determinerCode="INSTANCE">
+                <id root="1.2.826.0.1285.0.2.0.107" extension="928942012545"/>
+            </device>
+        </communicationFunctionSnd>
+        <wsa:RelatesTo>uuid:{{ref_to_message_id}}</wsa:RelatesTo>
+    </SOAP-ENV:Header>
+    <SOAP-ENV:Body>
+        <retrievalQueryResponse>
+            <QUPA_IN050000UK32>
+                <id root="{{message_id}}"/>
+                <creationTime value="20200323142102"/>
+                <versionCode code="V3NPfIT4.2.00"/>
+                <interactionId root="2.16.840.1.113883.2.1.3.2.4.12" extension="QUPA_IN050000UK32"/>
+                <processingCode code="P"/>
+                <processingModeCode code="T"/>
+                <acceptAckCode code="NE"/>
+                <acknowledgement typeCode="AA">
+                    <messageRef>
+                        <id root="{{ref_to_message_id}}"/>
+                    </messageRef>
+                </acknowledgement>
+                <communicationFunctionRcv typeCode="RCV">
+                    <device classCode="DEV" determinerCode="INSTANCE">
+                        <id root="1.2.826.0.1285.0.2.0.107" extension="918999198975"/>
+                    </device>
+                </communicationFunctionRcv>
+                <communicationFunctionSnd typeCode="SND">
+                    <device classCode="DEV" determinerCode="INSTANCE">
+                        <id root="1.2.826.0.1285.0.2.0.107" extension="928942012545"/>
+                    </device>
+                </communicationFunctionSnd>
+                <ControlActEvent classCode="CACT" moodCode="EVN">
+                    <author1 typeCode="AUT">
+                        <AgentSystemSDS classCode="AGNT">
+                            <agentSystemSDS classCode="DEV" determinerCode="INSTANCE">
+                                <id root="1.2.826.0.1285.0.2.0.107" extension="928942012545"/>
+                            </agentSystemSDS>
+                        </AgentSystemSDS>
+                    </author1>
+                    <subject typeCode="SUBJ">
+                        <PdsSuccessfulRetrieval classCode="OBS" moodCode="EVN">
+                            <subject typeCode="SBJ">
+                                <patientRole classCode="PAT">
+                                    <id root="2.16.840.1.113883.2.1.4.1" extension="9689174606"/>
+                                    <addr use="H">
+                                        <streetAddressLine/>
+                                        <streetAddressLine>12 QUEENS TERRACE</streetAddressLine>
+                                        <streetAddressLine/>
+                                        <streetAddressLine>WALLSEND</streetAddressLine>
+                                        <streetAddressLine>TYNE &amp; WEAR</streetAddressLine>
+                                        <postalCode>NE28 7QU</postalCode>
+                                        <useablePeriod>
+                                            <low value="20080426"/>
+                                        </useablePeriod>
+                                        <id root="2.16.840.1.113883.2.1.3.2.4.18.1" extension="wYTKJ"/>
+                                    </addr>
+                                    <patientPerson classCode="PSN" determinerCode="INSTANCE">
+                                        <name use="L">
+                                            <prefix>MR</prefix>
+                                            <given>Duncan</given>
+                                            <given>Jack</given>
+                                            <family>MOLLOY</family>
+                                            <validTime>
+                                                <low value="19710705"/>
+                                            </validTime>
+                                            <id root="2.16.840.1.113883.2.1.3.2.4.18.1" extension="eYStY"/>
+                                        </name>
+                                        <administrativeGenderCode code="1"/>
+                                        <birthTime value="19390120"/>
+                                        <playedOtherProviderPatient classCode="PAT">
+                                            <subjectOf typeCode="SBJ">
+                                                <patientCareProvision classCode="PCPR" moodCode="EVN">
+                                                    <id root="2.16.840.1.113883.2.1.3.2.4.18.1" extension="aiYuC"/>
+                                                    <code codeSystem="2.16.840.1.113883.2.1.3.2.4.17.37" code="1"/>
+                                                    <effectiveTime>
+                                                        <low value="19700131"/>
+                                                    </effectiveTime>
+                                                    <responsibleParty typeCode="RESP">
+                                                        <healthCareProvider classCode="PROV">
+                                                            <id root="2.16.840.1.113883.2.1.4.3" extension="A87016"/>
+                                                        </healthCareProvider>
+                                                    </responsibleParty>
+                                                </patientCareProvision>
+                                            </subjectOf>
+                                        </playedOtherProviderPatient>
+                                    </patientPerson>
+                                    <subjectOf8 typeCode="SBJ">
+                                        <previousNhsContact classCode="OBS" moodCode="EVN">
+                                            <code code="17" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.35"/>
+                                            <value codeSystem="2.16.840.1.113883.2.1.3.2.4.17.38" code="0"/>
+                                        </previousNhsContact>
+                                    </subjectOf8>
+                                </patientRole>
+                            </subject>
+                            <pertinentInformation typeCode="PERT">
+                                <pertinentSerialChangeNumber classCode="OBS" moodCode="EVN">
+                                    <code code="2" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.35"/>
+                                    <value value="1"/>
+                                </pertinentSerialChangeNumber>
+                            </pertinentInformation>
+                        </PdsSuccessfulRetrieval>
+                    </subject>
+                    <queryAck type="QueryAck">
+                        <queryResponseCode code="OK"/>
+                    </queryAck>
+                </ControlActEvent>
+            </QUPA_IN050000UK32>
+        </retrievalQueryResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

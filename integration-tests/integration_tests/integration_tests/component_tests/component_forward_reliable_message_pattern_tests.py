@@ -25,6 +25,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
     def setUp(self):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_INBOUND_QUEUE.drain()
 
     def test_should_place_unsolicited_valid_message_onto_queue_for_client_to_receive(self):
         # Arrange

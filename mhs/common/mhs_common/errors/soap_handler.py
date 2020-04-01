@@ -4,6 +4,7 @@ from typing import Dict, AnyStr, Tuple
 
 from defusedxml import ElementTree
 import utilities.integration_adaptors_logger as log
+from comms.http_headers import HttpHeaders
 
 from mhs_common.messages.soap_fault_envelope import SOAPFault
 
@@ -30,10 +31,10 @@ def handle_soap_error(code: int, headers: Dict, body: AnyStr) -> Tuple[int, AnyS
         logger.warning('Not HTTP 500 response. {Code} {Body}', fparams={'Code': code, 'Body': body})
         return code, body, soap_fault_codes
 
-    if 'Content-Type' not in headers:
+    if HttpHeaders.CONTENT_TYPE not in headers:
         raise ValueError('No Content-Type header in Spine response, response cannot be handled!')
 
-    if headers['Content-Type'] != 'text/xml':
+    if headers[HttpHeaders.CONTENT_TYPE] != 'text/xml':
         raise ValueError('Unexpected Content-Type {}!'.format(headers['Content-Type']))
 
     try:

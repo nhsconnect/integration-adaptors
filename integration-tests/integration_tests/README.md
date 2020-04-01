@@ -95,3 +95,16 @@ docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml up
 ```
 docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml scale inbound=3 outbound=3
 ```
+
+## Running integration tests against fake components
+
+Run `fake_spine` and `fake_spineroutelookup` as if running component tests
+Run `inbound` and `outbound` with the `all_component_test_env.yaml` configuration (same as of running component tests)
+Run the integration tests using the `all_component_test_env.yaml` instead of the normal integration test configuration.
+
+## Fake Spine request / response delays
+
+There are two environment variables that can control how quickly Fake Spine responds:
+
+* `FAKE_SPINE_OUTBOUND_DELAY_MS` (default: 0) controls the minimum time the service will take to handle each outbound request
+* `FAKE_SPINE_INBOUND_DELAY_MS` (default: 0) controls how much time after the outbound request completes that the service will send the asynchronous inbound response
