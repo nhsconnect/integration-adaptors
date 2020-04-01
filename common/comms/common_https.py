@@ -36,6 +36,7 @@ class CommonHttps(object):
                         "proxy_host": http_proxy_host,
                         "proxy_port": http_proxy_port
                     })
+        logger.debug("Request body: %s", body)
 
         if not validate_cert:
             logger.warning("Server certificate validation has been disabled.")
@@ -61,4 +62,6 @@ class CommonHttps(object):
                         "proxy_port": http_proxy_port,
                         "code": response.code
                     })
+        logger.debug("Response body: %s", response.body.decode('utf-8') if response.body else None)
+
         return response
