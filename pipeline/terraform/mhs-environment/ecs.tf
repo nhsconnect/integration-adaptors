@@ -104,6 +104,10 @@ locals {
   ]
 }
 
+output "mhs_outbound_validate_certificate" {
+  value = tobool(var.mhs_outbound_validate_certificate)
+}
+
 # MHS outbound ECS task definition
 resource "aws_ecs_task_definition" "mhs_outbound_task" {
   family = "${var.environment_id}-mhs-outbound"
