@@ -156,7 +156,7 @@ class TestRoutingAndReliability(unittest.TestCase):
         self.mock_http_client.fetch.assert_called_with(expected_url, raise_error=True,
                                                        method=HTTP_METHOD, body=None, headers=None,
                                                        client_cert=client_cert, client_key=client_key,
-                                                       ca_certs=ca_certs, validate_cert=False, proxy_host=proxy_host,
+                                                       ca_certs=ca_certs, validate_cert=True, proxy_host=proxy_host,
                                                        proxy_port=proxy_port)
 
     @staticmethod

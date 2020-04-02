@@ -61,7 +61,7 @@ class TestCommonHttps(TestCase):
                                           client_cert=None,
                                           client_key=None,
                                           ca_certs=None,
-                                          validate_cert=False,
+                                          validate_cert=True,
                                           proxy_host=None,
                                           proxy_port=None)
 
