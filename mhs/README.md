@@ -150,16 +150,3 @@ within the boundary of your infrastructure.
 
 For information targeted at developers making use of the MHS Adaptor, please refer to [MHS Adaptor developer notes](mhs-adaptor-dev-notes.md). 
 This includes information on how to [test-drive the MHS Adaptor on a local development machine](running-mhs-adaptor-locally.md). 
-
-## Note on Certificate Validation 
-
-**WARNING: Due to the limitations of NHS Digital OpenTest configuration, verification of the server certificate received when making a connection 
-to the spine MHS is currently DISABLED (see the [OutboundTransmission](./outbound/outbound/transmission/outbound_transmission.py) class'
-`make_request` method). This MHS should not be used in a production environment unless this certificate verification
-is re-enabled.**
-
-As at 17 October 2019, a change is pending to the OpenTest environment which will enable service certificate verification. 
-
-
-
-
