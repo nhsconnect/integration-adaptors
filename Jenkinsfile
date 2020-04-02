@@ -334,7 +334,6 @@ pipeline {
                             }
                         }
                     
-
                         stage('Integration Tests') {
                             when {
                                 expression { runIntegrationTest }
@@ -356,8 +355,8 @@ pipeline {
                                             }
                                         }
                                     }
+                                    sh label: 'Running integration tests', script: 'pipenv run inttests'
                                 }
-                                sh label: 'Running integration tests', script: 'pipenv run inttests'
                             }
                         }
                     }
