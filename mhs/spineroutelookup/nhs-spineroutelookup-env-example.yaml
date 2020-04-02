@@ -8,6 +8,12 @@ MHS_SDS_REDIS_CACHE_HOST: redis
 MHS_SDS_REDIS_DISABLE_TLS: "True"
 MHS_LDAP_CONNECTION_RETRIES: "3"
 
+# Optional mock ldap env variables
+#MHS_AWS_PROFILE: nhsd-private # AWS profile from ~/.aws/credentials to be used when downloading LDAP data from S3
+#MHS_LDAP_MOCK_DATA_URL: "file://tmp/mock_ldap_data"
+#MHS_LDAP_MOCK_DATA_URL: "s3://nhsd-integration-adaptors/mock_ldap_data"
+#MHS_FAKE_SPINE_URL: "http://fake-spine/"
+
 #User-specific env variables
 MHS_SECRET_PARTY_KEY: AXXXXX-XXXXXXX #put your party key here (OpenTest)
 MHS_SECRET_CLIENT_CERT: |

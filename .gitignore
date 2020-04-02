@@ -147,3 +147,6 @@ export-env-vars-and-run-mhs-docker.sh
 
 # system
 .DS_Store
+
+# mock ldap data
+/mhs/spineroutelookup/mock_ldap_data/*.json
