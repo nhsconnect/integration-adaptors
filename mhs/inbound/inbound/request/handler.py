@@ -20,6 +20,7 @@ from mhs_common.state.persistence_adaptor import PersistenceAdaptor
 from mhs_common.workflow import asynchronous_forward_reliable as forward_reliable
 from utilities import integration_adaptors_logger as log
 from utilities.timing import time_request
+import logging
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -46,6 +47,8 @@ class InboundHandler(base_handler.BaseHandler):
     @time_request
     async def post(self):
         logger.info('Inbound POST received: {request}', fparams={'request': self.request})
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('Request body: %s', self.request.body.decode() if self.request.body else None)
         request_message = self._extract_incoming_ebxml_request_message()
 
         if not self._is_message_intended_for_receiving_mhs(request_message):

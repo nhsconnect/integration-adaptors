@@ -28,6 +28,7 @@ resource "aws_ecs_task_definition" "test-environment-scr-service-task" {
           awslogs-group = "/ecs/scr-service-environment"
           awslogs-region = var.region
           awslogs-stream-prefix = var.build_id
+          awslogs-datetime-format = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
         }
       }
 

@@ -12,7 +12,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "python:3.7-slim",
+      "image": "nhsdev/nia-sds-base:latest",
       "commit": true,
       "changes": [
         "EXPOSE 80",
@@ -25,8 +25,6 @@
     {
       "type": "shell",
       "inline": [
-        "apt-get update",
-        "apt-get install build-essential -y",
         "mkdir -p {{user `app_dir`}}/mhs"
       ]
     },
