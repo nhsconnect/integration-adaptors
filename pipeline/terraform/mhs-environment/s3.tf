@@ -11,6 +11,7 @@ data "aws_elb_service_account" "main" {}
 
 # S3 bucket for storing MHS load balancer access logs
 resource "aws_s3_bucket" "mhs_access_logs_bucket" {
+  bucket = "${var.environment_id}-mhs-access-logs-bucket"
   server_side_encryption_configuration {
 
     rule {
