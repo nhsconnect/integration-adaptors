@@ -12,7 +12,7 @@ class CommonHttps(object):
 
     @staticmethod
     async def make_request(url: str, method: str, headers: Dict[str, str], body: str, client_cert: str = None,
-                           client_key: str = None, ca_certs: str = None, validate_cert: bool = True,
+                           client_key: str = None, ca_certs: str = None, validate_cert: bool = False,
                            http_proxy_host: str = None, http_proxy_port: int = None,
                            raise_error_response: bool = True):
         """Send a HTTPS request and return it's response.
@@ -38,6 +38,8 @@ class CommonHttps(object):
                         "proxy_port": http_proxy_port
                     })
         logger.debug("Request body: %s", body)
+
+        logger.warning("Cert validation: {validate_cert}", fparams={"validate_cert": validate_cert})
 
         if not validate_cert:
             logger.warning("Server certificate validation has been disabled.")
