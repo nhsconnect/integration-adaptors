@@ -12,7 +12,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "python:3.7-slim",
+      "image": "nhsdev/nia-mhs-inbound-base:latest",
       "container_dir": "/packer-files",
       "commit": true,
       "changes": [
@@ -26,8 +26,6 @@
     {
       "type": "shell",
       "inline": [
-        "apt-get update",
-        "apt-get install -y build-essential libssl-dev swig pkg-config",
         "mkdir -p {{user `app_dir`}}/mhs"
       ]
     },
@@ -49,12 +47,6 @@
     {
       "type": "shell",
       "inline": [
-        "sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
-      ]
-    },
-    {
-      "type": "shell",
-      "inline": [
         "pip install pipenv",
         "cd {{user `app_dir`}}/{{user `inbound_dir`}}",
         "pipenv install --deploy --ignore-pipfile"
@@ -67,7 +59,7 @@
         "name": "publish",
         "type": "docker-tag",
         "repository": "{{user `registry`}}{{user `repository`}}",
-        "tag": "inbound-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "name": "publish",
@@ -78,7 +70,7 @@
       {
         "type": "docker-tag",
         "repository": "local/mhs-inbound",
-        "tag": "inbound-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "type": "docker-tag",
