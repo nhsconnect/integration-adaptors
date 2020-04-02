@@ -3,11 +3,12 @@ import os
 import pathlib
 import unittest.mock
 
-import mhs_common.workflow as workflow
 import tornado.testing
 import tornado.web
+
+import inbound.request.handler as handler
+import mhs_common.workflow as workflow
 import utilities.file_utilities as file_utilities
-from utilities import mdc
 import utilities.message_utilities as message_utilities
 import utilities.test_utilities as test_utilities
 import utilities.xml_utilities as xml_utilities
@@ -15,8 +16,7 @@ from mhs_common.configuration import configuration_manager
 from mhs_common.messages import ebxml_request_envelope
 from mhs_common.state import work_description as wd
 from mhs_common.workflow import asynchronous_forward_reliable as forward_reliable
-
-import inbound.request.handler as handler
+from utilities import mdc
 
 MESSAGES_DIR = "messages"
 REQUEST_FILE = "ebxml_request.msg"
@@ -29,14 +29,14 @@ FROM_PARTY_ID = "FROM_PARTY_ID"
 ASYNC_CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
 SYNC_CONTENT_TYPE_HEADERS = {"Content-Type": 'text/xml'}
 REF_TO_MESSAGE_ID = "B4D38C15-4981-4366-BDE9-8F56EDC4AB72"
-UNSOLICITED_REF_TO_MESSAGE_ID = "B5D38C15-4981-4366-BDE9-8F56EDC4AB72"
+UNSOLICITED_REF_TO_MESSAGE_ID = "C614484E-4B10-499A-9ACD-5D645CFACF61"
 CORRELATION_ID = '10F5A436-1913-43F0-9F18-95EA0E43E61A'
 EXPECTED_MESSAGE = '<hl7:MCCI_IN010000UK13 xmlns:hl7="urn:hl7-org:v3"/>'
-EXPECTED_UNSOLICITED_ATTACHMENTS = [{ebxml_request_envelope.ATTACHMENT_BASE64: False,
+EXPECTED_UNSOLICITED_ATTACHMENTS = [{ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload',
+                                     ebxml_request_envelope.ATTACHMENT_BASE64: False,
                                      ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797'
                                                                                    '-A947B09F347F@spine.nhs.uk',
                                      ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
-                                     ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload',
                                      ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description'}]
 
 state_data = [
@@ -98,7 +98,10 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
     @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
-    def test_receive_ack(self, mock_get_uuid, mock_get_timestamp):
+    def test_successful_request_has_acknowledgement_in_response(self, mock_get_uuid, mock_get_timestamp):
+        """
+        Happy-path test where the reply has a work description and an acknowledgement is sent back to Spine
+        """
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
         expected_ack_response = file_utilities.FileUtilities.get_file_string(
@@ -107,21 +110,14 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
+        self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
         self.mock_workflow.handle_inbound_message.assert_called_once_with(REF_TO_MESSAGE_ID, CORRELATION_ID,
                                                                           unittest.mock.ANY, EXPECTED_MESSAGE)
 
-    def test_correct_workflow(self):
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
-
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
-        self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
-
-        self.assertEqual(ack_response.code, 200)
-
-    def test_workflow_throws_exception(self):
+    def test_when_workflow_throws_exception_then_http_500_response(self):
         self.mock_workflow.handle_inbound_message.side_effect = Exception("what a failure")
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
@@ -130,22 +126,15 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(response.code, 500)
         self.assertEqual('500: Exception in workflow', response.body.decode())
 
-    def test_no_reference_to_id(self):
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / NO_REF_FILE))
-
-        ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
-
-        self.assertEqual(ack_response.code, 500)
-
     @unittest.mock.patch.object(mdc, "inbound_message_id")
     @unittest.mock.patch.object(mdc, "correlation_id")
     @unittest.mock.patch.object(mdc, "message_id")
     @unittest.mock.patch.object(mdc, 'interaction_id')
-    def test_mdc_variables_are_set(self,
-                                   mock_interaction_id,
-                                   mock_message_id,
-                                   mock_correlation_id,
-                                   mock_inbound_message_id):
+    def test_when_request_handled_then_logging_mdc_variables_are_set(self,
+                                                                     mock_interaction_id,
+                                                                     mock_message_id,
+                                                                     mock_correlation_id,
+                                                                     mock_inbound_message_id):
         request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)

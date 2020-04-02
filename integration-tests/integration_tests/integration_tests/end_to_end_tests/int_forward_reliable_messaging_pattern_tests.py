@@ -35,6 +35,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
     def setUp(self):
         MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
         MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_INBOUND_QUEUE.drain()
         self.assertions = CommonAssertions('forward-reliable')
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):

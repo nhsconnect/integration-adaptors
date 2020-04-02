@@ -11,7 +11,7 @@ Content-Transfer-Encoding: 8bit
 			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">YES-0000806</eb:PartyId>
 		</eb:From>
 		<eb:To>
-			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">A91424-9199121</eb:PartyId>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">FROM_PARTY_ID</eb:PartyId>
 		</eb:To>
 		<eb:CPAId>S1001A1630</eb:CPAId>
 		<eb:ConversationId>10F5A436-1913-43F0-9F18-95EA0E43E61A</eb:ConversationId>
