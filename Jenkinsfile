@@ -19,6 +19,7 @@ pipeline {
     options {
         ansiColor('xterm')
         timestamps()
+        buildDiscarder(logRotator(numToKeepStr: "10")) // keep only last 10 builds
     }
 
     environment {

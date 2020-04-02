@@ -34,10 +34,3 @@ variable "fake_spine_alb_certificate_arn" {
   type = string
   description = "ARN of the TLS certificate that the fake-spine load balancer should present. This can be a certificate stored in IAM or ACM."
 }
-
-# Things to be taken from remote state later
-
-variable "vpc_id" {
-  type = string
-  description = "VPC ID of the base component"
-}
