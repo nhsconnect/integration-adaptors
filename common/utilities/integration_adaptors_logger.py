@@ -8,7 +8,7 @@ from utilities import config
 from utilities import mdc
 
 AUDIT = 25
-LOG_FORMAT_STRING = "%(asctime)sZ | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s " \
+LOG_FORMAT_STRING = "[%(asctime)sZ] | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s " \
                     "| %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s"
 
 _project_name = None
