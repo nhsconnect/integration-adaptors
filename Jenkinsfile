@@ -125,7 +125,7 @@ pipeline {
                         stage('Deploy component locally') {
                             steps {
                                 sh label: 'Setup component test environment', script: './integration-tests/setup_component_test_env.sh'
-                                sh label: 'Export environment variables', script: '''
+                                sh label: 'Start containers', script: '''
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml down -v
                                     docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network down -v
                                     . ./component-test-source.sh
@@ -135,7 +135,7 @@ pipeline {
                         }
                         stage('Component Tests') {
                             steps {
-                                sh label: 'Running component tests', script: '''
+                                sh label: 'Run component tests', script: '''
                                     docker build -t local/mhs-componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
                                     docker run --rm --network "${BUILD_TAG_LOWER}_default" \
                                         --env "MHS_ADDRESS=http://outbound" \
@@ -152,6 +152,18 @@ pipeline {
                     }
                     post {
                         always {
+                            sh label: 'Docker status', script: 'docker ps --all'
+                            sh label: 'Dump container logs to files', script: '''
+                                mkdir logs
+                                docker logs ${BUILD_TAG_LOWER}_route_1 > logs/route.log
+                                docker logs ${BUILD_TAG_LOWER}_outbound_1 > logs/outbound.log
+                                docker logs ${BUILD_TAG_LOWER}_inbound_1 > logs/inbound.log
+                                docker logs ${BUILD_TAG_LOWER}_fakespine_1 > logs/fakespine.log
+                                docker logs ${BUILD_TAG_LOWER}_rabbitmq_1 > logs/rabbitmq.log
+                                docker logs ${BUILD_TAG_LOWER}_redis_1 > logs/redis.log
+                                docker logs ${BUILD_TAG_LOWER}_dynamodb_1 > logs/dynamodb.log
+                            '''
+                            archiveArtifacts artifacts: 'logs/*.log', fingerprint: true
                             sh label: 'Docker compose logs', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} logs'
                             sh label: 'Docker compose down', script: 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
                         }
