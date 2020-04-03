@@ -3,6 +3,7 @@ from typing import Dict
 from tornado import httpclient
 
 from utilities import integration_adaptors_logger as log
+import logging
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -36,6 +37,7 @@ class CommonHttps(object):
                         "proxy_host": http_proxy_host,
                         "proxy_port": http_proxy_port
                     })
+        logger.debug("Request body: %s", body)
 
         logger.warning("Cert validation: {validate_cert}", fparams={"validate_cert": validate_cert})
         logger.warning("client_cert: {client_cert}", fparams={"client_cert": client_cert})
@@ -66,4 +68,8 @@ class CommonHttps(object):
                         "proxy_port": http_proxy_port,
                         "code": response.code
                     })
+
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Response body: %s", response.body.decode() if response.body else None)
+
         return response
