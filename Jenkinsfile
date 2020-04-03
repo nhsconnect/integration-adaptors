@@ -294,9 +294,9 @@ pipeline {
                                                 -backend-config="bucket=${TF_STATE_BUCKET}" \
                                                 -backend-config="region=${TF_STATE_BUCKET_REGION}" \
                                                 -backend-config="key=${ENVIRONMENT_ID}-fakespine.tfstate" \
-                                                -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_FSP_LOCK_TABLE_NAME}" \
                                                 -input=false -no-color
                                         """
+                                        //                                                 -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_FSP_LOCK_TABLE_NAME}" \
                                         String planCommand = """
                                             terraform plan -no-color \
                                                 -var environment_id=${ENVIRONMENT_ID} \
