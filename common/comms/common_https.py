@@ -38,7 +38,7 @@ class CommonHttps(object):
                     })
 
         logger.warning("Cert validation: {validate_cert}", fparams={"validate_cert": validate_cert})
-        logger.warning("client_cert: {client_cert}",       fparams={"client_cert": client_cert})
+        logger.warning("client_cert: {client_cert}", fparams={"client_cert": client_cert})
         logger.warning("client_key: {client_key}", fparams={"client_key": client_key})
         logger.warning("ca_certs: {ca_certs}", fparams={"ca_certs": ca_certs})
 
