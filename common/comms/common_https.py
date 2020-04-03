@@ -39,10 +39,10 @@ class CommonHttps(object):
                     })
         logger.debug("Request body: %s", body)
 
-        logger.warning("Cert validation: {validate_cert}", fparams={"validate_cert": validate_cert})
-        logger.warning("client_cert: {client_cert}", fparams={"client_cert": client_cert})
-        logger.warning("client_key: {client_key}", fparams={"client_key": client_key})
-        logger.warning("ca_certs: {ca_certs}", fparams={"ca_certs": ca_certs})
+        logger.info("Cert validation: {validate_cert}", fparams={"validate_cert": validate_cert})
+        logger.info("client_cert: {client_cert}", fparams={"client_cert": client_cert})
+        logger.info("client_key: {client_key}", fparams={"client_key": client_key})
+        logger.info("ca_certs: {ca_certs}", fparams={"ca_certs": ca_certs})
 
         if not validate_cert:
             logger.warning("Server certificate validation has been disabled.")
