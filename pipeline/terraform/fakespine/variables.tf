@@ -24,6 +24,11 @@ variable "execution_role_arn" {
   description = "ARN of the IAM role for MHS containers to pull from ECR and put logs in Cloudwatch."
 }
 
+variable "mhs_state_bucket" {
+  type = string
+  description = "Name of bucket with MHS component state"
+}
+
 variable "fake_spine_service_minimum_instance_count" {
   type = number
   description = "The minimum number of instances of fake-spine to run. This will be the number of instances deployed initially."

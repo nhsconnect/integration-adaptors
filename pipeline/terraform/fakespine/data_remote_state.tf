@@ -1,7 +1,7 @@
 data "terraform_remote_state" "mhs" {
   backend = "s3"
   
-  config {
+  config = {
     bucket = var.mhs_state_bucket
   }
 

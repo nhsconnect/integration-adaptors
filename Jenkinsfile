@@ -296,24 +296,19 @@ pipeline {
                                                 -backend-config="key=${ENVIRONMENT_ID}-fakespine.tfstate" \
                                                 -input=false -no-color
                                         """
+                                        // Remove the DynamoDB lock for now
                                         //                                                 -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_FSP_LOCK_TABLE_NAME}" \
-                                        String planCommand = """
-                                            terraform plan -no-color \
-                                                -var environment_id=${ENVIRONMENT_ID} \
-                                                -var build_id=${BUILD_TAG} \
-                                                -var execution_role_arn=${TASK_EXECUTION_ROLE} \
-                                                -var ecr_address=${DOCKER_REGISTRY}
-                                        """
-                                        String applyCommand = """
-                                            terraform apply -no-color -auto-approve \
-                                                -var environment_id=${ENVIRONMENT_ID} \
-                                                -var build_id=${BUILD_TAG} \
-                                                -var execution_role_arn=${TASK_EXECUTION_ROLE} \
-                                                -var ecr_address=${DOCKER_REGISTRY}
-                                        """
-                                        sh(label:"Initialising Terraform", script: initCommand)
-                                        sh(label:"Planning Terraform", script: planCommand)
-                                        //sh(label:"Applying Terraform", script: applyCommand)
+                                        // Create a consistent list of variables for both Plan and Apply
+                                        Map<String, String> tfVariables = [
+                                             "environment_id":     "${ENVIRONMENT_ID}",
+                                             "build_id":           "${BUILD_TAG}",
+                                             "execution_role_arn": "${TASK_EXECUTION_ROLE}",
+                                             "ecr_address":        "${DOCKER_REGISTRY}",
+                                             "mhs_state_bucket":   "${TF_STATE_BUCKET}"
+                                        ]
+                                        sh(label:"Terraform: init", script: initCommand)
+                                        terraform("plan", "fakespine", ["-no-color"], tfVariables)
+                                        //terraform("apply", "fakespine", ["-no-color", "-auto-approve"], tfVariables)
                                     }
                                 }
                             }
@@ -372,4 +367,10 @@ void executeUnitTestsWithCoverage() {
 
 void buildModules(String action) {
     sh label: action, script: 'pipenv install --dev --deploy --ignore-pipfile'
+}
+
+void terraform(String action, String component, List<String> parameters, Map<String, String> variables, Map<String, String> backendConfig=[:]) {
+    List<String> variablesList=variables.collect([]) { key,value -> "-var "+key+"="value }
+    String command = "terraform "+action+" "+parameters.join(" ")+" "+variablesList.join(" ")
+    sh(label:"Terraform: "+action, script: command)
 }
