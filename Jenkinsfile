@@ -8,8 +8,6 @@ Boolean deployFakespine    = true
 
 pipeline {
 
-   PLEASE DONT BUILD THIS NOW
-
     agent{
         label 'jenkins-workers'
     }
