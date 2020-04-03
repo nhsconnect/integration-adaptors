@@ -370,7 +370,7 @@ void buildModules(String action) {
 }
 
 void terraform(String action, String component, List<String> parameters, Map<String, String> variables, Map<String, String> backendConfig=[:]) {
-    List<String> variablesList=variables.collect { key,value -> "-var "+key+"="value }
-    String command = "terraform "+action+" "+parameters.join(" ")+" "+variablesList.join(" ")
+    List<String> variablesList=variables.collect { key, value -> "-var ${key}=${value}" }
+    String command = "terraform ${action} ${parameters.join(" ")} ${variablesList.join(" ")}"
     sh(label:"Terraform: "+action, script: command)
 }
