@@ -1,10 +1,10 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
-Boolean runBuild       = false
+Boolean runBuild           = false
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
-Boolean runTerraform    = true
-Boolean deployFakespine = true
+Boolean runTerraform       = true
+Boolean deployFakespine    = true
 
 pipeline {
 
@@ -39,7 +39,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build & test MHS Common') {
             when {
               expression { runBuild }
