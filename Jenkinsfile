@@ -152,8 +152,9 @@ pipeline {
                     }
                     post {
                         always {
-                            sh label: 'Docker status', script: 'docker ps -al'
+                            sh label: 'Docker status', script: 'docker ps --all'
                             sh label: 'Dump container logs', script: '''
+                                mkdir logs
                                 docker logs ${BUILD_TAG_LOWER}_route_1 > logs/route.log
                                 docker logs ${BUILD_TAG_LOWER}_outbound_1 > logs/outbound.log
                                 docker logs ${BUILD_TAG_LOWER}_inbound_1 > logs/inbound.log
