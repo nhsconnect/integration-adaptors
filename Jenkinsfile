@@ -135,7 +135,7 @@ pipeline {
                         }
                         stage('Component Tests') {
                             steps {
-                                sh label: 'Running component tests', script: '''
+                                sh label: 'Run component tests', script: '''
                                     docker build -t local/mhs-componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
                                     docker run --rm --network "${BUILD_TAG_LOWER}_default" \
                                         --env "MHS_ADDRESS=http://outbound" \
@@ -153,7 +153,7 @@ pipeline {
                     post {
                         always {
                             sh label: 'Docker status', script: 'docker ps --all'
-                            sh label: 'Dump container logs', script: '''
+                            sh label: 'Dump container logs to files', script: '''
                                 mkdir logs
                                 docker logs ${BUILD_TAG_LOWER}_route_1 > logs/route.log
                                 docker logs ${BUILD_TAG_LOWER}_outbound_1 > logs/outbound.log
