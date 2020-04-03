@@ -67,18 +67,19 @@ class InboundHandler(base_handler.BaseHandler):
         if ref_to_message_id:
             try:
                 work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
+                logger.info(f'Retrieved work description for message {ref_to_message_id} from state store')
             except wd.EmptyWorkDescriptionError as e:
-                await self._handle_no_work_description_found_for_request(e, message_id, correlation_id,
-                                                                         request_message, received_message)
-                return
+                logger.error(f'No work description found in state store for message {ref_to_message_id}')
+                raise tornado.web.HTTPError(500, f'Unknown message reference {ref_to_message_id}',
+                                            reason="Unknown message reference") from e
         else:
-            await self._handle_no_work_description_found_for_request(None, message_id, correlation_id,
-                                                                     request_message, received_message)
+            logger.info(f'No RefToMessageId on inbound reply: handling as an unsolicited message')
+            await self._handle_unsolicited_message(message_id, correlation_id, request_message, received_message)
             return
 
         message_workflow = self.workflows[work_description.workflow]
-        logger.info('Retrieved work description from state store, forwarding message to {workflow}',
-                    fparams={'workflow': message_workflow})
+        logger.info('Forwarding message {message_id} to {workflow}',
+                    fparams={'workflow': message_workflow, 'message_id': ref_to_message_id})
 
         try:
             await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
@@ -89,11 +90,9 @@ class InboundHandler(base_handler.BaseHandler):
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
                                         reason=f'Exception in workflow') from e
 
-    async def _handle_no_work_description_found_for_request(self, e: wd.EmptyWorkDescriptionError,
-                                                            message_id: str, correlation_id: str,
-                                                            request_message:
-                                                            ebxml_request_envelope.EbxmlRequestEnvelope,
-                                                            received_message: str):
+    async def _handle_unsolicited_message(self, message_id: str, correlation_id: str,
+                                          request_message: ebxml_request_envelope.EbxmlRequestEnvelope,
+                                          received_message: str):
         # Lookup workflow for request
         interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
         interaction_details = self._get_interaction_details(interaction_id)
@@ -107,12 +106,10 @@ class InboundHandler(base_handler.BaseHandler):
 
         # If not, then something has gone wrong
         else:
-            logger.error('No work description found in state store for message with {workflow} , unsolicited '
-                         'message received unexpectedly from Spine.',
+            logger.error('Received unsolicited message for a workflow {workflow} that does not support unsolicited messaging',
                          fparams={'workflow': interaction_details['workflow']})
-            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
-                                             'received from Spine',
-                                        reason="Unknown message reference") from e
+            raise tornado.web.HTTPError(500, 'Unsolicited messaging is not supported for this interaction type',
+                                        reason="Unsolicited messaging not supported for this interaction")
 
     async def handle_forward_reliable_unsolicited_request(self, correlation_id: str,
                                                           forward_reliable_workflow:
