@@ -301,7 +301,6 @@ pipeline {
                                             terraform plan -no-color -auto-approve \
                                                 -var environment_id=${ENVIRONMENT_ID} \
                                                 -var build_id=${BUILD_TAG} \
-                                                -var cluster_id=${CLUSTER_ID} \
                                                 -var task_execution_role=${TASK_EXECUTION_ROLE} \
                                                 -var ecr_address=${DOCKER_REGISTRY} \
                                                 -var scr_log_level=DEBUG \
@@ -313,7 +312,6 @@ pipeline {
                                             terraform apply -no-color -auto-approve \
                                                 -var environment_id=${ENVIRONMENT_ID} \
                                                 -var build_id=${BUILD_TAG} \
-                                                -var cluster_id=${CLUSTER_ID} \
                                                 -var task_execution_role=${TASK_EXECUTION_ROLE} \
                                                 -var ecr_address=${DOCKER_REGISTRY} \
                                                 -var scr_log_level=DEBUG \
