@@ -139,9 +139,6 @@ pipeline {
         }
 
         stage('Test') {
-            when {
-                expression { runTest }
-            }
             parallel {
                 stage('Run Component Tests') {
                     options {
