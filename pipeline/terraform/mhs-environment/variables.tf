@@ -28,6 +28,10 @@ variable "opentest_vpc_id" {
   type = string
   description = "VPC id of the VPC that contains the Opentest connection to Spine"
 }
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC id of the DLT-Distributed Load Testing system that connects to the MHS"
+}
 
 variable "internal_root_domain" {
   type = string
