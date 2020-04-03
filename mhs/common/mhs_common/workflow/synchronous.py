@@ -129,7 +129,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         return envelope.serialize()
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
+                                     payload: str, attachments=None, manifest=None):
         raise NotImplementedError('This method is not supported for the synchronous message workflow as there is no '
                                   'inbound message')
 

@@ -56,7 +56,7 @@ class CommonWorkflow(abc.ABC):
 
     @abc.abstractmethod
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
+                                     payload: str, attachments=None, manifest=None):
         """
         Handles an inbound message from an external system (typically from spine)
 
@@ -64,6 +64,8 @@ class CommonWorkflow(abc.ABC):
         :param correlation_id: correlation ID of the request
         :param work_description: work description object for the payload
         :param payload: payload to handle
+        :param attachments: attachments from the received message
+        :param manifest: message manifest
         """
         pass
 

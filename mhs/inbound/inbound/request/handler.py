@@ -51,24 +51,28 @@ class InboundHandler(base_handler.BaseHandler):
             logger.debug('Request body: %s', self.request.body.decode() if self.request.body else None)
         request_message = self._extract_incoming_ebxml_request_message()
 
+        self._extract_message_id(request_message)
+        interaction_id = self._extract_interaction_id(request_message)
+        ref_to_message_id = self._extract_ref_message(request_message)
+        correlation_id = self._extract_correlation_id(request_message)
+
         if not self._is_message_intended_for_receiving_mhs(request_message):
             self._return_message_to_message_initiator(request_message)
             return
 
-        interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
-        mdc.interaction_id.set(interaction_id)
-
-        ref_to_message_id = self._extract_ref_message(request_message)
-        correlation_id = self._extract_correlation_id(request_message)
-        self._extract_message_id(request_message)
-
-        received_message = request_message.message_dictionary[MESSAGE]
+        payload = request_message.message_dictionary[MESSAGE]
+        attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
+        # manifest = request_message.message_dictionary[MESSAGE]
+        #TODO: extract manifest from received message
+        manifest = "THE_MANIFEST"
 
         try:
             work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
         except wd.EmptyWorkDescriptionError as e:
-            await self._handle_no_work_description_found_for_request(e, ref_to_message_id, correlation_id,
-                                                                     request_message, received_message)
+            logger.info(e)
+            await self._handle_no_work_description_found_for_request(ref_to_message_id, correlation_id, interaction_id,
+                                                                     payload, attachments=attachments, manifest=manifest)
+            self._send_ack(request_message)
             return
 
         message_workflow = self.workflows[work_description.workflow]
@@ -77,29 +81,29 @@ class InboundHandler(base_handler.BaseHandler):
 
         try:
             await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
-                                                          received_message)
+                                                          payload, attachments=attachments, manifest=manifest)
             self._send_ack(request_message)
         except Exception as e:
             logger.exception('Exception in workflow')
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
                                         reason=f'Exception in workflow') from e
 
-    async def _handle_no_work_description_found_for_request(self, e: wd.EmptyWorkDescriptionError,
-                                                            ref_to_message_id: str, correlation_id: str,
-                                                            request_message:
-                                                            ebxml_request_envelope.EbxmlRequestEnvelope,
-                                                            received_message: str):
+    async def _handle_no_work_description_found_for_request(self,
+                                                            ref_to_message_id: str,
+                                                            correlation_id: str,
+                                                            interaction_id: str,
+                                                            payload: str,
+                                                            attachments=None, manifest=None):
         # Lookup workflow for request
-        interaction_id = request_message.message_dictionary[ebxml_envelope.ACTION]
         interaction_details = self._get_interaction_details(interaction_id)
         message_workflow = self._extract_default_workflow(interaction_details, interaction_id)
 
         # If it matches forward reliable workflow, then this will be an unsolicited request from another GP system.
         # So let the workflow handle this.
         if isinstance(message_workflow, forward_reliable.AsynchronousForwardReliableWorkflow):
-            await self.handle_forward_reliable_unsolicited_request(correlation_id, message_workflow, received_message,
-                                                                   ref_to_message_id, request_message)
-
+            await self.handle_forward_reliable_unsolicited_request(correlation_id, message_workflow,
+                                                                   payload, ref_to_message_id,
+                                                                   attachments=attachments, manifest=manifest)
         # If not, then something has gone wrong
         else:
             logger.error('No work description found in state store for message with {workflow} , unsolicited '
@@ -107,21 +111,20 @@ class InboundHandler(base_handler.BaseHandler):
                          fparams={'workflow': interaction_details['workflow']})
             raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
                                              'received from Spine',
-                                        reason="Unknown message reference") from e
+                                        reason="Unknown message reference")
 
     async def handle_forward_reliable_unsolicited_request(self, correlation_id: str,
-                                                          forward_reliable_workflow:
-                                                          workflow.AsynchronousForwardReliableWorkflow,
-                                                          received_message: str, ref_to_message_id: str,
-                                                          request_message: ebxml_request_envelope.EbxmlRequestEnvelope):
+                                                          forward_reliable_workflow: workflow.AsynchronousForwardReliableWorkflow,
+                                                          payload: str, ref_to_message_id: str,
+                                                          attachments=None, manifest=None):
         logger.info('Received unsolicited inbound request for the forward-reliable workflow. Passing the '
                     'request to forward-reliable workflow.')
-        attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
+
         try:
             await forward_reliable_workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id,
-                                                                               received_message,
-                                                                               attachments)
-            self._send_ack(request_message)
+                                                                               payload,
+                                                                               attachments=attachments,
+                                                                               manifest=manifest)
         except Exception as e:
             logger.exception('Exception in workflow')
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
@@ -168,13 +171,13 @@ class InboundHandler(base_handler.BaseHandler):
 
     def _extract_message_id(self, message):
         """
-        Extracts the message id of the inbound message, this is to be logg
+        Extracts the message id of the inbound message and assigns it as the inbound message Id in logging
         :param message:
-        :return:
+        :return: the inbound message id assigned to this message by sender
         """
-        message_id = message.message_dictionary[MESSAGE_ID]
-        mdc.inbound_message_id.set(message_id)
-        logger.info('Found inbound message id on request.')
+        inbound_message_id = message.message_dictionary[MESSAGE_ID]
+        mdc.inbound_message_id.set(inbound_message_id)
+        logger.info("Found inbound message id '%s' on request.", inbound_message_id)
 
     def _extract_ref_message(self, message):
         """
@@ -184,8 +187,19 @@ class InboundHandler(base_handler.BaseHandler):
         """
         message_id = message.message_dictionary[RECEIVED_MESSAGE_ID]
         mdc.message_id.set(message_id)
-        logger.info('Found message id on inbound message.')
+        logger.info("Found message id '%s' inbound message.", message_id)
         return message_id
+
+    def _extract_interaction_id(self, message):
+        """
+        Extracts the interaction id of the inbound message and assigns it as the interaction Id in logging
+        :param message:
+        :return:
+        """
+        interaction_id = message.message_dictionary[ebxml_envelope.ACTION]
+        mdc.interaction_id.set(interaction_id)
+        logger.info("Found interaction id '%s' on inbound message.", interaction_id)
+        return interaction_id
 
     def _extract_incoming_ebxml_request_message(self):
         try:
@@ -200,7 +214,7 @@ class InboundHandler(base_handler.BaseHandler):
 
     def _is_message_intended_for_receiving_mhs(self, request_message):
         """
-        Asserts whether the incoming message was intended for thi MHS instance given the to party key defined in the
+        Asserts whether the incoming message was intended for this MHS instance given the to party key defined in the
         message.
 
         error_code, severity and description defined as per the TMS Error Base v3.0 document

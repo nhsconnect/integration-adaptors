@@ -30,7 +30,7 @@ class DummyCommonAsynchronousWorkflow(common_asynchronous.CommonAsynchronousWork
         pass
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
+                                     payload: str, attachments=None, manifest=None):
         pass
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):

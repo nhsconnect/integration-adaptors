@@ -104,7 +104,7 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
     # paths are changed
     supplier_application = tornado.web.Application(
         [
-            (r"/", client_request_handler.SynchronousHandler,dict(config_manager=config_manager, workflows=workflows)),
+            (r"/", client_request_handler.SynchronousHandler, dict(config_manager=config_manager, workflows=workflows)),
             (r"/healthcheck", healthcheck_handler.HealthcheckHandler)
         ])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)

@@ -83,7 +83,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
 
     @timing.time_function
     async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str,
-                                                 attachments: list):
+                                                 attachments: Optional[list] = None, manifest: Optional[str] = None):
         logger.info('Entered async forward reliable workflow to handle unsolicited inbound message')
         logger.audit('Unsolicited inbound {WorkflowName} workflow invoked.',
                      fparams={'WorkflowName': self.workflow_name})
@@ -92,7 +92,8 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
         await work_description.publish()
 
         result = await retriable_action.RetriableAction(
-            lambda: self._put_message_onto_queue_with(message_id, correlation_id, payload, attachments=attachments),
+            lambda: self._put_message_onto_queue_with(
+                message_id, correlation_id, payload, attachments=attachments, manifest=manifest),
             self.inbound_queue_max_retries,
             self.inbound_queue_retry_delay)\
             .execute()
