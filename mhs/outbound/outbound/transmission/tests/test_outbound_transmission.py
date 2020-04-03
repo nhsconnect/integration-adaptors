@@ -39,6 +39,7 @@ MAX_RETRIES = 3
 EXPECTED_MAX_HTTP_REQUESTS = MAX_RETRIES + 1
 RETRY_DELAY = 100
 RETRY_DELAY_IN_SECONDS = RETRY_DELAY / 1000
+VALIDATE_CERT = True
 HTTP_PROXY_HOST = "proxy_host"
 HTTP_PROXY_PORT = 3128
 
@@ -46,7 +47,7 @@ HTTP_PROXY_PORT = 3128
 class TestOutboundTransmission(TestCase):
     def setUp(self):
         self.transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH,
-                                                                       MAX_RETRIES, RETRY_DELAY)
+                                                                       MAX_RETRIES, RETRY_DELAY, VALIDATE_CERT)
 
     @async_test
     async def test_should_make_HTTP_request_with_default_parameters(self):
@@ -64,11 +65,7 @@ class TestOutboundTransmission(TestCase):
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
-                                          # ****************************************************************************
-                                          # This SHOULD be true, but we must temporarily set it to false due to Opentest
-                                          # limitations.
-                                          # ****************************************************************************
-                                          validate_cert=False,
+                                          validate_cert=VALIDATE_CERT,
                                           proxy_host=None,
                                           proxy_port=None
                                           )
@@ -78,7 +75,7 @@ class TestOutboundTransmission(TestCase):
     @async_test
     async def test_should_use_proxy_details_if_provided(self):
         self.transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH,
-                                                                       MAX_RETRIES, RETRY_DELAY, HTTP_PROXY_HOST,
+                                                                       MAX_RETRIES, RETRY_DELAY, VALIDATE_CERT, HTTP_PROXY_HOST,
                                                                        HTTP_PROXY_PORT)
 
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:
@@ -95,11 +92,7 @@ class TestOutboundTransmission(TestCase):
                                           client_cert=CLIENT_CERT_PATH,
                                           client_key=CLIENT_KEY_PATH,
                                           ca_certs=CA_CERTS_PATH,
-                                          # ****************************************************************************
-                                          # This SHOULD be true, but we must temporarily set it to false due to Opentest
-                                          # limitations.
-                                          # ****************************************************************************
-                                          validate_cert=False,
+                                          validate_cert=VALIDATE_CERT,
                                           proxy_host=HTTP_PROXY_HOST,
                                           proxy_port=HTTP_PROXY_PORT)
 
@@ -140,7 +133,7 @@ class TestOutboundTransmission(TestCase):
     @async_test
     async def test_should_try_request_twice_if_max_retries_set_to_one(self, mock_sleep):
         transmission = outbound_transmission.OutboundTransmission(CLIENT_CERT_PATH, CLIENT_KEY_PATH, CA_CERTS_PATH, 1,
-                                                                  RETRY_DELAY)
+                                                                  RETRY_DELAY, VALIDATE_CERT)
         mock_sleep.return_value = awaitable(None)
 
         with patch.object(httpclient.AsyncHTTPClient(), "fetch") as mock_fetch:

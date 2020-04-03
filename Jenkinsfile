@@ -168,7 +168,7 @@ pipeline {
                         stage('Component Tests') {
                             steps {
                                 sh label: 'Running component tests', script: '''
-                                    docker build -t componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
+                                    docker build -t local/mhs-componenttest:$BUILD_TAG -f ./component-test.Dockerfile .
                                     docker run --rm --network "${BUILD_TAG_LOWER}_default" \
                                         --env "MHS_ADDRESS=http://outbound" \
                                         --env "AWS_ACCESS_KEY_ID=test" \
@@ -177,7 +177,7 @@ pipeline {
                                         --env "FAKE_SPINE_ADDRESS=http://fakespine" \
                                         --env "MHS_INBOUND_QUEUE_URL=http://rabbitmq:5672" \
                                         --env "SCR_ADDRESS=http://scradaptor" \
-                                        componenttest:$BUILD_TAG
+                                        local/mhs-componenttest:$BUILD_TAG
                                 '''
                             }
                         }
@@ -226,6 +226,7 @@ pipeline {
                                             -var execution_role_arn=${TASK_EXECUTION_ROLE} \
                                             -var task_scaling_role_arn=${TASK_SCALING_ROLE} \
                                             -var ecr_address=${DOCKER_REGISTRY} \
+                                            -var mhs_outbound_validate_certificate=${MHS_OUTBOUND_VALIDATE_CERTIFICATE} \
                                             -var mhs_log_level=DEBUG \
                                             -var mhs_outbound_http_proxy=${MHS_OUTBOUND_HTTP_PROXY} \
                                             -var mhs_state_table_read_capacity=5 \
