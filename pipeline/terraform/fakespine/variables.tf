@@ -27,11 +27,13 @@ variable "execution_role_arn" {
 variable "fake_spine_service_minimum_instance_count" {
   type = number
   description = "The minimum number of instances of fake-spine to run. This will be the number of instances deployed initially."
+  default = 3
 }
 
 variable "fake_spine_service_maximum_instance_count" {
   type = number
   description = "The maximum number of instances of fake-spine to run."
+  default = 9
 }
 
 variable "fake_spine_service_target_request_count" {
@@ -40,7 +42,8 @@ variable "fake_spine_service_target_request_count" {
   default = 1200
 }
 
-variable "fake_spine_alb_certificate_arn" {
-  type = string
-  description = "ARN of the TLS certificate that the fake-spine load balancer should present. This can be a certificate stored in IAM or ACM."
-}
+# Uncomment when known what to do with that
+# variable "fake_spine_alb_certificate_arn" {
+#   type = string
+#   description = "ARN of the TLS certificate that the fake-spine load balancer should present. This can be a certificate stored in IAM or ACM."
+# }
