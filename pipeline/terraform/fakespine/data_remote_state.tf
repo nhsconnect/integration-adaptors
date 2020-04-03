@@ -3,7 +3,7 @@ data "terraform_remote_state" "mhs" {
   
   config = {
     bucket = var.mhs_state_bucket
+    key = "${var.environment_id}-mhs.tfstate"
+    region = var.region
   }
-
-  key = "${var.environment_id}-mhs.tfstate"
 }

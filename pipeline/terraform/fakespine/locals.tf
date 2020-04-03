@@ -25,7 +25,8 @@ locals {
     },
     {
       name = "MHS_SECRET_PARTY_KEY",
-      valueFrom = var.party_key_arn
+      //valueFrom = var.party_key_arn
+      value = "TODO"
     },
   ]
 }
