@@ -4,7 +4,7 @@ output "vpc_id" {
 }
 
 output "subnet_ids" {
-  value = aws_subnet.mhs_subnets.*.id
+  value = aws_subnet.mhs_subnet.*.id
   description = "IDs of subnets used in MHS Component"
 }
 
