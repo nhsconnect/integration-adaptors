@@ -13,7 +13,6 @@ pipeline {
     }
 
     options {
-        ansiColor('xterm')
         timestamps()
         buildDiscarder(logRotator(numToKeepStr: "10")) // keep only last 10 builds
     }
@@ -292,42 +291,43 @@ pipeline {
                             }
                             steps {
                                 dir ('pipeline/terraform/fakespine'){
-                                    String initCommand = """
-                                        terraform init \
-                                            -backend-config="bucket=${TF_STATE_BUCKET}" \
-                                            -backend-config="region=${TF_STATE_BUCKET_REGION}" \
-                                            -backend-config="key=${ENVIRONMENT_ID}-fakespine.tfstate" \
-                                            -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_FSP_LOCK_TABLE_NAME}" \
-                                            -input=false -no-color
-                                    """
-                                    String planCommand = """
-                                        terraform plan -no-color -auto-approve \
-                                            -var environment_id=${ENVIRONMENT_ID} \
-                                            -var build_id=${BUILD_TAG} \
-                                            -var cluster_id=${CLUSTER_ID} \
-                                            -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                                            -var ecr_address=${DOCKER_REGISTRY} \
-                                            -var scr_log_level=DEBUG \
-                                            -var scr_service_port=${SCR_SERVICE_PORT} \
-                                            -var scr_mhs_address=${MHS_ADDRESS} \
-                                            -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
-                                    """
-                                    String applyCommand = """
-                                        terraform apply -no-color -auto-approve \
-                                            -var environment_id=${ENVIRONMENT_ID} \
-                                            -var build_id=${BUILD_TAG} \
-                                            -var cluster_id=${CLUSTER_ID} \
-                                            -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                                            -var ecr_address=${DOCKER_REGISTRY} \
-                                            -var scr_log_level=DEBUG \
-                                            -var scr_service_port=${SCR_SERVICE_PORT} \
-                                            -var scr_mhs_address=${MHS_ADDRESS} \
-                                            -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
-                                    """
-
-                                    sh(label:"Initialising Terraform", script: initCommand)
-                                    sh(label:"Planning Terraform", script: planCommand)
-                                    //sh(label:"Applying Terraform", script: applyCommand)
+                                    script {
+                                        String initCommand = """
+                                            terraform init \
+                                                -backend-config="bucket=${TF_STATE_BUCKET}" \
+                                                -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                                                -backend-config="key=${ENVIRONMENT_ID}-fakespine.tfstate" \
+                                                -backend-config="dynamodb_table=${ENVIRONMENT_ID}-${TF_FSP_LOCK_TABLE_NAME}" \
+                                                -input=false -no-color
+                                        """
+                                        String planCommand = """
+                                            terraform plan -no-color -auto-approve \
+                                                -var environment_id=${ENVIRONMENT_ID} \
+                                                -var build_id=${BUILD_TAG} \
+                                                -var cluster_id=${CLUSTER_ID} \
+                                                -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                                                -var ecr_address=${DOCKER_REGISTRY} \
+                                                -var scr_log_level=DEBUG \
+                                                -var scr_service_port=${SCR_SERVICE_PORT} \
+                                                -var scr_mhs_address=${MHS_ADDRESS} \
+                                                -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
+                                        """
+                                        String applyCommand = """
+                                            terraform apply -no-color -auto-approve \
+                                                -var environment_id=${ENVIRONMENT_ID} \
+                                                -var build_id=${BUILD_TAG} \
+                                                -var cluster_id=${CLUSTER_ID} \
+                                                -var task_execution_role=${TASK_EXECUTION_ROLE} \
+                                                -var ecr_address=${DOCKER_REGISTRY} \
+                                                -var scr_log_level=DEBUG \
+                                                -var scr_service_port=${SCR_SERVICE_PORT} \
+                                                -var scr_mhs_address=${MHS_ADDRESS} \
+                                                -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
+                                        """
+                                        sh(label:"Initialising Terraform", script: initCommand)
+                                        sh(label:"Planning Terraform", script: planCommand)
+                                        //sh(label:"Applying Terraform", script: applyCommand)
+                                    }
                                 }
                             }
                         }
