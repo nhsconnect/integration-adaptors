@@ -14,6 +14,16 @@ variable "ecr_address" {
   description = "Address of the ECR registry to get containers from."
 }
 
+variable "build_id" {
+  type = string
+  description = "ID used to identify the current build."
+}
+
+variable "execution_role_arn" {
+  type = string
+  description = "ARN of the IAM role for MHS containers to pull from ECR and put logs in Cloudwatch."
+}
+
 variable "fake_spine_service_minimum_instance_count" {
   type = number
   description = "The minimum number of instances of fake-spine to run. This will be the number of instances deployed initially."

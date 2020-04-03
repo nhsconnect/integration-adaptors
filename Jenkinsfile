@@ -301,23 +301,15 @@ pipeline {
                                             terraform plan -no-color \
                                                 -var environment_id=${ENVIRONMENT_ID} \
                                                 -var build_id=${BUILD_TAG} \
-                                                -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                                                -var ecr_address=${DOCKER_REGISTRY} \
-                                                -var scr_log_level=DEBUG \
-                                                -var scr_service_port=${SCR_SERVICE_PORT} \
-                                                -var scr_mhs_address=${MHS_ADDRESS} \
-                                                -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
+                                                -var execution_role_arn=${TASK_EXECUTION_ROLE} \
+                                                -var ecr_address=${DOCKER_REGISTRY}
                                         """
                                         String applyCommand = """
                                             terraform apply -no-color -auto-approve \
                                                 -var environment_id=${ENVIRONMENT_ID} \
                                                 -var build_id=${BUILD_TAG} \
-                                                -var task_execution_role=${TASK_EXECUTION_ROLE} \
-                                                -var ecr_address=${DOCKER_REGISTRY} \
-                                                -var scr_log_level=DEBUG \
-                                                -var scr_service_port=${SCR_SERVICE_PORT} \
-                                                -var scr_mhs_address=${MHS_ADDRESS} \
-                                                -var scr_mhs_ca_certs_arn=${OUTBOUND_CA_CERTS_ARN}
+                                                -var execution_role_arn=${TASK_EXECUTION_ROLE} \
+                                                -var ecr_address=${DOCKER_REGISTRY}
                                         """
                                         sh(label:"Initialising Terraform", script: initCommand)
                                         sh(label:"Planning Terraform", script: planCommand)
