@@ -3,7 +3,7 @@
 resource "aws_ecs_service" "fake_spine_service" {
   name = "${var.environment_id}-fake-spine"
   //cluster = aws_ecs_cluster.mhs_cluster.id
-  cluster = data.terraform_remote_state.mhs.cluster_id
+  cluster = data.terraform_remote_state.mhs.outputs.cluster_id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
   desired_count = var.fake_spine_service_minimum_instance_count
@@ -16,7 +16,7 @@ resource "aws_ecs_service" "fake_spine_service" {
     security_groups = [
       aws_security_group.fake_spine_security_group.id
     ]
-    subnets = data.terraform_remote_state.mhs.subnet_ids
+    subnets = data.terraform_remote_state.mhs.outputs.subnet_ids
   }
 
   load_balancer {

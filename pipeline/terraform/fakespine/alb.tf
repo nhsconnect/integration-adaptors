@@ -6,14 +6,14 @@
 resource "aws_lb" "fake_spine_alb" {
   internal = true
   load_balancer_type = "application"
-  subnets = data.terraform_remote_state.mhs.subnet_ids
+  subnets = data.terraform_remote_state.mhs.outputs.subnet_ids
   security_groups = [
     aws_security_group.alb_fake_spine_security_group.id
   ]
 
   access_logs {
     //bucket = aws_s3_bucket.mhs_access_logs_bucket.bucket
-    bucket = data.terraform_remote_state.mhs.logs_s3_bucket
+    bucket = data.terraform_remote_state.mhs.outputs.logs_s3_bucket
     prefix = "fake_spine-${var.build_id}"
     enabled = true
   }
