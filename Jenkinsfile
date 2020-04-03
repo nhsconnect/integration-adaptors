@@ -298,7 +298,7 @@ pipeline {
                                                 -input=false -no-color
                                         """
                                         String planCommand = """
-                                            terraform plan -no-color -auto-approve \
+                                            terraform plan -no-color \
                                                 -var environment_id=${ENVIRONMENT_ID} \
                                                 -var build_id=${BUILD_TAG} \
                                                 -var task_execution_role=${TASK_EXECUTION_ROLE} \
