@@ -24,6 +24,8 @@ EBXML_TEMPLATE = "ebxml_request"
 
 MESSAGE = "hl7_message"
 
+MANIFEST = "manifest"
+
 DUPLICATE_ELIMINATION = "duplicate_elimination"
 ACK_REQUESTED = "ack_requested"
 ACK_SOAP_ACTOR = "ack_soap_actor"
@@ -138,7 +140,18 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         if payload_part:
             extracted_values[MESSAGE] = payload_part
 
+        extracted_values[MANIFEST] = cls._extract_manifest(xml_tree)
+
         return EbxmlRequestEnvelope(extracted_values)
+
+    @classmethod
+    def _extract_manifest(cls, xml_tree: Element):
+        manifest_xpath = f"./SOAP:Body/{ebxml_envelope.EBXML_NAMESPACE}:Manifest"
+        manifest = xml_tree.find(manifest_xpath, ebxml_envelope.NAMESPACES)
+        if manifest:
+            return ElementTree.tostring(manifest, encoding='unicode')
+        else:
+            logger.warning("Message does not have ebXML manifest at '%s'", manifest_xpath)
 
     @classmethod
     def _add_descriptions_to_attachments(cls, xml_tree: Element, attachments: List[Dict[str, Union[str, bool]]]):

@@ -62,9 +62,7 @@ class InboundHandler(base_handler.BaseHandler):
 
         payload = request_message.message_dictionary[MESSAGE]
         attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
-        # manifest = request_message.message_dictionary[MESSAGE]
-        #TODO: extract manifest from received message
-        manifest = "THE_MANIFEST"
+        manifest = request_message.message_dictionary[ebxml_request_envelope.MANIFEST]
 
         try:
             work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
