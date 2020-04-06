@@ -1,5 +1,5 @@
 """This module defines the synchronous workflow."""
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 import utilities.integration_adaptors_logger as log
 from tornado import httpclient
 from utilities import timing
@@ -129,7 +129,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         return envelope.serialize()
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str, attachments=None, manifest=None):
+                                     payload: str, attachments: Optional[List[dict]], manifest: Optional[str]):
         raise NotImplementedError('This method is not supported for the synchronous message workflow as there is no '
                                   'inbound message')
 

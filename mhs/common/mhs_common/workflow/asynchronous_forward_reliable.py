@@ -1,5 +1,5 @@
 """This module defines the asynchronous forward reliable workflow."""
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
@@ -83,7 +83,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
 
     @timing.time_function
     async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, payload: str,
-                                                 attachments: Optional[list] = None, manifest: Optional[str] = None):
+                                                 attachments: Optional[List[dict]], manifest: Optional[str]):
         logger.info('Entered async forward reliable workflow to handle unsolicited inbound message')
         logger.audit('Unsolicited inbound {WorkflowName} workflow invoked.',
                      fparams={'WorkflowName': self.workflow_name})
@@ -92,8 +92,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
         await work_description.publish()
 
         result = await retriable_action.RetriableAction(
-            lambda: self._put_message_onto_queue_with(
-                message_id, correlation_id, payload, attachments=attachments, manifest=manifest),
+            lambda: self._put_message_onto_queue_with(message_id, correlation_id, payload, attachments, manifest),
             self.inbound_queue_max_retries,
             self.inbound_queue_retry_delay)\
             .execute()

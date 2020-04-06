@@ -1,5 +1,5 @@
 """This module defines the common base for all asynchronous workflows."""
-from typing import Dict, Callable, Tuple, Optional
+from typing import Dict, Callable, Tuple, Optional, List
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
@@ -114,7 +114,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
 
     @timing.time_function
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str, attachments=None, manifest=None):
+                                     payload: str, attachments: Optional[List[dict]], manifest: Optional[str]):
         logger.info('Entered {WorkflowName} workflow to handle inbound message',
                     fparams={'WorkflowName': self.workflow_name})
         logger.audit('{WorkflowName} inbound workflow invoked. Message received from spine',
@@ -179,14 +179,14 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             logger.exception('Error encountered whilst obtaining outbound URL.')
             raise
 
-    async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments=None, manifest=None):
+    async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments, manifest):
         await self.queue_adaptor.send_async(
             {
                 'payload': payload,
                 'attachments': attachments or [],
                 'message_id': message_id,
                 'correlation_id': correlation_id,
-                'manifest': manifest
+                'manifest': manifest or ''
             },
             properties={
                 'message_id': message_id,

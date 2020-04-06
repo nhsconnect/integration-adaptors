@@ -1,6 +1,6 @@
 """This module defines the inbound request handler component."""
 
-from typing import Dict
+from typing import Dict, List, Optional
 
 import mhs_common.messages.common_ack_envelope as common_ack_envelope
 import mhs_common.messages.ebxml_ack_envelope as ebxml_ack_envelope
@@ -13,7 +13,7 @@ import tornado.web
 from utilities import mdc
 from mhs_common.configuration import configuration_manager
 from mhs_common.handler import base_handler
-from mhs_common.messages.envelope import MESSAGE, CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID
+from mhs_common.messages.envelope import CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID
 from mhs_common.state import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.state.persistence_adaptor import PersistenceAdaptor
@@ -60,7 +60,7 @@ class InboundHandler(base_handler.BaseHandler):
             self._return_message_to_message_initiator(request_message)
             return
 
-        payload = request_message.message_dictionary[MESSAGE]
+        payload = request_message.message_dictionary[ebxml_request_envelope.MESSAGE]
         attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
         manifest = request_message.message_dictionary[ebxml_request_envelope.MANIFEST]
 
@@ -69,7 +69,7 @@ class InboundHandler(base_handler.BaseHandler):
         except wd.EmptyWorkDescriptionError as e:
             logger.info(e)
             await self._handle_no_work_description_found_for_request(ref_to_message_id, correlation_id, interaction_id,
-                                                                     payload, attachments=attachments, manifest=manifest)
+                                                                     payload, attachments, manifest)
             self._send_ack(request_message)
             return
 
@@ -79,7 +79,7 @@ class InboundHandler(base_handler.BaseHandler):
 
         try:
             await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
-                                                          payload, attachments=attachments, manifest=manifest)
+                                                          payload, attachments, manifest)
             self._send_ack(request_message)
         except Exception as e:
             logger.exception('Exception in workflow')
@@ -91,7 +91,7 @@ class InboundHandler(base_handler.BaseHandler):
                                                             correlation_id: str,
                                                             interaction_id: str,
                                                             payload: str,
-                                                            attachments=None, manifest=None):
+                                                            attachments: Optional[List[dict]], manifest: Optional[str]):
         # Lookup workflow for request
         interaction_details = self._get_interaction_details(interaction_id)
         message_workflow = self._extract_default_workflow(interaction_details, interaction_id)
@@ -101,7 +101,7 @@ class InboundHandler(base_handler.BaseHandler):
         if isinstance(message_workflow, forward_reliable.AsynchronousForwardReliableWorkflow):
             await self.handle_forward_reliable_unsolicited_request(correlation_id, message_workflow,
                                                                    payload, ref_to_message_id,
-                                                                   attachments=attachments, manifest=manifest)
+                                                                   attachments, manifest)
         # If not, then something has gone wrong
         else:
             logger.error('No work description found in state store for message with {workflow} , unsolicited '
@@ -114,15 +114,13 @@ class InboundHandler(base_handler.BaseHandler):
     async def handle_forward_reliable_unsolicited_request(self, correlation_id: str,
                                                           forward_reliable_workflow: workflow.AsynchronousForwardReliableWorkflow,
                                                           payload: str, ref_to_message_id: str,
-                                                          attachments=None, manifest=None):
+                                                          attachments: Optional[List[dict]], manifest: str):
         logger.info('Received unsolicited inbound request for the forward-reliable workflow. Passing the '
                     'request to forward-reliable workflow.')
 
         try:
             await forward_reliable_workflow.handle_unsolicited_inbound_message(ref_to_message_id, correlation_id,
-                                                                               payload,
-                                                                               attachments=attachments,
-                                                                               manifest=manifest)
+                                                                               payload, attachments, manifest)
         except Exception as e:
             logger.exception('Exception in workflow')
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',

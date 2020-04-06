@@ -1,5 +1,5 @@
 """This module defines the sync-async workflow."""
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 from utilities import integration_adaptors_logger as log
 
@@ -94,7 +94,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return 500, "No async response received from sync-async store"
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str, attachments=None, manifest=None):
+                                     payload: str, attachments: Optional[List[dict]], manifest: Optional[str]):
         logger.info('Entered sync-async inbound workflow')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
