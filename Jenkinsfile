@@ -305,7 +305,8 @@ pipeline {
                                              "execution_role_arn": "${TASK_EXECUTION_ROLE}",
                                              "ecr_address":        "${DOCKER_REGISTRY}",
                                              "mhs_state_bucket":   "${TF_STATE_BUCKET}",
-                                             "task_role_arn":      "${TASK_ROLE}"
+                                             "task_role_arn":      "${TASK_ROLE}",
+                                             "fake_spine_alb_certificate_arn": "${FAKESPINE_ALB_CERT_ARN}" //TODO Check if this can be set with data resource
                                         ]
                                         sh(label:"Terraform: init", script: initCommand)
                                         terraform("plan", "fakespine", ["-no-color"], tfVariables)

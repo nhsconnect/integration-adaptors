@@ -24,11 +24,11 @@ resource "aws_ecs_service" "fake_spine_service" {
     # That is why in these 2 lines below we do "[0]" to reference that one container and port definition.
     container_name = jsondecode(aws_ecs_task_definition.fake_spine_task.container_definitions)[0].name
     container_port = jsondecode(aws_ecs_task_definition.fake_spine_task.container_definitions)[0].portMappings[0].hostPort
-    target_group_arn = aws_lb_target_group.fake_spine_route_alb_target_group.arn
+    target_group_arn = aws_lb_target_group.fake_spine_alb_target_group.arn
   }
 
   depends_on = [
-    aws_lb.route_alb
+    aws_lb.fake_spine_alb
   ]
 
   # Preserve the autoscaled instance count when this service is updated

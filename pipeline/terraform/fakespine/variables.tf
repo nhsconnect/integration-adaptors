@@ -52,10 +52,7 @@ variable "task_role_arn" {
   description = "ARN of the IAM role for MHS containers to use other AWS services."
 }
 
-
-
-# Uncomment when known what to do with that
-# variable "fake_spine_alb_certificate_arn" {
-#   type = string
-#   description = "ARN of the TLS certificate that the fake-spine load balancer should present. This can be a certificate stored in IAM or ACM."
-# }
+variable "fake_spine_alb_certificate_arn" {
+  type = string
+  description = "ARN of the TLS certificate that the fake-spine load balancer should present. This can be a certificate stored in IAM or ACM."
+}
