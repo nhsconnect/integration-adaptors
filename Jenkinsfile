@@ -306,6 +306,7 @@ pipeline {
                                              "ecr_address":        "${DOCKER_REGISTRY}",
                                              "mhs_state_bucket":   "${TF_STATE_BUCKET}",
                                              "task_role_arn":      "${TASK_ROLE}",
+                                             "task_scaling_role":  "${TASK_SCALING_ROLE}"
                                              "fake_spine_alb_certificate_arn": "${FAKESPINE_ALB_CERT_ARN}" //TODO Check if this can be set with data resource
                                         ]
                                         sh(label:"Terraform: init", script: initCommand)

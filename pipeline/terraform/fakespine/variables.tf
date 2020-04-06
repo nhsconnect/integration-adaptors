@@ -56,3 +56,8 @@ variable "fake_spine_alb_certificate_arn" {
   type = string
   description = "ARN of the TLS certificate that the fake-spine load balancer should present. This can be a certificate stored in IAM or ACM."
 }
+
+variable "task_scaling_role_arn" {
+  type = string
+  description = "ARN of the IAM role for ECS to use when auto-scaling services"
+}
