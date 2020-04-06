@@ -14,8 +14,8 @@ class CommonAssertions(object):
         @param message_id: message id to look for
         """
         amq_assertor \
-            .assert_property('message-id', message_id) \
-            .assert_property('correlation-id', '1') \
+            .assert_property('message_id', message_id) \
+            .assert_property('correlation_id', '1') \
             .assert_json_content_type()
 
     def message_status_recorded_as_successfully_processed(self, state_table_assertor: DynamoMhsTableStateAssertor, message_id):
