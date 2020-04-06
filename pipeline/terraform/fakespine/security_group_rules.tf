@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "fake_spine_security_group_vpc_endpoints_egre
   to_port = 443
   protocol = "tcp"
   //prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id]
-  prefix_list_ids = data.terraform_remote_state.mhs.outputs.s3_endpoint_prefix_list_ids
+  prefix_list_ids = [data.terraform_remote_state.mhs.outputs.s3_endpoint_prefix_list_ids]
   description = "S3 (for pulling ECR images)"
 }
 

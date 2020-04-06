@@ -32,3 +32,8 @@ output "s3_endpoint_prefix_list_ids" {
   value = aws_vpc_endpoint.s3_endpoint.prefix_list_id
   description = "IDs of Prefix list provided by S3 endpoint"
 }
+
+output "logs_s3_bucket" {
+  value = aws_s3_bucket.mhs_access_logs_bucket.bucket
+  description = "S3 Bucket for storing logs"
+}
