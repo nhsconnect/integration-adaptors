@@ -304,7 +304,8 @@ pipeline {
                                              "build_id":           "${BUILD_TAG}",
                                              "execution_role_arn": "${TASK_EXECUTION_ROLE}",
                                              "ecr_address":        "${DOCKER_REGISTRY}",
-                                             "mhs_state_bucket":   "${TF_STATE_BUCKET}"
+                                             "mhs_state_bucket":   "${TF_STATE_BUCKET}",
+                                             "task_role_arn":      "${TASK_ROLE}"
                                         ]
                                         sh(label:"Terraform: init", script: initCommand)
                                         terraform("plan", "fakespine", ["-no-color"], tfVariables)

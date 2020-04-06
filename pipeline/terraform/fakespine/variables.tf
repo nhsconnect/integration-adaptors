@@ -47,6 +47,13 @@ variable "fake_spine_service_target_request_count" {
   default = 1200
 }
 
+variable "task_role_arn" {
+  type = string
+  description = "ARN of the IAM role for MHS containers to use other AWS services."
+}
+
+
+
 # Uncomment when known what to do with that
 # variable "fake_spine_alb_certificate_arn" {
 #   type = string
