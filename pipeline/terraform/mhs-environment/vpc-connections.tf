@@ -167,8 +167,3 @@ resource "aws_vpc_peering_connection" "dlt_peering_connection" {
     EnvironmentId = var.environment_id
   }
 }
-# Allow DNS resolution of the domain names defined in route53.tf in the DLT VPC
-resource "aws_route53_zone_association" "dlt_hosted_zone_mhs_vpc_association" {
-  zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
-  vpc_id = data.aws_vpc.dlt_vpc.id
-}
