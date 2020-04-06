@@ -13,6 +13,11 @@ output "cluster_id" {
   description = "ID of ECS Cluster created by this component"
 }
 
+output "cluster_name" {
+  value = aws_ecs_cluster.mhs_cluster.name
+  description = "Name of ECS Cluster created by this component"
+}
+
 output "cloudwatch_vpce_security_group_id" {
   value = aws_security_group.cloudwatch_security_group.id
   description = "ID of security group for cloudwatch VPC Endpoint"
