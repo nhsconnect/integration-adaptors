@@ -64,15 +64,22 @@ class InboundHandler(base_handler.BaseHandler):
         attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
         manifest = request_message.message_dictionary[ebxml_request_envelope.MANIFEST]
 
-        try:
-            work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
-        except wd.EmptyWorkDescriptionError as e:
-            logger.info(e)
-            await self._handle_no_work_description_found_for_request(ref_to_message_id, correlation_id, interaction_id,
-                                                                     payload, attachments, manifest)
-            self._send_ack(request_message)
-            return
+        work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
+        if not work_description:
+            await self._handle_no_work_description_found_for_request(
+                ref_to_message_id, correlation_id, interaction_id, payload, attachments, manifest)
+        else:
+            await self._handle_found_work_description_for_request(
+                ref_to_message_id, correlation_id, work_description, payload, attachments, manifest)
 
+        self._send_ack(request_message)
+
+    async def _handle_found_work_description_for_request(self,
+                                                         ref_to_message_id: str,
+                                                         correlation_id: str,
+                                                         work_description: wd.WorkDescription,
+                                                         payload: str,
+                                                         attachments: Optional[List[dict]], manifest: Optional[str]):
         message_workflow = self.workflows[work_description.workflow]
         logger.info('Retrieved work description from state store, forwarding message to {workflow}',
                     fparams={'workflow': message_workflow})
@@ -80,7 +87,6 @@ class InboundHandler(base_handler.BaseHandler):
         try:
             await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description,
                                                           payload, attachments, manifest)
-            self._send_ack(request_message)
         except Exception as e:
             logger.exception('Exception in workflow')
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',

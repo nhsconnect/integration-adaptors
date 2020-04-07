@@ -101,7 +101,7 @@ async def update_status_with_retries(wdo: WorkDescription,
         raise WorkDescriptionUpdateFailedError
 
 
-async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> WorkDescription:
+async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> Optional[WorkDescription]:
     """
     Attempts to retrieve and deserialize a work description instance from the given persistence store to create
     a local work description
@@ -120,7 +120,7 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
     json_store_data = await persistence_store.get(key)
     if json_store_data is None:
         logger.info('Persistence store returned empty value for {key}', fparams={'key': key})
-        raise EmptyWorkDescriptionError(f'Failed to find a value for key id {key}')
+        return None
 
     return WorkDescription(persistence_store, json_store_data)
 
