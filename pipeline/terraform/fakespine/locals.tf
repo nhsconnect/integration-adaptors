@@ -1,9 +1,10 @@
 locals {
     fake_spine_base_environment_variables = [
     {
-    name = "FAKE_SPINE_PRIVATE_KEY",
-    value = "TODO"
-    },{
+      name = "FAKE_SPINE_PRIVATE_KEY",
+      value = "TODO"
+    },
+    {
       name = "FAKE_SPINE_CERTIFICATE",
       value = "TODO"
     },

@@ -37,3 +37,13 @@ output "logs_s3_bucket" {
   value = aws_s3_bucket.mhs_access_logs_bucket.bucket
   description = "S3 Bucket for storing logs"
 }
+
+output "mhs_hosted_zone_id" {
+  value = aws_route53_zone.mhs_hosted_zone.zone_id
+  description = "Zone ID of MHS Hosted R53 Zone"
+}
+
+output "mhs_hosted_zone_name" {
+  value = aws_route53_zone.mhs_hosted_zone.name
+  description = "Name of MHS Hosted R53 Zone"
+}
