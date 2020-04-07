@@ -144,3 +144,26 @@ resource "aws_security_group_rule" "mhs_route_security_group_opentest_ldap_proxy
     data.aws_vpc.opentest_vpc.cidr_block]
   description = "Allow outbound LDAP requests to Opentest"
 }
+##############
+# DLT- Distributed Load Tester VPC
+##############
+
+# VPC peering connection
+resource "aws_vpc_peering_connection" "dlt_peering_connection" {
+  peer_vpc_id = var.dlt_vpc_id
+  vpc_id = aws_vpc.mhs_vpc.id
+  auto_accept = true
+
+  accepter {
+    allow_remote_vpc_dns_resolution = true
+  }
+
+  requester {
+    allow_remote_vpc_dns_resolution = true
+  }
+
+  tags = {
+    Name = "${var.environment_id}-mhs-dlt-peering-connection"
+    EnvironmentId = var.environment_id
+  }
+}
