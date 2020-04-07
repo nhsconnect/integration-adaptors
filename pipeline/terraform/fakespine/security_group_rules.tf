@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "fake_spine_security_group_ecr_egress_rule" {
 }
 
 # # Egress rule to allow writing logs to Cloudwatch
-resource "aws_security_group_rule" "mhs_outbound_security_group_cloudwatch_egress_rule" {
+resource "aws_security_group_rule" "fake_spine_security_group_cloudwatch_egress_rule" {
   security_group_id = aws_security_group.fake_spine_security_group.id
   type = "egress"
   from_port = 443

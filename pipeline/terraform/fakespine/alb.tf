@@ -4,6 +4,7 @@
 
 # Application load balancer for MHS outbound
 resource "aws_lb" "fake_spine_alb" {
+  name = "${var.environment_id}-fake-spine-alb"
   internal = true
   load_balancer_type = "application"
   subnets = data.terraform_remote_state.mhs.outputs.subnet_ids
