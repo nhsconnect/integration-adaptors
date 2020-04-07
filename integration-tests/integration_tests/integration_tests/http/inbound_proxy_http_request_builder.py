@@ -19,7 +19,7 @@ class InboundProxyHttpRequestBuilder(object):
             HttpHeaders.CONTENT_TYPE: 'multipart/related; boundary="--=_MIME-Boundary"'
         }
         self.body = None
-        self.inbound_proxy_host = os.environ.get('INBOUND_PROXY_HOST', 'http://fakespine') + "/inbound-proxy"
+        self.inbound_proxy_host = os.environ.get('INBOUND_PROXY_HOST', 'http://fakespine:8888') + "/inbound-proxy"
         self.assertor = unittest.TestCase('__init__')
 
     def with_body(self, body) -> InboundProxyHttpRequestBuilder:
