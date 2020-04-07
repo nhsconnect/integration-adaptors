@@ -199,6 +199,12 @@ variable "route_ca_certs_arn" {
   default = ""
 }
 
+variable "outbound_ca_certs_arn" {
+  type = string
+  description = "ARN of the secrets manager secret containing the CA certificates to be used to verify the certificate presented by the Spine Route Lookup service. Required if you are using certificates that are not signed by a legitimate CA."
+  default = ""
+}
+
 variable "outbound_alb_certificate_arn" {
   type = string
   description = "ARN of the TLS certificate that the outbound load balancer should present. This can be a certificate stored in IAM or ACM."
