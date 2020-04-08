@@ -5,7 +5,7 @@ resource "aws_lb_target_group" "fake_spine_alb_target_group" {
   protocol = "HTTP"
   target_type = "ip"
   vpc_id = data.terraform_remote_state.mhs.outputs.vpc_id
-  name = "${var.environment_id}-fake-spine-alb-target-group"
+  name = "${var.environment_id}-fake-spine-alb-tg"
 
   health_check {
     path = "/healthcheck"
@@ -13,7 +13,7 @@ resource "aws_lb_target_group" "fake_spine_alb_target_group" {
   }
 
   tags = {
-    Name = "${var.environment_id}-fake-spine-alb-target-group"
+    Name = "${var.environment_id}-fake-spine-alb-tg"
     EnvironmentId = var.environment_id
   }
 }

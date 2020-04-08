@@ -5,7 +5,8 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
   [
     {
       name = "fake-spine"
-      image = "${var.ecr_address}/fake-spine:fake-spine-${var.build_id}"
+      #image = "${var.ecr_address}/fake-spine:fake-spine-${var.build_id}"
+      image = "${var.ecr_address}/fake-spine:latest" //TODO, for testing, change to build_id later
       environment = local.fake_spine_base_environment_variables
       secrets = []
       essential = true
