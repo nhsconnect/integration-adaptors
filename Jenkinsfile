@@ -300,6 +300,13 @@ pipeline {
                                 expression { deployFakespine && runTerraform }
                             }
                             steps {
+                                dir('integration-tests/fake_spine') {
+                                    script {
+                                        sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} ." )
+                                        sh ( label: "Push the fake spine image to ECR",      script: "docker push ${DOCKER_REGISTRY}/fake-spine")
+                                    }
+                                }
+
                                 dir ('pipeline/terraform/fakespine'){
                                     script {
                                         String initCommand = """
