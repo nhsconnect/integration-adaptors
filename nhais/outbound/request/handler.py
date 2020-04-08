@@ -1,17 +1,31 @@
+from typing import Any
 
 from comms.http_headers import HttpHeaders
+from tornado import httputil
 from utilities import mdc
 from common.handler import base_handler
 
 from utilities import integration_adaptors_logger as log, message_utilities, timing
+
+from mesh.mesh_outbound import MeshOutboundWrapper
+from outbound.converter.fhir_to_edifact import FhirToEdifact
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class SynchronousHandler(base_handler.BaseHandler):
 
+    def __init__(self, application: "Application", request: httputil.HTTPServerRequest, **kwargs: Any):
+        super().__init__(application, request, **kwargs)
+        self.super(application, request, kwargs)
+        self.fhir_to_edifact = FhirToEdifact()
+        self.mesh_wrapper = MeshOutboundWrapper()
+
     @timing.time_request
     async def post(self):
+        edifact = self.fhir_to_edifact.convert(self.request.body.decode())
+        await self.mesh_wrapper.send(edifact)
+        # TODO: response status code 202
         test_id = self._extract_test_id()
         new_id = test_id
 

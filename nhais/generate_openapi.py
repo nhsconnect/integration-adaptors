@@ -5,8 +5,8 @@ import apispec.ext.marshmallow
 import apispec_webframeworks.tornado
 from common.request import healthcheck_handler
 
-from outbound.request import request_body_schema
-from outbound.request.synchronous import handler
+from outbound.request import request_body_schema, handler
+
 
 def create_spec() -> apispec.APISpec:
     """

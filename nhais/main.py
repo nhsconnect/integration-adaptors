@@ -2,7 +2,7 @@ import tornado.httpclient
 import utilities.integration_adaptors_logger as log
 from common.request import healthcheck_handler
 from utilities import config
-from outbound.request.synchronous import handler
+from outbound.request import handler
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
