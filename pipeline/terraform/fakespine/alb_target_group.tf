@@ -5,6 +5,7 @@ resource "aws_lb_target_group" "fake_spine_alb_target_group" {
   protocol = "HTTP"
   target_type = "ip"
   vpc_id = data.terraform_remote_state.mhs.outputs.vpc_id
+  name = "${var.environment_id}-fake-spine-alb-target-group"
 
   health_check {
     path = "/healthcheck"
