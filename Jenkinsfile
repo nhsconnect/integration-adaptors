@@ -4,6 +4,7 @@ Boolean runBuild           = false
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
 Boolean runTerraform       = true
+Boolean buildFakespine     = true
 Boolean deployFakespine    = true
 
 pipeline {
@@ -322,8 +323,8 @@ pipeline {
                                              "fake_spine_alb_certificate_arn": "${FAKESPINE_ALB_CERT_ARN}" //TODO Check if this can be set with data resource
                                         ]
                                         sh(label:"Terraform: init", script: initCommand)
-                                        terraform("plan",  "fakespine", ["-no-color"],                  tfVariables )
-                                        terraform("apply", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
+                                        //terraform("plan",  "fakespine", ["-no-color"],                  tfVariables )
+                                        terraform("destroy", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
                                     }
                                 }
                             }
