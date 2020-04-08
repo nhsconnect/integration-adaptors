@@ -1,6 +1,6 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
-Boolean runBuild           = true
+Boolean runBuild           = false
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
 Boolean runTerraform       = true
