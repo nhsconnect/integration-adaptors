@@ -2,6 +2,7 @@ import tornado.httpclient
 import utilities.integration_adaptors_logger as log
 from common.request import healthcheck_handler
 from utilities import config
+from outbound.request.synchronous import handler
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -15,6 +16,7 @@ def start_tornado_server() -> None:
 
     supplier_application = tornado.web.Application(
         [
+            (r'/', handler.SynchronousHandler),
             (r"/healthcheck", healthcheck_handler.HealthcheckHandler)
         ])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)

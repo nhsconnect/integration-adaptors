@@ -1,0 +1,56 @@
+{
+    "paths": {
+        "/": {
+            "post": {
+                "summary": "Make a request to the NHAIS",
+                "description": "Make a request to the NHAIS",
+                "operationId": "postNHAIS",
+                "parameters": [
+                    {
+                        "name": "Test-Id",
+                        "in": "header",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Test ID of the message."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response.",
+                        "content": {
+                            "text/xml": {}
+                        }
+                    },
+                    "202": {
+                        "description": "Acknowledgement that we successfully sent the message to Spine (response will come asynchronously on the inbound queue)."
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/RequestBody"
+                            }
+                        }
+                    },
+                    "description": "The HL7 payload (and optional attachments) to be sent to Spine."
+                }
+            }
+        },
+        "/healthcheck": {
+            "get": {
+                "summary": "Healthcheck endpoint",
+                "description": "This endpoint just returns a HTTP 200 response and does no further processing. This endpoint is intended to be used by load balancers/other infrastructure to check that the server is running.",
+                "operationId": "getHealthcheck",
+                "responses": {
+                    "200": {
+                        "description": "The only response this endpoint returns."
+                    }
+                }
+            }
+        }
+    }
+}
