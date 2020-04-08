@@ -1,6 +1,6 @@
 import tornado.httpclient
 import utilities.integration_adaptors_logger as log
-from common.request import healthcheck_handler
+from requests import healthcheck_handler
 from utilities import config
 from outbound.request import handler
 

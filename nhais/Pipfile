@@ -7,6 +7,7 @@ verify_ssl = true
 
 [packages]
 tornado = "*"
+integration-adaptors-common = {editable = true,path = "./../common"}
 pycurl = {version = "~=7.43",platform_system = "!= 'Windows'"}
 marshmallow = "~=3.2"
 
