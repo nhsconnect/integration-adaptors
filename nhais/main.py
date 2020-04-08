@@ -20,7 +20,7 @@ def start_tornado_server() -> None:
             (r"/healthcheck", healthcheck_handler.HealthcheckHandler)
         ])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
-    server_port = int(config.get_config('SERVER_PORT', default='90'))
+    server_port = int(config.get_config('SERVER_PORT', default='80'))
     supplier_server.listen(server_port)
 
     logger.info('Starting nhais server at port {server_port}', fparams={'server_port': server_port})
