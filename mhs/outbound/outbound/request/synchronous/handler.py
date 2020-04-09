@@ -260,14 +260,15 @@ class SynchronousHandler(base_handler.BaseHandler):
                                                                                              interaction_details,
                                                                                              body,
                                                                                              async_workflow)
-        await self.write_response_with_store_updates(status, response, wdo, sync_async_workflow)
+        await self.write_response_with_store_updates(status, response, wdo, sync_async_workflow, message_id, correlation_id)
 
     async def write_response_with_store_updates(self, status: int, response: str, wdo: wd.WorkDescription,
-                                                wf: workflow.CommonWorkflow):
+                                                wf: workflow.CommonWorkflow,
+                                                message_id: str, correlation_id: str):
         try:
             if wdo:
                 await wf.set_successful_message_response(wdo)
-            self._write_response(status, response)
+            self._write_response(status, response, message_id, correlation_id)
         except Exception:
             logger.exception('Failed to respond to supplier system')
             if wdo:
@@ -279,9 +280,9 @@ class SynchronousHandler(base_handler.BaseHandler):
                                                                                            interaction_details,
                                                                                            body,
                                                                                            None)
-            await self.write_response_with_store_updates(status, response, work_description_response, wf)
+            await self.write_response_with_store_updates(status, response, work_description_response, wf, message_id, correlation_id)
 
-    def _write_response(self, status: int, message: str) -> None:
+    def _write_response(self, status: int, message: str, message_id: str, correlation_id: str) -> None:
         """Write the given message to the response.
 
         :param message: The message to write to the response.
@@ -293,8 +294,8 @@ class SynchronousHandler(base_handler.BaseHandler):
         else:
             content_type = "text/xml"
         self.set_header(HttpHeaders.CONTENT_TYPE, content_type)
-        self.set_header(HttpHeaders.CORRELATION_ID, self._extract_correlation_id())
-        self.set_header(HttpHeaders.MESSAGE_ID, self._extract_message_id())
+        self.set_header(HttpHeaders.CORRELATION_ID, correlation_id)
+        self.set_header(HttpHeaders.MESSAGE_ID, message_id)
         self.write(message)
 
     def _retrieve_interaction_details(self, interaction_id):

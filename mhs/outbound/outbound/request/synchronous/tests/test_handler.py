@@ -67,6 +67,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.headers["Content-Type"], "text/xml")
+        self.assertEqual(response.headers["Message-Id"], MOCK_UUID)
         self.assertEqual(response.headers["Correlation-Id"], MOCK_UUID_2)
         self.assertEqual(response.body.decode(), expected_response)
 
@@ -145,6 +146,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body.decode(), expected_response)
         self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
+        self.assertEqual(response.headers["Message-Id"], MOCK_UUID)
         mock_get_uuid.assert_called_once()
 
         self.workflow.handle_outbound_message.assert_called_with(None, MOCK_UUID, CORRELATION_ID, INTERACTION_DETAILS,
