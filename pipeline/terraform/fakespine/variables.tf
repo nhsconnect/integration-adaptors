@@ -68,12 +68,12 @@ variable "inbound_server_base_url" {
 }
 
 variable "outbound_delay_ms" {
-  type = number
+  type = string
   description = "Delay in miliseconds for outgoing communication"
 }
 
 variable "inbound_delay_ms" {
-  type = number
+  type = string
   description = "Delay in miliseconds for incoming communication"
 }
 
