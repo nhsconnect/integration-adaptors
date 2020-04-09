@@ -1,0 +1,31 @@
+type: object
+description: NHS Number Verification Status Indicator.
+required:
+  - coding
+properties:
+  coding:
+    type: array
+    minItems: 1
+    maxItems: 1
+    items:
+      type: object
+      required:
+        - code
+      properties:
+        system:
+          type: string
+          description: URI of the coding system specification.
+          default: https://fhir.nhs.uk/R4/CodeSystem/UKCore-NHSNumberVerificationStatus
+          readOnly: true
+        version:
+          type: string
+          description: Version of the coding system in use.
+          example: 1.0.0
+        code:
+          type: string
+          description: Symbol in syntax defined by the system.
+          example: "01"
+        display:
+          type: string
+          description: Representation defined by the system.
+          example: Number present and verified

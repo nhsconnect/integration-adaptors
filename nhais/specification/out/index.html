@@ -1,0 +1,969 @@
+<!doctype html>
+<html>
+  <head>
+    <title>NHAIS Adaptor (FHIR) API</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>NHAIS Adaptor (FHIR) API</h1>
+    <div class="app-desc"><h2>Overview</h2>
+<p>Use this API to access the NHAIS Adaptor API</p>
+<p>You can:</p>
+<ul>
+<li>Accept a new patient</li>
+<li>Amend an existing patient's demographics</li>
+<li>Request a Removal for a patient who has moved out of area</li>
+<li>Request a Deduction for a supported reason</li>
+</ul>
+<p>The NHAIS Adaptor does not store any patient demograpic data and no GET operations are supported.</p>
+<p>The API is based on the <a href="https://github.com/NHSDigital/personal-demographics-service-api">Personal Demographics Service API</a></p>
+<h2>Technology</h2>
+<p>This API is <a href="https://digital.nhs.uk/developer/developer-reference/introduction-to-apis#basic-rest">RESTful</a>.</p>
+<p>It also conforms to the <a href="https://digital.nhs.uk/developer/developer-reference/introduction-to-apis#fhir">FHIR</a> global standard for health care data exchange.
+Specifically, it is aligned with <a href="https://digital.nhs.uk/services/fhir-uk-core">FHIR UK Core</a>, which is built on FHIR Release 4.</p>
+<p>You don’t need to know much about FHIR to use this API - FHIR APIs are just RESTful APIs that follow specific rules.
+In particular:</p>
+<ul>
+<li>resource names are capitalised and singular, for example the <code>/Patient</code> not <code>/patients</code></li>
+<li>array names are singular, for example <code>line</code> not <code>lines</code> for address lines</li>
+<li>data items that are country-specific and thus not included in the FHIR global base resources are usually wrapped in an <code>extension</code> object</li>
+</ul>
+<h2>Endpoints</h2>
+<p>To see details for specific endpoints, select from the list on the left hand side of the page:</p>
+<ul>
+<li><code>GET /Patient</code> - search for patient</li>
+<li><code>GET /Patient/{id}</code> - get patient's personal details</li>
+<li><code>PATCH /Patient/{id}</code> - update patient's personal details</li>
+</ul>
+</div>
+    <div class="app-desc">More information: <a href="https://github.com/nhsconnect/integration-adaptors">https://github.com/nhsconnect/integration-adaptors</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: {VERSION}</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">All rights reserved</div>
+    <div class="license-url">http://apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Patients">Patients</a></h4>
+  <ul>
+  <li><a href="#acceptPatient"><code><span class="http-method">post</span> /Patient/{id}</code></a></li>
+  <li><a href="#deductPatient"><code><span class="http-method">post</span> /Patient/{id}/$nhais.deduction</code></a></li>
+  <li><a href="#removePatient"><code><span class="http-method">post</span> /Patient/{id}/$nhais.removal</code></a></li>
+  <li><a href="#updatePatientPartial"><code><span class="http-method">patch</span> /Patient/{id}</code></a></li>
+  </ul>
+
+  <h1><a name="Patients">Patients</a></h1>
+  <div class="method"><a name="acceptPatient"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /Patient/{id}</code></pre></div>
+    <div class="method-summary">Accept a new patient (Acceptance transaction) (<span class="nickname">acceptPatient</span>)</div>
+    <div class="method-notes"><h2>Overview</h2>
+<p>Use this endpoint to send an Acceptance to NHAIS.</p>
+<h2>Operation Id</h2>
+<p>When you submit an amendment an operation id will be included in the response. This operation id MUST be retained
+to match against the asynchronous reply from NHAIS</p>
+<h2>Sandbox test scenarios</h2>
+<p>TODO: document interactions supported by fake mesh</p>
+<p>| Scenario                            | Request                                                      | Response                                         |
+| ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+|                                     |                                                              |                                                  |</p>
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The patient's NHS Number. The primary identifier of a patient, unique within NHS England and Wales. Always 10 digits and must be a <a href="https://www.datadictionary.nhs.uk/data_dictionary/attributes/n/nhs/nhs_number_de.asp">valid NHS Number</a>. default: null </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">Patient <a href="#Patient">Patient</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#OperationOutcome">OperationOutcome</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/fhir+json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">202</h4>
+    Acceptance forwarded to NHAIS for processing
+        <a href="#OperationOutcome">OperationOutcome</a>
+    <h4 class="field-label">400</h4>
+    Client error.
+        <a href="#OperationOutcome">OperationOutcome</a>
+    <h4 class="field-label">415</h4>
+    Unsupported media type.
+        <a href="#OperationOutcome">OperationOutcome</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="deductPatient"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /Patient/{id}/$nhais.deduction</code></pre></div>
+    <div class="method-summary">Deduct a patient (Deduction transaction) (<span class="nickname">deductPatient</span>)</div>
+    <div class="method-notes"><h2>Overview</h2>
+<p>Use this endpoint to send a Deduction transaction to NHAIS.</p>
+<h2>Operation Id</h2>
+<p>When you submit an amendment an operation id will be included in the response. This operation id MUST be retained
+to match against the asynchronous reply from NHAIS</p>
+<h2>EDIFACT</h2>
+<p>The following Interchange contains just one Deduction Request transaction for:</p>
+<p>NHS Number N/10/10.
+Deduction Date : 25/12/1991, Deduction Reason : Death, Free Text : Died on holiday in Majorca.
+Registered with GP 281 (GMC National GP Code 4826940).</p>
+<p>Information transmitted within Interchange 2, Message 3, Transaction Number 17 at 13:17 on 13/01/1992.</p>
+<p>UNB+UNOA:2+TES5+XX11+920113:1317+00000002'
+UNH+00000003+FHSREG:0:1:FH:FHS001'
+BGM+++507'
+NAD+FHS+XX1:954'
+DTM+137:199201131317:203'
+RFF+950:G5'
+S01+1'
+RFF+TN:17'
+NAD+GP+4826940,281:900'
+GIS+1:ZZZ'
+DTM+961:19911225:102'
+FTX+RGI+++DIED ON HOLIDAY IN MAJORCA'
+S02+2'
+PNA+PAT+N/10/10:OPI'
+UNT+14+00000003'
+UNZ+1+00000002'</p>
+<h2>Sandbox test scenarios</h2>
+<p>TODO: document interactions supported by fake mesh</p>
+<p>| Scenario                            | Request                                                      | Response                                         |
+| ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+|                                     |                                                              |                                                  |</p>
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The patient's NHS Number. The primary identifier of a patient, unique within NHS England and Wales. Always 10 digits and must be a <a href="https://www.datadictionary.nhs.uk/data_dictionary/attributes/n/nhs/nhs_number_de.asp">valid NHS Number</a>. default: null </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">Patient <a href="#Patient">Patient</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#OperationOutcome">OperationOutcome</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/fhir+json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">202</h4>
+    Deduction forwarded to NHAIS for processing
+        <a href="#OperationOutcome">OperationOutcome</a>
+    <h4 class="field-label">400</h4>
+    Client error.
+        <a href="#OperationOutcome">OperationOutcome</a>
+    <h4 class="field-label">415</h4>
+    Unsupported media type.
+        <a href="#OperationOutcome">OperationOutcome</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="removePatient"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /Patient/{id}/$nhais.removal</code></pre></div>
+    <div class="method-summary">Accept a new patient (Acceptance transaction) (<span class="nickname">removePatient</span>)</div>
+    <div class="method-notes"><h2>Overview</h2>
+<p>Use this endpoint to send a Removal transaction to NHAIS.</p>
+<h2>Operation Id</h2>
+<p>TODO: operation id (transaction id) will probably need to be provided in the request since this is a reply to
+a HA -&gt; GP amendment</p>
+<h2>Sandbox test scenarios</h2>
+<p>TODO: document interactions supported by fake mesh</p>
+<p>| Scenario                            | Request                                                      | Response                                         |
+| ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+|                                     |                                                              |                                                  |</p>
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The patient's NHS Number. The primary identifier of a patient, unique within NHS England and Wales. Always 10 digits and must be a <a href="https://www.datadictionary.nhs.uk/data_dictionary/attributes/n/nhs/nhs_number_de.asp">valid NHS Number</a>. default: null </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">Patient <a href="#Patient">Patient</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#OperationOutcome">OperationOutcome</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/fhir+json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">202</h4>
+    Removal forwarded to NHAIS for processing
+        <a href="#OperationOutcome">OperationOutcome</a>
+    <h4 class="field-label">400</h4>
+    Client error.
+        <a href="#OperationOutcome">OperationOutcome</a>
+    <h4 class="field-label">415</h4>
+    Unsupported media type.
+        <a href="#OperationOutcome">OperationOutcome</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="updatePatientPartial"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="patch"><code class="huge"><span class="http-method">patch</span> /Patient/{id}</code></pre></div>
+    <div class="method-summary">Amend patient details (Amendment transaction) (<span class="nickname">updatePatientPartial</span>)</div>
+    <div class="method-notes"><h2>Overview</h2>
+<p>Use this endpoint to send an Amendment to NHAIS.</p>
+<p>This is a 'patch' operation, meaning you can update specific parts of the patient record (such as a name or an address), as opposed to having to update the entire record.</p>
+<h2>Operation Id</h2>
+<p>When you submit an amendment an operation id will be included in the response. This operation id MUST be retained
+to match against the asynchronous reply from NHAIS</p>
+<h2>Sandbox test scenarios</h2>
+<p>TODO: document interactions supported by fake mesh</p>
+<p>| Scenario                            | Request                                                      | Response                                         |
+| ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+|                                     |                                                              |                                                  |</p>
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The patient's NHS Number. The primary identifier of a patient, unique within NHS England and Wales. Always 10 digits and must be a <a href="https://www.datadictionary.nhs.uk/data_dictionary/attributes/n/nhs/nhs_number_de.asp">valid NHS Number</a>. default: null </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">inline_object <a href="#inline_object">inline_object</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#OperationOutcome">OperationOutcome</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/fhir+json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">202</h4>
+    Amendment forwarded to NHAIS for processing
+        <a href="#OperationOutcome">OperationOutcome</a>
+    <h4 class="field-label">400</h4>
+    Client error.
+        <a href="#OperationOutcome">OperationOutcome</a>
+    <h4 class="field-label">415</h4>
+    Unsupported media type.
+        <a href="#OperationOutcome">OperationOutcome</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#Address"><code>Address</code> - </a></li>
+    <li><a href="#AddressKey"><code>AddressKey</code> - </a></li>
+    <li><a href="#Communication"><code>Communication</code> - </a></li>
+    <li><a href="#ContactPoint"><code>ContactPoint</code> - </a></li>
+    <li><a href="#DeathNotificationStatus"><code>DeathNotificationStatus</code> - </a></li>
+    <li><a href="#DeathNotificationStatus_2"><code>DeathNotificationStatus_2</code> - </a></li>
+    <li><a href="#DeathNotificationStatus_2_coding"><code>DeathNotificationStatus_2_coding</code> - </a></li>
+    <li><a href="#DispensingDoctor"><code>DispensingDoctor</code> - </a></li>
+    <li><a href="#DispensingDoctor_valueReference"><code>DispensingDoctor_valueReference</code> - </a></li>
+    <li><a href="#DispensingDoctor_valueReference_identifier"><code>DispensingDoctor_valueReference_identifier</code> - </a></li>
+    <li><a href="#ErrorCode"><code>ErrorCode</code> - </a></li>
+    <li><a href="#ErrorCode_coding"><code>ErrorCode_coding</code> - </a></li>
+    <li><a href="#Gender"><code>Gender</code> - </a></li>
+    <li><a href="#GeneralPractitionerReference"><code>GeneralPractitionerReference</code> - </a></li>
+    <li><a href="#GeneralPractitionerReference_identifier"><code>GeneralPractitionerReference_identifier</code> - </a></li>
+    <li><a href="#HumanName"><code>HumanName</code> - </a></li>
+    <li><a href="#Language"><code>Language</code> - </a></li>
+    <li><a href="#Language_coding"><code>Language_coding</code> - </a></li>
+    <li><a href="#MedicalApplianceSupplier"><code>MedicalApplianceSupplier</code> - </a></li>
+    <li><a href="#MedicalApplianceSupplier_valueReference"><code>MedicalApplianceSupplier_valueReference</code> - </a></li>
+    <li><a href="#MedicalApplianceSupplier_valueReference_identifier"><code>MedicalApplianceSupplier_valueReference_identifier</code> - </a></li>
+    <li><a href="#Meta"><code>Meta</code> - </a></li>
+    <li><a href="#Meta_security"><code>Meta_security</code> - </a></li>
+    <li><a href="#NHSNumberVerificationStatus"><code>NHSNumberVerificationStatus</code> - </a></li>
+    <li><a href="#NHSNumberVerificationStatus_2"><code>NHSNumberVerificationStatus_2</code> - </a></li>
+    <li><a href="#NHSNumberVerificationStatus_2_coding"><code>NHSNumberVerificationStatus_2_coding</code> - </a></li>
+    <li><a href="#NominatedPharmacy"><code>NominatedPharmacy</code> - </a></li>
+    <li><a href="#NominatedPharmacy_valueReference"><code>NominatedPharmacy_valueReference</code> - </a></li>
+    <li><a href="#NominatedPharmacy_valueReference_identifier"><code>NominatedPharmacy_valueReference_identifier</code> - </a></li>
+    <li><a href="#OperationOutcome"><code>OperationOutcome</code> - </a></li>
+    <li><a href="#OperationOutcome_issue"><code>OperationOutcome_issue</code> - </a></li>
+    <li><a href="#Patient"><code>Patient</code> - </a></li>
+    <li><a href="#Period"><code>Period</code> - </a></li>
+    <li><a href="#inline_object"><code>inline_object</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="Address"><code>Address</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>An address associated with the patient.</div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Unique system identifier for this address. </div>
+<div class="param">period (optional)</div><div class="param-desc"><span class="param-type"><a href="#Period">Period</a></span>  </div>
+<div class="param">use </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>Purpose of this address:</p>
+<ul>
+<li>home - a communication address at a home.</li>
+<li>work - an office address. First choice for business related contacts during business hours.</li>
+<li>temp - a temporary address. The period can provide more detailed information.</li>
+<li>billing - a corresponding address nominated by the patient where communication can be sent.</li>
+</ul>
+ </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">home</div><div class="param-enum">work</div><div class="param-enum">temp</div><div class="param-enum">billing</div>
+<div class="param">line (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> All lines of the address except the postal code. </div>
+<div class="param">postalCode (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Postal code of the address. </div>
+<div class="param">extension (optional)</div><div class="param-desc"><span class="param-type"><a href="#AddressKey">array[AddressKey]</a></span> Postal Address File (PAF) key associated with this address formatted as a FHIR extension. Empty if no PAF key for the address is known, or an object specifying the code system of the address key and the value of the address key. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AddressKey"><code>AddressKey</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Unique identifier for an address.</div>
+    <div class="field-items">
+      <div class="param">url (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of specification of the AddressKey extension. </div>
+<div class="param">extension (optional)</div><div class="param-desc"><span class="param-type"><a href="#anyOf<object,object>">array[anyOf<object,object>]</a></span> Specification of address key system and address key value. Contains exactly two items: one describing the code system the Address Key uses, and the other specifying the value of the Address Key. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Communication"><code>Communication</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Wrapper object for communication details.</div>
+    <div class="field-items">
+      <div class="param">url </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Definition of communication extension. </div>
+<div class="param">extension </div><div class="param-desc"><span class="param-type"><a href="#anyOf<object,object>">array[anyOf<object,object>]</a></span> Definition of communication extension, The array must have two items, a valueCodeableConcept for the language and a valueBoolean for if an interpreter is required. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ContactPoint"><code>ContactPoint</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A contact point, such as a phone number or email address. This will only be populated on a retrieval and not a search.</div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Unique object identifier for this contact point. </div>
+<div class="param">period (optional)</div><div class="param-desc"><span class="param-type"><a href="#Period">Period</a></span>  </div>
+<div class="param">system </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Means of communication, such as phone or email. </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">phone</div><div class="param-enum">fax</div><div class="param-enum">email</div><div class="param-enum">pager</div><div class="param-enum">url</div><div class="param-enum">sms</div><div class="param-enum">other</div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Phone number, email address, or other identifier for use with contact system. </div>
+<div class="param">use </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Location associated with communication system, or marker to indicate it is temporary or outdated. </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">home</div><div class="param-enum">work</div><div class="param-enum">temp</div><div class="param-enum">old</div><div class="param-enum">mobile</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeathNotificationStatus"><code>DeathNotificationStatus</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Wrapper object for death notification details.</div>
+    <div class="field-items">
+      <div class="param">url </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Definition of death notification extension. </div>
+<div class="param">extension </div><div class="param-desc"><span class="param-type"><a href="#anyOf<object,object>">array[anyOf<object,object>]</a></span> Array containing exactly one death notification status code object and exactly one effective date object. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeathNotificationStatus_2"><code>DeathNotificationStatus_2</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Death Notification Status.</div>
+    <div class="field-items">
+      <div class="param">coding (optional)</div><div class="param-desc"><span class="param-type"><a href="#DeathNotificationStatus_2_coding">array[DeathNotificationStatus_2_coding]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeathNotificationStatus_2_coding"><code>DeathNotificationStatus_2_coding</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">system </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URI of the coding system specification. </div>
+<div class="param">version (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Version of the coding system in use. </div>
+<div class="param">code </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>Symbol, in syntax, defined by the system:</p>
+<ul>
+<li>Code 1 - Informal death notice received via an update from a local NHS Organisation such as GP practice or Trust</li>
+<li>Code 2 - Formal death notice received from Registrar of Deaths. Only these endpoints are allowed to add a Formal death:
+<ul>
+<li>National Back Office using the Demographic Spine Application (DSA)</li>
+<li>Office of National Statistics (ONS)</li>
+<li>Maternity sites</li>
+</ul>
+</li>
+<li>Code U - Removed. This is a possible response, but it cannot be used on an update because Spine will reject it</li>
+</ul>
+ </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">1</div><div class="param-enum">2</div><div class="param-enum">U</div>
+<div class="param">display (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Representation defined by the system. </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">Informal death notice received via an update from a local NHS Organisation such as GP practice or Trust</div><div class="param-enum">Formal death notice received from Registrar of Deaths</div><div class="param-enum">Removed</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DispensingDoctor"><code>DispensingDoctor</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Wrapper object for the patient's dispensing doctor. This will only be populated on a retrieval and not a search.</div>
+    <div class="field-items">
+      <div class="param">url </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of specification of UKCore-DispensingDoctor FHIR extension. </div>
+<div class="param">valueReference </div><div class="param-desc"><span class="param-type"><a href="#DispensingDoctor_valueReference">DispensingDoctor_valueReference</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DispensingDoctor_valueReference"><code>DispensingDoctor_valueReference</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Reference to a GP Practive Pharmacy Organization Resource.</div>
+    <div class="field-items">
+      <div class="param">reference </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of the FHIR Organization resource for the dispensing doctor. See <a href="https://developer.nhs.uk/apis/ods/">Organisation Data Service FHIR API</a> for more details. </div>
+<div class="param">identifier </div><div class="param-desc"><span class="param-type"><a href="#DispensingDoctor_valueReference_identifier">DispensingDoctor_valueReference_identifier</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DispensingDoctor_valueReference_identifier"><code>DispensingDoctor_valueReference_identifier</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Wrapper object for the patient's dispensing doctor organisation code.</div>
+    <div class="field-items">
+      <div class="param">system (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL for the FHIR code system for the ODS organisation code. </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Organisation code for the dispensing doctor, as held in the <a href="https://developer.nhs.uk/apis/ods/">Organisation Data Service</a>. </div>
+<div class="param">period (optional)</div><div class="param-desc"><span class="param-type"><a href="#Period">Period</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ErrorCode"><code>ErrorCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Internal error code.</div>
+    <div class="field-items">
+      <div class="param">coding (optional)</div><div class="param-desc"><span class="param-type"><a href="#ErrorCode_coding">array[ErrorCode_coding]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ErrorCode_coding"><code>ErrorCode_coding</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">system (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URI of the coding system specification. </div>
+<div class="param">version (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Version of the coding system in use. </div>
+<div class="param">code (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Symbol in syntax defined by the system. </div>
+<div class="param">display (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Representation defined by the system. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Gender"><code>Gender</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Gender with which the patient most strongly identifies.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GeneralPractitionerReference"><code>GeneralPractitionerReference</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>General practice (not practitioner) with which the patient is or was registered.</div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Object identifier (OID) specific to the returned details - this should be return exactly the same in any update. </div>
+<div class="param">type (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Type of Reference being returned. </div>
+<div class="param">reference (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL for the FHIR Organization resource for the registered general practice. See <a href="https://developer.nhs.uk/apis/ods/">Organisation Data Service FHIR API</a> for more details. </div>
+<div class="param">identifier </div><div class="param-desc"><span class="param-type"><a href="#GeneralPractitionerReference_identifier">GeneralPractitionerReference_identifier</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GeneralPractitionerReference_identifier"><code>GeneralPractitionerReference_identifier</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Identifier and system of identification used for this Organisation.</div>
+    <div class="field-items">
+      <div class="param">system (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL for the Organisation Data Service - who are responsible for publishing codes that identify organisations and individuals across health and social care. </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Organisation code for the registered general practice, as held in the <a href="https://developer.nhs.uk/apis/ods/">Organisation Data Service</a>. </div>
+<div class="param">period (optional)</div><div class="param-desc"><span class="param-type"><a href="#Period">Period</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HumanName"><code>HumanName</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Unique object identifier for this name. </div>
+<div class="param">use </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>How this name should be used.</p>
+<ul>
+<li>usual - Known as, conventional or the one patient normally uses. A patient will always have a usual name.</li>
+<li>temp - An alias or temporary name. This may also be used for temporary names assigned at birth or in emergency situations.</li>
+<li>nickname - A name that the patient prefers to be addressed by, but is not part of their usual name.</li>
+<li>old - This name is no longer in use (or was never correct, but retained for records).</li>
+<li>maiden - Name changed for Marriage. A name used prior to changing name because of marriage. This term is not gender specific. The use of this term does not imply any particular history for a person's name.</li>
+</ul>
+<p>The following use codes are included in the <a href="https://www.hl7.org/fhir/valueset-name-use.html">name-use</a> value set, but should not be used and will not be returned as part of a retrieval.</p>
+<ul>
+<li>official - The formal name as registered in an official (government) registry, but which name might not be commonly used. May be called &quot;legal name&quot;.</li>
+<li>anonymous - Anonymous assigned name, alias, or pseudonym (used to protect a person's identity for privacy reasons).</li>
+</ul>
+ </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">usual</div><div class="param-enum">temp</div><div class="param-enum">nickname</div><div class="param-enum">old</div><div class="param-enum">maiden</div>
+<div class="param">period (optional)</div><div class="param-desc"><span class="param-type"><a href="#Period">Period</a></span>  </div>
+<div class="param">given (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Given names, including any middle names. </div>
+<div class="param">family </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Family name (often called Surname). </div>
+<div class="param">prefix (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Name prefixes, titles, and prenominals. </div>
+<div class="param">suffix (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Name suffices and postnominals. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Language"><code>Language</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Human language.</div>
+    <div class="field-items">
+      <div class="param">coding </div><div class="param-desc"><span class="param-type"><a href="#Language_coding">array[Language_coding]</a></span> Exactly one language code. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Language_coding"><code>Language_coding</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">system (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of the Language Code System. Always uses the 'UKCore-HumanLanguage' Code System. </div>
+<div class="param">version (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Version of the language code system. </div>
+<div class="param">code </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Language code. </div>
+<div class="param">display (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Display-friendly representation of the language code (such as English). If there is a language code with no defined mapping, <code>Unknown</code> will be returned. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="MedicalApplianceSupplier"><code>MedicalApplianceSupplier</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Wrapper object for the patient's medical appliance supplier. This will only be populated on a retrieval and not a search.</div>
+    <div class="field-items">
+      <div class="param">url </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of specification of UKCore-MedicalApplianceSupplier FHIR extension. </div>
+<div class="param">valueReference </div><div class="param-desc"><span class="param-type"><a href="#MedicalApplianceSupplier_valueReference">MedicalApplianceSupplier_valueReference</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="MedicalApplianceSupplier_valueReference"><code>MedicalApplianceSupplier_valueReference</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Reference to a GP Practive Pharmacy Organization Resource.</div>
+    <div class="field-items">
+      <div class="param">reference </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of the FHIR Organization resource for the medical appliance supplier. See <a href="https://developer.nhs.uk/apis/ods/">Organisation Data Service FHIR API</a> for more details. </div>
+<div class="param">identifier </div><div class="param-desc"><span class="param-type"><a href="#MedicalApplianceSupplier_valueReference_identifier">MedicalApplianceSupplier_valueReference_identifier</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="MedicalApplianceSupplier_valueReference_identifier"><code>MedicalApplianceSupplier_valueReference_identifier</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Wrapper object for the patient's medical appliance supplier organisation code.</div>
+    <div class="field-items">
+      <div class="param">system (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL for the FHIR code system for the ODS organisation code. </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Organisation code for the medical appliance supplier, as held in the <a href="https://developer.nhs.uk/apis/ods/">Organisation Data Service</a>. </div>
+<div class="param">period (optional)</div><div class="param-desc"><span class="param-type"><a href="#Period">Period</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Meta"><code>Meta</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Metadata about this resource.</div>
+    <div class="field-items">
+      <div class="param">versionId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The NHS Digital assigned version of the patient resource. </div>
+<div class="param">security (optional)</div><div class="param-desc"><span class="param-type"><a href="#Meta_security">array[Meta_security]</a></span> <p>The level of security on the patients record, which affects which fields are populated on retrieval. The possible responses are:</p>
+<ul>
+<li>U - unrestricted. All available data will be returned.</li>
+<li>R - restricted. Any sensitive data around the patients location, so <code>address</code>, <code>generalPractitioner</code> and <code>telecom</code>, will be removed from the response. Additionally, the death notification extension will be removed.</li>
+<li>V - very restricted. All patient data will be removed from the response apart from <code>id</code>, <code>identifier</code> and <code>meta</code> fields.</li>
+<li>REDACTED - redacted. The patient record has been marked as invalid, so the data should not be used. This code will never be returned; you will receive a 404, and appropriate error response, if an invalidated patient retrieval is attempted.
+It is also possible that no security field will be added to the response, which is the equivalent of unrestricted.</li>
+</ul>
+ </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Meta_security"><code>Meta_security</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">system (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URI of the value set specification. </div>
+<div class="param">code (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Code defined by the system value set. </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">U</div><div class="param-enum">R</div><div class="param-enum">V</div><div class="param-enum">REDACTED</div>
+<div class="param">display (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Representation defined by the system. </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">unrestricted</div><div class="param-enum">restricted</div><div class="param-enum">very restricted</div><div class="param-enum">redacted</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NHSNumberVerificationStatus"><code>NHSNumberVerificationStatus</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Status indicating if NHS number is present and verified.</div>
+    <div class="field-items">
+      <div class="param">url (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of the extension definition. </div>
+<div class="param">valueCodeableConcept (optional)</div><div class="param-desc"><span class="param-type"><a href="#NHSNumberVerificationStatus_2">NHSNumberVerificationStatus_2</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NHSNumberVerificationStatus_2"><code>NHSNumberVerificationStatus_2</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>NHS Number Verification Status Indicator.</div>
+    <div class="field-items">
+      <div class="param">coding </div><div class="param-desc"><span class="param-type"><a href="#NHSNumberVerificationStatus_2_coding">array[NHSNumberVerificationStatus_2_coding]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NHSNumberVerificationStatus_2_coding"><code>NHSNumberVerificationStatus_2_coding</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">system (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URI of the coding system specification. </div>
+<div class="param">version (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Version of the coding system in use. </div>
+<div class="param">code </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Symbol in syntax defined by the system. </div>
+<div class="param">display (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Representation defined by the system. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NominatedPharmacy"><code>NominatedPharmacy</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Wrapper object for the patient's nominated pharmacy. This will only be populated on a retrieval and not a search.</div>
+    <div class="field-items">
+      <div class="param">url </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of specification of UKCore-NominatedPharmacy FHIR extension. </div>
+<div class="param">valueReference </div><div class="param-desc"><span class="param-type"><a href="#NominatedPharmacy_valueReference">NominatedPharmacy_valueReference</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NominatedPharmacy_valueReference"><code>NominatedPharmacy_valueReference</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Reference to a Pharmacy Organization Resource.</div>
+    <div class="field-items">
+      <div class="param">reference </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL of the FHIR Organization resource for the nominated pharmacy. See <a href="https://developer.nhs.uk/apis/ods/">Organisation Data Service FHIR API</a> for more details. </div>
+<div class="param">identifier </div><div class="param-desc"><span class="param-type"><a href="#NominatedPharmacy_valueReference_identifier">NominatedPharmacy_valueReference_identifier</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NominatedPharmacy_valueReference_identifier"><code>NominatedPharmacy_valueReference_identifier</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Wrapper object for the patient's nominated pharmacy organisation code.</div>
+    <div class="field-items">
+      <div class="param">system (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL for the FHIR code system for the ODS organisation code. </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Organisation code for the nominated pharmacy, as held in the <a href="https://developer.nhs.uk/apis/ods/">Organisation Data Service</a>. </div>
+<div class="param">period (optional)</div><div class="param-desc"><span class="param-type"><a href="#Period">Period</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="OperationOutcome"><code>OperationOutcome</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Outcome of an operation that does not result in a resource or bundle being returned (e.g. error, async/batch submission).</div>
+    <div class="field-items">
+      <div class="param">resourceType (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> FHIR Resource Type. </div>
+<div class="param">issue (optional)</div><div class="param-desc"><span class="param-type"><a href="#OperationOutcome_issue">array[OperationOutcome_issue]</a></span> List of issues that have occurred. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="OperationOutcome_issue"><code>OperationOutcome_issue</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">severity </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Severity of the error. </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">fatal</div><div class="param-enum">error</div><div class="param-enum">warning</div><div class="param-enum">information</div>
+<div class="param">code </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> FHIR error code. </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">invalid</div><div class="param-enum">structure</div><div class="param-enum">required</div><div class="param-enum">value</div><div class="param-enum">invariant</div><div class="param-enum">security</div><div class="param-enum">login</div><div class="param-enum">unknown</div><div class="param-enum">expired</div><div class="param-enum">forbidden</div><div class="param-enum">suppressed</div><div class="param-enum">processing</div><div class="param-enum">not-supported</div><div class="param-enum">duplicate</div><div class="param-enum">multiple-matches</div><div class="param-enum">not-found</div><div class="param-enum">deleted</div><div class="param-enum">too-long</div><div class="param-enum">code-invalid</div><div class="param-enum">extension</div><div class="param-enum">too-costly</div><div class="param-enum">business-rule</div><div class="param-enum">conflict</div><div class="param-enum">transient</div><div class="param-enum">lock-error</div><div class="param-enum">no-store</div><div class="param-enum">exception</div><div class="param-enum">timeout</div><div class="param-enum">incomplete</div><div class="param-enum">throttled</div><div class="param-enum">informational</div>
+<div class="param">details (optional)</div><div class="param-desc"><span class="param-type"><a href="#ErrorCode">ErrorCode</a></span>  </div>
+<div class="param">expression (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> FHIRPath of element(s) related to the error. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Patient"><code>Patient</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">resourceType (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> FHIR resource type. </div>
+<div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The patient's NHS Number. The primary identifier of a patient, unique within NHS England and Wales. Always 10 digits and must be a <a href="https://www.datadictionary.nhs.uk/data_dictionary/attributes/n/nhs/nhs_number_de.asp">valid NHS Number</a>. </div>
+<div class="param">identifier (optional)</div><div class="param-desc"><span class="param-type"><a href="#object">array[Object]</a></span> Identifier and system of identification used for this Patient. </div>
+<div class="param">meta (optional)</div><div class="param-desc"><span class="param-type"><a href="#Meta">Meta</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#HumanName">array[HumanName]</a></span> <p>List of names associated with the patient.</p>
+<p>When a patient tagged as <code>very restricted</code> is retrieved, all names will be removed from the response.</p>
+ </div>
+<div class="param">gender </div><div class="param-desc"><span class="param-type"><a href="#Gender">Gender</a></span>  </div>
+<div class="param">birthDate </div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> <p>Date of birth. A date in the format <code>yyyy-mm-dd</code>.</p>
+<p>When a patient tagged as <code>very restricted</code> is retrieved, birth date will be removed from the response.</p>
+ format: date</div>
+<div class="param">deceasedDateTime (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> <p>Date and time of death, if applicable and known. A datetime in the format <code>yyyy-mm-ddTHH:MM:SS+HH:MM</code>.</p>
+<p>When a patient tagged as <code>very restricted</code> is retrieved, death date will be removed from the response.</p>
+ format: date-time</div>
+<div class="param">address </div><div class="param-desc"><span class="param-type"><a href="#Address">array[Address]</a></span> <p>List of addresses associated with the patient.</p>
+<p>This will only be fully populated on a retrieval, only a the <code>home</code> address will be returned on a search.</p>
+<p>When a patient tagged as <code>restricted</code> or <code>very restricted</code> is retrieved, all addresses will be removed from the response.</p>
+ </div>
+<div class="param">telecom (optional)</div><div class="param-desc"><span class="param-type"><a href="#ContactPoint">array[ContactPoint]</a></span> <p>List of contact points for the patient; for example, phone numbers or email addresses.</p>
+<p>When a patient tagged as <code>restricted</code> or <code>very restricted</code> is retrieved, all contact points will be removed from the response.</p>
+ </div>
+<div class="param">generalPractitioner (optional)</div><div class="param-desc"><span class="param-type"><a href="#GeneralPractitionerReference">array[GeneralPractitionerReference]</a></span> <p>General Practice (not practitioner) with which the patient is, or was, registered. Always contains zero or one general practitioner object.</p>
+<p>When a patient tagged as <code>restricted</code> or <code>very restricted</code> is retrieved, the General Practice will be removed from the response.</p>
+ </div>
+<div class="param">extension (optional)</div><div class="param-desc"><span class="param-type"><a href="#anyOf<NominatedPharmacy,DispensingDoctor,MedicalApplianceSupplier,DeathNotificationStatus,Communication>">array[anyOf<NominatedPharmacy,DispensingDoctor,MedicalApplianceSupplier,DeathNotificationStatus,Communication>]</a></span> <p>Wrapper array for the patient's pharmacies, death notification status and communication details; these are all FHIR extensions. Always contains zero or one of each pharmacy object, zero or one death notification status object, and zero or one communication details object.</p>
+<p>When a patient tagged as <code>restricted</code> or <code>very restricted</code> is retrieved, the Pharmacy and Death Notification extensions will be removed from the response.</p>
+ </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Period"><code>Period</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Time period when name was, is, or will be in use.</div>
+    <div class="field-items">
+      <div class="param">start </div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> Start date of time period, if known, in format <code>yyyy-mm-dd</code>. Can be a future date. format: date</div>
+<div class="param">end (optional)</div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> End date of time period, if known and if not ongoing, in format <code>yyyy-mm-dd</code>. Can be a future date. format: date</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="inline_object"><code>inline_object</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">correction (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Set to true if the update is correcting previously incorrect data. </div>
+<div class="param">patches </div><div class="param-desc"><span class="param-type"><a href="#object">array[Object]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

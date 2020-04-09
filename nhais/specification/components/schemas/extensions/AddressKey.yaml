@@ -1,0 +1,63 @@
+type: object
+description: Unique identifier for an address.
+properties:
+  url:
+    type: string
+    description: URL of specification of the AddressKey extension.
+    default: https://simplifier.net/guide/UKCoreDecember2019/ExtensionUKCore-AddressKey
+    readOnly: true
+  extension:
+    type: array
+    description: "Specification of address key system and address key value. Contains exactly two items: one describing the code system the Address Key uses, and the other specifying the value of the Address Key."
+    minItems: 2
+    maxItems: 2
+    items:
+      anyOf:
+        - type: object
+          description: Coding system of the address key.
+          required:
+            - url
+            - valueCoding
+          properties:
+            url:
+              type: string
+              description: Always 'type'.
+              default: type
+              readOnly: true
+            valueCoding:
+              type: object
+              description: URL of specification of address key format.
+              required:
+                - system
+                - code
+              properties:
+                system:
+                  type: string
+                  description: URL of Code System that describes available Address Key formats.
+                  default: "https://simplifier.net/guide/UKCoreDecember2019/CodeSystemUKCore-AddressKeyType"
+                  readOnly: true
+                code:
+                  type: string
+                  description: Address Key system. Always 'PAF'.
+                  default: "PAF"
+                  example: "PAF"
+                  readOnly: true
+        - type: object
+          description: Value of the address key.
+          required:
+            - url
+            - valueString
+          properties:
+            url:
+              type: string
+              description: Always 'value'.
+              default: value
+              example: value
+              readOnly: true
+            valueString:
+              type: string
+              description: Address key in PAF format. An 8 digit number including leading zeroes, formatted as a string.
+              minLength: 8
+              maxLength: 8
+              pattern: '^[0-9]{8}$'
+              example: '12345678'

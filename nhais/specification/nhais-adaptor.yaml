@@ -1,0 +1,518 @@
+# This is an OpenAPI Specification (https://swagger.io/specification/)
+# for the NHAIS Adaptor API
+# owned by NHS Digital (https://digital.nhs.uk/)
+openapi: "3.0.0"
+info:
+  version: "{VERSION}"
+  title: NHAIS Adaptor (FHIR) API
+  description: |
+    ## Overview
+    Use this API to access the NHAIS Adaptor API
+
+    You can:
+    * Accept a new patient
+    * Amend an existing patient's demographics
+    * Request a Removal for a patient who has moved out of area
+    * Request a Deduction for a supported reason
+
+    The NHAIS Adaptor does not store any patient demograpic data and no GET operations are supported.
+
+    The API is based on the [Personal Demographics Service API](https://github.com/NHSDigital/personal-demographics-service-api)
+
+    ## Technology
+    This API is [RESTful](https://digital.nhs.uk/developer/developer-reference/introduction-to-apis#basic-rest).
+
+    It also conforms to the [FHIR](https://digital.nhs.uk/developer/developer-reference/introduction-to-apis#fhir) global standard for health care data exchange.
+    Specifically, it is aligned with [FHIR UK Core](https://digital.nhs.uk/services/fhir-uk-core), which is built on FHIR Release 4.
+
+    You don’t need to know much about FHIR to use this API - FHIR APIs are just RESTful APIs that follow specific rules.
+    In particular:
+    - resource names are capitalised and singular, for example the `/Patient` not `/patients`
+    - array names are singular, for example `line` not `lines` for address lines
+    - data items that are country-specific and thus not included in the FHIR global base resources are usually wrapped in an `extension` object
+
+    ## Endpoints
+    To see details for specific endpoints, select from the list on the left hand side of the page:
+    * `GET /Patient` - search for patient
+    * `GET /Patient/{id}` - get patient's personal details
+    * `PATCH /Patient/{id}` - update patient's personal details
+
+  contact:
+    name: National Integration Adaptors API Support
+    url: 'https://github.com/nhsconnect/integration-adaptors'
+servers:
+  - url: 'https://localhost'
+    description: There are not publicly available services available for testing or integration
+tags:
+  - name: patients
+paths:
+  '/Patient/{id}/$nhais.deduction':
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      description: |
+        ## Overview
+        Use this endpoint to send a Deduction transaction to NHAIS.
+
+        ## Operation Id
+        When you submit an amendment an operation id will be included in the response. This operation id MUST be retained
+                to match against the asynchronous reply from NHAIS
+
+        ## EDIFACT
+
+        The following Interchange contains just one Deduction Request transaction for:
+
+        NHS Number N/10/10.
+        Deduction Date : 25/12/1991, Deduction Reason : Death, Free Text : Died on holiday in Majorca.
+        Registered with GP 281 (GMC National GP Code 4826940).
+
+        Information transmitted within Interchange 2, Message 3, Transaction Number 17 at 13:17 on 13/01/1992.
+
+        UNB+UNOA:2+TES5+XX11+920113:1317+00000002'
+        UNH+00000003+FHSREG:0:1:FH:FHS001'
+        BGM+++507'
+        NAD+FHS+XX1:954'
+        DTM+137:199201131317:203'
+        RFF+950:G5'
+        S01+1'
+        RFF+TN:17'
+        NAD+GP+4826940,281:900'
+        GIS+1:ZZZ'
+        DTM+961:19911225:102'
+        FTX+RGI+++DIED ON HOLIDAY IN MAJORCA'
+        S02+2'
+        PNA+PAT+N/10/10:OPI'
+        UNT+14+00000003'
+        UNZ+1+00000002'
+
+
+        ## Sandbox test scenarios
+        TODO: document interactions supported by fake mesh
+
+        | Scenario                            | Request                                                      | Response                                         |
+        | ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+        |                                     |                                                              |                                                  |
+
+      summary: Deduct a patient (Deduction transaction)
+      operationId: deduct-patient
+      tags:
+        - patients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: components/schemas/Patient.yaml
+            examples:
+              removal:
+                summary: Removal transaction
+                value:
+                  $ref: components/examples/requests/NHAIS/deduction.json
+      responses:
+        '202':
+          description: Deduction forwarded to NHAIS for processing
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+        '400':
+          description: Client error.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+              examples:
+                invalid-nhs-number:
+                  summary: Invalid NHS number supplied
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: value
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: INVALID_NHS_NUMBER
+                              display: NHS Number 9000000000 is not a valid NHS number.
+                no-patches-submitted:
+                  summary: No patches submitted
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: required
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: noPatchesSubmitted
+                              display: No patches submitted.
+                invalid-patch-operation:
+                  summary: Invalid patch operation(s)
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: value
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: invalidPatchOperation
+                              display: 'Invalid patch: attempted to modify Patient properties that cannot be changed by an Amendment'
+        '415':
+          description: Unsupported media type.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+              example:
+                resourceType: OperationOutcome
+                issue:
+                  - severity: error
+                    code: value
+                    details:
+                      coding:
+                        - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                          version: '1'
+                          code: unsupportedMediaType
+                          display: "Must be 'application/json-patch+json'."
+  '/Patient/{id}/$nhais.removal':
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      description: |
+        ## Overview
+        Use this endpoint to send a Removal transaction to NHAIS.
+
+        ## Operation Id
+        TODO: operation id (transaction id) will probably need to be provided in the request since this is a reply to
+        a HA -> GP amendment
+
+        ## Sandbox test scenarios
+        TODO: document interactions supported by fake mesh
+
+        | Scenario                            | Request                                                      | Response                                         |
+        | ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+        |                                     |                                                              |                                                  |
+
+      summary: Accept a new patient (Acceptance transaction)
+      operationId: remove-patient
+      tags:
+        - patients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: components/schemas/Patient.yaml
+            examples:
+              removal:
+                summary: Removal transaction
+                value:
+                  $ref: components/examples/requests/NHAIS/removal.json
+      responses:
+        '202':
+          description: Removal forwarded to NHAIS for processing
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+        '400':
+          description: Client error.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+              examples:
+                invalid-nhs-number:
+                  summary: Invalid NHS number supplied
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: value
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: INVALID_NHS_NUMBER
+                              display: NHS Number 9000000000 is not a valid NHS number.
+                no-patches-submitted:
+                  summary: No patches submitted
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: required
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: noPatchesSubmitted
+                              display: No patches submitted.
+                invalid-patch-operation:
+                  summary: Invalid patch operation(s)
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: value
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: invalidPatchOperation
+                              display: 'Invalid patch: attempted to modify Patient properties that cannot be changed by an Amendment'
+        '415':
+          description: Unsupported media type.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+              example:
+                resourceType: OperationOutcome
+                issue:
+                  - severity: error
+                    code: value
+                    details:
+                      coding:
+                        - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                          version: '1'
+                          code: unsupportedMediaType
+                          display: "Must be 'application/json-patch+json'."
+  '/Patient/{id}':
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    post:
+      description: |
+        ## Overview
+        Use this endpoint to send an Acceptance to NHAIS.
+
+        ## Operation Id
+        When you submit an amendment an operation id will be included in the response. This operation id MUST be retained
+        to match against the asynchronous reply from NHAIS
+
+        ## Sandbox test scenarios
+        TODO: document interactions supported by fake mesh
+
+        | Scenario                            | Request                                                      | Response                                         |
+        | ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+        |                                     |                                                              |                                                  |
+
+      summary: Accept a new patient (Acceptance transaction)
+      operationId: accept-patient
+      tags:
+        - patients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: components/schemas/Patient.yaml
+            examples:
+              acceptance:
+                summary: Acceptance transaction
+                value:
+                  $ref: components/examples/requests/NHAIS/acceptance.json
+      responses:
+        '202':
+          description: Acceptance forwarded to NHAIS for processing
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+        '400':
+          description: Client error.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+              examples:
+                invalid-nhs-number:
+                  summary: Invalid NHS number supplied
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: value
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: INVALID_NHS_NUMBER
+                              display: NHS Number 9000000000 is not a valid NHS number.
+                no-patches-submitted:
+                  summary: No patches submitted
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: required
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: noPatchesSubmitted
+                              display: No patches submitted.
+                invalid-patch-operation:
+                  summary: Invalid patch operation(s)
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: value
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: invalidPatchOperation
+                              display: 'Invalid patch: attempted to modify Patient properties that cannot be changed by an Amendment'
+        '415':
+          description: Unsupported media type.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+              example:
+                resourceType: OperationOutcome
+                issue:
+                  - severity: error
+                    code: value
+                    details:
+                      coding:
+                        - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                          version: '1'
+                          code: unsupportedMediaType
+                          display: "Must be 'application/json-patch+json'."
+    patch:
+      description: |
+        ## Overview
+        Use this endpoint to send an Amendment to NHAIS.
+
+        This is a 'patch' operation, meaning you can update specific parts of the patient record (such as a name or an address), as opposed to having to update the entire record.
+
+        ## Operation Id
+        When you submit an amendment an operation id will be included in the response. This operation id MUST be retained
+        to match against the asynchronous reply from NHAIS
+
+        ## Sandbox test scenarios
+        TODO: document interactions supported by fake mesh
+
+        | Scenario                            | Request                                                      | Response                                         |
+        | ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
+        |                                     |                                                              |                                                  |
+
+      summary: Amend patient details (Amendment transaction)
+      operationId: update-patient-partial
+      tags:
+        - patients
+      externalDocs:
+        description: IETF RFC 6902, which defines json-patch.
+        url: https://tools.ietf.org/html/rfc6902
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patches
+              properties:
+                correction:
+                  description: Set to true if the update is correcting previously incorrect data.
+                  type: boolean
+                  default: false
+                patches:
+                  $ref: components/schemas/JsonPatch.yaml
+            examples:
+              amendment:
+                summary: Amendment transaction
+                value:
+                  $ref: components/examples/requests/PatientPatch/amendment.json
+      responses:
+        '202':
+          description: Amendment forwarded to NHAIS for processing
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+        '400':
+          description: Client error.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+              examples:
+                invalid-nhs-number:
+                  summary: Invalid NHS number supplied
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: value
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: INVALID_NHS_NUMBER
+                              display: NHS Number 9000000000 is not a valid NHS number.
+                no-patches-submitted:
+                  summary: No patches submitted
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: required
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: noPatchesSubmitted
+                              display: No patches submitted.
+                invalid-patch-operation:
+                  summary: Invalid patch operation(s)
+                  value:
+                    resourceType: OperationOutcome
+                    issue:
+                      - severity: error
+                        code: value
+                        details:
+                          coding:
+                            - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                              version: '1'
+                              code: invalidPatchOperation
+                              display: 'Invalid patch: attempted to modify Patient properties that cannot be changed by an Amendment'
+        '415':
+          description: Unsupported media type.
+          content:
+            application/fhir+json:
+              schema:
+                $ref: components/schemas/OperationOutcome.yaml
+              example:
+                resourceType: OperationOutcome
+                issue:
+                  - severity: error
+                    code: value
+                    details:
+                      coding:
+                        - system: 'https://fhir.nhs.uk/R4/CodeSystem/Spine-ErrorOrWarningCode'
+                          version: '1'
+                          code: unsupportedMediaType
+                          display: "Must be 'application/json-patch+json'."
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      description: The patient's NHS Number. The primary identifier of a patient, unique within NHS England and Wales. Always 10 digits and must be a [valid NHS Number](https://www.datadictionary.nhs.uk/data_dictionary/attributes/n/nhs/nhs_number_de.asp).
+      required: true
+      schema:
+        type: string
+        example: "9000000009"
+  schemas:
+    Patient:
+      $ref: components/schemas/Patient.yaml
+    OperationOutcome:
+      $ref: components/schemas/OperationOutcome.yaml
