@@ -340,6 +340,23 @@ resource "aws_security_group" "alb_outbound_security_group" {
     ]
     description = "Allow inbound HTTPS connections from supplier VPC"
   }
+#################
+#Please remove below DLT (Distributed Load Tester) code if not needed
+#################
+# Allow inbound traffic from the DLT VPC. We don't make any
+# assumptions here about the internal structure of the DLT VPC,
+# instead just allowing inbound requests from the whole VPC.
+# A DLT could restrict this rule further by limiting access, for
+# example to a specific Security Group
+    ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [
+      data.aws_vpc.dlt_vpc.cidr_block
+    ]
+    description = "Allow inbound HTTPS connections from DLT VPC"
+  }
 
   # Allow outbound traffic to MHS outbound tasks
   egress {
