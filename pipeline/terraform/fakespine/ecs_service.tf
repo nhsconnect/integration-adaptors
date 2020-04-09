@@ -7,7 +7,7 @@ resource "aws_ecs_service" "fake_spine_service" {
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
   desired_count = var.fake_spine_service_minimum_instance_count
-  launch_type = "FARGATE"
+  //launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.fake_spine_task.arn
 
