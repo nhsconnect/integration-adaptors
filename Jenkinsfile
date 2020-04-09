@@ -1,6 +1,6 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
-Boolean runBuild           = true
+Boolean runBuild           = false
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
 Boolean runTerraform       = true
@@ -137,6 +137,9 @@ pipeline {
                     }
                 }
                 stage('Fake Spine') {
+                    when {
+                        expression { buildFakespine }
+                    }
                     stages {
                         stage('Build') {
                             steps {
@@ -325,14 +328,6 @@ pipeline {
                                 expression { deployFakespine && runTerraform }
                             }
                             steps {
-                                // dir('integration-tests/fake_spine') {
-                                //     script {
-                                //         sh ( label: "Build the Docker image for fake spine", script: "docker build -t ${DOCKER_REGISTRY}/fake-spine/fake-spine:${BUILD_TAG} ." )
-                                //         String DockerLogin = sh ( label: "Get the docker login for ECR", script: "aws ecr get-login --no-include-email --region ${TF_STATE_BUCKET_REGION} --profile nhsdred", returnStdout: true).replace("https://", "")
-                                //         sh ( label: "Push the fake spine image to ECR",      script: "${DockerLogin} && docker push ${DOCKER_REGISTRY}/fake-spine/fake-spine:${BUILD_TAG}" )
-                                //     }
-                                // }
-
                                 dir ('pipeline/terraform/fakespine'){
                                     script {
                                         String initCommand = """

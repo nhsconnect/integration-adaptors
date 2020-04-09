@@ -14,8 +14,8 @@ resource "aws_ecs_service" "fake_spine_service" {
   network_configuration {
     assign_public_ip = false
     security_groups = [
-      aws_security_group.fake_spine_security_group.id
-      data.terraform_remote_state.mhs.outputs.cloudwatch_vpce_security_group_id
+      aws_security_group.fake_spine_security_group.id,
+      data.terraform_remote_state.mhs.outputs.cloudwatch_vpce_security_group_id,
       data.terraform_remote_state.mhs.outputs.ecr_vpce_security_group_id
     ]
     subnets = data.terraform_remote_state.mhs.outputs.subnet_ids
