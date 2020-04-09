@@ -14,14 +14,14 @@ def configure_http_client():
 
 def start_tornado_server() -> None:
 
-    supplier_application = tornado.web.Application(
+    tornado_application = tornado.web.Application(
         [
             (r'/fhir/Patient/.*', handler.Handler),
             (r'/healthcheck', healthcheck_handler.HealthcheckHandler)
         ])
-    supplier_server = tornado.httpserver.HTTPServer(supplier_application)
+    tornado_server = tornado.httpserver.HTTPServer(tornado_application)
     server_port = int(config.get_config('SERVER_PORT', default='80'))
-    supplier_server.listen(server_port)
+    tornado_server.listen(server_port)
 
     logger.info('Starting nhais server at port {server_port}', fparams={'server_port': server_port})
     tornado_io_loop = tornado.ioloop.IOLoop.current()
