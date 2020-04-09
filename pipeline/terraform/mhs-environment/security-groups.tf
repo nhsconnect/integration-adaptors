@@ -249,7 +249,8 @@ resource "aws_security_group" "ecr_security_group" {
     security_groups = [
       aws_security_group.mhs_outbound_security_group.id,
       aws_security_group.mhs_route_security_group.id,
-      aws_security_group.mhs_inbound_security_group.id
+      aws_security_group.mhs_inbound_security_group.id,
+      "sg-033a6e83d13055fac" //Nasty dirty hack to get fake spine pull its image
     ]
     description = "Allow inbound HTTPS requests from MHS tasks"
   }
@@ -274,7 +275,8 @@ resource "aws_security_group" "cloudwatch_security_group" {
     security_groups = [
       aws_security_group.mhs_outbound_security_group.id,
       aws_security_group.mhs_route_security_group.id,
-      aws_security_group.mhs_inbound_security_group.id
+      aws_security_group.mhs_inbound_security_group.id,
+      "sg-033a6e83d13055fac", //Nasty dirty hack to get fake spine to write logs to CW
     ]
     description = "Allow inbound HTTPS requests from MHS tasks"
   }
