@@ -17,6 +17,7 @@ from mhs_common.state.persistence_adaptor_factory import get_persistence_adaptor
 from utilities import secrets, certs
 
 import inbound.request.handler as async_request_handler
+from utilities.string_utilities import str2bool
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -49,17 +50,31 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
                                      )
 
 
+def build_ssl_context(local_certs_file: str, ca_certs_file: str, key_file: str, ):
+    """
+    :param local_certs_file: The filename of the certificate to present for authentication.
+    :param ca_certs_file: The filename of the CA certificates as passed to ssl.SSLContext.load_verify_locations
+    :param key_file: The filename of the private key for the certificate identified by local_certs_file.
+    """
+    # Ensure Client authentication
+    ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    ssl_ctx.load_cert_chain(local_certs_file, key_file)
+    # The docs suggest we have to specify both that we must verify the client cert and the locations
+    ssl_ctx.verify_mode = ssl.CERT_NONE
+    ssl_ctx.load_verify_locations(ca_certs_file)
+
+    return ssl_ctx
+
+
 def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: str, party_key: str,
                          workflows: Dict[str, workflow.CommonWorkflow],
                          persistence_store: persistence_adaptor.PersistenceAdaptor,
                          config_manager: configuration_manager.ConfigurationManager
                          ) -> None:
     """
-
     :param persistence_store: persistence store adaptor for message information
     :param local_certs_file: The filename of the certificate to present for authentication.
-    :param ca_certs_file: The filename of the CA certificates as passed to
-    ssl.SSLContext.load_verify_locations
+    :param ca_certs_file: The filename of the CA certificates as passed to ssl.SSLContext.load_verify_locations
     :param key_file: The filename of the private key for the certificate identified by local_certs_file.
     :param workflows: The workflows to be used to handle messages.
     :param config_manager: The config manager used to obtain interaction details
@@ -71,15 +86,12 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
                                                              work_description_store=persistence_store,
                                                              config_manager=config_manager))])
 
-    # Ensure Client authentication
-    ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    ssl_ctx.load_cert_chain(local_certs_file, key_file)
-    # The docs suggest we have to specify both that we must verify the client cert and the locations
-    ssl_ctx.verify_mode = ssl.CERT_REQUIRED
-    ssl_ctx.load_verify_locations(ca_certs_file)
+    ssl_ctx = build_ssl_context(local_certs_file, ca_certs_file, key_file) \
+        if str2bool(config.get_config('INBOUND_USE_SSL', default=str(True))) \
+        else None
 
     inbound_server = tornado.httpserver.HTTPServer(inbound_application, ssl_options=ssl_ctx)
-    inbound_server_port = 443
+    inbound_server_port = int(config.get_config('INBOUND_SERVER_PORT', default='443'))
     inbound_server.listen(inbound_server_port)
 
     healthcheck_application = tornado.web.Application([

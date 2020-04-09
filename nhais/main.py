@@ -16,8 +16,8 @@ def start_tornado_server() -> None:
 
     supplier_application = tornado.web.Application(
         [
-            (r'/', handler.SynchronousHandler),
-            (r"/healthcheck", healthcheck_handler.HealthcheckHandler)
+            (r'/fhir/Patient/.*', handler.Handler),
+            (r'/healthcheck', healthcheck_handler.HealthcheckHandler)
         ])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
     server_port = int(config.get_config('SERVER_PORT', default='80'))
