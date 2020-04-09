@@ -11,7 +11,7 @@ properties:
     readOnly: true
   extension:
     type: object
-    description: asdf
+    description: NHAIS Deduction details
     properties:
       deductionType:
         type: string
