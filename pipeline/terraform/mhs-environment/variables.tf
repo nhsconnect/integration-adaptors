@@ -28,11 +28,14 @@ variable "opentest_vpc_id" {
   type = string
   description = "VPC id of the VPC that contains the Opentest connection to Spine"
 }
+#################
+#Please remove below DLT (Distributed Load Tester) code if not needed
+#################
 variable "dlt_vpc_id" {
   type = string
   description = "VPC id of the DLT-Distributed Load Testing system that connects to the MHS"
 }
-
+################
 variable "internal_root_domain" {
   type = string
   description = "Domain name to be used internally to refer to parts of the MHS (subdomains will be created off of this root domain). This domain name should not clash with any domain name on the internet. e.g. internal.somedomainyoucontrol.com"
