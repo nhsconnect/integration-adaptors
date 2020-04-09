@@ -8,6 +8,8 @@ from unittest import mock
 import exceptions
 from comms import proton_queue_adaptor
 from tornado import httpclient
+
+from mhs_common.workflow.InboundMessageData import InboundMessageData
 from utilities import test_utilities
 from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
@@ -45,6 +47,7 @@ INTERACTION_DETAILS = {
     'uniqueIdentifier': "31312",
     'ods-code': ODS_CODE
 }
+EBXML = "ebxml_data"
 PAYLOAD = 'payload'
 SERIALIZED_MESSAGE = 'serialized-message'
 ATTACHMENTS = [{
@@ -54,6 +57,7 @@ ATTACHMENTS = [{
     ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
     ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
 }]
+INBOUND_MESSAGE_DATA = InboundMessageData(EBXML, PAYLOAD, ATTACHMENTS)
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
 INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
@@ -545,11 +549,11 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
-        self.mock_queue_adaptor.send_async.assert_called_once_with({'payload': PAYLOAD, 'attachments': []},
-                                                                   properties={'message-id': MESSAGE_ID,
-                                                                               'correlation-id': CORRELATION_ID})
+        self.mock_queue_adaptor.send_async.assert_called_once_with(
+            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
+            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
@@ -569,11 +573,11 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
         mock_sleep.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
-        self.mock_queue_adaptor.send_async.assert_called_with({'payload': PAYLOAD, 'attachments': []},
-                                                              properties={'message-id': MESSAGE_ID,
-                                                                          'correlation-id': CORRELATION_ID})
+        self.mock_queue_adaptor.send_async.assert_called_with(
+            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
+            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
@@ -591,7 +595,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         mock_sleep.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
         self.assertEqual(
@@ -627,7 +631,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         mock_sleep.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
         self.assertEqual(2, self.mock_queue_adaptor.send_async.call_count,
@@ -644,11 +648,11 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, ATTACHMENTS)
+        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, INBOUND_MESSAGE_DATA)
 
-        self.mock_queue_adaptor.send_async.assert_called_once_with({'payload': PAYLOAD, 'attachments': ATTACHMENTS},
-                                                                   properties={'message-id': MESSAGE_ID,
-                                                                               'correlation-id': CORRELATION_ID})
+        self.mock_queue_adaptor.send_async.assert_called_once_with(
+            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
+            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.mock_create_new_work_description.assert_called_once_with(self.mock_persistence_store, MESSAGE_ID,
                                                                       workflow.FORWARD_RELIABLE,
                                                                       MessageStatus.
@@ -673,11 +677,11 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
         mock_sleep.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, ATTACHMENTS)
+        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, INBOUND_MESSAGE_DATA)
 
-        self.mock_queue_adaptor.send_async.assert_called_with({'payload': PAYLOAD, 'attachments': ATTACHMENTS},
-                                                              properties={'message-id': MESSAGE_ID,
-                                                                          'correlation-id': CORRELATION_ID})
+        self.mock_queue_adaptor.send_async.assert_called_with(
+            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
+            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
         mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
@@ -694,7 +698,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         mock_sleep.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, [])
+            await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, INBOUND_MESSAGE_DATA)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
         self.assertEqual(
@@ -729,7 +733,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         mock_sleep.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, PAYLOAD, [])
+            await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, INBOUND_MESSAGE_DATA)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
         self.assertEqual(2, self.mock_queue_adaptor.send_async.call_count,

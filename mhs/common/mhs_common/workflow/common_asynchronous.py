@@ -179,13 +179,13 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
     async def _put_message_onto_queue_with(self, message_id, correlation_id, inbound_message_data: InboundMessageData):
         await self.queue_adaptor.send_async(
             {
-                'ebXML': inbound_message_data.ebXML,
+                'ebXML': inbound_message_data.ebxml,
                 'payload': inbound_message_data.payload,
                 'attachments': inbound_message_data.attachments or []
             },
             properties={
-                'message_id': message_id,
-                'correlation_id': correlation_id
+                'message-id': message_id,
+                'correlation-id': correlation_id
             })
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):

@@ -47,11 +47,13 @@ def get_test_message_dictionary():
     }
 
 
-def expected_values(message=None):
+def expected_values(payload=None, ebxml=None):
     values = copy.deepcopy(EXPECTED_VALUES)
 
-    if message:
-        values[ebxml_request_envelope.MESSAGE] = message
+    if ebxml:
+        values[ebxml_request_envelope.EBXML] = ebxml
+    if payload:
+        values[ebxml_request_envelope.MESSAGE] = payload
 
     return values
 
@@ -233,36 +235,32 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     def test_from_string_parses_valid_requests(self):
         with self.subTest("A valid request containing a payload"):
-            message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_request.msg"))
-            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request')
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest("A multi-part MIME message with a defect in the payload"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_payload_defect.msg"))
-
-            expected_values_with_test_payload = expected_values("mock-payload")
+            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_payload_defect')
+            expected_values_with_test_payload = expected_values(payload="mock-payload", ebxml=ebxml)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
             self.assertEqual(expected_values_with_test_payload, parsed_message.message_dictionary)
 
         with self.subTest("A valid request that does not contain the optional payload MIME part"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_no_payload.msg"))
-            expected_values_with_no_payload = expected_values()
+            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_no_payload')
+            expected_values_with_no_payload = expected_values(payload=None, ebxml=ebxml)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
             self.assertEqual(expected_values_with_no_payload, parsed_message.message_dictionary)
 
         with self.subTest("A valid request containing one textual attachment"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_one_attachment.msg"))
-            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment')
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
             expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
@@ -276,9 +274,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest("A valid request containing one textual attachment with application/xml content type"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_one_attachment_application_xml_content_type.msg"))
-            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_application_xml_content_type')
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
             expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
@@ -292,9 +289,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest("A valid request containing one textual and one base64 attachment"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_multiple_attachments.msg"))
-            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_multiple_attachments')
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
             expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS] += [
                 {
                     ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
@@ -339,26 +335,24 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     def test_from_string_parses_messages_with_optional_parts_missing(self):
         sub_tests = [
-            ('DuplicateElimination', 'ebxml_request_no_duplicate_elimination.msg',
-             ebxml_request_envelope.DUPLICATE_ELIMINATION),
-            ('SyncReply', 'ebxml_request_no_sync_reply.msg', ebxml_request_envelope.SYNC_REPLY)
+            ('DuplicateElimination', 'ebxml_request_no_duplicate_elimination', ebxml_request_envelope.DUPLICATE_ELIMINATION),
+            ('SyncReply', 'ebxml_request_no_sync_reply', ebxml_request_envelope.SYNC_REPLY)
         ]
         for element_name, filename, key in sub_tests:
             with self.subTest(f'A valid request without a {element_name} element'):
-                message = file_utilities.FileUtilities.get_file_string(
-                    str(self.message_dir / filename))
-                expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+                message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, filename)
+
+                expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
                 expected_values_with_payload[key] = False
 
-                parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS,
-                                                                                         message)
+                parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(
+                    MULTIPART_MIME_HEADERS, message)
 
                 self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest(f'A valid request without an AckRequested element'):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / 'ebxml_request_no_ack_requested.msg'))
-            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_no_ack_requested')
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
             expected_values_with_payload[ebxml_request_envelope.ACK_REQUESTED] = False
             del expected_values_with_payload[ebxml_request_envelope.ACK_SOAP_ACTOR]
 
@@ -376,9 +370,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         with self.subTest("A valid request containing one attachment without a description has description defaulted "
                           "to an empty string"):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / "ebxml_request_one_attachment_without_description.msg"))
-            expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
+            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_without_description')
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
             expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',

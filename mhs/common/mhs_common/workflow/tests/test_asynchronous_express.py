@@ -7,6 +7,7 @@ from unittest import mock
 
 import exceptions
 from comms import proton_queue_adaptor
+from mhs_common.workflow.InboundMessageData import InboundMessageData
 from utilities import test_utilities
 from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
@@ -43,7 +44,13 @@ INTERACTION_DETAILS = {
     'action': ACTION,
     'uniqueIdentifier': "31312"
 }
+
 PAYLOAD = 'payload'
+EBXML = "ebxml_data"
+ATTACHMENTS = ['attachment1', 'attachment2']
+
+INBOUND_MESSAGE_DATA = InboundMessageData(EBXML, PAYLOAD, ATTACHMENTS)
+
 SERIALIZED_MESSAGE = 'serialized-message'
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
@@ -390,11 +397,11 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
-        self.mock_queue_adaptor.send_async.assert_called_once_with({'payload': PAYLOAD, 'attachments': []},
-                                                                   properties={'message-id': MESSAGE_ID,
-                                                                               'correlation-id': CORRELATION_ID})
+        self.mock_queue_adaptor.send_async.assert_called_once_with(
+            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
+            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
@@ -411,11 +418,11 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
         mock_sleep.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
-        self.mock_queue_adaptor.send_async.assert_called_with({'payload': PAYLOAD, 'attachments': []},
-                                                              properties={'message-id': MESSAGE_ID,
-                                                                          'correlation-id': CORRELATION_ID})
+        self.mock_queue_adaptor.send_async.assert_called_with(
+            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
+            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
@@ -431,7 +438,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         mock_sleep.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
         self.assertEqual(
@@ -464,7 +471,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         mock_sleep.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
         self.assertEqual(2, self.mock_queue_adaptor.send_async.call_count,
