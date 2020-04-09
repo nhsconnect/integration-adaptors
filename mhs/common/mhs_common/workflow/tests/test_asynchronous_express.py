@@ -7,7 +7,7 @@ from unittest import mock
 
 import exceptions
 from comms import proton_queue_adaptor
-from mhs_common.workflow.InboundMessageData import InboundMessageData
+from mhs_common.workflow.common import MessageData
 from utilities import test_utilities
 from utilities.file_utilities import FileUtilities
 from utilities.test_utilities import async_test
@@ -49,7 +49,7 @@ PAYLOAD = 'payload'
 EBXML = "ebxml_data"
 ATTACHMENTS = ['attachment1', 'attachment2']
 
-INBOUND_MESSAGE_DATA = InboundMessageData(EBXML, PAYLOAD, ATTACHMENTS)
+INBOUND_MESSAGE_DATA = MessageData(EBXML, PAYLOAD, ATTACHMENTS)
 
 SERIALIZED_MESSAGE = 'serialized-message'
 INBOUND_QUEUE_MAX_RETRIES = 3

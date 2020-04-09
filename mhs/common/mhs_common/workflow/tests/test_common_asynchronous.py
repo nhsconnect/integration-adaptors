@@ -2,7 +2,7 @@ import unittest
 from typing import Optional, Tuple, List
 from unittest import mock
 
-from mhs_common.workflow.InboundMessageData import InboundMessageData
+from mhs_common.workflow.common import MessageData
 from utilities import test_utilities
 from utilities.test_utilities import async_test
 
@@ -34,7 +34,7 @@ class DummyCommonAsynchronousWorkflow(common_asynchronous.CommonAsynchronousWork
                                      message_id: str,
                                      correlation_id: str,
                                      work_description: wd.WorkDescription,
-                                     inbound_message_data: InboundMessageData):
+                                     message_data: MessageData):
         pass
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):

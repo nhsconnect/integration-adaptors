@@ -54,8 +54,8 @@ class ForwardReliableMessagingPatternTests(TestCase):
 
         # Assert
         AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
-            .assert_property('message_id', message_id) \
-            .assert_property('correlation_id', '1') \
+            .assert_property('message-id', message_id) \
+            .assert_property('correlation-id', '1') \
             .assert_json_content_type() \
             .assertor_for_hl7_xml_message() \
             .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)

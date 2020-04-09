@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from mhs_common.workflow.InboundMessageData import InboundMessageData
+from mhs_common.workflow.common import MessageData
 from utilities import test_utilities
 
 from mhs_common import workflow
@@ -113,7 +113,7 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
 
 class TestSyncAsyncWorkflowInbound(TestCase):
 
-    inbound_message_data = InboundMessageData(None, 'wqe', None)
+    message_data = MessageData(None, 'wqe', None)
 
     def setUp(self):
         self.persistence = MagicMock()
@@ -127,7 +127,7 @@ class TestSyncAsyncWorkflowInbound(TestCase):
         self.work_description.set_inbound_status.return_value = test_utilities.awaitable(True)
         self.work_description.update.return_value = test_utilities.awaitable(True)
 
-        await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, self.inbound_message_data)
+        await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, self.message_data)
 
         self.persistence.add.assert_called_with('1', {
             'correlation_id': 'cor_id',
@@ -150,7 +150,7 @@ class TestSyncAsyncWorkflowInbound(TestCase):
                                                      persistence_store_max_retries=max_retries,
                                                      sync_async_store_retry_delay=100)
         with self.assertRaises(ValueError):
-            await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, self.inbound_message_data)
+            await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, self.message_data)
 
         self.work_description.set_inbound_status.assert_called_with(
             wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)
@@ -173,7 +173,7 @@ class TestSyncAsyncWorkflowInbound(TestCase):
                                                      persistence_store_max_retries=max_retries,
                                                      sync_async_store_retry_delay=100)
         with self.assertRaises(ValueError):
-            await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, self.inbound_message_data)
+            await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, self.message_data)
 
         self.work_description.set_inbound_status.assert_called_with(
             wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_FAILED_TO_BE_STORED)

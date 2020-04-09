@@ -16,7 +16,7 @@ from mhs_common.configuration import configuration_manager
 from mhs_common.messages import ebxml_request_envelope
 from mhs_common.state import work_description as wd
 from mhs_common.workflow import asynchronous_forward_reliable as forward_reliable
-from mhs_common.workflow.InboundMessageData import InboundMessageData
+from mhs_common.workflow.common import MessageData
 from utilities import mdc
 
 MESSAGES_DIR = "messages"
@@ -118,7 +118,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
         self.mock_workflow.handle_inbound_message.assert_called_once_with(REF_TO_MESSAGE_ID, CORRELATION_ID,
-                                                                          unittest.mock.ANY, InboundMessageData(ebxml, EXPECTED_MESSAGE, []))
+                                                                          unittest.mock.ANY, MessageData(ebxml, EXPECTED_MESSAGE, []))
 
     def test_when_workflow_throws_exception_then_http_500_response(self):
         """
@@ -226,7 +226,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
             str(self.message_dir / EXPECTED_ASYNC_ACK_RESPONSE_FILE))
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
         self.mock_forward_reliable_workflow.handle_unsolicited_inbound_message.assert_called_once_with(
-            UNSOLICITED_REF_TO_MESSAGE_ID, CORRELATION_ID, InboundMessageData(ebxml, EXPECTED_MESSAGE, EXPECTED_UNSOLICITED_ATTACHMENTS))
+            UNSOLICITED_REF_TO_MESSAGE_ID, CORRELATION_ID, MessageData(ebxml, EXPECTED_MESSAGE, EXPECTED_UNSOLICITED_ATTACHMENTS))
 
     def test_post_unsolicited_non_forward_reliable_request_results_in_error_response(self):
         """

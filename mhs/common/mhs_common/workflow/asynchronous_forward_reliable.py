@@ -6,7 +6,7 @@ from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from isodate import isoerror
 from mhs_common.retry import retriable_action
-from mhs_common.workflow.InboundMessageData import InboundMessageData
+from mhs_common.workflow.common import MessageData
 from utilities import timing, config
 from utilities.date_utilities import DateUtilities
 
@@ -83,7 +83,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                                                                   reliability_details, retry_interval)
 
     @timing.time_function
-    async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, inbound_message_data: InboundMessageData):
+    async def handle_unsolicited_inbound_message(self, message_id: str, correlation_id: str, message_data: MessageData):
         logger.info('Entered async forward reliable workflow to handle unsolicited inbound message')
         logger.audit('Unsolicited inbound {WorkflowName} workflow invoked.',
                      fparams={'WorkflowName': self.workflow_name})
@@ -92,7 +92,7 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
         await work_description.publish()
 
         result = await retriable_action.RetriableAction(
-            lambda: self._put_message_onto_queue_with(message_id, correlation_id, inbound_message_data),
+            lambda: self._put_message_onto_queue_with(message_id, correlation_id, message_data),
             self.inbound_queue_max_retries,
             self.inbound_queue_retry_delay)\
             .execute()

@@ -3,7 +3,7 @@ from typing import Tuple, Optional
 import utilities.integration_adaptors_logger as log
 from tornado import httpclient
 
-from mhs_common.workflow.InboundMessageData import InboundMessageData
+from mhs_common.workflow.common import MessageData
 from utilities import timing
 from mhs_common import workflow
 from mhs_common.errors.soap_handler import handle_soap_error
@@ -130,7 +130,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         envelope = soap_envelope.SoapEnvelope(message_details)
         return envelope.serialize()
 
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription, inbound_message_data: InboundMessageData):
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription, message_data: MessageData):
         raise NotImplementedError('This method is not supported for the synchronous message workflow as there is no '
                                   'inbound message')
 

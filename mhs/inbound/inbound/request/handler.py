@@ -10,7 +10,7 @@ import mhs_common.messages.ebxml_request_envelope as ebxml_request_envelope
 import mhs_common.workflow as workflow
 import tornado.web
 
-from mhs_common.workflow.InboundMessageData import InboundMessageData
+from mhs_common.workflow.common import MessageData
 from utilities import mdc
 from mhs_common.configuration import configuration_manager
 from mhs_common.handler import base_handler
@@ -66,23 +66,23 @@ class InboundHandler(base_handler.BaseHandler):
         payload = request_message.message_dictionary[ebxml_request_envelope.MESSAGE]
         attachments = request_message.message_dictionary[ebxml_request_envelope.ATTACHMENTS]
 
-        inbound_message_data = InboundMessageData(eb_xml, payload, attachments)
+        message_data = MessageData(eb_xml, payload, attachments)
 
         if ref_to_message_id:
             logger.info(f'RefToMessageId on inbound reply: handling as an referenced reply message')
-            await self._handle_referenced_reply_message(ref_to_message_id, correlation_id, inbound_message_data)
+            await self._handle_referenced_reply_message(ref_to_message_id, correlation_id, message_data)
         else:
             logger.info(f'No RefToMessageId on inbound reply: handling as an unsolicited message')
-            await self._handle_unsolicited_message(message_id, correlation_id, interaction_id, inbound_message_data)
+            await self._handle_unsolicited_message(message_id, correlation_id, interaction_id, message_data)
         self._send_ack(request_message)
 
-    async def _handle_referenced_reply_message(self, message_id: str, correlation_id: str, inbound_message_data: InboundMessageData):
+    async def _handle_referenced_reply_message(self, message_id: str, correlation_id: str, message_data: MessageData):
         work_description = await self._get_work_description_from_store(message_id)
         message_workflow = self.workflows[work_description.workflow]
         logger.info('Forwarding message {message_id} to {workflow}', fparams={'workflow': message_workflow, 'message_id': message_id})
 
         try:
-            await message_workflow.handle_inbound_message(message_id, correlation_id, work_description, inbound_message_data)
+            await message_workflow.handle_inbound_message(message_id, correlation_id, work_description, message_data)
         except Exception as e:
             logger.exception('Exception in workflow')
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
@@ -99,7 +99,7 @@ class InboundHandler(base_handler.BaseHandler):
                                         reason="Unknown message reference") from e
 
     async def _handle_unsolicited_message(self, message_id: str, correlation_id: str,
-                                          interaction_id: str, inbound_message_data: InboundMessageData):
+                                          interaction_id: str, message_data: MessageData):
         # Lookup workflow for request
         interaction_details = self._get_interaction_details(interaction_id)
         message_workflow = self._extract_default_workflow(interaction_details, interaction_id)
@@ -107,7 +107,7 @@ class InboundHandler(base_handler.BaseHandler):
         # If it matches forward reliable workflow, then this will be an unsolicited request from another GP system.
         # So let the workflow handle this.
         if isinstance(message_workflow, forward_reliable.AsynchronousForwardReliableWorkflow):
-            await self.handle_forward_reliable_unsolicited_request(message_id, correlation_id, message_workflow, inbound_message_data)
+            await self.handle_forward_reliable_unsolicited_request(message_id, correlation_id, message_workflow, message_data)
         # If not, then something has gone wrong
         else:
             logger.error('Received unsolicited message for a workflow {workflow} that does not support unsolicited messaging',
@@ -117,11 +117,11 @@ class InboundHandler(base_handler.BaseHandler):
 
     async def handle_forward_reliable_unsolicited_request(self, message_id: str, correlation_id: str,
                                                           forward_reliable_workflow: workflow.AsynchronousForwardReliableWorkflow,
-                                                          inbound_message_data: InboundMessageData):
+                                                          message_data: MessageData):
         logger.info('Received unsolicited inbound request for the forward-reliable workflow. Passing the '
                     'request to forward-reliable workflow.')
         try:
-            await forward_reliable_workflow.handle_unsolicited_inbound_message(message_id, correlation_id, inbound_message_data)
+            await forward_reliable_workflow.handle_unsolicited_inbound_message(message_id, correlation_id, message_data)
         except Exception as e:
             logger.exception('Exception in workflow')
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
