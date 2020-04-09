@@ -1,0 +1,14 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+tornado = "*"
+integration-adaptors-common = {editable = true,path = "./../common"}
+pycurl = {version = "~=7.43",platform_system = "!= 'Windows'"}
+
+[requires]
+python_version = "3.7"
