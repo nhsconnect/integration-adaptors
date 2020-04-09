@@ -18,16 +18,16 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
       }]
       secrets = [{
         name = "FAKE_SPINE_PRIVATE_KEY",
-        value = var.fake_spine_private_key
+        valueFrom = var.fake_spine_private_key
       }, {
         name = "FAKE_SPINE_CERTIFICATE",
-        value = var.fake_spine_certificate
+        valueFrom = var.fake_spine_certificate
       }, {
         name = "FAKE_SPINE_CA_STORE",
-        value = var.fake_spine_ca_store
+        valueFrom = var.fake_spine_ca_store
       }, {
         name = "MHS_SECRET_PARTY_KEY",
-        value = var.party_key_arn
+        valueFrom = var.party_key_arn
       }]
       essential = true
       logConfiguration = {
