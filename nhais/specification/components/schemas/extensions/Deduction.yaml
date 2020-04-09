@@ -1,0 +1,28 @@
+type: object
+description: Wrapper object for NHAIS Deduction details.
+required:
+  - url
+  - extension
+properties:
+  url:
+    type: string
+    description: Definition of Deduction extension.
+    default: https://TODO.COM/ExtensionNhais-Deduction
+    readOnly: true
+  extension:
+    type: object
+    description: asdf
+    properties:
+      deductionType:
+        type: string
+        description: The type of deduction
+        enum: [death, emigrated, other]
+      deductionDate:
+        type: string
+        description: The date the patient is deducted
+        format: date
+        example: 2010-10-22
+      deductionReason:
+        type: string
+        description: The reason for the deduction. Alphanumeric only
+        pattern: [A-Za-z0-9 ]+

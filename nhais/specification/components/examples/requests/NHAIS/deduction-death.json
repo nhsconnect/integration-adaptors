@@ -1,0 +1,40 @@
+{
+  "resourceType": "Patient",
+  "id": "N/10/10",
+  "identifier": [
+    {
+      "system": "https://fhir.nhs.uk/Id/nhs-number",
+      "value": "N/10/10"
+    }
+  ],
+  "generalPractitioner": [
+    {
+      "id": "4826940,281",
+      "type": "Organization",
+      "reference": "TODO: not the identifier used by ODS https://directory.spineservices.nhs.uk/STU3/Organization/Y12345",
+      "identifier": {
+        "system": "TODO: not an ODS code https://digital.nhs.uk/services/organisation-data-service",
+        "value": "4826940,281"
+      }
+    }
+  ],
+  "managingOrganization": [
+    {
+      "id": "XX1",
+      "type": "Organization",
+      "reference": "TODO: not the identifier used by ODS https://directory.spineservices.nhs.uk/STU3/Organization/Y12345",
+      "identifier": {
+        "system": "TODO: not an ODS code https://digital.nhs.uk/services/organisation-data-service",
+        "value": "XX1"
+      }
+    }
+  ],
+  "extension": [
+    {
+      "url": "https://TODO.COM/ExtensionNhais-Deduction",
+      "deductionType": "death",
+      "deductionDate": "1991-12-25",
+      "deductionReason": "DIED ON HOLIDAY IN MAJORCA"
+    }
+  ]
+}
