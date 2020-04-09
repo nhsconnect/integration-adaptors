@@ -140,8 +140,8 @@ pipeline {
                     stages {
                         stage('Build') {
                             steps {
-                                dir('integration-tests/fake-spine') {
-                                    buildModules('Installing route lookup dependencies')
+                                dir('integration-tests/fake_spine') {
+                                    buildModules('Installing fake spine')
                                 }
                             }
                         }
