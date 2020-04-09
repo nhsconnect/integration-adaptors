@@ -25,4 +25,4 @@ properties:
       deductionReason:
         type: string
         description: The reason for the deduction. Alphanumeric only
-        pattern: [A-Za-z0-9 ]+
+        pattern: "[A-Za-z0-9 ]+"
