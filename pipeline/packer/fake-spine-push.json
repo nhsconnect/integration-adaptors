@@ -2,7 +2,7 @@
   "_description": "This template pushes a Fakespine image.",
   "variables": {
     "registry": "{{env `DOCKER_REGISTRY`}}",
-    "repository": "/mhs/fake-spine",
+    "repository": "/fake-spine",
     "tag": "{{env `BUILD_TAG`}}"
   },
   "builders": [
