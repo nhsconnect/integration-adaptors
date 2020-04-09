@@ -1,6 +1,6 @@
 """This module defines the inbound request handler component."""
 
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 import mhs_common.messages.common_ack_envelope as common_ack_envelope
 import mhs_common.messages.ebxml_ack_envelope as ebxml_ack_envelope
@@ -52,7 +52,7 @@ class InboundHandler(base_handler.BaseHandler):
             logger.debug('Request body: %s', self.request.body.decode() if self.request.body else None)
         request_message = self._extract_incoming_ebxml_request_message()
 
-        self._extract_message_id(request_message)
+        message_id = self._extract_message_id(request_message)
         interaction_id = self._extract_interaction_id(request_message)
         ref_to_message_id = self._extract_ref_message(request_message)
         correlation_id = self._extract_correlation_id(request_message)
@@ -68,37 +68,38 @@ class InboundHandler(base_handler.BaseHandler):
 
         inbound_message_data = InboundMessageData(eb_xml, payload, attachments)
 
-        work_description = await wd.get_work_description_from_store(self.work_description_store, ref_to_message_id)
-        if not work_description:
-            await self._handle_no_work_description_found_for_request(
-                ref_to_message_id, correlation_id, interaction_id, inbound_message_data)
+        if ref_to_message_id:
+            logger.info(f'RefToMessageId on inbound reply: handling as an referenced reply message')
+            await self._handle_referenced_reply_message(ref_to_message_id, correlation_id, inbound_message_data)
         else:
-            await self._handle_found_work_description_for_request(
-                ref_to_message_id, correlation_id, work_description, inbound_message_data)
-
+            logger.info(f'No RefToMessageId on inbound reply: handling as an unsolicited message')
+            await self._handle_unsolicited_message(message_id, correlation_id, interaction_id, inbound_message_data)
         self._send_ack(request_message)
 
-    async def _handle_found_work_description_for_request(self,
-                                                         ref_to_message_id: str,
-                                                         correlation_id: str,
-                                                         work_description: wd.WorkDescription,
-                                                         inbound_message_data: InboundMessageData):
+    async def _handle_referenced_reply_message(self, message_id: str, correlation_id: str, inbound_message_data: InboundMessageData):
+        work_description = await self._get_work_description_from_store(message_id)
         message_workflow = self.workflows[work_description.workflow]
-        logger.info('Retrieved work description from state store, forwarding message to {workflow}',
-                    fparams={'workflow': message_workflow})
+        logger.info('Forwarding message {message_id} to {workflow}', fparams={'workflow': message_workflow, 'message_id': message_id})
 
         try:
-            await message_workflow.handle_inbound_message(ref_to_message_id, correlation_id, work_description, inbound_message_data)
+            await message_workflow.handle_inbound_message(message_id, correlation_id, work_description, inbound_message_data)
         except Exception as e:
             logger.exception('Exception in workflow')
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
                                         reason=f'Exception in workflow') from e
 
-    async def _handle_no_work_description_found_for_request(self,
-                                                            ref_to_message_id: str,
-                                                            correlation_id: str,
-                                                            interaction_id: str,
-                                                            inbound_message_data: InboundMessageData):
+    async def _get_work_description_from_store(self, message_id: str):
+        try:
+            work_description = await wd.get_work_description_from_store(self.work_description_store, message_id)
+            logger.info(f'Retrieved work description for message {message_id} from state store')
+            return work_description
+        except wd.EmptyWorkDescriptionError as e:
+            logger.error(f'No work description found in state store for message {message_id}')
+            raise tornado.web.HTTPError(500, f'Unknown message reference {message_id}',
+                                        reason="Unknown message reference") from e
+
+    async def _handle_unsolicited_message(self, message_id: str, correlation_id: str,
+                                          interaction_id: str, inbound_message_data: InboundMessageData):
         # Lookup workflow for request
         interaction_details = self._get_interaction_details(interaction_id)
         message_workflow = self._extract_default_workflow(interaction_details, interaction_id)
@@ -106,28 +107,21 @@ class InboundHandler(base_handler.BaseHandler):
         # If it matches forward reliable workflow, then this will be an unsolicited request from another GP system.
         # So let the workflow handle this.
         if isinstance(message_workflow, forward_reliable.AsynchronousForwardReliableWorkflow):
-            await self.handle_forward_reliable_unsolicited_request(
-                ref_to_message_id, correlation_id, message_workflow, inbound_message_data)
+            await self.handle_forward_reliable_unsolicited_request(message_id, correlation_id, message_workflow, inbound_message_data)
         # If not, then something has gone wrong
         else:
-            logger.error('No work description found in state store for message with {workflow} , unsolicited '
-                         'message received unexpectedly from Spine.',
+            logger.error('Received unsolicited message for a workflow {workflow} that does not support unsolicited messaging',
                          fparams={'workflow': interaction_details['workflow']})
-            raise tornado.web.HTTPError(500, 'No work description in state store, unsolicited message '
-                                             'received from Spine',
-                                        reason="Unknown message reference")
+            raise tornado.web.HTTPError(500, 'Unsolicited messaging is not supported for this interaction type',
+                                        reason="Unsolicited messaging not supported for this interaction")
 
-    async def handle_forward_reliable_unsolicited_request(self,
-                                                          ref_to_message_id: str,
-                                                          correlation_id: str,
+    async def handle_forward_reliable_unsolicited_request(self, message_id: str, correlation_id: str,
                                                           forward_reliable_workflow: workflow.AsynchronousForwardReliableWorkflow,
                                                           inbound_message_data: InboundMessageData):
         logger.info('Received unsolicited inbound request for the forward-reliable workflow. Passing the '
                     'request to forward-reliable workflow.')
-
         try:
-            await forward_reliable_workflow.handle_unsolicited_inbound_message(
-                ref_to_message_id, correlation_id, inbound_message_data)
+            await forward_reliable_workflow.handle_unsolicited_inbound_message(message_id, correlation_id, inbound_message_data)
         except Exception as e:
             logger.exception('Exception in workflow')
             raise tornado.web.HTTPError(500, 'Error occurred during message processing, failed to complete workflow',
@@ -174,24 +168,29 @@ class InboundHandler(base_handler.BaseHandler):
 
     def _extract_message_id(self, message):
         """
-        Extracts the message id of the inbound message and assigns it as the inbound message Id in logging
+        Extracts the message id of the inbound message, this is to be included in the standard log format
         :param message:
         :return: the inbound message id assigned to this message by sender
         """
-        inbound_message_id = message.message_dictionary[MESSAGE_ID]
-        mdc.inbound_message_id.set(inbound_message_id)
-        logger.info("Found inbound message id '%s' on request.", inbound_message_id)
+        message_id = message.message_dictionary[MESSAGE_ID]
+        mdc.inbound_message_id.set(message_id)
+        logger.info('Found inbound message id on request.')
+        return message_id
 
-    def _extract_ref_message(self, message):
+    def _extract_ref_message(self, message) -> Optional[str]:
         """
         Extracts the reference-to message id and assigns it as the message Id in logging
         :param message:
-        :return: the message id the inbound message is a response to
+        :return: the ref-to message id from the inbound reply or None for unsolicited messages
         """
-        message_id = message.message_dictionary[RECEIVED_MESSAGE_ID]
-        mdc.message_id.set(message_id)
-        logger.info("Found message id '%s' inbound message.", message_id)
-        return message_id
+        if RECEIVED_MESSAGE_ID in message.message_dictionary:
+            message_id = message.message_dictionary[RECEIVED_MESSAGE_ID]
+            mdc.message_id.set(message_id)
+            logger.info('Found "reference to" message id on inbound message.')
+            return message_id
+        logger.info('Inbound message did not contain a "reference to" message id')
+        return None
+
 
     def _extract_interaction_id(self, message):
         """
