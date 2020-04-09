@@ -35,11 +35,11 @@ Content-Transfer-Encoding: 8bit
 			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
 		</eb:Reference>
 		<eb:Reference xlink:href="cid:8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk">
-            <eb:Description xml:lang="en">Some description</eb:Description>
-        </eb:Reference>
-        <eb:Reference xlink:href="cid:64A73E03-30BD-4231-9959-0C4B54400345@spine.nhs.uk">
-            <eb:Description xml:lang="en">Another description</eb:Description>
-        </eb:Reference>
+			<eb:Description xml:lang="en">Some description</eb:Description>
+		</eb:Reference>
+		<eb:Reference xlink:href="cid:64A73E03-30BD-4231-9959-0C4B54400345@spine.nhs.uk">
+			<eb:Description xml:lang="en">Another description</eb:Description>
+		</eb:Reference>
 	</eb:Manifest>
 </SOAP:Body>
 </SOAP:Envelope>
