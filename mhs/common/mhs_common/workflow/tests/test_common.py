@@ -36,8 +36,7 @@ class DummyCommonWorkflow(common.CommonWorkflow):
                                       ) -> Tuple[int, str]:
         pass
 
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str, attachments: Optional[List[dict]], manifest: Optional[str]):
+    async def handle_inbound_message(self,  message_id: str, correlation_id: str, work_description: wd.WorkDescription, inbound_message_data: InboundMessageData):
         pass
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):

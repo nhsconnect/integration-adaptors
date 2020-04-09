@@ -1,7 +1,7 @@
 """This module defines the envelope used to wrap asynchronous messages to be sent to a remote MHS."""
 import copy
 from typing import Dict, Tuple, Any, Optional, NamedTuple
-from xml.etree.ElementTree import Element, register_namespace
+from xml.etree.ElementTree import Element
 
 import utilities.message_utilities as message_utilities
 from utilities import integration_adaptors_logger as log
@@ -28,18 +28,10 @@ DESCRIPTION = "description"
 EBXML_NAMESPACE = "eb"
 SOAP_NAMESPACE = "SOAP"
 XLINK_NAMESPACE = "xlink"
-XSI_NAMESPACE = "xsi"
-HL7EBXML_NAMESPACE = "hl7ebxml"
 
-NAMESPACES = {
-    SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
-    EBXML_NAMESPACE: "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd",
-    XLINK_NAMESPACE: "http://www.w3.org/1999/xlink",
-    XSI_NAMESPACE: "http://www.w3c.org/2001/XML-Schema-Instance",
-    HL7EBXML_NAMESPACE: "urn:hl7-org:transport/ebxml/DSTUv1.0",
-}
-
-[register_namespace(k, v) for k, v in NAMESPACES.items()]
+NAMESPACES = {SOAP_NAMESPACE: "http://schemas.xmlsoap.org/soap/envelope/",
+              EBXML_NAMESPACE: "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd",
+              XLINK_NAMESPACE: "http://www.w3.org/1999/xlink"}
 
 
 class EbxmlEnvelope(envelope.Envelope):

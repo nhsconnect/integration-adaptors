@@ -1,7 +1,9 @@
 """This module defines the synchronous workflow."""
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional
 import utilities.integration_adaptors_logger as log
 from tornado import httpclient
+
+from mhs_common.workflow.InboundMessageData import InboundMessageData
 from utilities import timing
 from mhs_common import workflow
 from mhs_common.errors.soap_handler import handle_soap_error
@@ -68,7 +70,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                                                                 interaction_details=interaction_details,
                                                                                 message=payload)
         except Exception:
-            logger.error('Failed to prepare outbound message')
+            logger.exception('Failed to prepare outbound message')
             await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
             return 500, 'Failed message preparation', None
 
@@ -128,8 +130,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
         envelope = soap_envelope.SoapEnvelope(message_details)
         return envelope.serialize()
 
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str, attachments: Optional[List[dict]], manifest: Optional[str]):
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription, inbound_message_data: InboundMessageData):
         raise NotImplementedError('This method is not supported for the synchronous message workflow as there is no '
                                   'inbound message')
 

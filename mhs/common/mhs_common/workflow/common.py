@@ -7,6 +7,7 @@ import utilities.integration_adaptors_logger as log
 import mhs_common.state.work_description as wd
 from mhs_common.messages import ebxml_envelope
 from mhs_common.routing import routing_reliability
+from mhs_common.workflow.InboundMessageData import InboundMessageData
 
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
@@ -56,16 +57,14 @@ class CommonWorkflow(abc.ABC):
 
     @abc.abstractmethod
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str, attachments: Optional[List[dict]], manifest: Optional[str]):
+                                     inbound_message_data: InboundMessageData):
         """
         Handles an inbound message from an external system (typically from spine)
 
         :param message_id: ID of the message the original request to Spine was made with
         :param correlation_id: correlation ID of the request
         :param work_description: work description object for the payload
-        :param payload: payload to handle
-        :param attachments: attachments from the received message
-        :param manifest: message manifest
+        :param inbound_message_data: object consolidating the ebXML, payload and attachments
         """
         pass
 
