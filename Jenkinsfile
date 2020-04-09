@@ -145,6 +145,13 @@ pipeline {
                                 }
                             }
                         }
+                        stage('Build docker image') {
+                            steps {
+                                dir('integration-tests/fake_spine') {
+                                      sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} ." )
+                                }
+                            }
+                        }
                         stage('Push image') {
                             steps {
                                 script {
