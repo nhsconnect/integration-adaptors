@@ -328,8 +328,16 @@ pipeline {
                                              "mhs_state_bucket":   "${TF_STATE_BUCKET}",
                                              "task_role_arn":      "${TASK_ROLE}",
                                              "task_scaling_role_arn":          "${TASK_SCALING_ROLE}",
-                                             "fake_spine_alb_certificate_arn": "${FAKESPINE_ALB_CERT_ARN}" //TODO Check if this can be set with data resource
+                                             "fake_spine_alb_certificate_arn": "${FAKESPINE_ALB_CERT_ARN}", //TODO Check if this can be set with data resource
+                                             "inbound_server_base_url":        "${FAKESPINE_INBOUND_URL}",
+                                             "outbound_delay_ms":              "${FAKESPINE_OUTBOUND_DELAY}",
+                                             "inbound_delay_ms":               "${FAKESPINE_INBOUND_DELAY}",
+                                             "fake_spine_certificate":         "${FAKESPINE_CERTIFICATE}",
+                                             "fake_spine_private_key":         "${FAKESPINE_PRIVATE_KEY}",
+                                             "fake_spine_ca_store":            "${FAKESPINE_CA_STORE}",
+                                             "party_key_arn":                  "${FAKESPINE_PARTY_KEY}"
                                         ]
+
                                         sh(label:"Terraform: init", script: initCommand)
                                         terraform("plan",  "fakespine", ["-no-color"],                  tfVariables )
                                         terraform("apply", "fakespine", ["-no-color", "-auto-approve"], tfVariables )

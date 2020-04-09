@@ -61,3 +61,38 @@ variable "task_scaling_role_arn" {
   type = string
   description = "ARN of the IAM role for ECS to use when auto-scaling services"
 }
+
+variable "inbound_server_base_url" {
+  type = string
+  description = "URL of the inbound server"
+}
+
+variable "outbound_delay_ms" {
+  type = number
+  description = "Delay in miliseconds for outgoing communication"
+}
+
+variable "inbound_delay_ms" {
+  type = number
+  description = "Delay in miliseconds for incoming communication"
+}
+
+variable "fake_spine_private_key" {
+  type = string
+  description = "Private key for certificate used by fake spine"
+}
+
+variable "fake_spine_certificate" {
+  type = string
+  description = "Certificate for fake spine"
+}
+
+variable "fake_spine_ca_store" {
+  type = string
+  description = "CA store for fake spine"
+}
+
+variable "party_key_arn" {
+  type = string
+  description = "Secret key for communication with MHS"
+}

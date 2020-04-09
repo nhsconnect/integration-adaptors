@@ -33,24 +33,24 @@ resource "aws_security_group_rule" "fake_spine_security_group_vpc_endpoints_egre
 # }
 
 # Egress rule to allow requests to ECR (to pull the MHS outbound image to run)
-resource "aws_security_group_rule" "fake_spine_security_group_ecr_egress_rule" {
-  security_group_id = aws_security_group.fake_spine_security_group.id
-  type = "egress"
-  from_port = 443
-  to_port = 443
-  protocol = "tcp"
-  source_security_group_id = data.terraform_remote_state.mhs.outputs.ecr_vpce_security_group_id
-  description = "HTTPS connections to ECR endpoint."
-}
+# resource "aws_security_group_rule" "fake_spine_security_group_ecr_egress_rule" {
+#   security_group_id = aws_security_group.fake_spine_security_group.id
+#   type = "egress"
+#   from_port = 443
+#   to_port = 443
+#   protocol = "tcp"
+#   source_security_group_id = data.terraform_remote_state.mhs.outputs.ecr_vpce_security_group_id
+#   description = "HTTPS connections to ECR endpoint."
+# }
 
-# # Egress rule to allow writing logs to Cloudwatch
-resource "aws_security_group_rule" "fake_spine_security_group_cloudwatch_egress_rule" {
-  security_group_id = aws_security_group.fake_spine_security_group.id
-  type = "egress"
-  from_port = 443
-  to_port = 443
-  protocol = "tcp"
-  //source_security_group_id = aws_security_group.cloudwatch_security_group.id
-  source_security_group_id = data.terraform_remote_state.mhs.outputs.cloudwatch_vpce_security_group_id
-  description = "HTTPS connections to Cloudwatch endpoint"
-}
+# # # Egress rule to allow writing logs to Cloudwatch
+# resource "aws_security_group_rule" "fake_spine_security_group_cloudwatch_egress_rule" {
+#   security_group_id = aws_security_group.fake_spine_security_group.id
+#   type = "egress"
+#   from_port = 443
+#   to_port = 443
+#   protocol = "tcp"
+#   //source_security_group_id = aws_security_group.cloudwatch_security_group.id
+#   source_security_group_id = data.terraform_remote_state.mhs.outputs.cloudwatch_vpce_security_group_id
+#   description = "HTTPS connections to Cloudwatch endpoint"
+# }

@@ -8,7 +8,7 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
       image = "${var.ecr_address}/fake-spine:fake-spine-${var.build_id}"
       #image = "067756640211.dkr.ecr.eu-west-2.amazonaws.com/fake-spine:route-PR-188-2-f1135b2" //TODO, for testing, change to build_id later
       environment = local.fake_spine_base_environment_variables
-      secrets = []
+      secrets = local.fake_spine_secret_environment_variables
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
