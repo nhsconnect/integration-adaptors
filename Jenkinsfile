@@ -1,6 +1,6 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
-Boolean runBuild           = false
+Boolean runBuild           = true
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
 Boolean runTerraform       = true
@@ -131,6 +131,31 @@ pipeline {
                             steps {
                                 script {
                                     sh label: 'Pushing spine route lookup image', script: "packer build -color=false pipeline/packer/spineroutelookup.json"
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Fake Spine') {
+                    stages {
+                        stage('Build') {
+                            steps {
+                                dir('integration-tests/fake_spine') {
+                                    buildModules('Installing fake spine')
+                                }
+                            }
+                        }
+                        stage('Build docker image') {
+                            steps {
+                                dir('integration-tests/fake_spine') {
+                                      sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} ." )
+                                }
+                            }
+                        }
+                        stage('Push image') {
+                            steps {
+                                script {
+                                    sh label: 'Pushing fake spine lookup image', script: "packer build -color=false pipeline/packer/fake-spine-push.json"
                                 }
                             }
                         }

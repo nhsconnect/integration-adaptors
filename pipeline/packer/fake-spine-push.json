@@ -1,14 +1,14 @@
 {
-  "_description": "This template pushes an inbound image.",
+  "_description": "This template pushes a Fakespine image.",
   "variables": {
     "registry": "{{env `DOCKER_REGISTRY`}}",
-    "repository": "/mhs/inbound",
+    "repository": "/fake-spine",
     "tag": "{{env `BUILD_TAG`}}"
   },
   "builders": [
     {
       "type": "docker",
-      "image": "local/mhs-inbound:{{user `tag`}}",
+      "image": "local/fake-spine:{{user `tag`}}",
       "pull": false,
       "commit": true
     }
