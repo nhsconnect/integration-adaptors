@@ -1,5 +1,6 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
+Boolean runBuildCommon     = true
 Boolean runBuild           = false
 Boolean runUnitTest        = false
 Boolean runIntegrationTest = false
@@ -29,7 +30,7 @@ pipeline {
     stages {
         stage('Build & test common') {
             when {
-              expression { runBuild }
+              expression { runBuildCommon }
             }
             steps {
                 dir('common') {
