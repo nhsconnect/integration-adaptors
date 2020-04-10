@@ -34,7 +34,7 @@ class MeshOutboundWrapper:
     @timing.time_function
     async def send(self, message):
         await self._publish_message_to_inbound_queue(message)
-        pass
+
 
 
 

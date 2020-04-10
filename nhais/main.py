@@ -29,7 +29,6 @@ def start_tornado_server() -> None:
         tornado_io_loop.start()
     except KeyboardInterrupt:
         logger.warning('Keyboard interrupt')
-        pass
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)
