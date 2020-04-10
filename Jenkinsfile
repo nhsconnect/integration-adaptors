@@ -359,8 +359,8 @@ pipeline {
                                         ]
 
                                         sh(label:"Terraform: init", script: initCommand)
-                                        terraform("destroy",  "fakespine", ["-no-color"],                  tfVariables )
-                                        //terraform("apply", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
+                                        //terraform("plan",  "fakespine", ["-no-color"],                  tfVariables )
+                                        terraform("destroy", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
                                     }
                                 }
                             }
