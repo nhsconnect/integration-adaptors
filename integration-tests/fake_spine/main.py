@@ -7,7 +7,6 @@ import tornado.ioloop
 import tornado.web
 from tornado.options import parse_command_line
 
-import utilities.integration_adaptors_logger as log
 from fake_spine import config, healthcheck_handler
 from fake_spine.certs import Certs
 from fake_spine.component_test_responses import component_test_responses
@@ -16,9 +15,16 @@ from fake_spine.request_handler import SpineRequestHandler
 from fake_spine.request_matching import SpineRequestResponseMapper
 from fake_spine.vnp_test_responses import vnp_test_responses
 
-logger = log.IntegrationAdaptorsLogger(__name__)
+logger = logging.getLogger(__name__)
+
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-AUDIT = 25
 
 
 def build_proxy_application(inbound_certs: Certs):
@@ -40,8 +46,7 @@ def build_application_configuration() -> SpineRequestResponseMapper:
     return SpineRequestResponseMapper(response_mappings)
 
 
-if __name__ == "__main__":
-    log.configure_logging("fakespine")
+def app():
     parse_command_line()
 
     logger.log(logging.INFO, "Building fakespine service configuration")
@@ -74,3 +79,10 @@ if __name__ == "__main__":
 
     logger.log(logging.INFO, "Starting fakespine service")
     tornado.ioloop.IOLoop.current().start()
+
+
+if __name__ == "__main__":
+    try:
+        app()
+    except Exception:
+        logger.exception("App crashed")
