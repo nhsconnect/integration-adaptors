@@ -33,6 +33,8 @@ Class | Method | HTTP request | Description
  - [NHSNumberVerificationStatus](.//Models/NHSNumberVerificationStatus.md)
  - [NHSNumberVerificationStatus2](.//Models/NHSNumberVerificationStatus2.md)
  - [NHSNumberVerificationStatus2Coding](.//Models/NHSNumberVerificationStatus2Coding.md)
+ - [OperationIdentifier](.//Models/OperationIdentifier.md)
+ - [OperationIdentifierExtension](.//Models/OperationIdentifierExtension.md)
  - [OperationOutcome](.//Models/OperationOutcome.md)
  - [OperationOutcomeIssue](.//Models/OperationOutcomeIssue.md)
  - [Patient](.//Models/Patient.md)

@@ -1,0 +1,30 @@
+type: object
+description: Wrapper object for asynchronous operation identifiers.
+required:
+  - url
+  - extension
+properties:
+  url:
+    type: string
+    description: Definition of OperationIdentifier extension.
+    default: https://TODO.COM/ExtensionNhais-OperationIdentifier
+    readOnly: true
+  extension:
+    type: object
+    description: "Asynchronous operation identifiers. TODO: Could optionally include NHAIS-specific IDs if needed to support queries from HA"
+    required:
+      - operationId
+    properties:
+      operationId:
+        type: string
+        description: The identifier (UUID) of the accepted transaction
+        pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+      tn:
+        type: string
+        description: Transaction number used by EDIFACT messaging
+      sis:
+        type: string
+        description: Send interchange sequence used by EDIFACT messaging
+      sms:
+        type: string
+        decription: Send message sequence used by EDIFACT messaging

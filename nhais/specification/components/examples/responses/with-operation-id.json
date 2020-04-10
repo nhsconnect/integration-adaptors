@@ -1,0 +1,10 @@
+{
+  "resourceType": "OperationOutcome",
+  "id": "1019049583",
+  "extension": [
+    {
+      "url": "https://TODO.COM/ExtensionNhais-OperationIdentifier",
+      "operationId": "352dc6db-e98a-4d71-acba-864b1ea488ec"
+    }
+  ]
+}
