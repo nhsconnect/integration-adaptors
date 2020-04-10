@@ -11,7 +11,7 @@ import utilities.integration_adaptors_logger as log
 from comms import proton_queue_adaptor
 from mhs_common import workflow
 from mhs_common.configuration import configuration_manager
-from mhs_common.request import healthcheck_handler
+from requests import healthcheck_handler
 from mhs_common.state import persistence_adaptor
 from mhs_common.state.persistence_adaptor_factory import get_persistence_adaptor
 from utilities import secrets, certs
