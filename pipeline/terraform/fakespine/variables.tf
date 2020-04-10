@@ -101,3 +101,8 @@ variable "fake_spine_outbound_ssl" {
   type = string
   description ="Should the SSL on fake spine service be enabled"
 }
+
+variable "fake_spine_port" {
+  type = string
+  description = "Port on which tne service will listen to connections"
+}

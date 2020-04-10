@@ -15,6 +15,6 @@ RUN pip install pipenv
 RUN pipenv install --deploy --ignore-pipfile
 COPY . .
 EXPOSE 80 443
-CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND"]
-#ENTRYPOINT ["pipenv", "run", "start", "--logging=DEBUG"]
+#CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND"]
+ENTRYPOINT ["pipenv", "run", "start", "--logging=DEBUG"]
 #ENTRYPOINT echo "Starting up, env variables:";  env | grep FAKE_SPINE ; pipenv run start --logging=DEBUG
