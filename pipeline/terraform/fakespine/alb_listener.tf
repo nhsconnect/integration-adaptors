@@ -3,8 +3,8 @@ resource "aws_lb_listener" "fake_spine_alb_listener" {
   load_balancer_arn = aws_lb.fake_spine_alb.arn
   port = 443
   protocol = "HTTPS"
-  //ssl_policy = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  //certificate_arn = var.fake_spine_alb_certificate_arn
+  ssl_policy = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = var.fake_spine_alb_certificate_arn
 
   default_action {
     type = "forward"
