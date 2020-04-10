@@ -58,8 +58,7 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
   memory = "1024"
   network_mode = "awsvpc"
   requires_compatibilities = [
-    //"FARGATE"
-    "EC2"
+    "FARGATE"
   ]
   tags = {
     Name = "${var.environment_id}-fake-spine-task"

@@ -2,12 +2,12 @@
 # VPC's subnets. Each container is register with the route service's LB's target group.
 resource "aws_ecs_service" "fake_spine_service" {
   name = "${var.environment_id}-fake-spine"
-  cluster = "arn:aws:ecs:eu-west-2:067756640211:cluster/testing-fake-spine"
-  //cluster = data.terraform_remote_state.mhs.outputs.cluster_id
+  //cluster = "arn:aws:ecs:eu-west-2:067756640211:cluster/testing-fake-spine"
+  cluster = data.terraform_remote_state.mhs.outputs.cluster_id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
   desired_count = var.fake_spine_service_minimum_instance_count
-  //launch_type = "FARGATE"
+  launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.fake_spine_task.arn
 
