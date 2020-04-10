@@ -320,9 +320,7 @@ pipeline {
                         }
                         stage('Build docker image') {
                             steps {
-                                dir('integration-tests/fake_spine') {
-                                      sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} -f ./integration-tests/fake_spine/Dockerfile ." )
-                                }
+                                sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} -f ./integration-tests/fake_spine/Dockerfile ." )
                             }
                         }
                         stage('Push image') {
