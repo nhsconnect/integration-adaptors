@@ -1,6 +1,7 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
 Boolean runBuild           = true
+Boolean runUnitTest        = false
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
 Boolean runTerraform       = true
@@ -64,6 +65,9 @@ pipeline {
                             }
                         }
                         stage('Unit test') {
+                            when {
+                                expression { runUnitTest }
+                            }
                             steps {
                                 dir('mhs/inbound') {
                                     executeUnitTestsWithCoverage()
@@ -89,6 +93,9 @@ pipeline {
                             }
                         }
                         stage('Unit test') {
+                            when {
+                                expression { runUnitTest }
+                            }
                             steps {
                                 dir('mhs/outbound') {
                                     executeUnitTestsWithCoverage()
@@ -121,6 +128,9 @@ pipeline {
                             }
                         }
                         stage('Unit test') {
+                            when {
+                                expression { runUnitTest }
+                            }
                             steps {
                                 dir('mhs/spineroutelookup') {
                                     executeUnitTestsWithCoverage()
