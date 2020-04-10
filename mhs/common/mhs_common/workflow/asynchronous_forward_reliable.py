@@ -5,7 +5,7 @@ import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from isodate import isoerror
-from mhs_common.retry import retriable_action
+from retry import retriable_action
 from mhs_common.workflow.common import MessageData
 from utilities import timing, config
 from utilities.date_utilities import DateUtilities
