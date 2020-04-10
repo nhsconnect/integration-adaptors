@@ -31,12 +31,12 @@ def get_test_message_dictionary():
 
 class TestEbXmlAckEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
-        expected_message = file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
+        expected_message = file_utilities.get_file_string(str(self.expected_message_dir / EXPECTED_EBXML))
         expected_http_headers = {
             'charset': 'UTF-8', 'SOAPAction': 'urn:oasis:names:tc:ebxml-msg:service/Acknowledgment',
             'Content-Type': 'text/xml'
@@ -53,8 +53,8 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         self.assertEqual(expected_http_headers, http_headers)
         xml_utilities.XmlUtilities.assert_xml_equal(expected_message_bytes, message_bytes)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_required_tags(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
@@ -69,20 +69,20 @@ class TestEbXmlAckEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                     envelope.serialize()
 
     def test_from_string(self):
-        message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_header.xml"))
+        message = file_utilities.get_file_string(str(self.message_dir / "ebxml_header.xml"))
 
         parsed_message = ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, message)
 
         self.assertEqual(EXPECTED_VALUES, parsed_message.message_dictionary)
 
     def test_from_string_with_no_values(self):
-        message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_header_empty.xml"))
+        message = file_utilities.get_file_string(str(self.message_dir / "ebxml_header_empty.xml"))
 
         with self.assertRaisesRegex(ebxml_envelope.EbXmlParsingError, "Weren't able to find required element"):
             ebxml_ack_envelope.EbxmlAckEnvelope.from_string({}, message)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_roundtrip(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP

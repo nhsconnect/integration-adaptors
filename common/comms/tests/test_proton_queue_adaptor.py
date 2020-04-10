@@ -19,7 +19,7 @@ TEST_EXCEPTION = Exception()
 TEST_SIDE_EFFECT = unittest.mock.Mock(side_effect=TEST_EXCEPTION)
 
 
-@unittest.mock.patch('utilities.message_utilities.MessageUtilities.get_uuid', new=lambda: TEST_UUID)
+@unittest.mock.patch('utilities.message_utilities.get_uuid', new=lambda: TEST_UUID)
 class TestProtonQueueAdaptor(unittest.TestCase):
     """Class to contain tests for the ProtonQueueAdaptor functionality."""
 
