@@ -47,13 +47,15 @@ def get_test_message_dictionary():
     }
 
 
-def expected_values(payload=None, ebxml=None):
+def expected_values(payload=None, ebxml=None, attachments=None):
     values = copy.deepcopy(EXPECTED_VALUES)
 
     if ebxml:
         values[ebxml_request_envelope.EBXML] = ebxml
     if payload:
         values[ebxml_request_envelope.MESSAGE] = payload
+    if attachments:
+        values[ebxml_request_envelope.ATTACHMENTS] += attachments
 
     return values
 
@@ -260,14 +262,14 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         with self.subTest("A valid request containing one textual attachment"):
             message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment')
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
-            expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
+            attachments = [{
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                 ebxml_request_envelope.ATTACHMENT_BASE64: False,
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
-            })
+            }]
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml, attachments=attachments)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -275,14 +277,14 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         with self.subTest("A valid request containing one textual attachment with application/xml content type"):
             message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_application_xml_content_type')
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
-            expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
+            attachments = [{
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                 ebxml_request_envelope.ATTACHMENT_BASE64: False,
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
-            })
+            }]
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml, attachments=attachments)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -290,8 +292,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         with self.subTest("A valid request containing one textual and one base64 attachment"):
             message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_multiple_attachments')
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
-            expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS] += [
+            attachments = [
                 {
                     ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                     ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
@@ -307,6 +308,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                     ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR'
                                                                '42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
                 }]
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml, attachments=attachments)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -361,8 +363,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest(f'A valid request without an AckRequested SOAP actor attribute'):
-            message = file_utilities.FileUtilities.get_file_string(
-                str(self.message_dir / 'ebxml_request_no_soap_actor.msg'))
+            message, _ = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_no_soap_actor')
 
             with self.assertRaisesRegex(
                     ebxml_envelope.EbXmlParsingError, "Weren't able to find required attribute actor"):
@@ -371,14 +372,14 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         with self.subTest("A valid request containing one attachment without a description has description defaulted "
                           "to an empty string"):
             message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_without_description')
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
-            expected_values_with_payload[ebxml_request_envelope.ATTACHMENTS].append({
+            attachments = [{
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                 ebxml_request_envelope.ATTACHMENT_BASE64: False,
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: '',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
-            })
+            }]
+            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml, attachments=attachments)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
