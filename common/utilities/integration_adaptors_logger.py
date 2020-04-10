@@ -103,7 +103,7 @@ def configure_logging(project_name: str = None):
 
     logging.addLevelName(AUDIT, "AUDIT")
     logger = logging.getLogger()
-    log_level = config.get_config('LOG_LEVEL')
+    log_level = config.get_config('LOG_LEVEL', default='INFO')
     logger.setLevel(log_level)
     handler = logging.StreamHandler(sys.stdout)
 
