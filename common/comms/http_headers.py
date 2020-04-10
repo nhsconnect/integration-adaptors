@@ -7,4 +7,3 @@ class HttpHeaders:
     FROM_ASID = "from-asid"
     SYNC_ASYNC = "sync-async"
     ODS_CODE = "ods-code"
-    TEST_ID = "Test-Id"
