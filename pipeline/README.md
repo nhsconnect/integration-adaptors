@@ -209,6 +209,7 @@ from this root domain). This domain name should not clash with any domain name o
 internal.somedomainyoucontrol.com"
 - MHS_OUTBOUND_HTTP_PROXY: The hostname of the HTTP proxy being used to route connections to Spine. E.g. an Opentest
 proxy machine.
+- MHS_OUTBOUND_VALIDATE_CERTIFICATE: Verification of the server certificate received when making a connection to the spine MHS.
 - MHS_INBOUND_QUEUE_URL: The host url of the amqp inbound queue broker. e.g. `amqps://example.com:port`. Note that if
 the amqp connection being used is a secured connection (which it should be in production), then the url should start
 with `amqps://` and not `amqp+ssl://`. This URL should not include the queue name.

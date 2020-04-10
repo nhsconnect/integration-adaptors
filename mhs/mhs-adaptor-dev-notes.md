@@ -65,6 +65,7 @@ contain sensitive information such as the content of messages being sent.
 * `MHS_OUTBOUND_TRANSMISSION_RETRY_DELAY` (outbound only) The delay between retries of outbound requests in milliseconds. If no value is given, a default of `100` is used.
 * `MHS_OUTBOUND_HTTP_PROXY` (outbound only) An optional http(s) proxy to route downstream requests via. Note that the proxy must passthrough https requests transparently.
 * `MHS_OUTBOUND_HTTP_PROXY_PORT` (outbound only) The http(s) proxy port to use. Ignored if `MHS_OUTBOUND_HTTP_PROXY` is not provided. Defaults to `3128`.
+* `MHS_OUTBOUND_VALIDATE_CERTIFICATE` (outbound only) Verification of the server certificate received when making a connection to the spine MHS.
 * `MHS_INBOUND_QUEUE_URL` (inbound only) The host url of the amqp inbound queue broker. e.g. `amqps://example.com:port/queue-name`. Note that if the amqp connection being used is a secured connection (which it should be in production), then the url should start with `amqps://` and not `amqp+ssl://`.
 * `MHS_SECRET_INBOUND_QUEUE_USERNAME` (inbound only) The username to use when connecting to the amqp inbound queue.
 * `MHS_SECRET_INBOUND_QUEUE_PASSWORD` (inbound only) The password to use when connecting to the amqp inbound queue.

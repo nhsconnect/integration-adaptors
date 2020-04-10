@@ -1,6 +1,5 @@
-//SET ASID TO ONE YOU WERE GIVEN
-
 {
+    "python.pythonPath": "/usr/local/bin/python3",
     "workbench.settings.editor": "json",
     "workbench.settings.useSplitJSON": true,
     "rest-client.environmentVariables": {

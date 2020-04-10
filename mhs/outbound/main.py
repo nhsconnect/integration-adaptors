@@ -1,24 +1,25 @@
 import pathlib
 from typing import Dict
 
-import definitions
-import mhs_common.configuration.configuration_manager as configuration_manager
 import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+
+import definitions
+import mhs_common.configuration.configuration_manager as configuration_manager
+import outbound.request.synchronous.handler as client_request_handler
 import utilities.integration_adaptors_logger as log
+from requests import healthcheck_handler
 from mhs_common import workflow
-from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state.persistence_adaptor_factory import get_persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
+from outbound.transmission import outbound_transmission
 from utilities import config, certs
 from utilities import secrets
-
-import outbound.request.synchronous.handler as client_request_handler
-from outbound.transmission import outbound_transmission
+from utilities.string_utilities import str2bool
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -140,13 +141,14 @@ def main():
                                                   ca_certs=secrets.get_secret_config('CA_CERTS'))
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
+    validate_cert = str2bool(config.get_config('OUTBOUND_VALIDATE_CERTIFICATE', default=str(True)))
     http_proxy_host = config.get_config('OUTBOUND_HTTP_PROXY', default=None)
     http_proxy_port = None
     if http_proxy_host is not None:
         http_proxy_port = int(config.get_config('OUTBOUND_HTTP_PROXY_PORT', default="3128"))
     transmission = outbound_transmission.OutboundTransmission(certificates.local_cert_path,
                                                               certificates.private_key_path, certificates.ca_certs_path,
-                                                              max_retries, retry_delay, http_proxy_host,
+                                                              max_retries, retry_delay, validate_cert, http_proxy_host,
                                                               http_proxy_port)
 
     party_key = secrets.get_secret_config('PARTY_KEY')

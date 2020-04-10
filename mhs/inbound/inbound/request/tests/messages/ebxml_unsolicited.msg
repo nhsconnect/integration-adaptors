@@ -20,7 +20,6 @@ Content-Transfer-Encoding: 8bit
 		<eb:MessageData>
 			<eb:MessageId>C614484E-4B10-499A-9ACD-5D645CFACF61</eb:MessageId>
 			<eb:Timestamp>2019-05-04T20:55:16Z</eb:Timestamp>
-			<eb:RefToMessageId>B5D38C15-4981-4366-BDE9-8F56EDC4AB72</eb:RefToMessageId>
 		</eb:MessageData>
         <eb:DuplicateElimination/>
     </eb:MessageHeader>

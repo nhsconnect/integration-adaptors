@@ -187,7 +187,7 @@ class TestHTTPWrapperTimeUtilities(AsyncHTTPTestCase):
     def _assert_handler_data(self, response, expected_code, expected_body, expected_func_name, log_mock):
         self.assertEqual(response.code, expected_code)
         if expected_body:
-            self.assertEqual(response.body.decode('utf8'), expected_body)
+            self.assertEqual(response.body.decode(), expected_body)
         log_mock.info.assert_called_with('{FuncName} from {Handler} took {Duration} seconds',
                                          fparams={
                                              'FuncName': expected_func_name,
