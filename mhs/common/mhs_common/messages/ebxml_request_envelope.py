@@ -9,7 +9,6 @@ import email.message
 import email.policy
 from typing import Dict, Tuple, Union, List, Sequence, Generator
 from xml.etree.ElementTree import Element
-from xml.etree import ElementTree
 
 from builder import pystache_message_builder
 from defusedxml import ElementTree
