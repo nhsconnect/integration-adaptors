@@ -21,6 +21,5 @@ def get_persistence_adaptor(*args, **kwargs) -> PersistenceAdaptor:
     :return: new instance of persistence adaptor
     """
     persistence_adaptor = config.get_config('PERSISTENCE_ADAPTOR', default=_DEFAULT_ADAPTOR)
-    logger.info("Building persistence adaptor using '{persistence_adaptor}' type",
-                {'persistence_adaptor': persistence_adaptor})
+    logger.info("Building persistence adaptor using '%s' type", persistence_adaptor)
     return _PERSISTENCE_ADAPTOR_TYPES[persistence_adaptor.lower()](*args, **kwargs)

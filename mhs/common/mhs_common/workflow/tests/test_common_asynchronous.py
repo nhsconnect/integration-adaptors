@@ -2,6 +2,7 @@ import unittest
 from typing import Optional, Tuple
 from unittest import mock
 
+from mhs_common.workflow.common import MessageData
 from utilities import test_utilities
 from utilities.test_utilities import async_test
 
@@ -29,8 +30,11 @@ class DummyCommonAsynchronousWorkflow(common_asynchronous.CommonAsynchronousWork
                                       ) -> Tuple[int, str]:
         pass
 
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
+    async def handle_inbound_message(self,
+                                     message_id: str,
+                                     correlation_id: str,
+                                     work_description: wd.WorkDescription,
+                                     message_data: MessageData):
         pass
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
