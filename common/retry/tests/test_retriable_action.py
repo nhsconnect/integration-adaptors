@@ -3,7 +3,7 @@ from unittest import mock
 
 from utilities import test_utilities
 
-from common.retry import retriable_action
+from retry import retriable_action
 
 DEFAULT_RETRIES = 3
 DEFAULT_DELAY = 0.1
