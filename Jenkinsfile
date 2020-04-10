@@ -1,6 +1,6 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
-Boolean runBuild           = true
+Boolean runBuild           = false
 Boolean runUnitTest        = false
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
@@ -141,34 +141,6 @@ pipeline {
                             steps {
                                 script {
                                     sh label: 'Pushing spine route lookup image', script: "packer build -color=false pipeline/packer/spineroutelookup.json"
-                                }
-                            }
-                        }
-                    }
-                }
-                stage('Fake Spine') {
-                    when {
-                        expression { buildFakespine }
-                    }
-                    stages {
-                        stage('Build') {
-                            steps {
-                                dir('integration-tests/fake_spine') {
-                                    buildModules('Installing fake spine')
-                                }
-                            }
-                        }
-                        stage('Build docker image') {
-                            steps {
-                                dir('integration-tests/fake_spine') {
-                                      sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} ." )
-                                }
-                            }
-                        }
-                        stage('Push image') {
-                            steps {
-                                script {
-                                    sh label: 'Pushing fake spine lookup image', script: "packer build -color=false pipeline/packer/fake-spine-push.json"
                                 }
                             }
                         }
@@ -332,6 +304,36 @@ pipeline {
                                 }
                             }
                         }
+                        //Moved from build section to speed up deployment
+                stage('Build Fake Spine') {
+                    when {
+                        expression { buildFakespine }
+                    }
+                    stages {
+                        stage('Build') {
+                            steps {
+                                dir('integration-tests/fake_spine') {
+                                    buildModules('Installing fake spine')
+                                }
+                            }
+                        }
+                        stage('Build docker image') {
+                            steps {
+                                dir('integration-tests/fake_spine') {
+                                      sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} ." )
+                                }
+                            }
+                        }
+                        stage('Push image') {
+                            steps {
+                                script {
+                                    sh label: 'Pushing fake spine lookup image', script: "packer build -color=false pipeline/packer/fake-spine-push.json"
+                                }
+                            }
+                        }
+                    }
+                }
+
 
                         stage('Deploy FakeSpine') {
                             when {
