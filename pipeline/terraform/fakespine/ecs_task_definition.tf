@@ -44,8 +44,8 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
       }
       portMappings = [
         {
-          containerPort = var.fake_spine_port
-          hostPort = var.fake_spine_port
+          containerPort = tonumber(var.fake_spine_port)
+          hostPort = tonumber(var.fake_spine_port)
           protocol = "tcp"
         }
       ]
