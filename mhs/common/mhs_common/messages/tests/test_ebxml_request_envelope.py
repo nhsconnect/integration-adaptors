@@ -70,8 +70,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
     # Serialisation tests
     #####################
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_with_no_attachments(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
@@ -80,14 +80,14 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         message_id, http_headers, message = envelope.serialize()
 
-        normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+        normalized_message = file_utilities.normalize_line_endings(message)
 
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
         self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(self.normalized_expected_serialized_message, normalized_message)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_with_one_attachment(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.side_effect = ["8F1D7DE1-02AB-48D7-A797-A947B09F347F", test_ebxml_envelope.MOCK_UUID]
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
@@ -104,14 +104,14 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         message_id, http_headers, message = envelope.serialize()
 
         normalized_expected_message = self._get_expected_file_string('ebxml_request_one_attachment.xml')
-        normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+        normalized_message = file_utilities.normalize_line_endings(message)
 
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
         self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(normalized_expected_message, normalized_message)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_with_multiple_attachments(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.side_effect = [
             "8F1D7DE1-02AB-48D7-A797-A947B09F347F", "64A73E03-30BD-4231-9959-0C4B54400345",
@@ -139,14 +139,14 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         message_id, http_headers, message = envelope.serialize()
 
         normalized_expected_message = self._get_expected_file_string('ebxml_request_multiple_attachments.xml')
-        normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+        normalized_message = file_utilities.normalize_line_endings(message)
 
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
         self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(normalized_expected_message, normalized_message)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_message_id_not_generated(self, mock_get_uuid, mock_get_timestamp):
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
 
@@ -156,15 +156,15 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         message_id, http_headers, message = envelope.serialize()
 
-        normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+        normalized_message = file_utilities.normalize_line_endings(message)
 
         mock_get_uuid.assert_not_called()
         self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
         self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(self.normalized_expected_serialized_message, normalized_message)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_raises_error_when_required_tags_not_passed(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
@@ -178,8 +178,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 with self.assertRaisesRegex(pystache_message_builder.MessageGenerationError, 'Failed to find key'):
                     envelope.serialize()
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_raises_error_when_required_attachment_tags_not_passed(self, mock_get_uuid, mock_get_timestamp):
         mock_get_timestamp.return_value = test_ebxml_envelope.MOCK_TIMESTAMP
 
@@ -204,8 +204,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 with self.assertRaisesRegex(pystache_message_builder.MessageGenerationError, 'Failed to find key'):
                     envelope.serialize()
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_doesnt_include_xml_tag_when_corresponding_boolean_flag_set_to_false(self, mock_get_uuid,
                                                                                            mock_get_timestamp):
         mock_get_uuid.return_value = test_ebxml_envelope.MOCK_UUID
@@ -224,7 +224,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
                 message_id, http_headers, message = envelope.serialize()
 
-                normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+                normalized_message = file_utilities.normalize_line_endings(message)
 
                 self.assertEqual(test_ebxml_envelope.MOCK_UUID, message_id)
                 self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
@@ -237,7 +237,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
     def test_from_string_parses_valid_requests(self):
         with self.subTest("A valid request containing a payload"):
-            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request')
+            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request')
             expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
@@ -245,7 +245,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest("A multi-part MIME message with a defect in the payload"):
-            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_payload_defect')
+            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request_payload_defect')
             expected_values_with_test_payload = expected_values(ebxml=ebxml, payload="mock-payload")
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
@@ -253,7 +253,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_test_payload, parsed_message.message_dictionary)
 
         with self.subTest("A valid request that does not contain the optional payload MIME part"):
-            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_no_payload')
+            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request_no_payload')
             expected_values_with_no_payload = expected_values(ebxml=ebxml, payload=None)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
@@ -261,7 +261,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_no_payload, parsed_message.message_dictionary)
 
         with self.subTest("A valid request containing one textual attachment"):
-            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment')
+            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment')
             attachments = [{
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
@@ -277,7 +277,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest("A valid request containing one textual attachment with application/xml content type"):
-            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_application_xml_content_type')
+            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_application_xml_content_type')
             attachments = [{
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
@@ -293,7 +293,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest("A valid request containing one textual and one base64 attachment"):
-            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_multiple_attachments')
+            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request_multiple_attachments')
             attachments = [
                 {
                     ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
@@ -332,7 +332,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         ]
         for sub_test_name, filename in sub_tests:
             with self.subTest(sub_test_name):
-                message = file_utilities.FileUtilities.get_file_string(
+                message = file_utilities.get_file_string(
                     str(self.message_dir / filename))
 
                 with self.assertRaises(ebxml_envelope.EbXmlParsingError):
@@ -345,7 +345,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
         ]
         for element_name, filename, key in sub_tests:
             with self.subTest(f'A valid request without a {element_name} element'):
-                message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, filename)
+                message, ebxml = message_utilities.load_test_data(self.message_dir, filename)
 
                 expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE)
                 expected_values_with_payload[key] = False
@@ -356,7 +356,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest(f'A valid request without an AckRequested element'):
-            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_no_ack_requested')
+            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request_no_ack_requested')
             expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE)
             expected_values_with_payload[ebxml_request_envelope.ACK_REQUESTED] = False
             del expected_values_with_payload[ebxml_request_envelope.ACK_SOAP_ACTOR]
@@ -366,7 +366,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest(f'A valid request without an AckRequested SOAP actor attribute'):
-            message, _ = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_no_soap_actor')
+            message, _ = message_utilities.load_test_data(self.message_dir, 'ebxml_request_no_soap_actor')
 
             with self.assertRaisesRegex(
                     ebxml_envelope.EbXmlParsingError, "Weren't able to find required attribute actor"):
@@ -374,7 +374,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         with self.subTest("A valid request containing one attachment without a description has description defaulted "
                           "to an empty string"):
-            message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_without_description')
+            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_without_description')
             attachments = [{
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
@@ -396,5 +396,5 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
     def _get_expected_file_string(self, filename: str):
         # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
         # file, so normalize the line endings of the strings being compared
-        return file_utilities.FileUtilities.normalize_line_endings(
-            file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / filename)))
+        return file_utilities.normalize_line_endings(
+            file_utilities.get_file_string(str(self.expected_message_dir / filename)))

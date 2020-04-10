@@ -1,5 +1,5 @@
 import unittest
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple
 from unittest import mock
 
 from mhs_common.workflow.common import MessageData

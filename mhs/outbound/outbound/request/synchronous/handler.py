@@ -195,7 +195,7 @@ class SynchronousHandler(base_handler.BaseHandler):
     def _extract_message_id(self):
         message_id = self.request.headers.get(HttpHeaders.MESSAGE_ID, None)
         if not message_id:
-            message_id = message_utilities.MessageUtilities.get_uuid()
+            message_id = message_utilities.get_uuid()
             mdc.message_id.set(message_id)
             logger.info("Didn't receive message id in incoming request from supplier, so have generated a new one.")
         else:
@@ -206,7 +206,7 @@ class SynchronousHandler(base_handler.BaseHandler):
     def _extract_correlation_id(self):
         correlation_id = self.request.headers.get(HttpHeaders.CORRELATION_ID, None)
         if not correlation_id:
-            correlation_id = message_utilities.MessageUtilities.get_uuid()
+            correlation_id = message_utilities.get_uuid()
             mdc.correlation_id.set(correlation_id)
             logger.info("Didn't receive correlation id in incoming request from supplier, so have generated a new one.")
         else:

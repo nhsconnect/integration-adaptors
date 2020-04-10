@@ -102,7 +102,6 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                             self.persistence_store_retries)
 
         try:
-            #TODO: check if need to add attachments and manifest as well
             await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: message_data.payload})
             logger.info('Placed message in sync-async store successfully')
             await wd.update_status_with_retries(work_description,

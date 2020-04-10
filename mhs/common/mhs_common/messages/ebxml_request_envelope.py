@@ -102,7 +102,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         """
         attachment: dict
         for attachment in message_dictionary.setdefault(ATTACHMENTS, []):
-            attachment[ATTACHMENT_CONTENT_ID] = f'{message_utilities.MessageUtilities.get_uuid()}@spine.nhs.uk'
+            attachment[ATTACHMENT_CONTENT_ID] = f'{message_utilities.get_uuid()}@spine.nhs.uk'
             try:
                 attachment[ATTACHMENT_CONTENT_TRANSFER_ENCODING] = 'base64' if attachment.pop(ATTACHMENT_BASE64) \
                     else '8bit'

@@ -11,7 +11,7 @@ from tornado import httpclient
 
 from mhs_common.workflow.common import MessageData
 from utilities import test_utilities
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_forward_reliable as forward_reliable
@@ -295,7 +295,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-        message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+        message = file_utilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
         response = httpclient.HTTPResponse
         response.code = 500
@@ -423,7 +423,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-        message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+        message = file_utilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
         response = httpclient.HTTPResponse
         response.code = 500
@@ -463,7 +463,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                     response = mock.MagicMock()
                     response.code = 500
                     response.headers = {'Content-Type': 'text/xml'}
-                    response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
+                    response.body = file_utilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
                     self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
                     with mock.patch('utilities.config.get_config',
@@ -503,7 +503,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         error_response = mock.MagicMock()
         error_response.code = 500
         error_response.headers = {'Content-Type': 'text/xml'}
-        error_response.body = FileUtilities.get_file_string(
+        error_response.body = file_utilities.get_file_string(
             Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
         success_response = mock.MagicMock()
@@ -529,7 +529,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         response.code = 500
         response.headers = {'Content-Type': 'text/xml'}
         # a non retriable soap 300 error code
-        response.body = FileUtilities.get_file_string(
+        response.body = file_utilities.get_file_string(
             Path(self.test_message_dir) / 'soapfault_response_single_error_300.xml')
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 

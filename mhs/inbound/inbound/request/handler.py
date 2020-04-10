@@ -89,14 +89,14 @@ class InboundHandler(base_handler.BaseHandler):
                                         reason=f'Exception in workflow') from e
 
     async def _get_work_description_from_store(self, message_id: str):
-        try:
-            work_description = await wd.get_work_description_from_store(self.work_description_store, message_id)
+        work_description = await wd.get_work_description_from_store(self.work_description_store, message_id)
+        if work_description:
             logger.info(f'Retrieved work description for message {message_id} from state store')
             return work_description
-        except wd.EmptyWorkDescriptionError as e:
+        else:
             logger.error(f'No work description found in state store for message {message_id}')
             raise tornado.web.HTTPError(500, f'Unknown message reference {message_id}',
-                                        reason="Unknown message reference") from e
+                                        reason="Unknown message reference")
 
     async def _handle_unsolicited_message(self, message_id: str, correlation_id: str,
                                           interaction_id: str, message_data: MessageData):

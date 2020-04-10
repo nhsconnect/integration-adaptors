@@ -9,7 +9,7 @@ import exceptions
 from comms import proton_queue_adaptor
 from mhs_common.workflow.common import MessageData
 from utilities import test_utilities
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_express as async_express
@@ -270,7 +270,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-        message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+        message = file_utilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
         response = mock.MagicMock()
         response.code = 500
