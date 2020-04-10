@@ -320,9 +320,7 @@ pipeline {
                         }
                         stage('Build docker image') {
                             steps {
-                                dir('integration-tests/fake_spine') {
-                                      sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} ." )
-                                }
+                                sh ( label: "Build the Docker image for fake spine", script: "docker build -t local/fake-spine:${BUILD_TAG} -f ./integration-tests/fake_spine/Dockerfile ." )
                             }
                         }
                         stage('Push image') {
@@ -368,7 +366,8 @@ pipeline {
                                              "fake_spine_certificate":         "${FAKESPINE_CERTIFICATE}",
                                              "fake_spine_private_key":         "${FAKESPINE_PRIVATE_KEY}",
                                              "fake_spine_ca_store":            "${FAKESPINE_CA_STORE}",
-                                             "party_key_arn":                  "${FAKESPINE_PARTY_KEY}"
+                                             "party_key_arn":                  "${FAKESPINE_PARTY_KEY}",
+                                             "fake_spine_outbound_ssl":        "${FAKE_SPINE_OUTBOUND_SSL_ENABLED}"
                                         ]
 
                                         sh(label:"Terraform: init", script: initCommand)
