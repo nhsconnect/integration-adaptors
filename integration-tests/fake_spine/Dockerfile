@@ -9,6 +9,7 @@ RUN pip install pipenv
 
 COPY Pipfile Pipfile
 COPY Pipfile.lock Pipfile.lock
+COPY common/ /usr/src/app/common/
 RUN pipenv install --deploy --ignore-pipfile
 
 COPY . .
