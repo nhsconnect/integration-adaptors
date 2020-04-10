@@ -96,3 +96,8 @@ variable "party_key_arn" {
   type = string
   description = "Secret key for communication with MHS"
 }
+
+variable "fake_spine_outbound_ssl" {
+  type = string
+  description ="Should the SSL on fake spine service be enabled"
+}

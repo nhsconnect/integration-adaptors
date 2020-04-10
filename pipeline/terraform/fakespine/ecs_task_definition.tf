@@ -15,6 +15,9 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
       }, {
         name = "FAKE_SPINE_INBOUND_DELAY_MS",
         value = var.inbound_delay_ms
+      }, {
+        name = "FAKE_SPINE_OUTBOUND_SSL_ENABLED"
+        value = var.fake_spine_outbound_ssl
       }]
       secrets = [{
         name = "FAKE_SPINE_PRIVATE_KEY",
