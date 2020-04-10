@@ -76,3 +76,4 @@ properties:
     items:
       anyOf:
         - $ref: "extensions/Deduction.yaml"
+        - $ref: "extensions/Removal.yaml"

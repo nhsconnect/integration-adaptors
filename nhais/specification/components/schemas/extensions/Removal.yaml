@@ -1,0 +1,24 @@
+type: object
+description: Wrapper object for NHAIS Removal details.
+required:
+  - url
+  - extension
+properties:
+  url:
+    type: string
+    description: Definition of Removal extension.
+    default: https://TODO.COM/ExtensionNhais-Removal
+    readOnly: true
+  extension:
+    type: object
+    description: NHAIS Removal details
+    properties:
+      removalDate:
+        type: string
+        description: "The date the patient is removed. TODO: is this required? Need more examples, App J example has a date but no explanation why"
+        format: date
+        example: 2010-10-22
+      removalReason:
+        type: string
+        description: The free-text reason for the removal. Alphanumeric only
+        pattern: "[A-Za-z0-9 ]+"

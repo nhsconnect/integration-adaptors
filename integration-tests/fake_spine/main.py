@@ -72,3 +72,4 @@ if __name__ == "__main__":
 
     logger.log(logging.INFO, "Starting fakespine service")
     tornado.ioloop.IOLoop.current().start()
+    logger.exception()
