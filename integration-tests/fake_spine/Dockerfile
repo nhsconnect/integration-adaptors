@@ -14,4 +14,5 @@ RUN pipenv install --deploy --ignore-pipfile
 COPY . .
 
 EXPOSE 80
-ENTRYPOINT ["pipenv", "run", "start", "--logging=DEBUG"]
+#ENTRYPOINT ["pipenv", "run", "start", "--logging=DEBUG"]
+ENTRYPOINT echo "Starting up, env variables:";  env | grep FAKE_SPINE ; pipenv run start --logging=DEBUG
