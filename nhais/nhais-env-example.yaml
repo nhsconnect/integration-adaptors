@@ -6,4 +6,3 @@ NHAIS_RETRY_DELAY: "0.1"
 
 #User-specific env variables
 NHAIS_OUTBOUND_QUEUE_HOST: "localhost:5672/outbound"
-
