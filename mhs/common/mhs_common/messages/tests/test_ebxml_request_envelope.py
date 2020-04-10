@@ -47,7 +47,7 @@ def get_test_message_dictionary():
     }
 
 
-def expected_values(payload=None, ebxml=None, attachments=None):
+def expected_values(ebxml=None, payload=None, attachments=None):
     values = copy.deepcopy(EXPECTED_VALUES)
 
     if ebxml:
@@ -238,7 +238,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
     def test_from_string_parses_valid_requests(self):
         with self.subTest("A valid request containing a payload"):
             message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request')
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
+            expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -246,7 +246,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         with self.subTest("A multi-part MIME message with a defect in the payload"):
             message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_payload_defect')
-            expected_values_with_test_payload = expected_values(payload="mock-payload", ebxml=ebxml)
+            expected_values_with_test_payload = expected_values(ebxml=ebxml, payload="mock-payload")
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -254,7 +254,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         with self.subTest("A valid request that does not contain the optional payload MIME part"):
             message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_no_payload')
-            expected_values_with_no_payload = expected_values(payload=None, ebxml=ebxml)
+            expected_values_with_no_payload = expected_values(ebxml=ebxml, payload=None)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -269,7 +269,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
             }]
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml, attachments=attachments)
+            expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE,
+                                                           attachments=attachments)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -284,7 +285,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
             }]
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml, attachments=attachments)
+            expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE,
+                                                           attachments=attachments)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -308,7 +310,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                     ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR'
                                                                '42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
                 }]
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml, attachments=attachments)
+            expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE,
+                                                           attachments=attachments)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
@@ -344,7 +347,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             with self.subTest(f'A valid request without a {element_name} element'):
                 message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, filename)
 
-                expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
+                expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE)
                 expected_values_with_payload[key] = False
 
                 parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(
@@ -354,7 +357,7 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
 
         with self.subTest(f'A valid request without an AckRequested element'):
             message, ebxml = message_utilities.MessageUtilities.load_test_data(self.message_dir, 'ebxml_request_no_ack_requested')
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml)
+            expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE)
             expected_values_with_payload[ebxml_request_envelope.ACK_REQUESTED] = False
             del expected_values_with_payload[ebxml_request_envelope.ACK_SOAP_ACTOR]
 
@@ -379,7 +382,8 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 ebxml_request_envelope.ATTACHMENT_DESCRIPTION: '',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
             }]
-            expected_values_with_payload = expected_values(payload=EXPECTED_MESSAGE, ebxml=ebxml, attachments=attachments)
+            expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE,
+                                                           attachments=attachments)
 
             parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
 
