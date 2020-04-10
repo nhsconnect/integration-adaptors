@@ -2,7 +2,7 @@ import asyncio
 
 from utilities import integration_adaptors_logger as log
 
-from mhs_common.retry import retriable_action
+from retry import retriable_action
 from mhs_common.state import persistence_adaptor
 
 logger = log.IntegrationAdaptorsLogger(__name__)

@@ -9,7 +9,7 @@ from tornado import httpclient
 from utilities import timing
 
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
-from mhs_common.retry import retriable_action
+from retry import retriable_action
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd

@@ -5,7 +5,7 @@ from mhs_common.workflow.common import MessageData
 from utilities import integration_adaptors_logger as log
 
 from mhs_common import workflow
-from mhs_common.retry import retriable_action
+from retry import retriable_action
 from mhs_common.state import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.workflow import common
