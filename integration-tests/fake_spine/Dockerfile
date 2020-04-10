@@ -1,6 +1,6 @@
 FROM python:3.7-slim
 RUN apt-get update
-RUN apt-get install build-essential
+RUN apt-get install build-essential -y
 RUN apt-get install apache2 -y
 RUN mkdir -p /usr/src/app/mhs/fakespine
 RUN pip install pipenv
