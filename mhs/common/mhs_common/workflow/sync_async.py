@@ -1,6 +1,7 @@
 """This module defines the sync-async workflow."""
 from typing import Tuple, Optional
 
+from mhs_common.workflow.common import MessageData
 from utilities import integration_adaptors_logger as log
 
 from mhs_common import workflow
@@ -93,8 +94,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                          fparams={'messageId': message_id})
             return 500, "No async response received from sync-async store"
 
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription, message_data: MessageData):
         logger.info('Entered sync-async inbound workflow')
         await wd.update_status_with_retries(work_description,
                                             work_description.set_inbound_status,
@@ -102,7 +102,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                             self.persistence_store_retries)
 
         try:
-            await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: payload})
+            await self._add_to_sync_async_store(message_id, {CORRELATION_ID: correlation_id, MESSAGE_DATA: message_data.payload})
             logger.info('Placed message in sync-async store successfully')
             await wd.update_status_with_retries(work_description,
                                                 work_description.set_inbound_status,

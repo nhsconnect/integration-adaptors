@@ -45,8 +45,8 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_scr_adaptor_calls_mhs_end_point_with_populated_message(self, request_mock):
         # Arrange
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
-        expected_message = file_utilities.FileUtilities.get_file_string(populated_message_path)
+        body = file_utilities.get_file_dict(complete_data_path)
+        expected_message = file_utilities.get_file_string(populated_message_path)
 
         # Act
         self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
@@ -64,7 +64,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_exception_raised_during_message_sending_raises_MessageSendingError(self, request_mock):
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
         request_mock.side_effect = Exception('Failed to route the dam packet')
 
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST',
@@ -75,7 +75,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertIn('Failed to route the dam packet', response.body.decode())
 
     def test_empty_interaction_name_raises_error(self):
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
 
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={},
                               body=json.dumps(body))
@@ -85,7 +85,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_application_json_content_type_is_passed_to_mhs(self, request_mock):
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
@@ -98,7 +98,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_correlation_id_is_passed_to_mhs_if_provided_to_scr_adaptor(self, request_mock):
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
@@ -114,7 +114,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_message_id_is_passed_to_mhs_if_provided_to_scr_adaptor(self, request_mock):
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
@@ -130,7 +130,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
 
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_both_message_id_and_correlation_are_passed_to_mhs_when_provided(self, request_mock):
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
@@ -147,13 +147,13 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertEqual(message_id_header, "messageId1212")
         self.assertEqual(correlation_id_header, 'correlationId1212')
 
-    @mock.patch('utilities.message_utilities.MessageUtilities.get_uuid')
+    @mock.patch('utilities.message_utilities.get_uuid')
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_when_no_correlation_id_is_provided_the_adaptor_generates_one_and_passes_it_to_the_mhs(self,
                                                                                                    request_mock,
                                                                                                    uuid_mock):
         uuid_mock.return_value = "yes-this-is-mocked"
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
 
         request_mock.return_value = test_utilities.awaitable("Response message")
 
@@ -170,8 +170,8 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_should_correct_parse_success_response(self, request_mock):
         # Arrange
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
-        response_body = file_utilities.FileUtilities.get_file_string(response_xml)
+        body = file_utilities.get_file_dict(complete_data_path)
+        response_body = file_utilities.get_file_string(response_xml)
         response_mock = TestResponse()
         response_mock.body = response_body
         request_mock.return_value = test_utilities.awaitable(response_mock)
@@ -191,7 +191,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
     @mock.patch('comms.common_https.CommonHttps.make_request')
     def test_should_return_error_message_when_bad_response_body_is_returned(self, request_mock):
         # Arrange
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
         response_mock = TestResponse()
         response_mock.body = "This is a bad response to parse"
         request_mock.return_value = test_utilities.awaitable(response_mock)
