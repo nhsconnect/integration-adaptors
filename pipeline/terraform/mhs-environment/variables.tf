@@ -224,7 +224,7 @@ variable "spineroutelookup_service_search_base" {
 variable "spineroutelookup_service_disable_sds_tls" {
   type = string
   description = "Whether TLS should be disabled for connections to SDS."
-  default = "False"
+  default = "True"
 }
 
 variable "elasticache_node_type" {
