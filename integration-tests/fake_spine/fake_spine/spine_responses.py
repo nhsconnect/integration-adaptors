@@ -5,7 +5,7 @@ from typing import Tuple, NamedTuple, Union
 
 from tornado.httputil import HTTPServerRequest
 
-from fake_spine.config import ROOT_DIR
+from fake_spine import fake_spine_configuration
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -36,6 +36,7 @@ class SpineResponseBuilder(SpineResponse):
         self.response_file_location = None
         self.inbound_request_file_location = None
         self.response_code = 202
+        self.config = fake_spine_configuration.FakeSpineConfiguration()
 
     def override_response(self, response_file_location: str):
         self.response_file_location = response_file_location
@@ -50,7 +51,7 @@ class SpineResponseBuilder(SpineResponse):
         return self
 
     def get_outbound_response(self, request: HTTPServerRequest) -> OutboundResponse:
-        response_from_file = pathlib.Path(ROOT_DIR) / "configured_responses" / self.response_file_location
+        response_from_file = pathlib.Path(self.config.ROOT_DIR) / "configured_responses" / self.response_file_location
         return OutboundResponse(self.response_code, response_from_file.read_text())
 
 

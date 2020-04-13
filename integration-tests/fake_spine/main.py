@@ -7,7 +7,7 @@ import tornado.web
 from tornado.options import parse_command_line
 
 import utilities.integration_adaptors_logger as log
-from fake_spine import config, healthcheck_handler
+from fake_spine import fake_spine_configuration, healthcheck_handler
 from fake_spine.certs import Certs
 from fake_spine.component_test_responses import component_test_responses
 from fake_spine.inbound_proxy_request_handler import InboundProxyRequestHandler
@@ -40,11 +40,12 @@ def build_application_configuration() -> SpineRequestResponseMapper:
 
 
 def app():
-    log.configure_logging("fake-spine")
+    log.configure_logging("fake-spine")  # ensure this is first to get proper logging of startup errors
     parse_command_line()
 
     logger.info("Building fakespine service configuration")
 
+    config = fake_spine_configuration.FakeSpineConfiguration()
     certs = Certs.create_certs_files(ROOT_DIR,
                                      private_key=config.FAKE_SPINE_PRIVATE_KEY,
                                      local_cert=config.FAKE_SPINE_CERTIFICATE,

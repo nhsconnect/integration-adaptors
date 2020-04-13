@@ -2,7 +2,7 @@ from utilities import integration_adaptors_logger as log
 
 from tornado import httpclient
 
-from fake_spine import config
+from fake_spine import fake_spine_configuration
 from fake_spine.spine_responses import InboundRequest
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -16,6 +16,7 @@ class InboundClient(object):
 
     def __init__(self):
         self.http_client = httpclient.AsyncHTTPClient()
+        config = fake_spine_configuration.FakeSpineConfiguration()
         self.inbound_url = f'http://localhost:{config.INBOUND_PROXY_PORT}/inbound-proxy'
 
     async def make_request(self, request: InboundRequest):

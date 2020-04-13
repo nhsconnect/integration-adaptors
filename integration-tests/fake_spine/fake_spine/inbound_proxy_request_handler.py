@@ -4,7 +4,7 @@ import tornado.web
 from tornado import httpclient
 
 from fake_spine.certs import Certs
-from fake_spine import config
+from fake_spine import fake_spine_configuration
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -13,13 +13,14 @@ class InboundProxyRequestHandler(tornado.web.RequestHandler):
 
     def initialize(self, inbound_certs: Certs) -> None:
         self.inbound_certs = inbound_certs
+        self.config = fake_spine_configuration.FakeSpineConfiguration()
 
     async def post(self):
         logger.info(f"request accepted {self.request} with headers: {self.request.headers}, and body: {self.request.body}")
         logger.info(f"request being proxied to inbound service")
 
         response = await httpclient.AsyncHTTPClient()\
-            .fetch(config.INBOUND_SERVER_BASE_URL,
+            .fetch(self.config.INBOUND_SERVER_BASE_URL,
                    raise_error=False,
                    method="POST",
                    body=self.request.body,
