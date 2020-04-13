@@ -13,7 +13,7 @@ resource "aws_ecs_service" "fake_spine_service" {
   # health_check_grace_period_seconds = 120 // give two minutes before killing the service
 
   network_configuration {
-    assign_public_ip = false
+    assign_public_ip = true
     security_groups = [
       aws_security_group.fake_spine_security_group.id
     ]
