@@ -234,6 +234,7 @@ pipeline {
                                             -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
                                             -var opentest_vpc_id=${OPENTEST_VPC_ID} \
                                             -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
+                                            -var dlt_vpc_id=${DLT_VPC_ID} \
                                             -var mhs_outbound_service_minimum_instance_count=3 \
                                             -var mhs_outbound_service_maximum_instance_count=9 \
                                             -var mhs_inbound_service_minimum_instance_count=3 \
