@@ -194,6 +194,7 @@ variable "client_key_arn" {
 variable "ca_certs_arn" {
   type = string
   description = "ARN of the secrets manager secret of the endpoint issuing subCA certificate and root CA Certificate (in that order)."
+  default = "arn:aws:secretsmanager:eu-west-2:067756640211:secret:build-fakespine-cert-tAch3o"
 }
 
 variable "route_ca_certs_arn" {
