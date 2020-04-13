@@ -29,6 +29,7 @@ class FakeSpineConfiguration(object):
         self.FAKE_SPINE_CA_STORE = environ_or_error('FAKE_SPINE_CA_STORE')
         self.FAKE_SPINE_PORT = int(environ_or_error('FAKE_SPINE_PORT', default='443'))
         self.INBOUND_PROXY_PORT = int(environ_or_error('INBOUND_PROXY_PORT', default='8888'))
+        self.FAKE_SPINE_PROXY_VALIDATE_CERT = str2bool(os.environ.get('FAKE_SPINE_PROXY_VALIATE_CERT', default='True'))
         self.INBOUND_SERVER_BASE_URL = environ_or_error('INBOUND_SERVER_BASE_URL')
         self.OUTBOUND_DELAY_MS = int(environ_or_error('FAKE_SPINE_OUTBOUND_DELAY_MS', default='0'))
         self.INBOUND_DELAY_MS = int(environ_or_error('FAKE_SPINE_INBOUND_DELAY_MS', default='0'))

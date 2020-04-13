@@ -28,7 +28,7 @@ class InboundProxyRequestHandler(tornado.web.RequestHandler):
                    client_cert=self.inbound_certs.local_cert_path,
                    client_key=self.inbound_certs.private_key_path,
                    ca_certs=self.inbound_certs.ca_certs_path,
-                   validate_cert=True)
+                   validate_cert=self.config.FAKE_SPINE_PROXY_VALIDATE_CERT)
 
         logger.info(f"inbound responded with code: {response.code} and body: {response.body}")
         self.set_status(response.code)
