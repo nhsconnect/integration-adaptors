@@ -10,7 +10,7 @@ resource "aws_ecs_service" "fake_spine_service" {
   launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.fake_spine_task.arn
-  //health_check_grace_period_seconds = 120 // give two minutes before killing the service
+  health_check_grace_period_seconds = 120 // give two minutes before killing the service
 
   network_configuration {
     assign_public_ip = false
