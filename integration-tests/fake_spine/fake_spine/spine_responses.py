@@ -1,5 +1,5 @@
 import abc
-import logging
+from utilities import integration_adaptors_logger as log
 import pathlib
 from typing import Tuple, NamedTuple, Union
 
@@ -7,7 +7,7 @@ from tornado.httputil import HTTPServerRequest
 
 from fake_spine.config import ROOT_DIR
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class InboundRequest(NamedTuple):

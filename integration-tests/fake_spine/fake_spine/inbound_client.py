@@ -1,11 +1,11 @@
-import logging
+from utilities import integration_adaptors_logger as log
 
 from tornado import httpclient
 
 from fake_spine import config
 from fake_spine.spine_responses import InboundRequest
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 class InboundClient(object):
 

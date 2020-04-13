@@ -1,5 +1,5 @@
 import asyncio
-import logging
+from utilities import integration_adaptors_logger as log
 
 import tornado.web
 
@@ -8,7 +8,7 @@ from fake_spine.request_matching import SpineRequestResponseMapper
 from fake_spine.spine_responses import InboundRequest
 from fake_spine import config
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class SpineRequestHandler(tornado.web.RequestHandler):
@@ -27,10 +27,10 @@ class SpineRequestHandler(tornado.web.RequestHandler):
         await self.inbound_client.make_request(inbound_request)
 
     async def post(self):
-        logger.log(logging.INFO, f"request accepted {self.request} with headers: {self.request.headers}, and body: {self.request.body}")
+        logger.info(f"request accepted {self.request} with headers: {self.request.headers}, and body: {self.request.body}")
         responses = self.fake_response_handler.response_for_request(self.request)
         status, response = responses.get_outbound_response(self.request)
-        logger.log(logging.INFO, f"response to request {status} : {response}")
+        logger.info(f"response to request {status} : {response}")
 
         await self._do_outbound_delay()
 
