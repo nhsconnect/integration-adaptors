@@ -2,7 +2,7 @@
 # VPC's subnets. Each container is register with the route service's LB's target group.
 resource "aws_ecs_service" "fake_spine_service" {
   name = "${var.environment_id}-fake-spine"
-  //cluster = "arn:aws:ecs:eu-west-2:067756640211:cluster/testing-fake-spine"
+  # cluster = "arn:aws:ecs:eu-west-2:067756640211:cluster/testing-fake-spine"
   cluster = data.terraform_remote_state.mhs.outputs.cluster_id
   deployment_maximum_percent = 200
   deployment_minimum_healthy_percent = 100
@@ -10,7 +10,7 @@ resource "aws_ecs_service" "fake_spine_service" {
   launch_type = "FARGATE"
   scheduling_strategy = "REPLICA"
   task_definition = aws_ecs_task_definition.fake_spine_task.arn
-  //health_check_grace_period_seconds = 120 // give two minutes before killing the service
+  # health_check_grace_period_seconds = 120 // give two minutes before killing the service
 
   network_configuration {
     assign_public_ip = false
@@ -28,14 +28,14 @@ resource "aws_ecs_service" "fake_spine_service" {
   #   target_group_arn = aws_lb_target_group.fake_spine_alb_target_group.arn
   # }
 
-  depends_on = [
-    aws_lb.fake_spine_alb
-  ]
+  # depends_on = [
+  #   aws_lb.fake_spine_alb
+  # ]
 
   # Preserve the autoscaled instance count when this service is updated
-  lifecycle {
-    ignore_changes = [
-      "desired_count"
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     "desired_count"
+  #   ]
+  # }
 }
