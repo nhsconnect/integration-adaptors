@@ -5,15 +5,16 @@ import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
 from exceptions import MaxRetriesExceeded
 from tornado import httpclient
+
 from utilities import timing
 
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
-from mhs_common.retry import retriable_action
+from retry import retriable_action
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
-from mhs_common.workflow.common import CommonWorkflow
+from mhs_common.workflow.common import CommonWorkflow, MessageData
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -113,8 +114,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         return error_response
 
     @timing.time_function
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription, message_data: MessageData):
         logger.info('Entered {WorkflowName} workflow to handle inbound message',
                     fparams={'WorkflowName': self.workflow_name})
         logger.audit('{WorkflowName} inbound workflow invoked. Message received from spine',
@@ -124,7 +124,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                                             wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
                                             self.store_retries)
 
-        await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, payload)
+        await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, message_data)
 
         logger.info('Placed message onto inbound queue successfully')
         await wd.update_status_with_retries(work_description,
@@ -142,10 +142,10 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                                                 message_id: str,
                                                 correlation_id: str,
                                                 work_description: wd.WorkDescription,
-                                                payload: str):
+                                                message_data: MessageData):
 
         result = await retriable_action.RetriableAction(
-            lambda: self._put_message_onto_queue_with(message_id, correlation_id, payload),
+            lambda: self._put_message_onto_queue_with(message_id, correlation_id, message_data),
             self.inbound_queue_max_retries,
             self.inbound_queue_retry_delay) \
             .execute()
@@ -175,10 +175,17 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             logger.exception('Error encountered whilst obtaining outbound URL.')
             raise
 
-    async def _put_message_onto_queue_with(self, message_id, correlation_id, payload, attachments=None):
-        await self.queue_adaptor.send_async({'payload': payload, 'attachments': attachments or []},
-                                            properties={'message-id': message_id,
-                                                        'correlation-id': correlation_id})
+    async def _put_message_onto_queue_with(self, message_id, correlation_id, message_data: MessageData):
+        await self.queue_adaptor.send_async(
+            {
+                'ebXML': message_data.ebxml,
+                'payload': message_data.payload,
+                'attachments': message_data.attachments or []
+            },
+            properties={
+                'message-id': message_id,
+                'correlation-id': correlation_id
+            })
 
     async def set_successful_message_response(self, wdo: wd.WorkDescription):
         pass

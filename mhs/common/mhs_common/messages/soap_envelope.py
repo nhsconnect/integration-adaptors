@@ -56,9 +56,9 @@ class SoapEnvelope(envelope.Envelope):
 
         message_id = soap_message_dictionary.get(MESSAGE_ID)
         if not message_id:
-            message_id = message_utilities.MessageUtilities.get_uuid()
+            message_id = message_utilities.get_uuid()
             soap_message_dictionary[MESSAGE_ID] = message_id
-        timestamp = message_utilities.MessageUtilities.get_timestamp()
+        timestamp = message_utilities.get_timestamp()
         soap_message_dictionary[TIMESTAMP] = timestamp
 
         logger.info('Creating SOAP message with {MessageId} and {Timestamp}',

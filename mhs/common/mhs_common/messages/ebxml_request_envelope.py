@@ -24,6 +24,8 @@ EBXML_TEMPLATE = "ebxml_request"
 
 MESSAGE = "hl7_message"
 
+EBXML = "ebxml"
+
 DUPLICATE_ELIMINATION = "duplicate_elimination"
 ACK_REQUESTED = "ack_requested"
 ACK_SOAP_ACTOR = "ack_soap_actor"
@@ -99,7 +101,7 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         """
         attachment: dict
         for attachment in message_dictionary.setdefault(ATTACHMENTS, []):
-            attachment[ATTACHMENT_CONTENT_ID] = f'{message_utilities.MessageUtilities.get_uuid()}@spine.nhs.uk'
+            attachment[ATTACHMENT_CONTENT_ID] = f'{message_utilities.get_uuid()}@spine.nhs.uk'
             try:
                 attachment[ATTACHMENT_CONTENT_TRANSFER_ENCODING] = 'base64' if attachment.pop(ATTACHMENT_BASE64) \
                     else '8bit'
@@ -131,9 +133,8 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
         cls._extract_more_values_from_xml_tree(xml_tree, extracted_values)
 
         cls._add_descriptions_to_attachments(xml_tree, attachments)
+        extracted_values[EBXML] = ebxml_part
         extracted_values[ATTACHMENTS] = attachments
-
-        logger.info('Extracted {extracted_values} from message', fparams={'extracted_values': extracted_values})
 
         if payload_part:
             extracted_values[MESSAGE] = payload_part

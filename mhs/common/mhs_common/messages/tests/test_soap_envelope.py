@@ -61,14 +61,14 @@ class TestSoapRequestEnvelope(TestCase):
         self.expected_message_dir = Path(ROOT_DIR) / EXPECTED_MESSAGE_DIR
         self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
 
-        expected_message = file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_SOAP))
+        expected_message = file_utilities.get_file_string(str(self.expected_message_dir / EXPECTED_SOAP))
         # Pystache does not convert line endings to LF in the same way as Python does when loading the example from
         # file, so normalize the line endings of the strings being compared
-        self.normalized_expected_serialized_message = file_utilities.FileUtilities.normalize_line_endings(
+        self.normalized_expected_serialized_message = file_utilities.normalize_line_endings(
             expected_message)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize(self, mock_get_uuid, mock_get_timestamp):
         mock_get_uuid.return_value = MOCK_UUID
         mock_get_timestamp.return_value = MOCK_TIMESTAMP
@@ -77,14 +77,14 @@ class TestSoapRequestEnvelope(TestCase):
 
         message_id, http_headers, message = envelope.serialize()
 
-        normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+        normalized_message = file_utilities.normalize_line_endings(message)
 
         self.assertEqual(MOCK_UUID, message_id)
         self.assertEqual(EXPECTED_HTTP_HEADERS, http_headers)
         self.assertEqual(self.normalized_expected_serialized_message, normalized_message)
 
-    @patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_timestamp")
+    @patch.object(message_utilities, "get_uuid")
     def test_serialize_message_id_not_generated(self, mock_get_uuid, mock_get_timestamp):
         mock_get_timestamp.return_value = MOCK_TIMESTAMP
 
@@ -94,7 +94,7 @@ class TestSoapRequestEnvelope(TestCase):
 
         message_id, http_headers, message = envelope.serialize()
 
-        normalized_message = file_utilities.FileUtilities.normalize_line_endings(message)
+        normalized_message = file_utilities.normalize_line_endings(message)
 
         mock_get_uuid.assert_not_called()
         self.assertEqual(MOCK_UUID, message_id)
@@ -114,7 +114,7 @@ class TestSoapRequestEnvelope(TestCase):
 
     def test_from_string(self):
         with self.subTest("A valid request containing a payload"):
-            message = file_utilities.FileUtilities.get_file_string(str(self.expected_message_dir / EXPECTED_SOAP))
+            message = file_utilities.get_file_string(str(self.expected_message_dir / EXPECTED_SOAP))
             expected_values_with_payload = expected_values(message=EXPECTED_MESSAGE)
 
             parsed_message = soap_envelope.SoapEnvelope.from_string(SOAP_HEADERS, message)
@@ -122,7 +122,7 @@ class TestSoapRequestEnvelope(TestCase):
             self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
         with self.subTest("A soap message with missing message id"):
-            message = file_utilities.FileUtilities.get_file_string(
+            message = file_utilities.get_file_string(
                 str(self.test_message_dir / "soap_request_with_defect.msg"))
 
             with self.assertRaisesRegex(

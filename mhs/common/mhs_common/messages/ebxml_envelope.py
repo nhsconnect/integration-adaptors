@@ -71,9 +71,9 @@ class EbxmlEnvelope(envelope.Envelope):
 
         message_id = ebxml_message_dictionary.get(MESSAGE_ID)
         if not message_id:
-            message_id = message_utilities.MessageUtilities.get_uuid()
+            message_id = message_utilities.get_uuid()
             ebxml_message_dictionary[MESSAGE_ID] = message_id
-        timestamp = message_utilities.MessageUtilities.get_timestamp()
+        timestamp = message_utilities.get_timestamp()
         ebxml_message_dictionary[TIMESTAMP] = timestamp
         logger.info('Creating ebXML message with {MessageId} and {Timestamp}',
                     fparams={'MessageId': message_id, 'Timestamp': timestamp})
