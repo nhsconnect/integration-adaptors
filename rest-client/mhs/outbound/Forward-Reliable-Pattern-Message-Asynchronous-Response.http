@@ -1,9 +1,10 @@
-# @name Forward_Reliable_Pattern_Message
+# @name Forward_Reliable_Pattern_Message_Asynchronous_Response
 
 POST {{HOSTNAME}}:{{OUTBOUND-PORT}} HTTP/1.1
 content-type: application/json
 Interaction-Id: COPC_IN000001UK01
 sync-async: false
+# This interaction does not allow sync-async
 ods-code: X26
 
 {
