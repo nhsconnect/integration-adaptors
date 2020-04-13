@@ -1,12 +1,12 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
-Boolean runBuildCommon     = false
+Boolean runBuildCommon     = true
 Boolean runBuild           = false
 Boolean runUnitTest        = false
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
 Boolean runTerraform       = true
-Boolean buildFakespine     = false
+Boolean buildFakespine     = true
 Boolean deployFakespine    = true
 
 pipeline {
