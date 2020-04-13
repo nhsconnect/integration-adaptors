@@ -1,24 +1,25 @@
 import pathlib
 from typing import Dict
 
-import definitions
-import mhs_common.configuration.configuration_manager as configuration_manager
 import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+
+import definitions
+import mhs_common.configuration.configuration_manager as configuration_manager
+import outbound.request.synchronous.handler as client_request_handler
 import utilities.integration_adaptors_logger as log
+from requests import healthcheck_handler
 from mhs_common import workflow
-from mhs_common.request import healthcheck_handler
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor
 from mhs_common.state.persistence_adaptor_factory import get_persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
+from outbound.transmission import outbound_transmission
 from utilities import config, certs
 from utilities import secrets
-
-import outbound.request.synchronous.handler as client_request_handler
-from outbound.transmission import outbound_transmission
+from utilities.string_utilities import str2bool
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -103,7 +104,7 @@ def start_tornado_server(data_dir: pathlib.Path, workflows: Dict[str, workflow.C
     # paths are changed
     supplier_application = tornado.web.Application(
         [
-            (r"/", client_request_handler.SynchronousHandler,dict(config_manager=config_manager, workflows=workflows)),
+            (r"/", client_request_handler.SynchronousHandler, dict(config_manager=config_manager, workflows=workflows)),
             (r"/healthcheck", healthcheck_handler.HealthcheckHandler)
         ])
     supplier_server = tornado.httpserver.HTTPServer(supplier_application)
@@ -140,7 +141,7 @@ def main():
                                                   ca_certs=secrets.get_secret_config('CA_CERTS'))
     max_retries = int(config.get_config('OUTBOUND_TRANSMISSION_MAX_RETRIES', default="3"))
     retry_delay = int(config.get_config('OUTBOUND_TRANSMISSION_RETRY_DELAY', default="100"))
-    validate_cert = bool(config.get_config('OUTBOUND_VALIDATE_CERTIFICATE', default="True"))
+    validate_cert = str2bool(config.get_config('OUTBOUND_VALIDATE_CERTIFICATE', default=str(True)))
     http_proxy_host = config.get_config('OUTBOUND_HTTP_PROXY', default=None)
     http_proxy_port = None
     if http_proxy_host is not None:

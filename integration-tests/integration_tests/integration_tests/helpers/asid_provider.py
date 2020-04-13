@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 
 from integration_tests.test_definitions import ROOT_DIR
 
@@ -15,7 +15,7 @@ def get_asid():
     """
     try:
         asid_file = str(Path(ROOT_DIR) / "data/certs/asid.txt")
-        asid = FileUtilities.get_file_string(asid_file)
+        asid = file_utilities.get_file_string(asid_file)
     except:
         asid = None
 

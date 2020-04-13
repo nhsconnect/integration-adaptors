@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+apispec = "~=3.0"
+apispec-webframeworks = "~=0.5"
+
+[packages]
+tornado = "*"
+integration-adaptors-common = {editable = true,path = "./../common"}
+pycurl = {version = "~=7.43",platform_system = "!= 'Windows'"}
+marshmallow = "~=3.2"
+
+[requires]
+python_version = "3.7"

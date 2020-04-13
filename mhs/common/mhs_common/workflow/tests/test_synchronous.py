@@ -98,7 +98,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
         wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_PREPARATION_FAILED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Failed message preparation')
-        log_mock.error.assert_called_with('Failed to prepare outbound message')
+        log_mock.exception.assert_called_with('Failed to prepare outbound message')
 
     @mock.patch('mhs_common.messages.soap_envelope.SoapEnvelope')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')

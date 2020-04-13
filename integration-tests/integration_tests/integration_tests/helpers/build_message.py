@@ -41,7 +41,7 @@ def build_message(template,
     dissent_override = '0'
     use_date_filter = False
     document_type = '196971000000103'
-    message_id = message_id if message_id is not None else message_utilities.MessageUtilities.get_uuid()
+    message_id = message_id if message_id is not None else message_utilities.get_uuid()
 
     message = message_builder.MustacheMessageBuilder(template).build_message({
         UUID: message_id,

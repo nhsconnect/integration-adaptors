@@ -3,7 +3,7 @@ from pathlib import Path
 from xml.etree import ElementTree
 from unittest import TestCase
 
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 
 from mhs_common.messages.soap_fault_envelope import SOAPFault
 
@@ -12,26 +12,26 @@ class TestSOAPFault(TestCase):
     message_dir = Path(os.path.dirname(os.path.abspath(__file__))) / 'test_messages'
 
     def test_is_soap_empty(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_empty.xml' )
+        message = file_utilities.get_file_string(Path(self.message_dir) / 'soapfault_response_empty.xml' )
         self.assertTrue(SOAPFault.is_soap_fault(ElementTree.fromstring(message)))
 
     def test_is_soap_negative(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'ebxml_header.xml')
+        message = file_utilities.get_file_string(Path(self.message_dir) / 'ebxml_header.xml')
         self.assertFalse(SOAPFault.is_soap_fault(ElementTree.fromstring(message)))
 
     def test_soap_fault_single(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml')
+        message = file_utilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml')
         self.assertTrue(SOAPFault.is_soap_fault(ElementTree.fromstring(message)))
 
     def test_soap_fault_multiple(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
+        message = file_utilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
         self.assertTrue(SOAPFault.is_soap_fault(ElementTree.fromstring(message)))
 
     def test_soap_fault_empty(self):
         self.assertFalse(SOAPFault.is_soap_fault(None))
 
     def test_from_string_single(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml')
+        message = file_utilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml')
         fault: SOAPFault = SOAPFault.from_string({}, message)
         self.assertEqual(fault.fault_code, 'SOAP:Server')
         self.assertEqual(fault.fault_string, 'Application Exception')
@@ -44,7 +44,7 @@ class TestSOAPFault(TestCase):
         self.assertEqual(fault.error_list[0]['description'], 'System failure to process message - default')
 
     def test_from_string_multiple(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
+        message = file_utilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
         fault: SOAPFault = SOAPFault.from_string({}, message)
         self.assertEqual(fault.fault_code, 'SOAP:Server')
         self.assertEqual(fault.fault_string, 'Application Exception')
