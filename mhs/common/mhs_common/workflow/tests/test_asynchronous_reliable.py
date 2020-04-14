@@ -8,8 +8,10 @@ from unittest import mock
 import exceptions
 from comms import proton_queue_adaptor
 from tornado import httpclient
+
+from mhs_common.workflow.common import MessageData
 from utilities import test_utilities
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_reliable as async_reliable
@@ -44,7 +46,10 @@ INTERACTION_DETAILS = {
     'action': ACTION,
     'uniqueIdentifier': "31312"
 }
+EBXML = 'ebxml_data'
 PAYLOAD = 'payload'
+ATTACHMENTS = ['attachment1', 'attachment2']
+INBOUND_MESSAGE_DATA = MessageData(EBXML, PAYLOAD, ATTACHMENTS)
 SERIALIZED_MESSAGE = 'serialized-message'
 INBOUND_QUEUE_MAX_RETRIES = 3
 INBOUND_QUEUE_RETRY_DELAY = 100
@@ -270,7 +275,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-        message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+        message = file_utilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
         response = httpclient.HTTPResponse
         response.code = 500
@@ -394,7 +399,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
 
         self.mock_ebxml_request_envelope.return_value.serialize.return_value = (MESSAGE_ID, {}, SERIALIZED_MESSAGE)
 
-        message = FileUtilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
+        message = file_utilities.get_file_string(Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
         response = httpclient.HTTPResponse
         response.code = 500
@@ -433,7 +438,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                     response = mock.MagicMock()
                     response.code = 500
                     response.headers = {'Content-Type': 'text/xml'}
-                    response.body = FileUtilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
+                    response.body = file_utilities.get_file_string(Path(self.test_message_dir) / soap_fault_file_path)
                     self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
                     await self.workflow.handle_outbound_message(None, MESSAGE_ID, CORRELATION_ID,
@@ -471,7 +476,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         error_response = mock.MagicMock()
         error_response.code = 500
         error_response.headers = {'Content-Type': 'text/xml'}
-        error_response.body = FileUtilities.get_file_string(
+        error_response.body = file_utilities.get_file_string(
             Path(self.test_message_dir) / 'soapfault_response_single_error.xml')
 
         success_response = mock.MagicMock()
@@ -497,7 +502,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         response.code = 500
         response.headers = {'Content-Type': 'text/xml'}
         # a non retriable soap 300 error code
-        response.body = FileUtilities.get_file_string(
+        response.body = file_utilities.get_file_string(
             Path(self.test_message_dir) / 'soapfault_response_single_error_300.xml')
         self.mock_transmission_adaptor.make_request.return_value = test_utilities.awaitable(response)
 
@@ -516,11 +521,11 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.setup_mock_work_description()
         self.mock_queue_adaptor.send_async.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
-        self.mock_queue_adaptor.send_async.assert_called_once_with({'payload': PAYLOAD, 'attachments': []},
-                                                                   properties={'message-id': MESSAGE_ID,
-                                                                               'correlation-id': CORRELATION_ID})
+        self.mock_queue_adaptor.send_async.assert_called_once_with(
+            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
+            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
@@ -540,11 +545,11 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
         mock_sleep.return_value = test_utilities.awaitable(None)
 
-        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
-        self.mock_queue_adaptor.send_async.assert_called_with({'payload': PAYLOAD, 'attachments': []},
-                                                              properties={'message-id': MESSAGE_ID,
-                                                                          'correlation-id': CORRELATION_ID})
+        self.mock_queue_adaptor.send_async.assert_called_with(
+            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
+            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
@@ -562,7 +567,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         mock_sleep.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
         self.assertEqual(
@@ -598,7 +603,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         mock_sleep.return_value = test_utilities.awaitable(None)
 
         with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, PAYLOAD)
+            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
         self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
 
         self.assertEqual(2, self.mock_queue_adaptor.send_async.call_count,

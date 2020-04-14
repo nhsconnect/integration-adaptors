@@ -112,7 +112,7 @@ It is known that libraries used by this application sometimes log out clinical p
 | 2 | `Attempting to publish work description key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Attempts to publish the local state of the work description to the state store for new message to outbound |
 | 3 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 4 | `No previous version found, continuing attempt to publish new version` | Checks versions to avoid collisions. No remote version found, continues attempt to publish new remote version with current timestamp |
-| 5 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Successfully updated state database with new remote version |
+| 5 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | State: VERSION: `1`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_RECEIVED` |
 | 6 | `Looking up endpoint details for ods code: ods_code=YES.` | Confirmation from spine route lookup, ods code set to `yes` to communicate to spine |
 | 7 | `Looking up endpoint details for service_id=urn:nhs:names:services:psisquery:QUPC_IN160101UK05.` | Request made to retrieve routing details from spine route lookup |
 | 8 | `Retrieved endpoint details for details="{'service_id': 'urn:nhs:names:services:psisquery:QUPC_IN160101UK05', 'url': 'https://192.168.128.11/reliablemessaging/queryrequest', 'party_key': 'YES-0000806', 'cpa_id': 'S20003A000304', 'to_asid': '227319907548'}"` | Confirmation endpoint details successfully retrieved from spine route lookup |
@@ -121,26 +121,26 @@ It is known that libraries used by this application sometimes log out clinical p
 | 11 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 12 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 13 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, increments local version number |
-| 14 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Successfully updated state database with message state serialized|
+| 14 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | State: VERSION: `2`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_PREPARED` |
 | 15 | `About to make outbound request` | Starting process to send message request from Outbound to Spine |
 | 16 | `WorkflowName=async-express outbound workflow invoked. Message sent to Spine and Acknowledgment=MessageStatus.OUTBOUND_MESSAGE_ACKD received.` | Message successfully sent to spine from outbound and spine returned acknowledgement |
 | 17 | `Attempting to publish work description key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Attempts to publish the local state of the work description to the state store to update message state with this information received spine |
 | 18 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 19 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 20 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 21 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Successfully updated state database with message status updated, spine successfully received message. |
+| 21 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | State: VERSION: `3`, INBOUND_STATUS: `INBOUND_RESPONSE_RECEIVED`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_PREPARED` |
 | 22 | `Entered WorkflowName=async-express workflow to handle inbound message` | Starting Inbound async-express workflow to handle message from spine |
 | 23 | `Attempting to publish work description key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Attempting to publish key to state database |
 | 24 | `Retrieving latest work description to check version` | Query state database to check if version exists |
 | 25 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 26 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 27 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Successfully updated state database with message status updated that inbound received message |
+| 27 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | State: VERSION: `4`, INBOUND_STATUS: `INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED`, OUTBOUND_STATUS: `SYNC_RESPONSE_SUCCESSFUL` | 
 | 28 | `Placed message onto inbound queue successfully` | Confirmation message added to inbound queue |
 | 29 | `Attempting to publish work description key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Attempting to publish key to state database |
 | 30 | `Retrieving latest work description to check version` | Query state database to check if version exists |
 | 31 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 32 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 33 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | Successfully updated state database with message status updated to inbound queue. |
+| 33 | `Successfully updated work description to state store for key=4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703` | State: VERSION: `5`, INBOUND_STATUS: `INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_ACKD` |
 | 34 | `WorkflowName=async-express inbound workflow completed. Message placed on queue, returning Acknowledgement=MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED to spine` | Confirmation of inbound workflow completed. |
 
 #### Asynchronous Reliable
@@ -151,7 +151,7 @@ It is known that libraries used by this application sometimes log out clinical p
 | 2 | `Attempting to publish work description key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Attempts to publish the local state of the work description to the state store for new message to outbound |
 | 3 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 4 | `No previous version found, continuing attempt to publish new version` | Checks versions to avoid collisions. No remote version found, continues attempt to publish new remote version with current timestamp |
-| 5 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Successfully updated state database with new remote version with message status updated that outbound received message |
+| 5 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | State: VERSION: `1`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_RECEIVED` |
 | 6 | `Looking up endpoint details for ods code: ods_code=YES.` | Confirmation from spine route lookup, ods code set to `yes` to communicate to spine |
 | 7 | `Looking up endpoint details for service_id=urn:nhs:names:services:psis:REPC_IN150016UK05.` | Request made to routing details from spine route lookup |
 | 8 | `Retrieved endpoint details for details="{'service_id': 'urn:nhs:names:services:psis:REPC_IN150016UK05', 'url': 'https://192.168.128.11/reliablemessaging/reliablerequest', 'party_key': 'YES-0000806', 'cpa_id': 'S20001A000182', 'to_asid': '227319907548'}"` | Confirmation endpoint successfully retrieved routing details from spine route lookup |
@@ -162,26 +162,26 @@ It is known that libraries used by this application sometimes log out clinical p
 | 13 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 14 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 15 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, increments local version number |
-| 16 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Successfully updated state database with message status serialized|
+| 16 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | State: VERSION: `2`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_PREPARED` |
 | 17 | `About to make outbound request` | Starting process to send message request from Outbound to Spine |
 | 18 | `WorkflowName=async-reliable outbound workflow invoked. Message sent to Spine and Acknowledgment=MessageStatus.OUTBOUND_MESSAGE_ACKD received.` | Message successfully sent to spine from outbound and spine returned acknowledgement |
 | 19 | `Attempting to publish work description key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Attempts to publish the local state of the work description to the state store to update message state from this information received spine |
 | 20 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 21 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 22 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 23 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Successfully updated state database with message status updated, spine successfully received message. |
+| 23 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | State: VERSION: `3`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_ACKD` |
 | 24 | `Entered WorkflowName=async-reliable workflow to handle inbound message` | Starting Inbound async-reliable workflow to handle message from spine |
 | 25 | `Attempting to publish work description key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Attempting to publish key to state database |
 | 26 | `Retrieving latest work description to check version` | Query state database to check if version exists |
 | 27 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 28 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 29 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Successfully updated state database with message status updated that inbound received message |
+| 29 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | State: VERSION: `4`, INBOUND_STATUS: `INBOUND_RESPONSE_RECEIVED`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_ACKD` |
 | 30 | `Placed message onto inbound queue successfully` | Confirmation message added to inbound queue |
 | 31 | `Attempting to publish work description key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Attempting to publish key to state database |
 | 32 | `Retrieving latest work description to check version` | Query state database to check if version exists |
 | 33 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 34 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 35 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | Successfully updated state database with message status updated to inbound queue. |
+| 35 | `Successfully updated work description to state store for key=30446459-2A2C-4B56-8C5D-A89B3B3377DF` | State: VERSION: `5`, INBOUND_STATUS: `INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_ACKD` |
 | 36 | `WorkflowName=async-reliable inbound workflow completed. Message placed on queue, returning Acknowledgement=MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED to spine` | Confirmation of inbound workflow completed. |
 
 #### Synchronous asynchronous
@@ -198,15 +198,15 @@ It is known that libraries used by this application sometimes log out clinical p
 | 8 | `Message serialised successfully` | Serialize outbound message with routing information and previous incoming message data such as `message_id`, `correlation_id`, `interaction_details`, `payload`, `wdo`,`to_party_key`, `cpa_id` |
 | 9 | `Attempting to publish work description key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | Attempts to publish the local state of the work description to the state store for new message to outbound with spine route lookup workflow completed|
 | 10 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
-| 11 | `No previous version found, continuing attempt to publish new version` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 12 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | Successfully updated state database with message status |
+| 11 | `No previous version found, continuing attempt to publish new version` | Checks versions to avoid collisions. No remote version found, continues attempt to publish new remote version with current timestamp |
+| 12 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | State: VERSION: `1`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_RECEIVED` |
 | 13 | `About to make outbound request` | Starting process to send message request from Outbound to Spine |
 | 14 | `WorkflowName=async-reliable outbound workflow invoked. Message sent to Spine and Acknowledgment=MessageStatus.OUTBOUND_MESSAGE_ACKD received.` | Message successfully sent to spine from outbound and spine returned acknowledgement |
 | 15 | `Attempting to publish work description key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | Attempts to publish the local state of the work description to the state store to update message state from this information received spine |
 | 16 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 17 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 18 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number
-| 19 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | Successfully updated state database with message status with this information received spine|
+| 19 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | State: VERSION: `2`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_PREPARED` |
 | 20 | `Attempting to retrieve the async response from the async store` | Starting process to retrieve message from sync-async store |
 | 21 | `Beginning async retrieval from sync-async store` | Retrieval process for sync-async store started |
 | 22 | `Entered sync-async inbound workflow` | Started inbound workflow sync-async to handle incoming message |
@@ -214,7 +214,7 @@ It is known that libraries used by this application sometimes log out clinical p
 | 24 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 25 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 26 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 27 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | Successfully updated state database with message status message received by inbound |
+| 27 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | State: VERSION: `3`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_ACKD` |
 | 28 | `Attempting to add inbound message to sync-async store` | Attempt to add incoming message to sync-async store  |
 | 29 | `Successfully updated state store` | Sync-async store successfully updated |
 | 30 | `Placed message in sync-async store successfully` | Confirmation message successfully added to sync-async store |
@@ -222,13 +222,13 @@ It is known that libraries used by this application sometimes log out clinical p
 | 32 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 33 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 34 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 35 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | Successfully updated state database with message status placed in sync-async store |
+| 35 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | State: VERSION: `4`, INBOUND_STATUS: `INBOUND_RESPONSE_RECEIVED`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_ACKD` |
 | 36 | `Retrieved async response from sync-async store` | Message retrieved by inbound from sync-async store |
 | 37 | `Attempting to publish work description key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | Attempts to publish the local state of the work description to the state store to update message state successfully retrieved message from sync-async store |
 | 38 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 39 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 40 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, incrementing local version number |
-| 41 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | Successfully updated state database with message status received by inbound from sync-async store |
+| 41 | `Successfully updated work description to state store for key=2FBB3940-B8DC-481F-8EF0-22CFB5F3D724` | State: VERSION: `5`, INBOUND_STATUS: `INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_ACKD` |
 
 #### Synchronous
 
@@ -238,7 +238,7 @@ It is known that libraries used by this application sometimes log out clinical p
 | 2 | `Attempting to publish work description key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | Attempts to publish the local state of the work description to the state store for new message to outbound |
 | 3 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 4 | `No previous version found, continuing attempt to publish new version` | Checks versions to avoid collisions. No remote version found, continues attempt to publish new remote version with current timestamp |
-| 5 | `Successfully updated work description to state store for key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | Successfully updated state database with new remote version with message status updated that outbound received message |
+| 5 | `Successfully updated work description to state store for key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | State: VERSION: `1`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_RECEIVED` |
 | 6 | `Looking up endpoint details for ods code: ods_code=YES.` | Confirmation from spine route lookup, ods code set to `yes` to communicate to spine |
 | 7 | `Looking up endpoint details for service_id=urn:nhs:names:services:pdsquery:QUPA_IN040000UK32` | Request made to routing details from spine route lookup |
 | 8 | `Retrieved endpoint details for details="{'service_id': 'urn:nhs:names:services:pdsquery:QUPA_IN040000UK32', 'url': 'https://192.168.128.11/sync-service', 'party_key': 'YES-0000806', 'cpa_id': 'S20001A000168', 'to_asid': '928942012545'}"` | Confirmation endpoint successfully retrieved routing details from spine route lookup | 
@@ -246,14 +246,20 @@ It is known that libraries used by this application sometimes log out clinical p
 | 10 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 11 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 12 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, increments local version number | 
-| 13 | `Successfully updated work description to state store for key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | Successfully updated state database with message returned from spine route lookup | 
+| 13 | `Successfully updated work description to state store for key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | State: VERSION: `2`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_PREPARED` | 
 | 14 | `About to make outbound request` | Starting process to send message request from Outbound to Spine |
 | 15 | `Outbound Synchronous workflow completed. Message sent to Spine and Acknowledgment=MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED received.` | Message successfully sent to spine from outbound and spine returned acknowledgement | 
 | 16 | `Attempting to publish work description key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | Attempts to publish the local state of the work description to the state store to update message state from this information received spine |
 | 17 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
 | 18 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
 | 19 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, increments local version number | 
-| 20 | `Successfully updated work description to state store for key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | Successfully updated state database with message status updated, spine successfully received message. | 
+| 20 | `Successfully updated work description to state store for key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | State: VERSION: `3`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `OUTBOUND_MESSAGE_RESPONSE_RECEIVED` | 
+| 21 | `Outbound Synchronous workflow completed. Message sent to Spine and Acknowledgment=MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED received.` | Message successfully received from spine to outbound | 
+| 22 | `Attempting to publish work description key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | Attempts to publish the local state of the work description to the state store to update message state from this information received spine |
+| 23 | `Retrieving latest work description to check version` | Queries state database with local state to check remote state exists |
+| 24 | `Retrieved previous version, comparing versions` | Previous remote version found in state database and comparing versions |
+| 25 | `Local version matches remote, incrementing local version number` | Checks versions to avoid collisions. Previous remote version matches local version, increments local version number | 
+| 26 | `Successfully updated work description to state store for key=C78164D9-A1EB-497E-BCB5-74CABD3162F0` | State: VERSION: `4`, INBOUND_STATUS: `NULL`, OUTBOUND_STATUS: `SYNC_RESPONSE_SUCCESSFUL` | 
 
 ### Cloud Watch
 

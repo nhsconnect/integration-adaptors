@@ -26,10 +26,10 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
              dict(forwarder=self.forwarder))
         ])
 
-    @mock.patch('utilities.message_utilities.MessageUtilities.get_uuid')
+    @mock.patch('utilities.message_utilities.get_uuid')
     def test_handler_returns_message_processing_response(self, uuid_mock):
         uuid_mock.return_value = "check123"
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
         response_mock = {'data': "Nice response message"}
         self.forwarder.forward_message_to_mhs.return_value = test_utilities.awaitable(response_mock)
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-name': '123'},
@@ -56,7 +56,7 @@ class TestSummaryCareRecord(AsyncHTTPTestCase):
         self.assertIn(error, response.body.decode())
 
     def test_message_generation_exception_in_handler_returns_error_to_caller(self):
-        body = file_utilities.FileUtilities.get_file_dict(complete_data_path)
+        body = file_utilities.get_file_dict(complete_data_path)
         self.forwarder.forward_message_to_mhs.side_effect = MessageGenerationError('This is a specific error')
         response = self.fetch(GP_SUMMARY_UPLOAD_URL, method='POST', headers={'interaction-name': '123'},
                               body=json.dumps(body))

@@ -34,7 +34,7 @@ class BaseTestEbxmlEnvelope(TestCase):
 
 class TestEbxmlEnvelope(BaseTestEbxmlEnvelope):
     def test_cant_find_optional_text_value_during_parsing(self):
-        message = file_utilities.FileUtilities.get_file_string(str(self.message_dir / "ebxml_header.xml"))
+        message = file_utilities.get_file_string(str(self.message_dir / "ebxml_header.xml"))
 
         xml_tree = ElementTree.fromstring(message)
         values_dict = {}

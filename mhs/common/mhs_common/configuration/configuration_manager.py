@@ -1,7 +1,7 @@
 """This module defines the configuration manager component."""
 import copy
 
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 
 
 class ConfigurationManager(object):
@@ -12,7 +12,7 @@ class ConfigurationManager(object):
 
         :param interactions_file_name: The file to load interaction details from. This file should be in JSON format.
         """
-        self.interactions = FileUtilities.get_file_dict(interactions_file_name)
+        self.interactions = file_utilities.get_file_dict(interactions_file_name)
 
     def get_interaction_details(self, interaction_name: str) -> dict:
         """Get details for the specified interaction.

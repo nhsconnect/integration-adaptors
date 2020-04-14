@@ -3,7 +3,7 @@ import tornado.ioloop
 import tornado.web
 from ldap3 import Connection
 
-from mhs_common.request import healthcheck_handler
+from requests import healthcheck_handler
 from utilities import config, secrets
 from utilities import integration_adaptors_logger as log
 

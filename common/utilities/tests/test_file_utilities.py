@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 
 TEST_FILE_DIR = "test_files"
 
@@ -25,14 +25,14 @@ class TestFileUtilities(TestCase):
     def test_get_file_string(self):
         test_file = os.path.join(self.test_files_dir, TEST_FILE)
 
-        loaded_string = FileUtilities.get_file_string(test_file)
+        loaded_string = file_utilities.get_file_string(test_file)
 
         self.assertEqual(EXPECTED_STRING, loaded_string, "The string loaded should match the one expected.")
 
     def test_get_file_dict(self):
         test_json_file = os.path.join(self.test_files_dir, TEST_JSON_FILE)
 
-        loaded_dict = FileUtilities.get_file_dict(test_json_file)
+        loaded_dict = file_utilities.get_file_dict(test_json_file)
 
         self.assertEqual(EXPECTED_JSON, loaded_dict, "The dictionary loaded should match the one expected.")
 
@@ -48,6 +48,6 @@ class TestFileUtilities(TestCase):
             message = line_break_type + " line endings should be normalized."
 
             with self.subTest(message):
-                normalized_string = FileUtilities.normalize_line_endings(test_string)
+                normalized_string = file_utilities.normalize_line_endings(test_string)
 
                 self.assertEqual(EXPECTED_NORMALIZED_STRING, normalized_string)
