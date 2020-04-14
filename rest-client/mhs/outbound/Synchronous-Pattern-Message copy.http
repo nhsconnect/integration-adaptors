@@ -1,7 +1,7 @@
 # @name Synchronous_Pattern_Message
 
 POST {{HOSTNAME}}:{{OUTBOUND-PORT}} HTTP/1.1
-content-type: application/json
+Content-Type: application/json
 Interaction-Id: QUPA_IN040000UK32
 sync-async: false
 from-asid: {{ASID}}

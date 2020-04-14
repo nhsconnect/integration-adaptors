@@ -6,6 +6,7 @@
         "$shared": {},
         "$sample_mhs_environment": {
             "HOSTNAME": "http://localhost",
+            "SPINE_HOSTNAME": "https://192.168.128.11/",
             "INBOUND-PORT": "8082",
             "OUTBOUND-PORT": "80",
             "ROUTE-LOOKUP-PORT": "8088",

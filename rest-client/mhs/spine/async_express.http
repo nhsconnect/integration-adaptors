@@ -1,6 +1,6 @@
 
 # @name Async_Express
-POST https://192.168.128.11/reliablemessaging/queryrequest HTTP/1.1
+POST {{SPINE_HOSTNAME}}/reliablemessaging/queryrequest HTTP/1.1
 charset: UTF-8
 SOAPAction: urn:nhs:names:services:psisquery/QUPC_IN160101UK05
 content-type: multipart/related; boundary="--=_MIME-Boundary"; type=text/xml; start=ebXMLHeader@spine.nhs.uk

@@ -1,10 +1,10 @@
 # @name Async_Express_Pattern_Message
 
 POST {{HOSTNAME}}:{{OUTBOUND-PORT}} HTTP/1.1
-content-type: application/json
+Content-Type: application/json
 Interaction-Id: QUPC_IN160101UK05
 sync-async: true
-# This interaction allows both sync and async response. If false is, than acknowledgemnt of message
+# This interaction allows both sync and async response. If set to false, than acknowledgemnt of message
 # being sent to Spine will be received. If set to true, the response from Spine will be shown.
 from-asid: {{ASID}}
 
