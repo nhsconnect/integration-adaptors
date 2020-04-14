@@ -218,8 +218,8 @@ pipeline {
                                             -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
                                             -var elasticache_node_type="cache.t2.micro" \
                                             -var mhs_forward_reliable_endpoint_url=https://ec2-3-10-232-118.eu-west-2.compute.amazonaws.com/reliablemessaging/forwardreliable \
-                                            -var inbound_use_ssl="false" \
-                                            -var inbound_server_port="80"
+                                            -var inbound_use_ssl="False" \
+                                            -var inbound_server_port="443"
                                         """
                                     script {
                                         env.MHS_ADDRESS = sh (

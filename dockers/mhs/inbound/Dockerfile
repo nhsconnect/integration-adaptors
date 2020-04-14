@@ -15,6 +15,6 @@ WORKDIR /usr/src/app/mhs/inbound
 
 RUN pipenv install --deploy --ignore-pipfile
 
-EXPOSE 443 80 8080
+EXPOSE 443 80
 
 ENTRYPOINT pipenv run start-inbound
