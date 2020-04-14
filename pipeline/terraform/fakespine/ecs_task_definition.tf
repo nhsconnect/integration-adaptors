@@ -6,7 +6,7 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
     {
       name = "fake-spine"
       image = "${var.ecr_address}/fake-spine:${var.build_id}"
-      # image = "067756640211.dkr.ecr.eu-west-2.amazonaws.com/fake-spine:PR-188-113-702c9e9" // use the same image - no need to rebuild it
+      # image = "067756640211.dkr.ecr.eu-west-2.amazonaws.com/fake-spine:PR-188-113-702c9e9"
       environment = [{
         name = "INBOUND_SERVER_BASE_URL",
         value = var.inbound_server_base_url
@@ -23,7 +23,6 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
         name = "FAKE_SPINE_PORT"
         value = var.fake_spine_port
       }]
-      secrets = []
       # secrets = [{
       #   name = "FAKE_SPINE_PRIVATE_KEY",
       #   valueFrom = var.fake_spine_private_key
