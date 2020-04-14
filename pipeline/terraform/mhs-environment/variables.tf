@@ -248,3 +248,14 @@ variable "mhs_forward_reliable_endpoint_url" {
   type = string
   description = "The URL to communicate with Spine for Forward Reliable messaging from the outbound service"
 }
+
+variable "inbound_use_ssl" {
+  type = string
+  description = "Set to 'False' to disable SSL"
+  default = "True"
+}
+variable "inbound_server_port" {
+  type = string
+  description = "The server port that the inbound service listens on"
+  default = "443"
+}

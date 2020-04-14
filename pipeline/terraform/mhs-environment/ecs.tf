@@ -186,6 +186,14 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
         {
           name = "MHS_INBOUND_QUEUE_URL"
           value = var.inbound_queue_host
+        },
+        {
+          name = "MHS_INBOUND_USE_SSL"
+          value = var.inbound_use_ssl
+        },
+        {
+          name = "MHS_INBOUND_SERVER_PORT"
+          value = var.inbound_server_port
         }
       ]
       secrets = [
