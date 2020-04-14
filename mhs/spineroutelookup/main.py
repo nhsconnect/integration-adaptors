@@ -68,9 +68,9 @@ def initialise_routing(sds_url: str, search_base: str, tls: bool = True) -> rout
 
     cache = load_cache_implementation()
 
-    sds_connection = sds_mock_connection_factory.build_mock_sds_connection() \
-        if config.get_config(sds_mock_connection_factory.LDAP_MOCK_DATA_URL_CONFIG_KEY, default=None) \
-        else build_real_sds_connection(sds_url, tls)
+    sds_connection = sds_mock_connection_factory.build_mock_sds_connection()
+        # if config.get_config(sds_mock_connection_factory.LDAP_MOCK_DATA_URL_CONFIG_KEY, default=None) \
+        # else build_real_sds_connection(sds_url, tls)
 
     client = sds_client.SDSClient(sds_connection, search_base)
     attribute_lookup = mhs_attribute_lookup.MHSAttributeLookup(client=client, cache=cache)
