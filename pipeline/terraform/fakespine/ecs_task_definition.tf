@@ -23,19 +23,20 @@ resource "aws_ecs_task_definition" "fake_spine_task" {
         name = "FAKE_SPINE_PORT"
         value = var.fake_spine_port
       }]
-      secrets = [{
-        name = "FAKE_SPINE_PRIVATE_KEY",
-        valueFrom = var.fake_spine_private_key
-      }, {
-        name = "FAKE_SPINE_CERTIFICATE",
-        valueFrom = var.fake_spine_certificate
-      }, {
-        name = "FAKE_SPINE_CA_STORE",
-        valueFrom = var.fake_spine_ca_store
-      }, {
-        name = "MHS_SECRET_PARTY_KEY",
-        valueFrom = var.party_key_arn
-      }]
+      secrets = []
+      # secrets = [{
+      #   name = "FAKE_SPINE_PRIVATE_KEY",
+      #   valueFrom = var.fake_spine_private_key
+      # }, {
+      #   name = "FAKE_SPINE_CERTIFICATE",
+      #   valueFrom = var.fake_spine_certificate
+      # }, {
+      #   name = "FAKE_SPINE_CA_STORE",
+      #   valueFrom = var.fake_spine_ca_store
+      # }, {
+      #   name = "MHS_SECRET_PARTY_KEY",
+      #   valueFrom = var.party_key_arn
+      # }]
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
