@@ -259,3 +259,11 @@ variable "inbound_server_port" {
   description = "The server port that the inbound service listens on"
   default = "443"
 }
+variable "mhs_ldap_mock_data_url" {
+  type = string
+  description = "Route uses this to connect to the fake ldap"
+}
+variable "mhs_fake_spine_url" {
+  type = string
+  description = "url for the fake spine"
+}
