@@ -13,7 +13,6 @@ from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 
 
-# @skip('Skipping FR test until fix is available')
 class ForwardReliableMessagingPatternTests(TestCase):
     """
      These tests show forward reliable response from Spine via the MHS for the example message interaction of
@@ -48,7 +47,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
                           sync_async=False,
-                          correlation_id='1',
+                          correlation_id=message_id,
                           ods_code='X26') \
             .with_body(message) \
             .execute_post_expecting_success()
@@ -56,7 +55,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
         # Assert
         AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
             .assert_property('message-id', message_id) \
-            .assert_property('correlation-id', '1') \
+            .assert_property('correlation-id', message_id) \
             .assert_json_content_type() \
             .assertor_for_hl7_xml_message() \
             .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)
@@ -73,7 +72,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
                           sync_async=False,
-                          correlation_id='1',
+                          correlation_id=message_id,
                           ods_code='X26') \
             .with_body(message) \
             .execute_post_expecting_success()
