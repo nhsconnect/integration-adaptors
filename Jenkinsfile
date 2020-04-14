@@ -205,9 +205,9 @@ pipeline {
                                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                                             -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
                                             -var party_key_arn=${PARTY_KEY_ARN} \
-                                            -var client_cert_arn=${CLIENT_CERT_ARN} \
-                                            -var client_key_arn=${CLIENT_KEY_ARN} \
-                                            -var ca_certs_arn=${CA_CERTS_ARN} \
+                                            -var client_cert_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:build-fakespine-cert-tAch3o \
+                                            -var client_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:build-fakespine-private-key-6qgFQJ \
+                                            -var ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:build-fakespine-ca-store-MZp3Gz \
                                             -var route_ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:mhs-route.vp-testing.nhsredteam.internal.nhs.uk-zkFNpa \
                                             -var outbound_alb_certificate_arn=arn:aws:acm:eu-west-2:067756640211:certificate/9be6a367-6a0a-4a06-97b1-3ba190eaa2b5 \
                                             -var route_alb_certificate_arn=arn:aws:acm:eu-west-2:067756640211:certificate/5b27c5a6-d8d7-46c6-b7f2-648a27ef806d \
