@@ -1,7 +1,7 @@
 import tornado.testing
 from tornado.web import Application
 
-from mhs_common.request import healthcheck_handler
+from handlers import healthcheck_handler
 
 
 class TestHealthcheckHandler(tornado.testing.AsyncHTTPTestCase):
@@ -11,5 +11,5 @@ class TestHealthcheckHandler(tornado.testing.AsyncHTTPTestCase):
     def test_get(self):
         response = self.fetch('/healthcheck', method='GET')
 
-        self.assertEqual(response.code, 200)
-        self.assertEqual(response.body.decode(), '')
+        self.assertEqual(200, response.code)
+        self.assertEqual('', response.body.decode())

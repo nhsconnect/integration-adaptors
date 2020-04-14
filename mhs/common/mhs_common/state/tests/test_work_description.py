@@ -229,8 +229,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         persistence = MagicMock()
         persistence.get.return_value = test_utilities.awaitable(None)
 
-        with self.assertRaises(wd.EmptyWorkDescriptionError):
-            await wd.get_work_description_from_store(persistence, 'aaa-aaa-aaa')
+        self.assertIsNone(await wd.get_work_description_from_store(persistence, 'aaa-aaa-aaa'))
 
     @async_test
     async def test_get_from_store_empty_store(self):

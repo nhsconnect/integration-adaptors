@@ -101,7 +101,7 @@ class SummaryCareRecord(tornado.web.RequestHandler):
         """
         correlation_id = self.request.headers.get('Correlation-Id', None)
         if not correlation_id:
-            correlation_id = message_utilities.MessageUtilities.get_uuid()
+            correlation_id = message_utilities.get_uuid()
             mdc.correlation_id.set(correlation_id)
             logger.info("No correlation-id header found in message, generated a new one")
         else:

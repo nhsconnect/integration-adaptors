@@ -16,15 +16,16 @@ from mhs_common.configuration import configuration_manager
 from mhs_common.messages import ebxml_request_envelope
 from mhs_common.state import work_description as wd
 from mhs_common.workflow import asynchronous_forward_reliable as forward_reliable
+from mhs_common.workflow.common import MessageData
 from utilities import mdc
 
 MESSAGES_DIR = "messages"
-REQUEST_FILE = "ebxml_request.msg"
+REQUEST_FILE = "ebxml_request"
 REQUEST_FILE_UNINTENDED = "ebxml_request_unintended.msg"
 REQUEST_FILE_UNKNOWN_REF_TO = "ebxml_unknown_ref_to.msg"
 EXPECTED_ASYNC_ACK_RESPONSE_FILE = "ebxml_ack.xml"
 EXPECTED_ASYNC_NACK_RESPONSE_FILE = "ebxml_nack.xml"
-UNSOLICITED_REQUEST_FILE = "ebxml_unsolicited.msg"
+UNSOLICITED_REQUEST_FILE = "ebxml_unsolicited"
 NO_REF_FILE = "ebxml_no_reference.msg"
 FROM_PARTY_ID = "FROM_PARTY_ID"
 ASYNC_CONTENT_TYPE_HEADERS = {"Content-Type": 'multipart/related; boundary="--=_MIME-Boundary"'}
@@ -60,11 +61,11 @@ async def state_return_values(message_key):
     :param message_key:
     :return: data associated with that key
     """
-    resposes = [data for data in state_data if data[wd.DATA_KEY] == message_key]
-    if not resposes:
+    responses = [data for data in state_data if data[wd.DATA_KEY] == message_key]
+    if not responses:
         return None
     else:
-        return resposes[0]
+        return responses[0]
 
 
 class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
@@ -96,8 +97,8 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
                                                  work_description_store=self.state, party_id=FROM_PARTY_ID))
         ])
 
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @unittest.mock.patch.object(message_utilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities, "get_uuid")
     def test_successful_request_has_acknowledgement_in_response(self, mock_get_uuid, mock_get_timestamp):
         """
         GIVEN an inbound message (not unsolicited)
@@ -106,9 +107,9 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         """
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        expected_ack_response = file_utilities.FileUtilities.get_file_string(
+        expected_ack_response = file_utilities.get_file_string(
             str(self.message_dir / EXPECTED_ASYNC_ACK_RESPONSE_FILE))
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+        request_body, ebxml = message_utilities.load_test_data(self.message_dir, REQUEST_FILE)
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
@@ -117,7 +118,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
         self.mock_workflow.handle_inbound_message.assert_called_once_with(REF_TO_MESSAGE_ID, CORRELATION_ID,
-                                                                          unittest.mock.ANY, EXPECTED_MESSAGE)
+                                                                          unittest.mock.ANY, MessageData(ebxml, EXPECTED_MESSAGE, []))
 
     def test_when_workflow_throws_exception_then_http_500_response(self):
         """
@@ -126,7 +127,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         THEN the response is an error (500) with reason "Exception in workflow"
         """
         self.mock_workflow.handle_inbound_message.side_effect = Exception("what a failure")
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+        request_body, _ = message_utilities.load_test_data(self.message_dir, REQUEST_FILE)
 
         response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
@@ -142,7 +143,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
                                                                      mock_message_id,
                                                                      mock_correlation_id,
                                                                      mock_inbound_message_id):
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE))
+        request_body, _ = message_utilities.load_test_data(self.message_dir, REQUEST_FILE)
 
         ack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
         self.mocked_workflows[workflow.ASYNC_EXPRESS].handle_inbound_message.assert_called()
@@ -153,8 +154,8 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         mock_message_id.set.assert_called_with(REF_TO_MESSAGE_ID)
         mock_interaction_id.set.assert_called_with('MCCI_IN010000UK13')
 
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @unittest.mock.patch.object(message_utilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities, "get_uuid")
     def test_message_unintended_for_receiver(self, mock_get_uuid, mock_get_timestamp):
         """
         GIVEN any inbound message
@@ -163,9 +164,9 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         """
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        expected_nack_response = file_utilities.FileUtilities.get_file_string(
+        expected_nack_response = file_utilities.get_file_string(
             str(self.message_dir / EXPECTED_ASYNC_NACK_RESPONSE_FILE))
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE_UNINTENDED))
+        request_body = file_utilities.get_file_string(str(self.message_dir / REQUEST_FILE_UNINTENDED))
 
         nack_response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
 
@@ -174,8 +175,8 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         xml_utilities.XmlUtilities.assert_xml_equal(expected_nack_response, nack_response.body)
         self.mock_workflow.handle_inbound_message.assert_not_called()
 
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @unittest.mock.patch.object(message_utilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities, "get_uuid")
     def test_post_with_unknown_ref_to_message_id_is_rejected(self, mock_get_uuid, mock_get_timestamp):
         """
         Edge-case where an "unsolicited" forward reliable message is received that contains a RefToMessageId that we
@@ -187,7 +188,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         """
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / REQUEST_FILE_UNKNOWN_REF_TO))
+        request_body = file_utilities.get_file_string(str(self.message_dir / REQUEST_FILE_UNKNOWN_REF_TO))
         self.config_manager.get_interaction_details.return_value = {'workflow': workflow.FORWARD_RELIABLE}
         self.mock_forward_reliable_workflow.handle_unsolicited_inbound_message.return_value = \
             test_utilities.awaitable(None)
@@ -201,8 +202,8 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
     # Unsolicited inbound request tests
     ###################################
 
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_timestamp")
-    @unittest.mock.patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @unittest.mock.patch.object(message_utilities, "get_timestamp")
+    @unittest.mock.patch.object(message_utilities, "get_uuid")
     def test_post_unsolicited_forward_reliable_request_successfully_handled(self, mock_get_uuid, mock_get_timestamp):
         """
         GIVEN an unsolicited inbound message
@@ -212,7 +213,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         """
         mock_get_uuid.return_value = "5BB171D4-53B2-4986-90CF-428BE6D157F5"
         mock_get_timestamp.return_value = "2012-03-15T06:51:08Z"
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / UNSOLICITED_REQUEST_FILE))
+        request_body, ebxml = message_utilities.load_test_data(self.message_dir, UNSOLICITED_REQUEST_FILE)
         self.config_manager.get_interaction_details.return_value = {'workflow': workflow.FORWARD_RELIABLE}
         self.mock_forward_reliable_workflow.handle_unsolicited_inbound_message.return_value = \
             test_utilities.awaitable(None)
@@ -221,11 +222,11 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(ack_response.code, 200)
         self.assertEqual(ack_response.headers["Content-Type"], "text/xml")
-        expected_ack_response = file_utilities.FileUtilities.get_file_string(
+        expected_ack_response = file_utilities.get_file_string(
             str(self.message_dir / EXPECTED_ASYNC_ACK_RESPONSE_FILE))
         xml_utilities.XmlUtilities.assert_xml_equal(expected_ack_response, ack_response.body)
         self.mock_forward_reliable_workflow.handle_unsolicited_inbound_message.assert_called_once_with(
-            UNSOLICITED_REF_TO_MESSAGE_ID, CORRELATION_ID, EXPECTED_MESSAGE, EXPECTED_UNSOLICITED_ATTACHMENTS)
+            UNSOLICITED_REF_TO_MESSAGE_ID, CORRELATION_ID, MessageData(ebxml, EXPECTED_MESSAGE, EXPECTED_UNSOLICITED_ATTACHMENTS))
 
     def test_post_unsolicited_non_forward_reliable_request_results_in_error_response(self):
         """
@@ -233,7 +234,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         WHEN the interaction is not handled by a forward reliable workflow
         THEN the response is an error (500) with reason "Unsolicited messaging not supported for this interaction"
         """
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / UNSOLICITED_REQUEST_FILE))
+        request_body, _ = message_utilities.load_test_data(self.message_dir, UNSOLICITED_REQUEST_FILE)
         self.config_manager.get_interaction_details.return_value = {'workflow': workflow.ASYNC_EXPRESS}
 
         response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
@@ -248,7 +249,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         WHEN the interaction is unknown
         THEN the response is an error (404) with reason "Unknown interaction ID"
         """
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / UNSOLICITED_REQUEST_FILE))
+        request_body, _ = message_utilities.load_test_data(self.message_dir, UNSOLICITED_REQUEST_FILE)
         self.config_manager.get_interaction_details.return_value = None
 
         response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
@@ -262,7 +263,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         WHEN the interaction is mapped to an unknown workflow
         THEN the response is an error (500) with reason "Couldn't determine workflow to invoke for interaction ID"
         """
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / UNSOLICITED_REQUEST_FILE))
+        request_body, _ = message_utilities.load_test_data(self.message_dir, UNSOLICITED_REQUEST_FILE)
         self.config_manager.get_interaction_details.return_value = {'workflow': 'invalid-workflow-name'}
 
         response = self.fetch("/", method="POST", body=request_body, headers=ASYNC_CONTENT_TYPE_HEADERS)
@@ -277,7 +278,7 @@ class TestInboundHandler(tornado.testing.AsyncHTTPTestCase):
         WHEN the workflow handler raises an exception
         THEN the response is an error (500) with reason "Exception in workflow"
         """
-        request_body = file_utilities.FileUtilities.get_file_string(str(self.message_dir / UNSOLICITED_REQUEST_FILE))
+        request_body, _ = message_utilities.load_test_data(self.message_dir, UNSOLICITED_REQUEST_FILE)
         self.config_manager.get_interaction_details.return_value = {'workflow': workflow.FORWARD_RELIABLE}
 
         error_future = asyncio.Future()

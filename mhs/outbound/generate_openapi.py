@@ -3,7 +3,7 @@ import json
 import apispec
 import apispec.ext.marshmallow
 import apispec_webframeworks.tornado
-from mhs_common.request import healthcheck_handler
+from handlers import healthcheck_handler
 
 from outbound.request import request_body_schema
 from outbound.request.synchronous import handler

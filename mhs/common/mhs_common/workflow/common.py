@@ -1,5 +1,6 @@
 """This module defines the common base of all workflows."""
 import abc
+from dataclasses import dataclass
 from typing import Tuple, Optional, Dict, List
 
 import utilities.integration_adaptors_logger as log
@@ -14,6 +15,13 @@ MHS_CPA_ID_KEY = 'nhsMhsCPAId'
 MHS_TO_ASID_KEY = 'uniqueIdentifier'
 
 logger = log.IntegrationAdaptorsLogger(__name__)
+
+
+@dataclass
+class MessageData:
+    ebxml: str
+    payload: str
+    attachments: List
 
 
 class CommonWorkflow(abc.ABC):
@@ -56,14 +64,14 @@ class CommonWorkflow(abc.ABC):
 
     @abc.abstractmethod
     async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription,
-                                     payload: str):
+                                     message_data: MessageData):
         """
         Handles an inbound message from an external system (typically from spine)
 
         :param message_id: ID of the message the original request to Spine was made with
         :param correlation_id: correlation ID of the request
         :param work_description: work description object for the payload
-        :param payload: payload to handle
+        :param message_data: object consolidating the ebXML, payload and attachments
         """
         pass
 
