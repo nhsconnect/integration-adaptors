@@ -3,7 +3,7 @@ from pathlib import Path
 from xml.etree import ElementTree
 from unittest import TestCase
 
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 
 from mhs_common.messages.ebxml_error_envelope import EbxmlErrorEnvelope
 
@@ -12,26 +12,26 @@ class TestEbxmlEnvelope(TestCase):
     message_dir = Path(os.path.dirname(os.path.abspath(__file__))) / 'test_messages'
 
     def test_is_ebxml_empty(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_empty.xml' )
+        message = file_utilities.get_file_string(self.message_dir / 'ebxml_response_error_empty.xml' )
         self.assertTrue(EbxmlErrorEnvelope.is_ebxml_error(ElementTree.fromstring(message)))
 
     def test_is_ebxml_negative(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_header.xml')
+        message = file_utilities.get_file_string(self.message_dir / 'ebxml_header.xml')
         self.assertFalse(EbxmlErrorEnvelope.is_ebxml_error(ElementTree.fromstring(message)))
 
     def test_ebxml_error_single(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_single.xml')
+        message = file_utilities.get_file_string(self.message_dir / 'ebxml_response_error_single.xml')
         self.assertTrue(EbxmlErrorEnvelope.is_ebxml_error(ElementTree.fromstring(message)))
 
     def test_ebxml_error_multiple(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_multiple.xml')
+        message = file_utilities.get_file_string(self.message_dir / 'ebxml_response_error_multiple.xml')
         self.assertTrue(EbxmlErrorEnvelope.is_ebxml_error(ElementTree.fromstring(message)))
 
     def test_ebxml_error_empty(self):
         self.assertFalse(EbxmlErrorEnvelope.is_ebxml_error(None))
 
     def test_from_string_single(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_single.xml')
+        message = file_utilities.get_file_string(self.message_dir / 'ebxml_response_error_single.xml')
         ebxml_error: EbxmlErrorEnvelope = EbxmlErrorEnvelope.from_string(message)
         self.assertEqual(len(ebxml_error.errors), 1)
 
@@ -41,7 +41,7 @@ class TestEbxmlEnvelope(TestCase):
         self.assertEqual(ebxml_error.errors[0]['Description'], '501319:Unknown eb:CPAId')
 
     def test_from_string_multiple(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_multiple.xml')
+        message = file_utilities.get_file_string(self.message_dir / 'ebxml_response_error_multiple.xml')
         ebxml_error: EbxmlErrorEnvelope = EbxmlErrorEnvelope.from_string(message)
         self.assertEqual(len(ebxml_error.errors), 2)
 

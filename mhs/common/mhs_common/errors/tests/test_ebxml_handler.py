@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from defusedxml import ElementTree
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 
 from mhs_common.errors.ebxml_handler import handle_ebxml_error
 
@@ -24,14 +24,14 @@ class TestEbxmlHandler(unittest.TestCase):
             handle_ebxml_error(200, {'Content-Type': 'text/xml'}, '<a><b><b></a>')
 
     def test_single_error(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_single.xml')
+        message = file_utilities.get_file_string(self.message_dir / 'ebxml_response_error_single.xml')
         resp_json = json.loads(handle_ebxml_error(200, {'Content-Type': 'text/xml'}, message)[1])
 
         self.assert_json_error_root(resp_json)
         self.assert_json_with_first_error(resp_json)
 
     def test_multiple_errors(self):
-        message = FileUtilities.get_file_string(self.message_dir / 'ebxml_response_error_multiple.xml')
+        message = file_utilities.get_file_string(self.message_dir / 'ebxml_response_error_multiple.xml')
         resp_json = json.loads(handle_ebxml_error(200, {'Content-Type': 'text/xml'}, message)[1])
 
         self.assert_json_error_root(resp_json)
