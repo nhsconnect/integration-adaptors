@@ -266,7 +266,6 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                 ebxml_request_envelope.ATTACHMENT_BASE64: False,
-                ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
             }]
             expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE,
@@ -282,7 +281,6 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                 ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                 ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                 ebxml_request_envelope.ATTACHMENT_BASE64: False,
-                ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                 ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
             }]
             expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE,
@@ -299,14 +297,12 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
                     ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
                     ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
                     ebxml_request_envelope.ATTACHMENT_BASE64: False,
-                    ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description',
                     ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
                 },
                 {
                     ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '64A73E03-30BD-4231-9959-0C4B54400345@spine.nhs.uk',
                     ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'image/png',
                     ebxml_request_envelope.ATTACHMENT_BASE64: True,
-                    ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Another description',
                     ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR'
                                                                '42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
                 }]
@@ -371,23 +367,6 @@ class TestEbxmlRequestEnvelope(test_ebxml_envelope.BaseTestEbxmlEnvelope):
             with self.assertRaisesRegex(
                     ebxml_envelope.EbXmlParsingError, "Weren't able to find required attribute actor"):
                 ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
-
-        with self.subTest("A valid request containing one attachment without a description has description defaulted "
-                          "to an empty string"):
-            message, ebxml = message_utilities.load_test_data(self.message_dir, 'ebxml_request_one_attachment_without_description')
-            attachments = [{
-                ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797-A947B09F347F@spine.nhs.uk',
-                ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
-                ebxml_request_envelope.ATTACHMENT_BASE64: False,
-                ebxml_request_envelope.ATTACHMENT_DESCRIPTION: '',
-                ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
-            }]
-            expected_values_with_payload = expected_values(ebxml=ebxml, payload=EXPECTED_MESSAGE,
-                                                           attachments=attachments)
-
-            parsed_message = ebxml_request_envelope.EbxmlRequestEnvelope.from_string(MULTIPART_MIME_HEADERS, message)
-
-            self.assertEqual(expected_values_with_payload, parsed_message.message_dictionary)
 
     #######################
     # Helper methods

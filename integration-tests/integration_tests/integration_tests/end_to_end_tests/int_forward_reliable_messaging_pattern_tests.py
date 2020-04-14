@@ -13,6 +13,7 @@ from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 
 
+# @skip('Skipping FR test until fix is available')
 class ForwardReliableMessagingPatternTests(TestCase):
     """
      These tests show forward reliable response from Spine via the MHS for the example message interaction of
@@ -38,7 +39,6 @@ class ForwardReliableMessagingPatternTests(TestCase):
         MHS_INBOUND_QUEUE.drain()
         self.assertions = CommonAssertions('forward-reliable')
 
-    @skip('Skipping FR test until fix is available')
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
@@ -61,7 +61,6 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .assertor_for_hl7_xml_message() \
             .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)
 
-    @skip('Skipping FR test until fix is available')
     def test_should_record_forward_reliable_message_status_as_successful(self):
         # Arrange
         # The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.
