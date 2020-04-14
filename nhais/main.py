@@ -2,6 +2,7 @@ import tornado.httpclient
 import utilities.integration_adaptors_logger as log
 from requests import healthcheck_handler
 from utilities import config
+from outbound.request import handler
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -15,7 +16,8 @@ def start_tornado_server() -> None:
 
     tornado_application = tornado.web.Application(
         [
-            (r"/healthcheck", healthcheck_handler.HealthcheckHandler)
+            (r'/fhir/Patient/.*', handler.Handler),
+            (r'/healthcheck', healthcheck_handler.HealthcheckHandler)
         ])
     tornado_server = tornado.httpserver.HTTPServer(tornado_application)
     server_port = int(config.get_config('SERVER_PORT', default='80'))
@@ -27,7 +29,6 @@ def start_tornado_server() -> None:
         tornado_io_loop.start()
     except KeyboardInterrupt:
         logger.warning('Keyboard interrupt')
-        pass
     finally:
         tornado_io_loop.stop()
         tornado_io_loop.close(True)

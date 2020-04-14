@@ -3,7 +3,7 @@ import os
 import unittest
 from pathlib import Path
 
-from utilities.file_utilities import FileUtilities
+import utilities.file_utilities as file_utilities
 
 from mhs_common.errors.soap_handler import handle_soap_error
 
@@ -23,14 +23,14 @@ class TestOutboundSOAPHandler(unittest.TestCase):
             handle_soap_error(500, {'Content-Type': 'text/xml'}, '<a><b><b></a>')
 
     def test_single_error(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml')
+        message = file_utilities.get_file_string(Path(self.message_dir) / 'soapfault_response_single_error.xml')
         resp_json = json.loads(handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
 
         self.assert_json_error_root(resp_json)
         self.assert_json_with_first_error(resp_json)
 
     def test_multiple_errors(self):
-        message = FileUtilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
+        message = file_utilities.get_file_string(Path(self.message_dir) / 'soapfault_response_multiple_errors.xml')
         resp_json = json.loads(handle_soap_error(500, {'Content-Type': 'text/xml'}, message)[1])
 
         self.assert_json_error_root(resp_json)

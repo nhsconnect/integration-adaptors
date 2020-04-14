@@ -54,7 +54,7 @@ class TestSynchronousHandler(BaseHandlerTest):
                                                                  SYNC_ASYNC_WORKFLOW: self.sync_async_workflow}))
         ])
 
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_uuid")
     @patch.object(mdc, "correlation_id")
     @patch.object(mdc, "message_id")
     def test_post_message(self, mock_message_id, mock_correlation_id, mock_get_uuid):
@@ -67,6 +67,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.assertEqual(response.code, 200)
         self.assertEqual(response.headers["Content-Type"], "text/xml")
+        self.assertEqual(response.headers["Message-Id"], MOCK_UUID)
         self.assertEqual(response.headers["Correlation-Id"], MOCK_UUID_2)
         self.assertEqual(response.body.decode(), expected_response)
 
@@ -102,7 +103,7 @@ class TestSynchronousHandler(BaseHandlerTest):
                 self.assertEqual(response.code, 200)
                 self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
 
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_uuid")
     @patch.object(mdc, "correlation_id")
     @patch.object(mdc, "message_id")
     def test_post_message_with_message_id_passed_in(self, mock_message_id, mock_correlation_id, mock_get_uuid):
@@ -129,7 +130,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         mock_message_id.set.assert_called_with(message_id)
         mock_correlation_id.set.assert_called_with(MOCK_UUID)
 
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_uuid")
     def test_post_message_with_correlation_id_passed_in_should_call_workflow(self, mock_get_uuid):
         expected_response = "Hello world!"
         self.workflow.handle_outbound_message.return_value = test_utilities.awaitable((200, expected_response, None))
@@ -145,12 +146,13 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.assertEqual(response.code, 200)
         self.assertEqual(response.body.decode(), expected_response)
         self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
+        self.assertEqual(response.headers["Message-Id"], MOCK_UUID)
         mock_get_uuid.assert_called_once()
 
         self.workflow.handle_outbound_message.assert_called_with(None, MOCK_UUID, CORRELATION_ID, INTERACTION_DETAILS,
                                                                  REQUEST_BODY_PAYLOAD, None)
 
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_uuid")
     @patch.object(mdc, "correlation_id")
     @patch.object(mdc, "message_id")
     @patch.object(mdc, 'interaction_id')
@@ -243,7 +245,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn('Required Interaction-Id header not found', response.body.decode())
 
-    @patch.object(message_utilities.MessageUtilities, "get_uuid")
+    @patch.object(message_utilities, "get_uuid")
     def test_post_with_no_correlation_id_assigns_new_correlation_id(self, mock_get_uuid):
 
         mock_get_uuid.return_value = MOCK_UUID
