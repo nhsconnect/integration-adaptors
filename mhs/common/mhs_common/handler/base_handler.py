@@ -57,5 +57,5 @@ class BaseHandler(tornado.web.RequestHandler):
     def _extract_correlation(self):
         correlation_id = self.request.headers.get(HttpHeaders.CORRELATION_ID, None)
         if correlation_id is None:
-            return message_utilities.MessageUtilities.get_uuid()
+            return message_utilities.get_uuid()
         return correlation_id

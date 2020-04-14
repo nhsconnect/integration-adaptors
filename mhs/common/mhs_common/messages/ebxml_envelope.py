@@ -20,7 +20,7 @@ SERVICE = "service"
 ACTION = "action"
 MESSAGE_ID = 'message_id'
 TIMESTAMP = 'timestamp'
-RECEIVED_MESSAGE_ID = "received_message_id"
+RECEIVED_MESSAGE_ID = "received_message_id"  # RefToMessageId - id of original message sent to outbound
 ERROR_CODE = "error_code"
 SEVERITY = "severity"
 DESCRIPTION = "description"
@@ -41,6 +41,7 @@ class EbxmlEnvelope(envelope.Envelope):
         name: str
         xml_name: str
         xml_parent: str = None
+        required: bool = True
 
     _elements_to_extract_when_parsing = [
         _ElementToExtractWhenParsing(FROM_PARTY_ID, 'PartyId', xml_parent='From'),
@@ -51,7 +52,7 @@ class EbxmlEnvelope(envelope.Envelope):
         _ElementToExtractWhenParsing(ACTION, 'Action'),
         _ElementToExtractWhenParsing(MESSAGE_ID, 'MessageId', xml_parent='MessageData'),
         _ElementToExtractWhenParsing(TIMESTAMP, 'Timestamp', xml_parent='MessageData'),
-        _ElementToExtractWhenParsing(RECEIVED_MESSAGE_ID, 'RefToMessageId', xml_parent='MessageData')
+        _ElementToExtractWhenParsing(RECEIVED_MESSAGE_ID, 'RefToMessageId', xml_parent='MessageData', required=False)
     ]
 
     def __init__(self, template_file: str, message_dictionary: Dict[str, Any]):
@@ -70,9 +71,9 @@ class EbxmlEnvelope(envelope.Envelope):
 
         message_id = ebxml_message_dictionary.get(MESSAGE_ID)
         if not message_id:
-            message_id = message_utilities.MessageUtilities.get_uuid()
+            message_id = message_utilities.get_uuid()
             ebxml_message_dictionary[MESSAGE_ID] = message_id
-        timestamp = message_utilities.MessageUtilities.get_timestamp()
+        timestamp = message_utilities.get_timestamp()
         ebxml_message_dictionary[TIMESTAMP] = timestamp
         logger.info('Creating ebXML message with {MessageId} and {Timestamp}',
                     fparams={'MessageId': message_id, 'Timestamp': timestamp})
@@ -103,11 +104,12 @@ class EbxmlEnvelope(envelope.Envelope):
         extracted_values = {}
 
         for element_to_extract in EbxmlEnvelope._elements_to_extract_when_parsing:
-            EbxmlEnvelope._add_if_present(extracted_values, element_to_extract.name,
-                                          EbxmlEnvelope._extract_ebxml_text_value(xml_tree,
-                                                                                  element_to_extract.xml_name,
-                                                                                  parent=element_to_extract.xml_parent,
-                                                                                  required=True))
+            extracted_value = EbxmlEnvelope._extract_ebxml_text_value(xml_tree,
+                                                                      element_to_extract.xml_name,
+                                                                      parent=element_to_extract.xml_parent,
+                                                                      required=element_to_extract.required)
+            EbxmlEnvelope._add_if_present(extracted_values, element_to_extract.name, extracted_value)
+
 
         return extracted_values
 

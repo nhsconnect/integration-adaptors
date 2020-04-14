@@ -12,7 +12,7 @@
   "builders": [
     {
       "type": "docker",
-      "image": "python:3.7-slim",
+      "image": "nhsdev/nia-mhs-outbound-base:latest",
       "container_dir": "/packer-files",
       "commit": true,
       "changes": [
@@ -26,8 +26,6 @@
     {
       "type": "shell",
       "inline": [
-        "apt-get update",
-        "apt-get install build-essential libcurl4-openssl-dev libssl-dev -y",
         "mkdir -p {{user `app_dir`}}/mhs"
       ]
     },
@@ -49,12 +47,6 @@
     {
       "type": "shell",
       "inline": [
-        "sed -i 's/SECLEVEL=2/SECLEVEL=1/' /etc/ssl/openssl.cnf # Temporarily lower security to workaround opentest certs with SHA1 signatures"
-      ]
-    },
-    {
-      "type": "shell",
-      "inline": [
         "pip install pipenv",
         "cd {{user `app_dir`}}/{{user `outbound_dir`}}",
         "pipenv install --deploy --ignore-pipfile"
@@ -67,7 +59,7 @@
         "name": "publish",
         "type": "docker-tag",
         "repository": "{{user `registry`}}{{user `repository`}}",
-        "tag": "outbound-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "name": "publish",
@@ -78,7 +70,7 @@
       {
         "type": "docker-tag",
         "repository": "local/mhs-outbound",
-        "tag": "outbound-{{user `tag`}}"
+        "tag": "{{user `tag`}}"
       },
       {
         "type": "docker-tag",

@@ -1,4 +1,4 @@
 
 # @name Post
-POST {{HOSTNAME}}:8082/ HTTP/1.1
+POST {{HOSTNAME}}:{{INBOUND-PORT}}/ HTTP/1.1
 

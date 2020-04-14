@@ -7,7 +7,7 @@ import tornado.ioloop
 import tornado.web
 from tornado.options import parse_command_line
 
-from fake_spine import config
+from fake_spine import config, healthcheck_handler
 from fake_spine.certs import Certs
 from fake_spine.component_test_responses import component_test_responses
 from fake_spine.inbound_proxy_request_handler import InboundProxyRequestHandler
@@ -63,6 +63,12 @@ if __name__ == "__main__":
     proxy = tornado.httpserver.HTTPServer(proxy_application)
     logger.info(f'Inbound proxy starting on port {config.INBOUND_PROXY_PORT}')
     proxy.listen(config.INBOUND_PROXY_PORT)
+
+    healthcheck_application = tornado.web.Application([
+        ("/healthcheck", healthcheck_handler.HealthcheckHandler)
+    ])
+    logger.info(f'Healthcheck starting on port {config.FAKE_SPINE_HEALTHCHECK_PORT}')
+    healthcheck_application.listen(config.FAKE_SPINE_HEALTHCHECK_PORT)
 
     logger.log(logging.INFO, "Starting fakespine service")
     tornado.ioloop.IOLoop.current().start()
