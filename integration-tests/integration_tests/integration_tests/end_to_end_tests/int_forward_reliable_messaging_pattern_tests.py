@@ -38,7 +38,6 @@ class ForwardReliableMessagingPatternTests(TestCase):
         MHS_INBOUND_QUEUE.drain()
         self.assertions = CommonAssertions('forward-reliable')
 
-    @skip('Skipping FR test until fix is available')
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
         message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
@@ -48,7 +47,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
                           sync_async=False,
-                          correlation_id='1',
+                          correlation_id=message_id,
                           ods_code='X26') \
             .with_body(message) \
             .execute_post_expecting_success()
@@ -56,12 +55,11 @@ class ForwardReliableMessagingPatternTests(TestCase):
         # Assert
         AMQMessageAssertor(MHS_INBOUND_QUEUE.get_next_message_on_queue()) \
             .assert_property('message-id', message_id) \
-            .assert_property('correlation-id', '1') \
+            .assert_property('correlation-id', message_id) \
             .assert_json_content_type() \
             .assertor_for_hl7_xml_message() \
             .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)
 
-    @skip('Skipping FR test until fix is available')
     def test_should_record_forward_reliable_message_status_as_successful(self):
         # Arrange
         # The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.
@@ -74,7 +72,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
                           sync_async=False,
-                          correlation_id='1',
+                          correlation_id=message_id,
                           ods_code='X26') \
             .with_body(message) \
             .execute_post_expecting_success()
