@@ -73,7 +73,7 @@ and used for searching, filtering, agregation, graphing etc.
 | `InteractionId` | This ID is used to determine the workflow the message will take, there our four different workflows sync, sync-async, express and forward reliable. |
 | `MessageId` | A unique ID which is generated at the very start of a workflow if not already assigned. |
 | `CorrelationId` | A unique ID which is generated at the very start of a workflow and is used throughout all log messages related to that work, such that all the logs in the chain can be tied together for a single work item. CorrelationId can be passed into the MHS components from the supplier's calling client to allow for the CorrelationId to also tie the workflow together with the client system. |
-| `Inbound Message Id` | Also known as `RefToMessageId` A unique ID which is generated at the very start of a workflow if not already assigned. UUID assigned to incoming inbound messages that refer to original message_id of outbound message. Used to find if message id exists in state database to determine if message is unsolicited or not. |
+| `RefToMessageId` | A unique ID which is generated at the very start of a workflow if not already assigned. UUID assigned to incoming inbound messages that refer to original message_id of outbound message. Used to find if message id exists in state database to determine if message is unsolicited or not. |
 | `LoggerName` | Identifies the sub-component within the solution which produced the logs.  It's a dot-separated name where the first part is the component that produced the log. |
 | `Log Message` | Information that is logged. |
 
