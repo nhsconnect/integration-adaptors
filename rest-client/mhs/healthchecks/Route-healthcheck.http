@@ -1,3 +1,0 @@
-
-# @name Route-healthcheck
-GET {{BASE_URL}}:{{ROUTE-LOOKUP-PORT}}/healthcheck HTTP/1.1

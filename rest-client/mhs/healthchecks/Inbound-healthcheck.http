@@ -1,3 +1,0 @@
-
-# @name Inbound-healthcheck
-GET {{BASE_URL}}:{{INBOUND-PORT}}/healthcheck HTTP/1.1

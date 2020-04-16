@@ -1,4 +1,4 @@
-# @name Async_Reliable_Pattern_From_JMeter
+# @name async-reliable-pattern-from-jmeter
 
 POST {{BASE_URL}}:{{OUTBOUND-PORT}} HTTP/1.1
 content-type: application/json

@@ -1,10 +1,14 @@
 # In inbound main.py, change ssl_ctx.verify_mode = ssl.CERT_REQUIRED to ssl.CERT_NONE or ssl.CERT_OPTIONAL
-# This request will be handle as a unsolicited message.
+# This request will be throw 500 server error because of RefToMessageId. This is the refers to message id
+# to the 'original' message from outbound. Add this id to state database and specific workflow. 
+
+# @name solicited-request
+
 
 @baseUrl = http://localhost
 @port = 443
-
-# @name Unsolicited-request
+ 
+# @name Request
 POST {{baseUrl}}:{{port}}/ HTTP/1.1
 Host: rmmid.nis1.national.ncrs.nhs.uk
 SOAPAction: urn:nhs:names:services:gp2gp/COPC_IN000001UK01
@@ -34,6 +38,7 @@ Content-Transfer-Encoding: 8bit
 		<eb:MessageData>
 			<eb:MessageId>047C22B4-613F-47D3-9A72-44A1758464FB</eb:MessageId>
 			<eb:Timestamp>2013-11-04T14:33:58Z</eb:Timestamp>
+			<eb:RefToMessageId>8936cd14-d728-41a7-8d14-485183ebc2de</eb:RefToMessageId>
 		</eb:MessageData>
 		<eb:DuplicateElimination/>
 	</eb:MessageHeader>
