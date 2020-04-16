@@ -5,7 +5,7 @@ import os
 import unittest
 import uuid
 
-import handlers
+import requests
 from requests import Response
 
 from comms.http_headers import HttpHeaders
@@ -55,7 +55,7 @@ class ScrHttpRequestBuilder(object):
         Asserts the response is successful.
         :return: Response
         """
-        response = handlers.post(self.scr_host, headers=self.headers, data=self.body)
+        response = requests.post(self.scr_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.ok,
             f'A non successful error code was returned from server: {response.status_code} {response.text}')
@@ -67,7 +67,7 @@ class ScrHttpRequestBuilder(object):
         Executes a POST request against the SCR Adaptor, asserts the response status code is 400 
         :return: Response
         """
-        response = handlers.post(self.scr_host, headers=self.headers, data=self.body)
+        response = requests.post(self.scr_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.status_code == 400,
             f'A non 400 error code was returned from server: {response.status_code} {response.text}')
@@ -78,7 +78,7 @@ class ScrHttpRequestBuilder(object):
         Executes a POST request against the SCR Adaptor, asserts the response status code is 500 
         :return: Response
         """
-        response = handlers.post(self.scr_host, headers=self.headers, data=self.body)
+        response = requests.post(self.scr_host, headers=self.headers, data=self.body)
         self.assertor.assertTrue(
             response.status_code == 500,
             f'A non 400 error code was returned from server: {response.status_code} {response.text}')
