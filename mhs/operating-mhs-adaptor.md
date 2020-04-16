@@ -46,6 +46,12 @@ Audit logs are emitted through the same channel as other log messages, via the s
 
 ## Log Format
 
+First few logs don't follow the pattern as they are written before logger initialization. Those are minor read configuration logs. Pattern: 
+
+```text
+[%(asctime)sZ] | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s | %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s
+```
+
 Log messages produced by the MHS Adaptor are in human readable form and important data is included within the log message as key=value pairs so that they can be parsed 
 and used for searching, filtering, agregation, graphing etc.
 
@@ -54,6 +60,8 @@ and used for searching, filtering, agregation, graphing etc.
 ```
 
 - The start of the log line included a datetime-stamp in ISO8601 timestamp format and always in UTC timezone.
+
+- The above example does not contain an `inbound_message_id` as this log is from outbound. Only logs from inbound that are not unsolicited will contain this id. 
 
 - The end of the log line contains some log messages:
 
@@ -65,8 +73,8 @@ and used for searching, filtering, agregation, graphing etc.
 | `InteractionId` | This ID is used to determine the workflow the message will take, there our four different workflows sync, sync-async, express and forward reliable. |
 | `MessageId` | A unique ID which is generated at the very start of a workflow if not already assigned. |
 | `CorrelationId` | A unique ID which is generated at the very start of a workflow and is used throughout all log messages related to that work, such that all the logs in the chain can be tied together for a single work item. CorrelationId can be passed into the MHS components from the supplier's calling client to allow for the CorrelationId to also tie the workflow together with the client system. |
-| `RefToMessageId` | A unique ID which is generated at the very start of a workflow if not already assigned. UUID assigned to incoming inbound messages that refer to original message_id of outbound message. Used to find if message id exists in state database to determine if message is unsolicited or not. |
-| `LoggerName` | Identifies the sub-component within the solution which produced the logs. |
+| `Inbound Message Id` | Also known as `RefToMessageId` A unique ID which is generated at the very start of a workflow if not already assigned. UUID assigned to incoming inbound messages that refer to original message_id of outbound message. Used to find if message id exists in state database to determine if message is unsolicited or not. |
+| `LoggerName` | Identifies the sub-component within the solution which produced the logs.  It's a dot-separated name where the first part is the component that produced the log. |
 | `Log Message` | Information that is logged. |
 
 ## Log Level
