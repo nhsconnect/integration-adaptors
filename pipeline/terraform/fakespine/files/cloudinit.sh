@@ -36,12 +36,13 @@ git fetch
 git checkout feature/NIAD-132-fake-spine-vnp-deploy
 
 log "Building the image"
+BUILD_TAG=foo
 docker build -t local/fake-spine:${BUILD_TAG} -f ./integration-tests/fake_spine/Dockerfile .
 
 log "Starting the image"
 ./setup_component_test_env.sh
 . ./component-test-source.sh
-docker-compose -f docker-compose.yml up fakespine
+BUILD_TAG=foo docker-compose -f docker-compose.yml up fakespine
 
 
 

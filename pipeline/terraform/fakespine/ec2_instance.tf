@@ -30,12 +30,12 @@ data "aws_ami" "base_linux" {
 }
 
 resource "aws_iam_instance_profile" "fake_spine_instance_profile" {
- name = "${var.environment_id}-fake_spine_instance_profile"
+ name = "${var.environment_id}-fake-spine_instance_profile"
  role = aws_iam_role.fake_spine_iam_role.name
 }
 
 resource "aws_iam_role" "fake_spine_iam_role" {
-  name = "${var.environment_id}-iam_role"
+  name = "${var.environment_id}-fake-spine_iam_role"
   assume_role_policy = data.aws_iam_policy_document.fake_spine_assume_role.json
 }
 
