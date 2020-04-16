@@ -29,9 +29,13 @@ data "aws_ami" "base_linux" {
   }
 }
 
-resource "aws_iam_instance_profile" "fake_spine_instance_profile" {
- name = "${var.environment_id}-fake-spine_instance_profile"
- role = data.aws_iam_role.fake_spine_iam_role.name
+# resource "aws_iam_instance_profile" "fake_spine_instance_profile" {
+#  name = "${var.environment_id}-fake-spine_instance_profile"
+#  role = data.aws_iam_role.fake_spine_iam_role.name
+# }
+
+data  "aws_iam_instance_profile" "fake_spine_instance_profile" {
+  name = "build-fake-spine-iam-role"
 }
 
 # resource "aws_iam_role" "fake_spine_iam_role" {
@@ -43,36 +47,36 @@ data "aws_iam_role" "fake_spine_iam_role" {
   name = "build-fake-spine-iam-role"
 }
 
-data "aws_iam_policy_document" "fake_spine_assume_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
+# data "aws_iam_policy_document" "fake_spine_assume_role" {
+#   statement {
+#     actions = ["sts:AssumeRole"]
 
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
+#     principals {
+#       type        = "Service"
+#       identifiers = ["ec2.amazonaws.com"]
+#     }
+#   }
+# }
 
-resource "aws_iam_role_policy_attachment" "fs_role_S3" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-  role       = data.aws_iam_role.fake_spine_iam_role.name
-}
+# resource "aws_iam_role_policy_attachment" "fs_role_S3" {
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+#   role       = data.aws_iam_role.fake_spine_iam_role.name
+# }
 
-resource "aws_iam_role_policy_attachment" "fs_role_Secrets" {
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-  role       = data.aws_iam_role.fake_spine_iam_role.name
-}
+# resource "aws_iam_role_policy_attachment" "fs_role_Secrets" {
+#   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+#   role       = data.aws_iam_role.fake_spine_iam_role.name
+# }
 
-resource "aws_iam_role_policy_attachment" "fs_role_ECR" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
-  role       = data.aws_iam_role.fake_spine_iam_role.name
-}
+# resource "aws_iam_role_policy_attachment" "fs_role_ECR" {
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+#   role       = data.aws_iam_role.fake_spine_iam_role.name
+# }
 
-resource "aws_iam_role_policy_attachment" "fs_role_CW" {
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
-  role       = data.aws_iam_role.fake_spine_iam_role.name
-}
+# resource "aws_iam_role_policy_attachment" "fs_role_CW" {
+#   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+#   role       = data.aws_iam_role.fake_spine_iam_role.name
+# }
 
 resource "aws_instance" "fake_spine_instance" {
   ami = data.aws_ami.base_linux.id
@@ -83,7 +87,7 @@ resource "aws_instance" "fake_spine_instance" {
   associate_public_ip_address = true
   availability_zone = "eu-west-2a"
 
-  iam_instance_profile = aws_iam_instance_profile.fake_spine_instance_profile.name
+  iam_instance_profile = data.aws_iam_instance_profile.fake_spine_instance_profile.name
 
   user_data = data.template_cloudinit_config.fake_spine_user_data.rendered
 
