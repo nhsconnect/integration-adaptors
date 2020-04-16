@@ -84,7 +84,7 @@ def _modify_spine_url(fake_spine_url):
 
 def build_mock_sds_connection():
     # url = config.get_config(LDAP_MOCK_DATA_URL_CONFIG_KEY)
-    url = "s3://nhsd-test/mock_ldap_data"
+    url = "s3://nhsd-integration-adaptors/mock_ldap_data"
     parsed_url = urlparse(url)
 
     _MOCK_DATA_LOADERS[parsed_url.scheme](parsed_url)
