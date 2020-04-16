@@ -1,4 +1,3 @@
-import logging
 import os
 import ssl
 
@@ -7,7 +6,8 @@ import tornado.ioloop
 import tornado.web
 from tornado.options import parse_command_line
 
-from fake_spine import config, healthcheck_handler
+import utilities.integration_adaptors_logger as log
+from fake_spine import fake_spine_configuration, healthcheck_handler
 from fake_spine.certs import Certs
 from fake_spine.component_test_responses import component_test_responses
 from fake_spine.inbound_proxy_request_handler import InboundProxyRequestHandler
@@ -15,7 +15,8 @@ from fake_spine.request_handler import SpineRequestHandler
 from fake_spine.request_matching import SpineRequestResponseMapper
 from fake_spine.vnp_test_responses import vnp_test_responses
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
+
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -28,6 +29,7 @@ def build_proxy_application(inbound_certs: Certs):
 def build_application(fake_response_handler: SpineRequestResponseMapper):
     return tornado.web.Application([
         (r"/", SpineRequestHandler, dict(fake_response_handler=fake_response_handler)),
+        (r"/healthcheck", healthcheck_handler.HealthcheckHandler)
     ])
 
 
@@ -37,25 +39,31 @@ def build_application_configuration() -> SpineRequestResponseMapper:
     return SpineRequestResponseMapper(response_mappings)
 
 
-if __name__ == "__main__":
+def app():
+    log.configure_logging("fake-spine")  # ensure this is first to get proper logging of startup errors
     parse_command_line()
 
-    logger.log(logging.INFO, "Building fakespine service configuration")
+    logger.info("Building fakespine service configuration")
 
+    config = fake_spine_configuration.FakeSpineConfiguration()
     certs = Certs.create_certs_files(ROOT_DIR,
                                      private_key=config.FAKE_SPINE_PRIVATE_KEY,
                                      local_cert=config.FAKE_SPINE_CERTIFICATE,
                                      ca_certs=config.FAKE_SPINE_CA_STORE)
 
-    ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    ssl_ctx.load_cert_chain(certs.local_cert_path, certs.private_key_path)
-    ssl_ctx.verify_mode = ssl.CERT_REQUIRED
-    ssl_ctx.load_verify_locations(certs.ca_certs_path)
-
     application_configuration = build_application_configuration()
     application = build_application(application_configuration)
 
-    server = tornado.httpserver.HTTPServer(application, ssl_options=ssl_ctx)
+    if config.FAKE_SPINE_OUTBOUND_SSL_ENABLED:
+        logger.info("Starting fake-spine outbound with SSL enabled")
+        ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        ssl_ctx.load_cert_chain(certs.local_cert_path, certs.private_key_path)
+        ssl_ctx.verify_mode = ssl.CERT_REQUIRED
+        ssl_ctx.load_verify_locations(certs.ca_certs_path)
+        server = tornado.httpserver.HTTPServer(application, ssl_options=ssl_ctx)
+    else:
+        logger.info("Starting fake-spine outbound with SSL disabled")
+        server = tornado.httpserver.HTTPServer(application)
     logger.info(f'Fake spine starting on port {config.FAKE_SPINE_PORT}')
     server.listen(config.FAKE_SPINE_PORT)
 
@@ -64,11 +72,12 @@ if __name__ == "__main__":
     logger.info(f'Inbound proxy starting on port {config.INBOUND_PROXY_PORT}')
     proxy.listen(config.INBOUND_PROXY_PORT)
 
-    healthcheck_application = tornado.web.Application([
-        ("/healthcheck", healthcheck_handler.HealthcheckHandler)
-    ])
-    logger.info(f'Healthcheck starting on port {config.FAKE_SPINE_HEALTHCHECK_PORT}')
-    healthcheck_application.listen(config.FAKE_SPINE_HEALTHCHECK_PORT)
-
-    logger.log(logging.INFO, "Starting fakespine service")
+    logger.info("Starting fakespine service")
     tornado.ioloop.IOLoop.current().start()
+
+
+if __name__ == "__main__":
+    try:
+        app()
+    except Exception:
+        logger.exception("App crashed")

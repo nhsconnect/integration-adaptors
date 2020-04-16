@@ -38,7 +38,8 @@ EXPECTED_UNSOLICITED_ATTACHMENTS = [{ebxml_request_envelope.ATTACHMENT_PAYLOAD: 
                                      ebxml_request_envelope.ATTACHMENT_BASE64: False,
                                      ebxml_request_envelope.ATTACHMENT_CONTENT_ID: '8F1D7DE1-02AB-48D7-A797'
                                                                                    '-A947B09F347F@spine.nhs.uk',
-                                     ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain'}]
+                                     ebxml_request_envelope.ATTACHMENT_CONTENT_TYPE: 'text/plain',
+                                     ebxml_request_envelope.ATTACHMENT_DESCRIPTION: 'Some description'}]
 
 state_data = [
     {
