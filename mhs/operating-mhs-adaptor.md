@@ -50,21 +50,24 @@ Log messages produced by the MHS Adaptor are in human readable form and importan
 and used for searching, filtering, agregation, graphing etc.
 
 ```text
-[2019-10-10T10:10:00.735207Z] Entered async express workflow to handle outbound message RequestId=459D9095-45F2-4C2D-86EA-E1E0F78BC142 CorrelationId=12345 ProcessKey=ASYNC_EXPRESS_WORKFLOW0001 pid=6 LogLevel=INFO LoggerName=ASYNC_EXPRESS_WORKFLOW
+2020-03-26T10:31:52.118165Z | AUDIT | 40186 | QUPC_IN160101UK05 | 4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703 | 1 |  | outbound.mhs_common.workflow.asynchronous_express | WorkflowName=async-express outbound workflow invoked.
 ```
 
-- The start of the log line included a datetime-stamp in ISO8601 timestamp format and always in UTC timezone.
+- The start of the log line included a datetime-stamp in ISO8601 timestamp format and always in UTC timezone.
 
-- The end of the log line contains some common key=value pairs which can be expected to be present in all log messages:
+- The end of the log line contains some log messages:
 
 | Common Key | Purpose |
 | ---------- |:------- |
-| `ProcessKey` | To identify which logical component of the solution produced the log message and a unique identifier for the log line to aid tracking down the piece of code that produced the log message, e.g. `"ASYNC_EXPRESS_WORKFLOW0001"`. Each ProcessKey will be unique. |
-| `pid`        | Process ID, identifies the running instance of a component that produced the log message. |
-| `RequestId` | Identifies what item of work is being processed be it an incoming request, message processed off a queue or batch file being picked up and worked. |
-| `CorrelationId` | A unique ID which is generated at the very start of a workflow and is used throughout all log messages related to that work, such that all the logs in the chain can be tied together for a single work item. CorrelationId can be passed into the MHS Adaptor components from the supplier's calling client to allow for the CorrelationId to also tie the workflow together with the client system. |
+| `Time` | Datetime-stamp in ISO8601 timestamp format and always in UTC timezone. |
 | `LogLevel` | The level at which the log line was raised. |
+| `pid` | Process ID, identifies the running instance of a component that produced the log message. |
+| `InteractionId` | This ID is used to determine the workflow the message will take, there our four different workflows sync, sync-async, express and forward reliable. |
+| `MessageId` | A unique ID which is generated at the very start of a workflow if not already assigned. |
+| `CorrelationId` | A unique ID which is generated at the very start of a workflow and is used throughout all log messages related to that work, such that all the logs in the chain can be tied together for a single work item. CorrelationId can be passed into the MHS components from the supplier's calling client to allow for the CorrelationId to also tie the workflow together with the client system. |
+| `RefToMessageId` | A unique ID which is generated at the very start of a workflow if not already assigned. UUID assigned to incoming inbound messages that refer to original message_id of outbound message. Used to find if message id exists in state database to determine if message is unsolicited or not. |
 | `LoggerName` | Identifies the sub-component within the solution which produced the logs. |
+| `Log Message` | Information that is logged. |
 
 ## Log Level
 The logs produced by the MHS Adaptor application components have one of the following log levels, the following table describes the semantics of each log level:
@@ -86,7 +89,7 @@ The MHS Adaptor components have specifically chosen INFO as the lowest log level
 Every outbound and inbound message which passes through the MHS Adaptor produces an audit log message. Following is an example of the format:
 
 ```text
-[2019-10-10T10:10:00.735207Z] Async-express workflow invoked. Message sent to Spine and Acknowledgment=MessageStatus.OUTBOUND_MESSAGE_ACKD received. RequestSentTime=2019-10-10T10:10:00.282734Z AcknowledgmentReceivedTime=2019-10-10T10:10:00.435207Z RequestId=E2EDED45-F6BE-4666-9CAE-AD05618CD559 CorrelationId=12345 ProcessKey=ASYNC_EXPRESS_WORKFLOW0011 pid=6 LogLevel=AUDIT LoggerName=ASYNC_EXPRESS_WORKFLOW
+20-03-26T10:31:52.500735Z | AUDIT | 40186 | QUPC_IN160101UK05 | 4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703 | 1 |  | outbound.mhs_common.workflow.common_asynchronous | WorkflowName=async-express outbound workflow invoked. Message sent to Spine and Acknowledgment=MessageStatus.OUTBOUND_MESSAGE_ACKD received.
 ```
 Audit messages are produced with the log level of AUDIT.
 
@@ -96,7 +99,7 @@ Audit messages are produced with the log level of AUDIT.
 
 `AcknowledgementReceivedTime` is the time the ACK response was received from Spine by the MHS Adaptor.
 
-See above for details of `RequestId`, `CorrelationId`, `ProcessKey`, `pid`, `LogLevel`, and `LoggerName`.
+See above for details of `Time`, `LogLevel`, `pid`, `InteractionId`, `MessageId`, `CorrelationID`, `RefToMessageId`, `Loggername` and `Log Message`.
 
 ### Workflow processes
 
