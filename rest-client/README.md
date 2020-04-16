@@ -12,7 +12,7 @@ Download the following to set up VSCode Rest Client:
 
 Open workspace, ensure Rest Client and GUID Insert are enabled on workspace. Go to `Preferences` > `Extensions`, search for the two extensions above (Rest Client & GUID) and select enable. 
 
-</br>
+<br>
 
 ## Constructing Request
 
@@ -33,7 +33,7 @@ Open workspace, ensure Rest Client and GUID Insert are enabled on workspace. Go 
 - List of environments `Cmd`+`Option`+`E`
 - Open settings `Cmd`+`,`
 
-</br>
+<br>
 
 ### Environment Variables 
 
@@ -47,17 +47,17 @@ Environment variables are store in `settings.json` file located in `.vscode` fol
     "rest-client.environmentVariables": {
         "$shared": {},
         "$sample_mhs_environment": {
-            "HOSTNAME": "http://localhost",
-            "SPINE_HOSTNAME": "https://192.168.128.11/",
-            "INBOUND-PORT": "8082",
+            "BASE_URL": "http://localhost",
+            "INBOUND-PORT": "443",
+            "TO-PARTY-ID": "X26-9199246",
             "OUTBOUND-PORT": "80",
             "ROUTE-LOOKUP-PORT": "8088",
             "FAKE-SPINE-PORT": "8091",
-            "ASID": "91XXXXXXXXXX",
+            "ASID": "9XXXXXXXXXXX",
             "GUID-idRoot": "3c996a6b-8e3b-42ec-8796-34aa8dca353c",
             "GUID-idAltRoot": "af16f8c8-1a31-470c-802a-1716425b04fa",
             "SHORT-TIMESTAMP": "20190927152035",
-            "PARTY-KEY": "A9XXXX-XXXXXX",
+            "PARTY-KEY": "A9XXXX-XXXXXXX",
             "FILE-UPLOADED": "test file will go here",
             "LOCAL_SCR_URL": "http://localhost:9000/",
             "MESSAGE_ID": "6a6c8179-e8e3-419a-a6dc-0c07844ddef7"
@@ -72,7 +72,7 @@ Enironment variables can be used in a http file by surrounding text with curly b
 
 
 
-</br>
+<br>
 
 ### File Variables
 
@@ -88,13 +88,13 @@ Can be used in file as shown below in the Request Line:
 POST {{baseUrl}}:80 HTTP/1.1
 ```
 
-</br>
+<br>
 
 ### Generate UUID
 
 Currently it is only possible to generate UUID manual using an extension. To generator new UUID, `fn` + `F1` and type `Insert GUID` where needed. Currently an environment variable is used in settings.json for this to be easily changed in all http files. 
 
-</br>
+<br>
 
 ### Response Panel 
 
@@ -120,7 +120,7 @@ Save response body, click `Save Response Body` button
     }
     ```
 
-</br>
+<br>
 
 ### Tips
 
@@ -135,7 +135,7 @@ Hover over response size to view the breakdown response size details of headers 
 
 ![Image of response size](./documentation/vscode-response-size.png )
 
-</br>
+<br>
 
 ## custom
 

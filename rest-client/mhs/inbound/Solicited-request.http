@@ -5,11 +5,11 @@
 # @name Solicited-request
 
 
-@baseUrl = http://localhost:
+@baseUrl = http://localhost
 @port = 443
  
 # @name Request
-POST {{baseUrl}}{{port}}/ HTTP/1.1
+POST {{baseUrl}}:{{port}}/ HTTP/1.1
 Host: rmmid.nis1.national.ncrs.nhs.uk
 SOAPAction: urn:nhs:names:services:gp2gp/COPC_IN000001UK01
 Content-Length: 1028570

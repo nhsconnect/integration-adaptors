@@ -1,11 +1,11 @@
 # In inbound main.py, change ssl_ctx.verify_mode = ssl.CERT_REQUIRED to ssl.CERT_NONE or ssl.CERT_OPTIONAL
 # This request will be handle as a unsolicited message.
 
-@baseUrl = http://localhost:
+@baseUrl = http://localhost
 @port = 443
 
 # @name Unsolicited-request
-POST {{baseUrl}}{{port}}/ HTTP/1.1
+POST {{baseUrl}}:{{port}}/ HTTP/1.1
 Host: rmmid.nis1.national.ncrs.nhs.uk
 SOAPAction: urn:nhs:names:services:gp2gp/COPC_IN000001UK01
 Content-Length: 1028570
