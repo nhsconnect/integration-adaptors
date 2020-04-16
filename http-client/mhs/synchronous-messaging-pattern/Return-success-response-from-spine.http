@@ -1,0 +1,15 @@
+// Message ID: F5187FB6-B033-4A75-838B-9E7A1AFB3111 configured in fakespine to return a SOAP Fault error.
+// Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
+
+@PATIENT_NHS_NUMBER = 9689174606
+
+# @name Return_error_response_to_client_when_error_response_returned_from_spine
+POST http://localhost HTTP/1.1
+interaction-id: QUPA_IN040000UK32
+message-id: {{$guid}}
+sync-async: false
+from-asid: {{ASID}}
+Content-Type: application/json
+ods-code: YES
+
+{"payload": "<QUPA_IN040000UK32 xmlns=\"urn:hl7-org:v3\" xmlns:hl7=\"urn:hl7-org:v3\">\n <id root=\"D43CBE19-0EDD-4E0D-9B5B-D08F7B691DF3\" />\n <creationTime value=\"20200416135515\" />\n <versionCode code=\"V3NPfIT3.0\" />\n <interactionId root=\"2.16.840.1.113883.2.1.3.2.4.12\" extension=\"QUPA_IN040000UK32\" />\n <processingCode code=\"P\" />\n <processingModeCode code=\"T\" />\n <acceptAckCode code=\"NE\" />\n <communicationFunctionRcv>\n <device classCode=\"DEV\" determinerCode=\"INSTANCE\">\n <hl7:id xmlns:SOAP=\"http://schemas.xmlsoap.org/soap/envelope/\" extension=\"928942012545\"\n root=\"1.2.826.0.1285.0.2.0.107\" />\n </device>\n </communicationFunctionRcv>\n <communicationFunctionSnd>\n <device classCode=\"DEV\" determinerCode=\"INSTANCE\">\n <hl7:id xmlns:SOAP=\"http://schemas.xmlsoap.org/soap/envelope/\" extension=\"918999198977\"\n root=\"1.2.826.0.1285.0.2.0.107\" />\n </device>\n </communicationFunctionSnd>\n <ControlActEvent classCode=\"CACT\" moodCode=\"EVN\">\n <author1 typeCode=\"AUT\">\n <AgentSystemSDS classCode=\"AGNT\">\n <agentSystemSDS classCode=\"DEV\" determinerCode=\"INSTANCE\">\n <hl7:id xmlns:SOAP=\"http://schemas.xmlsoap.org/soap/envelope/\" extension=\"918999198977\"\n root=\"1.2.826.0.1285.0.2.0.107\" />\n </agentSystemSDS>\n </AgentSystemSDS>\n </author1>\n <query>\n <historicDataIndicator>\n <value code=\"0\" codeSystem=\"2.16.840.1.113883.2.1.3.2.4.17.36\" />\n <semanticsText>historicDataIndicator</semanticsText>\n </historicDataIndicator>\n <person.id>\n <value root=\"2.16.840.1.113883.2.1.4.1\" extension=\"9689174606\" />\n <semanticsText>person.id</semanticsText>\n </person.id>\n <retrievalItem>\n <semanticsText>person.allData</semanticsText>\n </retrievalItem>\n </query>\n </ControlActEvent>\n</QUPA_IN040000UK32>\n"}

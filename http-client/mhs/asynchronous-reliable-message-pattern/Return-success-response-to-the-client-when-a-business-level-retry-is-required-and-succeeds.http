@@ -8,7 +8,7 @@
 
 POST http://localhost HTTP/1.1
 interaction-id: REPC_IN150016UK05
-message-id: 35586865-45B0-41A5-98F6-817CA6F1F5EF
+message-id: {{$guid}}
 sync-async: false
 from-asid: {{ASID}}
 Content-Type: application/json
