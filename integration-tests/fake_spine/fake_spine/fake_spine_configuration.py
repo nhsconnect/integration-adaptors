@@ -34,4 +34,4 @@ class FakeSpineConfiguration(object):
         self.OUTBOUND_DELAY_MS = int(environ_or_error('FAKE_SPINE_OUTBOUND_DELAY_MS', default='0'))
         self.INBOUND_DELAY_MS = int(environ_or_error('FAKE_SPINE_INBOUND_DELAY_MS', default='0'))
         self.MHS_SECRET_PARTY_KEY = os.environ.get('MHS_SECRET_PARTY_KEY')
-        self.FAKE_SPINE_OUTBOUND_SSL_ENABLED = str2bool(os.environ.get('FAKE_SPINE_OUTBOUND_SSL_ENABLED', default=str(True)))
+        self.FAKE_SPINE_OUTBOUND_SSL_ENABLED = str2bool(os.environ.get('FAKE_SPINE_OUTBOUND_SSL_ENABLED', default='True'))

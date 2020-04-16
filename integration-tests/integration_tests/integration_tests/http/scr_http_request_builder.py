@@ -6,7 +6,7 @@ import unittest
 import uuid
 
 import handlers
-from handlers import Response
+from requests import Response
 
 from comms.http_headers import HttpHeaders
 

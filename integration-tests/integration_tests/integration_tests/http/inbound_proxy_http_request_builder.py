@@ -4,8 +4,8 @@ Provides functionality for calling the inbound service of the MHS, via a proxy, 
 from __future__ import annotations
 import os
 import unittest
-import handlers
-from handlers import Response
+import requests
+from requests import Response
 from comms.http_headers import HttpHeaders
 
 
@@ -63,4 +63,4 @@ class InboundProxyHttpRequestBuilder(object):
         Execute a POST request against the INBOUND_PROXY using the configured body and headers within this class.
         :return: response from MHS inbound service
         """
-        return handlers.post(self.inbound_proxy_host, headers=self.headers, data=self.body, verify=False)
+        return requests.post(self.inbound_proxy_host, headers=self.headers, data=self.body, verify=False)
