@@ -34,18 +34,10 @@ data "aws_ami" "base_linux" {
 #  role = data.aws_iam_role.fake_spine_iam_role.name
 # }
 
-data  "aws_iam_instance_profile" "fake_spine_instance_profile" {
-  name = "build-fake-spine-iam-role"
-}
-
 # resource "aws_iam_role" "fake_spine_iam_role" {
 #   name = "${var.environment_id}-fake-spine_iam_role"
 #   assume_role_policy = data.aws_iam_policy_document.fake_spine_assume_role.json
 # }
-
-data "aws_iam_role" "fake_spine_iam_role" {
-  name = "build-fake-spine-iam-role"
-}
 
 # data "aws_iam_policy_document" "fake_spine_assume_role" {
 #   statement {
@@ -87,7 +79,7 @@ resource "aws_instance" "fake_spine_instance" {
   associate_public_ip_address = true
   availability_zone = "eu-west-2a"
 
-  iam_instance_profile = data.aws_iam_instance_profile.fake_spine_instance_profile.name
+  iam_instance_profile = "TerraformJumpboxRole"
 
   user_data = data.template_cloudinit_config.fake_spine_user_data.rendered
 
