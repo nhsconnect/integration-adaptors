@@ -71,6 +71,7 @@ data "aws_ami" "base_linux" {
 # }
 
 resource "aws_instance" "fake_spine_instance" {
+  name = "${var.environment_id}-fake-spine_instance"
   ami = data.aws_ami.base_linux.id
   instance_type = "t2.micro"
   key_name = "kainos-dev"

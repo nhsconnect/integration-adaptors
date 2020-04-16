@@ -19,6 +19,17 @@ resource "aws_security_group_rule" "fake_spine_security_group_ingress_443" {
   description = "Allow HTTP inbound requests from fake spine load balancer"
 }
 
+resource "aws_security_group_rule" "fake_spine_security_group_ingress_22" {
+  security_group_id = aws_security_group.fake_spine_security_group.id
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  cidr_blocks = ["91.222.71.98/32"]
+  //source_security_group_id = aws_security_group.alb_fake_spine_security_group.id
+  description = "Allow SSH inbound from Kainos Gdansk VPN"
+}
+
 resource "aws_security_group_rule" "fake_spine_security_group_egress_80" {
   security_group_id = aws_security_group.alb_fake_spine_security_group.id
   source_security_group_id = aws_security_group.fake_spine_security_group.id
@@ -82,3 +93,4 @@ resource "aws_security_group_rule" "fake_spine_security_group_cloudwatch_egress_
   source_security_group_id = data.terraform_remote_state.mhs.outputs.cloudwatch_vpce_security_group_id
   description = "HTTPS connections to Cloudwatch endpoint"
 }
+
