@@ -71,13 +71,12 @@ resource "aws_iam_role_policy_attachment" "fs_role_CW" {
 }
 
 resource "aws_instance" "fake_spine_instance" {
-  count = locals.deploy_to_ec2 ? 1 : 0
   ami = data.aws_ami.base_linux.id
   instance_type = "t2.micro"
   key_name = "kainos-dev"
   security_groups = [aws_security_group.fake_spine_security_group.id]
   subnet_id = data.terraform_remote_state.mhs.outputs.subnet_ids[0]
-  associate_public_ip_adress = true
+  associate_public_ip_address = true
   availability_zone = "eu-west-2a"
 
   iam_instance_profile = aws_iam_instance_profile.fake_spine_instance_profile.name
