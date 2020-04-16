@@ -48,19 +48,13 @@ Environment variables are store in `settings.json` file located in `.vscode` fol
         "$shared": {},
         "$sample_mhs_environment": {
             "BASE_URL": "http://localhost",
-            "INBOUND-PORT": "443",
-            "TO-PARTY-ID": "X26-9199246",
-            "OUTBOUND-PORT": "80",
-            "ROUTE-LOOKUP-PORT": "8088",
-            "FAKE-SPINE-PORT": "8091",
-            "ASID": "9XXXXXXXXXXX",
-            "GUID-idRoot": "3c996a6b-8e3b-42ec-8796-34aa8dca353c",
-            "GUID-idAltRoot": "af16f8c8-1a31-470c-802a-1716425b04fa",
-            "SHORT-TIMESTAMP": "20190927152035",
-            "PARTY-KEY": "A9XXXX-XXXXXXX",
-            "FILE-UPLOADED": "test file will go here",
-            "LOCAL_SCR_URL": "http://localhost:9000/",
-            "MESSAGE_ID": "6a6c8179-e8e3-419a-a6dc-0c07844ddef7"
+                        "INBOUND-PORT": "8082",
+                        "OUTBOUND-PORT": "80",
+                        "ROUTE-LOOKUP-PORT": "8088",
+                        "FAKE-SPINE-PORT": "8091",
+                        "ASID": "9XXXXXXXXXXX",
+                        "PARTY-KEY": "A9XXXX-XXXXXXX",
+                        "REF-TO-MESSAGE-ID": "8936cd14-d728-41a7-8d14-485183ebc2de"
         }
     }
 }

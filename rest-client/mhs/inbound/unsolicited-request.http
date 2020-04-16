@@ -6,7 +6,6 @@
 
 # @name unsolicited-request
 POST {{baseUrl}}:{{port}}/ HTTP/1.1
-Host: rmmid.nis1.national.ncrs.nhs.uk
 SOAPAction: urn:nhs:names:services:gp2gp/COPC_IN000001UK01
 Content-Length: 1028570
 Content-Type: multipart/related; boundary="--=_MIME-Boundary"; type="text/xml"; start="<ebXMLHeader@spine.nhs.uk>"
@@ -22,17 +21,17 @@ Content-Transfer-Encoding: 8bit
 <SOAP:Header>
 	<eb:MessageHeader SOAP:mustUnderstand="1" eb:version="2.0">
 		<eb:From>
-			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">RHM-801710</eb:PartyId>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">{{PARTY-KEY}}</eb:PartyId>
 		</eb:From>
 		<eb:To>
 			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">A91576-9198964</eb:PartyId>
 		</eb:To>
 		<eb:CPAId>S2030731A2137927</eb:CPAId>
-		<eb:ConversationId>74799658-43DF-11E3-805D-BBA66E7A9031</eb:ConversationId>
+		<eb:ConversationId>{{$guid}}</eb:ConversationId>
 		<eb:Service>urn:nhs:names:services:gp2gp</eb:Service>
 		<eb:Action>COPC_IN000001UK01</eb:Action>
 		<eb:MessageData>
-			<eb:MessageId>047C22B4-613F-47D3-9A72-44A1758464FB</eb:MessageId>
+			<eb:MessageId>{{$guid}}</eb:MessageId>
 			<eb:Timestamp>2013-11-04T14:33:58Z</eb:Timestamp>
 		</eb:MessageData>
 		<eb:DuplicateElimination/>
