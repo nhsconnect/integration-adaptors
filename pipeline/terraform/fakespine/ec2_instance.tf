@@ -34,10 +34,16 @@ resource "aws_iam_instance_profile" "fake_spine_instance_profile" {
  role = aws_iam_role.fake_spine_iam_role.name
 }
 
-resource "aws_iam_role" "fake_spine_iam_role" {
-  name = "${var.environment_id}-fake-spine_iam_role"
-  assume_role_policy = data.aws_iam_policy_document.fake_spine_assume_role.json
+# resource "aws_iam_role" "fake_spine_iam_role" {
+#   name = "${var.environment_id}-fake-spine_iam_role"
+#   assume_role_policy = data.aws_iam_policy_document.fake_spine_assume_role.json
+# }
+
+data "aws_iam_role" "fake_spine_iam_role" {
+  name = "build-fake-spine-iam-role"
 }
+
+
 
 data "aws_iam_policy_document" "fake_spine_assume_role" {
   statement {
@@ -52,22 +58,22 @@ data "aws_iam_policy_document" "fake_spine_assume_role" {
 
 resource "aws_iam_role_policy_attachment" "fs_role_S3" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-  role       = aws_iam_role.fake_spine_iam_role.name
+  role       = data.aws_iam_role.fake_spine_iam_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "fs_role_Secrets" {
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-  role       = aws_iam_role.fake_spine_iam_role.name
+  role       = data.aws_iam_role.fake_spine_iam_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "fs_role_ECR" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
-  role       = aws_iam_role.fake_spine_iam_role.name
+  role       = data.aws_iam_role.fake_spine_iam_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "fs_role_CW" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
-  role       = aws_iam_role.fake_spine_iam_role.name
+  role       = data.aws_iam_role.fake_spine_iam_role.name
 }
 
 resource "aws_instance" "fake_spine_instance" {
