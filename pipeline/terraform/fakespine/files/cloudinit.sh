@@ -3,7 +3,7 @@
 
 # -u          :: Fail on unbounded variable usage
 # -o pipefail :: Report failures that occur elsewhere than just the last command in a pipe
-set -uo pipefail
+# set -uo pipefail
 
 # Just for logging. Because rsyslog is not running before userdata.
 log_file='/tmp/bootstrap.log';
@@ -24,6 +24,9 @@ export curl="$(which curl || echo '/usr/bin/curl')";
 
 log "Installing docker, git, ssh"
 
+service firewalld stop
+
+yum makecache
 yum install -y docker git ssh
 
 log "Cloning the NHS repo"

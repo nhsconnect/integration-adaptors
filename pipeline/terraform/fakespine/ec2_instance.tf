@@ -98,3 +98,33 @@ data "template_cloudinit_config" "fake_spine_user_data" {
     content      = file("${path.module}/files/cloudinit.sh")
   }
 }
+
+resource "aws_security_group_rule" "fake_spine_security_group_ingress_22" {
+  security_group_id = aws_security_group.fake_spine_security_group.id
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  cidr_blocks = ["91.222.71.98/32"]
+  description = "Allow SSH inbound from Kainos Gdansk VPN"
+}
+
+resource "aws_security_group_rule" "fake_spine_security_group_egress_Internet_443" {
+  security_group_id = aws_security_group.fake_spine_security_group.id
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "HTTPS connections to Internet."
+}
+
+resource "aws_security_group_rule" "fake_spine_security_group_egress_Internet_80" {
+  security_group_id = aws_security_group.fake_spine_security_group.id
+  type = "egress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "HTTPS connections to Internet."
+}
