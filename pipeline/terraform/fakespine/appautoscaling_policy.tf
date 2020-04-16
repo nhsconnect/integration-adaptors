@@ -1,6 +1,7 @@
 # An autoscaling policy for the MHS route ECS service that scales services so that each instance handles the desired
 # number of requests per minute.
 # resource "aws_appautoscaling_policy" "fake_spine_autoscaling_policy" {
+#   count = local.deploy_to_ec2 ? 0 : 1
 #   name = "${var.environment_id}-fake-spine-autoscaling-policy"
 #   policy_type = "TargetTrackingScaling"
 #   resource_id = aws_appautoscaling_target.fake_spine_autoscaling_target.resource_id

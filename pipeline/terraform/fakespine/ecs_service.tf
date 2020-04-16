@@ -1,6 +1,7 @@
 # Create an ECS service that runs a configurable number of instances of the fake-spine service container across all of the
 # VPC's subnets. Each container is register with the route service's LB's target group.
 resource "aws_ecs_service" "fake_spine_service" {
+  count = local.deploy_to_ec2 ? 0 : 1
   name = "${var.environment_id}-fake-spine"
   # cluster = "arn:aws:ecs:eu-west-2:067756640211:cluster/testing-fake-spine"
   cluster = data.terraform_remote_state.mhs.outputs.cluster_id

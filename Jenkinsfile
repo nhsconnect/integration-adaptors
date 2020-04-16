@@ -1,12 +1,12 @@
 // Global variables - to be moved to parameters
 // Options to switch off certain steps if needed
-Boolean runBuildCommon     = true
+Boolean runBuildCommon     = false
 Boolean runBuild           = false
 Boolean runUnitTest        = false
 Boolean runIntegrationTest = false
 Boolean runComponentTest   = false
 Boolean runTerraform       = true
-Boolean buildFakespine     = true
+Boolean buildFakespine     = false
 Boolean deployFakespine    = true
 
 pipeline {
@@ -373,7 +373,7 @@ pipeline {
 
                                         sh(label:"Terraform: init", script: initCommand)
                                         terraform("plan",  "fakespine", ["-no-color"],                  tfVariables )
-                                        terraform("apply", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
+                                        //terraform("apply", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
                                         //terraform("destroy", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
                                     }
                                 }

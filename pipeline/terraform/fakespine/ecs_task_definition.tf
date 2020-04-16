@@ -1,5 +1,6 @@
 # Fake Spine ECS task definition
 resource "aws_ecs_task_definition" "fake_spine_task" {
+  count = local.deploy_to_ec2 ? 0 : 1
   family = "${var.environment_id}-fake-spine"
   container_definitions = jsonencode(
   [

@@ -1,4 +1,5 @@
 locals {
+    deploy_to_ec2 = true
     fake_spine_base_environment_variables = [
     {
       name = "INBOUND_SERVER_BASE_URL",
