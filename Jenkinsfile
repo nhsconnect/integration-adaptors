@@ -413,8 +413,8 @@ pipeline {
 
     post {
         always {
-            cobertura coberturaReportFile: '**/coverage.xml'
-            junit '**/test-reports/*.xml'
+            //cobertura coberturaReportFile: '**/coverage.xml'
+            //junit '**/test-reports/*.xml'
             sh 'docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p ${BUILD_TAG_LOWER} down -v'
             sh 'docker volume prune --force'
             // Prune Docker images for current CI build.

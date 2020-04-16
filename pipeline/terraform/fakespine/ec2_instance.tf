@@ -29,7 +29,7 @@ data "aws_ami" "base_linux" {
   }
 }
 
-resource "aws_instance_profile" "fake_spine_instance_profile" {
+resource "aws_iam_instance_profile" "fake_spine_instance_profile" {
  name = "${var.environment_id}-fake_spine_instance_profile"
  role = aws_iam_role.fake_spine_iam_role.name
 }
@@ -80,7 +80,7 @@ resource "aws_instance" "fake_spine_instance" {
   associate_public_ip_adress = true
   availability_zone = "eu-west-2a"
 
-  iam_instance_profile = aws_instance_profile.fake_spine_instance_profile.name
+  iam_instance_profile = aws_iam_instance_profile.fake_spine_instance_profile.name
 
   user_data = data.template_cloudinit_config.fake_spine_user_data.rendered
 
