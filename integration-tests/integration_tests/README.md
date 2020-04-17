@@ -60,6 +60,183 @@ source ./component-test-source.sh
 docker-compose -f docker-compose.yml -f docker-compose.component.override.yml -p custom_network up --build
 ```
 
+## Running Integration Tests with Visual Studio Code Rest Client
+#### Prerequisites
+The following is required
+- Visual Studio Code
+- Visual Studio Code REST Client Plugin: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+- Docker 
+- OpenTest connection
+
+#### Environment set up
+1. Create a docker-compose.yml file in a local folder with the following content:
+
+```yml
+version: '3' 
+
+services: 
+  inbound: 
+    image: nhsdev/nia-mhs-inbound:${BUILD_TAG} 
+    ports: 
+      - "443" 
+      - "80" 
+    environment: 
+      - MHS_LOG_LEVEL=NOTSET 
+      - MHS_SECRET_PARTY_KEY 
+      - MHS_SECRET_CLIENT_CERT 
+      - MHS_SECRET_CLIENT_KEY 
+      - MHS_SECRET_CA_CERTS 
+      - MHS_INBOUND_QUEUE_URL=rabbitmq:5672/inbound 
+      - MHS_SECRET_INBOUND_QUEUE_USERNAME=guest 
+      - MHS_SECRET_INBOUND_QUEUE_PASSWORD=guest 
+      - MHS_STATE_TABLE_NAME=mhs_state 
+      - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state 
+      - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000 
+      # boto3 requires some AWS creds to be provided, even 
+      # when connecting to local DynamoDB 
+      - AWS_ACCESS_KEY_ID=test 
+      - AWS_SECRET_ACCESS_KEY=test 
+      - TCP_PORTS=443 
+      - SERVICE_PORTS=443,80 
+
+  outbound: 
+    image: nhsdev/nia-mhs-outbound:${BUILD_TAG} 
+    ports: 
+      - "80" 
+    environment: 
+      - MHS_LOG_LEVEL=NOTSET 
+      - MHS_SECRET_PARTY_KEY 
+      - MHS_SECRET_CLIENT_CERT 
+      - MHS_SECRET_CLIENT_KEY 
+      - MHS_SECRET_CA_CERTS 
+      - MHS_STATE_TABLE_NAME=mhs_state 
+      - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000 
+      - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state 
+      - AWS_ACCESS_KEY_ID=test 
+      - AWS_SECRET_ACCESS_KEY=test 
+      - MHS_RESYNC_INTERVAL=1 
+      - MAX_RESYNC_RETRIES=20 
+      - MHS_SPINE_ROUTE_LOOKUP_URL=http://route 
+      - MHS_SPINE_ORG_CODE=YES 
+      - MHS_SPINE_REQUEST_MAX_SIZE=4999600 # 5 000 000 - 400 
+      # Note that this endpoint URL is Opentest-specific 
+      - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable 
+      - SERVICE_PORTS=80 
+      - MHS_OUTBOUND_VALIDATE_CERTIFICATE
+
+  route: 
+    image: nhsdev/nia-mhs-route:${BUILD_TAG} 
+    ports: 
+        - "8080:80" 
+    environment: 
+      - MHS_LOG_LEVEL=NOTSET 
+      - MHS_SDS_URL=ldap://192.168.128.11 
+      - MHS_SDS_SEARCH_BASE=ou=services,o=nhs 
+      - MHS_DISABLE_SDS_TLS=True 
+      - MHS_SDS_REDIS_CACHE_HOST=redis 
+      - MHS_SDS_REDIS_DISABLE_TLS=True 
+  dynamodb: 
+    image: nhsdev/nia-dynamodb-local:1.0.1 
+    ports: 
+      - "8000:8000" 
+  rabbitmq: 
+    image: nhsdev/nia-rabbitmq-local:1.0.1  
+    ports: 
+      - "15672:15672" 
+      - "5672:5672" 
+    hostname: "localhost" 
+  redis: 
+    image: redis 
+    ports: 
+      - "6379:6379" 
+
+  inbound-lb: 
+    image: dockercloud/haproxy 
+    links: 
+      - inbound 
+    ports: 
+      - "443:443" 
+      - "8079:80" 
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock 
+    environment:  
+      - MODE=tcp 
+      - TIMEOUT=connect 0, client 0, server 0
+```
+
+2. Create a script to start the containers, call it export-env-vars-and-run-mhs-docker.sh and make it executable.
+
+3. Add the following content and your OpenTest details into the file
+
+```bash
+LIGHT_GREEN='\033[1;32m' 
+NC='\033[0m' 
+echo -e "${LIGHT_GREEN}Exporting environment variables${NC}" 
+
+export BUILD_TAG="latest" 
+export MHS_OUTBOUND_VALIDATE_CERTIFICATE="False"
+
+# Your OpenTest Party key here 
+export MHS_SECRET_PARTY_KEY="" 
+
+# Your OpenTest endpoint certificate here 
+export MHS_SECRET_CLIENT_CERT="" 
+
+# Your OpenTest endpoint private key here 
+export MHS_SECRET_CLIENT_KEY="" 
+
+# OpenTest Endpoint issuing subCA certificate and Root CA certificate here 
+export MHS_SECRET_CA_CERTS="" 
+
+echo -e "${LIGHT_GREEN}Stopping running containers${NC}" 
+docker-compose -f docker-compose.yml stop; 
+
+echo -e "${LIGHT_GREEN}Build and starting containers${NC}" 
+docker-compose -f docker-compose.yml up -d --build
+```
+
+4. Confirm you are connected to the OpenTest VPN and start all the containers by executing the shell script you created above.
+
+./export-env-vars-and-run-mhs-docker.sh
+
+#### Executing requests in Visual Studio Code
+1. Open Visual Studio Code
+2. Check out the integration-adapter project on the develop branch from github: https://github.com/nhsconnect/integration-adaptors
+3. In the project root create the directory `.vscode` if it doesn't exist already
+4. In the .vscode folder create a file called `settings.json`
+5. Add the information below to the `settings.json` file
+    ```json
+    {
+        "workbench.settings.editor": "json",
+        "workbench.settings.useSplitJSON": true,
+        "rest-client.environmentVariables": {
+            "$shared": {},
+            "$mhs": {
+                "ASID": "OpenTest ASID Here",
+                "GUID-idRoot": "3c996a6b-8e3b-42ec-8796-34aa8dca353c",
+                "GUID-idAltRoot": "af16f8c8-1a31-470c-802a-1716425b04fa",
+                "SHORT-TIMESTAMP": "20190927152035",
+                "PARTY-KEY": "OpenTest Party Key Here",
+                "FILE-UPLOADED": "test file will go here",
+                "LOCAL_SCR_URL": "http://localhost:9000/",
+                "MESSAGE_ID": "6a6c8179-e8e3-419a-a6dc-0c07844ddef7"
+            }
+        }
+    }
+    ```
+
+6. Navigate the code directories to the requests: `/http-client/mhs/outbound`
+7. Navigate to the folder of the message pattern type you wish to run a request for and open a request .http file
+8. In the bottom right corner of Visual Studio Code click `No Environment` and select `$mhs`
+9. Change the data `@PATIENT_NHS_NUMBER` to be a number which is valid in OpenTest. A correct number can be found in the
+correct integration test for the same message pattern type. 
+
+    The integration tests can be found in `/integration-tests/integration_tests/integration_tests/end_to_end_tests`
+
+    The number can be found as the second parameter in a line which looks like this `message, message_id = build_message('QUPC_IN160101UK05', '9689177923')`
+
+10. Click the `Send Request` link which can be found inside the .http file request
+
 ## Running scalable docker cluster
 
 By default docker-compose starts 1 instance per service. 
