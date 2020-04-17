@@ -116,7 +116,7 @@ pipeline {
         }
 
         stage('Test') {
-            parallel {
+            //parallel {
                 stage('Run Component Tests') {
                     options {
                         lock('local-docker-compose-environment')
@@ -289,7 +289,7 @@ pipeline {
                         }
                     }
                 }
-            }
+            //} // parallel
         }
     }
 
