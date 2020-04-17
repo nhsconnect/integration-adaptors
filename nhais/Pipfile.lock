@@ -1,11 +1,10 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e28ef17ab50d169ab8d04666a916aadefa07f84aff66549d07a507765b17f316"
+            "sha256": "0ad4515196f43c4e27bafd37d8b0e41836b080dbc921dffce4afb5193348452d"
         },
         "pipfile-spec": 6,
         "requires": {
-            "generate-openapi-docs": "python generate_openapi.py",
             "python_version": "3.7"
         },
         "sources": [

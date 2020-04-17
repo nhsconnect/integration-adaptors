@@ -12,8 +12,6 @@ def validate_schema(request):
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
     json_schema_patient = ROOT_DIR + "/json-schema-patient.json"
 
-
-
     with open(json_schema_patient) as file:
         data = json.load(file)
 
@@ -26,4 +24,3 @@ def validate_schema(request):
         logger.critical('Did not match json schema')
 
     return is_valid_schema
-

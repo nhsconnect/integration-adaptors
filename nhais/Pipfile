@@ -16,4 +16,3 @@ jsonschema = "*"
 
 [requires]
 python_version = "3.7"
-generate-openapi-docs = 'python generate_openapi.py'
