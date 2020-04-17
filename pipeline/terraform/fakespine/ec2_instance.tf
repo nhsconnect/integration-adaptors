@@ -1,3 +1,69 @@
+# Resources for running fake spine on EC2 backed ECS
+
+# Roles  - will need to be created manually as Roles for jenkins worker does not allow them
+
+# ecs-instance-role
+
+# resource "aws_iam_role" "ecs-service-role" {
+#     name                = "ecs-service-role"
+#     path                = "/"
+#     assume_role_policy  = "${data.aws_iam_policy_document.ecs-service-policy.json}"
+# }
+
+# resource "aws_iam_role_policy_attachment" "ecs-service-role-attachment" {
+#     role       = "${aws_iam_role.ecs-service-role.name}"
+#     policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+# }
+
+# data "aws_iam_policy_document" "ecs-service-policy" {
+#     statement {
+#         actions = ["sts:AssumeRole"]
+
+#         principals {
+#             type        = "Service"
+#             identifiers = ["ecs.amazonaws.com"]
+#         }
+#     }
+# }
+
+# output "ecs-service-role-arn" {
+#   value = "${aws_iam_role.ecs-service-role.arn}"
+# }
+
+##########################################################################################
+
+resource "aws_autoscaling_group" "ecs-autoscaling-group" {
+  name = "ec2-ecs-asg"
+  max_size = 3
+  min_size = 1
+  desired_capacity = 1
+  vpc_zone_identifier  = data.terraform_remote_state.mhs.outputs.subnet_ids
+  launch_configuration = aws_launch_configuration.ecs-launch-configuration.name
+  health_check_type    = "ELB"
+}
+
+resource "aws_launch_configuration" "ecs-launch-configuration" {
+    name                        = "ec2-ecs-lc"
+    image_id                    = "${var.image-id}"
+    instance_type               = "t2.micro"
+    iam_instance_profile        = "${var.ecs-instance-profile-name}" 
+    security_groups             = ["${var.security-group-id}"]
+    associate_public_ip_address = "true"
+    key_name                    = "kainos-dev"
+    user_data                   = "${template_file.ecs-launch-configuration-user-data.rendered}"
+}
+
+resource "template_file" "ecs-launch-configuration-user-data" {
+    template = "${file("${path.module}/user-data.tpl")}"
+
+    vars {
+        ecs-cluster-name = "${var.ecs-cluster-name}"
+    }
+}
+
+
+
+
 data "aws_ami" "base_linux" {
   most_recent      = true
   name_regex       = "^amzn2-ami-hvm-2.0*"
