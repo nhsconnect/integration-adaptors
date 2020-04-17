@@ -7,7 +7,7 @@ from common.handler import base_handler
 from utilities import integration_adaptors_logger as log, timing
 from utilities import config, message_utilities
 
-import generate_openapi
+import generate_jsonschema
 
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.converter.fhir_to_edifact import FhirToEdifact
@@ -28,7 +28,7 @@ class Handler(base_handler.BaseHandler):
 
     @timing.time_request
     async def post(self):
-        is_valid_schema = generate_openapi.validate_schema(self.request.body.decode())
+        is_valid_schema = generate_jsonschema.validate_schema(self.request.body.decode())
         if(is_valid_schema):
             edifact = self.fhir_to_edifact.convert(self.request.body.decode())
             unique_operation_id = message_utilities.get_uuid()
