@@ -18,7 +18,7 @@ services:
       - FAKE_SPINE_PRIVATE_KEY
       - FAKE_SPINE_CA_STORE
       - INBOUND_SERVER_BASE_URL=https://inbound
-      - MHS_LOG_DEVEL=DEBUG
+      - MHS_LOG_LEVEL=DEBUG
 
   inbound:
     ports:
