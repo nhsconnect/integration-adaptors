@@ -1,0 +1,5 @@
+# @name routing
+
+GET {{BASE_URL}}:{{ROUTE-LOOKUP-PORT}}/reliability?org-code=YES&service-id=urn:nhs:names:services:psis:REPC_IN150016UK05 HTTP/1.1
+org-code: YES
+service-id: urn:nhs:names:services:psis:REPC_IN150016UK05

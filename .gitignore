@@ -110,7 +110,7 @@ venv.bak/
 .idea
 
 # VSCode settings
-.vscode
+.vscode/
 
 # Terraform
 .terraform
@@ -146,9 +146,6 @@ export-env-vars-and-run-mhs-docker.sh
 
 # system
 .DS_Store
-
-# enviornment file
-integration-tests/integration_tests/integration-tests-env.yaml
 
 # mock ldap data
 /mhs/spineroutelookup/mock_ldap_data/*.json
