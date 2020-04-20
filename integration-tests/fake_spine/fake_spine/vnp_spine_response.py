@@ -6,7 +6,7 @@ from tornado.httputil import HTTPServerRequest
 
 from fake_spine.spine_responses import SpineResponseBuilder, InboundRequest, OutboundResponse
 from fake_spine.vnp_spine_message_builder import VnpMessageBuilder
-from fake_spine import config
+from fake_spine import fake_spine_configuration
 
 
 class VnpSpineResponseException(Exception):
@@ -20,6 +20,7 @@ class VnpSpineResponseBuilder(SpineResponseBuilder):
     def __init__(self):
         super().__init__()
         self.inbound_request_headers = {}
+        self.config = fake_spine_configuration.FakeSpineConfiguration()
 
     def _extract_message_id(self, request: HTTPServerRequest):
         body = request.body.decode()
@@ -39,7 +40,7 @@ class VnpSpineResponseBuilder(SpineResponseBuilder):
         message_id = self._extract_message_id(outbound_request)
         template_parameters = {
             'message_id': str(uuid.uuid4()),
-            'to_party_id': config.MHS_SECRET_PARTY_KEY,
+            'to_party_id': self.config.MHS_SECRET_PARTY_KEY,
             'ref_to_message_id': message_id
         }
         return message_builder.build_message(template_parameters)

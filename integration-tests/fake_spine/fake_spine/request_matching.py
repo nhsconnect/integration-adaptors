@@ -1,4 +1,4 @@
-import logging
+from utilities import integration_adaptors_logger as log
 import traceback
 from typing import Callable, List
 from typing import NamedTuple
@@ -7,7 +7,7 @@ from tornado.httputil import HTTPServerRequest
 
 from fake_spine.spine_responses import SpineResponse
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class RequestMatcher(object):
