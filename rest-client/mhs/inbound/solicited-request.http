@@ -1,0 +1,129 @@
+# In inbound main.py, change ssl_ctx.verify_mode = ssl.CERT_REQUIRED to ssl.CERT_NONE or ssl.CERT_OPTIONAL
+# This request will be throw 500 server error because of RefToMessageId. This is the refers to message id
+# to the 'original' message from outbound. Add this id to state database and specific workflow. 
+
+# @name solicited-request
+
+
+@baseUrl = http://localhost
+@port = 443
+ 
+# @name Request
+POST {{baseUrl}}:{{port}}/ HTTP/1.1
+SOAPAction: urn:nhs:names:services:gp2gp/COPC_IN000001UK01
+Content-Length: 1028570
+Content-Type: multipart/related; boundary="--=_MIME-Boundary"; type="text/xml"; start="<ebXMLHeader@spine.nhs.uk>"
+Connection: close
+
+----=_MIME-Boundary
+Content-Id: <ebXMLHeader@spine.nhs.uk>
+Content-Type: text/xml; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP:Envelope xmlns:xsi="http://www.w3c.org/2001/XML-Schema-Instance" xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:hl7ebxml="urn:hl7-org:transport/ebxml/DSTUv1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+<SOAP:Header>
+	<eb:MessageHeader SOAP:mustUnderstand="1" eb:version="2.0">
+		<eb:From>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">{{PARTY-KEY}}</eb:PartyId>
+		</eb:From>
+		<eb:To>
+			<eb:PartyId eb:type="urn:nhs:names:partyType:ocs+serviceInstance">A91576-9198964</eb:PartyId>
+		</eb:To>
+		<eb:CPAId>S2030731A2137927</eb:CPAId>
+		<eb:ConversationId>{{$guid}}</eb:ConversationId>
+		<eb:Service>urn:nhs:names:services:gp2gp</eb:Service>
+		<eb:Action>COPC_IN000001UK01</eb:Action>
+		<eb:MessageData>
+			<eb:MessageId>{{$guid}}</eb:MessageId>
+			<eb:Timestamp>2013-11-04T14:33:58Z</eb:Timestamp>
+			<eb:RefToMessageId>{{REF-TO-MESSAGE-ID}}</eb:RefToMessageId>
+		</eb:MessageData>
+		<eb:DuplicateElimination/>
+	</eb:MessageHeader>
+	<eb:AckRequested SOAP:mustUnderstand="1" eb:version="2.0" eb:signed="false" SOAP:actor="urn:oasis:names:tc:ebxml-msg:actor:nextMSH"/>
+	
+</SOAP:Header>
+<SOAP:Body>
+	<eb:Manifest SOAP:mustUnderstand="1" eb:version="2.0">
+		<eb:Reference xlink:href="cid:23e1591d-455e-11e3-9c76-31def0104cb3@spine.nhs.uk">
+			<eb:Schema eb:location="http://www.nhsia.nhs.uk/schemas/HL7-Message.xsd" eb:version="1.0"/>
+			<eb:Description xml:lang="en">HL7 payload</eb:Description> 
+			<hl7ebxml:Payload style="HL7" encoding="XML" version="3.0"/>
+		</eb:Reference>
+		<eb:Reference xlink:href="cid:23e21c6e-455e-11e3-9c76-31def0104cb3">
+<eb:Description xml:lang="en">Attachments</eb:Description>
+</eb:Reference>
+
+	</eb:Manifest>
+</SOAP:Body>
+</SOAP:Envelope>
+
+----=_MIME-Boundary
+Content-Id: <23e1591d-455e-11e3-9c76-31def0104cb3@spine.nhs.uk>
+Content-Type: application/xml; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<?xml version="1.0" encoding="UTF-8"?>
+<COPC_IN000001UK01 xmlns="urn:hl7-org:v3">
+	<id root="047C22B4-613F-47D3-9A72-44A1758464FB"/>
+	<creationTime value="20131104143227964"/>
+	<versionCode code="V3NPfIT3.0"/>
+	<interactionId root="2.16.840.1.113883.2.1.3.2.4.12" extension="COPC_IN000001UK01"/>
+	<processingCode code="P"/>
+	<processingModeCode code="T"/>
+	<acceptAckCode code="NE"/>
+	<communicationFunctionRcv>
+		<device>
+			<id root="1.2.826.0.1285.0.2.0.107" extension="276827251543"/>
+		</device>
+	</communicationFunctionRcv>
+	<communicationFunctionSnd>
+		<device>
+			<id root="1.2.826.0.1285.0.2.0.107" extension="715373337545"/>
+		</device>
+	</communicationFunctionSnd>
+	<ControlActEvent>
+		<author1>
+			<AgentSystemSDS>
+				<agentSystemSDS>
+					<id root="1.2.826.0.1285.0.2.0.107" extension="715373337545"/>
+				</agentSystemSDS>
+			</AgentSystemSDS>
+		</author1>
+		<subject>
+			<PayloadInformation xmlns="urn:hl7-org:v3" xmlns:npfitlc="NPFIT:HL7:Localisation">
+				<code code="GP2GPLMATTACHMENTINFO" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.202" displayName="GP2GP Large Message Attachment Information"/>
+				<id root="047C22B4-613F-47D3-9A72-44A1758464FB"/>
+				<npfitlc:messageType root="2.16.840.1.113883.2.1.3.2.4.18.17" extension="RCMR_MT000001GB01"/>
+				<value>
+					<Gp2gpfragment xmlns="urn:nhs:names:services:gp2gp">
+						<Version>01</Version> 
+						<Recipients>
+							<Recipient>__TO_NACS__</Recipient> 
+						</Recipients>
+						<From>__FROM_NACS__</From> 
+						<subject>Attachment: CBBAE92D-C7E8-4A9C-8887-F5AEBA1F8CE1_0.messageattachment</subject> 
+						<message-id>047C22B4-613F-47D3-9A72-44A1758464FB</message-id> 
+					</Gp2gpfragment>
+				</value>
+				<pertinentInformation>
+				<sequenceNumber value="1"/>
+					<pertinentPayloadBody>
+						<code code="GP2GPLMATTACHMENT" codeSystem="2.16.840.1.113883.2.1.3.2.4.17.202" displayName="GP2GP Large Message Attachment"/>
+						<id root="047C22B4-613F-47D3-9A72-44A1758464FB"/>
+						<value><reference value="CBBAE92D-C7E8-4A9C-8887-F5AEBA1F8CE1_0.messageattachment"/></value>
+					</pertinentPayloadBody>
+				</pertinentInformation>
+			</PayloadInformation>
+		</subject>
+	</ControlActEvent>
+</COPC_IN000001UK01>
+
+----=_MIME-Boundary
+Content-Id: <23e21c6e-455e-11e3-9c76-31def0104cb3>
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+
+SGVsbG8gV29ybGQh
+----=_MIME-Boundary--
