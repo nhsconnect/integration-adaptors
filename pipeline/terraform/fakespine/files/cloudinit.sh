@@ -49,19 +49,18 @@ git checkout feature/NIAD-132-fake-spine-vnp-deploy
 
 log "Building the image"
 BUILD_TAG=foo
-docker build -t local/fake-spine:${BUILD_TAG} ./integration-tests/fake_spine/Dockerfile .
+docker build -t local/fake-spine:${BUILD_TAG} -f ./integration-tests/fake_spine/Dockerfile .
 
 log "Starting the image"
 ./integration-tests/setup_component_test_env.sh
 . ./component-test-source.sh
-. /var/variables-source.sh
-BUILD_TAG=foo docker-compose -f docker-compose.yml f docker-compose.ec2.override.yml up -d fakespine
+. /var/variables_source.sh
+BUILD_TAG=foo docker-compose -f docker-compose.yml -f docker-compose.ec2.override.yml up -d fakespine
 
 log "Wait 20s"
 wait 20s
 
 log "Show the logs of started container"
-C_ID=`docker ps -n 1 --format '{{.ID}}'`
-docker logs ${C_ID}
+docker logs `docker ps -n 1 --format '{{.ID}}'`
 
 
