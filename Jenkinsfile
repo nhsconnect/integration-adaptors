@@ -116,6 +116,7 @@ pipeline {
         }
 
         stage('Test') {
+            // NIAD-189: Parallel component and integration tests disabled due to intermittent build failures
             //parallel {
             stages {
                 stage('Run Component Tests') {
