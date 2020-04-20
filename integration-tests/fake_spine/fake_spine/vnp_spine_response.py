@@ -38,7 +38,7 @@ class VnpSpineResponseBuilder(SpineResponseBuilder):
         matches = self.conversation_id_expression.search(body)
         if matches:
             return matches.group('conversationId')
-        logger.info(f'Unable to find a Conversation in the request')
+        logger.info(f'Unable to find a ConversationId in the request')
         return ''
 
     def override_inbound_request_headers(self, inbound_request_headers):
