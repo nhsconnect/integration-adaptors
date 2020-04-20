@@ -76,7 +76,8 @@ services:
   fakespine:
     image: local/fake-spine:${BUILD_TAG}
     # build:
-    #   context: ./integration-tests/fake_spine
+    #   context: .
+    #   dockerfile: ./integration-tests/fake_spine/Dockerfile
     ports:
       - "8443:443"
       - "8081:80"
