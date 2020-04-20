@@ -6,8 +6,7 @@ import utilities.integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
-def validate_schema(request):
-    request_body = json.loads(request)
+def validate_schema(request_body):
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
     json_schema_patient = ROOT_DIR + "/json-schema-patient.json"
@@ -15,12 +14,13 @@ def validate_schema(request):
     with open(json_schema_patient) as file:
         data = json.load(file)
 
-    is_valid_schema = False
+    exception_thrown = None
 
     try:
         validate(instance=request_body, schema=data)
-        is_valid_schema = True
-    except Exception:
-        logger.critical('Did not match json schema')
+    except Exception as e:
+        logger.error('Did not match json schema' + str(e))
+        exception_thrown = e
 
-    return is_valid_schema
+
+    return exception_thrown
