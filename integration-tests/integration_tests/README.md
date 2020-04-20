@@ -212,14 +212,13 @@ docker-compose -f docker-compose.yml up -d --build
         "rest-client.environmentVariables": {
             "$shared": {},
             "$mhs": {
-                "ASID": "OpenTest ASID Here",
-                "GUID-idRoot": "3c996a6b-8e3b-42ec-8796-34aa8dca353c",
-                "GUID-idAltRoot": "af16f8c8-1a31-470c-802a-1716425b04fa",
-                "SHORT-TIMESTAMP": "20190927152035",
-                "PARTY-KEY": "OpenTest Party Key Here",
-                "FILE-UPLOADED": "test file will go here",
-                "LOCAL_SCR_URL": "http://localhost:9000/",
-                "MESSAGE_ID": "6a6c8179-e8e3-419a-a6dc-0c07844ddef7"
+                "BASE_URL": "http://localhost",
+                "INBOUND-PORT": "8082",
+                "OUTBOUND-PORT": "80",
+                "ROUTE-LOOKUP-PORT": "8088",
+                "FAKE-SPINE-PORT": "8091",
+                "ASID": "9XXXXXXXXXXX",
+                "PARTY-KEY": "A9XXXX-XXXXXXX"
             }
         }
     }
