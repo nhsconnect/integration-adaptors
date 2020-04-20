@@ -110,7 +110,7 @@ venv.bak/
 .idea
 
 # VSCode settings
-.vscode
+.vscode/
 
 # Terraform
 .terraform

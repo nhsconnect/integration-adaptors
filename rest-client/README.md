@@ -12,93 +12,11 @@ Download the following to set up VSCode Rest Client:
 
 Open workspace, ensure Rest Client and GUID Insert are enabled on workspace. Go to `Preferences` > `Extensions`, search for the two extensions above (Rest Client & GUID) and select enable. 
 
-</br>
+<br>
 
 ## Constructing Request
 
-### Request Variables
-
-Think of request variables as attaching a name metadata to the underlying request. This counts as a empty line. Format, either `//` or `#` followed my space and `@name` then space and the name of your request as seen below:
-
-```http
-# @name nameOfRequest
-```
-
-</br>
-
-### Request Line
-
-The first non-empty line of the selection is the Request Line. `GET` and `POST` request line examples below. 
-
-#### GET
-If request method is omitted, request will be treated as GET, as shown below:
-
-```http
-http://myexample.come HTTP/1.1
-```
-
-```http
-GET http://myexample.come HTTP/1.1
-```
-
-#### POST
-
-```http
-POST http://myexample.come HTTP/1.1
-```
-
-</br>
-
-### Request Headers
-
-The lines immediately after the request line to first empty line are parsed as Request Headers.
-
-Format:
-```http
-field-name: field-value
-```
-
-By default REST Client Extension will add a User-Agent header with value vscode-restclient in your request if you don't explicitly specify. 
-
-```http
-User-Agent: rest-client
-Content-Type: application/json
-```
-
-</br>
-
-### Request Body
-
-Add a blank line after the Request Headers, all content after it will be treated as Request Body. 
-
-JSON example:
-
-```http
-POST https://example.com/comments HTTP/1.1
-content-type: application/json
-
-{
-    "name": "sample",
-    "time": "Wed, 21 Oct 2015 18:27:50 GMT"
-}
-```
-
-XML example:
-
-```xml
-<request>
-    <name>This is an example</name>
-</request>
-```
-
-Specify file path to use as a body:
-
-```http
-< ./example.xml
-```
-
-
-</br>
+- Rest Client documentation: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 
 ## Using VSCode Rest Client
 
@@ -115,11 +33,32 @@ Specify file path to use as a body:
 - List of environments `Cmd`+`Option`+`E`
 - Open settings `Cmd`+`,`
 
-</br>
+<br>
 
 ### Environment Variables 
 
-Environment variables are store in `settings.json` file located in `.vscode` folder. An example can be seen [here](../.vscode/settings.json) of how to set up file. 
+Environment variables are store in `settings.json` file located in `.vscode` folder. An example of how to set up file:
+
+```http
+{
+    "python.pythonPath": "/usr/local/bin/python3",
+    "workbench.settings.editor": "json",
+    "workbench.settings.useSplitJSON": true,
+    "rest-client.environmentVariables": {
+        "$shared": {},
+        "$sample_mhs_environment": {
+            "BASE_URL": "http://localhost",
+                        "INBOUND-PORT": "8082",
+                        "OUTBOUND-PORT": "80",
+                        "ROUTE-LOOKUP-PORT": "8088",
+                        "FAKE-SPINE-PORT": "8091",
+                        "ASID": "9XXXXXXXXXXX",
+                        "PARTY-KEY": "A9XXXX-XXXXXXX",
+                        "REF-TO-MESSAGE-ID": "8936cd14-d728-41a7-8d14-485183ebc2de"
+        }
+    }
+}
+```
 
 When in selected http file, ensure at the bottom right corner the environment you wish to use is selected. As default this is set to `no environment`. In this repo a `sample-mhs-environment` has been created in the settings file, to be used as sample content. It will be listed in the environment list. `$shared` variables will be available when no environment is selected. 
 
@@ -127,7 +66,7 @@ Enironment variables can be used in a http file by surrounding text with curly b
 
 
 
-</br>
+<br>
 
 ### File Variables
 
@@ -143,13 +82,13 @@ Can be used in file as shown below in the Request Line:
 POST {{baseUrl}}:80 HTTP/1.1
 ```
 
-</br>
+<br>
 
 ### Generate UUID
 
 Currently it is only possible to generate UUID manual using an extension. To generator new UUID, `fn` + `F1` and type `Insert GUID` where needed. Currently an environment variable is used in settings.json for this to be easily changed in all http files. 
 
-</br>
+<br>
 
 ### Response Panel 
 
@@ -175,7 +114,7 @@ Save response body, click `Save Response Body` button
     }
     ```
 
-</br>
+<br>
 
 ### Tips
 
@@ -190,7 +129,7 @@ Hover over response size to view the breakdown response size details of headers 
 
 ![Image of response size](./documentation/vscode-response-size.png )
 
-</br>
+<br>
 
 ## custom
 
