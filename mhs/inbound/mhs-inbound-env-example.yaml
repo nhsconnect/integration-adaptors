@@ -7,7 +7,7 @@ MHS_SYNC_ASYNC_STATE_TABLE_NAME: sync_async_state
 MHS_DYNAMODB_ENDPOINT_URL: http://localhost:8000
 AWS_ACCESS_KEY_ID: test
 AWS_SECRET_ACCESS_KEY: test
-MHS_INBOUND_USE_SSL: false
+MHS_INBOUND_USE_SSL: true
 #User-specific env variables
 MHS_SECRET_PARTY_KEY: AXXXXX-XXXXXXX #put your party key here (OpenTest)
 MHS_SECRET_CLIENT_CERT: |
