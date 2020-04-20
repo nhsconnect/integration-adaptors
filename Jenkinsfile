@@ -227,7 +227,7 @@ pipeline {
                                             -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
                                             -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                             -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
-                                            -var spineroutelookup_service_sds_url=ldaps://10.196.94.141 \
+                                            -var spineroutelookup_service_sds_url=ldaps://ldap.nis1.national.ncrs.nhs.uk \
                                             -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
                                             -var spineroutelookup_service_disable_sds_tls=False \
                                             -var elasticache_node_type="cache.t2.micro" \
