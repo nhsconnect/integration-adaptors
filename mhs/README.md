@@ -54,11 +54,11 @@ The MHS Adaptor presents a simple HTTP synchronous interface which is used to ma
 
 Please refer to the [API Documentation](outbound/openapi-docs.html) for further details.
 
-Examples of how this API is called can be found in the [integration tests](../integration-tests/integration_tests/) module
+Examples of how this API is called can be found in the [integration tests](../integration-tests/integration_tests) module
 
 ## RestClient collection- example requests to the MHS Adaptor
 
-A RestClient collection [rest-client/mhs](../rest-client/mhs/) illustrates how the MHS Adaptor API
+A RestClient collection [rest-client/mhs](../rest-client/mhs) illustrates how the MHS Adaptor API
 is called. This collection provides following API request examples:
  - asynchronous request to outbound, with no retries while sending requests from outbound to spine
  - asynchronous request to outbound, with retries while sending request from outbound to to spine
@@ -71,7 +71,8 @@ There are also health, reliability and routing checks.
  
 Before sending these requests, you will need to create a setting.json file as described in [README](../rest-client/README.md).
  
-Before sending requests directly to the inbound service, set 'MHS_INBOUND_USE_SSL: false' in .yaml inbound configuration file.
+Before sending requests directly to the inbound service, you will need to switch off ssl by setting 'MHS_INBOUND_USE_SSL: false' in .yaml inbound configuration file.
+It is necessary to send requests to inbound without ssl.  
 
 #### "Async Express Pattern Message  - Synchronous Response" 
 
