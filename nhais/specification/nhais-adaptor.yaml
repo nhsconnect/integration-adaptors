@@ -351,6 +351,157 @@ paths:
         ## Overview
         Use this endpoint to send an Acceptance to NHAIS.
 
+        It is anticipated that the GP System will prompt the GP to determine the following minimum basic information about the patient:
+        		NHS Number
+        	*	Surname
+        		Previous Surname
+        		Forename(s)
+        		Title
+        	*	Sex
+        		Date of Birth
+        	*	Present Address excluding Postcode
+        		Postcode
+        		Place of Birth [mandatory if NHS Number not entered]
+        	*	Patient's Responsible GP
+        	*	Patient's Responsible HA
+
+        	(* = Mandatory field)
+
+            Birth Acceptance:
+
+            *	Patient's Responsible GP
+        	*	Patient's Responsible HA
+        	*	NHS Number
+        	*	Surname
+        		Previous Surname
+        		First Forename
+        		Second Forename
+        		Other Forenames
+        		Title
+        	*	Sex
+        	*	Date of Birth
+        	*	Present Address excluding Postcode
+        		Postcode
+        		Place of Birth
+        		Drugs Dispensed Marker
+        		RPP Mileage
+        		Blocked Route/Special District Marker
+        		Walking Units
+        		Residential Institute Code
+        		Free Text (GP Notes)
+
+        	(* = Mandatory field)
+
+            1st Acceptance Acceptance:
+            	*	Patient's Responsible GP
+            	*	Patient's Responsible HA
+            		NHS Number
+            	*	Surname
+            		Previous Surname
+            		First Forename
+            		Second Forename
+            		Other Forenames
+            		Title
+            	*	Sex
+            		Date of Birth
+            	*	Present Address excluding Postcode
+            		Postcode
+            		Place of Birth [mandatory if NHS Number not entered]
+            		Drugs Dispensed Marker
+            		RPP Mileage
+            		Blocked Route/Special District Marker
+            		Walking Units
+            		Residential Institute Code
+            		Free Text (GP Notes)
+
+            	(* = Mandatory field)
+
+            Transfer In Acceptance:
+            	*	Patient's Responsible GP
+            	*	Patient's Responsible HA
+            		NHS Number
+            	*	Surname
+            		Previous Surname
+            		First Forename
+            		Second Forename
+            		Other Forenames
+            		Title
+            	*	Sex
+            		Date of Birth
+            	*	Present Address excluding Postcode
+            		Postcode
+            		Place of Birth [mandatory if NHS Number not entered]
+            		Drugs Dispensed Marker
+            		RPP Mileage
+            		Blocked Route/Special District Marker
+            		Walking Units
+            		Residential Institute Code
+            	*	Previous Address - 5 fields
+            	*	Previous GP Name
+            		Previous HA Cipher
+            		Free Text (GP Notes)
+
+            	(* = Mandatory field: for Previous Address at least one of the five fields MUST be completed.)
+
+            Immigrant Acceptance:
+            	*	Patient's Responsible GP
+            	*	Patient's Responsible HA
+            		NHS Number
+            	*	Surname
+            		Previous Surname
+            		First Forename
+            		Second Forename
+            		Other Forenames
+            		Title
+            	*	Sex
+            		Date of Birth
+            	*	Present Address excluding Postcode
+            		Postcode
+            		Place of Birth [mandatory if NHS Number not entered]
+            		Drugs Dispensed Marker
+            		RPP Mileage
+            		Blocked Route/Special District Marker
+            		Walking Units
+            		Residential Institute Code
+            	*	Date of Entry into the UK
+            		Date Patient left the UK
+            		Previous Address - 5 fields
+            		Previous GP Name
+            		Previous HA Cipher
+            		Free Text (GP Notes)
+
+            	(* = Mandatory field)
+
+            Ex-Services Acceptance:
+            	*	Patient's Responsible GP
+            	*	Patient's Responsible HA
+            		NHS Number
+            	*	Surname
+            		Previous Surname
+            		First Forename
+            		Second Forename
+            		Other Forenames
+            		Title
+            	*	Sex
+            		Date of Birth
+            	*	Present Address excluding Postcode
+            		Postcode
+            		Place of Birth [mandatory if NHS Number not entered]
+            		Drugs Dispensed Marker
+            		RPP Mileage
+            		Blocked Route/Special District Marker
+            		Walking Units
+            		Residential Institute Code
+            		Previous Address - 5 fields
+            		Date of Enlistment (Joining)
+            		Date of Enlistment (Leaving)
+            		Free Text (GP Notes)
+
+            	(* = Mandatory field)
+
+
+
+
         ## Operation Id
         When you submit an amendment an operation id will be included in the response. This operation id MUST be retained
         to match against the asynchronous reply from NHAIS
