@@ -4,7 +4,7 @@ from utilities import file_utilities
 import definitions
 import pathlib
 import os
-import requests
+import handlers
 
 complete_data_path = pathlib.Path(definitions.ROOT_DIR) / 'tests' / 'data' / 'complete_input.json'
 
@@ -17,6 +17,6 @@ class SCREndpointTest(TestCase):
 
     def test_scr_happy_path(self):
         body = file_utilities.get_file_dict(complete_data_path)
-        response = requests.post(f"{get_target_address()}/gp_summary_upload",
+        response = handlers.post(f"{get_target_address()}/gp_summary_upload",
                                  data=json.dumps(body))
         self.assertEqual(json.dumps(json.loads(response.text)), json.dumps(body))

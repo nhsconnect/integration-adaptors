@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fake_spine.config import ROOT_DIR
+from fake_spine import fake_spine_configuration
 from fake_spine.pystache_message_builder import PystacheMessageBuilder
 
 TEMPLATES_DIR = "vnp_responses"
@@ -14,6 +14,7 @@ class VnpMessageBuilder(PystacheMessageBuilder):
 
         :param template_file: The template file to populate with values.
         """
-        template_dir = str(Path(ROOT_DIR) / TEMPLATES_DIR)
+        config = fake_spine_configuration.FakeSpineConfiguration()
+        template_dir = str(Path(config.ROOT_DIR) / TEMPLATES_DIR)
 
         super().__init__(template_dir, template_file)
