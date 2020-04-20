@@ -69,104 +69,13 @@ The following is required
 - OpenTest connection
 
 #### Environment set up
-1. Create a docker-compose.yml file in a local folder with the following content:
+1. Create a local directory and copy the the following files from the project root into the new directory
 
-```yml
-version: '3' 
-
-services: 
-  inbound: 
-    image: nhsdev/nia-mhs-inbound:${BUILD_TAG} 
-    ports: 
-      - "443" 
-      - "80" 
-    environment: 
-      - MHS_LOG_LEVEL=NOTSET 
-      - MHS_SECRET_PARTY_KEY 
-      - MHS_SECRET_CLIENT_CERT 
-      - MHS_SECRET_CLIENT_KEY 
-      - MHS_SECRET_CA_CERTS 
-      - MHS_INBOUND_QUEUE_URL=rabbitmq:5672/inbound 
-      - MHS_SECRET_INBOUND_QUEUE_USERNAME=guest 
-      - MHS_SECRET_INBOUND_QUEUE_PASSWORD=guest 
-      - MHS_STATE_TABLE_NAME=mhs_state 
-      - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state 
-      - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000 
-      # boto3 requires some AWS creds to be provided, even 
-      # when connecting to local DynamoDB 
-      - AWS_ACCESS_KEY_ID=test 
-      - AWS_SECRET_ACCESS_KEY=test 
-      - TCP_PORTS=443 
-      - SERVICE_PORTS=443,80 
-
-  outbound: 
-    image: nhsdev/nia-mhs-outbound:${BUILD_TAG} 
-    ports: 
-      - "80" 
-    environment: 
-      - MHS_LOG_LEVEL=NOTSET 
-      - MHS_SECRET_PARTY_KEY 
-      - MHS_SECRET_CLIENT_CERT 
-      - MHS_SECRET_CLIENT_KEY 
-      - MHS_SECRET_CA_CERTS 
-      - MHS_STATE_TABLE_NAME=mhs_state 
-      - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000 
-      - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state 
-      - AWS_ACCESS_KEY_ID=test 
-      - AWS_SECRET_ACCESS_KEY=test 
-      - MHS_RESYNC_INTERVAL=1 
-      - MAX_RESYNC_RETRIES=20 
-      - MHS_SPINE_ROUTE_LOOKUP_URL=http://route 
-      - MHS_SPINE_ORG_CODE=YES 
-      - MHS_SPINE_REQUEST_MAX_SIZE=4999600 # 5 000 000 - 400 
-      # Note that this endpoint URL is Opentest-specific 
-      - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable 
-      - SERVICE_PORTS=80 
-      - MHS_OUTBOUND_VALIDATE_CERTIFICATE
-
-  route: 
-    image: nhsdev/nia-mhs-route:${BUILD_TAG} 
-    ports: 
-        - "8080:80" 
-    environment: 
-      - MHS_LOG_LEVEL=NOTSET 
-      - MHS_SDS_URL=ldap://192.168.128.11 
-      - MHS_SDS_SEARCH_BASE=ou=services,o=nhs 
-      - MHS_DISABLE_SDS_TLS=True 
-      - MHS_SDS_REDIS_CACHE_HOST=redis 
-      - MHS_SDS_REDIS_DISABLE_TLS=True 
-  dynamodb: 
-    image: nhsdev/nia-dynamodb-local:1.0.1 
-    ports: 
-      - "8000:8000" 
-  rabbitmq: 
-    image: nhsdev/nia-rabbitmq-local:1.0.1  
-    ports: 
-      - "15672:15672" 
-      - "5672:5672" 
-    hostname: "localhost" 
-  redis: 
-    image: redis 
-    ports: 
-      - "6379:6379" 
-
-  inbound-lb: 
-    image: dockercloud/haproxy 
-    links: 
-      - inbound 
-    ports: 
-      - "443:443" 
-      - "8079:80" 
-    volumes: 
-      - /var/run/docker.sock:/var/run/docker.sock 
-    environment:  
-      - MODE=tcp 
-      - TIMEOUT=connect 0, client 0, server 0
-```
+    `docker-compose.yml` `docker-compose.lb.override.yml` `docker-compose.integration.override.yml`
 
 2. Create a script to start the containers, call it export-env-vars-and-run-mhs-docker.sh and make it executable.
 
-3. Add the following content and your OpenTest details into the file
+2. Add the following content and your OpenTest details into the file
 
 ```bash
 LIGHT_GREEN='\033[1;32m' 
@@ -189,10 +98,10 @@ export MHS_SECRET_CLIENT_KEY=""
 export MHS_SECRET_CA_CERTS="" 
 
 echo -e "${LIGHT_GREEN}Stopping running containers${NC}" 
-docker-compose -f docker-compose.yml stop; 
+docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml -f docker-compose.integration.override.yml stop; 
 
 echo -e "${LIGHT_GREEN}Build and starting containers${NC}" 
-docker-compose -f docker-compose.yml up -d --build
+docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml -f docker-compose.integration.override.yml up -d --build
 ```
 
 4. Confirm you are connected to the OpenTest VPN and start all the containers by executing the shell script you created above.

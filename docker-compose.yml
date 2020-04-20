@@ -64,7 +64,7 @@ services:
     ports:
       - "8000:8000"
   rabbitmq:
-    build: ./common/local-env/rabbit/
+    image: nhsdev/nia-rabbitmq-local:1.0.1
     ports:
       - "15672:15672"
       - "5672:5672"
