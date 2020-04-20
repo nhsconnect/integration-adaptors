@@ -19,6 +19,7 @@ generate a template response (outbound) and reply (inbound) depending on that me
 | QUPC_IN160101UK05 | Async Express     | Yes            |
 | REPC_IN150016UK05 | Async Reliable    | Yes            |
 | QUPA_IN040000UK32 | Synchronous       | No             |
+| COPC_IN000001UK01 | Forward Reliable  | Yes            |
 
 ## Inbound Proxy
 
