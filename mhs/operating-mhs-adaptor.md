@@ -70,7 +70,7 @@ and used for searching, filtering, agregation, graphing etc.
 | `Time` | Datetime-stamp in ISO8601 timestamp format and always in UTC timezone. |
 | `LogLevel` | The level at which the log line was raised. |
 | `pid` | Process ID, identifies the running instance of a component that produced the log message. |
-| `InteractionId` | This ID is used to determine the workflow the message will take, there our four different workflows sync, sync-async, express and forward reliable. |
+| `InteractionId` | ID of interaction that you want to invoke. Each interaction has an associated workflow (sync, async express, async reliable and forward reliable)) and a corresponding syn-async flag.
 | `MessageId` | A unique ID which is generated at the very start of a workflow if not already assigned. |
 | `CorrelationId` | A unique ID which is generated at the very start of a workflow and is used throughout all log messages related to that work, such that all the logs in the chain can be tied together for a single work item. CorrelationId can be passed into the MHS components from the supplier's calling client to allow for the CorrelationId to also tie the workflow together with the client system. |
 | `RefToMessageId` | A unique ID which is generated at the very start of a workflow if not already assigned. UUID assigned to incoming inbound messages that refer to original message_id of outbound message. Used to find if message id exists in state database to determine if message is unsolicited or not. |
