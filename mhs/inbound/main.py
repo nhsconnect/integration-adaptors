@@ -87,7 +87,7 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
                                                              config_manager=config_manager))])
 
     ssl_ctx = build_ssl_context(local_certs_file, ca_certs_file, key_file) \
-        if str2bool(config.get_config('INBOUND_USE_SSL', default=str(True))) \
+        if str2bool(config.get_config('MHS_INBOUND_USE_SSL', default=str(True))) \
         else None
 
     inbound_server = tornado.httpserver.HTTPServer(inbound_application, ssl_options=ssl_ctx)
