@@ -9,6 +9,7 @@ from utilities import config, message_utilities
 
 import generate_jsonschema
 import json
+import os
 
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.converter.fhir_to_edifact import FhirToEdifact
@@ -26,33 +27,52 @@ class Handler(base_handler.BaseHandler):
             password=config.get_config('OUTBOUND_QUEUE_PASSWORD', default=None))
         self.fhir_to_edifact = FhirToEdifact()
         self.mesh_wrapper = MeshOutboundWrapper(queue_adaptor)
+        root_dir = os.path.dirname(os.path.abspath(__file__))
+        self.json_schema_patient = root_dir + "/json-schema-patient.json"
 
-    def validate_uri_matches_payload_operation(self, request_body):
-        operation = request_body['resourceType']
-        request_uri = self.request.uri
-        string_length_of_operation = request_uri.find(operation)
-        if(string_length_of_operation >= len(operation)):
+    def validate_uri_matches_payload_operation(self, operation, uri):
+        string_length_of_operation = uri.find(operation)
+        if (string_length_of_operation >= len(operation) - 1):
             return True
         else:
             return False
 
+    def set_unsuccesful_response(self, status, code, coding_code, details):
+        self.set_status(status)
+        data = {"issue":
+            [{
+                "severity": "error",
+                "code": code,
+                "details": {
+                    "coding": [{
+                        "system": "https://www.hl7.org/fhir/patient.html",
+                        "version": "1",
+                        "code": coding_code,
+                        "display": details
+                    }]
+                }
+            }]
+        }
+        payload = {'resourceType': 'OperationOutcome', 'OperationOutcome': data}
+        self.finish(payload)
+
     @timing.time_request
     async def post(self):
         request_body = json.loads(self.request.body.decode())
-        uri_matches_payload_operation = self.validate_uri_matches_payload_operation(request_body)
+        uri_matches_payload_operation = self.validate_uri_matches_payload_operation(
+            request_body['resourceType'], self.request.uri)
         if uri_matches_payload_operation:
-            exception_thrown = generate_jsonschema.validate_schema(request_body)
+            exception_thrown = generate_jsonschema.validate_schema(request_body, self.json_schema_patient)
             if exception_thrown is None:
                 edifact = self.fhir_to_edifact.convert(self.request.body.decode())
                 unique_operation_id = message_utilities.get_uuid()
                 await self.mesh_wrapper.send(edifact)
-                self.set_status(202)
-                await self.finish(f"<html><body>UniqueOperationID: {unique_operation_id}</body></html>")
+                self.set_header("OperationId", unique_operation_id)
+                await self.finish()
             else:
-                self.set_status(400)
-                await self.finish(
-                    f"<html><body>Resource could not be parsed or failed basic FHIR validation rules (or multiple matches were found for conditional criteria). Details found below:\n\n{exception_thrown}</body></html>")
+                details = f"'{exception_thrown.path[0]}' {exception_thrown.message}"
+                self.set_unsuccesful_response(400, "value", "JSON_PAYLOAD_NOT_VALID_TO_SCHEMA",
+                                  details)
         else:
-            self.set_status(400)
-            await self.finish(
-                f"<html><body>Requested uri operation: {self.request.uri}, does not match payload operation requested: {request_body['resourceType']}.</body></html>")
+            self.set_unsuccesful_response(400, "value", "URI_DOES_NOT_MATCH_PAYLOAD_OPERATION",
+                              f"Requested uri operation: {self.request.uri}, does not match payload operation requested: {request_body['resourceType']}.")
