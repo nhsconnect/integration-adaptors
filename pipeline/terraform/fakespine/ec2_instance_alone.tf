@@ -32,38 +32,6 @@
 
 ##########################################################################################
 
-resource "aws_autoscaling_group" "ecs-autoscaling-group" {
-  name = "ec2-ecs-asg"
-  max_size = 3
-  min_size = 1
-  desired_capacity = 1
-  vpc_zone_identifier  = data.terraform_remote_state.mhs.outputs.subnet_ids
-  launch_configuration = aws_launch_configuration.ecs-launch-configuration.name
-  health_check_type    = "ELB"
-}
-
-resource "aws_launch_configuration" "ecs-launch-configuration" {
-    name                        = "ec2-ecs-lc"
-    image_id                    = "${var.image-id}"
-    instance_type               = "t2.micro"
-    iam_instance_profile        = "${var.ecs-instance-profile-name}" 
-    security_groups             = ["${var.security-group-id}"]
-    associate_public_ip_address = "true"
-    key_name                    = "kainos-dev"
-    user_data                   = "${template_file.ecs-launch-configuration-user-data.rendered}"
-}
-
-resource "template_file" "ecs-launch-configuration-user-data" {
-    template = "${file("${path.module}/user-data.tpl")}"
-
-    vars {
-        ecs-cluster-name = "${var.ecs-cluster-name}"
-    }
-}
-
-
-
-
 data "aws_ami" "base_linux" {
   most_recent      = true
   name_regex       = "^amzn2-ami-hvm-2.0*"
@@ -155,11 +123,33 @@ resource "aws_instance" "fake_spine_instance" {
   }
 }
 
+# Instance does not have the rights to read the secrets - this part is useless :(
+# data "template_file" "fake_spine_init_template" {
+#   template = file("${path.module}/files/variables.sh")
+#   vars = {
+#     INBOUND_SERVER_BASE_URL         = var.inbound_server_base_url,
+#     FAKE_SPINE_OUTBOUND_DELAY_MS    = var.outbound_delay_ms,
+#     FAKE_SPINE_INBOUND_DELAY_MS     = var.inbound_delay_ms,
+#     FAKE_SPINE_OUTBOUND_SSL_ENABLED = var.fake_spine_outbound_ssl,
+#     FAKE_SPINE_PORT                 = var.fake_spine_port
+
+#     FAKE_SPINE_PRIVATE_KEY_ARN = var.fake_spine_private_key
+#     FAKE_SPINE_CERTIFICAT_ARN  = var.fake_spine_certificate
+#     FAKE_SPINE_CA_STORE_ARN    = var.fake_spine_ca_store
+#     MHS_SECRET_PARTY_KEY_ARN   = var.party_key_arn
+#   }
+# }
+
 data "template_cloudinit_config" "fake_spine_user_data" {
   gzip          = "true"
   base64_encode = "true"
 
-    part {
+  # part {
+  #   content_type ="text/x-shellscript"
+  #   content = data.template_file.fake_spine_init_template.rendered
+  # }  
+
+  part {
     content_type = "text/x-shellscript"
     content      = file("${path.module}/files/cloudinit.sh")
   }
