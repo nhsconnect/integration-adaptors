@@ -1,11 +1,11 @@
 """A module that defines a Pystache-based MessageBuilder."""
-import logging
+from utilities import integration_adaptors_logger as log
 
 import pystache
 from pystache import common as pystache_common
 from pystache import context as pystache_context
 
-logger = logging.getLogger(__name__)
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class PystacheMessageBuilder(object):

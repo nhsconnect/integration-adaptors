@@ -7,7 +7,9 @@ services:
       dockerfile: Dockerfile
 
   fakespine:
-    build: ./integration-tests/fake_spine
+    build:
+      context: ./
+      dockerfile: ./integration-tests/fake_spine/Dockerfile
     ports:
       - "6061:443"
       - "6062:80"
@@ -16,6 +18,7 @@ services:
       - FAKE_SPINE_PRIVATE_KEY
       - FAKE_SPINE_CA_STORE
       - INBOUND_SERVER_BASE_URL=https://inbound
+      - MHS_LOG_LEVEL=INFO
 
   inbound:
     ports:
