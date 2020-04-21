@@ -13,7 +13,7 @@ with open(json_patient) as file:
 REQUEST_BODY = json.dumps(data)
 REQUEST_PATIENT_URI = "/fhir/Patient/abc"
 REQUEST_VALID_OPERATION = "Patient"
-REQUEST_INVALID_OPERATION = "Patients"
+REQUEST_INVALID_OPERATION = "Patientssss"
 
 
 class TestHandler(tornado.testing.AsyncHTTPTestCase):
@@ -27,12 +27,10 @@ class TestHandler(tornado.testing.AsyncHTTPTestCase):
 
         self.assertEqual(404, response.code)
 
-    def test_valid_operation_uri_and_payload_matches_true_response(self):
+    def test_valid_operation_uri_and_payload_matches_return_length_of_response(self):
         response = handler.Handler.validate_uri_matches_payload_operation(self, REQUEST_VALID_OPERATION, REQUEST_PATIENT_URI)
+        self.assertEqual(6, response)
 
-        self.assertEqual(True, response)
-
-    def test_invalid_operation_uri_and_payload_matches_false_response(self):
+    def test_invalid_operation_uri_and_payload_return_negative_number_response(self):
         response = handler.Handler.validate_uri_matches_payload_operation(self, REQUEST_INVALID_OPERATION, REQUEST_PATIENT_URI)
-
-        self.assertEqual(False, response)
+        self.assertEqual(-1, response)

@@ -9,6 +9,10 @@ Ensure you have Pipenv installed and on your path, then within NHAIS directory, 
 
 `pipenv install`
 
+Install FHIR resources:
+
+`pip install fhir.resources`
+
 ## Developer setup 
 
 Open integration-adaptors in IDE (but point to root folder of repository)
