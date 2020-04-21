@@ -57,8 +57,8 @@ log "Starting the image"
 . /var/variables_source.sh
 BUILD_TAG=foo docker-compose -f docker-compose.yml -f docker-compose.ec2.override.yml up -d fakespine
 
-log "Wait 20s"
-wait 20s
+log "Sleep 20s"
+sleep 20s
 
 log "Show the logs of started container"
 docker logs `docker ps -n 1 --format '{{.ID}}'`
