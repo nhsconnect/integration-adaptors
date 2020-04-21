@@ -53,10 +53,15 @@ First few logs don't follow the pattern as they are written before logger initia
 ```
 
 Log messages produced by the MHS Adaptor are in human readable form and important data is included within the log message as key=value pairs so that they can be parsed 
-and used for searching, filtering, agregation, graphing etc.
+and used for searching, filtering, agregation, graphing etc. Few first logs don't follow the pattern as they are written before logger initialization. 
+Those are minor read-config logs.
 
 ```text
 2020-03-26T10:31:52.118165Z | AUDIT | 40186 | QUPC_IN160101UK05 | 4DE4BBB7-F1DE-48BD-8824-E8FFCE4FC703 | 1 |  | outbound.mhs_common.workflow.asynchronous_express | WorkflowName=async-express outbound workflow invoked.
+```
+The pattern is as follows (mind that inbound_message_id is missing in the example above):
+```text
+"[%(asctime)sZ] | %(levelname)s | %(process)d | %(interaction_id)s | %(message_id)s | %(correlation_id)s | %(inbound_message_id)s | %(name)s | %(message)s"
 ```
 
 - The start of the log line included a datetime-stamp in ISO8601 timestamp format and always in UTC timezone.
