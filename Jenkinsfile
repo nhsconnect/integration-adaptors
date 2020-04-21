@@ -258,6 +258,48 @@ pipeline {
                                 }
                             }
                         }
+                        stage ("Deploy FakeSpine") {
+                            steps {
+                                dir ('pipeline/terraform/fakespine'){
+                                    script {
+                                        String initCommand = """
+                                            terraform init \
+                                                -backend-config="bucket=${TF_STATE_BUCKET}" \
+                                                -backend-config="region=${TF_STATE_BUCKET_REGION}" \
+                                                -backend-config="key=${ENVIRONMENT_ID}-fakespine.tfstate" \
+                                                -input=false -no-color
+                                        """
+                                        // Create a consistent list of variables for both Plan and Apply
+                                        Map<String, String> tfVariables = [
+                                             "environment_id":     "${ENVIRONMENT_ID}",
+                                             "build_id":           "${BUILD_TAG}",
+                                             "execution_role_arn": "${TASK_EXECUTION_ROLE}",
+                                             "ecr_address":        "${DOCKER_REGISTRY}",
+                                             "mhs_state_bucket":   "${TF_STATE_BUCKET}",
+                                             "task_role_arn":      "${TASK_ROLE}",
+                                             "task_scaling_role_arn":          "${TASK_SCALING_ROLE}",
+                                             "fake_spine_alb_certificate_arn": "${FAKESPINE_ALB_CERT_ARN}", //TODO Check if this can be set with data resource
+                                             "inbound_server_base_url":        "${FAKESPINE_INBOUND_URL}",
+                                             "outbound_delay_ms":              "${FAKESPINE_OUTBOUND_DELAY}",
+                                             "inbound_delay_ms":               "${FAKESPINE_INBOUND_DELAY}",
+                                             "fake_spine_certificate":         "${FAKESPINE_CERTIFICATE}",
+                                             "fake_spine_private_key":         "${FAKESPINE_PRIVATE_KEY}",
+                                             "fake_spine_ca_store":            "${FAKESPINE_CA_STORE}",
+                                             "party_key_arn":                  "${FAKESPINE_PARTY_KEY}",
+                                             "fake_spine_outbound_ssl":        "${FAKE_SPINE_OUTBOUND_SSL_ENABLED}",
+                                             "fake_spine_port":                "${FAKE_SPINE_PORT}",
+                                             "git_branch_name":                "${GIT_BRANCH}",
+                                             "git_repo_url":                   "https://github.com/nhsconnect/integration-adaptors"
+                                        ]
+
+                                        sh(label:"Terraform: init", script: initCommand)
+                                        terraform("plan",  "fakespine", ["-no-color"],                  tfVariables )
+                                        terraform("apply", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
+                                        //terraform("destroy", "fakespine", ["-no-color", "-auto-approve"], tfVariables )
+                                    }
+                                }
+                            }
+                        }
 //
 //                         stage('Integration Tests') {
 //                             steps {
@@ -309,4 +351,10 @@ void executeUnitTestsWithCoverage() {
 
 void buildModules(String action) {
     sh label: action, script: 'pipenv install --dev --deploy --ignore-pipfile'
+}
+
+void terraform(String action, String component, List<String> parameters, Map<String, String> variables, Map<String, String> backendConfig=[:]) {
+    List<String> variablesList=variables.collect { key, value -> "-var ${key}=${value}" }
+    String command = "terraform ${action} ${parameters.join(" ")} ${variablesList.join(" ")}"
+    sh(label:"Terraform: "+action, script: command)
 }
