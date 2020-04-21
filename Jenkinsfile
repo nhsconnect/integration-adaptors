@@ -11,34 +11,34 @@ pipeline {
     }
 
     stages {
-//         stage('Build & test common') {
-//             steps {
-//                 dir('common') {
-//                     buildModules('Installing common dependencies')
+        stage('Build & test common') {
+            steps {
+                dir('common') {
+                    buildModules('Installing common dependencies')
 //                     executeUnitTestsWithCoverage()
-//                 }
-//             }
-//         }
-//         stage('Build & test MHS Common') {
-//             steps {
-//                 dir('mhs/common') {
-//                     buildModules('Installing mhs common dependencies')
+                }
+            }
+        }
+        stage('Build & test MHS Common') {
+            steps {
+                dir('mhs/common') {
+                    buildModules('Installing mhs common dependencies')
 //                     executeUnitTestsWithCoverage()
-//                 }
-//             }
-//         }
+                }
+            }
+        }
 
         stage('Build MHS') {
             parallel {
                 stage('Inbound') {
                     stages {
-//                         stage('Build') {
-//                             steps {
-//                                 dir('mhs/inbound') {
-//                                     buildModules('Installing inbound dependencies')
-//                                 }
-//                             }
-//                         }
+                        stage('Build') {
+                            steps {
+                                dir('mhs/inbound') {
+                                    buildModules('Installing inbound dependencies')
+                                }
+                            }
+                        }
 //                         stage('Unit test') {
 //                             steps {
 //                                 dir('mhs/inbound') {
@@ -57,13 +57,13 @@ pipeline {
                 }
                 stage('Outbound') {
                     stages {
-//                         stage('Build') {
-//                             steps {
-//                                 dir('mhs/outbound') {
-//                                     buildModules('Installing outbound dependencies')
-//                                 }
-//                             }
-//                         }
+                        stage('Build') {
+                            steps {
+                                dir('mhs/outbound') {
+                                    buildModules('Installing outbound dependencies')
+                                }
+                            }
+                        }
 //                         stage('Unit test') {
 //                             steps {
 //                                 dir('mhs/outbound') {
@@ -89,13 +89,13 @@ pipeline {
                 }
                 stage('Route') {
                     stages {
-//                         stage('Build') {
-//                             steps {
-//                                 dir('mhs/spineroutelookup') {
-//                                     buildModules('Installing route lookup dependencies')
-//                                 }
-//                             }
-//                         }
+                        stage('Build') {
+                            steps {
+                                dir('mhs/spineroutelookup') {
+                                    buildModules('Installing route lookup dependencies')
+                                }
+                            }
+                        }
 //                         stage('Unit test') {
 //                             steps {
 //                                 dir('mhs/spineroutelookup') {
@@ -227,11 +227,11 @@ pipeline {
                                             -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
                                             -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                             -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
-                                            -var spineroutelookup_service_sds_url=ldaps://ldap.nis1.national.ncrs.nhs.uk \
+                                            -var spineroutelookup_service_sds_url="ldaps://ldap.nis1.national.ncrs.nhs.uk" \
                                             -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
-                                            -var spineroutelookup_service_disable_sds_tls=False \
+                                            -var spineroutelookup_service_disable_sds_tls="False" \
                                             -var elasticache_node_type="cache.t2.micro" \
-                                            -var mhs_forward_reliable_endpoint_url=https://msg.int.spine2.ncrs.nhs.uk/reliablemessaging/reliablerequest
+                                            -var mhs_forward_reliable_endpoint_url="https://msg.int.spine2.ncrs.nhs.uk/reliablemessaging/reliablerequest"
                                         """
                                     script {
                                         env.MHS_ADDRESS = sh (
