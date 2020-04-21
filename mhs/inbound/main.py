@@ -12,8 +12,8 @@ from comms import proton_queue_adaptor
 from mhs_common import workflow
 from mhs_common.configuration import configuration_manager
 from handlers import healthcheck_handler
-from mhs_common.state import persistence_adaptor
-from mhs_common.state.persistence_adaptor_factory import get_persistence_adaptor
+from persistence import persistence_adaptor
+from persistence.persistence_adaptor_factory import get_persistence_adaptor
 from utilities import secrets, certs
 
 import inbound.request.handler as async_request_handler

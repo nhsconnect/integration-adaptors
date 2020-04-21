@@ -12,7 +12,7 @@ from utilities.date_utilities import DateUtilities
 
 from mhs_common import workflow
 from mhs_common.routing import routing_reliability
-from mhs_common.state import persistence_adaptor
+from persistence import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_asynchronous, asynchronous_reliable

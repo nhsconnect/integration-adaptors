@@ -1,7 +1,7 @@
 import utilities.config as config
-from mhs_common.state.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
+from persistence.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
 import utilities.integration_adaptors_logger as log
-from mhs_common.state.persistence_adaptor import PersistenceAdaptor
+from persistence.persistence_adaptor import PersistenceAdaptor
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 

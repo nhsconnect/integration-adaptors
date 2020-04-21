@@ -6,7 +6,7 @@ import aioboto3
 import utilities.integration_adaptors_logger as log
 from utilities import config
 
-from mhs_common.state import persistence_adaptor
+from persistence import persistence_adaptor
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 

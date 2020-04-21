@@ -11,7 +11,7 @@ from utilities import timing
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from retry import retriable_action
 from mhs_common.routing import routing_reliability
-from mhs_common.state import persistence_adaptor
+from persistence import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.common import CommonWorkflow, MessageData

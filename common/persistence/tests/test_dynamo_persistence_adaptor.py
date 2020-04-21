@@ -8,7 +8,7 @@ import unittest.mock
 import utilities.config
 from utilities import test_utilities
 
-import mhs_common.state.dynamo_persistence_adaptor
+import persistence.dynamo_persistence_adaptor
 
 TEST_TABLE_ARN = "TEST TABLE ARN"
 TEST_DATA_OBJECT = {"test_attribute": "test_value"}
@@ -31,11 +31,11 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
     def setUp(self):
         """Configure a dynamo persistence adaptor with the boto3 calls mocked."""
-        patcher = unittest.mock.patch.object(mhs_common.state.dynamo_persistence_adaptor.aioboto3, "resource")
+        patcher = unittest.mock.patch.object(persistence.dynamo_persistence_adaptor.aioboto3, "resource")
         self.mock_boto3_resource = patcher.start()
         self.addCleanup(patcher.stop)
         self.__configure_mocks(self.mock_boto3_resource)
-        self.service = mhs_common.state.dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+        self.service = persistence.dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
             table_name=TEST_TABLE_ARN
         )
 
@@ -63,7 +63,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
         """Test unhappy path for add where an IO exception occurs."""
         self.mock_table.put_item.side_effect = TEST_SIDE_EFFECT
 
-        with self.assertRaises(mhs_common.state.dynamo_persistence_adaptor.RecordCreationError) as ex:
+        with self.assertRaises(persistence.dynamo_persistence_adaptor.RecordCreationError) as ex:
             await self.service.add(TEST_KEY, TEST_DATA_OBJECT)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
@@ -92,7 +92,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
         """Test unhappy path for get where an IO exception occurs."""
         self.mock_table.get_item.side_effect = TEST_SIDE_EFFECT
 
-        with self.assertRaises(mhs_common.state.dynamo_persistence_adaptor.RecordRetrievalError) as ex:
+        with self.assertRaises(persistence.dynamo_persistence_adaptor.RecordRetrievalError) as ex:
             await self.service.get(TEST_INVALID_KEY)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
@@ -121,7 +121,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
         """Test unhappy path for delete where an IO exception occurs."""
         self.mock_table.delete_item.side_effect = TEST_SIDE_EFFECT
 
-        with self.assertRaises(mhs_common.state.dynamo_persistence_adaptor.RecordDeletionError) as ex:
+        with self.assertRaises(persistence.dynamo_persistence_adaptor.RecordDeletionError) as ex:
             await self.service.delete(TEST_INVALID_KEY)
 
         self.assertIs(ex.exception.__cause__, TEST_EXCEPTION)
@@ -204,7 +204,7 @@ class ComponentTestDynamoPersistenceAdaptor(unittest.TestCase):
 
     def setUp(self):
         """Configure a dynamo persistence adaptor with active boto3 calls."""
-        self.service = mhs_common.state.dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
+        self.service = persistence.dynamo_persistence_adaptor.DynamoPersistenceAdaptor(
             table_name="custom_test_db"
         )
 

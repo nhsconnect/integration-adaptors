@@ -15,9 +15,9 @@ from utilities import mdc
 from mhs_common.configuration import configuration_manager
 from mhs_common.handler import base_handler
 from mhs_common.messages.envelope import CONVERSATION_ID, MESSAGE_ID, RECEIVED_MESSAGE_ID
-from mhs_common.state import persistence_adaptor as pa
+from persistence import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
-from mhs_common.state.persistence_adaptor import PersistenceAdaptor
+from persistence.persistence_adaptor import PersistenceAdaptor
 from mhs_common.workflow import asynchronous_forward_reliable as forward_reliable
 from utilities import integration_adaptors_logger as log
 from utilities.timing import time_request
