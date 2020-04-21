@@ -6,16 +6,16 @@
 # set -uo pipefail
 
 # Just for logging. Because rsyslog is not running before userdata.
-log_file='/tmp/bootstrap.log';
+# log_file='/tmp/bootstrap.log';
 
 function log() {
   echo -e "$(date) ${1}" \
-    | tee -a "${log_file}";
+    | tee -a "/tmp/bootstrap.log";
 }
 
 function error() {
   echo -e "$(date) ERROR: ${1}" \
-    | tee -a "${log_file}";
+    | tee -a "/tmp/bootstrap.log";
   exit 1;
 };
 
