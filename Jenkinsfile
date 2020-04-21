@@ -11,34 +11,34 @@ pipeline {
     }
 
     stages {
-        stage('Build & test common') {
-            steps {
-                dir('common') {
-                    buildModules('Installing common dependencies')
+//         stage('Build & test common') {
+//             steps {
+//                 dir('common') {
+//                     buildModules('Installing common dependencies')
 //                     executeUnitTestsWithCoverage()
-                }
-            }
-        }
-        stage('Build & test MHS Common') {
-            steps {
-                dir('mhs/common') {
-                    buildModules('Installing mhs common dependencies')
+//                 }
+//             }
+//         }
+//         stage('Build & test MHS Common') {
+//             steps {
+//                 dir('mhs/common') {
+//                     buildModules('Installing mhs common dependencies')
 //                     executeUnitTestsWithCoverage()
-                }
-            }
-        }
+//                 }
+//             }
+//         }
 
         stage('Build MHS') {
             parallel {
                 stage('Inbound') {
                     stages {
-                        stage('Build') {
-                            steps {
-                                dir('mhs/inbound') {
-                                    buildModules('Installing inbound dependencies')
-                                }
-                            }
-                        }
+//                         stage('Build') {
+//                             steps {
+//                                 dir('mhs/inbound') {
+//                                     buildModules('Installing inbound dependencies')
+//                                 }
+//                             }
+//                         }
 //                         stage('Unit test') {
 //                             steps {
 //                                 dir('mhs/inbound') {
@@ -56,14 +56,14 @@ pipeline {
                     }
                 }
                 stage('Outbound') {
-                    stages {
-                        stage('Build') {
-                            steps {
-                                dir('mhs/outbound') {
-                                    buildModules('Installing outbound dependencies')
-                                }
-                            }
-                        }
+//                     stages {
+//                         stage('Build') {
+//                             steps {
+//                                 dir('mhs/outbound') {
+//                                     buildModules('Installing outbound dependencies')
+//                                 }
+//                             }
+//                         }
 //                         stage('Unit test') {
 //                             steps {
 //                                 dir('mhs/outbound') {
@@ -88,14 +88,14 @@ pipeline {
                     }
                 }
                 stage('Route') {
-                    stages {
-                        stage('Build') {
-                            steps {
-                                dir('mhs/spineroutelookup') {
-                                    buildModules('Installing route lookup dependencies')
-                                }
-                            }
-                        }
+//                     stages {
+//                         stage('Build') {
+//                             steps {
+//                                 dir('mhs/spineroutelookup') {
+//                                     buildModules('Installing route lookup dependencies')
+//                                 }
+//                             }
+//                         }
 //                         stage('Unit test') {
 //                             steps {
 //                                 dir('mhs/spineroutelookup') {
@@ -115,7 +115,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
+//         stage('Test') {
             // NIAD-189: Parallel component and integration tests disabled due to intermittent build failures
             parallel {
 //             stages {
@@ -293,9 +293,9 @@ pipeline {
 //                         }
                     }
                 }
-            } // parallel
-        }
-    }
+//             } // parallel
+//         }
+//     }
 
     post {
         always {
