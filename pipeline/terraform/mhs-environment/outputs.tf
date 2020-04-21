@@ -52,3 +52,9 @@ output "outbound_sg_id" {
   value = aws_security_group.mhs_outbound_security_group.id
   description = "ID of outbound security group"
 }
+
+
+output "subnet_cidrs" {
+  value = aws_subnet.mhs_subnet.*.cidr_block
+  description = "CIDRs used by MHS subnets"
+}

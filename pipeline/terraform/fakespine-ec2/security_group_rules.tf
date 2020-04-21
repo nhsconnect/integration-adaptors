@@ -92,7 +92,7 @@ resource "aws_security_group_rule" "fake_spine_security_sg_egress_inbound_app_po
   from_port = var.mhs_inbound_port
   to_port = var.mhs_inbound_port
   protocol = "tcp"
-  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  cidr_blocks = [data.terraform_remote_state.mhs.outputs.subnet_cidrs]
   # source_security_group_id = data.terraform_remote_state.mhs.outputs.inbound_lb_sg_id
   description = "Allow egress ${var.fake_spine_port} outbound requests to MHS inbound"
 }
