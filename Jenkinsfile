@@ -260,7 +260,7 @@ pipeline {
                         }
                         stage ("Deploy FakeSpine") {
                             steps {
-                                dir ('pipeline/terraform/fakespine'){
+                                dir ('pipeline/terraform/fakespine-ec2'){
                                     script {
                                         String initCommand = """
                                             terraform init \
