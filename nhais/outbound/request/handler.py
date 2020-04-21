@@ -57,6 +57,7 @@ class Handler(base_handler.BaseHandler):
 
     @timing.time_request
     async def post(self):
+        # TODO: Path should be POST /fhir/Patient/{id}. Need to check that {id} matches the identifier of the Patient in the payload
         try:
             request_body = json.loads(self.request.body.decode())
             # The JSONSchema for Patient requires a const resourceType = 'Patient' so this is not required
