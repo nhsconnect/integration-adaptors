@@ -9,6 +9,3 @@ services:
 
   route:
     image: nhsdev/nia-mhs-route:${BUILD_TAG}
-
-  rabbitmq:
-    image: nhsdev/nia-rabbitmq-local:1.0.1
