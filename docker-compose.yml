@@ -73,3 +73,21 @@ services:
     image: redis
     ports:
       - "6379:6379"
+  fakespine:
+    image: local/fake-spine:${BUILD_TAG}
+    # build:
+    #   context: .
+    #   dockerfile: ./integration-tests/fake_spine/Dockerfile
+    ports:
+      - "8443:443"
+      - "8081:80"
+    environment:
+      - FAKE_SPINE_CA_STORE=${FAKE_SPINE_CA_STORE}
+      - FAKE_SPINE_CERTIFICATE=${FAKE_SPINE_CERTIFICATE}
+      - FAKE_SPINE_INBOUND_DELAY_MS=150
+      - FAKE_SPINE_OUTBOUND_DELAY_MS=150
+      - FAKE_SPINE_PRIVATE_KEY=${FAKE_SPINE_PRIVATE_KEY}
+      - INBOUND_SERVER_BASE_URL=${INBOUND_SERVER_BASE_URL}
+      - MHS_SECRET_PARTY_KEY=${MHS_SECRET_PARTY_KEY}
+      - FAKE_SPINE_PORT=${FAKE_SPINE_PORT}
+      - FAKE_SPINE_OUTBOUND_SSL_ENABLED=${FAKE_SPINE_OUTBOUND_SSL_ENABLED}
