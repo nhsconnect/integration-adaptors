@@ -71,7 +71,7 @@ The following is required
 #### Environment set up
 1. Create a local directory and copy the the following files from the project root into the new directory
 
-    `docker-compose.yml` `docker-compose.lb.override.yml` `docker-compose.integration.override.yml`
+    `docker-compose.yml` `docker-compose.lb.override.yml` `docker-compose.release.image.override.yml`
 
 2. Create a script to start the containers, call it export-env-vars-and-run-mhs-docker.sh and make it executable.
 
@@ -98,10 +98,10 @@ export MHS_SECRET_CLIENT_KEY=""
 export MHS_SECRET_CA_CERTS="" 
 
 echo -e "${LIGHT_GREEN}Stopping running containers${NC}" 
-docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml -f docker-compose.integration.override.yml stop; 
+docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml -f docker-compose.release.image.override.yml stop; 
 
 echo -e "${LIGHT_GREEN}Build and starting containers${NC}" 
-docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml -f docker-compose.integration.override.yml up -d --build
+docker-compose -f docker-compose.yml -f docker-compose.lb.override.yml -f docker-compose.release.image.override.yml up -d --build
 ```
 
 4. Confirm you are connected to the OpenTest VPN and start all the containers by executing the shell script you created above.
