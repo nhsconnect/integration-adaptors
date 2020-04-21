@@ -1,8 +1,13 @@
 import tornado.httpclient
+import tornado.web
+import tornado.httpserver
+import tornado.ioloop
 import utilities.integration_adaptors_logger as log
 from handlers import healthcheck_handler
+from outbound.request.deduction import DeductionRequestHandler
+from outbound.request.removal import RemovalRequestHandler
 from utilities import config
-from outbound.request import handler
+from outbound.request import acceptance_amendment
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -16,7 +21,9 @@ def start_tornado_server() -> None:
 
     tornado_application = tornado.web.Application(
         [
-            (r'/fhir/Patient/.*', handler.Handler),
+            (r'/fhir/Patient/([0-9]*)/\$nhais\.removal', RemovalRequestHandler),
+            (r'/fhir/Patient/([0-9]*)/\$nhais\.deduction', DeductionRequestHandler),
+            (r'/fhir/Patient/([0-9]*)', acceptance_amendment.AcceptanceAmendmentRequestHandler),  # POST -> Acceptance, PATCH -> Amendment
             (r'/healthcheck', healthcheck_handler.HealthcheckHandler)
         ])
     tornado_server = tornado.httpserver.HTTPServer(tornado_application)

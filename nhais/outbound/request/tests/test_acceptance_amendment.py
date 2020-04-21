@@ -1,7 +1,7 @@
 import tornado.testing
 from tornado.web import Application
 
-from outbound.request import handler
+from outbound.request import acceptance_amendment
 
 import json
 import os
@@ -16,9 +16,9 @@ REQUEST_VALID_OPERATION = "Patient"
 REQUEST_INVALID_OPERATION = "Patientssss"
 
 
-class TestHandler(tornado.testing.AsyncHTTPTestCase):
+class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
     def get_app(self) -> Application:
-        return tornado.web.Application([(r'/fhir/Patient/.*', handler.Handler)])
+        return tornado.web.Application([(r'/fhir/Patient/([0-9]*])', acceptance_amendment.AcceptanceAmendmentRequestHandler)])
 
     def test_invalid_post_request_line_return_404_response_code(self):
 

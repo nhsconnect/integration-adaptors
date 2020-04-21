@@ -1,4 +1,8 @@
+from json import JSONDecodeError
 from typing import Any
+
+import tornado.web
+from fhirclient.models.codeableconcept import CodeableConcept
 
 from comms import proton_queue_adaptor
 from tornado import httputil
@@ -19,9 +23,9 @@ from outbound.converter.fhir_to_edifact import FhirToEdifact
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 
-class Handler(base_handler.BaseHandler):
+class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
 
-    def __init__(self, application: "Application", request: httputil.HTTPServerRequest, **kwargs: Any):
+    def __init__(self, application, request: httputil.HTTPServerRequest, **kwargs: Any):
         super().__init__(application, request, **kwargs)
         queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
             host=config.get_config('OUTBOUND_QUEUE_HOST'),
@@ -40,6 +44,13 @@ class Handler(base_handler.BaseHandler):
 
     def set_unsuccesful_response(self, status, code, coding_code, details):
         self.set_status(status)
+        # TODO: Consider building this up programmatically instead?
+        operation_outcome = OperationOutcome()
+        outcome_issue = OperationOutcomeIssue()
+        outcome_issue.severity = "error"
+        outcome_issue.code = code
+        issue_details = CodeableConcept()
+
         operationOutcomeIssue = OperationOutcomeIssue({
             "severity": "error",
             "code": code,
@@ -56,9 +67,10 @@ class Handler(base_handler.BaseHandler):
         self.finish(operationOutcome)
 
     @timing.time_request
-    async def post(self):
+    async def post(self, patient_id):
         # TODO: Path should be POST /fhir/Patient/{id}. Need to check that {id} matches the identifier of the Patient in the payload
         try:
+            # TODO: request with empty body causes unhandled error here
             request_body = json.loads(self.request.body.decode())
             # The JSONSchema for Patient requires a const resourceType = 'Patient' so this is not required
             # uri_matches_payload_operation = self.validate_uri_matches_payload_operation(
@@ -78,3 +90,11 @@ class Handler(base_handler.BaseHandler):
         except SchemaValidationException as e:
             details = f"'{e.path[0]}' {e.message}"
             self.set_unsuccesful_response(400, "value", "JSON_PAYLOAD_NOT_VALID_TO_SCHEMA", details)
+        except JSONDecodeError:
+            # TODO: create correct error response
+            raise
+
+    @timing.time_request
+    async def patch(self, patient_id):
+        self.set_status(202)
+        await self.finish(f'Amendment for patient {patient_id}')
