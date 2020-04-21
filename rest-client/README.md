@@ -53,8 +53,7 @@ Environment variables are store in `settings.json` file located in `.vscode` fol
                         "ROUTE-LOOKUP-PORT": "8088",
                         "FAKE-SPINE-PORT": "8091",
                         "ASID": "9XXXXXXXXXXX",
-                        "PARTY-KEY": "A9XXXX-XXXXXXX",
-                        "REF-TO-MESSAGE-ID": "8936cd14-d728-41a7-8d14-485183ebc2de"
+                        "PARTY-KEY": "A9XXXX-XXXXXXX"
         }
     }
 }
