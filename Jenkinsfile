@@ -215,11 +215,11 @@ pipeline {
                                             -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                                             -var spineroutelookup_service_sds_url=ldap://ec2-3-10-232-118.eu-west-2.compute.amazonaws.com \
                                             -var mhs_ldap_mock_data_url="s3://nhsd-test/mock_ldap_data" \
-                                            -var mhs_fake_spine_url=http://fake-spine/ \
+                                            -var mhs_fake_spine_url=http://172.31.18.145/ \
                                             -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
                                             -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
                                             -var elasticache_node_type="cache.t2.micro" \
-                                            -var mhs_forward_reliable_endpoint_url=https://ec2-3-10-232-118.eu-west-2.compute.amazonaws.com/reliablemessaging/forwardreliable \
+                                            -var mhs_forward_reliable_endpoint_url=https://172.31.18.145/ \
                                             -var inbound_use_ssl="False" \
                                             -var inbound_server_port="443"
                                         """
