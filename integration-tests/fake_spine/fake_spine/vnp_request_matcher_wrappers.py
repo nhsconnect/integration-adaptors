@@ -12,5 +12,10 @@ def async_reliable():
 
 
 def sync():
-    return RequestMatcher('async-reliable-vnp',
+    return RequestMatcher('sync-vnp',
                           lambda request: '<wsa:Action>urn:nhs:names:services:pdsquery/QUPA_IN040000UK32</wsa:Action>' in request.body.decode())
+
+
+def forward_reliable():
+    return RequestMatcher('forward-reliable-vnp',
+                          lambda request: '<eb:Action>COPC_IN000001UK01</eb:Action>' in request.body.decode())
