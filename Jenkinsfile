@@ -221,8 +221,8 @@ pipeline {
                                             -var party_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_PARTY_KEY-FbOTJn \
                                             -var client_cert_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
                                             -var client_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PLT_INT_Endpoint_PrivateKey-Fu1jb6 \
-                                            -var ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
-                                            -var route_ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
+                                            -var ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_CA_valid_till_may_2022-XJup7p \
+                                            -var route_ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_CA_valid_till_may_2022-XJup7p \
                                             -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
                                             -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
                                             -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
