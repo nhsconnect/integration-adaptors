@@ -1,4 +1,4 @@
-  #!/bin/bash
+#!/bin/bash
 # vim: set syntax=sh tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab :
 
 # -u          :: Fail on unbounded variable usage
