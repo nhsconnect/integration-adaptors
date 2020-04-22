@@ -132,11 +132,29 @@ The requests are sent via the docker containers which can be setup following the
 . In the project root create the directory `.vscode` if it doesn't exist already
 . In the .vscode folder create a file called `settings.json`
 . Add the information below to the `settings.json` file
-
+[source,json]
+----
+{
+    "python.pythonPath": "/usr/local/bin/python3",
+    "workbench.settings.editor": "json",
+    "workbench.settings.useSplitJSON": true,
+    "rest-client.environmentVariables": {
+        "$shared": {},
+        "$sample_mhs_environment": {
+            "BASE_URL": "http://localhost",
+                        "INBOUND-PORT": "8082",
+                        "OUTBOUND-PORT": "80",
+                        "ROUTE-LOOKUP-PORT": "8088",
+                        "FAKE-SPINE-PORT": "8091",
+                        "ASID": "9XXXXXXXXXXX",
+                        "PARTY-KEY": "A9XXXX-XXXXXXX"
+        }
+    }
+}
+----
 . Navigate the code directories to the requests: `/http-client/mhs/outbound`
-
 . Navigate to the folder of the message pattern type you wish to run a request for and open a request .http file
-. In the bottom right corner of Visual Studio Code click `No Environment` and select `$mhs`
+. In the bottom right corner of Visual Studio Code click `No Environment` and select `$sample_mhs_environment`
 . Change the data `@PATIENT_NHS_NUMBER` to be a number which is valid in OpenTest. A correct number can be found in the
 correct integration test for the same message pattern type.
 
