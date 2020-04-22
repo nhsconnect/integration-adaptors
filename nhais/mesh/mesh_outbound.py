@@ -1,15 +1,17 @@
 import utilities.integration_adaptors_logger as log
-from comms import queue_adaptor
 from retry import retriable_action
 from utilities import timing, config
+from comms import proton_queue_adaptor
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 class MeshOutboundWrapper:
 
-    def __init__(self,
-                 queue_adaptor: queue_adaptor.QueueAdaptor = None):
-        self.queue_adaptor = queue_adaptor
+    def __init__(self):
+        self.queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
+            host=config.get_config('OUTBOUND_QUEUE_HOST'),
+            username=config.get_config('OUTBOUND_QUEUE_USERNAME', default=None),
+            password=config.get_config('OUTBOUND_QUEUE_PASSWORD', default=None))
         self.queue_max_retries = int(config.get_config('MAX_RETRIES', default='10'))
         self.queue_retry_delay = float(config.get_config('RETRY_DELAY', default='0.1'))
         self.transmission = None
