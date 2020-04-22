@@ -8,16 +8,16 @@
 # Just for logging. Because rsyslog is not running before userdata.
 # log_file='/tmp/bootstrap.log';
 
-function log() {
-  echo -e "$(date) ${1}" \
-    | tee -a "/tmp/bootstrap.log";
-}
+# function log() {
+#   echo -e "$(date) ${1}" \
+#     | tee -a "/tmp/bootstrap.log";
+# }
 
-function error() {
-  echo -e "$(date) ERROR: ${1}" \
-    | tee -a "/tmp/bootstrap.log";
-  exit 1;
-};
+# function error() {
+#   echo -e "$(date) ERROR: ${1}" \
+#     | tee -a "/tmp/bootstrap.log";
+#   exit 1;
+# };
 
 export aws="$(which aws || echo '/usr/bin/aws')";
 export curl="$(which curl || echo '/usr/bin/curl')";
@@ -26,19 +26,19 @@ export curl="$(which curl || echo '/usr/bin/curl')";
 # yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 # yum-config-manager --enable epel
 
-log "Installing docker, git, ssh"
+echo "Installing docker, git, ssh"
 
 yum makecache
 yum install -y docker git ssh
 
-log "Installing docker compose"
+echo "Installing docker compose"
 curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 service docker start
 
-log "Cloning the NHS repo from ${GIT_REPO} branch ${GIT_BRANCH}"
+echo "Cloning the NHS repo from ${GIT_REPO} branch ${GIT_BRANCH}"
 
 mkdir -p /opt/NHS
 cd /opt/NHS
@@ -47,19 +47,19 @@ cd integration-adaptors
 git fetch
 git checkout ${GIT_BRANCH}
 
-log "Building the image with tag ${BUILD_TAG}"
+echo "Building the image with tag ${BUILD_TAG}"
 docker build -t local/fake-spine:${BUILD_TAG} -f ./integration-tests/fake_spine/Dockerfile .
 
-log "Starting the image"
+echo "Starting the image"
 ./integration-tests/setup_component_test_env.sh
 . ./component-test-source.sh
 . /var/variables_source.sh
 BUILD_TAG=${BUILD_TAG} docker-compose -f docker-compose.yml -f docker-compose.ec2.override.yml up -d fakespine
 
-log "Sleep 20s"
+echo "Sleep 20s"
 sleep 20s
 
-log "Show the logs of started container"
+echo "Show the logs of started container"
 docker logs `docker ps -n 1 --format '{{.ID}}'`
 
 
