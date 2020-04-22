@@ -12,7 +12,8 @@ services:
       - MHS_SECRET_CLIENT_CERT
       - MHS_SECRET_CLIENT_KEY
       - MHS_SECRET_CA_CERTS
-      - MHS_INBOUND_QUEUE_URL=rabbitmq:5672/inbound
+      - MHS_INBOUND_QUEUE_BROKERS=amqp://rabbitmq:5672
+      - MHS_INBOUND_QUEUE_NAME: inbound
       - MHS_SECRET_INBOUND_QUEUE_USERNAME=guest
       - MHS_SECRET_INBOUND_QUEUE_PASSWORD=guest
       - MHS_STATE_TABLE_NAME=mhs_state

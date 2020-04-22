@@ -28,10 +28,9 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
     :return: The workflows that can be used to handle messages.
     """
-
     queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
-        urls=config.get_config('INBOUND_QUEUE_URL').split(','),
-        queue='inbound',
+        urls=config.get_config('INBOUND_QUEUE_BROKERS').split(','),
+        queue=config.get_config('INBOUND_QUEUE_NAME'),
         username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME', default=None),
         password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD', default=None),
         max_retries=int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3')),
