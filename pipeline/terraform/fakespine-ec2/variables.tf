@@ -106,3 +106,19 @@ variable "fake_spine_port" {
   type = string
   description = "Port on which tne service will listen to connections"
 }
+
+variable "git_branch_name" {
+  type = string
+  description = "Branch to clone inside the EC2 instance"
+}
+
+variable "git_repo_url" {
+  type = string
+  description = "Repository to clone inside the EC2 instance"
+}
+
+variable "mhs_inbound_port" {
+  type = number
+  description = "Port in which mhs inbound runs"
+  default = 443
+}
