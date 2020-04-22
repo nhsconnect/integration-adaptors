@@ -124,7 +124,8 @@ def _read_real_server_data(output_path):
     logger.info("Saving real server schema at '%s'", server_schema_path)
     server.schema.to_file(server_schema_path)
 
-    if connection.search('ou=Services,o=nhs', '(nhsIDCode=YES)', attributes=ALL_ATTRIBUTES):
+    # if connection.search('ou=Services,o=nhs', '(nhsIDCode=YES)', attributes=ALL_ATTRIBUTES):
+    if connection.search('ou=Services,o=nhs', '(nhsIDCode=X26)', attributes=ALL_ATTRIBUTES):
         server_entries_path = os.path.join(output_path, _SERVER_ENTRIES_FILE)
         logger.info("Saving server entries at '%s'", server_entries_path)
         connection.response_to_file(server_entries_path, raw=True)
