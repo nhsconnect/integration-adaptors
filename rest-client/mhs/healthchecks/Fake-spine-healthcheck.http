@@ -1,2 +1,0 @@
-# @name Fake-spine-healthcheck
-GET {{HOSTNAME}}:{{FAKE-SPINE-PORT}}/healthcheck HTTP/1.1

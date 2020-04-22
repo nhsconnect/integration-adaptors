@@ -1,0 +1,31 @@
+{
+  "_description": "This template pushes a Fakespine image.",
+  "variables": {
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/fake-spine",
+    "tag": "{{env `BUILD_TAG`}}"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "local/fake-spine:{{user `tag`}}",
+      "pull": false,
+      "commit": true
+    }
+  ],
+  "provisioners": [],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "{{user `registry`}}{{user `repository`}}",
+        "tag": "{{user `tag`}}"
+      },
+      {
+        "type": "docker-push",
+        "ecr_login": true,
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
+      }
+    ]
+  ]
+}

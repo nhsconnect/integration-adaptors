@@ -10,7 +10,7 @@ import definitions
 import mhs_common.configuration.configuration_manager as configuration_manager
 import outbound.request.synchronous.handler as client_request_handler
 import utilities.integration_adaptors_logger as log
-from requests import healthcheck_handler
+from handlers import healthcheck_handler
 from mhs_common import workflow
 from mhs_common.routing import routing_reliability
 from mhs_common.state import persistence_adaptor

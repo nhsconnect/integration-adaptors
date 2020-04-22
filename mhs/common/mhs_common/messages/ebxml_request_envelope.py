@@ -132,7 +132,6 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
 
         cls._extract_more_values_from_xml_tree(xml_tree, extracted_values)
 
-        cls._add_descriptions_to_attachments(xml_tree, attachments)
         extracted_values[EBXML] = ebxml_part
         extracted_values[ATTACHMENTS] = attachments
 
@@ -140,30 +139,6 @@ class EbxmlRequestEnvelope(ebxml_envelope.EbxmlEnvelope):
             extracted_values[MESSAGE] = payload_part
 
         return EbxmlRequestEnvelope(extracted_values)
-
-    @classmethod
-    def _add_descriptions_to_attachments(cls, xml_tree: Element, attachments: List[Dict[str, Union[str, bool]]]):
-        """
-        For the attachments in attachments, extract the corresponding description of the attachment from xml_tree and
-        set the description on the attachment. If a description isn't found, set '' as the description.
-        :param xml_tree: XML tree containing attachment descriptions
-        :param attachments: attachments to add descriptions to
-        """
-        for attachment in attachments:
-            description_element = xml_tree.find(
-                f".//{ebxml_envelope.EBXML_NAMESPACE}:Reference["
-                f"@{ebxml_envelope.XLINK_NAMESPACE}:href='cid:{attachment[ATTACHMENT_CONTENT_ID]}']"
-                f"/{ebxml_envelope.EBXML_NAMESPACE}:Description",
-                ebxml_envelope.NAMESPACES)
-            if description_element is None:
-                logger.info("{Attachment} with {ContentType} found with no description. Setting description to ''",
-                            fparams={
-                                'Attachment': attachment[ATTACHMENT_CONTENT_ID],
-                                'ContentType': attachment[ATTACHMENT_CONTENT_TYPE]
-                            })
-                attachment[ATTACHMENT_DESCRIPTION] = ''
-            else:
-                attachment[ATTACHMENT_DESCRIPTION] = description_element.text
 
     @classmethod
     def _extract_more_values_from_xml_tree(cls, xml_tree: Element,
