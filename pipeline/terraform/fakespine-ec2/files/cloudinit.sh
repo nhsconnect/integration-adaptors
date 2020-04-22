@@ -38,7 +38,7 @@ ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 service docker start
 
-log "Cloning the NHS repo"
+log "Cloning the NHS repo from ${GIT_REPO} branch ${GIT_BRANCH}"
 
 mkdir -p /opt/NHS
 cd /opt/NHS
@@ -47,14 +47,14 @@ cd integration-adaptors
 git fetch
 git checkout ${GIT_BRANCH}
 
-log "Building the image"
+log "Building the image with tag ${BUILD_TAG}"
 docker build -t local/fake-spine:${BUILD_TAG} -f ./integration-tests/fake_spine/Dockerfile .
 
 log "Starting the image"
 ./integration-tests/setup_component_test_env.sh
 . ./component-test-source.sh
 . /var/variables_source.sh
-docker-compose -f docker-compose.yml -f docker-compose.ec2.override.yml up -d fakespine
+BUILD_TAG=${BUILD_TAG} docker-compose -f docker-compose.yml -f docker-compose.ec2.override.yml up -d fakespine
 
 log "Sleep 20s"
 sleep 20s
