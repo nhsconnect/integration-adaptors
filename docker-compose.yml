@@ -45,6 +45,8 @@ services:
       - MHS_SPINE_REQUEST_MAX_SIZE=4999600 # 5 000 000 - 400
       # Note that this endpoint URL is Opentest-specific
       - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable
+      # This is for disabling hostname validation so OpenTest ip address will work
+      - MHS_OUTBOUND_VALIDATE_CERTIFICATE=${MHS_OUTBOUND_VALIDATE_CERTIFICATE:-True}
   route:
     image: local/mhs-route:${BUILD_TAG}
     # build:
@@ -64,7 +66,7 @@ services:
     ports:
       - "8000:8000"
   rabbitmq:
-    build: ./common/local-env/rabbit/
+    image: nhsdev/nia-rabbitmq-local:1.0.1
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -73,3 +75,21 @@ services:
     image: redis
     ports:
       - "6379:6379"
+  fakespine:
+    image: local/fake-spine:${BUILD_TAG}
+    # build:
+    #   context: .
+    #   dockerfile: ./integration-tests/fake_spine/Dockerfile
+    ports:
+      - "8443:443"
+      - "8081:80"
+    environment:
+      - FAKE_SPINE_CA_STORE=${FAKE_SPINE_CA_STORE}
+      - FAKE_SPINE_CERTIFICATE=${FAKE_SPINE_CERTIFICATE}
+      - FAKE_SPINE_INBOUND_DELAY_MS=150
+      - FAKE_SPINE_OUTBOUND_DELAY_MS=150
+      - FAKE_SPINE_PRIVATE_KEY=${FAKE_SPINE_PRIVATE_KEY}
+      - INBOUND_SERVER_BASE_URL=${INBOUND_SERVER_BASE_URL}
+      - MHS_SECRET_PARTY_KEY=${MHS_SECRET_PARTY_KEY}
+
+

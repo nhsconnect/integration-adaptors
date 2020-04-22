@@ -54,17 +54,25 @@ The MHS Adaptor presents a simple HTTP synchronous interface which is used to ma
 
 Please refer to the [API Documentation](outbound/openapi-docs.html) for further details.
 
-Examples of how this API is called can be found in the [integration tests](../integration-tests/integration_tests/) module
+Examples of how this API is called can be found in the [integration tests](../integration-tests/integration_tests) module
 
-## Postman collection - example requests to the MHS Adaptor
+## RestClient collection- example requests to the MHS Adaptor
 
-A [Postman collection](outbound/MHS_Adaptor_Requests_postman_collection.json) is available which illustrates how the MHS Adaptor API
-is called. Once imported into [Postman](https://www.getpostman.com/) this collection provides two API request examples:
-
-Before sending these requests, you will amend the details of the request as follows:
- - Set the `from-asid` message header to the ASID of your spine endpoint, as provided to you by NHS Digital
- - In the Body, replace two instances of the string `FROM_ASID` with the ASID of your spine endpoint as above.
- - Set the URL to the address of the MHS Adaptor API in your environment. 
+A RestClient collection [rest-client/mhs](../rest-client/mhs) illustrates how the MHS Adaptor API
+is called. This collection provides following API request examples:
+ - asynchronous request to outbound, with no retries while sending requests from outbound to spine
+ - asynchronous request to outbound, with retries while sending request from outbound to to spine
+ - synchronous request to outbound, with retries while sending request to nhs application other than spine
+ - synchronous request to outbound
+ - solicited request to inbound
+ - unsolicited request to inbound.
+ 
+There are also health, reliability and routing checks.
+ 
+Before sending these requests, you will need to create a setting.json file as described in [README](../rest-client/README.md).
+ 
+Before sending requests directly to the inbound service, you will need to switch off ssl by setting 'MHS_INBOUND_USE_SSL: false' in .yaml inbound configuration file.
+It is necessary to send requests to inbound without ssl.  
 
 #### "Async Express Pattern Message  - Synchronous Response" 
 
