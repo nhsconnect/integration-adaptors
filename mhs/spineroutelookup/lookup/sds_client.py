@@ -5,6 +5,8 @@ from typing import Dict, List
 
 import ldap3
 import ldap3.core.exceptions as ldap_exceptions
+
+from lookup import sds_connection_factory
 from utilities import integration_adaptors_logger as log
 
 import lookup.sds_exception as sds_exception
@@ -89,12 +91,23 @@ class SDSClient(object):
         """
 
         search_filter = f"(&(nhsIDCode={ods_code}) (objectClass={AS_OBJECT_CLASS}) (nhsAsSvcIA={interaction_id}))"
-
-        message_id = self.connection.search(search_base=self.search_base,
+        self.connection.bind()
+        try:
+            message_id = self.connection.search(search_base=self.search_base,
                                             search_filter=search_filter,
                                             attributes=[MHS_PARTY_KEY, MHS_ASID])
-        logger.info("{message_id} - for query: {ods_code} {interaction_id}",
+            logger.info("{message_id} - for query: {ods_code} {interaction_id}",
                     fparams={"message_id": message_id, "ods_code": ods_code, "interaction_id": interaction_id})
+        except ldap_exceptions.LDAPExceptionError as e:
+            logger.exception(e)
+            logger.info("LDAP error occurred trying to reconnect")
+            self.connection = sds_connection_factory.create_connection()
+            self.connection.bind()
+            message_id = self.connection.search(search_base=self.search_base,
+                                                search_filter=search_filter,
+                                                attributes=[MHS_PARTY_KEY, MHS_ASID])
+            logger.info("{message_id} - for query: {ods_code} {interaction_id}",
+                        fparams={"message_id": message_id, "ods_code": ods_code, "interaction_id": interaction_id})
 
         response = await self._get_query_result(message_id)
         logger.info("Found accredited supplier details for {message_id}", fparams={"message_id": message_id})

@@ -114,4 +114,4 @@ class MhsHttpRequestBuilder(object):
         Execute a POST request against the MHS using the configured body and headers within this class.
         :return: response from MHS
         """
-        return requests.post(self.mhs_host, headers=self.headers, data=self.body, verify=False)
+        return requests.post(self.mhs_host, headers=self.headers, data=self.body, verify=False, timeout=15)
