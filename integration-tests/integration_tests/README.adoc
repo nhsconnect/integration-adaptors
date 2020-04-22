@@ -121,7 +121,7 @@ To be able scale up, a load balance has to be added to the cluster,
 target service has to have internal port to ephemeral binding
 and and environment variable has to be set for HTTPS comm.
 
-The `docker-compose.lb.override.yml` contains additional definitions for 2 load balancers - inbound + ourbound services.
+The `docker-compose.lb.override.yml` contains additional definitions for 2 load balancers - inbound + outbound services.
 
 == Sending requests using Visual Studio Code
 This section explains how to send requests to OpenTest which is the NHS Spine Test System.
