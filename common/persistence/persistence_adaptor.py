@@ -35,3 +35,12 @@ class PersistenceAdaptor(abc.ABC):
         :return: The instance of the item which has been deleted from persistence. (None if no item found)
         """
         pass
+
+    @abc.abstractmethod
+    async def update(self, key: str, data: dict) -> Optional[dict]:
+        """
+        Updates an item from a table given it's key and update data.
+        :param key: The key of the item to delete.
+        :return: The instance of the item which has been deleted from persistence. (None if no item found)
+        """
+        pass

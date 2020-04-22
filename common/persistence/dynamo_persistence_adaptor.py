@@ -1,6 +1,7 @@
 """Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
 import contextlib
 import json
+from typing import Optional
 
 import aioboto3
 import utilities.integration_adaptors_logger as log
@@ -28,6 +29,25 @@ class RecordRetrievalError(RuntimeError):
 
 class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
     """Class responsible for persisting items into a DynamoDB."""
+
+    async def update(self, key: str, expression: str, attributes: dict) -> Optional[dict]:
+        logger.info('Adding data for {key}', fparams={'key': key})
+        try:
+            async with self.__get_dynamo_table() as table:
+                response = await table.update_item(
+                    Key={'key': key},
+                    UpdateExpression=expression,
+                    ExpressionAttributeValues=attributes,
+                    ReturnValues='UPDATED_NEW'
+                )
+            if response.get('Attributes', {}).get('data') is None:
+                logger.info('No previous record found: {key}', fparams={'key': key})
+                return None
+            return json.loads(response.get('Attributes', {}).get('data'))
+        except Exception as e:
+            logger.exception('Error creating record')
+            raise RecordCreationError from e
+        pass
 
     def __init__(self, table_name):
         """
