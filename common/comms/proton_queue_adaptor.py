@@ -43,6 +43,12 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         self.password = password
         self.max_retries = max_retries
         self.retry_delay = retry_delay
+
+        if self.urls is None or not isinstance(urls, List) or len(urls) == 0:
+            raise ValueError("Invalid urls %s", urls)
+        if queue is None or len(queue.strip()) == 0:
+            raise ValueError("Invalid queue name %s", queue)
+
         logger.info('Initialized proton queue adaptor for {urls} with {max_retries} and {retry_delay}',
                     fparams={'urls': self.urls, 'max_retries': max_retries, 'retry_delay': retry_delay})
 

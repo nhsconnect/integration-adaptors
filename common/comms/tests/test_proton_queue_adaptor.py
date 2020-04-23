@@ -35,6 +35,22 @@ class TestProtonQueueAdaptor(unittest.TestCase):
         self.service = comms.proton_queue_adaptor.ProtonQueueAdaptor(
             urls=TEST_QUEUE_SINGLE_URL, queue=TEST_QUEUE_NAME, username=TEST_QUEUE_USERNAME, password=TEST_QUEUE_PASSWORD)
 
+    def test_value_error_is_raised_when_broker_urls_are_invalid(self) -> None:
+        test_data = [
+            {"queue": TEST_QUEUE_NAME, "urls": None},
+            {"queue": TEST_QUEUE_NAME, "urls": ""},
+            {"queue": TEST_QUEUE_NAME, "urls": " "},
+            {"urls": TEST_QUEUE_SINGLE_URL, "queue": None},
+            {"urls": TEST_QUEUE_SINGLE_URL, "queue": ""},
+            {"urls": TEST_QUEUE_SINGLE_URL, "queue": " "}
+        ]
+
+        for data in test_data:
+            self.assertRaises(
+                ValueError,
+                comms.proton_queue_adaptor.ProtonQueueAdaptor,
+                **data, username=None, password=None)
+
     # TESTING SEND ASYNC METHOD
 
     @utilities.test_utilities.async_test
