@@ -95,11 +95,6 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
                                                              routing=self.mock_routing_reliability)
         self.assertIsNotNone(workflow)
 
-    # def test_construct_workflow_with_only_inbound_params(self):
-    #     workflow = async_express.AsynchronousExpressWorkflow(queue_adaptor=mock.sentinel.queue_adaptor)
-    #     self.assertIsNotNone(workflow)
-    #     self.assertEqual(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS, workflow.inbound_queue_retry_delay)
-
     ############################
     # Outbound tests
     ############################
@@ -409,7 +404,7 @@ class TestAsynchronousExpressWorkflow(unittest.TestCase):
         future.set_exception(proton_queue_adaptor.MessageSendingError())
         self.mock_queue_adaptor.send_async.return_value = future
 
-        with self.assertRaises(proton_queue_adaptor.MessageSendingError) as cm:
+        with self.assertRaises(proton_queue_adaptor.MessageSendingError):
             await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),

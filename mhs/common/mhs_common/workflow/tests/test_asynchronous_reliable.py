@@ -532,7 +532,7 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.return_value = future
         mock_sleep.return_value = test_utilities.awaitable(None)
 
-        with self.assertRaises(proton_queue_adaptor.MessageSendingError) as cm:
+        with self.assertRaises(proton_queue_adaptor.MessageSendingError):
             await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),

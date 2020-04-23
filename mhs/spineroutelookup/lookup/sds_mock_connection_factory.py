@@ -107,12 +107,13 @@ def build_mock_sds_connection():
 def main(args):
     config.setup_config('MHS')
     log.configure_logging('spineroutelookup')
-    _read_real_server_data(args.path)
+    _read_real_server_data(args.path, args.nhs_id_code)
 
 
-def _read_real_server_data(output_path):
+def _read_real_server_data(output_path, nhs_id_code):
     ldap_address = config.get_config('SDS_URL')
-    logger.info("Downloading real server data from '%s'", ldap_address)
+    logger.info("Downloading real server data from '%s' for nhs id code '%s' and saving data at '%s'",
+                ldap_address, nhs_id_code, output_path)
     server = Server(ldap_address, get_info=ALL)
     connection = Connection(server, auto_bind=True)
 
@@ -124,8 +125,7 @@ def _read_real_server_data(output_path):
     logger.info("Saving real server schema at '%s'", server_schema_path)
     server.schema.to_file(server_schema_path)
 
-    # if connection.search('ou=Services,o=nhs', '(nhsIDCode=YES)', attributes=ALL_ATTRIBUTES):
-    if connection.search('ou=Services,o=nhs', '(nhsIDCode=X26)', attributes=ALL_ATTRIBUTES):
+    if connection.search('ou=Services,o=nhs', f'(nhsIDCode={nhs_id_code})', attributes=ALL_ATTRIBUTES):
         server_entries_path = os.path.join(output_path, _SERVER_ENTRIES_FILE)
         logger.info("Saving server entries at '%s'", server_entries_path)
         connection.response_to_file(server_entries_path, raw=True)
@@ -145,6 +145,7 @@ class ArgParser(argparse.ArgumentParser):
 if __name__ == "__main__":
     parser = ArgParser(description='Downloads real LDAP server config')
     parser.add_argument('path', help="Path where to download files")
+    parser.add_argument('nhs_id_code', help="NHS ID Code do download data for")
     app_args = parser.parse_args()
 
     try:
