@@ -53,10 +53,10 @@
         },
         "aioitertools": {
             "hashes": [
-                "sha256:3684a9e5626664169ee31bc6e40d30d1ad86d9a1832d251652fda2cf3e3e74ae",
-                "sha256:dd7232299dccb0650b1b5489aa9a7a7c40824bd40daec5afd47260c3b943790a"
+                "sha256:27411653e28c391f2caa79476cc719591da88540278c53e7d6925d5b2fafa162",
+                "sha256:34155556df490ae1afb63b6393f80111cd3afdd32a5e6fe7c6fb897ace3277d3"
             ],
-            "version": "==0.6.0"
+            "version": "==0.6.1"
         },
         "async-timeout": {
             "hashes": [

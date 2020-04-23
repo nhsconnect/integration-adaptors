@@ -4,6 +4,7 @@ import json
 from typing import Optional
 
 import aioboto3 as aioboto3
+from boto3.dynamodb.conditions import Key
 
 from persistence.dynamo_persistence_adaptor import RecordCreationError
 from sequence.sequence import SequenceGenerator
@@ -12,8 +13,12 @@ from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
+_COUNTER_ATTRIBUTE = 'last_generated_number'
+_INCREMENT_EXPRESSION = f'set {_COUNTER_ATTRIBUTE} = {_COUNTER_ATTRIBUTE} + :i'
+_INCREMENT_VALUE = {':i': 1}
 
 class DynamoSequenceGenerator(SequenceGenerator):
+
 
     def __init__(self, table_name):
         """
@@ -25,32 +30,34 @@ class DynamoSequenceGenerator(SequenceGenerator):
         """
         self.table_name = table_name
 
-    async def next(self, key: str) -> Optional[dict]:
-        logger.info('Adding data for {key}', fparams={'key': key})
-        try:
-            async with self.__get_dynamo_table() as table:
-                response = await table.update_item(
-                    Key={'key': key},
-                    UpdateExpression='set counter = counter + :i',
-                    ExpressionAttributeValues={':i': 1},
-                    ReturnValues='UPDATED_NEW'
-                )
-            if response.get('Attributes', {}).get('data') is None:
-                logger.info('No previous record found: {key}', fparams={'key': key})
-                return None
-            return json.loads(response.get('Attributes', {}).get('data'))
-        except Exception as e:
-            logger.exception('Error creating record')
-            raise RecordCreationError from e
-        pass
 
-    @contextlib.asynccontextmanager
-    async def __get_dynamo_table(self):
-        """
-        Creates a connection to the table referenced by this instance.
-        :return: The table to be used by this instance.
-        """
-        async with aioboto3.resource('dynamodb', region_name='eu-west-2',
-                                     endpoint_url=config.get_config('DYNAMODB_ENDPOINT_URL', None)) as dynamo_resource:
-            logger.info('Establishing connection to {table_name}', fparams={'table_name': self.table_name})
-            yield dynamo_resource.Table(self.table_name)
+    async def next(self, key: str) -> int:
+        num = await self._next(key)
+        # zero is never a valid transaction id
+        if num == 0:
+            num = await self._next(key)
+        return num
+
+
+    async def _next(self, key: str) -> int:
+        endpoint = config.get_config('DYNAMODB_ENDPOINT_URL', None)
+        async with aioboto3.resource('dynamodb', region_name='eu-west-2', endpoint_url=endpoint) as dynamo_resource:
+            table = await dynamo_resource.Table(self.table_name)
+            response = await table.update_item(
+                Key={'key': key},
+                UpdateExpression=_INCREMENT_EXPRESSION,
+                ExpressionAttributeValues=_INCREMENT_VALUE,
+                ReturnValues='UPDATED_NEW'
+            )
+
+            print('============ DynamoSequenceGenerator.next [response] ===========')
+            print(response)
+
+            result = await table.query(
+                KeyConditionExpression=Key('key').eq(key)
+            )
+
+            print('============ DynamoSequenceGenerator.next [query] ===========')
+            print(result['Items'])
+            return response['Attributes'][_COUNTER_ATTRIBUTE] % 10000000
+
