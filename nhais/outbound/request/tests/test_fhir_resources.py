@@ -3,6 +3,8 @@ import os
 import unittest
 
 from fhir.resources.fhirabstractbase import FHIRValidationError
+from fhir.resources.humanname import HumanName
+from fhir.resources.identifier import Identifier
 from fhir.resources.patient import Patient
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
@@ -56,3 +58,20 @@ class TestFhirResource(unittest.TestCase):
             self.assertEqual('name.0', e.errors[0].path)
             # the error itself contains info about the internal class structure and memory address
             self.assertRegex(e.errors[0].errors[0].args[0], expected)
+
+    def test_output_json(self):
+        p = Patient()
+        p.name = [HumanName()]
+        p.name[0].family = "Lastname"
+        p.name[0].given = ["Firstname"]
+        # no runtime errors if invalid fields are set (but IntelliJ IDE flags a warning)
+        # this extra field does not appear in output JSON
+        # need to be careful we don't lose data this way
+        p.name[0].somethingelse = "asdf"
+        p.identifier = [Identifier()]
+        # p.identifier[0] = Identifier()
+        p.identifier[0].value = "123"
+        json_dict = p.as_json()
+        json_str = json.dumps(json_dict)
+        expected = '{"identifier": [{"value": "123"}], "name": [{"family": "Lastname", "given": ["Firstname"]}], "resourceType": "Patient"}'
+        self.assertEqual(expected, json_str)
