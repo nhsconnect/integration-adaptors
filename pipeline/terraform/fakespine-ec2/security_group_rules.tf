@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "fake_spine_security_sg_egress_outbound_app_p
 }
 
 # vp jumbbox -> fake-spine
-resource "aws_security_group_rule" "fake_spine_sg_ingress_outbound_app_port" {
+resource "aws_security_group_rule" "fake_spine_sg_ingress_jumpbox_app_port" {
   security_group_id = aws_security_group.fake_spine_security_group.id
   type = "ingress"
   from_port = var.fake_spine_port
