@@ -84,6 +84,17 @@ resource "aws_security_group_rule" "fake_spine_security_sg_egress_outbound_app_p
   description = "Allow egress ${var.fake_spine_port} inbound requests from MHS outbound"
 }
 
+# vp jumbbox -> fake-spine
+resource "aws_security_group_rule" "fake_spine_sg_ingress_outbound_app_port" {
+  security_group_id = aws_security_group.fake_spine_security_group.id
+  type = "ingress"
+  from_port = var.fake_spine_port
+  to_port = var.fake_spine_port
+  protocol = "tcp"
+  cidr_blocks = ["172.31.16.204"]
+  description = "Allow ingress ${var.fake_spine_port} inbound requests from VP jumpbox"
+}
+
 # fake-spine -> mhs inbound
 # ingress lb does not have a security group, allowing traffic within the subnet
 resource "aws_security_group_rule" "fake_spine_security_sg_egress_inbound_app_port" {
