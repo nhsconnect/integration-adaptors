@@ -91,7 +91,7 @@ resource "aws_security_group_rule" "fake_spine_sg_ingress_jumpbox_app_port" {
   from_port = var.fake_spine_port
   to_port = var.fake_spine_port
   protocol = "tcp"
-  cidr_blocks = ["172.31.16.204"]
+  cidr_blocks = ["172.31.16.204/32"]
   description = "Allow ingress ${var.fake_spine_port} inbound requests from VP jumpbox"
 }
 
