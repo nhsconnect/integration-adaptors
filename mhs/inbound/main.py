@@ -34,7 +34,7 @@ def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
         username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME', default=None),
         password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD', default=None),
         max_retries=int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3')),
-        retry_delay=int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100')))
+        retry_delay=int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000)
     sync_async_store = get_persistence_adaptor(table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
 
     persistence_store_max_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
