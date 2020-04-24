@@ -1,6 +1,10 @@
+from datetime import datetime
+
 from edifact.edifact_exception import EdifactValidationException
 from edifact.outgoing.models.segment import Segment, SegmentCollection
 from edifact.validation_helpers import *
+
+TIMESTAMP_FORMAT ='%y%m%d:%H%M'
 
 
 class InterchangeHeader(Segment):
@@ -10,7 +14,7 @@ class InterchangeHeader(Segment):
     example: UNB+UNOA:2+TES5+XX11+920113:1317+00000002'
     """
 
-    def __init__(self, sender, recipient, date_time, sequence_number=None):
+    def __init__(self, sender, recipient, date_time: datetime, sequence_number: (None, int) = None):
         """
         :param sender: the sender of the interchange
         :param recipient: the intended recipient of the interchange
@@ -28,7 +32,10 @@ class InterchangeHeader(Segment):
 
     @property
     def value(self):
-        return f"UNOA:2+{self.sender}+{self.recipient}+{self.date_time}+{self.sequence_number}++FHSREG"
+        formatted_date_time = self.date_time.strftime(TIMESTAMP_FORMAT)
+        formatted_sequence_number = f'{self.sequence_number:08}'
+        # nhais-adaptor version has '++FHSREG' appended to the end which doesn't seem correct
+        return f"UNOA:2+{self.sender}+{self.recipient}+{formatted_date_time}+{formatted_sequence_number}"
 
     def pre_validate(self):
         required(self, 'sender')
@@ -46,7 +53,7 @@ class InterchangeTrailer(Segment):
     example: UNZ+1+00000002'
     """
 
-    def __init__(self, number_of_messages, sequence_number=None):
+    def __init__(self, number_of_messages: int, sequence_number: (None, int) = None):
         """
         :param number_of_messages: the number of messages within this interchange
         :param sequence_number: a unique reference of the interchange
@@ -60,7 +67,8 @@ class InterchangeTrailer(Segment):
 
     @property
     def value(self):
-        return f"{self.number_of_messages}+{self.sequence_number}"
+        formatted_sequence_number = f'{self.sequence_number:08}'
+        return f"{self.number_of_messages}+{formatted_sequence_number}"
 
     def pre_validate(self):
         required(self, 'number_of_messages')

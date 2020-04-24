@@ -1,4 +1,5 @@
 from edifact.outgoing.models.segment import Segment, SegmentCollection
+from edifact.validation_helpers import *
 
 
 class MessageHeader(Segment):
@@ -10,12 +11,26 @@ class MessageHeader(Segment):
 
     SEGMENT_KEY = "UNH"
 
-    def __init__(self, sequence_number):
+    def __init__(self, sequence_number: (int, None) = None):
         """
         :param sequence_number: a unique reference of the message
         """
-        segment_value = f"{sequence_number}+FHSREG:0:1:FH:FHS001"
-        super().__init__(key=self.SEGMENT_KEY, value=segment_value)
+        self.sequence_number = sequence_number
+
+    @property
+    def key(self):
+        return "UNH"
+
+    def _validate_stateful(self):
+        required(self, 'sequence_number')
+
+    @property
+    def value(self):
+        formatted_sequence_number = f'{self.sequence_number:08}'
+        return f"{formatted_sequence_number}+FHSREG:0:1:FH:FHS001"
+
+    def pre_validate(self):
+        pass
 
 
 class MessageTrailer(Segment):
@@ -25,15 +40,29 @@ class MessageTrailer(Segment):
     example: UNT+18+00000003'
     """
 
-    SEGMENT_KEY = "UNT"
-
-    def __init__(self, number_of_segments, sequence_number):
+    def __init__(self, number_of_segments: (None, int) = None, sequence_number: (None, int) = None):
         """
         :param number_of_segments: the total number of segments in the message including the header and trailer
         :param sequence_number: a unique reference of the message
         """
-        segment_value = f"{number_of_segments}+{sequence_number}"
-        super().__init__(key=self.SEGMENT_KEY, value=segment_value)
+        self.number_of_segments = number_of_segments
+        self.sequence_number = sequence_number
+
+    @property
+    def key(self):
+        return "UNT"
+
+    @property
+    def value(self):
+        formatted_sequence_number = f'{self.sequence_number:08}'
+        return f"{self.number_of_segments}+{formatted_sequence_number}"
+
+    def pre_validate(self):
+        pass
+
+    def _validate_stateful(self):
+        required(self, 'number_of_segments')
+        required(self, 'sequence_number')
 
 
 class MessageBeginning(SegmentCollection):
