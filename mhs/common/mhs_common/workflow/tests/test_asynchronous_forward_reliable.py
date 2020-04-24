@@ -58,9 +58,6 @@ ATTACHMENTS = [{
     ebxml_request_envelope.ATTACHMENT_PAYLOAD: 'Some payload'
 }]
 INBOUND_MESSAGE_DATA = MessageData(EBXML, PAYLOAD, ATTACHMENTS)
-INBOUND_QUEUE_MAX_RETRIES = 3
-INBOUND_QUEUE_RETRY_DELAY = 100
-INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS = INBOUND_QUEUE_RETRY_DELAY / 1000
 MAX_REQUEST_SIZE = 5_000_000
 MHS_END_POINT_KEY = 'nhsMHSEndPoint'
 MHS_TO_PARTY_KEY_KEY = 'nhsMHSPartyKey'
@@ -94,8 +91,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             persistence_store=self.mock_persistence_store,
             transmission=self.mock_transmission_adaptor,
             queue_adaptor=self.mock_queue_adaptor,
-            inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-            inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
             max_request_size=MAX_REQUEST_SIZE,
             persistence_store_max_retries=3,
             routing=self.mock_routing_reliability
@@ -111,15 +106,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             routing=self.mock_routing_reliability
         )
         self.assertIsNotNone(workflow)
-
-    def test_construct_workflow_with_only_inbound_params(self):
-        workflow = forward_reliable.AsynchronousForwardReliableWorkflow(
-            queue_adaptor=mock.sentinel.queue_adaptor,
-            inbound_queue_max_retries=INBOUND_QUEUE_MAX_RETRIES,
-            inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY
-        )
-        self.assertIsNotNone(workflow)
-        self.assertEqual(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS, workflow.inbound_queue_retry_delay)
 
     ############################
     # Outbound tests
@@ -486,9 +472,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             persistence_store=self.mock_persistence_store,
             transmission=self.mock_transmission_adaptor,
             queue_adaptor=self.mock_queue_adaptor,
-            # Set number of retries to 1
-            inbound_queue_max_retries=1,
-            inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
             max_request_size=MAX_REQUEST_SIZE,
             persistence_store_max_retries=3,
             routing=self.mock_routing_reliability
@@ -564,25 +547,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
                                               'WorkflowName': 'forward-reliable'
                                           })
 
-    @mock.patch('asyncio.sleep')
-    @async_test
-    async def test_handle_inbound_message_error_putting_message_onto_queue_then_success(self, mock_sleep):
-        self.setup_mock_work_description()
-        error_future = asyncio.Future()
-        error_future.set_exception(proton_queue_adaptor.MessageSendingError())
-        self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
-        mock_sleep.return_value = test_utilities.awaitable(None)
-
-        await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
-
-        self.mock_queue_adaptor.send_async.assert_called_with(
-            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
-            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
-        self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
-                          mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
-                         self.mock_work_description.set_inbound_status.call_args_list)
-        mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
-
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @mock.patch('asyncio.sleep')
     @async_test
@@ -594,13 +558,8 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.return_value = future
         mock_sleep.return_value = test_utilities.awaitable(None)
 
-        with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
+        with self.assertRaises(proton_queue_adaptor.MessageSendingError):
             await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
-        self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
-
-        self.assertEqual(
-            [mock.call(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS) for _ in range(INBOUND_QUEUE_MAX_RETRIES)],
-            mock_sleep.call_args_list)
 
         self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
                           mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
@@ -608,35 +567,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         # Should be called when invoked
         audit_log_mock.assert_called_once_with('{WorkflowName} inbound workflow invoked. Message '
                                                'received from spine', fparams={'WorkflowName': 'forward-reliable'})
-
-    @mock.patch('asyncio.sleep')
-    @async_test
-    async def test_handle_inbound_message_tries_putting_onto_queue_twice_if_retry_set_to_one(self, mock_sleep):
-        self.workflow = forward_reliable.AsynchronousForwardReliableWorkflow(
-            party_key=FROM_PARTY_KEY,
-            persistence_store=self.mock_persistence_store,
-            transmission=self.mock_transmission_adaptor,
-            queue_adaptor=self.mock_queue_adaptor,
-            # Set number of retries to 1
-            inbound_queue_max_retries=1,
-            inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
-            persistence_store_max_retries=3,
-            routing=self.mock_routing_reliability
-        )
-
-        self.setup_mock_work_description()
-        future = asyncio.Future()
-        future.set_exception(proton_queue_adaptor.MessageSendingError())
-        self.mock_queue_adaptor.send_async.return_value = future
-        mock_sleep.return_value = test_utilities.awaitable(None)
-
-        with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
-        self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
-
-        self.assertEqual(2, self.mock_queue_adaptor.send_async.call_count,
-                         msg='Incorrect number of attempts at putting message onto queue')
-        mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
 
     ############################
     # Inbound unsolicited tests
@@ -668,24 +598,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
 
-    @mock.patch('asyncio.sleep')
-    @async_test
-    async def test_handle_unsolicited_inbound_message_error_putting_message_onto_queue_then_success(self, mock_sleep):
-        self.setup_mock_work_description()
-        error_future = asyncio.Future()
-        error_future.set_exception(proton_queue_adaptor.MessageSendingError())
-        self.mock_queue_adaptor.send_async.side_effect = [error_future, test_utilities.awaitable(None)]
-        mock_sleep.return_value = test_utilities.awaitable(None)
-
-        await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, INBOUND_MESSAGE_DATA)
-
-        self.mock_queue_adaptor.send_async.assert_called_with(
-            {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
-            properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
-        self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
-                         self.mock_work_description.set_inbound_status.call_args_list)
-        mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
-
     @mock.patch('utilities.integration_adaptors_logger.IntegrationAdaptorsLogger.audit')
     @mock.patch('asyncio.sleep')
     @async_test
@@ -697,48 +609,13 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.return_value = future
         mock_sleep.return_value = test_utilities.awaitable(None)
 
-        with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
+        with self.assertRaises(proton_queue_adaptor.MessageSendingError):
             await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, INBOUND_MESSAGE_DATA)
-        self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
-
-        self.assertEqual(
-            [mock.call(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS) for _ in range(INBOUND_QUEUE_MAX_RETRIES)],
-            mock_sleep.call_args_list)
 
         audit_log_mock.assert_called_with('Unsolicited inbound {WorkflowName} workflow invoked.',
                                           fparams={'WorkflowName': 'forward-reliable'})
         self.assertEqual([mock.call(MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
-
-    @mock.patch('asyncio.sleep')
-    @async_test
-    async def test_handle_unsolicited_inbound_message_tries_putting_onto_queue_twice_if_retry_set_to_one(self,
-                                                                                                         mock_sleep):
-        self.workflow = forward_reliable.AsynchronousForwardReliableWorkflow(
-            party_key=FROM_PARTY_KEY,
-            persistence_store=self.mock_persistence_store,
-            transmission=self.mock_transmission_adaptor,
-            queue_adaptor=self.mock_queue_adaptor,
-            # Set number of retries to 1
-            inbound_queue_max_retries=1,
-            inbound_queue_retry_delay=INBOUND_QUEUE_RETRY_DELAY,
-            persistence_store_max_retries=3,
-            routing=self.mock_routing_reliability
-        )
-
-        self.setup_mock_work_description()
-        future = asyncio.Future()
-        future.set_exception(proton_queue_adaptor.MessageSendingError())
-        self.mock_queue_adaptor.send_async.return_value = future
-        mock_sleep.return_value = test_utilities.awaitable(None)
-
-        with self.assertRaises(exceptions.MaxRetriesExceeded) as cm:
-            await self.workflow.handle_unsolicited_inbound_message(MESSAGE_ID, CORRELATION_ID, INBOUND_MESSAGE_DATA)
-        self.assertIsInstance(cm.exception.__cause__, proton_queue_adaptor.MessageSendingError)
-
-        self.assertEqual(2, self.mock_queue_adaptor.send_async.call_count,
-                         msg='Incorrect number of attempts at putting message onto queue')
-        mock_sleep.assert_called_once_with(INBOUND_QUEUE_RETRY_DELAY_IN_SECONDS)
 
     ############################
     # Helper methods
