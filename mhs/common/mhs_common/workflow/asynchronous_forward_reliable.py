@@ -26,14 +26,11 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
     def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
-                 inbound_queue_max_retries: int = None,
-                 inbound_queue_retry_delay: int = None,
                  max_request_size: int = None,
                  persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
         super().__init__(party_key, persistence_store, transmission,
-                         queue_adaptor, inbound_queue_max_retries,
-                         inbound_queue_retry_delay, max_request_size, persistence_store_max_retries,
+                         queue_adaptor, max_request_size, persistence_store_max_retries,
                          routing)
 
         self.workflow_specific_interaction_details = dict(
@@ -91,19 +88,11 @@ class AsynchronousForwardReliableWorkflow(asynchronous_reliable.AsynchronousReli
                                                           wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_RECEIVED)
         await work_description.publish()
 
-        result = await retriable_action.RetriableAction(
-            lambda: self._put_message_onto_queue_with(message_id, correlation_id, message_data),
-            self.inbound_queue_max_retries,
-            self.inbound_queue_retry_delay)\
-            .execute()
-
-        if not result.is_successful:
-            logger.error("Exceeded the maximum number of retries, {max_retries} retries, when putting "
-                         "unsolicited message onto inbound queue",
-                         fparams={"max_retries": self.inbound_queue_max_retries})
+        try:
+            await self._put_message_onto_queue_with(message_id, correlation_id, message_data)
+        except Exception as e:
             await work_description.set_inbound_status(wd.MessageStatus.UNSOLICITED_INBOUND_RESPONSE_FAILED)
-            raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
-                                     'been exceeded') from result.exception
+            raise e
 
         logger.audit('{WorkflowName} workflow invoked for inbound unsolicited request. '
                      'Attempted to place message onto inbound queue with {Acknowledgement}.',
