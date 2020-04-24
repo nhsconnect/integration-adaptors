@@ -3,7 +3,6 @@ from typing import Any
 
 import tornado.web
 
-
 from tornado import httputil
 from outbound.schema.schema_validation_exception import SchemaValidationException
 
@@ -26,7 +25,7 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         self.fhir_to_edifact = FhirToEdifact()
         self.mesh_wrapper = MeshOutboundWrapper()
 
-    def set_unsuccesful_response(self, status, code, coding_code, details):
+    def __set_unsuccesful_response(self, status, code, coding_code, details):
         self.set_status(status)
         # TODO: Consider building this up programmatically instead? Block until reliable library is found
         self.set_status(status)
@@ -49,29 +48,29 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
 
     @timing.time_request
     async def post(self, patient_id):
-
         try:
             request_body = json.loads(self.request.body.decode())
-            if "id" in request_body:
-                if(request_body['id'] == patient_id):
-                    validate_request.validate_patient(request_body)
-                    edifact = self.fhir_to_edifact.convert(self.request.body.decode())
-                    unique_operation_id = message_utilities.get_uuid()
-                    await self.mesh_wrapper.send(edifact)
-                    self.set_status(202)
-                    self.set_header("OperationId", unique_operation_id)
-                    await self.finish()
-                else:
-                    self.set_unsuccesful_response(400, "value", "ID_MISMATCH_URI_AND_PAYLOAD",f"URI id `{patient_id}` does not match PAYLOAD id `{request_body['id']}`")
+            validate_request.validate_patient(request_body)
+            if (request_body['id'] == patient_id):
+                edifact = self.fhir_to_edifact.convert(self.request.body.decode())
+                unique_operation_id = message_utilities.get_uuid()
+                await self.mesh_wrapper.send(edifact)
+                self.set_status(202)
+                self.set_header("OperationId", unique_operation_id)
+                await self.finish()
             else:
-                self.set_unsuccesful_response(400, "value", "JSON_PAYLOAD_MISSING_ID", "Could not find 'id' in payload")
+                self.__set_unsuccesful_response(400, "value", "ID_IN_URI_DOES_NOT_MATCH_PAYLOAD_ID",
+                                              f"URI id `{patient_id}` does not match PAYLOAD id `{request_body['id']}`")
         except SchemaValidationException as e:
             if hasattr(e, 'message'):
                 details = f"{e.message}"
-                self.set_unsuccesful_response(400, "value", "JSON_PAYLOAD_NOT_VALID_TO_SCHEMA", details)
-        except JSONDecodeError:
-                self.set_unsuccesful_response(400, "value", "JSON_PAYLOAD_IS_MISSING", "Payload is missing, Payload required.")
-
+                self.__set_unsuccesful_response(400, "value", "JSON_PAYLOAD_NOT_VALID_TO_SCHEMA", details)
+        except JSONDecodeError as e:
+            self.__set_unsuccesful_response(400, "value", "PAYLOAD_IS_NOT_JSON_FORMAT",
+                                          "Payload is missing, Payload required.")
+        except TypeError as e:
+            self.__set_unsuccesful_response(400, "value", "ID_IS_IN_PAYLOAD_IS_MISSING",
+                                            "Payload is missing id, id is required.")
 
     @timing.time_request
     async def patch(self, patient_id):

@@ -31,5 +31,11 @@ _PATIENT_VALIDATOR = _create_validator('json-schema-patient.json')
 def validate_patient(request_body):
     try:
         _PATIENT_VALIDATOR.validate(instance=request_body)
+        __validate_patient_id_exists_in_payload(request_body)
     except ValidationError as e:
         raise SchemaValidationException(message=e.message, path=e.path)
+
+
+def __validate_patient_id_exists_in_payload(request_body):
+    if 'id' not in request_body:
+        raise SchemaValidationException(message="id is missing from payload.", path="id")
