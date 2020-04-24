@@ -37,6 +37,9 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
     def get_app(self) -> Application:
         return tornado.web.Application([(r'/fhir/Patient/(.*)', AcceptanceAmendmentRequestHandler)])
 
+    async def async_magic(self):
+        pass
+
     def test_invalid_post_request_line_return_404_response_code(self):
         response = self.fetch(r'/water/Panda/9000000009', method="POST",
                               body=VALID_REQUEST_BODY)
@@ -52,9 +55,6 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch(r'/fhir/Patient/9000000009', method="POST",
                               body=VALID_REQUEST_BODY)
         self.assertEqual(202, response.code)
-
-    async def async_magic(self):
-        pass
 
     @patch.object(MeshOutboundWrapper, "send")
     @patch.object(MeshOutboundWrapper, "__init__")
