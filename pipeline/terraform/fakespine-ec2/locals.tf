@@ -1,4 +1,6 @@
 locals {
+  mhs_inbound_url = length(var.inbound_server_base_url) == 0 ? data.terraform_remote_state.mhs.outputs.inbound_lb_domain_name : var.inbound_server_base_url
+
     fake_spine_base_environment_variables = [
     {
       name = "INBOUND_SERVER_BASE_URL",

@@ -65,6 +65,7 @@ variable "task_scaling_role_arn" {
 variable "inbound_server_base_url" {
   type = string
   description = "URL of the inbound server"
+  default = ""
 }
 
 variable "outbound_delay_ms" {

@@ -279,7 +279,7 @@ pipeline {
                                              "task_role_arn":      "${TASK_ROLE}",
                                              "task_scaling_role_arn":          "${TASK_SCALING_ROLE}",
                                              "fake_spine_alb_certificate_arn": "${FAKESPINE_ALB_CERT_ARN}", //TODO Check if this can be set with data resource
-                                             "inbound_server_base_url":        "${FAKESPINE_INBOUND_URL}",
+                                             //"inbound_server_base_url":        "${FAKESPINE_INBOUND_URL}", // Inbound is taken from output from MHS
                                              "outbound_delay_ms":              "${FAKESPINE_OUTBOUND_DELAY}",
                                              "inbound_delay_ms":               "${FAKESPINE_INBOUND_DELAY}",
                                              "fake_spine_certificate":         "${FAKESPINE_CERTIFICATE}",
