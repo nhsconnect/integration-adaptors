@@ -148,7 +148,7 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
     }
   ]
   )
-  cpu = "512"
+  cpu = "1024"
   memory = "1024"
   network_mode = "awsvpc"
   requires_compatibilities = [
@@ -249,7 +249,7 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
     }
   ]
   )
-  cpu = "512"
+  cpu = "1024"
   memory = "1024"
   network_mode = "awsvpc"
   requires_compatibilities = [
@@ -331,7 +331,7 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
     }
   ]
   )
-  cpu = "512"
+  cpu = "1024"
   memory = "1024"
   network_mode = "awsvpc"
   requires_compatibilities = [
