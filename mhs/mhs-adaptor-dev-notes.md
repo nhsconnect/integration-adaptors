@@ -104,6 +104,7 @@ are allowed to be. This should be set minus any HTTP headers and other content i
 e.g. Setting this to ~400 bytes less than the maximum request body size should be roughly the correct value
 (calculating this value accurately is pretty much impossible as one of the HTTP headers is the Content-Length header
 which varies depending on the request body size).
+* `MHS_LAZY_LDAP` use lazy connection from spine route lookup component to SPINE LDAP service
 
 Note that if you are using Opentest, you should use the credentials you were given when you got access to set `MHS_SECRET_PARTY_KEY`, `MHS_SECRET_CLIENT_CERT`, `MHS_SECRET_CLIENT_KEY` and `MHS_SECRET_CA_CERTS`.
 
