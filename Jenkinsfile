@@ -194,7 +194,7 @@ pipeline {
                                             -var task_scaling_role_arn=${TASK_SCALING_ROLE} \
                                             -var ecr_address=${DOCKER_REGISTRY} \
                                             -var mhs_outbound_validate_certificate="False" \
-                                            -var mhs_log_level=DEBUG \
+                                            -var mhs_log_level=WARNING \
                                             -var mhs_outbound_http_proxy="" \
                                             -var mhs_state_table_read_capacity=5 \
                                             -var mhs_state_table_write_capacity=5 \
@@ -213,13 +213,13 @@ pipeline {
                                             -var route_alb_certificate_arn=arn:aws:acm:eu-west-2:067756640211:certificate/5b27c5a6-d8d7-46c6-b7f2-648a27ef806d \
                                             -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                                             -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
-                                            -var spineroutelookup_service_sds_url=ldap://fakespine.vp-testing.nhsredteam.internal.nhs.uk \
+                                            -var spineroutelookup_service_sds_url=ldap://172.31.18.145 \
                                             -var mhs_ldap_mock_data_url="s3://nhsd-test/mock_ldap_data" \
-                                            -var mhs_fake_spine_url=http://fakespine.vp-testing.nhsredteam.internal.nhs.uk/ \
+                                            -var mhs_fake_spine_url=http://172.31.18.145/ \
                                             -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
                                             -var spineroutelookup_service_disable_sds_tls=${SPINEROUTELOOKUP_SERVICE_DISABLE_TLS} \
                                             -var elasticache_node_type="cache.t2.micro" \
-                                            -var mhs_forward_reliable_endpoint_url=http://fakespine.vp-testing.nhsredteam.internal.nhs.uk:80 \
+                                            -var mhs_forward_reliable_endpoint_url=http://172.31.18.145:80 \
                                             -var inbound_use_ssl="False" \
                                             -var inbound_server_port="443"
                                         """
