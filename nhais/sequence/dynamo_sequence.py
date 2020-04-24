@@ -1,12 +1,6 @@
-import abc
-import contextlib
-import json
-from typing import Optional
-
 import aioboto3 as aioboto3
 from boto3.dynamodb.conditions import Key
 
-from persistence.dynamo_persistence_adaptor import RecordCreationError
 from sequence.sequence import SequenceGenerator
 import utilities.integration_adaptors_logger as log
 from utilities import config
@@ -14,7 +8,7 @@ from utilities import config
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 _COUNTER_ATTRIBUTE = 'last_generated_number'
-_INCREMENT_EXPRESSION = f'set {_COUNTER_ATTRIBUTE} = {_COUNTER_ATTRIBUTE} + :i'
+_INCREMENT_EXPRESSION = f'ADD {_COUNTER_ATTRIBUTE} :i'
 _INCREMENT_VALUE = {':i': 1}
 
 class DynamoSequenceGenerator(SequenceGenerator):
@@ -60,4 +54,3 @@ class DynamoSequenceGenerator(SequenceGenerator):
             print('============ DynamoSequenceGenerator.next [query] ===========')
             print(result['Items'])
             return response['Attributes'][_COUNTER_ATTRIBUTE] % 10000000
-
