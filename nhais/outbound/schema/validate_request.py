@@ -1,39 +1,23 @@
-import json
-import os
-from pathlib import Path
+from fhir.resources.fhirabstractbase import FHIRValidationError
+from jsonschema import ValidationError
 
-from jsonschema import Draft6Validator, ValidationError
+from fhir.resources.fhirelementfactory import FHIRElementFactory
 
 import utilities.integration_adaptors_logger as log
 from outbound.schema.schema_validation_exception import SchemaValidationException
 
 _logger = log.IntegrationAdaptorsLogger(__name__)
 
-_MODULE_PATH = os.path.dirname(os.path.abspath(__file__))
-_SCHEMAS_DIR = "schemas"
-_SCHEMAS_PATH = str(Path(_MODULE_PATH) / _SCHEMAS_DIR)
-
-
-def _load_schema(json_schema_filename):
-    full_path = Path(_SCHEMAS_PATH) / json_schema_filename
-    with open(full_path) as file:
-        return json.load(file)
-
-
-def _create_validator(json_schema_file):
-    schema_json = _load_schema(json_schema_file)
-    return Draft6Validator(schema_json)
-
-
-_PATIENT_VALIDATOR = _create_validator('json-schema-patient.json')
-
 
 def validate_patient(request_body):
     try:
-        _PATIENT_VALIDATOR.validate(instance=request_body)
+        patient = FHIRElementFactory.instantiate('Patient', request_body)
         __validate_patient_id_exists_in_payload(request_body)
     except ValidationError as e:
         raise SchemaValidationException(message=e.message, path=e.path)
+    except FHIRValidationError as e:
+        raise FHIRValidationError(e.args[0])
+    return patient
 
 
 def __validate_patient_id_exists_in_payload(request_body):

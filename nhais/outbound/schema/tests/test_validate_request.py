@@ -2,6 +2,8 @@ import unittest
 import json
 import os
 
+from fhir.resources.fhirabstractbase import FHIRValidationError
+
 from outbound.schema.schema_validation_exception import SchemaValidationException
 from outbound.schema.validate_request import validate_patient
 
@@ -23,14 +25,17 @@ class TestValidateRequest(unittest.TestCase):
 
     def test_valid_schema(self):
         try:
-            validate_patient(VALID_REQUEST_BODY)
+            response = validate_patient(VALID_REQUEST_BODY)
         except SchemaValidationException:
             self.fail("myFunc() raised ExceptionType unexpectedly!")
+
+        self.assertEqual('9000000009', response.id)
+        self.assertEqual('Patient', response.resource_type)
 
     def test_missing_id(self):
         with self.assertRaises(SchemaValidationException) as e:
             validate_patient(MISSING_ID_REQUEST_BODY)
 
     def test_invalid_schema(self):
-        with self.assertRaises(SchemaValidationException) as e:
+        with self.assertRaises(FHIRValidationError) as e:
             validate_patient(INVALID_ID_REQUEST_BODY)

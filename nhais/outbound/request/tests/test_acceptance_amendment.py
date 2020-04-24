@@ -66,12 +66,11 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
                               body=INVALID_ID_REQUEST_BODY)
 
         response_body = json.loads(response.body.decode())
-        severity = response_body['OperationOutcome']['issue'][0]['severity']
-        coding = response_body['OperationOutcome']['issue'][0]['details']['coding'][0]
+        severity = response_body['issue'][0]['severity']
+        coding = response_body['issue'][0]['details']['coding'][0]
 
         self.assertEqual('error', severity)
         self.assertEqual('JSON_PAYLOAD_NOT_VALID_TO_SCHEMA', coding['code'])
-        self.assertEqual('9000000009 is not of type \'string\'', coding['display'])
         self.assertEqual('OperationOutcome', response_body['resourceType'])
         self.assertEqual(400, response.code)
 
@@ -85,8 +84,8 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
                               body=VALID_REQUEST_BODY)
 
         response_body = json.loads(response.body.decode())
-        severity = response_body['OperationOutcome']['issue'][0]['severity']
-        coding = response_body['OperationOutcome']['issue'][0]['details']['coding'][0]
+        severity = response_body['issue'][0]['severity']
+        coding = response_body['issue'][0]['details']['coding'][0]
 
         self.assertEqual('error', severity)
         self.assertEqual('ID_IN_URI_DOES_NOT_MATCH_PAYLOAD_ID', coding['code'])
@@ -104,11 +103,11 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
                               body=MISSING_ID_REQUEST_BODY)
 
         response_body = json.loads(response.body.decode())
-        severity = response_body['OperationOutcome']['issue'][0]['severity']
-        coding = response_body['OperationOutcome']['issue'][0]['details']['coding'][0]
+        severity = response_body['issue'][0]['severity']
+        coding = response_body['issue'][0]['details']['coding'][0]
 
         self.assertEqual('error', severity)
-        self.assertEqual('ID_IS_IN_PAYLOAD_IS_MISSING', coding['code'])
+        self.assertEqual('ID_IN_PAYLOAD_IS_MISSING', coding['code'])
         self.assertEqual('Payload is missing id, id is required.', coding['display'])
         self.assertEqual('OperationOutcome', response_body['resourceType'])
         self.assertEqual(400, response.code)
@@ -122,8 +121,8 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch('/fhir/Patient/90000009', method="POST", allow_nonstandard_methods=True)
 
         response_body = json.loads(response.body.decode())
-        severity = response_body['OperationOutcome']['issue'][0]['severity']
-        coding = response_body['OperationOutcome']['issue'][0]['details']['coding'][0]
+        severity = response_body['issue'][0]['severity']
+        coding = response_body['issue'][0]['details']['coding'][0]
 
         self.assertEqual('error', severity)
         self.assertEqual('PAYLOAD_IS_NOT_JSON_FORMAT', coding['code'])
