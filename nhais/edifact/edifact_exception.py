@@ -1,0 +1,2 @@
+class EdifactValidationException(Exception):
+    pass
