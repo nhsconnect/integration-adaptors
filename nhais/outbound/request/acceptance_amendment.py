@@ -78,7 +78,7 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
             if (request_body['id'] == patient_id):
                 edifact = self.fhir_to_edifact.convert(patient)
                 unique_operation_id = message_utilities.get_uuid()
-                await self.mesh_wrapper.send(edifact)
+                await self.mesh_wrapper.send(edifact.as_json())
                 self.set_status(202)
                 self.set_header("OperationId", unique_operation_id)
                 await self.finish()

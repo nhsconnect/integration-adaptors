@@ -9,11 +9,14 @@ class MeshOutboundWrapper:
 
     def __init__(self):
         self.queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
-            host=config.get_config('OUTBOUND_QUEUE_HOST'),
+            urls=config.get_config('OUTBOUND_QUEUE_BROKERS').split(','),
+            queue=config.get_config('OUTBOUND_QUEUE_NAME'),
             username=config.get_config('OUTBOUND_QUEUE_USERNAME', default=None),
-            password=config.get_config('OUTBOUND_QUEUE_PASSWORD', default=None))
-        self.queue_max_retries = int(config.get_config('MAX_RETRIES', default='10'))
-        self.queue_retry_delay = float(config.get_config('RETRY_DELAY', default='0.1'))
+            password=config.get_config('OUTBOUND_QUEUE_PASSWORD', default=None),
+            max_retries=int(config.get_config('OUTBOUND_QUEUE_MAX_RETRIES', default='3')),
+            retry_delay=int(config.get_config('OUTBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000)
+        self.queue_max_retries = int(config.get_config('OUTBOUND_MAX_RETRIES', default='3'))
+        self.queue_retry_delay = float(config.get_config('OUTBOUND_RETRY_DELAY', default='100')) / 1000
         self.transmission = None
 
     async def _publish_message_to_inbound_queue(self, message):
