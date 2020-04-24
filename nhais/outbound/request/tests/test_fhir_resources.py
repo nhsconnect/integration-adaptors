@@ -27,6 +27,12 @@ with open(invalid_json_patient_id) as file:
 
 
 class TestFhirResource(unittest.TestCase):
+    """
+    Using Pipenv to install the "fhir.resources" package did not work, it tries to install the "fhir" package instead.
+    As a workaround pip was used to install the package into the virtualenv directly:
+    $ pipenv shell
+    (nhais) $ pip install fhir.resources
+    """
 
     def test_valid_patient1(self):
         p = Patient(VALID_REQUEST_BODY1)
