@@ -49,5 +49,5 @@ class AMQWrapper(object):
 
 MHS_INBOUND_QUEUE = AMQWrapper(os.environ.get('MHS_SECRET_INBOUND_QUEUE_USERNAME', None),
                                os.environ.get('MHS_SECRET_INBOUND_QUEUE_PASSWORD', None),
-                               os.environ.get('MHS_INBOUND_QUEUE_URL', 'localhost:5672'),
+                               os.environ.get('MHS_INBOUND_QUEUE_BROKERS', 'amqp://localhost:5672'),
                                os.environ.get('MHS_INBOUND_QUEUE_NAME', 'inbound'))
