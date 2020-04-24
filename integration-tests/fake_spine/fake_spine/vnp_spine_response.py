@@ -7,6 +7,9 @@ from tornado.httputil import HTTPServerRequest
 from fake_spine.spine_responses import SpineResponseBuilder, InboundRequest, OutboundResponse
 from fake_spine.vnp_spine_message_builder import VnpMessageBuilder
 from fake_spine import fake_spine_configuration
+from utilities import integration_adaptors_logger as log
+
+logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class VnpSpineResponseException(Exception):
@@ -15,7 +18,8 @@ class VnpSpineResponseException(Exception):
 
 class VnpSpineResponseBuilder(SpineResponseBuilder):
 
-    root_id_expression = re.compile('(<id root="(?P<messageId>.+)"\\s*/>)')
+    root_id_expression = re.compile('<id root="(?P<messageId>.+)"\\s*/>')
+    conversation_id_expression = re.compile('<eb:ConversationId>(?P<conversationId>.+)</eb:ConversationId>')
 
     def __init__(self):
         super().__init__()
@@ -26,10 +30,16 @@ class VnpSpineResponseBuilder(SpineResponseBuilder):
         body = request.body.decode()
         matches = self.root_id_expression.search(body)
         if matches:
-            groups = matches.groups()
-            if len(groups) >= 2:
-                return matches.groups()[-1]
+            return matches.group('messageId')
         raise VnpSpineResponseException(f'Unable to find a MessageId in the request')
+
+    def _extract_conversation_id(self, request: HTTPServerRequest):
+        body = request.body.decode()
+        matches = self.conversation_id_expression.search(body)
+        if matches:
+            return matches.group('conversationId')
+        logger.info(f'Unable to find a ConversationId in the request')
+        return ''
 
     def override_inbound_request_headers(self, inbound_request_headers):
         self.inbound_request_headers = inbound_request_headers
@@ -38,10 +48,12 @@ class VnpSpineResponseBuilder(SpineResponseBuilder):
     def _build_from_message(self, outbound_request, file_location):
         message_builder = VnpMessageBuilder(file_location)
         message_id = self._extract_message_id(outbound_request)
+        conversation_id = self._extract_conversation_id(outbound_request)
         template_parameters = {
             'message_id': str(uuid.uuid4()),
             'to_party_id': self.config.MHS_SECRET_PARTY_KEY,
-            'ref_to_message_id': message_id
+            'ref_to_message_id': message_id,
+            'conversation_id': conversation_id
         }
         return message_builder.build_message(template_parameters)
 

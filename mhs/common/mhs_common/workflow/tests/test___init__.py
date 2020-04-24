@@ -13,9 +13,7 @@ class TestWorkflow(unittest.TestCase):
         self.check_workflows_are_present(workflow_map)
 
     def test_get_workflow_map_for_inbound(self):
-        workflow_map = workflow.get_workflow_map(inbound_async_queue=sentinel.queue_adaptor,
-                                                 inbound_queue_max_retries=3,
-                                                 inbound_queue_retry_delay=100)
+        workflow_map = workflow.get_workflow_map(inbound_async_queue=sentinel.queue_adaptor)
 
         self.check_workflows_are_present(workflow_map)
 

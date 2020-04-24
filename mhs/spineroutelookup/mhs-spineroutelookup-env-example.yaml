@@ -7,6 +7,7 @@ MHS_DISABLE_SDS_TLS: "True"
 MHS_SDS_REDIS_CACHE_HOST: redis
 MHS_SDS_REDIS_DISABLE_TLS: "True"
 MHS_LDAP_CONNECTION_RETRIES: "3"
+MHS_LAZY_LDAP: "True"
 
 # Optional mock ldap env variables
 #MHS_AWS_PROFILE: nhsd-private # AWS profile from ~/.aws/credentials to be used when downloading LDAP data from S3

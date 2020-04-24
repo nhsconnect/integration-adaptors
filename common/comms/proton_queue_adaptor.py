@@ -1,14 +1,15 @@
 """Module for Proton specific queue adaptor functionality. """
 import json
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 import proton.handlers
 import proton.reactor
-import tornado.ioloop
 
 import comms.queue_adaptor
 import utilities.integration_adaptors_logger as log
 import utilities.message_utilities as message_utilities
+from exceptions import MaxRetriesExceeded
+from retry.retriable_action import RetriableAction
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -26,7 +27,7 @@ class EarlyDisconnectError(RuntimeError):
 class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
     """Proton implementation of a queue adaptor."""
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, urls: List[str], queue: str, username, password, max_retries=0, retry_delay=0) -> None:
         """
         Construct a Proton implementation of a :class:`QueueAdaptor <comms.queue_adaptor.QueueAdaptor>`.
         The kwargs provided should contain the following information:
@@ -36,10 +37,20 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         :param kwargs: The key word arguments required for this constructor.
         """
         super().__init__()
-        self.host = kwargs.get('host')
-        self.username = kwargs.get('username')
-        self.password = kwargs.get('password')
-        logger.info('Initialized proton queue adaptor for {host}', fparams={'host': self.host})
+        self.urls = urls
+        self.queue = queue
+        self.username = username
+        self.password = password
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
+
+        if self.urls is None or not isinstance(urls, List) or len(urls) == 0:
+            raise ValueError("Invalid urls %s", urls)
+        if queue is None or len(queue.strip()) == 0:
+            raise ValueError("Invalid queue name %s", queue)
+
+        logger.info('Initialized proton queue adaptor for {urls} with {max_retries} and {retry_delay}',
+                    fparams={'urls': self.urls, 'max_retries': max_retries, 'retry_delay': retry_delay})
 
     async def send_async(self, message: dict, properties: Dict[str, Any] = None) -> None:
         """Builds and asynchronously sends a message to the host defined when this adaptor was constructed. Raises an
@@ -50,8 +61,10 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         """
         logger.info('Sending message asynchronously.')
         payload = self.__construct_message(message, properties=properties)
-        await tornado.ioloop.IOLoop.current() \
-            .run_in_executor(executor=None, func=lambda: self.__send(payload))
+        try:
+            await self.__send_with_retries(payload)
+        except MaxRetriesExceeded as e:
+            raise MessageSendingError() from e
 
     @staticmethod
     def __construct_message(message: dict, properties: Dict[str, Any] = None) -> proton.Message:
@@ -64,35 +77,70 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         message_id = message_utilities.get_uuid()
         logger.info('Constructing message with {id} and {applicationProperties}',
                     fparams={'id': message_id, 'applicationProperties': properties})
-        return proton.Message(id=message_id, content_type='application/json', body=json.dumps(message),
+        return proton.Message(id=message_id,
+                              content_type='application/json',
+                              body=json.dumps(message),
                               properties=properties)
 
-    def __send(self, message: proton.Message) -> None:
+    async def __try_sending_to_all_in_sequence(self, message: proton.Message) -> None:
+        """
+        Sends message to ONE of available brokers trying each in sequence. Raises exception if none succeeds.
+        :param message: message to send
+        """
+        exception = None
+        for url in self.urls:
+            try:
+                logger.info("Trying to send message to {url} {queue}", fparams={'url': url, 'queue': self.queue})
+                messaging_handler = ProtonMessagingHandler(url, self.queue, self.username, self.password, message)
+                proton.reactor.Container(messaging_handler).run()
+            except EarlyDisconnectError as e:
+                logger.warning("Failed to send message to '%s", url)
+                exception = e
+            else:
+                exception = None
+                break
+        if exception:
+            logger.warning("Failed to send message to any of '%s", self.urls)
+            raise exception
+
+    async def __send_with_retries(self, message: proton.Message) -> None:
         """
         Performs a synchronous send of a message, to the host defined when this adaptor was constructed.
         :param message: The message to be sent.
         """
-        proton.reactor.Container(ProtonMessagingHandler(self.host, self.username, self.password, message)).run()
+        result = await RetriableAction(
+            lambda: self.__try_sending_to_all_in_sequence(message),
+            self.max_retries,
+            self.retry_delay)\
+            .with_retriable_exception_check(lambda ex: isinstance(ex, EarlyDisconnectError))\
+            .execute()
+
+        if not result.is_successful:
+            logger.error("Exceeded the maximum number of retries, {max_retries} retries, when putting "
+                         "message onto inbound queue",
+                         fparams={"max_retries": self.max_retries})
+            raise MaxRetriesExceeded('The max number of retries to put a message onto the inbound queue has '
+                                     'been exceeded') from result.exception
 
 
 class ProtonMessagingHandler(proton.handlers.MessagingHandler):
     """Implementation of a Proton MessagingHandler which will send a single message. Note that this class will raise
     an exception to indicate that a message could not be sent successfully."""
 
-    def __init__(self, host: str, username: str, password: str, message: proton.Message) -> None:
+    def __init__(self, url: str, queue: str, username: str, password: str, message: proton.Message) -> None:
         """
         Constructs a MessagingHandler which will send a specified message to a specified host.
-        :param host: The host to send the message to.
+        :param url: The host to send the message to.
         :param username: The username to login to the host with.
         :param password: The password to login to the host with.
         :param message: The message to be sent to the host.
         """
         super().__init__()
-        self._host = host
+        self._url = url
+        self._queue = queue
         self._username = username
         self._password = password
         self._message = message
-        self._sender = None
         self._sent = False
 
     def on_start(self, event: proton.Event) -> None:
@@ -100,9 +148,9 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The start event.
         """
-        logger.info('Establishing connection to {host} for sending messages.', fparams={'host': self._host})
-        self._sender = event.container.create_sender(proton.Url(self._host, username=self._username,
-                                                                password=self._password))
+        logger.info('Establishing connection to {url} for sending messages.', fparams={'url': self._url})
+        conn = event.container.connect(url=self._url, user=self._username, password=self._password, reconnect=False)
+        event.container.create_sender(conn, target=self._queue)
 
     def on_sendable(self, event: proton.Event) -> None:
         """Called when the link is ready for sending messages.
@@ -112,7 +160,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         if event.sender.credit:
             if not self._sent:
                 event.sender.send(self._message)
-                logger.info('Message sent to {host}.', fparams={'host': self._host})
+                logger.info('Message sent to {url}.', fparams={'url': event.connection.connected_address})
                 self._sent = True
         else:
             logger.error('Failed to send message as no available credit.')
@@ -123,7 +171,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The accepted event.
         """
-        logger.info('Message received by {host}.', fparams={'host': self._host})
+        logger.info('Message received by {url}.', fparams={'url': event.connection.connected_address})
         event.connection.close()
 
     def on_disconnected(self, event: proton.Event) -> None:
@@ -131,7 +179,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The disconnect event.
         """
-        logger.info('Disconnected from {host}.', fparams={'host': self._host})
+        logger.info('Disconnected from {url}.', fparams={'url': event.connection.connected_address})
         if not self._sent:
             logger.error('Disconnected before message could be sent.')
             raise EarlyDisconnectError()
@@ -142,7 +190,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
         :param event:
         :return:
         """
-        logger.warning('Message rejected by {host}.', fparams={'host': self._host})
+        logger.warning('Message rejected by {url}.', fparams={'url': self._url})
         self._sent = False
 
     def on_transport_error(self, event: proton.Event) -> None:
@@ -150,8 +198,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The transport error event.
         """
-        logger.error("There was an error with the transport used for the connection to {host}.",
-                     fparams={'host': self._host})
+        logger.error("There was an error with the transport used for the connection to {url}.",
+                     fparams={'url': event.connection.connected_address})
         super().on_transport_error(event)
         raise EarlyDisconnectError()
 
@@ -160,8 +208,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The connection error event.
         """
-        logger.error("{host} closed the connection with an error. {remote_condition}",
-                     fparams={'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error("{url} closed the connection with an error. {remote_condition}",
+                     fparams={'url': event.connection.connected_address, 'remote_condition': event.context.remote_condition})
         super().on_connection_error(event)
         raise EarlyDisconnectError()
 
@@ -170,8 +218,8 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The session error event.
         """
-        logger.error("{host} closed the session with an error. {remote_condition}",
-                     fparams={'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error("{url} closed the session with an error. {remote_condition}",
+                     fparams={'url': event.connection.connected_address, 'remote_condition': event.context.remote_condition})
         super().on_session_error(event)
         raise EarlyDisconnectError()
 
@@ -180,7 +228,7 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
 
         :param event: The link error event.
         """
-        logger.error("{host} closed the link with an error. {remote_condition}",
-                     fparams={'host': self._host, 'remote_condition': event.context.remote_condition})
+        logger.error("{url} closed the link with an error. {remote_condition}",
+                     fparams={'url': event.connection.connected_address, 'remote_condition': event.context.remote_condition})
         super().on_link_error(event)
         raise EarlyDisconnectError()
