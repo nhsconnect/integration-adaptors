@@ -145,7 +145,8 @@ pipeline {
                                         --env "AWS_SECRET_ACCESS_KEY=test" \
                                         --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
                                         --env "FAKE_SPINE_ADDRESS=http://fakespine" \
-                                        --env "MHS_INBOUND_QUEUE_URL=http://rabbitmq:5672" \
+                                        --env "MHS_INBOUND_QUEUE_BROKERS=amqp://rabbitmq:5672" \
+                                        --env "MHS_INBOUND_QUEUE_NAME=inbound" \
                                         --env "SCR_ADDRESS=http://scradaptor" \
                                         local/mhs-componenttest:$BUILD_TAG
                                 '''
@@ -213,7 +214,8 @@ pipeline {
                                             -var mhs_sync_async_table_read_capacity=5 \
                                             -var mhs_sync_async_table_write_capacity=5 \
                                             -var mhs_spine_org_code=${SPINE_ORG_CODE} \
-                                            -var inbound_queue_host="${MHS_INBOUND_QUEUE_URL}/${MHS_INBOUND_QUEUE_NAME}" \
+                                            -var inbound_queue_brokers="${MHS_INBOUND_QUEUE_BROKERS}" \
+                                            -var inbound_queue_name="${MHS_INBOUND_QUEUE_NAME}" \
                                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                                             -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
                                             -var party_key_arn=${PARTY_KEY_ARN} \

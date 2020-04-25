@@ -184,8 +184,12 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
           value = aws_dynamodb_table.mhs_sync_async_table.name
         },
         {
-          name = "MHS_INBOUND_QUEUE_URL"
-          value = var.inbound_queue_host
+          name = "MHS_INBOUND_QUEUE_BROKERS"
+          value = var.inbound_queue_brokers
+        },
+        {
+          name = "MHS_INBOUND_QUEUE_NAME"
+          value = var.inbound_queue_name
         }
       ]
       secrets = [
