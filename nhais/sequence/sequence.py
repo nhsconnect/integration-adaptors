@@ -3,7 +3,7 @@ from typing import Optional
 
 
 class SequenceGenerator(abc.ABC):
-    """An component that provides a common interface to generate a sequence of numbers."""
+    """A component that provides a common interface to generate a sequence of numbers."""
 
     @abc.abstractmethod
     async def next(self, key: str) -> Optional[dict]:

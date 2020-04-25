@@ -11,8 +11,8 @@ _COUNTER_ATTRIBUTE = 'last_generated_number'
 _INCREMENT_EXPRESSION = f'ADD {_COUNTER_ATTRIBUTE} :i'
 _INCREMENT_VALUE = {':i': 1}
 
-class DynamoSequenceGenerator(SequenceGenerator):
 
+class DynamoSequenceGenerator(SequenceGenerator):
 
     def __init__(self, table_name):
         """
@@ -24,14 +24,12 @@ class DynamoSequenceGenerator(SequenceGenerator):
         """
         self.table_name = table_name
 
-
     async def next(self, key: str) -> int:
         num = await self._next(key)
         # zero is never a valid transaction id
         if num == 0:
             num = await self._next(key)
         return num
-
 
     async def _next(self, key: str) -> int:
         endpoint = config.get_config('DYNAMODB_ENDPOINT_URL', None)
