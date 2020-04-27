@@ -45,7 +45,8 @@ class TestFhirResource(unittest.TestCase):
         self.assertEquals("2", p.extension[0].extension[0].valueCodeableConcept.coding[0].code)
 
     def test_invalid_ID(self):
-        expected = """Wrong type <class 'int'> for property "value" on <class 'fhir.resources.identifier.Identifier'>, expecting <class 'str'>"""
+        expected_id_message = """Wrong type <class 'int'> for property "value" on <class 'fhir.resources.identifier.Identifier'>, expecting <class 'str'>"""
+        expected_extension_message = """Wrong type <class 'int'> for property "valueString" on <class 'fhir.resources.extension.Extension'>, expecting <class 'str'>"""
         try:
             p = Patient(INVALID_ID_REQUEST_BODY)
         except FHIRValidationError as e:
@@ -56,8 +57,8 @@ class TestFhirResource(unittest.TestCase):
             # if there are multiple then the tree needs to be traverse and each (path, message) pair collected
             # error message(s) are deep in the tree and very specific to python classes and types
             errors = self._parse_fhir_errors(e)
-            self.assertEquals(errors[1], ('identifier.0.value', expected))
-            # self.assertEquals(expected, e.errors[0].errors[0].errors[0].args[0])
+            self.assertEqual(errors[0], ('address.0.extension.0.extension.1.valueString', expected_extension_message))
+            self.assertEqual(errors[1], ('identifier.0.value', expected_id_message))
 
     def _parse_fhir_errors(self, e):
 
