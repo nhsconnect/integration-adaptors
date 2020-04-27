@@ -50,11 +50,14 @@ class TestFhirResource(unittest.TestCase):
             p = Patient(INVALID_ID_REQUEST_BODY)
         except FHIRValidationError as e:
             # need to traverse the error tree to build the full path
-            self.assertEqual('identifier.0', e.errors[0].path)
-            self.assertEqual('value', e.errors[0].errors[0].path)
-            # error message deep in tree and very specific to python classes and types
+            # this sort of things only works if there is one error
+            # self.assertEqual('identifier.0', e.errors[0].path)
+            # self.assertEqual('value', e.errors[0].errors[0].path)
+            # if there are multiple then the tree needs to be traverse and each (path, message) pair collected
+            # error message(s) are deep in the tree and very specific to python classes and types
             errors = self._parse_fhir_errors(e)
-            self.assertEquals(expected, e.errors[0].errors[0].errors[0].args[0])
+            self.assertEquals(errors[1], ('identifier.0.value', expected))
+            # self.assertEquals(expected, e.errors[0].errors[0].errors[0].args[0])
 
     def _parse_fhir_errors(self, e):
 
