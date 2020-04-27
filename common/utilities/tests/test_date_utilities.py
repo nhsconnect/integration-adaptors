@@ -1,5 +1,7 @@
 import unittest
+from datetime import datetime, timezone, timedelta
 
+import time
 from isodate import isoerror
 
 from utilities.date_utilities import DateUtilities
@@ -34,3 +36,12 @@ class TestDateUtilities(unittest.TestCase):
                 with self.assertRaises(expected_exception):
                     DateUtilities.convert_xml_date_time_format_to_seconds(xml_date)
 
+    def test_utcnow(self):
+        past = datetime.now(tz=timezone(timedelta()))  # another way to create a UTC (+00:00) timestamp
+        time.sleep(0.1)
+        present = DateUtilities.utcnow()
+        time.sleep(0.1)
+        future = datetime.now(tz=timezone(timedelta()))
+        self.assertTrue(past < present)
+        self.assertTrue(present < future)
+        self.assertEqual(timezone.utc, present.tzinfo, 'datetime from utcnow() should be UTC')

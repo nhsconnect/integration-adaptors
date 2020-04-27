@@ -1,9 +1,9 @@
+import json
+
 import tornado.testing
 from tornado.web import Application
 
 from outbound.request import handler
-
-import json
 
 REQUEST_BODY_PAYLOAD = "A request"
 REQUEST_BODY = json.dumps({"payload": REQUEST_BODY_PAYLOAD})

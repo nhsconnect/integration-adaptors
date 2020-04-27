@@ -4,41 +4,40 @@ from datetime import datetime
 from fhir.resources.patient import Patient
 
 from edifact.outgoing.models.message import MessageHeader, MessageTrailer, BeginningOfMessage, NameAndAddress, \
-    DateTimePeriod
-from edifact.outgoing.models.segment import ConstantSegment
+    DateTimePeriod, SegmentGroup, ReferenceTransactionNumber
 from outbound.converter.fhir_helpers import get_ha_identifier
 
 
 class BaseMessageTranslator:
 
-    def __init__(self):
+    def __init__(self, translation_timestamp: datetime):
         self.segments = []
+        self.translation_timestamp = translation_timestamp
 
     def translate(self, patient: Patient):
         self.segments.append(MessageHeader())
         self.segments.append(BeginningOfMessage())
-        self.__append_message_header_nad(patient)
-        self.__append_message_header_dtm()
-        self._translate_body(patient)
+        self.segments.append(NameAndAddress(NameAndAddress.QualifierAndCode.FHS, get_ha_identifier(patient)))
+        self.segments.append(DateTimePeriod(DateTimePeriod.TypeAndFormat.TRANSLATION_TIMESTAMP, self.translation_timestamp))
+        self._append_transaction_type()
+        self.segments.append(SegmentGroup(1))
+        self.segments.append(ReferenceTransactionNumber())
+        self._append_message_body(patient)
         number_of_segments = len(self.segments) + 1
         self.segments.append(MessageTrailer(number_of_segments=number_of_segments))
         return self.segments
 
-    def __append_message_header_nad(self, patient: Patient):
-        recipient = get_ha_identifier(patient)
-        self.segments.append(NameAndAddress(NameAndAddress.QualifierAndCode.FHS, recipient))
-
-    def __append_message_header_dtm(self):
-        # TODO: does this need to be the same as the interchange header timestamp?
-        self.segments.append(DateTimePeriod(DateTimePeriod.TypeAndFormat.TRANSLATION_TIMESTAMP, datetime.utcnow()))
-
     @abc.abstractmethod
-    def __append_transaction_type(self):
+    def _append_transaction_type(self):
         """
-        Appends an RFF+950 segment (Reference) for the type of message represented by this class
+        Appends an RFF+950 segment (ReferenceTransactionType) for the type of message represented by this class
         """
         pass
 
     @abc.abstractmethod
-    def _translate_body(self, patient: Patient):
+    def _append_message_body(self, patient: Patient):
+        """
+        Appends the remainder of Segment Group 1 and all of Segment Group 2
+        :param patient: the FHIR Patient
+        """
         pass

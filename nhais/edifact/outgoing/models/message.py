@@ -1,3 +1,4 @@
+import abc
 import enum
 from datetime import datetime
 
@@ -137,19 +138,9 @@ class DateTimePeriod(Segment):
 
 class Reference(Segment):
 
-    class TransactionType(enum.Enum):
-        ACCEPTANCE = 'G1'
-        AMENDMENT = 'G2'
-        REMOVAL = 'G3'
-        DEDUCTION = 'G5'
-
-    def __init__(self, reference_number: (TransactionType, str)):
-        if isinstance(reference_number, self.TransactionType):
-            self.qualifier = '950'
-            self.reference_number = reference_number.value
-        else:
-            self.qualifier = 'TN'
-            self.reference_number = reference_number
+    def __init__(self, qualifier: str, reference: str):
+        self.qualifier = qualifier
+        self.reference = reference
 
     @property
     def key(self):
@@ -157,11 +148,52 @@ class Reference(Segment):
 
     @property
     def value(self):
-        return f'{self.qualifier}:{self.reference_number}'
+        return f'{self.qualifier}:{self.reference}'
 
     def pre_validate(self):
-        required(self, 'type_code')
-        required(self, 'format_code')
+        required(self, 'qualifier')
+        required(self, 'reference')
+
+
+class ReferenceTransactionType(Reference):
+
+    class TransactionType(enum.Enum):
+        ACCEPTANCE = 'G1'
+        AMENDMENT = 'G2'
+        REMOVAL = 'G3'
+        DEDUCTION = 'G5'
+
+    def __init__(self, transaction_type: TransactionType):
+        super().__init__(qualifier='950', reference=transaction_type.value)
+
+
+class ReferenceTransactionNumber(Reference):
+
+    def __init__(self):
+        super().__init__(qualifier='TN', reference='')
+
+    def pre_validate(self):
+        required(self, 'qualifier')
+
+    def _validate_stateful(self):
+        required(self, 'reference')
+
+
+class SegmentGroup(Segment):
+
+    def __init__(self, segment_group_number: int):
+        self.segment_group_number = segment_group_number
+
+    @property
+    def key(self):
+        return f'S{self.segment_group_number:02}'
+
+    @property
+    def value(self):
+        return f'{self.segment_group_number}'
+
+    def pre_validate(self):
+        required(self, 'segment_group_number')
 
 
 class MessageBeginning(SegmentCollection):

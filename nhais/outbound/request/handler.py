@@ -1,14 +1,13 @@
 from typing import Any
 
-from comms import proton_queue_adaptor
 from tornado import httputil
+
 from common.handler import base_handler
-
-from utilities import integration_adaptors_logger as log, timing
-from utilities import config
-
+from comms import proton_queue_adaptor
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.converter.interchange_translator import FhirToEdifactTranslator
+from utilities import config
+from utilities import integration_adaptors_logger as log, timing
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
