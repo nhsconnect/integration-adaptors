@@ -4,7 +4,8 @@ from sequence.dynamo_sequence import DynamoSequenceGenerator
 class TransactionIdGenerator:
     """A component that provides sequential transaction id"""
 
-    async def generate_transaction_id(self) -> int:
+    @staticmethod
+    async def generate_transaction_id() -> int:
         table = 'transaction_id_counter'
         key = 'transaction_id'
 

@@ -7,7 +7,7 @@ from utilities import test_utilities
 from utilities import config
 
 
-class TestDynamoSequence(unittest.TestCase):
+class ComponentTestDynamoSequence(unittest.TestCase):
 
     def setUp(self):
         config.setup_config("MHS")

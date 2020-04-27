@@ -42,13 +42,8 @@ class DynamoSequenceGenerator(SequenceGenerator):
                 ReturnValues='UPDATED_NEW'
             )
 
-            print('============ DynamoSequenceGenerator.next [response] ===========')
-            print(response)
-
             result = await table.query(
                 KeyConditionExpression=Key('key').eq(key)
             )
 
-            print('============ DynamoSequenceGenerator.next [query] ===========')
-            print(result['Items'])
             return response['Attributes'][_COUNTER_ATTRIBUTE] % 10000000
