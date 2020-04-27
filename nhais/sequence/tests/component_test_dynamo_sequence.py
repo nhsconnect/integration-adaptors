@@ -1,5 +1,8 @@
 """Module to test dynamo sequence functionality."""
+
+import time
 import unittest
+import asyncio
 
 import aioboto3
 from sequence import dynamo_sequence
@@ -17,55 +20,40 @@ class ComponentTestDynamoSequence(unittest.TestCase):
         self.region_name = 'eu-west-2'
 
     @test_utilities.async_test
-    async def test_transaction_ids_increase_by_one(self):
+    async def test_if_parallel_generation_there_are_no_gaps_no_duplicates(self):
         async with aioboto3.resource('dynamodb', region_name=self.region_name,
                                      endpoint_url=self.endpoint) as dynamo_resource:
             try:
-                await self.create_table(dynamo_resource)
+                await self.__create_table(dynamo_resource)
                 db = dynamo_sequence.DynamoSequenceGenerator(self.table_name)
-                transaction_id_1 = await db.next(self.key)
-                transaction_id_2 = await db.next(self.key)
-                self.assertEqual(transaction_id_1 + 1, transaction_id_2)
-            except dynamo_resource.meta.client.exceptions.ResourceInUseException:
-                self.fail()
-            finally:
-                table = await dynamo_resource.Table(self.table_name)
-                await table.delete()
-
-    @test_utilities.async_test
-    async def test_first_transaction_id_should_be_one(self):
-        async with aioboto3.resource('dynamodb', region_name=self.region_name,
-                                     endpoint_url=self.endpoint) as dynamo_resource:
-            try:
-                await self.create_table(dynamo_resource)
-                db = dynamo_sequence.DynamoSequenceGenerator(self.table_name)
-                transaction_id = await db.next(self.key)
-                self.assertEqual(transaction_id, 1)
-            except dynamo_resource.meta.client.exceptions.ResourceInUseException:
-                self.fail()
-            finally:
-                table = await dynamo_resource.Table(self.table_name)
-                await table.delete()
-
-    @test_utilities.async_test
-    async def test_after_9999999_should_be_one(self):
-        async with aioboto3.resource('dynamodb', region_name=self.region_name,
-                                     endpoint_url=self.endpoint) as dynamo_resource:
-            try:
-                await self.create_table(dynamo_resource)
-                db = dynamo_sequence.DynamoSequenceGenerator(self.table_name)
-                table = await dynamo_resource.Table(self.table_name)
-                await table.put_item(
-                    Item={'key': self.key, dynamo_sequence._COUNTER_ATTRIBUTE: 9999999}
+                result = await asyncio.gather(
+                    self.__generate_large_number_of_ids("one", 0.05, db),
+                    self.__generate_large_number_of_ids("two", 0.075, db)
                 )
-                transaction_id = await db.next(self.key)
-                self.assertEqual(transaction_id, 1)
+                await self.__verify_results(result)
             except dynamo_resource.meta.client.exceptions.ResourceInUseException:
                 self.fail()
             finally:
+                table = await dynamo_resource.Table(self.table_name)
                 await table.delete()
 
-    async def create_table(self, dynamo_resource):
+    async def __verify_results(self, result):
+        results = {**result[0], **result[1]}
+        sorted_keys = sorted(results)
+        self.assertEqual(sorted_keys.__len__(), 200)
+        for x in range(1, sorted_keys.__len__() - 1):
+            self.assertEqual(results[sorted_keys[x]] + 1, results[sorted_keys[x + 1]])
+
+    async def __generate_large_number_of_ids(self, task, delay, db):
+        dictionary_of_ids = {}
+        for i in range(100):
+            transaction_id = await db.next(self.key)
+            dictionary_of_ids[time.time()] = transaction_id
+            print(f'task:{task} - iteration:{i} - transaction_id:{transaction_id}')
+            await asyncio.sleep(delay)
+        return dictionary_of_ids
+
+    async def __create_table(self, dynamo_resource):
         await dynamo_resource.create_table(
             AttributeDefinitions=[
                 {'AttributeName': 'key', 'AttributeType': 'S'}
