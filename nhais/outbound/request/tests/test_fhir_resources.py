@@ -53,7 +53,21 @@ class TestFhirResource(unittest.TestCase):
             self.assertEqual('identifier.0', e.errors[0].path)
             self.assertEqual('value', e.errors[0].errors[0].path)
             # error message deep in tree and very specific to python classes and types
+            path, message = self._parse_fhir_error(e)
             self.assertEquals(expected, e.errors[0].errors[0].errors[0].args[0])
+
+    def _parse_fhir_error(self, e, path=''):
+        if isinstance(e, FHIRValidationError):
+            if e.path:
+                if path:
+                    path = f'{path}.{e.path}'
+                else:
+                    path = e.path
+            if e.errors:
+                # TODO: could be multiple errors
+                return self._parse_fhir_error(e.errors[0], path)
+        return path, e.args[0]
+
 
     def test_unknown_property(self):
         expected = 'Superfluous entry "invalidProperty" in data for <fhir.resources.humanname.HumanName object at 0x[0-9a-f]+>'
