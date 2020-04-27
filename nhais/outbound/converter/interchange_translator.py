@@ -12,7 +12,7 @@ from fhir.resources.patient import Patient
 from datetime import datetime
 
 
-class BaseFhirToEdifactTranslator(object):
+class FhirToEdifactTranslator(object):
 
     def __init__(self):
         self.transaction_id_generator = TransactionIdGenerator()

@@ -8,15 +8,17 @@ from fhir.resources.practitioner import Practitioner
 
 import re
 
-from outbound.converter.base_translator import BaseFhirToEdifactTranslator
+from outbound.converter.interchange_translator import FhirToEdifactTranslator
 from utilities.test_utilities import async_test
 
 
-class TestBaseFhirToEdifactTranslator(unittest.TestCase):
+class TestFhirToEdifactTranslator(unittest.TestCase):
 
-    UNB_PATTERN = r"UNB\+UNOA:2\+(?P<sender>[a-zA-Z0-9]+)\+(?P<recipient>[a-zA-Z0-9]+)+\+(?P<timestamp>[0-9]{6}:[0-9]{4})\+(?P<sis>[0-9]{8})'"
-    UNH_PATTERN = r"UNH\+(?P<sms>[0-9]{8})\+FHSREG:0:1:FH:FHS001'"
-    UNZ_PATTERN = r"UNZ\+(?P<message_count>[0-9]+)\+(?P<sis>[0-9]{8})'"
+    UNB_PATTERN = r"^UNB\+UNOA:2\+(?P<sender>[a-zA-Z0-9]+)\+(?P<recipient>[a-zA-Z0-9]+)+\+(?P<timestamp>[0-9]{6}:[0-9]{4})\+(?P<sis>[0-9]{8})'$"
+    UNH_PATTERN = r"^UNH\+(?P<sms>[0-9]{8})\+FHSREG:0:1:FH:FHS001'$"
+    BGM_PATTERN = r"^BGM\+\+\+507'$"
+    UNT_PATTERN = r"^UNT\+(?P<segment_count>[0-9]+)\+(?P<sms>[0-9]{8})'$"
+    UNZ_PATTERN = r"^UNZ\+(?P<message_count>[0-9]+)\+(?P<sis>[0-9]{8})'$"
 
     # TODO: mock sequence generators
     @async_test
@@ -33,21 +35,28 @@ class TestBaseFhirToEdifactTranslator(unittest.TestCase):
         ha.identifier = [ha_id]
         patient.managingOrganization = [ha]
 
-        translator = BaseFhirToEdifactTranslator()
+        translator = FhirToEdifactTranslator()
         edifact = await translator.convert(patient)
 
         self.assertIsNotNone(edifact)
         self.assertTrue(len(edifact) > 0)
         print(edifact)
         segments = edifact.splitlines()
+
         unz = segments.pop()
         self.assertRegex(unz, self.UNZ_PATTERN)
         unz_match = re.match(self.UNZ_PATTERN, unz)
-        self.assertEquals('1', unz_match.group('message_count'))
-        self.assertEquals('00000001', unz_match.group('sis'))
+        self.assertEqual('1', unz_match.group('message_count'))
+        self.assertEqual('00000001', unz_match.group('sis'))
 
         unt = segments.pop()
-        # TODO: UNT
+        self.assertRegex(unt, self.UNT_PATTERN)
+        unt_match = re.match(self.UNT_PATTERN, unt)
+        self.assertEqual('3', unt_match.group('segment_count'))
+        self.assertEqual('00000001', unt_match.group('sms'))
+
+        bgm = segments.pop()
+        self.assertRegex(bgm, self.BGM_PATTERN)
 
         unh = segments.pop()
         self.assertRegex(unh, self.UNH_PATTERN)
@@ -57,7 +66,7 @@ class TestBaseFhirToEdifactTranslator(unittest.TestCase):
         unb = segments.pop()
         self.assertRegex(unb, self.UNB_PATTERN)
         unb_match = re.match(self.UNB_PATTERN, unb)
-        self.assertEquals('GP123', unb_match.group('sender'))
-        self.assertEquals('HA456', unb_match.group('recipient'))
+        self.assertEqual('GP123', unb_match.group('sender'))
+        self.assertEqual('HA456', unb_match.group('recipient'))
         # TODO: timestamp
-        self.assertEquals('00000001', unb_match.group('sis'))
+        self.assertEqual('00000001', unb_match.group('sis'))

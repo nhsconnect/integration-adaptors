@@ -58,6 +58,30 @@ class Segment(object):
         return edifact_segment
 
 
+class ConstantSegment(Segment):
+    """
+    A general segment implementation for segments that always have a constant value and don't require parameters
+    or validation
+    takes in specific values required to generate a message trailer
+    example: BGM+++507'
+    """
+
+    def __init__(self, key, value):
+        self.__key = key
+        self.__value = value
+
+    @property
+    def key(self):
+        return self.__key
+
+    @property
+    def value(self):
+        return self.__value
+
+    def pre_validate(self):
+        pass
+
+
 class SegmentCollection(list):
     """
     A collection of segments base class

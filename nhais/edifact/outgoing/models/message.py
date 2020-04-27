@@ -65,6 +65,24 @@ class MessageTrailer(Segment):
         required(self, 'sequence_number')
 
 
+class BeginningOfMessage(Segment):
+    """
+    This segment is used to provide a code for the message which indicates its use. It is a constant of EDIFACT
+    example: BGM+++507'
+    """
+
+    @property
+    def key(self):
+        return 'BGM'
+
+    @property
+    def value(self):
+        return '++507'
+
+    def pre_validate(self):
+        pass
+
+
 class MessageBeginning(SegmentCollection):
     """
     A collection of segments that represent the start of a message
