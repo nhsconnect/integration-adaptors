@@ -46,7 +46,7 @@ class ComponentTestDynamoSequence(unittest.TestCase):
 
     async def __generate_large_number_of_ids(self, task, delay, db):
         dictionary_of_ids = {}
-        for i in range(100):
+        for i in range(500):
             transaction_id = await db.next(self.key)
             dictionary_of_ids[time.time()] = transaction_id
             print(f'task:{task} - iteration:{i} - transaction_id:{transaction_id}')
