@@ -40,13 +40,13 @@ class ComponentTestDynamoSequence(unittest.TestCase):
     async def __verify_results(self, result):
         results = {**result[0], **result[1]}
         sorted_keys = sorted(results)
-        self.assertEqual(sorted_keys.__len__(), 200)
+        self.assertEqual(sorted_keys.__len__(), 1000)
         for x in range(1, sorted_keys.__len__() - 1):
             self.assertEqual(results[sorted_keys[x]] + 1, results[sorted_keys[x + 1]])
 
     async def __generate_large_number_of_ids(self, task, delay, db):
         dictionary_of_ids = {}
-        for i in range(100):
+        for i in range(500):
             transaction_id = await db.next(self.key)
             dictionary_of_ids[time.time()] = transaction_id
             print(f'task:{task} - iteration:{i} - transaction_id:{transaction_id}')
