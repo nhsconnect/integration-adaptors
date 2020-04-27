@@ -1,14 +1,15 @@
-import tornado.testing
-from unittest.mock import patch, MagicMock
-
-from tornado.web import Application
-
-from outbound.request.acceptance_amendment import AcceptanceAmendmentRequestHandler
-
 import json
 import os
+from unittest.mock import patch, MagicMock
+
+import tornado.testing
+from fhir.resources.codeableconcept import CodeableConcept
+from fhir.resources.coding import Coding
+from fhir.resources.operationoutcome import OperationOutcomeIssue, OperationOutcome
+from tornado.web import Application
 
 from mesh.mesh_outbound import MeshOutboundWrapper
+from outbound.request.acceptance_amendment import AcceptanceAmendmentRequestHandler
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -16,20 +17,20 @@ REQUEST_PATIENT_URI = "/fhir/Patient/123"
 REQUEST_VALID_OPERATION = "Patient"
 REQUEST_INVALID_OPERATION = "Patientssss"
 
-valid_json_patient = root_dir + "/../../../common/data/patient.json"
+valid_json_patient = root_dir + "/../../../outbound/data/patient.json"
 with open(valid_json_patient) as file:
     data = json.load(file)
 VALID_REQUEST_BODY = json.dumps(data)
 
-invalid_json_patient_id = root_dir + "/../../../common/data/patient_invalid_id.json"
+invalid_json_patient_id = root_dir + "/../../../outbound/data/patient_invalid_id.json"
 with open(invalid_json_patient_id) as file:
     data = json.load(file)
 INVALID_ID_REQUEST_BODY = json.dumps(data)
 
-missing_json_patient_id = root_dir + "/../../../common/data/patient_missing_id.json"
+missing_json_patient_id = root_dir + "/../../../outbound/data/patient_missing_id.json"
 with open(missing_json_patient_id) as file:
     data = json.load(file)
-MISSING_ID_REQUEST_BODY = json.dumps(None)
+MISSING_ID_REQUEST_BODY = json.dumps(data)
 
 
 class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
@@ -39,6 +40,26 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
     async def async_magic(self):
         pass
+
+    def create_operation_outcome(self, response_body):
+        coding = Coding()
+        coding.code = response_body['issue'][0]['details']['coding'][0]['code']
+        coding.display = response_body['issue'][0]['details']['coding'][0]['display']
+        coding.version = response_body['issue'][0]['details']['coding'][0]['version']
+        coding.system = response_body['issue'][0]['details']['coding'][0]['version']
+
+        details = CodeableConcept()
+        details.coding = [coding]
+
+        operation_outcome_issue = OperationOutcomeIssue()
+        operation_outcome_issue.severity = response_body['issue'][0]['severity']
+        operation_outcome_issue.code = response_body['issue'][0]['code']
+        operation_outcome_issue.details = details
+
+        operation_outcome = OperationOutcome()
+        operation_outcome.issue = [operation_outcome_issue]
+
+        return operation_outcome
 
     def test_invalid_post_request_line_return_404_response_code(self):
         response = self.fetch(r'/water/Panda/9000000009', method="POST",
@@ -54,6 +75,7 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         response = self.fetch(r'/fhir/Patient/9000000009', method="POST",
                               body=VALID_REQUEST_BODY)
+
         self.assertEqual(202, response.code)
 
     @patch.object(MeshOutboundWrapper, "send")
@@ -65,13 +87,11 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch('/fhir/Patient/9000000009', method="POST",
                               body=INVALID_ID_REQUEST_BODY)
 
-        response_body = json.loads(response.body.decode())
-        severity = response_body['issue'][0]['severity']
-        coding = response_body['issue'][0]['details']['coding'][0]
+        operation_outcome = self.create_operation_outcome(json.loads(response.body.decode()))
 
-        self.assertEqual('error', severity)
-        self.assertEqual('JSON_PAYLOAD_NOT_VALID_TO_SCHEMA', coding['code'])
-        self.assertEqual('OperationOutcome', response_body['resourceType'])
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('JSON_PAYLOAD_NOT_VALID_TO_SCHEMA', operation_outcome.issue[0].details.coding[0].code)
+        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
 
     @patch.object(MeshOutboundWrapper, "send")
@@ -83,14 +103,12 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch('/fhir/Patient/2384763847264', method="POST",
                               body=VALID_REQUEST_BODY)
 
-        response_body = json.loads(response.body.decode())
-        severity = response_body['issue'][0]['severity']
-        coding = response_body['issue'][0]['details']['coding'][0]
+        operation_outcome = self.create_operation_outcome(json.loads(response.body.decode()))
 
-        self.assertEqual('error', severity)
-        self.assertEqual('ID_IN_URI_DOES_NOT_MATCH_PAYLOAD_ID', coding['code'])
-        self.assertEqual('URI id `2384763847264` does not match PAYLOAD id `9000000009`', coding['display'])
-        self.assertEqual('OperationOutcome', response_body['resourceType'])
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('ID_IN_URI_DOES_NOT_MATCH_PAYLOAD_ID', operation_outcome.issue[0].details.coding[0].code)
+        self.assertEqual('URI id `2384763847264` does not match PAYLOAD id `9000000009`', operation_outcome.issue[0].details.coding[0].display)
+        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
 
     @patch.object(MeshOutboundWrapper, "send")
@@ -102,14 +120,12 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch('/fhir/Patient/90000009', method="POST",
                               body=MISSING_ID_REQUEST_BODY)
 
-        response_body = json.loads(response.body.decode())
-        severity = response_body['issue'][0]['severity']
-        coding = response_body['issue'][0]['details']['coding'][0]
+        operation_outcome = self.create_operation_outcome(json.loads(response.body.decode()))
 
-        self.assertEqual('error', severity)
-        self.assertEqual('ID_IN_PAYLOAD_IS_MISSING', coding['code'])
-        self.assertEqual('Payload is missing id, id is required.', coding['display'])
-        self.assertEqual('OperationOutcome', response_body['resourceType'])
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('JSON_PAYLOAD_NOT_VALID_TO_SCHEMA', operation_outcome.issue[0].details.coding[0].code)
+        self.assertEqual('id id is missing from payload.', operation_outcome.issue[0].details.coding[0].display)
+        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
 
     @patch.object(MeshOutboundWrapper, "send")
@@ -120,13 +136,11 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         response = self.fetch('/fhir/Patient/90000009', method="POST", allow_nonstandard_methods=True)
 
-        response_body = json.loads(response.body.decode())
-        severity = response_body['issue'][0]['severity']
-        coding = response_body['issue'][0]['details']['coding'][0]
+        operation_outcome = self.create_operation_outcome(json.loads(response.body.decode()))
 
-        self.assertEqual('error', severity)
-        self.assertEqual('PAYLOAD_IS_NOT_JSON_FORMAT', coding['code'])
-        self.assertEqual('Payload is missing, Payload required.', coding['display'])
-        self.assertEqual('OperationOutcome', response_body['resourceType'])
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('PAYLOAD_IS_NOT_VALID_JSON_FORMAT', operation_outcome.issue[0].details.coding[0].code)
+        self.assertEqual('Payload is either missing, empty or not valid to json, this is required.', operation_outcome.issue[0].details.coding[0].display)
+        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
 

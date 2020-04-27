@@ -1,7 +1,7 @@
 import utilities.integration_adaptors_logger as log
+from comms import proton_queue_adaptor
 from retry import retriable_action
 from utilities import timing, config
-from comms import proton_queue_adaptor
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
