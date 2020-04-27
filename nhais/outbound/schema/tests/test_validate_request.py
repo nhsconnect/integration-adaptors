@@ -2,6 +2,8 @@ import json
 import os
 import unittest
 
+from fhir.resources.fhirelementfactory import FHIRElementFactory
+
 from outbound.schema.request_validation_exception import RequestValidationException
 from outbound.schema.validate_request import validate_patient
 
@@ -25,8 +27,10 @@ class TestValidateRequest(unittest.TestCase):
     def test_valid_schema(self):
         response = validate_patient(VALID_REQUEST_BODY)
 
-        self.assertEqual('9000000009', response.id)
-        self.assertEqual('Patient', response.resource_type)
+        patient = FHIRElementFactory.instantiate('Patient', response.as_json())
+
+        self.assertEqual('9000000009', patient.id)
+        self.assertEqual('Patient', patient.resource_type)
 
     def test_missing_id(self):
         with self.assertRaises(RequestValidationException) as e:

@@ -1,7 +1,6 @@
 import utilities.integration_adaptors_logger as log
 from fhir.resources.fhirabstractbase import FHIRValidationError
 from fhir.resources.fhirelementfactory import FHIRElementFactory
-from jsonschema import ValidationError
 
 from outbound.schema.request_validation_exception import RequestValidationException
 
