@@ -148,8 +148,8 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
     }
   ]
   )
-  cpu = "512"
-  memory = "1024"
+  cpu = "1024"
+  memory = "2048"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE"
@@ -249,8 +249,8 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
     }
   ]
   )
-  cpu = "512"
-  memory = "1024"
+  cpu = "1024"
+  memory = "2048"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE"
@@ -331,8 +331,8 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
     }
   ]
   )
-  cpu = "512"
-  memory = "1024"
+  cpu = "1024"
+  memory = "2048"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE"
