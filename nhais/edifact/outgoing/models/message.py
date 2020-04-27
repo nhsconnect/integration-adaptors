@@ -1,4 +1,5 @@
 import enum
+from datetime import datetime
 
 from edifact.outgoing.models.segment import Segment, SegmentCollection
 from edifact.validation_helpers import *
@@ -87,10 +88,10 @@ class BeginningOfMessage(Segment):
 
 class NameAndAddress(Segment):
 
-    class PartyQualifierAndCode(enum.Enum):
+    class QualifierAndCode(enum.Enum):
         FHS = ('FHS', '954')
 
-    def __init__(self, party_qualifier_and_code: PartyQualifierAndCode, party_identifier: str):
+    def __init__(self, party_qualifier_and_code: QualifierAndCode, party_identifier: str):
         (self.qualifier, self.code) = party_qualifier_and_code.value
         self.identifier = party_identifier
 
@@ -106,6 +107,32 @@ class NameAndAddress(Segment):
         required(self, 'qualifier')
         required(self, 'identifier')
         required(self, 'code')
+
+
+class DateTimePeriod(Segment):
+
+    class TypeAndFormat (enum.Enum):
+        TRANSLATION_TIMESTAMP = ('137', '203', '%Y%m%d%H%M')
+        PERIOD_END_DATE = ('206', '102', '%Y%m%d')
+
+    def __init__(self, qualifier_and_code: TypeAndFormat, timestamp: datetime):
+        (self.type_code, self.format_code, self.date_time_format) = qualifier_and_code.value
+        self.timestamp = timestamp
+
+    @property
+    def key(self):
+        return 'DTM'
+
+    @property
+    def value(self):
+        formatted_date_time = self.timestamp.strftime(self.date_time_format)
+        return f'{self.type_code}:{formatted_date_time}:{self.format_code}'
+
+    def pre_validate(self):
+        required(self, 'type_code')
+        required(self, 'format_code')
+        required(self, 'date_time_format')
+        required(self, 'timestamp')
 
 
 class MessageBeginning(SegmentCollection):

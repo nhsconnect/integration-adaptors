@@ -18,6 +18,7 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
     UNH_PATTERN = r"^UNH\+(?P<sms>[0-9]{8})\+FHSREG:0:1:FH:FHS001'$"
     BGM_PATTERN = r"^BGM\+\+\+507'$"
     NAD_MSG_HEADER_PATTERN = r"^NAD\+(?P<party_qualifier>FHS)\+(?P<party_id>[A-Z0-9]+):(?P<party_code>954)'$"
+    DTM_MSG_HEADER_PATTERN = r"^DTM\+(?P<type_code>137|206):(?P<date_time_value>[0-9]{12}|[0-9]{8}):(?P<format_code>203|102)'$"
     UNT_PATTERN = r"^UNT\+(?P<segment_count>[0-9]+)\+(?P<sms>[0-9]{8})'$"
     UNZ_PATTERN = r"^UNZ\+(?P<message_count>[0-9]+)\+(?P<sis>[0-9]{8})'$"
 
@@ -53,8 +54,15 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         unt = segments.pop()
         self.assertRegex(unt, self.UNT_PATTERN)
         unt_match = re.match(self.UNT_PATTERN, unt)
-        self.assertEqual('4', unt_match.group('segment_count'))
+        self.assertEqual('5', unt_match.group('segment_count'))
         self.assertEqual('00000001', unt_match.group('sms'))
+
+        dtm_msg_header = segments.pop()
+        self.assertRegex(dtm_msg_header, self.DTM_MSG_HEADER_PATTERN)
+        dtm_msg_header_match = re.match(self.DTM_MSG_HEADER_PATTERN, dtm_msg_header)
+        self.assertEqual('137', dtm_msg_header_match.group('type_code'))
+        # TODO: timestamp
+        self.assertEquals('203', dtm_msg_header_match.group('format_code'))
 
         nad_msg_header = segments.pop()
         self.assertRegex(nad_msg_header, self.NAD_MSG_HEADER_PATTERN)
