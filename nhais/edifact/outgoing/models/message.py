@@ -135,6 +135,35 @@ class DateTimePeriod(Segment):
         required(self, 'timestamp')
 
 
+class Reference(Segment):
+
+    class TransactionType(enum.Enum):
+        ACCEPTANCE = 'G1'
+        AMENDMENT = 'G2'
+        REMOVAL = 'G3'
+        DEDUCTION = 'G5'
+
+    def __init__(self, reference_number: (TransactionType, str)):
+        if isinstance(reference_number, self.TransactionType):
+            self.qualifier = '950'
+            self.reference_number = reference_number.value
+        else:
+            self.qualifier = 'TN'
+            self.reference_number = reference_number
+
+    @property
+    def key(self):
+        return 'RFF'
+
+    @property
+    def value(self):
+        return f'{self.qualifier}:{self.reference_number}'
+
+    def pre_validate(self):
+        required(self, 'type_code')
+        required(self, 'format_code')
+
+
 class MessageBeginning(SegmentCollection):
     """
     A collection of segments that represent the start of a message

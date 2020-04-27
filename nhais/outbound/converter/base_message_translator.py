@@ -33,5 +33,12 @@ class BaseMessageTranslator:
         self.segments.append(DateTimePeriod(DateTimePeriod.TypeAndFormat.TRANSLATION_TIMESTAMP, datetime.utcnow()))
 
     @abc.abstractmethod
+    def __append_transaction_type(self):
+        """
+        Appends an RFF+950 segment (Reference) for the type of message represented by this class
+        """
+        pass
+
+    @abc.abstractmethod
     def _translate_body(self, patient: Patient):
         pass
