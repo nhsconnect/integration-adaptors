@@ -311,4 +311,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         return interaction_details
 
     def _replace_uuid_placeholder(self, text: str, new_uuid: str):
+        mdc.message_id.set(new_uuid)
+        logger.info('Replaceing UUID placeholder with auto-generated UUID: {new_uuid}',
+                     fparams={'new_uuid': new_uuid})
         return text.replace(UUID_PLACEHOLDER, new_uuid)
