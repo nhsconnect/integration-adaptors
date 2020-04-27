@@ -53,20 +53,27 @@ class TestFhirResource(unittest.TestCase):
             self.assertEqual('identifier.0', e.errors[0].path)
             self.assertEqual('value', e.errors[0].errors[0].path)
             # error message deep in tree and very specific to python classes and types
-            path, message = self._parse_fhir_error(e)
+            errors = self._parse_fhir_errors(e)
             self.assertEquals(expected, e.errors[0].errors[0].errors[0].args[0])
 
-    def _parse_fhir_error(self, e, path=''):
-        if isinstance(e, FHIRValidationError):
-            if e.path:
+    def _parse_fhir_errors(self, e):
+
+        errors = []
+
+        def recurse(e, path):
+            if hasattr(e, 'path') and e.path:
                 if path:
                     path = f'{path}.{e.path}'
                 else:
                     path = e.path
-            if e.errors:
-                # TODO: could be multiple errors
-                return self._parse_fhir_error(e.errors[0], path)
-        return path, e.args[0]
+            if hasattr(e, 'errors') and e.errors:
+                for child_error in e.errors:
+                    recurse(child_error, path)
+            else:
+                errors.append((path, e.args[0]))
+
+        recurse(e, '')
+        return errors
 
 
     def test_unknown_property(self):
