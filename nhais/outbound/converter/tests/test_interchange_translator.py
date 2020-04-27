@@ -17,6 +17,7 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
     UNB_PATTERN = r"^UNB\+UNOA:2\+(?P<sender>[a-zA-Z0-9]+)\+(?P<recipient>[a-zA-Z0-9]+)+\+(?P<timestamp>[0-9]{6}:[0-9]{4})\+(?P<sis>[0-9]{8})'$"
     UNH_PATTERN = r"^UNH\+(?P<sms>[0-9]{8})\+FHSREG:0:1:FH:FHS001'$"
     BGM_PATTERN = r"^BGM\+\+\+507'$"
+    NAD_MSG_HEADER_PATTERN = r"^NAD\+(?P<party_qualifier>FHS)\+(?P<party_id>[A-Z0-9]+):(?P<party_code>954)'$"
     UNT_PATTERN = r"^UNT\+(?P<segment_count>[0-9]+)\+(?P<sms>[0-9]{8})'$"
     UNZ_PATTERN = r"^UNZ\+(?P<message_count>[0-9]+)\+(?P<sis>[0-9]{8})'$"
 
@@ -52,8 +53,15 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         unt = segments.pop()
         self.assertRegex(unt, self.UNT_PATTERN)
         unt_match = re.match(self.UNT_PATTERN, unt)
-        self.assertEqual('3', unt_match.group('segment_count'))
+        self.assertEqual('4', unt_match.group('segment_count'))
         self.assertEqual('00000001', unt_match.group('sms'))
+
+        nad_msg_header = segments.pop()
+        self.assertRegex(nad_msg_header, self.NAD_MSG_HEADER_PATTERN)
+        nad_msg_header_match = re.match(self.NAD_MSG_HEADER_PATTERN, nad_msg_header)
+        self.assertEquals('FHS', nad_msg_header_match.group('party_qualifier'))
+        self.assertEquals('HA456', nad_msg_header_match.group('party_id'))
+        self.assertEquals('954', nad_msg_header_match.group('party_code'))
 
         bgm = segments.pop()
         self.assertRegex(bgm, self.BGM_PATTERN)

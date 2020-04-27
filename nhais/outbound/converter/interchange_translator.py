@@ -5,6 +5,7 @@ from fhir.resources.practitioner import Practitioner
 from edifact.outgoing.models.interchange import InterchangeHeader, InterchangeTrailer
 from edifact.outgoing.models.message import Messages, MessageHeader, MessageTrailer
 from outbound.converter.base_message_translator import BaseMessageTranslator
+from outbound.converter.fhir_helpers import get_ha_identifier
 from sequence.interchange import InterchangeIdGenerator
 from sequence.message import MessageIdGenerator
 from sequence.transaction import TransactionIdGenerator
@@ -46,9 +47,7 @@ class FhirToEdifactTranslator(object):
         gp = patient.generalPractitioner[0]  # type: Practitioner
         gp_identifier = gp.identifier[0]  # type: Identifier
         sender = gp_identifier.value
-        ha = patient.managingOrganization[0]  # type: Organization
-        ha_identifier = ha.identifier[0]  # type: Identifier
-        recipient = ha_identifier.value
+        recipient = get_ha_identifier(patient)
         return InterchangeHeader(sender=sender, recipient=recipient, date_time=datetime.utcnow())
 
     def __interchange_trailer(self) -> InterchangeTrailer:

@@ -1,3 +1,5 @@
+import enum
+
 from edifact.outgoing.models.segment import Segment, SegmentCollection
 from edifact.validation_helpers import *
 
@@ -81,6 +83,29 @@ class BeginningOfMessage(Segment):
 
     def pre_validate(self):
         pass
+
+
+class NameAndAddress(Segment):
+
+    class PartyQualifierAndCode(enum.Enum):
+        FHS = ('FHS', '954')
+
+    def __init__(self, party_qualifier_and_code: PartyQualifierAndCode, party_identifier: str):
+        (self.qualifier, self.code) = party_qualifier_and_code.value
+        self.identifier = party_identifier
+
+    @property
+    def key(self):
+        return 'NAD'
+
+    @property
+    def value(self):
+        return f'{self.qualifier}+{self.identifier}:{self.code}'
+
+    def pre_validate(self):
+        required(self, 'qualifier')
+        required(self, 'identifier')
+        required(self, 'code')
 
 
 class MessageBeginning(SegmentCollection):
