@@ -2,15 +2,13 @@ import re
 import unittest
 from datetime import datetime, timezone
 from unittest import mock
+from unittest.mock import MagicMock
 
-from fhir.resources.identifier import Identifier
-from fhir.resources.organization import Organization
-from fhir.resources.patient import Patient
-from fhir.resources.practitioner import Practitioner
-
+import sequence.transaction_id
 from outbound.converter.interchange_translator import InterchangeTranslator
+from outbound.tests.fhir_test_helpers import create_patient
 from utilities.date_utilities import DateUtilities
-from utilities.test_utilities import async_test
+from utilities.test_utilities import async_test, awaitable
 
 
 class TestFhirToEdifactTranslator(unittest.TestCase):
@@ -25,25 +23,15 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
     UNT_PATTERN = r"^UNT\+(?P<segment_count>[0-9]+)\+(?P<sms>[0-9]{8})'$"
     UNZ_PATTERN = r"^UNZ\+(?P<message_count>[0-9]+)\+(?P<sis>[0-9]{8})'$"
 
-    # TODO: mock sequence generators
+    @mock.patch.object(sequence.transaction_id.TransactionIdGenerator, 'generate_transaction_id')
     @mock.patch('utilities.date_utilities.DateUtilities.utcnow')
     @async_test
-    async def test_message_translated(self, mock_utcnow):
+    async def test_message_translated(self, mock_utcnow, mock_generate_transaction_id):
         expected_date = datetime(year=2020, month=4, day=27, hour=17, minute=37, tzinfo=timezone.utc)
         mock_utcnow.return_value = expected_date
+        mock_generate_transaction_id.return_value = awaitable(5174)
         self.assertEqual(expected_date, DateUtilities.utcnow())
-
-        patient = Patient()
-        gp = Practitioner()
-        gp_id = Identifier()
-        gp_id.value = 'GP123'
-        gp.identifier = [gp_id]
-        patient.generalPractitioner = [gp]
-        ha = Organization()
-        ha_id = Identifier()
-        ha_id.value = 'HA456'
-        ha.identifier = [ha_id]
-        patient.managingOrganization = [ha]
+        patient = create_patient()
 
         translator = InterchangeTranslator()
         edifact = await translator.convert(patient)
@@ -68,7 +56,7 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         rff_tn = segments.pop()
         self.assertRegex(rff_tn, self.RFF_TN_PATTERN)
         rff_tn_match = re.match(self.RFF_TN_PATTERN, rff_tn)
-        self.assertEqual('1', rff_tn_match.group('transaction_number'))
+        self.assertEqual('5174', rff_tn_match.group('transaction_number'))
 
         s01 = segments.pop()
         self.assertRegex(s01, self.S01_PATTERN)

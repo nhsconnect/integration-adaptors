@@ -11,6 +11,7 @@ from fhir.resources.patient import Patient
 from fhir.resources.practitioner import Practitioner
 
 from comms.blocking_queue_adaptor import BlockingQueueAdaptor
+from outbound.tests.fhir_test_helpers import create_patient
 from outbound.tests.outbound_request_builder import OutboundRequestBuilder
 from utilities import config
 
@@ -29,45 +30,15 @@ class NhaisIntegrationTests(unittest.TestCase):
                                                  queue_name='mesh_outbound')
         self.mq_wrapper.drain()
 
-# {
-#     "id": "254406A3",
-#     "type": "Organization",
-#     "reference": "https://directory.spineservices.nhs.uk/STU3/Organization/Y12345",
-#     "identifier": {
-#         "system": "https://digital.nhs.uk/services/organisation-data-service",
-#         "value": "Y12345",
-#         "period": {
-#             "start": "2020-01-01",
-#             "end": "2021-12-31"
-#         }
-#     }
-# }
 
-    @staticmethod
-    def create_org_ref(id):
-        ref = FHIRReference()
-        # ref.id = id
-        ref.type = "Organisation"
-        identifier = Identifier()
-        identifier.value = id
-        ref.identifier = identifier
-        return ref
-
-
-    @staticmethod
-    def create_patient() -> Patient:
-        patient = Patient()
-        patient.id = '123'
-        patient.generalPractitioner = [NhaisIntegrationTests.create_org_ref('GP123')]
-        patient.managingOrganization = NhaisIntegrationTests.create_org_ref('HA456')
-        return patient
 
     def test_acceptance_transaction(self):
-        patient = self.create_patient()
+        patient = create_patient()
         response = OutboundRequestBuilder()\
             .with_headers()\
             .with_acceptance_patient(patient)\
             .execute_post_expecting_success()
+        # TODO: assert response
         message = self.mq_wrapper.get_next_message_on_queue()
         self.assertIsNotNone(message, 'message from queue should exist')
         self.assertTrue(len(message.body) > 0, 'message from queue should not be empty')
