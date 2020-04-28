@@ -54,7 +54,22 @@ echo "Starting the image"
 ./integration-tests/setup_component_test_env.sh
 . ./component-test-source.sh # Load the deafult env variables from the test set
 . /var/variables_source.sh   # Override with ones supplied by TF
-BUILD_TAG=${BUILD_TAG} docker-compose -f docker-compose.ec2.override.yml up -d fakespine
+# BUILD_TAG=${BUILD_TAG} docker-compose -f docker-compose.ec2.override.yml up -d fakespine
+docker run \
+ -e INBOUND_SERVER_BASE_URL \
+ -e FAKE_SPINE_OUTBOUND_DELAY_MS \
+ -e FAKE_SPINE_INBOUND_DELAY_MS \
+ -e FAKE_SPINE_OUTBOUND_SSL_ENABLED \
+ -e FAKE_SPINE_PORT \
+ -e FAKE_SPINE_PROXY_VALIDATE_CERT \
+ -e FAKE_SPINE_PRIVATE_KEY \
+ -e FAKE_SPINE_CERTIFICATE \
+ -e FAKE_SPINE_CA_STORE \
+ -e MHS_SECRET_PARTY_KEY \
+ -e MHS_LOG_LEVEL \
+ --log-driver=awslogs --log-opt awslogs-region=eu-west-2 --log-opt awslogs-group=/aws/ec2/fake-spine-ec2-instance --log-opt awslogs-create-group=true \
+ -d -p 80:80 443:443 \
+ local/fake-spine:${BUILD_TAG}
 
 echo "Sleep 20s"
 sleep 20s
