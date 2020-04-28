@@ -3,58 +3,30 @@ from json import JSONDecodeError
 from typing import Any
 
 import tornado.web
-from fhir.resources.codeableconcept import CodeableConcept
 from fhir.resources.operationoutcome import OperationOutcome
-from fhir.resources.operationoutcome import OperationOutcomeIssue
 from tornado import httputil
-from utilities import integration_adaptors_logger as log, timing
-from utilities import message_utilities
 
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.converter.fhir_to_edifact import FhirToEdifact
+from outbound.request.fhir_error_helpers import create_operation_outcome_from_validation_exception, \
+    OperationOutcomeIssueCode, create_operation_outcome
 from outbound.schema import validate_request
 from outbound.schema.request_validation_exception import RequestValidationException
+from utilities import integration_adaptors_logger as log, timing
+from utilities import message_utilities
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 
 class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
 
+    JSON_DECODE_ERROR_MESSAGE = "Request body is not parsable as JSON"
+    URI_MISMATCH_ERROR = 'Identifier in URI does not match identifier in request body'
+
     def __init__(self, application, request: httputil.HTTPServerRequest, **kwargs: Any):
         super().__init__(application, request, **kwargs)
         self.fhir_to_edifact = FhirToEdifact()
         self.mesh_wrapper = MeshOutboundWrapper()
-
-    def __set_unsuccesful_response(self, status, code, path, message):
-        operation_outcome = self.__build_operation_outcome(code, path, message)
-        self.set_status(status)
-        self.finish(operation_outcome.as_json())
-
-    def __build_operation_outcome(self, code, path, message):
-        details = CodeableConcept()
-        details.text = message
-
-        operation_outcome_issue = OperationOutcomeIssue()
-        operation_outcome_issue.severity = 'exception'
-        operation_outcome_issue.code = code
-        operation_outcome_issue.details = details
-        operation_outcome_issue.expression = path
-
-        operation_outcome = OperationOutcome()
-        operation_outcome.id = "validationfail"
-        operation_outcome.issue = [operation_outcome_issue]
-
-        return operation_outcome
-
-    def __extract_request_validation_path_and_message(self, errors):
-        path_list = []
-        message_list_string = ''
-
-        for path, message in errors:
-            path_list.append(path)
-            message_list_string += f'{message} \n '
-
-        return path_list, message_list_string
 
     @timing.time_request
     async def post(self, patient_id):
@@ -69,20 +41,22 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
                 self.set_header("OperationId", unique_operation_id)
                 await self.finish()
             else:
-                logger.exception('Exception, id doesnt match')
-                self.__set_unsuccesful_response(400, "value", ["id"],
-                                                f"URI id `{patient_id}` does not match PAYLOAD id `{patient.id}`")
+                logger.error(self.URI_MISMATCH_ERROR)
+                operation_outcome = create_operation_outcome(OperationOutcomeIssueCode.URI, 'id', self.URI_MISMATCH_ERROR)
+                self.__set_unsuccessful_response(400, operation_outcome)
+
         except RequestValidationException as e:
-            details = self.__extract_request_validation_path_and_message(e.errors)
-            logger.exception(f'Exception: {details}')
-            self.__set_unsuccesful_response(400, "value", details[0], details[1])
+            logger.exception(f'Error occurred when parsing the FHIR Patient payload')
+            operation_outcome = create_operation_outcome_from_validation_exception(e)
+            self.__set_unsuccessful_response(400, operation_outcome)
         except JSONDecodeError as e:
-            logger.exception('Exception: Payload is missing, empty or not a valid json')
-            self.__set_unsuccesful_response(400, "value", ["PAYLOAD"],
-                                            "Payload is either missing, empty or not valid to json, this is required.")
-        except Exception as e:
-            logger.exception(f'Exception: {e}')
-            self.set_status(500)
+            logger.exception(self.JSON_DECODE_ERROR_MESSAGE)
+            operation_outcome = create_operation_outcome(OperationOutcomeIssueCode.STRUCTURE, '', self.JSON_DECODE_ERROR_MESSAGE)
+            self.__set_unsuccessful_response(400, operation_outcome)
+
+    def __set_unsuccessful_response(self, status: int, operation_outcome: OperationOutcome):
+        self.set_status(status)
+        self.finish(operation_outcome.as_json())
 
     @timing.time_request
     async def patch(self, patient_id):

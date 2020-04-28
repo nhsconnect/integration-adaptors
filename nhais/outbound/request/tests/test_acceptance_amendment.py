@@ -4,15 +4,15 @@ from unittest.mock import patch, MagicMock
 
 import tornado.testing
 from fhir.resources.fhirelementfactory import FHIRElementFactory
+from fhir.resources.operationoutcome import OperationOutcomeIssue
 from fhir.resources.patient import Patient
 from tornado.web import Application
 
-from outbound.schema import validate_request
-from utilities import message_utilities
-
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.request.acceptance_amendment import AcceptanceAmendmentRequestHandler
+from outbound.schema import validate_request
 from outbound.schema.request_validation_exception import RequestValidationException, ValidationError
+from utilities import message_utilities
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -71,10 +71,9 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
 
-        self.assertEqual('exception', operation_outcome.issue[0].severity)
+        self.assertEqual('error', operation_outcome.issue[0].severity)
         self.assertEqual('id', operation_outcome.issue[0].expression[0])
-        self.assertEqual('URI id `2384763847264` does not match PAYLOAD id `9000000009`', operation_outcome.issue[0].details.text)
-        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
+        self.assertEqual('Identifier in URI does not match identifier in request body', operation_outcome.issue[0].details.text)
         self.assertEqual(400, response.code)
 
     @patch.object(MeshOutboundWrapper, "send")
@@ -87,10 +86,9 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
 
-        self.assertEqual('exception', operation_outcome.issue[0].severity)
-        self.assertEqual('PAYLOAD', operation_outcome.issue[0].expression[0])
-        self.assertEqual('Payload is either missing, empty or not valid to json, this is required.', operation_outcome.issue[0].details.text)
-        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('', operation_outcome.issue[0].expression[0])
+        self.assertEqual('Request body is not parsable as JSON', operation_outcome.issue[0].details.text)
         self.assertEqual(400, response.code)
 
     @patch.object(MeshOutboundWrapper, "send")
@@ -103,15 +101,14 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
 
-        self.assertEqual('exception', operation_outcome.issue[0].severity)
-        self.assertEqual('PAYLOAD', operation_outcome.issue[0].expression[0])
-        self.assertEqual('Payload is either missing, empty or not valid to json, this is required.', operation_outcome.issue[0].details.text)
-        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('', operation_outcome.issue[0].expression[0])
+        self.assertEqual('Request body is not parsable as JSON', operation_outcome.issue[0].details.text)
         self.assertEqual(400, response.code)
 
     @patch('outbound.schema.validate_request.validate_patient',
-           side_effect=(RequestValidationException([ValidationError(path='id', message='Wrong type <class \'int\'> for property "id" on <class \'fhir.resources.patient.Patient\'>, expecting <class \'str\'>'), ValidationError(path='meta.versionId', message='Wrong type <class \'int\'> for property "versionId" on <class \'fhir.resources.meta.Meta\'>, expecting <class \'str\'>')]))
-           )
+           side_effect=RequestValidationException([ValidationError(path='path1', message='message1'),
+                                                   ValidationError(path='path2', message='message2')]))
     @patch.object(MeshOutboundWrapper, "send")
     @patch.object(MeshOutboundWrapper, "__init__")
     def test_two_errors_in_fhir_schema(self, mock_init, mock_send, mock_validate_patient):
@@ -124,10 +121,18 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
 
-        self.assertEqual(2, len(operation_outcome.issue[0].expression))
-        self.assertEqual('exception', operation_outcome.issue[0].severity)
         self.assertEqual('validationfail', operation_outcome.id)
-        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
+        self.assertEqual(2, len(operation_outcome.issue))
+        first = operation_outcome.issue[0]  # type: OperationOutcomeIssue
+        self.assertEqual('error', first.severity)
+        self.assertEqual('structure', first.code)
+        self.assertEqual('path1', first.expression[0])
+        self.assertEqual('message1', first.details.text)
+        second = operation_outcome.issue[1]  # type: OperationOutcomeIssue
+        self.assertEqual('error', second.severity)
+        self.assertEqual('structure', second.code)
+        self.assertEqual('path2', second.expression[0])
+        self.assertEqual('message2', second.details.text)
         self.assertEqual(400, response.code)
 
 

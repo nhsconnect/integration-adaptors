@@ -2,13 +2,13 @@ import tornado.httpclient
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+
 import utilities.integration_adaptors_logger as log
 from handlers import healthcheck_handler
-from utilities import config
-
 from outbound.request import acceptance_amendment
 from outbound.request.deduction import DeductionRequestHandler
 from outbound.request.removal import RemovalRequestHandler
+from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 

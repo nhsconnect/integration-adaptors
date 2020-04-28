@@ -26,6 +26,7 @@ multiple_invalid_patient_payload = root_dir + "/data/patient_payload_multiple_in
 with open(multiple_invalid_patient_payload) as file:
     MULTIPLE_INVALID_REQUEST_BODY = json.load(file)
 
+
 class TestValidateRequest(unittest.TestCase):
 
     def test_valid_patient_payload(self):

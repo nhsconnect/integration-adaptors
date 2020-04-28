@@ -1,7 +1,5 @@
 import utilities.config as config
-from persistence.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
 import utilities.integration_adaptors_logger as log
-from persistence.persistence_adaptor import PersistenceAdaptor
 from sequence.dynamo_sequence import DynamoSequenceGenerator
 from sequence.sequence import SequenceGenerator
 

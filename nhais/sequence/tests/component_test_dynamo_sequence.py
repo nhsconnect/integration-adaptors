@@ -1,12 +1,13 @@
 """Module to test dynamo sequence functionality."""
 
-import unittest
 import asyncio
+import unittest
 
 import aioboto3
+
 from sequence import dynamo_sequence
-from utilities import test_utilities
 from utilities import config
+from utilities import test_utilities
 
 
 class ComponentTestDynamoSequence(unittest.TestCase):
