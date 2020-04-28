@@ -1,15 +1,14 @@
-from utilities import integration_adaptors_logger as log
-
-import tornado.web
 from tornado import httpclient
 
-from fake_spine.certs import Certs
 from fake_spine import fake_spine_configuration
+from fake_spine.base_handler import BaseHandler
+from fake_spine.certs import Certs
+from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 
-class InboundProxyRequestHandler(tornado.web.RequestHandler):
+class InboundProxyRequestHandler(BaseHandler):
 
     def initialize(self, inbound_certs: Certs) -> None:
         self.inbound_certs = inbound_certs
