@@ -28,14 +28,23 @@ class TestValidateRequest(unittest.TestCase):
 
     @patch.object(FHIRElementFactory, "instantiate")
     def test_missing_id(self, mock):
-        with self.assertRaises(RequestValidationException):
+
+
+        with self.assertRaises(RequestValidationException) as ex:
             validate_patient({'test': 'test'})
+
+        # TODO: Does the exception have the message and path that is expected? It is likely that the error or errors
+        #  are not actually related to id since the payload is not a Patient at all. Use the patient_missing_id.json
+        #  here instead
+        ex.exception
 
     @patch("outbound.schema.validate_request._parse_fhir_errors")
     @patch('fhir.resources.fhirelementfactory.FHIRElementFactory.instantiate',
            side_effect=FHIRValidationError('error'))
-    def test_invalid_schema(self, mock, mock2):
+    def test_invalid_id(self, mock, mock2):
+        # TODO: Its not clear what this is testing and protected members should not be mocked. Remove?
         type(mock2).return_value = PropertyMock(return_value=[('id', 'error message')])
         with self.assertRaises(RequestValidationException):
             validate_patient({"test": "test"})
 
+    # TODO: test validation of a payload containing multiple validation errors

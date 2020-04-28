@@ -36,12 +36,19 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         coding.system = 'https://www.hl7.org/fhir/patient.html'
 
         details = CodeableConcept()
-        details.coding = [coding]
+        details.coding = [coding]  # don't need coding
+        details.text  # message goes here
 
+        # TODO: now that RequestValidationException has a list of errors we need to map that to a list of issues
+        #  OperationOutcomeIssue has a location property that should be used for the path (JSONPath) of the error
+        #  details is a CodeableConcept object. The error message should be the text property of the CodeableConcept
+        #  http://www.hl7.org/fhir/operationoutcome-example-validationfail.json.html - don't do the 'text' bit this is for interactive web apps
+        #  http://www.hl7.org/fhir/operationoutcome.html
         operation_outcome_issue = OperationOutcomeIssue()
         operation_outcome_issue.severity = 'error'
         operation_outcome_issue.code = code
         operation_outcome_issue.details = details
+        operation_outcome_issue.expression  # path goes here
 
         operation_outcome = OperationOutcome()
         operation_outcome.issue = [operation_outcome_issue]
@@ -62,7 +69,7 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
                 await self.finish()
             else:
                 self.__set_unsuccesful_response(400, "value", "ID_IN_URI_DOES_NOT_MATCH_PAYLOAD_ID",
-                                                f"URI id `{patient_id}` does not match PAYLOAD id `{request_body['id']}`")
+                                                f"URI id `{patient_id}` does not match PAYLOAD id `{patient.id}`")
                 logger.error('Error, id doesnt match')
         except RequestValidationException as e:
             details = f"{e.path} {e.message}"
