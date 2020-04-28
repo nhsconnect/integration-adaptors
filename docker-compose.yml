@@ -12,7 +12,8 @@ services:
       - MHS_SECRET_CLIENT_CERT
       - MHS_SECRET_CLIENT_KEY
       - MHS_SECRET_CA_CERTS
-      - MHS_INBOUND_QUEUE_URL=rabbitmq:5672/inbound
+      - MHS_INBOUND_QUEUE_BROKERS=amqp://rabbitmq:5672
+      - MHS_INBOUND_QUEUE_NAME=inbound
       - MHS_SECRET_INBOUND_QUEUE_USERNAME=guest
       - MHS_SECRET_INBOUND_QUEUE_PASSWORD=guest
       - MHS_STATE_TABLE_NAME=mhs_state
@@ -45,6 +46,8 @@ services:
       - MHS_SPINE_REQUEST_MAX_SIZE=4999600 # 5 000 000 - 400
       # Note that this endpoint URL is Opentest-specific
       - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable
+      # This is for disabling hostname validation so OpenTest ip address will work
+      - MHS_OUTBOUND_VALIDATE_CERTIFICATE=${MHS_OUTBOUND_VALIDATE_CERTIFICATE:-True}
   route:
     image: local/mhs-route:${BUILD_TAG}
     # build:
@@ -60,11 +63,11 @@ services:
       - MHS_SDS_REDIS_CACHE_HOST=redis
       - MHS_SDS_REDIS_DISABLE_TLS=True
   dynamodb:
-    image: nhsdev/nia-dynamodb-local:1.0.1
+    image: nhsdev/nia-dynamodb-local:1.0.2
     ports:
       - "8000:8000"
   rabbitmq:
-    build: ./common/local-env/rabbit/
+    image: nhsdev/nia-rabbitmq-local:1.0.1
     ports:
       - "15672:15672"
       - "5672:5672"

@@ -53,7 +53,8 @@ terraform apply \
     -var mhs_state_table_write_capacity=<dynamodb_state_table_write_capacity> \
     -var mhs_sync_async_table_read_capacity=<dynamodb_sync_async_table_read_capacity> \
     -var mhs_sync_async_table_write_capacity=<dynamodb_sync_async_table_read_capacity> \
-    -var inbound_queue_host="<inbound_queue_url>" \
+    -var inbound_queue_brokers="<inbound_queue_brokers>" \
+    -var inbound_queue_name="<inbound_queue_name>" \
     -var inbound_queue_username_arn=<inbound_queue_username_secrets_manager_arn> \
     -var inbound_queue_password_arn=<inbound_queue_password_secrets_manager_arn> \
     -var party_key_arn=<party_key_secrets_manager_arn> \
@@ -84,7 +85,8 @@ terraform destroy \
     -var mhs_state_table_write_capacity=<dynamodb_state_table_write_capacity> \
     -var mhs_sync_async_table_read_capacity=<dynamodb_sync_async_table_read_capacity> \
     -var mhs_sync_async_table_write_capacity=<dynamodb_sync_async_table_read_capacity> \
-    -var inbound_queue_host="<inbound_queue_url>" \
+    -var inbound_queue_brokers="<inbound_queue_brokers>" \
+    -var inbound_queue_name="<inbound_queue_name>" \
     -var inbound_queue_username_arn=<inbound_queue_username_secrets_manager_arn> \
     -var inbound_queue_password_arn=<inbound_queue_password_secrets_manager_arn> \
     -var party_key_arn=<party_key_secrets_manager_arn> \

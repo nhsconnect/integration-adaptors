@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c6e86e172f74d5b7fd8060d83a4409e28eced09166e5f014c453586a721baa3f"
+            "sha256": "ceef9cb7905426456b5bd20f8813ebb5ce92160b2b824dac29481e49a9b09bf4"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -100,13 +100,6 @@
                 "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"
             ],
             "version": "==0.15.2"
-        },
-        "fhir-resources": {
-            "hashes": [
-                "sha256:f462e7299bdac3c69aad56c6a20810d8aae00f09e64e2663eaca91ce24e8b82b"
-            ],
-            "index": "pypi",
-            "version": "==5.1.0"
         },
         "idna": {
             "hashes": [

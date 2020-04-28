@@ -154,9 +154,14 @@ variable "mhs_spine_org_code" {
   description = "The organisation code for the Spine instance that your MHS is communicating with."
 }
 
-variable "inbound_queue_host" {
+variable "inbound_queue_brokers" {
   type = string
-  description = "URL of the Amazon MQ AMQP inbound queue to connect to."
+  description = "URL(s) of the Amazon MQ AMQP inbound queues to connect to."
+}
+
+variable "inbound_queue_name" {
+  type = string
+  description = "Name of the inbound queue"
 }
 
 variable "inbound_queue_username_arn" {

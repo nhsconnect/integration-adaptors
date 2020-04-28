@@ -1,10 +1,12 @@
 """Module for testing the Proton queue adaptor functionality."""
 import unittest.mock
+from unittest import mock
 
 import proton
 
 import comms.proton_queue_adaptor
 import utilities.test_utilities
+from exceptions import MaxRetriesExceeded
 
 TEST_UUID = "TEST UUID"
 TEST_MESSAGE = {'test': 'message'}
@@ -12,7 +14,9 @@ TEST_MESSAGE = {'test': 'message'}
 TEST_MESSAGE_SERIALISED = '{"test": "message"}'
 TEST_PROPERTIES = {'test-property-name': 'test-property-value'}
 TEST_PROTON_MESSAGE = unittest.mock.Mock()
-TEST_QUEUE_HOST = "TEST QUEUE HOST"
+TEST_QUEUE_SINGLE_URL = ["URL"]
+TEST_QUEUE_MULTIPLE_URLS = ["URL_1", "URL_2"]
+TEST_QUEUE_NAME = "TEST QUEUE NAME"
 TEST_QUEUE_USERNAME = "TEST QUEUE USERNAME"
 TEST_QUEUE_PASSWORD = "TEST QUEUE PASSWORD"
 TEST_EXCEPTION = Exception()
@@ -28,8 +32,24 @@ class TestProtonQueueAdaptor(unittest.TestCase):
         patcher = unittest.mock.patch.object(comms.proton_queue_adaptor.proton.reactor, "Container")
         self.mock_container = patcher.start()
         self.addCleanup(patcher.stop)
-        self.service = comms.proton_queue_adaptor.ProtonQueueAdaptor(host=TEST_QUEUE_HOST, username=TEST_QUEUE_USERNAME,
-                                                                     password=TEST_QUEUE_PASSWORD)
+        self.service = comms.proton_queue_adaptor.ProtonQueueAdaptor(
+            urls=TEST_QUEUE_SINGLE_URL, queue=TEST_QUEUE_NAME, username=TEST_QUEUE_USERNAME, password=TEST_QUEUE_PASSWORD)
+
+    def test_value_error_is_raised_when_broker_urls_are_invalid(self) -> None:
+        test_data = [
+            {"queue": TEST_QUEUE_NAME, "urls": None},
+            {"queue": TEST_QUEUE_NAME, "urls": ""},
+            {"queue": TEST_QUEUE_NAME, "urls": " "},
+            {"urls": TEST_QUEUE_SINGLE_URL, "queue": None},
+            {"urls": TEST_QUEUE_SINGLE_URL, "queue": ""},
+            {"urls": TEST_QUEUE_SINGLE_URL, "queue": " "}
+        ]
+
+        for data in test_data:
+            self.assertRaises(
+                ValueError,
+                comms.proton_queue_adaptor.ProtonQueueAdaptor,
+                **data, username=None, password=None)
 
     # TESTING SEND ASYNC METHOD
 
@@ -56,7 +76,8 @@ class TestProtonQueueAdaptor(unittest.TestCase):
     def assert_proton_called_correctly(self, properties=None):
         self.assertTrue(self.mock_container.return_value.run.called)
         proton_messaging_handler = self.mock_container.call_args[0][0]
-        self.assertEqual(TEST_QUEUE_HOST, proton_messaging_handler._host)
+        self.assertEqual(TEST_QUEUE_SINGLE_URL[0], proton_messaging_handler._url)
+        self.assertEqual(TEST_QUEUE_NAME, proton_messaging_handler._queue)
         self.assertEqual(TEST_QUEUE_USERNAME, proton_messaging_handler._username)
         self.assertEqual(TEST_QUEUE_PASSWORD, proton_messaging_handler._password)
         self.assertEqual(TEST_MESSAGE_SERIALISED, proton_messaging_handler._message.body)
@@ -64,24 +85,128 @@ class TestProtonQueueAdaptor(unittest.TestCase):
         self.assertEqual(properties, proton_messaging_handler._message.properties)
 
 
+@unittest.mock.patch('utilities.message_utilities.get_uuid', new=lambda: TEST_UUID)
+class TestProtonQueueAdaptorRetries(unittest.TestCase):
+    """Class to contain tests for the ProtonQueueAdaptor retry functionality."""
+
+    def setUp(self) -> None:
+        """Prepare standard mocks and service for unit testing."""
+        patcher = unittest.mock.patch.object(comms.proton_queue_adaptor.proton.reactor, "Container")
+        self.mock_container = patcher.start()
+        self.addCleanup(patcher.stop)
+        self.service = comms.proton_queue_adaptor.ProtonQueueAdaptor(
+            urls=TEST_QUEUE_MULTIPLE_URLS,
+            queue=TEST_QUEUE_NAME,
+            username=TEST_QUEUE_USERNAME,
+            password=TEST_QUEUE_PASSWORD,
+            max_retries=1,
+            retry_delay=0)
+
+    # TESTING SEND ASYNC METHOD
+
+    @utilities.test_utilities.async_test
+    async def test_send_async_when_first_url_succeeds(self):
+        """Test happy path of send_async."""
+        awaitable = self.service.send_async(TEST_MESSAGE)
+        self.assertFalse(self.mock_container.return_value.run.called)
+
+        self.mock_container.return_value.run.side_effect = [
+            None,
+            comms.proton_queue_adaptor.EarlyDisconnectError()
+        ]
+
+        await awaitable
+
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[0], call_index=0, call_count=1)
+
+    @utilities.test_utilities.async_test
+    async def test_send_async_when_first_url_fails(self):
+        """Test happy path of send_async."""
+        awaitable = self.service.send_async(TEST_MESSAGE)
+        self.assertFalse(self.mock_container.return_value.run.called)
+
+        self.mock_container.return_value.run.side_effect = [
+            comms.proton_queue_adaptor.EarlyDisconnectError(),
+            None
+        ]
+
+        await awaitable
+
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[0], call_index=0, call_count=2)
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[1], call_index=1, call_count=2)
+
+    @utilities.test_utilities.async_test
+    async def test_send_async_when_second_both_urls_fail_once(self):
+        """Test happy path of send_async."""
+        awaitable = self.service.send_async(TEST_MESSAGE)
+        self.assertFalse(self.mock_container.return_value.run.called)
+
+        side_effects = [
+            comms.proton_queue_adaptor.EarlyDisconnectError(),
+            comms.proton_queue_adaptor.EarlyDisconnectError(),
+            None
+        ]
+        self.mock_container.return_value.run.side_effect = side_effects
+
+        await awaitable
+
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[0], call_index=0, call_count=len(side_effects))
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[1], call_index=1, call_count=len(side_effects))
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[0], call_index=2, call_count=len(side_effects))
+
+    @utilities.test_utilities.async_test
+    async def test_send_async_when_second_both_urls_fail_twice(self):
+        """Test happy path of send_async."""
+        awaitable = self.service.send_async(TEST_MESSAGE)
+        self.assertFalse(self.mock_container.return_value.run.called)
+
+        self.mock_container.return_value.run.side_effect = [comms.proton_queue_adaptor.EarlyDisconnectError() for _ in range(4)]
+
+        with self.assertRaises(comms.proton_queue_adaptor.MessageSendingError):
+            await awaitable
+
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[0], call_index=0, call_count=4)
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[1], call_index=1, call_count=4)
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[0], call_index=2, call_count=4)
+        self.assert_proton_called_correctly(TEST_QUEUE_MULTIPLE_URLS[1], call_index=3, call_count=4)
+
+    def assert_proton_called_correctly(self, url, call_index, call_count):
+        self.assertTrue(self.mock_container.return_value.run.called)
+        self.assertEqual(self.mock_container.return_value.run.call_count, call_count)
+        url_index = TEST_QUEUE_MULTIPLE_URLS.index(url)
+        proton_messaging_handler = self.mock_container.call_args_list[call_index][0][0]
+        self.assertEqual(TEST_QUEUE_MULTIPLE_URLS[url_index], proton_messaging_handler._url)
+        self.assertEqual(TEST_QUEUE_NAME, proton_messaging_handler._queue)
+        self.assertEqual(TEST_QUEUE_USERNAME, proton_messaging_handler._username)
+        self.assertEqual(TEST_QUEUE_PASSWORD, proton_messaging_handler._password)
+        self.assertEqual(TEST_MESSAGE_SERIALISED, proton_messaging_handler._message.body)
+        self.assertEqual(TEST_UUID, proton_messaging_handler._message.id)
+
+
 class TestProtonMessagingHandler(unittest.TestCase):
     """Class to contain tests for the ProtonMessagingHandler functionality."""
 
     def setUp(self) -> None:
         """Prepare service for testing."""
-        self.handler = comms.proton_queue_adaptor.ProtonMessagingHandler(TEST_QUEUE_HOST, TEST_QUEUE_USERNAME,
-                                                                         TEST_QUEUE_PASSWORD, TEST_PROTON_MESSAGE)
+        self.handler = comms.proton_queue_adaptor.ProtonMessagingHandler(
+            TEST_QUEUE_SINGLE_URL[0], TEST_QUEUE_NAME, TEST_QUEUE_USERNAME, TEST_QUEUE_PASSWORD, TEST_PROTON_MESSAGE)
 
     # TESTING STARTUP METHOD
     def test_on_start_success(self):
         """Test happy path of on_start."""
         mock_event = unittest.mock.MagicMock()
 
+        conn_mock = unittest.mock.MagicMock()
+        mock_event.container.connect.return_value = conn_mock
+
         self.handler.on_start(mock_event)
 
-        mock_event.container.create_sender.assert_called_once_with(proton.Url(TEST_QUEUE_HOST,
-                                                                              username=TEST_QUEUE_USERNAME,
-                                                                              password=TEST_QUEUE_PASSWORD))
+        mock_event.container.connect.assert_called_once_with(
+            url=TEST_QUEUE_SINGLE_URL[0],
+            user=TEST_QUEUE_USERNAME,
+            password=TEST_QUEUE_PASSWORD,
+            reconnect=False)
+        mock_event.container.create_sender.assert_called_once_with(conn_mock, target=TEST_QUEUE_NAME)
 
     def test_on_start_error(self):
         """Test error condition when creating a message sender."""

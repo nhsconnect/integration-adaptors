@@ -64,7 +64,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
         self.assertions.hl7_xml_contains_response_code_and_patient_id(hl7_xml_message_assertor)
         self.assertions.message_status_recorded_as_successfully_processed(state_table_assertor, message_id)
 
-    def test_should_return_successful_response_and_record_spline_reply_in_resync_table_if_sync_async_requested(self):
+    def test_should_return_successful_response_and_record_spine_reply_in_resync_table_if_sync_async_requested(self):
         # Arrange
         messages = [build_message('QUPC_IN160101UK05', '9689177923') for _ in range(1)]
 

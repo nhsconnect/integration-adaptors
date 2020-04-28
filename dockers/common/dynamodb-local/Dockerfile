@@ -26,7 +26,7 @@ RUN nohup bash -c "java -jar DynamoDBLocal.jar -sharedDb &" && \
         --endpoint-url http://localhost:8000 \
         --region eu-west-2 create-table \
         --table-name transaction_id_counter \
-        --attribute-definitions AttributeName=key,AttributeType=N \
+        --attribute-definitions AttributeName=key,AttributeType=S \
         --key-schema AttributeName=key,KeyType=HASH \
         --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
 

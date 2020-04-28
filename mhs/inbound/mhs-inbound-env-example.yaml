@@ -1,7 +1,10 @@
 #Common env variables for inbound
 MHS_INBOUND_HEALTHCHECK_SERVER_PORT: "8082"
 MHS_LOG_LEVEL: NOTSET
-MHS_INBOUND_QUEUE_URL: localhost:5672/inbound
+#Inbound queue url must be in form <scheme>://<hostname>{:<port>}
+#this can be a coma-separated list of multiple brokers
+MHS_INBOUND_QUEUE_BROKERS: amqp://localhost:5672
+MHS_INBOUND_QUEUE_NAME: inbound
 MHS_STATE_TABLE_NAME: mhs_state
 MHS_SYNC_ASYNC_STATE_TABLE_NAME: sync_async_state
 MHS_DYNAMODB_ENDPOINT_URL: http://localhost:8000

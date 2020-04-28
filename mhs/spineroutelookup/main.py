@@ -1,14 +1,13 @@
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-from ldap3 import Connection
 
 from handlers import healthcheck_handler
 from utilities import config, secrets
 from utilities import integration_adaptors_logger as log
 
-from lookup import cache_adaptor, redis_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, \
-    routing_reliability, sds_mock_connection_factory
+from lookup import cache_adaptor, redis_cache, sds_client, mhs_attribute_lookup, \
+    routing_reliability, sds_connection_factory
 from request import routing_handler, reliability_handler, routing_reliability_handler
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -32,45 +31,16 @@ def load_cache_implementation():
     return redis_cache.RedisCache(redis_host, redis_port, cache_expiry_time, use_tls)
 
 
-def build_real_sds_connection(sds_url: str, tls: bool = True) -> Connection:
-    """Initialise the real SDS connection object
-
-    :param sds_url: The URL to communicate with SDS on.
-    :param tls: A flag to indicate whether TLS should be enabled for the SDS connection.
-    :return:
-    """
-    logger.info('Configuring connection to SDS using {url} {tls}', fparams={"url": sds_url, "tls": tls})
-
-    if tls:
-        client_key = secrets.get_secret_config('CLIENT_KEY')
-        client_cert = secrets.get_secret_config('CLIENT_CERT')
-        ca_certs = secrets.get_secret_config('CA_CERTS')
-
-        sds_connection = sds_connection_factory.build_sds_connection_tls(ldap_address=sds_url,
-                                                                         private_key=client_key,
-                                                                         local_cert=client_cert,
-                                                                         ca_certs=ca_certs)
-    else:
-        sds_connection = sds_connection_factory.build_sds_connection(ldap_address=sds_url)
-
-    return sds_connection
-
-
-def initialise_routing(sds_url: str, search_base: str, tls: bool = True) -> routing_reliability.RoutingAndReliability:
+def initialise_routing(search_base: str) -> routing_reliability.RoutingAndReliability:
     """Initialise the routing and reliability component to be used for SDS queries.
 
-    :param sds_url: The URL to communicate with SDS on.
     :param search_base: The LDAP location to use as the base of SDS searched. e.g. ou=services,o=nhs.
-    :param tls: A flag to indicate whether TLS should be enabled for the SDS connection.
     :return:
     """
-    logger.info('Configuring connection to SDS using {url} {tls}', fparams={"url": sds_url, "tls": tls})
 
     cache = load_cache_implementation()
 
-    sds_connection = sds_mock_connection_factory.build_mock_sds_connection() \
-        if config.get_config(sds_mock_connection_factory.LDAP_MOCK_DATA_URL_CONFIG_KEY, default=None) \
-        else build_real_sds_connection(sds_url, tls)
+    sds_connection = sds_connection_factory.create_connection()
 
     client = sds_client.SDSClient(sds_connection, search_base)
     attribute_lookup = mhs_attribute_lookup.MHSAttributeLookup(client=client, cache=cache)
@@ -112,12 +82,7 @@ def main():
     secrets.setup_secret_config("MHS")
     log.configure_logging('spineroutelookup')
 
-    sds_url = config.get_config("SDS_URL")
-    disable_tls_flag = config.get_config("DISABLE_SDS_TLS", None)
-    use_tls = disable_tls_flag != "True"
-    search_base = config.get_config("SDS_SEARCH_BASE")
-
-    routing = initialise_routing(sds_url=sds_url, search_base=search_base, tls=use_tls)
+    routing = initialise_routing(search_base=config.get_config("SDS_SEARCH_BASE"))
     start_tornado_server(routing)
 
 
