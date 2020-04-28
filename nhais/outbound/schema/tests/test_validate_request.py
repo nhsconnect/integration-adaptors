@@ -1,7 +1,9 @@
 import json
 import os
 import unittest
+from unittest.mock import patch, PropertyMock
 
+from fhir.resources.fhirabstractbase import FHIRValidationError
 from fhir.resources.fhirelementfactory import FHIRElementFactory
 
 from outbound.schema.request_validation_exception import RequestValidationException
@@ -12,14 +14,6 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 valid_json_patient = root_dir + "/../../../outbound/data/patient.json"
 with open(valid_json_patient) as file:
     VALID_REQUEST_BODY = json.load(file)
-
-invalid_json_patient_id = root_dir + "/../../../outbound/data/patient_invalid_id.json"
-with open(invalid_json_patient_id) as file:
-    INVALID_ID_REQUEST_BODY = json.load(file)
-
-missing_json_patient_id = root_dir + "/../../../outbound/data/patient_missing_id.json"
-with open(missing_json_patient_id) as file:
-    MISSING_ID_REQUEST_BODY = json.load(file)
 
 
 class TestValidateRequest(unittest.TestCase):
@@ -32,10 +26,16 @@ class TestValidateRequest(unittest.TestCase):
         self.assertEqual('9000000009', patient.id)
         self.assertEqual('Patient', patient.resource_type)
 
-    def test_missing_id(self):
-        with self.assertRaises(RequestValidationException) as e:
-            validate_patient(MISSING_ID_REQUEST_BODY)
+    @patch.object(FHIRElementFactory, "instantiate")
+    def test_missing_id(self, mock):
+        with self.assertRaises(RequestValidationException):
+            validate_patient({'test': 'test'})
 
-    def test_invalid_schema(self):
-        with self.assertRaises(RequestValidationException) as e:
-            validate_patient(INVALID_ID_REQUEST_BODY)
+    @patch("outbound.schema.validate_request._parse_fhir_errors")
+    @patch('fhir.resources.fhirelementfactory.FHIRElementFactory.instantiate',
+           side_effect=FHIRValidationError('error'))
+    def test_invalid_schema(self, mock, mock2):
+        type(mock2).return_value = PropertyMock(return_value=[('id', 'error message')])
+        with self.assertRaises(RequestValidationException):
+            validate_patient({"test": "test"})
+
