@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from edifact.edifact_exception import EdifactValidationException
-from edifact.outgoing.models.segment import Segment, SegmentCollection
 from edifact.validation_helpers import *
 
 TIMESTAMP_FORMAT ='%y%m%d:%H%M'
@@ -75,24 +73,3 @@ class InterchangeTrailer(Segment):
 
     def _validate_stateful(self):
         required(self, 'sequence_number')
-
-
-class Interchange(SegmentCollection):
-    """
-    The edifact interchange that is used to interface with NHAIS
-    It is constructed using a list of Segments
-    """
-
-    def __init__(self, sender, recipient, sequence_number, date_time, messages):
-        """
-        :param sender: the sender of the interchange
-        :param recipient: the intended recipient of the interchange
-        :param date_time: the date time stamp of the interchange header
-        :param sequence_number: a unique reference of the interchange
-        :param messages: The messages of the interchange
-        """
-        int_hdr = InterchangeHeader(sender=sender, recipient=recipient, date_time=date_time,
-                                    sequence_number=sequence_number)
-        int_trl = InterchangeTrailer(number_of_messages=len(messages), sequence_number=sequence_number)
-        segments = [int_hdr, messages, int_trl]
-        super().__init__(segments)

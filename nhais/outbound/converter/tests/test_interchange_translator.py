@@ -9,7 +9,7 @@ from fhir.resources.patient import Patient
 from fhir.resources.practitioner import Practitioner
 
 from edifact.outgoing.models.message import DateTimePeriod
-from outbound.converter.interchange_translator import FhirToEdifactTranslator
+from outbound.converter.interchange_translator import InterchangeTranslator
 from utilities.date_utilities import DateUtilities
 from utilities.test_utilities import async_test
 
@@ -46,7 +46,7 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         ha.identifier = [ha_id]
         patient.managingOrganization = [ha]
 
-        translator = FhirToEdifactTranslator()
+        translator = InterchangeTranslator()
         edifact = await translator.convert(patient)
 
         self.assertIsNotNone(edifact)

@@ -14,7 +14,7 @@ from sequence.transaction import TransactionIdGenerator
 from utilities.date_utilities import DateUtilities
 
 
-class FhirToEdifactTranslator(object):
+class InterchangeTranslator(object):
 
     def __init__(self):
         self.transaction_id_generator = TransactionIdGenerator()
