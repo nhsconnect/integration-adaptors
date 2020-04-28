@@ -19,6 +19,55 @@ class ComponentTestDynamoSequence(unittest.TestCase):
         self.region_name = 'eu-west-2'
 
     @test_utilities.async_test
+    async def test_transaction_ids_increase_by_one(self):
+        async with aioboto3.resource('dynamodb', region_name=self.region_name,
+                                     endpoint_url=self.endpoint) as dynamo_resource:
+            try:
+                await self.__create_table(dynamo_resource)
+                db = dynamo_sequence.DynamoSequenceGenerator(self.table_name)
+                transaction_id_1 = await db.next(self.key)
+                transaction_id_2 = await db.next(self.key)
+                self.assertEqual(transaction_id_1 + 1, transaction_id_2)
+            except dynamo_resource.meta.client.exceptions.ResourceInUseException:
+                self.fail()
+            finally:
+                table = await dynamo_resource.Table(self.table_name)
+                await table.delete()
+
+    @test_utilities.async_test
+    async def test_first_transaction_id_should_be_one(self):
+        async with aioboto3.resource('dynamodb', region_name=self.region_name,
+                                     endpoint_url=self.endpoint) as dynamo_resource:
+            try:
+                await self.__create_table(dynamo_resource)
+                db = dynamo_sequence.DynamoSequenceGenerator(self.table_name)
+                transaction_id = await db.next(self.key)
+                self.assertEqual(transaction_id, 1)
+            except dynamo_resource.meta.client.exceptions.ResourceInUseException:
+                self.fail()
+            finally:
+                table = await dynamo_resource.Table(self.table_name)
+                await table.delete()
+
+    @test_utilities.async_test
+    async def test_after_9999999_should_be_one(self):
+        async with aioboto3.resource('dynamodb', region_name=self.region_name,
+                                     endpoint_url=self.endpoint) as dynamo_resource:
+            try:
+                await self.__create_table(dynamo_resource)
+                table = await dynamo_resource.Table(self.table_name)
+                await table.put_item(
+                    Item={'key': self.key, dynamo_sequence._COUNTER_ATTRIBUTE: 9999999}
+                )
+                db = dynamo_sequence.DynamoSequenceGenerator(self.table_name)
+                transaction_id = await db.next(self.key)
+                self.assertEqual(transaction_id, 1)
+            except dynamo_resource.meta.client.exceptions.ResourceInUseException:
+                self.fail()
+            finally:
+                await table.delete()
+
+    @test_utilities.async_test
     async def test_parallel_generation_with_no_gaps_no_duplicates(self):
         async with aioboto3.resource('dynamodb', region_name=self.region_name,
                                      endpoint_url=self.endpoint) as dynamo_resource:

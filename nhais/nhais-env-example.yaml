@@ -6,3 +6,11 @@ NHAIS_RETRY_DELAY: "0.1"
 
 #User-specific env variables
 NHAIS_OUTBOUND_QUEUE_HOST: "localhost:5672/outbound"
+
+#common tests
+INTEGRATION_TEST_ASID: '9XXXXXXXXXXXXX' #put your ASID from OpenTest credentials
+MHS_ADDRESS: http://localhost
+SCR_ADDRESS: http://localhost:9000/
+AWS_ACCESS_KEY_ID: test
+AWS_SECRET_ACCESS_KEY: test
+MHS_DYNAMODB_ENDPOINT_URL: http://localhost:8000
