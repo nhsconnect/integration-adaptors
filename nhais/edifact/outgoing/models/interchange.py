@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from edifact.validation_helpers import *
+from edifact.outgoing.models.segment import Segment
 
 TIMESTAMP_FORMAT ='%y%m%d:%H%M'
 
@@ -36,12 +36,12 @@ class InterchangeHeader(Segment):
         return f"UNOA:2+{self.sender}+{self.recipient}+{formatted_date_time}+{formatted_sequence_number}"
 
     def pre_validate(self):
-        required(self, 'sender')
-        required(self, 'recipient')
-        required(self, 'date_time')
+        self._required('sender')
+        self._required('recipient')
+        self._required('date_time')
 
     def _validate_stateful(self):
-        required(self, 'sequence_number')
+        self._required('sequence_number')
 
 
 class InterchangeTrailer(Segment):
@@ -69,7 +69,7 @@ class InterchangeTrailer(Segment):
         return f"{self.number_of_messages}+{formatted_sequence_number}"
 
     def pre_validate(self):
-        required(self, 'number_of_messages')
+        self._required('number_of_messages')
 
     def _validate_stateful(self):
-        required(self, 'sequence_number')
+        self._required('sequence_number')

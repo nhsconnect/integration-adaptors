@@ -5,7 +5,7 @@ from edifact.edifact_exception import EdifactValidationException
 from edifact.outgoing.models.segment import Segment
 
 
-class BaseSegmentTest(unittest.TestCase):
+class BaseSegmentTest(unittest.TestCase, abc.ABC):
 
     @abc.abstractmethod
     def _create_segment(self) -> Segment:

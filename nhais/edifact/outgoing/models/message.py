@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from edifact.validation_helpers import *
+from edifact.outgoing.models.segment import Segment
 
 
 class MessageHeader(Segment):
@@ -10,8 +10,6 @@ class MessageHeader(Segment):
     takes in specific values required to generate an message header
     example: UNH+00000003+FHSREG:0:1:FH:FHS001'
     """
-
-    SEGMENT_KEY = "UNH"
 
     def __init__(self, sequence_number: (int, None) = None):
         """
@@ -24,7 +22,7 @@ class MessageHeader(Segment):
         return "UNH"
 
     def _validate_stateful(self):
-        required(self, 'sequence_number')
+        self._required('sequence_number')
 
     @property
     def value(self):
@@ -63,8 +61,8 @@ class MessageTrailer(Segment):
         pass
 
     def _validate_stateful(self):
-        required(self, 'number_of_segments')
-        required(self, 'sequence_number')
+        self._required('number_of_segments')
+        self._required('sequence_number')
 
 
 class BeginningOfMessage(Segment):
@@ -103,9 +101,9 @@ class NameAndAddress(Segment):
         return f'{self.qualifier}+{self.identifier}:{self.code}'
 
     def pre_validate(self):
-        required(self, 'qualifier')
-        required(self, 'identifier')
-        required(self, 'code')
+        self._required('qualifier')
+        self._required('identifier')
+        self._required('code')
 
 
 class DateTimePeriod(Segment):
@@ -128,10 +126,10 @@ class DateTimePeriod(Segment):
         return f'{self.type_code}:{formatted_date_time}:{self.format_code}'
 
     def pre_validate(self):
-        required(self, 'type_code')
-        required(self, 'format_code')
-        required(self, 'date_time_format')
-        required(self, 'timestamp')
+        self._required('type_code')
+        self._required('format_code')
+        self._required('date_time_format')
+        self._required('timestamp')
 
 
 class Reference(Segment):
@@ -149,8 +147,8 @@ class Reference(Segment):
         return f'{self.qualifier}:{self.reference}'
 
     def pre_validate(self):
-        required(self, 'qualifier')
-        required(self, 'reference')
+        self._required('qualifier')
+        self._required('reference')
 
 
 class ReferenceTransactionType(Reference):
@@ -171,10 +169,10 @@ class ReferenceTransactionNumber(Reference):
         super().__init__(qualifier='TN', reference='')
 
     def pre_validate(self):
-        required(self, 'qualifier')
+        self._required('qualifier')
 
     def _validate_stateful(self):
-        required(self, 'reference')
+        self._required('reference')
 
 
 class SegmentGroup(Segment):
@@ -191,4 +189,4 @@ class SegmentGroup(Segment):
         return f'{self.segment_group_number}'
 
     def pre_validate(self):
-        required(self, 'segment_group_number')
+        self._required('segment_group_number')

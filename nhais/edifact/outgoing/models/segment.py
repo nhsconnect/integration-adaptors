@@ -1,7 +1,9 @@
 import abc
 
+from edifact.edifact_exception import EdifactValidationException
 
-class Segment(object):
+
+class Segment(abc.ABC):
     """
     A segment is the basic building block of an edifact message.
     It represent each line in the edifact message that will be generated.
@@ -16,7 +18,7 @@ class Segment(object):
         """
         :return: the key of the segment for example NAD, DTM ...
         """
-        raise NotImplementedError()
+        pass
 
     @property
     @abc.abstractmethod
@@ -24,7 +26,7 @@ class Segment(object):
         """
         :return: the value of the segment
         """
-        raise NotImplementedError()
+        pass
 
     @abc.abstractmethod
     def pre_validate(self):
@@ -32,7 +34,7 @@ class Segment(object):
         Validates non-stateful data items of the segment (excludes things like sequence numbers)
         :raises: EdifactValidationException
         """
-        raise NotImplementedError()
+        pass
 
     def _validate_stateful(self):
         """
@@ -57,3 +59,12 @@ class Segment(object):
         self.validate()
         edifact_segment = f"{self.key}+{self.value}{Segment.TERMINATOR}"
         return edifact_segment
+
+    def _required(self, attribute_name):
+        """
+        A validation method to require that a specific property is truthy
+        :param attribute_name: the attribute name to test
+        :raises: EdifactValidationException if the attribute is not set
+        """
+        if not getattr(self, attribute_name, None):
+            raise EdifactValidationException(f'{self.key}: Attribute {attribute_name} is required')
