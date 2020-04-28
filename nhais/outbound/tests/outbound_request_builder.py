@@ -3,18 +3,15 @@ Provides functionality for calling the MHS over HTTP
 """
 from __future__ import annotations
 
-import json
-import os
 import unittest
 import uuid
-from typing import Optional
 
 import requests
 from fhir.resources.patient import Patient
+from requests import Response
 
 from comms.http_headers import HttpHeaders
-from integration_tests.helpers.asid_provider import get_asid
-from requests import Response
+from utilities import config
 
 
 class OutboundRequestBuilder(object):
@@ -25,7 +22,7 @@ class OutboundRequestBuilder(object):
     def __init__(self):
         self.headers = {}
         self.body = None
-        self.mhs_host = config.get('MHS_ADDRESS', 'http://localhost') + "/"
+        self.request_url = config.get_config('OUTBOUND_ADDRESS', 'http://localhost') + "/"
         self.assertor = unittest.TestCase('__init__')
 
     def with_headers(self, correlation_id: str = str(uuid.uuid4()).upper()) -> OutboundRequestBuilder:
@@ -44,18 +41,18 @@ class OutboundRequestBuilder(object):
     def with_acceptance_patient(self, patient: Patient) -> OutboundRequestBuilder:
         """
         Allows the setting of the payload for the HTTP request
-        :param body: the payload to send
-        :param attachments: any attachments to send
+        :param patient: the payload to send
         :return: self
         """
+        self.request_url += f'fhir/Patient/{patient.id}'
         self.body = patient.as_json()
         return self
 
     def execute_post_expecting_success(self) -> Response:
         """
-        Execute a POST request against the MHS using the configured body and headers within this class.
+        Execute a POST request against the configured body and headers within this class.
         Asserts the response is successful.
-        :return: response from MHS
+        :return: response
         """
         response = self._execute_post_request()
         self.assertor.assertTrue(
@@ -66,9 +63,9 @@ class OutboundRequestBuilder(object):
 
     def execute_post_expecting_error_response(self) -> Response:
         """
-        Execute a POST request against the MHS using the configured body and headers within this class.
+        Execute a POST request against the configured body and headers within this class.
         Asserts the response is 500.
-        :return: response from MHS
+        :return: response
         """
         response = self._execute_post_request()
         self.assertor.assertTrue(
@@ -79,9 +76,9 @@ class OutboundRequestBuilder(object):
 
     def execute_post_expecting_bad_request_response(self) -> Response:
         """
-        Execute a POST request against the MHS using the configured body and headers within this class.
+        Execute a POST request against the configured body and headers within this class.
         Asserts the response is 400.
-        :return: response from MHS
+        :return: response
         """
         response = self._execute_post_request()
         self.assertor.assertTrue(
@@ -95,4 +92,4 @@ class OutboundRequestBuilder(object):
         Execute a POST request against the MHS using the configured body and headers within this class.
         :return: response from MHS
         """
-        return requests.post(self.mhs_host, headers=self.headers, data=self.body, verify=False, timeout=15)
+        return requests.post(self.request_url, headers=self.headers, data=self.body, verify=False, timeout=15)
