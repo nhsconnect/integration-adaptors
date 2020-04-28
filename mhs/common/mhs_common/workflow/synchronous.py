@@ -8,7 +8,7 @@ from utilities import timing
 from mhs_common import workflow
 from mhs_common.errors.soap_handler import handle_soap_error
 from mhs_common.messages import soap_envelope
-from mhs_common.state import persistence_adaptor as pa
+from persistence import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow import common_synchronous

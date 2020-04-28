@@ -6,7 +6,7 @@ import aioboto3
 import utilities.integration_adaptors_logger as log
 from utilities import config
 
-from mhs_common.state import persistence_adaptor
+from persistence import persistence_adaptor
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -58,7 +58,6 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 return None
             return json.loads(response.get('Attributes', {}).get('data'))
         except Exception as e:
-            logger.exception('Error creating record')
             raise RecordCreationError from e
 
     async def get(self, key):
@@ -79,7 +78,6 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 return None
             return json.loads(response.get('Item', {}).get('data'))
         except Exception as e:
-            logger.exception('Error getting record')
             raise RecordRetrievalError from e
 
     async def delete(self, key):
@@ -100,7 +98,6 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 return None
             return json.loads(response.get('Attributes', {}).get('data'))
         except Exception as e:
-            logger.exception('Error deleting record')
             raise RecordDeletionError from e
 
     @contextlib.asynccontextmanager

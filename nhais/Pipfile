@@ -12,6 +12,7 @@ tornado = "*"
 integration-adaptors-common = {editable = true,path = "./../common"}
 pycurl = {version = "~=7.43",platform_system = "!= 'Windows'"}
 marshmallow = "~=3.2"
+aioboto3 = "8.0.3"
 
 [requires]
 python_version = "3.7"

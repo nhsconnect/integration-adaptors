@@ -2,9 +2,9 @@ from typing import Optional
 from unittest import TestCase
 from unittest.mock import patch
 
-from mhs_common.state.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
-import mhs_common.state.persistence_adaptor_factory as factory
-from mhs_common.state.persistence_adaptor import PersistenceAdaptor
+from persistence.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
+import persistence.persistence_adaptor_factory as factory
+from persistence.persistence_adaptor import PersistenceAdaptor
 
 
 class FakePersistenceAdaptor(PersistenceAdaptor):

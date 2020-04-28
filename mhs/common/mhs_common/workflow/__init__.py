@@ -4,7 +4,7 @@ from typing import Dict
 from comms import queue_adaptor
 
 from mhs_common.routing import routing_reliability
-from mhs_common.state import persistence_adaptor
+from persistence import persistence_adaptor
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.asynchronous_express import AsynchronousExpressWorkflow
 from mhs_common.workflow.asynchronous_reliable import AsynchronousReliableWorkflow
