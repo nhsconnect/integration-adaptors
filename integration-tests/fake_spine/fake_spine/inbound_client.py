@@ -17,7 +17,7 @@ class InboundClient(object):
 
     def __init__(self):
         self.http_client = httpclient.AsyncHTTPClient()
-        httpclient.AsyncHTTPClient.configure(None, max_clients=50)
+        httpclient.AsyncHTTPClient.configure(None, max_clients=500)
         config = fake_spine_configuration.FakeSpineConfiguration()
         self.inbound_url = f'http://localhost:{config.INBOUND_PROXY_PORT}/inbound-proxy'
 
