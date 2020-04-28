@@ -4,7 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-requests = "*"
+requests = "~=2.23"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
@@ -19,4 +19,6 @@ fhir-resources = "*"
 python_version = "3.7"
 
 [scripts]
-unittests = 'python -m xmlrunner -o test-reports -v'
+unittests = 'python -m xmlrunner discover -o test-reports -p "test_*" -v'
+inttests = 'python -m xmlrunner discover -o test-reports -p "int_*" -v'
+componenttests = 'python -m xmlrunner discover -o test-reports -p "component_*" -v'

@@ -1,15 +1,14 @@
 from datetime import datetime
 
-from fhir.resources.identifier import Identifier
 from fhir.resources.patient import Patient
 from fhir.resources.practitioner import Practitioner
 
 from edifact.outgoing.models.interchange import InterchangeHeader, InterchangeTrailer
 from edifact.outgoing.models.message import MessageHeader, MessageTrailer, ReferenceTransactionNumber
-from outbound.converter.base_message_translator import BaseMessageTranslator
 from outbound.converter.fhir_helpers import get_ha_identifier
-from sequence.interchange import InterchangeIdGenerator
-from sequence.message import MessageIdGenerator
+from outbound.converter.stub_message_translator import StubMessageTranslator
+from sequence.interchange_id import InterchangeIdGenerator
+from sequence.message_id import MessageIdGenerator
 from sequence.transaction_id import TransactionIdGenerator
 from utilities.date_utilities import DateUtilities
 
@@ -23,7 +22,6 @@ class InterchangeTranslator(object):
         self.segments = []
 
     async def convert(self, patient: Patient):
-        # TODO: NIAD-108 what if the request is an Amendment? Payload is not a Patient but JSONPatch!
         translation_timestamp = DateUtilities.utcnow()
         self.__append_interchange_header(patient, translation_timestamp)
         self.__append_message_segments(patient, translation_timestamp)
@@ -41,8 +39,7 @@ class InterchangeTranslator(object):
         self.segments.append(InterchangeHeader(sender=sender, recipient=recipient, date_time=translation_timestamp))
 
     def __append_message_segments(self, patient: Patient, translation_timestamp: datetime):
-        # TODO: pick a message translator based on the type of request
-        message_translator = BaseMessageTranslator(translation_timestamp)
+        message_translator = StubMessageTranslator(translation_timestamp)
         self.segments.extend(message_translator.translate(patient))
 
     def __pre_validate_segments(self):
@@ -60,7 +57,6 @@ class InterchangeTranslator(object):
                 segment.sequence_number = message_id
             if isinstance(segment, ReferenceTransactionNumber):
                 segment.reference = transaction_id
-
 
     def __translate_edifact(self):
         return '\n'.join([segment.to_edifact() for segment in self.segments])

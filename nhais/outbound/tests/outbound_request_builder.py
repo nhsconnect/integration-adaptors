@@ -17,7 +17,7 @@ from utilities import config
 
 class OutboundRequestBuilder(object):
     """
-    Responsible for building HTTP requests against the MHS service.
+    Responsible for building HTTP requests against the NHAIS service.
     """
 
     def __init__(self):
@@ -28,7 +28,7 @@ class OutboundRequestBuilder(object):
 
     def with_headers(self, correlation_id: str = str(uuid.uuid4()).upper()) -> OutboundRequestBuilder:
         """
-        Allows the setting of required headers for the MHS
+        Allows the setting of required headers
         :param correlation_id: the correlation id used
         :return: self
         """

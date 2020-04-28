@@ -8,7 +8,7 @@ from edifact.outgoing.models.message import MessageHeader, MessageTrailer, Begin
 from outbound.converter.fhir_helpers import get_ha_identifier
 
 
-class BaseMessageTranslator:
+class BaseMessageTranslator(abc.ABC):
 
     def __init__(self, translation_timestamp: datetime):
         self.segments = []

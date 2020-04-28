@@ -7,7 +7,35 @@ Environment Variables are used throughout application, an example can be found i
 
 Ensure you have Pipenv installed and on your path, then within NHAIS directory, run:
 
-`pipenv install`
+    pipenv install -d
+
+## Running Tests
+
+### Unit Tests
+
+    pipenv run unittests
+    
+### Component Tests
+
+Prerequisites
+
+* Run dynamo locally using docker-compose from repository root
+* Set and export environment variables defined in `nhais-env-example.yaml`
+
+
+    pipenv run componenttests
+    
+### Integration Tests
+
+Prerequisites
+
+* Run dynamo locally using docker-compose from repository root
+* Set and export environment variables defined in `nhais-env-example.yaml`
+* Run `main.py`
+
+
+    pipenv run inttests
+ 
 
 ## Developer setup 
 

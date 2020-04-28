@@ -46,11 +46,9 @@ class NhaisIntegrationTests(unittest.TestCase):
 
         message = self.mq_wrapper.get_next_message_on_queue()
         self.assertIsNotNone(message, 'message from queue should exist')
-        body_string = message.body.decode()
-        self.assertTrue(len(body_string) > 0, 'message from queue should not be empty')
-        self.assertIn(PATIENT_ID, body_string)
-        self.assertIn(GP_ID, body_string)
-        self.assertIn(HA_ID, body_string)
+        self.assertTrue(len(message.body) > 0, 'message from queue should not be empty')
+        self.assertIn(GP_ID, message.body)
+        self.assertIn(HA_ID, message.body)
         # TODO: verify EDIFACT message once inbound parsing work progresses
 
 

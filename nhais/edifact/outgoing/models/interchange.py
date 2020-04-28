@@ -2,8 +2,6 @@ from datetime import datetime
 
 from edifact.outgoing.models.segment import Segment
 
-TIMESTAMP_FORMAT ='%y%m%d:%H%M'
-
 
 class InterchangeHeader(Segment):
     """
@@ -11,6 +9,8 @@ class InterchangeHeader(Segment):
     takes in specific values required to generate an interchange header
     example: UNB+UNOA:2+TES5+XX11+920113:1317+00000002'
     """
+
+    TIMESTAMP_FORMAT ='%y%m%d:%H%M'
 
     def __init__(self, sender, recipient, date_time: datetime, sequence_number: (None, int) = None):
         """
@@ -30,9 +30,8 @@ class InterchangeHeader(Segment):
 
     @property
     def value(self):
-        formatted_date_time = self.date_time.strftime(TIMESTAMP_FORMAT)
+        formatted_date_time = self.date_time.strftime(InterchangeHeader.TIMESTAMP_FORMAT)
         formatted_sequence_number = f'{self.sequence_number:08}'
-        # nhais-adaptor version has '++FHSREG' appended to the end which doesn't seem correct
         return f"UNOA:2+{self.sender}+{self.recipient}+{formatted_date_time}+{formatted_sequence_number}"
 
     def pre_validate(self):
