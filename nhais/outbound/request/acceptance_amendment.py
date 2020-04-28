@@ -45,8 +45,8 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         operation_outcome.issue = [operation_outcome_issue]
 
         return operation_outcome
-        
-    def __extract_request_validateion_path_and_message(self, errors):
+
+    def __extract_request_validation_path_and_message(self, errors):
         path_list = []
         message_list_string = ''
 
