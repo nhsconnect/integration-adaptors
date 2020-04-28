@@ -10,7 +10,7 @@ from outbound.converter.base_message_translator import BaseMessageTranslator
 from outbound.converter.fhir_helpers import get_ha_identifier
 from sequence.interchange import InterchangeIdGenerator
 from sequence.message import MessageIdGenerator
-from sequence.transaction import TransactionIdGenerator
+from sequence.transaction_id import TransactionIdGenerator
 from utilities.date_utilities import DateUtilities
 
 
@@ -52,7 +52,7 @@ class InterchangeTranslator(object):
     async def __generate_identifiers(self):
         interchange_id = self.interchange_id_generator.next_interchange_id()
         message_id = self.message_id_generator.next_message_id()
-        transaction_id = self.transaction_id_generator.next_transaction_id()
+        transaction_id = await self.transaction_id_generator.generate_transaction_id()
         for segment in self.segments:
             if isinstance(segment, (InterchangeHeader, InterchangeTrailer)):
                 segment.sequence_number = interchange_id
