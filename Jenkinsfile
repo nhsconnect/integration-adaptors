@@ -194,7 +194,7 @@ pipeline {
                                             -var task_scaling_role_arn=${TASK_SCALING_ROLE} \
                                             -var ecr_address=${DOCKER_REGISTRY} \
                                             -var mhs_outbound_validate_certificate="False" \
-                                            -var mhs_log_level=INFO \
+                                            -var mhs_log_level=DEBUG \
                                             -var mhs_outbound_http_proxy="" \
                                             -var mhs_state_table_read_capacity=5 \
                                             -var mhs_state_table_write_capacity=5 \

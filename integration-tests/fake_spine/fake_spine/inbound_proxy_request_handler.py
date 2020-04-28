@@ -18,7 +18,6 @@ class InboundProxyRequestHandler(BaseHandler):
         logger.info(f"request accepted {self.request} with headers: {self.request.headers}, and body: {self.request.body}")
         logger.info(f"request being proxied to inbound service")
 
-        # httpclient.AsyncHTTPClient.configure(None, max_clients=500)
         http_client = httpclient.AsyncHTTPClient()
         logger.info(f"max_clients for inbound_proxy_request_handler: {http_client.max_clients}")
 
