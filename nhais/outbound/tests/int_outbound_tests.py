@@ -46,8 +46,11 @@ class NhaisIntegrationTests(unittest.TestCase):
     @staticmethod
     def create_org_ref(id):
         ref = FHIRReference()
-        ref.id = id
+        # ref.id = id
         ref.type = "Organisation"
+        identifier = Identifier()
+        identifier.value = id
+        ref.identifier = identifier
         return ref
 
 
@@ -55,24 +58,20 @@ class NhaisIntegrationTests(unittest.TestCase):
     def create_patient() -> Patient:
         patient = Patient()
         patient.id = '123'
-        # gp = Practitioner()
-        # gp_id = Identifier()
-        # gp_id.value = 'GP123'
-        # gp.identifier = [gp_id]
         patient.generalPractitioner = [NhaisIntegrationTests.create_org_ref('GP123')]
-        # ha = Organization()
-        # ha_id = Identifier()
-        # ha_id.value = 'HA456'
-        # ha.identifier = [ha_id]
-        # patient.managingOrganization = [ha]
+        patient.managingOrganization = NhaisIntegrationTests.create_org_ref('HA456')
         return patient
 
     def test_acceptance_transaction(self):
         patient = self.create_patient()
-        response = OutboundRequestBuilder().with_acceptance_patient(patient).execute_post_expecting_success()
+        response = OutboundRequestBuilder()\
+            .with_headers()\
+            .with_acceptance_patient(patient)\
+            .execute_post_expecting_success()
         message = self.mq_wrapper.get_next_message_on_queue()
         self.assertIsNotNone(message, 'message from queue should exist')
         self.assertTrue(len(message.body) > 0, 'message from queue should not be empty')
+        print(message.body)
         # TODO: verify EDIFACT message
 
 

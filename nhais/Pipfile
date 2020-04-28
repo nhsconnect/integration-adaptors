@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 requests = "*"
+unittest-xml-reporting = "~=2.5"
 
 [packages]
 tornado = "*"
@@ -16,3 +17,6 @@ fhir-resources = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+unittests = 'python -m xmlrunner -o test-reports -v'

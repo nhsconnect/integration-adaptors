@@ -2,7 +2,6 @@ import unittest
 from datetime import datetime
 
 from edifact.outgoing.models.interchange import InterchangeHeader, InterchangeTrailer
-from edifact.outgoing.models.tests.base_segment_test import test_missing_params
 
 TS = datetime(year=2019, month=4, day=23, hour=9, minute=0)
 

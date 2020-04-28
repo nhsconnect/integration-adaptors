@@ -5,7 +5,7 @@ from edifact.outgoing.models.segment import Segment
 from edifact.outgoing.models.tests.base_segment_test import BaseSegmentTest
 
 
-class TestMessageHeader(BaseSegmentTest):
+class TestMessageHeader(BaseSegmentTest, unittest.TestCase):
     """
     Test the generating of a message header
     """
@@ -20,7 +20,7 @@ class TestMessageHeader(BaseSegmentTest):
         return "UNH+00000001+FHSREG:0:1:FH:FHS001'"
 
 
-class TestMessageTrailer(BaseSegmentTest):
+class TestMessageTrailer(BaseSegmentTest, unittest.TestCase):
     """
     Test the generating of a message trailer
     """
@@ -41,7 +41,7 @@ class TestBeginningOfMessage(unittest.TestCase):
         self.assertEqual("BGM+++507'", BeginningOfMessage().to_edifact())
 
 
-class TestNameAndAddress(BaseSegmentTest):
+class TestNameAndAddress(BaseSegmentTest, unittest.TestCase):
 
     def _create_segment(self) -> Segment:
         return NameAndAddress(NameAndAddress.QualifierAndCode.FHS, 'PARTY')

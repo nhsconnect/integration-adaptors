@@ -3,6 +3,7 @@ Provides functionality for calling the MHS over HTTP
 """
 from __future__ import annotations
 
+import json
 import unittest
 import uuid
 
@@ -45,7 +46,7 @@ class OutboundRequestBuilder(object):
         :return: self
         """
         self.request_url += f'fhir/Patient/{patient.id}'
-        self.body = patient.as_json()
+        self.body = json.dumps(patient.as_json())
         return self
 
     def execute_post_expecting_success(self) -> Response:

@@ -36,8 +36,7 @@ class InterchangeTranslator(object):
 
     def __append_interchange_header(self, patient, translation_timestamp: datetime):
         gp = patient.generalPractitioner[0]  # type: Practitioner
-        gp_identifier = gp.identifier[0]  # type: Identifier
-        sender = gp_identifier.value
+        sender = gp.identifier.value
         recipient = get_ha_identifier(patient)
         self.segments.append(InterchangeHeader(sender=sender, recipient=recipient, date_time=translation_timestamp))
 
