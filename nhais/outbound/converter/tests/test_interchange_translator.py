@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import sequence.transaction_id
 from outbound.converter.interchange_translator import InterchangeTranslator
-from outbound.tests.fhir_test_helpers import create_patient
+from outbound.tests.fhir_test_helpers import create_patient, HA_ID, GP_ID
 from utilities.date_utilities import DateUtilities
 from utilities.test_utilities import async_test, awaitable
 
@@ -38,7 +38,6 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
 
         self.assertIsNotNone(edifact)
         self.assertTrue(len(edifact) > 0)
-        print(edifact)
         segments = edifact.splitlines()
 
         unz = segments.pop()
@@ -72,7 +71,7 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         self.assertRegex(nad_msg_header, self.NAD_MSG_HEADER_PATTERN)
         nad_msg_header_match = re.match(self.NAD_MSG_HEADER_PATTERN, nad_msg_header)
         self.assertEqual('FHS', nad_msg_header_match.group('party_qualifier'))
-        self.assertEqual('HA456', nad_msg_header_match.group('party_id'))
+        self.assertEqual(HA_ID, nad_msg_header_match.group('party_id'))
         self.assertEqual('954', nad_msg_header_match.group('party_code'))
 
         bgm = segments.pop()
@@ -86,7 +85,7 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         unb = segments.pop()
         self.assertRegex(unb, self.UNB_PATTERN)
         unb_match = re.match(self.UNB_PATTERN, unb)
-        self.assertEqual('GP123', unb_match.group('sender'))
-        self.assertEqual('HA456', unb_match.group('recipient'))
+        self.assertEqual(GP_ID, unb_match.group('sender'))
+        self.assertEqual(HA_ID, unb_match.group('recipient'))
         self.assertEqual('200427:1737', unb_match.group('timestamp'))
         self.assertEqual('00000001', unb_match.group('sis'))

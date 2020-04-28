@@ -1,6 +1,7 @@
 import enum
 from datetime import datetime
 
+from edifact.edifact_exception import EdifactValidationException
 from edifact.outgoing.models.segment import Segment
 
 
@@ -165,8 +166,8 @@ class ReferenceTransactionType(Reference):
 
 class ReferenceTransactionNumber(Reference):
 
-    def __init__(self):
-        super().__init__(qualifier='TN', reference='')
+    def __init__(self, reference=''):
+        super().__init__(qualifier='TN', reference=reference)
 
     def pre_validate(self):
         self._required('qualifier')
@@ -189,4 +190,9 @@ class SegmentGroup(Segment):
         return f'{self.segment_group_number}'
 
     def pre_validate(self):
-        self._required('segment_group_number')
+        if not self.segment_group_number:
+            raise EdifactValidationException(f'S: Attribute segment_group_number is required')
+        if not isinstance(self.segment_group_number, int):
+            raise EdifactValidationException(f'S: Attribute segment_group_number must be an integer')
+        if self.segment_group_number not in (1, 2):
+            raise EdifactValidationException(f'S: Attribute segment_group_number must be 1 or 2')

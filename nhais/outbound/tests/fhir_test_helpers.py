@@ -2,6 +2,9 @@ from fhir.resources.fhirreference import FHIRReference
 from fhir.resources.identifier import Identifier
 from fhir.resources.patient import Patient
 
+GP_ID = 'GP123'
+HA_ID = 'HA456'
+PATIENT_ID = '54321'
 
 def create_org_ref(identifier_value: str):
     ref = FHIRReference()
@@ -14,7 +17,7 @@ def create_org_ref(identifier_value: str):
 
 def create_patient() -> Patient:
     patient = Patient()
-    patient.id = '123'
-    patient.generalPractitioner = [create_org_ref('GP123')]
-    patient.managingOrganization = create_org_ref('HA456')
+    patient.id = PATIENT_ID
+    patient.generalPractitioner = [create_org_ref(GP_ID)]
+    patient.managingOrganization = create_org_ref(HA_ID)
     return patient
