@@ -11,6 +11,7 @@ data "template_file" "fake_spine_app_variables_template" {
     FAKE_SPINE_CERTIFICATE_ARN      = var.fake_spine_certificate,
     FAKE_SPINE_CA_STORE_ARN         = var.fake_spine_ca_store,
     MHS_SECRET_PARTY_KEY_ARN        = var.party_key_arn
+    FAKE_SPINE_PROXY_VALIDATE_CERT  = var.fake_spine_proxy_validate_cert
   }
 }
 
