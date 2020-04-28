@@ -8,7 +8,6 @@ from fhir.resources.organization import Organization
 from fhir.resources.patient import Patient
 from fhir.resources.practitioner import Practitioner
 
-from edifact.outgoing.models.message import DateTimePeriod
 from outbound.converter.interchange_translator import InterchangeTranslator
 from utilities.date_utilities import DateUtilities
 from utilities.test_utilities import async_test

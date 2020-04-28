@@ -1,11 +1,11 @@
 from typing import Tuple
 
-from fhirclient.models.operationdefinition import OperationDefinition
-
 import adaptor.fhir_helpers.fhir_finders as finders
 import adaptor.outgoing.common.common_adaptor as common_adaptor
 import adaptor.outgoing.common.date_formatter as date_formatter
 from adaptor.fhir_helpers.fhir_creators import ParameterName
+from fhirclient.models.operationdefinition import OperationDefinition
+
 from edifact.outgoing.models.interchange import Interchange
 from edifact.outgoing.models.message import Messages
 

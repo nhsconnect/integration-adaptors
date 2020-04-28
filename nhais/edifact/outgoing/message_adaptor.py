@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
-from fhir.resources.operationdefinition import OperationDefinition
-
 import adaptor.fhir_helpers.fhir_finders as finders
 import adaptor.outgoing.common.date_formatter as date_formatter
 from adaptor.fhir_helpers.fhir_creators import ParameterName
 from edifact.outgoing.models.birth.message_birth import Message
+from fhir.resources.operationdefinition import OperationDefinition
+
 from edifact.outgoing.models.message import MessageBeginning, MessageSegmentPatientDetails, \
     MessageSegmentRegistrationDetails
 

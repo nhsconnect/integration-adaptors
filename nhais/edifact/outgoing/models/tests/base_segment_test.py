@@ -1,11 +1,9 @@
 import abc
 import unittest
-from unittest import TestCase
-
-import typing
 
 from edifact.edifact_exception import EdifactValidationException
 from edifact.outgoing.models.segment import Segment
+
 
 class BaseSegmentTest(unittest.TestCase):
 
@@ -33,7 +31,7 @@ class BaseSegmentTest(unittest.TestCase):
     def test_to_edifact(self):
         segment = self._create_segment()
         edifact = segment.to_edifact()
-        self.assertEquals(self._get_expected_edifact(), edifact)
+        self.assertEqual(self._get_expected_edifact(), edifact)
 
     def test_missing_attributes(self):
         self.__test_missing_properties(self._get_attributes(), self._create_segment)

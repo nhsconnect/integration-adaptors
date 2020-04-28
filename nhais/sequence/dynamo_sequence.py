@@ -1,14 +1,8 @@
-import abc
-import contextlib
-import json
-from typing import Optional
-
 import aioboto3 as aioboto3
 from boto3.dynamodb.conditions import Key
 
-from persistence.dynamo_persistence_adaptor import RecordCreationError
-from sequence.sequence import SequenceGenerator
 import utilities.integration_adaptors_logger as log
+from sequence.sequence import SequenceGenerator
 from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)

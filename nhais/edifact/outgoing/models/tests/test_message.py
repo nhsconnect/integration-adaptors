@@ -1,7 +1,6 @@
 import unittest
 
-from edifact.outgoing.models.message import MessageHeader, MessageTrailer, EdifactValidationException, \
-    BeginningOfMessage, NameAndAddress
+from edifact.outgoing.models.message import MessageHeader, MessageTrailer, BeginningOfMessage, NameAndAddress
 from edifact.outgoing.models.segment import Segment
 from edifact.outgoing.models.tests.base_segment_test import BaseSegmentTest
 
@@ -21,21 +20,19 @@ class TestMessageHeader(BaseSegmentTest):
         return "UNH+00000001+FHSREG:0:1:FH:FHS001'"
 
 
-class TestMessageTrailer(unittest.TestCase):
+class TestMessageTrailer(BaseSegmentTest):
     """
     Test the generating of a message trailer
     """
 
-    def test_message_trailer_to_edifact(self):
-        msg_trl = MessageTrailer(number_of_segments=5, sequence_number=1).to_edifact()
-        self.assertEqual(msg_trl, "UNT+5+00000001'")
+    def _create_segment(self) -> Segment:
+        return MessageTrailer(number_of_segments=5, sequence_number=1)
 
-    def test_missing_params(self):
-        params = {
-            'number_of_segments': 5,
-            'sequence_number': 1
-        }
-        test_missing_params(self, params, MessageTrailer)
+    def _get_attributes(self):
+        return ['number_of_segments', 'sequence_number']
+
+    def _get_expected_edifact(self):
+        return "UNT+5+00000001'"
 
 
 class TestBeginningOfMessage(unittest.TestCase):
@@ -44,11 +41,13 @@ class TestBeginningOfMessage(unittest.TestCase):
         self.assertEqual("BGM+++507'", BeginningOfMessage().to_edifact())
 
 
-class TestNameAndAddress(unittest.TestCase):
+class TestNameAndAddress(BaseSegmentTest):
 
-    def test_to_edifact(self):
-        self.assertEqual("NAD+FHS+PARTY:954'", NameAndAddress(NameAndAddress.QualifierAndCode.FHS, 'PARTY').to_edifact())
+    def _create_segment(self) -> Segment:
+        return NameAndAddress(NameAndAddress.QualifierAndCode.FHS, 'PARTY')
 
-    def test_missing_properties(self):
-        gen = lambda: NameAndAddress(NameAndAddress.QualifierAndCode.FHS, 'PARTY')
-        test_missing_properties(self, ['qualifier', 'code', 'identifier'], gen)
+    def _get_attributes(self):
+        return ['qualifier', 'code', 'identifier']
+
+    def _get_expected_edifact(self):
+        return "NAD+FHS+PARTY:954'"
