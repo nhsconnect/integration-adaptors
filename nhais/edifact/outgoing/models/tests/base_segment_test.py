@@ -10,7 +10,7 @@ from edifact.outgoing.models.segment import Segment
 class BaseSegmentTest(unittest.TestCase):
 
     @abc.abstractmethod
-    def _create_segment(self):
+    def _create_segment(self) -> Segment:
         """
         :return: a valid Segment with all attributes populated
         """
@@ -24,7 +24,19 @@ class BaseSegmentTest(unittest.TestCase):
         pass
     
     @abc.abstractmethod
-    def _get_e
+    def _get_expected_edifact(self):
+        """
+        :return: the expected EDIFACT for the segment returned by _create_segment()
+        """
+        pass
+
+    def test_to_edifact(self):
+        segment = self._create_segment()
+        edifact = segment.to_edifact()
+        self.assertEquals(self._get_expected_edifact(), edifact)
+
+    def test_missing_attributes(self):
+        self.__test_missing_properties(self._get_attributes(), self._create_segment)
     
     def __test_missing_params(self, all_params: dict, constructor):
         for key, value in all_params.items():
@@ -33,9 +45,8 @@ class BaseSegmentTest(unittest.TestCase):
             with_missing = constructor(**missing)
             with self.assertRaises(EdifactValidationException, msg=f'missing "{key}" did not fail validation') as ctx:
                 with_missing.to_edifact()
-            test.assertEqual(f'{with_missing.key}: Attribute {key} is required', ctx.exception.args[0])
-    
-    
+            self.assertEqual(f'{with_missing.key}: Attribute {key} is required', ctx.exception.args[0])
+
     def __test_missing_properties(self, attribute_names: list, generator):
         """
         :param test: instance of the test case

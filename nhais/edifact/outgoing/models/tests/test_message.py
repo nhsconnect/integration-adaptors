@@ -2,23 +2,23 @@ import unittest
 
 from edifact.outgoing.models.message import MessageHeader, MessageTrailer, EdifactValidationException, \
     BeginningOfMessage, NameAndAddress
-from edifact.outgoing.models.tests.base_segment_test import test_missing_params, test_missing_properties, list_attributes
+from edifact.outgoing.models.segment import Segment
+from edifact.outgoing.models.tests.base_segment_test import BaseSegmentTest
 
 
-class TestMessageHeader(unittest.TestCase):
+class TestMessageHeader(BaseSegmentTest):
     """
     Test the generating of a message header
     """
 
-    def test_message_header_to_edifact(self):
-        msg_hdr = MessageHeader(sequence_number=1).to_edifact()
-        self.assertEqual(msg_hdr, "UNH+00000001+FHSREG:0:1:FH:FHS001'")
+    def _create_segment(self) -> Segment:
+        return MessageHeader(sequence_number=1)
 
-    def test_missing_params(self):
-        params = {
-            'sequence_number': 1
-        }
-        test_missing_params(self, params, MessageHeader)
+    def _get_attributes(self):
+        return ['sequence_number']
+
+    def _get_expected_edifact(self):
+        return "UNH+00000001+FHSREG:0:1:FH:FHS001'"
 
 
 class TestMessageTrailer(unittest.TestCase):
