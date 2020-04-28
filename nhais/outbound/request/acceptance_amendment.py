@@ -35,7 +35,7 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         details.text = message
 
         operation_outcome_issue = OperationOutcomeIssue()
-        operation_outcome_issue.severity = 'error'
+        operation_outcome_issue.severity = 'exception'
         operation_outcome_issue.code = code
         operation_outcome_issue.details = details
         operation_outcome_issue.expression = path
@@ -73,7 +73,7 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
                 self.__set_unsuccesful_response(400, "value", ["id"],
                                                 f"URI id `{patient_id}` does not match PAYLOAD id `{patient.id}`")
         except RequestValidationException as e:
-            details = self.__extract_request_validateion_path_and_message(e.errors)
+            details = self.__extract_request_validation_path_and_message(e.errors)
             logger.exception(f'Exception: {details}')
             self.__set_unsuccesful_response(400, "value", details[0], details[1])
         except JSONDecodeError as e:

@@ -3,7 +3,6 @@ import os
 from unittest.mock import patch, MagicMock
 
 import tornado.testing
-from fhir.resources.fhirabstractbase import FHIRValidationError
 from fhir.resources.fhirelementfactory import FHIRElementFactory
 from fhir.resources.patient import Patient
 from tornado.web import Application
@@ -72,9 +71,9 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
 
-        self.assertEqual('error', operation_outcome.issue[0].severity)
-        self.assertEqual('ID_IN_URI_DOES_NOT_MATCH_PAYLOAD_ID', operation_outcome.issue[0].details.coding[0].code)
-        self.assertEqual('URI id `2384763847264` does not match PAYLOAD id `9000000009`', operation_outcome.issue[0].details.coding[0].display)
+        self.assertEqual('exception', operation_outcome.issue[0].severity)
+        self.assertEqual('id', operation_outcome.issue[0].expression[0])
+        self.assertEqual('URI id `2384763847264` does not match PAYLOAD id `9000000009`', operation_outcome.issue[0].details.text)
         self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
 
@@ -88,9 +87,9 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
 
-        self.assertEqual('error', operation_outcome.issue[0].severity)
-        self.assertEqual('PAYLOAD_IS_NOT_VALID_JSON_FORMAT', operation_outcome.issue[0].details.coding[0].code)
-        self.assertEqual('Payload is either missing, empty or not valid to json, this is required.', operation_outcome.issue[0].details.coding[0].display)
+        self.assertEqual('exception', operation_outcome.issue[0].severity)
+        self.assertEqual('PAYLOAD', operation_outcome.issue[0].expression[0])
+        self.assertEqual('Payload is either missing, empty or not valid to json, this is required.', operation_outcome.issue[0].details.text)
         self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
 
@@ -104,9 +103,9 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
 
         operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
 
-        self.assertEqual('error', operation_outcome.issue[0].severity)
-        self.assertEqual('PAYLOAD_IS_NOT_VALID_JSON_FORMAT', operation_outcome.issue[0].details.coding[0].code)
-        self.assertEqual('Payload is either missing, empty or not valid to json, this is required.', operation_outcome.issue[0].details.coding[0].display)
+        self.assertEqual('exception', operation_outcome.issue[0].severity)
+        self.assertEqual('PAYLOAD', operation_outcome.issue[0].expression[0])
+        self.assertEqual('Payload is either missing, empty or not valid to json, this is required.', operation_outcome.issue[0].details.text)
         self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
 
@@ -126,7 +125,7 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
 
         self.assertEqual(2, len(operation_outcome.issue[0].expression))
-        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('exception', operation_outcome.issue[0].severity)
         self.assertEqual('validationfail', operation_outcome.id)
         self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
