@@ -16,7 +16,6 @@ class InboundClient(object):
     }
 
     def __init__(self):
-        # httpclient.AsyncHTTPClient.configure(None, max_clients=500)
         self.http_client = httpclient.AsyncHTTPClient()
         logger.info(f"max_clients for inbound_client: {self.http_client.max_clients}")
         config = fake_spine_configuration.FakeSpineConfiguration()
