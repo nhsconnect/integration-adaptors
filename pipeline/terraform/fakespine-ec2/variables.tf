@@ -123,3 +123,8 @@ variable "mhs_inbound_port" {
   description = "Port in which mhs inbound runs"
   default = 443
 }
+
+variable "fake_spine_proxy_validate_cert" {
+  type = string
+  description = "Validate certificate for proxy"
+}

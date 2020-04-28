@@ -54,7 +54,7 @@ echo "Starting the image"
 ./integration-tests/setup_component_test_env.sh
 . ./component-test-source.sh # Load the deafult env variables from the test set
 . /var/variables_source.sh   # Override with ones supplied by TF
-BUILD_TAG=${BUILD_TAG} docker-compose -f docker-compose.yml -f docker-compose.ec2.override.yml up -d fakespine
+BUILD_TAG=${BUILD_TAG} docker-compose -f docker-compose.ec2.override.yml up -d fakespine
 
 echo "Sleep 20s"
 sleep 20s
