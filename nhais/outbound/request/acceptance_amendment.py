@@ -4,7 +4,6 @@ from typing import Any
 
 import tornado.web
 from fhir.resources.codeableconcept import CodeableConcept
-from fhir.resources.coding import Coding
 from fhir.resources.operationoutcome import OperationOutcome
 from fhir.resources.operationoutcome import OperationOutcomeIssue
 from tornado import httputil
@@ -27,8 +26,11 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         self.mesh_wrapper = MeshOutboundWrapper()
 
     def __set_unsuccesful_response(self, status, code, path, message):
+        operation_outcome = self.__build_operation_outcome(code, path, message)
         self.set_status(status)
+        self.finish(operation_outcome.as_json())
 
+    def __build_operation_outcome(self, code, path, message):
         details = CodeableConcept()
         details.text = message
 
@@ -42,8 +44,8 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         operation_outcome.id = "validationfail"
         operation_outcome.issue = [operation_outcome_issue]
 
-        self.finish(operation_outcome.as_json())
-
+        return operation_outcome
+        
     def __extract_request_validateion_path_and_message(self, errors):
         path_list = []
         message_list_string = ''
@@ -67,18 +69,21 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
                 self.set_header("OperationId", unique_operation_id)
                 await self.finish()
             else:
-                logger.error('Error, id doesnt match')
+                logger.exception('Exception, id doesnt match')
                 self.__set_unsuccesful_response(400, "value", ["id"],
                                                 f"URI id `{patient_id}` does not match PAYLOAD id `{patient.id}`")
         except RequestValidationException as e:
             details = self.__extract_request_validateion_path_and_message(e.errors)
-            logger.error(f'Error: {details}')
+            logger.exception(f'Exception: {details}')
             self.__set_unsuccesful_response(400, "value", details[0], details[1])
         except JSONDecodeError as e:
-            logger.error('Error: Payload is missing, empty or not a valid json')
+            logger.exception('Exception: Payload is missing, empty or not a valid json')
             self.__set_unsuccesful_response(400, "value", ["PAYLOAD"],
                                             "Payload is either missing, empty or not valid to json, this is required.")
-            
+        except Exception as e:
+            logger.exception(f'Exception: {e}')
+            self.set_status(500)
+
     @timing.time_request
     async def patch(self, patient_id):
         self.set_status(202)
