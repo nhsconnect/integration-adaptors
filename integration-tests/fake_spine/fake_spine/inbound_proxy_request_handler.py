@@ -19,7 +19,11 @@ class InboundProxyRequestHandler(tornado.web.RequestHandler):
         logger.info(f"request accepted {self.request} with headers: {self.request.headers}, and body: {self.request.body}")
         logger.info(f"request being proxied to inbound service")
 
-        response = await httpclient.AsyncHTTPClient()\
+        # httpclient.AsyncHTTPClient.configure(None, max_clients=500)
+        http_client = httpclient.AsyncHTTPClient()
+        logger.info(f"max_clients for inbound_proxy_request_handler: {http_client.max_clients}")
+
+        response = await http_client\
             .fetch(self.config.INBOUND_SERVER_BASE_URL,
                    raise_error=False,
                    method="POST",
