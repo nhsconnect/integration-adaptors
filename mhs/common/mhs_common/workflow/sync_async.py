@@ -6,7 +6,7 @@ from utilities import integration_adaptors_logger as log
 
 from mhs_common import workflow
 from retry import retriable_action
-from mhs_common.state import persistence_adaptor as pa
+from persistence import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.workflow import common
 from mhs_common.workflow import common_synchronous

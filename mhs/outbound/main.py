@@ -13,8 +13,8 @@ import utilities.integration_adaptors_logger as log
 from handlers import healthcheck_handler
 from mhs_common import workflow
 from mhs_common.routing import routing_reliability
-from mhs_common.state import persistence_adaptor
-from mhs_common.state.persistence_adaptor_factory import get_persistence_adaptor
+from persistence import persistence_adaptor
+from persistence.persistence_adaptor_factory import get_persistence_adaptor
 from mhs_common.workflow import sync_async_resynchroniser as resync
 from outbound.transmission import outbound_transmission
 from utilities import config, certs

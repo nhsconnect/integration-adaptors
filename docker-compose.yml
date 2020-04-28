@@ -63,7 +63,7 @@ services:
       - MHS_SDS_REDIS_CACHE_HOST=redis
       - MHS_SDS_REDIS_DISABLE_TLS=True
   dynamodb:
-    image: nhsdev/nia-dynamodb-local:1.0.1
+    image: nhsdev/nia-dynamodb-local:1.0.2
     ports:
       - "8000:8000"
   rabbitmq:

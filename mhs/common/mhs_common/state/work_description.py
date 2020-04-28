@@ -7,7 +7,7 @@ import utilities.integration_adaptors_logger as log
 from utilities import timing
 
 from retry import retriable_action
-from mhs_common.state import persistence_adaptor as pa
+from persistence import persistence_adaptor as pa
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 

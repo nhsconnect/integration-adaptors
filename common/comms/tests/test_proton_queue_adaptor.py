@@ -1,12 +1,8 @@
 """Module for testing the Proton queue adaptor functionality."""
 import unittest.mock
-from unittest import mock
-
-import proton
 
 import comms.proton_queue_adaptor
 import utilities.test_utilities
-from exceptions import MaxRetriesExceeded
 
 TEST_UUID = "TEST UUID"
 TEST_MESSAGE = {'test': 'message'}
