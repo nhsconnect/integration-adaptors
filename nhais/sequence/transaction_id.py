@@ -1,4 +1,3 @@
-from sequence.dynamo_sequence import DynamoSequenceGenerator
 from sequence.sequence_factory import get_sequence_generator
 
 
