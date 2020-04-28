@@ -74,10 +74,7 @@ class ComponentTestDynamoSequence(unittest.TestCase):
             try:
                 await self.__create_table(dynamo_resource)
                 db = dynamo_sequence.DynamoSequenceGenerator(self.table_name)
-                result = await asyncio.gather(
-                    self.__generate_large_number_of_ids("one", 0.05, db),
-                    self.__generate_large_number_of_ids("two", 0.075, db)
-                )
+                result = await asyncio.gather(*[db.next(self.key) for i in range(100)])
                 await self.__verify_results(result)
             except dynamo_resource.meta.client.exceptions.ResourceInUseException:
                 self.fail()
@@ -85,21 +82,11 @@ class ComponentTestDynamoSequence(unittest.TestCase):
                 table = await dynamo_resource.Table(self.table_name)
                 await table.delete()
 
-    async def __verify_results(self, result):
-        results = result[0] + result[1]
+    async def __verify_results(self, results):
         results.sort()
-        self.assertEqual(len(results), 1000)
+        self.assertEqual(len(results), 100)
         for x in range(0, len(results) - 1):
             self.assertEqual(results[x] + 1, results[x + 1])
-
-    async def __generate_large_number_of_ids(self, task, delay, db):
-        ids = []
-        for i in range(500):
-            transaction_id = await db.next(self.key)
-            ids.append(transaction_id)
-            print(f'task:{task} - iteration:{i} - transaction_id:{transaction_id}')
-            await asyncio.sleep(delay)
-        return ids
 
     async def __create_table(self, dynamo_resource):
         await dynamo_resource.create_table(
