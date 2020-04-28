@@ -26,34 +26,33 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         self.fhir_to_edifact = FhirToEdifact()
         self.mesh_wrapper = MeshOutboundWrapper()
 
-    def __set_unsuccesful_response(self, status, code, coding_code, details):
+    def __set_unsuccesful_response(self, status, code, path, message):
         self.set_status(status)
 
-        coding = Coding()
-        coding.code = coding_code
-        coding.display = details
-        coding.version = '1'
-        coding.system = 'https://www.hl7.org/fhir/patient.html'
-
         details = CodeableConcept()
-        details.coding = [coding]  # don't need coding
-        details.text  # message goes here
+        details.text = message
 
-        # TODO: now that RequestValidationException has a list of errors we need to map that to a list of issues
-        #  OperationOutcomeIssue has a location property that should be used for the path (JSONPath) of the error
-        #  details is a CodeableConcept object. The error message should be the text property of the CodeableConcept
-        #  http://www.hl7.org/fhir/operationoutcome-example-validationfail.json.html - don't do the 'text' bit this is for interactive web apps
-        #  http://www.hl7.org/fhir/operationoutcome.html
         operation_outcome_issue = OperationOutcomeIssue()
         operation_outcome_issue.severity = 'error'
         operation_outcome_issue.code = code
         operation_outcome_issue.details = details
-        operation_outcome_issue.expression  # path goes here
+        operation_outcome_issue.expression = path
 
         operation_outcome = OperationOutcome()
+        operation_outcome.id = "validationfail"
         operation_outcome.issue = [operation_outcome_issue]
 
         self.finish(operation_outcome.as_json())
+
+    def __extract_request_validateion_path_and_message(self, errors):
+        path_list = []
+        message_list_string = ''
+
+        for path, message in errors:
+            path_list.append(path)
+            message_list_string += f'{message} \n '
+
+        return path_list, message_list_string
 
     @timing.time_request
     async def post(self, patient_id):
@@ -68,18 +67,18 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
                 self.set_header("OperationId", unique_operation_id)
                 await self.finish()
             else:
-                self.__set_unsuccesful_response(400, "value", "ID_IN_URI_DOES_NOT_MATCH_PAYLOAD_ID",
-                                                f"URI id `{patient_id}` does not match PAYLOAD id `{patient.id}`")
                 logger.error('Error, id doesnt match')
+                self.__set_unsuccesful_response(400, "value", ["id"],
+                                                f"URI id `{patient_id}` does not match PAYLOAD id `{patient.id}`")
         except RequestValidationException as e:
-            details = f"{e.path} {e.message}"
-            self.__set_unsuccesful_response(400, "value", "JSON_PAYLOAD_NOT_VALID_TO_SCHEMA", details)
+            details = self.__extract_request_validateion_path_and_message(e.errors)
             logger.error(f'Error: {details}')
+            self.__set_unsuccesful_response(400, "value", details[0], details[1])
         except JSONDecodeError as e:
-            self.__set_unsuccesful_response(400, "value", "PAYLOAD_IS_NOT_VALID_JSON_FORMAT",
-                                            "Payload is either missing, empty or not valid to json, this is required.")
             logger.error('Error: Payload is missing, empty or not a valid json')
-
+            self.__set_unsuccesful_response(400, "value", ["PAYLOAD"],
+                                            "Payload is either missing, empty or not valid to json, this is required.")
+            
     @timing.time_request
     async def patch(self, patient_id):
         self.set_status(202)

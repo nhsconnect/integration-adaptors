@@ -3,6 +3,7 @@ import os
 from unittest.mock import patch, MagicMock
 
 import tornado.testing
+from fhir.resources.fhirabstractbase import FHIRValidationError
 from fhir.resources.fhirelementfactory import FHIRElementFactory
 from fhir.resources.patient import Patient
 from tornado.web import Application
@@ -12,6 +13,7 @@ from utilities import message_utilities
 
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.request.acceptance_amendment import AcceptanceAmendmentRequestHandler
+from outbound.schema.request_validation_exception import RequestValidationException, ValidationError
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -108,6 +110,25 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual('OperationOutcome', operation_outcome.resource_type)
         self.assertEqual(400, response.code)
 
-    # TODO: test a validation value by mocking validate_patient with a side effect
-    #  include two errors in exception
-    #  assert that two issues are created on the response for them
+    @patch('outbound.schema.validate_request.validate_patient',
+           side_effect=(RequestValidationException([ValidationError(path='id', message='Wrong type <class \'int\'> for property "id" on <class \'fhir.resources.patient.Patient\'>, expecting <class \'str\'>'), ValidationError(path='meta.versionId', message='Wrong type <class \'int\'> for property "versionId" on <class \'fhir.resources.meta.Meta\'>, expecting <class \'str\'>')]))
+           )
+    @patch.object(MeshOutboundWrapper, "send")
+    @patch.object(MeshOutboundWrapper, "__init__")
+    def test_two_errors_in_fhir_schema(self, mock_init, mock_send, mock_validate_patient):
+        mock_init.return_value = None
+
+        mock_validate_patient.return_value = self.create_patient()
+        MagicMock.__await__ = lambda x: self.async_magic().__await__()
+
+        response = self.fetch('/fhir/Patient/9000000009', method="POST", body=self.create_request_body())
+
+        operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
+
+        self.assertEqual(2, len(operation_outcome.issue[0].expression))
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('validationfail', operation_outcome.id)
+        self.assertEqual('OperationOutcome', operation_outcome.resource_type)
+        self.assertEqual(400, response.code)
+
+
