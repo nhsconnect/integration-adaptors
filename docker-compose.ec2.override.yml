@@ -14,13 +14,14 @@ services:
       - FAKE_SPINE_PORT=${FAKE_SPINE_PORT}
       - FAKE_SPINE_OUTBOUND_SSL_ENABLED=${FAKE_SPINE_OUTBOUND_SSL_ENABLED}
       - MHS_LOG_LEVEL=DEBUG
-    logging:
-      driver: "awslogs"
-      options:
-        awslogs-region: "eu-west-2"
-        awslogs-group: "/aws/ec2/fake-spine-ec2-instance"
-        awslogs-create-group: "true"
-    ports:
-      - "443:443"
-      - "80:80"
+      ports:
+        - "443:443"
+        - "80:80"
+    # logging:
+    #   driver: "awslogs"
+    #   options:
+    #     awslogs-region: "eu-west-2"
+    #     awslogs-group: "/aws/ec2/fake-spine-ec2-instance"
+    #     awslogs-create-group: "true"
+
     
