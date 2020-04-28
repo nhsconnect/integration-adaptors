@@ -15,16 +15,13 @@ class MeshOutboundWrapper:
             password=config.get_config('OUTBOUND_QUEUE_PASSWORD', default=None),
             max_retries=int(config.get_config('OUTBOUND_QUEUE_MAX_RETRIES', default='3')),
             retry_delay=int(config.get_config('OUTBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000)
-        self.queue_max_retries = int(config.get_config('OUTBOUND_MAX_RETRIES', default='3'))
-        self.queue_retry_delay = float(config.get_config('OUTBOUND_RETRY_DELAY', default='100')) / 1000
         self.transmission = None
 
     async def _publish_message_to_inbound_queue(self, message):
-
         result = await retriable_action.RetriableAction(
             lambda: self._put_message_onto_queue_with(message),
-            self.queue_max_retries,
-            self.queue_retry_delay) \
+            self.queue_adaptor.max_retries,
+            self.queue_adaptor.retry_delay) \
             .execute()
 
         if not result.is_successful:
