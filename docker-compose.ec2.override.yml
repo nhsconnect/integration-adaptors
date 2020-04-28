@@ -14,9 +14,9 @@ services:
       - FAKE_SPINE_PORT=${FAKE_SPINE_PORT}
       - FAKE_SPINE_OUTBOUND_SSL_ENABLED=${FAKE_SPINE_OUTBOUND_SSL_ENABLED}
       - MHS_LOG_LEVEL=DEBUG
-      ports:
-        - "443:443"
-        - "80:80"
+    ports:
+      - "443:443"
+      - "80:80"
     # logging:
     #   driver: "awslogs"
     #   options:
