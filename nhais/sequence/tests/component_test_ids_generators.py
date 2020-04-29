@@ -37,16 +37,16 @@ class ComponentTestIds(unittest.TestCase):
             try:
                 await self.__create_table(dynamo_resource)
 
-                '''Generate two transaction ids - to make sure that the value increase each time'''
+                # Generate two transaction ids - to make sure that the value increase each time
                 self.assertEqual(await self.transaction_id_generator.generate_transaction_id(), 1)
                 self.assertEqual(await self.transaction_id_generator.generate_transaction_id(), 2)
 
-                '''Generate interchange id - the sequence should be independent from that of transaction id,
-                so it should start from 1'''
+                # Generate interchange id - the sequence should be independent from that of transaction id,
+                # so it should start from 1
                 self.assertEqual(await self.interchange_id_generator.generate_interchange_id(111, 222), 1)
 
-                '''Generate message id - the sequence should be independent from those of transaction id and
-                interchange id, so it should start from 1'''
+                # Generate message id - the sequence should be independent from those of transaction and
+                # interchange ids, so it should start from 1'''
                 self.assertEqual(await self.message_id_generator.generate_message_id(111, 222), 1)
 
             except dynamo_resource.meta.client.exceptions.ResourceInUseException:
@@ -62,12 +62,12 @@ class ComponentTestIds(unittest.TestCase):
             try:
                 await self.__create_table(dynamo_resource)
 
-                '''Generate two interchange ids for key SIS-111-222'''
+                # Generate two interchange ids for key SIS-111-222
                 self.assertEqual(await self.interchange_id_generator.generate_interchange_id(111, 222), 1)
                 self.assertEqual(await self.interchange_id_generator.generate_interchange_id(111, 222), 2)
 
-                '''Generate interchange id for key SIS-AAA-BBB - the sequence should be independent from 
-                that of interchange ids for key SIS-111-222, so it should start from 1'''
+                # Generate interchange id for key SIS-AAA-BBB - the sequence should be independent from
+                # that of interchange ids for key SIS-111-222, so it should start from 1'''
                 self.assertEqual(await self.interchange_id_generator.generate_interchange_id('AAA', 'BBB'), 1)
 
             except dynamo_resource.meta.client.exceptions.ResourceInUseException:
@@ -83,12 +83,12 @@ class ComponentTestIds(unittest.TestCase):
             try:
                 await self.__create_table(dynamo_resource)
 
-                '''Generate two message ids for key SIS-111-222'''
+                # Generate two message ids for key SIS-111-222
                 self.assertEqual(await self.message_id_generator.generate_message_id(111, 222), 1)
                 self.assertEqual(await self.message_id_generator.generate_message_id(111, 222), 2)
 
-                '''Generate interchange id for key SIS-AAA-BBB - the sequence should be independent from 
-                that of interchange ids for key SIS-111-222, so it should start from 1'''
+                # Generate interchange id for key SIS-AAA-BBB - the sequence should be independent
+                # from that of interchange ids for key SIS-111-222, so it should start from 1
                 self.assertEqual(await self.message_id_generator.generate_message_id('AAA', 'BBB'), 1)
 
             except dynamo_resource.meta.client.exceptions.ResourceInUseException:
