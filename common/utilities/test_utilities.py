@@ -36,7 +36,7 @@ def awaitable_exception(exception: Exception):
     """
     Create a :class:`asyncio.Future` that is completed and raises an exception.
 
-    :param result: to return
+    :param exception: to raise
     :return: a completed :class:`asyncio.Future`
     """
     future = asyncio.Future()
