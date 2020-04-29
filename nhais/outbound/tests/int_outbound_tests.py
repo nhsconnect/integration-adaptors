@@ -1,5 +1,8 @@
+import json
 import unittest
 import uuid
+
+from fhir.resources.fhirelementfactory import FHIRElementFactory
 
 from comms.blocking_queue_adaptor import BlockingQueueAdaptor
 from outbound.tests.fhir_test_helpers import create_patient, GP_ID, HA_ID
@@ -38,3 +41,19 @@ class NhaisIntegrationTests(unittest.TestCase):
         self.assertIn(GP_ID, message.body)
         self.assertIn(HA_ID, message.body)
         # TODO: verify EDIFACT message once inbound parsing work progresses
+
+    def test_acceptance_transaction_translation_error(self):
+        patient = create_patient()
+        patient.managingOrganization.identifier.value = None
+
+        response = OutboundRequestBuilder() \
+            .with_headers() \
+            .with_acceptance_patient(patient) \
+            .execute_post_expecting_bad_request_response()
+
+        operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.content.decode()))
+
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('', operation_outcome.issue[0].expression[0])
+        self.assertEqual('UNB: Attribute recipient is required', operation_outcome.issue[0].details.text)
+        self.assertEqual(400, response.status_code)

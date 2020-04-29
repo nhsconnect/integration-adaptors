@@ -1,14 +1,10 @@
-"""
-Provides access to AMQ queues
-"""
-
 from proton import Message, Timeout
 from proton.utils import BlockingConnection
 
 
 class BlockingQueueAdaptor(object):
     """
-    Allows reading from an AMQ queue
+    Allows blocking reads from an AMQP message queue
     """
 
     def __init__(self, username: str, password: str, queue_url: str, queue_name: str):

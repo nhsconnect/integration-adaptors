@@ -6,6 +6,7 @@ import tornado.web
 from fhir.resources.operationoutcome import OperationOutcome
 from tornado import httputil
 
+from edifact.edifact_exception import EdifactValidationException
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.converter.interchange_translator import InterchangeTranslator
 from outbound.request.fhir_error_helpers import create_operation_outcome_from_validation_exception, \
@@ -48,6 +49,10 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         except RequestValidationException as e:
             logger.exception(f'Error occurred when parsing the FHIR Patient payload')
             operation_outcome = create_operation_outcome_from_validation_exception(e)
+            self.__set_unsuccessful_response(400, operation_outcome)
+        except EdifactValidationException as e:
+            logger.exception('Error occurred when translating the EDIFACT message')
+            operation_outcome = create_operation_outcome(OperationOutcomeIssueCode.STRUCTURE, '', e.message)
             self.__set_unsuccessful_response(400, operation_outcome)
         except JSONDecodeError as e:
             logger.exception(self.JSON_DECODE_ERROR_MESSAGE)

@@ -2,11 +2,10 @@ import asyncio
 from datetime import datetime
 
 from fhir.resources.patient import Patient
-from fhir.resources.practitioner import Practitioner
 
 from edifact.outgoing.models.interchange import InterchangeHeader, InterchangeTrailer
 from edifact.outgoing.models.message import MessageHeader, MessageTrailer, ReferenceTransactionNumber
-from outbound.converter.fhir_helpers import get_ha_identifier
+from outbound.converter.fhir_helpers import get_ha_identifier, get_gp_identifier
 from outbound.converter.stub_message_translator import StubMessageTranslator
 from sequence.interchange_id import InterchangeIdGenerator
 from sequence.message_id import MessageIdGenerator
@@ -35,8 +34,7 @@ class InterchangeTranslator(object):
         return self.__translate_edifact()
 
     def __append_interchange_header(self, patient, translation_timestamp: datetime):
-        gp = patient.generalPractitioner[0]  # type: Practitioner
-        sender = gp.identifier.value
+        sender = get_gp_identifier(patient)
         recipient = get_ha_identifier(patient)
         self.segments.append(InterchangeHeader(sender=sender, recipient=recipient, date_time=translation_timestamp))
         return sender, recipient
