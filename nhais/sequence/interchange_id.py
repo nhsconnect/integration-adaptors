@@ -1,4 +1,4 @@
 class InterchangeIdGenerator(object):
 
-    def next_interchange_id(self):
+    async def generate_interchange_id(self):
         return 1

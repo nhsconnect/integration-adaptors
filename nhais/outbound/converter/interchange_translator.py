@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 
 from fhir.resources.patient import Patient
@@ -47,9 +48,11 @@ class InterchangeTranslator(object):
             segment.pre_validate()
 
     async def __generate_identifiers(self):
-        interchange_id = self.interchange_id_generator.next_interchange_id()
-        message_id = self.message_id_generator.next_message_id()
-        transaction_id = await self.transaction_id_generator.generate_transaction_id()
+        interchange_id, message_id, transaction_id = await asyncio.gather(
+            self.interchange_id_generator.generate_interchange_id(),
+            self.message_id_generator.generate_message_id(),
+            self.transaction_id_generator.generate_transaction_id()
+        )
         for segment in self.segments:
             if isinstance(segment, (InterchangeHeader, InterchangeTrailer)):
                 segment.sequence_number = interchange_id

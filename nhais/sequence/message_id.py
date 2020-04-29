@@ -1,4 +1,4 @@
 class MessageIdGenerator(object):
 
-    def next_message_id(self):
+    async def generate_message_id(self):
         return 1

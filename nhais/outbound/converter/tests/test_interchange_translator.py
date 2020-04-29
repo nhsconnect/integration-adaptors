@@ -2,8 +2,9 @@ import re
 import unittest
 from datetime import datetime, timezone
 from unittest import mock
-from unittest.mock import MagicMock
 
+import sequence.interchange_id
+import sequence.message_id
 import sequence.transaction_id
 from outbound.converter.interchange_translator import InterchangeTranslator
 from outbound.tests.fhir_test_helpers import create_patient, HA_ID, GP_ID
@@ -23,13 +24,18 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
     UNT_PATTERN = r"^UNT\+(?P<segment_count>[0-9]+)\+(?P<sms>[0-9]{8})'$"
     UNZ_PATTERN = r"^UNZ\+(?P<message_count>[0-9]+)\+(?P<sis>[0-9]{8})'$"
 
+    @mock.patch.object(sequence.message_id.MessageIdGenerator, 'generate_message_id')
+    @mock.patch.object(sequence.interchange_id.InterchangeIdGenerator, 'generate_interchange_id')
     @mock.patch.object(sequence.transaction_id.TransactionIdGenerator, 'generate_transaction_id')
     @mock.patch('utilities.date_utilities.DateUtilities.utcnow')
     @async_test
-    async def test_message_translated(self, mock_utcnow, mock_generate_transaction_id):
+    async def test_message_translated(self, mock_utcnow, mock_generate_transaction_id, mock_generate_interchange_id,
+                                      mock_generate_message_id):
         expected_date = datetime(year=2020, month=4, day=27, hour=17, minute=37, tzinfo=timezone.utc)
         mock_utcnow.return_value = expected_date
         mock_generate_transaction_id.return_value = awaitable(5174)
+        mock_generate_interchange_id.return_value = awaitable(45)
+        mock_generate_message_id.return_value = awaitable(56)
         self.assertEqual(expected_date, DateUtilities.utcnow())
         patient = create_patient()
 
@@ -44,13 +50,13 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         self.assertRegex(unz, self.UNZ_PATTERN)
         unz_match = re.match(self.UNZ_PATTERN, unz)
         self.assertEqual('1', unz_match.group('message_count'))
-        self.assertEqual('00000001', unz_match.group('sis'))
+        self.assertEqual('00000045', unz_match.group('sis'))
 
         unt = segments.pop()
         self.assertRegex(unt, self.UNT_PATTERN)
         unt_match = re.match(self.UNT_PATTERN, unt)
         self.assertEqual('7', unt_match.group('segment_count'))
-        self.assertEqual('00000001', unt_match.group('sms'))
+        self.assertEqual('00000056', unt_match.group('sms'))
 
         rff_tn = segments.pop()
         self.assertRegex(rff_tn, self.RFF_TN_PATTERN)
@@ -80,7 +86,7 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         unh = segments.pop()
         self.assertRegex(unh, self.UNH_PATTERN)
         unh_match = re.match(self.UNH_PATTERN, unh)
-        self.assertEqual('00000001', unh_match.group('sms'))
+        self.assertEqual('00000056', unh_match.group('sms'))
 
         unb = segments.pop()
         self.assertRegex(unb, self.UNB_PATTERN)
@@ -88,4 +94,4 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         self.assertEqual(GP_ID, unb_match.group('sender'))
         self.assertEqual(HA_ID, unb_match.group('recipient'))
         self.assertEqual('200427:1737', unb_match.group('timestamp'))
-        self.assertEqual('00000001', unb_match.group('sis'))
+        self.assertEqual('00000045', unb_match.group('sis'))
