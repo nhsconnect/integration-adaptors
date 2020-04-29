@@ -5,15 +5,15 @@ from typing import Any
 import tornado.web
 from fhir.resources.operationoutcome import OperationOutcome
 from tornado import httputil
-from utilities import integration_adaptors_logger as log, timing
-from utilities import message_utilities
 
 from mesh.mesh_outbound import MeshOutboundWrapper
-from outbound.converter.fhir_to_edifact import FhirToEdifact
+from outbound.converter.interchange_translator import InterchangeTranslator
 from outbound.request.fhir_error_helpers import create_operation_outcome_from_validation_exception, \
     OperationOutcomeIssueCode, create_operation_outcome
 from outbound.schema import validate_request
 from outbound.schema.request_validation_exception import RequestValidationException
+from utilities import integration_adaptors_logger as log, timing
+from utilities import message_utilities
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -25,7 +25,7 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
 
     def __init__(self, application, request: httputil.HTTPServerRequest, **kwargs: Any):
         super().__init__(application, request, **kwargs)
-        self.fhir_to_edifact = FhirToEdifact()
+        self.fhir_to_edifact = InterchangeTranslator()
         self.mesh_wrapper = MeshOutboundWrapper()
 
     @timing.time_request
@@ -34,10 +34,10 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
             request_body = json.loads(self.request.body.decode())
             patient = validate_request.validate_patient(request_body)
             if patient.id == patient_id:
-                edifact = self.fhir_to_edifact.convert(patient)
-                unique_operation_id = message_utilities.get_uuid()
-                await self.mesh_wrapper.send(edifact.as_json())
+                edifact = await self.fhir_to_edifact.convert(patient)
+                await self.mesh_wrapper.send(edifact)
                 self.set_status(202)
+                unique_operation_id = message_utilities.get_uuid()
                 self.set_header("OperationId", unique_operation_id)
                 await self.finish()
             else:

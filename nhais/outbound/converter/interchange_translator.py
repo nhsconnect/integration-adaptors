@@ -22,12 +22,13 @@ class InterchangeTranslator(object):
         self.interchange_id_generator = InterchangeIdGenerator()
         self.segments = []
 
-    async def convert(self, patient: Patient):
+    async def convert(self, patient: Patient) -> str:
         translation_timestamp = DateUtilities.utcnow()
         self.__append_interchange_header(patient, translation_timestamp)
         self.__append_message_segments(patient, translation_timestamp)
         self.segments.append(InterchangeTrailer(number_of_messages=1))
 
+        # pre-validate to ensure the EDIFACT message is valid before generating sequence numbers for it
         self.__pre_validate_segments()
         await self.__generate_identifiers()
         await self.__record_outgoing_state()

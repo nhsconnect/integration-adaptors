@@ -1,5 +1,4 @@
 import abc
-import unittest
 
 from edifact.edifact_exception import EdifactValidationException
 from edifact.outgoing.models.segment import Segment

@@ -24,5 +24,5 @@ class MeshOutboundWrapper:
         await self.queue_adaptor.send_async({'payload': message})
 
     @timing.time_function
-    async def send(self, message):
+    async def send(self, message: str):
         await self._publish_message_to_outbound_queue(message)

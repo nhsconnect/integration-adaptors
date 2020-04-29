@@ -7,12 +7,14 @@ from fhir.resources.fhirelementfactory import FHIRElementFactory
 from fhir.resources.operationoutcome import OperationOutcomeIssue
 from fhir.resources.patient import Patient
 from tornado.web import Application
-from utilities import message_utilities
 
 from mesh.mesh_outbound import MeshOutboundWrapper
+from outbound.converter.interchange_translator import InterchangeTranslator
 from outbound.request.acceptance_amendment import AcceptanceAmendmentRequestHandler
 from outbound.schema import validate_request
 from outbound.schema.request_validation_exception import RequestValidationException, ValidationError
+from utilities import message_utilities
+from utilities.test_utilities import awaitable
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,14 +46,16 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(404, response.code)
         self.assertEqual('Not Found', response.reason)
 
+    @patch.object(InterchangeTranslator, 'convert')
     @patch.object(validate_request, 'validate_patient')
     @patch.object(message_utilities, "get_uuid")
     @patch.object(MeshOutboundWrapper, "send")
     @patch.object(MeshOutboundWrapper, "__init__")
-    def test_happy_path(self, mock_init, mock_send, mock_get_uuid, mock_validate_patient):
+    def test_happy_path(self, mock_init, mock_send, mock_get_uuid, mock_validate_patient, mock_convert):
         mock_init.return_value = None
         mock_get_uuid.return_value = MOCK_UUID
         mock_validate_patient.return_value = self.create_patient()
+        mock_convert.return_value = awaitable('EDIFACT')
         MagicMock.__await__ = lambda x: self.async_magic().__await__()
 
         response = self.fetch(r'/fhir/Patient/9000000009', method="POST", body=self.create_request_body())
