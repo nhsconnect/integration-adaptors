@@ -7,12 +7,12 @@ from fhir.resources.fhirelementfactory import FHIRElementFactory
 from fhir.resources.operationoutcome import OperationOutcomeIssue
 from fhir.resources.patient import Patient
 from tornado.web import Application
+from utilities import message_utilities
 
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.request.acceptance_amendment import AcceptanceAmendmentRequestHandler
 from outbound.schema import validate_request
 from outbound.schema.request_validation_exception import RequestValidationException, ValidationError
-from utilities import message_utilities
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 

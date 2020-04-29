@@ -5,6 +5,8 @@ from typing import Any
 import tornado.web
 from fhir.resources.operationoutcome import OperationOutcome
 from tornado import httputil
+from utilities import integration_adaptors_logger as log, timing
+from utilities import message_utilities
 
 from mesh.mesh_outbound import MeshOutboundWrapper
 from outbound.converter.fhir_to_edifact import FhirToEdifact
@@ -12,8 +14,6 @@ from outbound.request.fhir_error_helpers import create_operation_outcome_from_va
     OperationOutcomeIssueCode, create_operation_outcome
 from outbound.schema import validate_request
 from outbound.schema.request_validation_exception import RequestValidationException
-from utilities import integration_adaptors_logger as log, timing
-from utilities import message_utilities
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 

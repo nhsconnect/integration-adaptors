@@ -4,10 +4,10 @@ import asyncio
 import unittest
 
 import aioboto3
-
-from sequence import dynamo_sequence
 from utilities import config
 from utilities import test_utilities
+
+from sequence import dynamo_sequence
 
 
 class ComponentTestDynamoSequence(unittest.TestCase):

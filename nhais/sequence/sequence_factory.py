@@ -1,5 +1,6 @@
 import utilities.config as config
 import utilities.integration_adaptors_logger as log
+
 from sequence.dynamo_sequence import DynamoSequenceGenerator
 from sequence.sequence import SequenceGenerator
 
