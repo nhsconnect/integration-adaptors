@@ -5,13 +5,13 @@ from edifact.outgoing.models.interchange import InterchangeHeader, InterchangeTr
 from edifact.outgoing.models.segment import Segment
 from edifact.outgoing.models.tests.base_segment_test import BaseSegmentTest
 
-TS = datetime(year=2019, month=4, day=23, hour=9, minute=0)
-
 
 class TestInterchangeHeader(BaseSegmentTest, unittest.TestCase):
 
+    TS = datetime(year=2019, month=4, day=23, hour=9, minute=0)
+
     def _create_segment(self) -> Segment:
-        return InterchangeHeader(sender="SNDR", recipient="RECP", date_time=TS, sequence_number=1)
+        return InterchangeHeader(sender="SNDR", recipient="RECP", date_time=self.TS, sequence_number=1)
 
     def _get_attributes(self):
         return ['sender', 'recipient', 'date_time', 'sequence_number']

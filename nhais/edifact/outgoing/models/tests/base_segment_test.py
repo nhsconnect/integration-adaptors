@@ -5,6 +5,9 @@ from edifact.outgoing.models.segment import Segment
 
 
 class BaseSegmentTest(abc.ABC):
+    """
+    A base test for subclasses of Segment. Implementor must also inherit unittest.TestCase.
+    """
 
     @abc.abstractmethod
     def _create_segment(self) -> Segment:
@@ -34,15 +37,6 @@ class BaseSegmentTest(abc.ABC):
 
     def test_missing_attributes(self):
         self.__test_missing_properties(self._get_attributes(), self._create_segment)
-    
-    def __test_missing_params(self, all_params: dict, constructor):
-        for key, value in all_params.items():
-            missing = dict(all_params)
-            missing[key] = None
-            with_missing = constructor(**missing)
-            with self.assertRaises(EdifactValidationException, msg=f'missing "{key}" did not fail validation') as ctx:
-                with_missing.to_edifact()
-            self.assertEqual(f'{with_missing.key}: Attribute {key} is required', ctx.exception.args[0])
 
     def __test_missing_properties(self, attribute_names: list, generator):
         """

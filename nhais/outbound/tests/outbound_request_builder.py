@@ -1,6 +1,3 @@
-"""
-Provides functionality for calling the MHS over HTTP
-"""
 from __future__ import annotations
 
 import json
