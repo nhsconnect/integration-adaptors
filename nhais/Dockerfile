@@ -1,7 +1,4 @@
 FROM python:3.7-slim as base
-# TODO: nhais doesn't use the tornado client so we shouldn't need curl but I can't exclude it
-# mhs-inbound seems to get away without it though...
-RUN apt-get update && apt-get install build-essential -y
 RUN pip install pipenv
 RUN mkdir -p /usr/src/app/nhais
 # TODO: should just be . after NIAD-193
@@ -11,6 +8,14 @@ COPY ./nhais/ /usr/src/app/nhais
 RUN mkdir -p /usr/src/app/common
 COPY ./common/ /usr/src/app/common
 WORKDIR /usr/src/app/nhais
+
+FROM base as builder
+# build-essential needed to by pipenv to compile dependencies but not needed at runtime
+RUN apt-get update && apt-get install build-essential -y
 RUN pipenv install --ignore-pipfile
+
+FROM base
+RUN mkdir -p /root/.local/share/virtualenvs
+COPY --from=builder /root/.local/share/virtualenvs /root/.local/share/virtualenvs
 EXPOSE 80
 ENTRYPOINT pipenv run start
