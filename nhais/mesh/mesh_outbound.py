@@ -4,6 +4,7 @@ from utilities import timing, config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
+
 class MeshOutboundWrapper:
 
     def __init__(self):
@@ -17,11 +18,7 @@ class MeshOutboundWrapper:
         self.transmission = None
 
     async def _publish_message_to_outbound_queue(self, message):
-        try:
-            await self._put_message_onto_queue_with(message)
-        except Exception as e:
-            raise e
-
+        await self._put_message_onto_queue_with(message)
 
     async def _put_message_onto_queue_with(self, message):
         await self.queue_adaptor.send_async({'payload': message})
@@ -29,8 +26,3 @@ class MeshOutboundWrapper:
     @timing.time_function
     async def send(self, message):
         await self._publish_message_to_outbound_queue(message)
-
-
-
-
-
