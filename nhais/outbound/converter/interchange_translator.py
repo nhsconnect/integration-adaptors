@@ -24,13 +24,13 @@ class InterchangeTranslator(object):
 
     async def convert(self, patient: Patient) -> str:
         translation_timestamp = DateUtilities.utcnow()
-        self.__append_interchange_header(patient, translation_timestamp)
+        sender, recipient = self.__append_interchange_header(patient, translation_timestamp)
         self.__append_message_segments(patient, translation_timestamp)
         self.segments.append(InterchangeTrailer(number_of_messages=1))
 
         # pre-validate to ensure the EDIFACT message is valid before generating sequence numbers for it
         self.__pre_validate_segments()
-        await self.__generate_identifiers()
+        await self.__generate_identifiers(sender, recipient)
         await self.__record_outgoing_state()
         return self.__translate_edifact()
 
@@ -39,6 +39,7 @@ class InterchangeTranslator(object):
         sender = gp.identifier.value
         recipient = get_ha_identifier(patient)
         self.segments.append(InterchangeHeader(sender=sender, recipient=recipient, date_time=translation_timestamp))
+        return sender, recipient
 
     def __append_message_segments(self, patient: Patient, translation_timestamp: datetime):
         message_translator = StubMessageTranslator(translation_timestamp)
@@ -48,10 +49,10 @@ class InterchangeTranslator(object):
         for segment in self.segments:
             segment.pre_validate()
 
-    async def __generate_identifiers(self):
+    async def __generate_identifiers(self, sender, recipient):
         interchange_id, message_id, transaction_id = await asyncio.gather(
-            self.interchange_id_generator.generate_interchange_id(),
-            self.message_id_generator.generate_message_id(),
+            self.interchange_id_generator.generate_interchange_id(sender, recipient),
+            self.message_id_generator.generate_message_id(sender, recipient),
             self.transaction_id_generator.generate_transaction_id()
         )
         for segment in self.segments:
