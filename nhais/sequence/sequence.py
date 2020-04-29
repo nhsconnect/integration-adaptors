@@ -1,5 +1,4 @@
 import abc
-from typing import Optional
 
 
 class SequenceGenerator(abc.ABC):
