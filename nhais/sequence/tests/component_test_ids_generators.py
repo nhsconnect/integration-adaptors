@@ -14,7 +14,7 @@ class ComponentTestIds(unittest.TestCase):
 
     def setUp(self):
         config.setup_config("MHS")
-        self.table_name = 'test_dynamo_sequence_table'
+        self.table_name = 'test_ids_generators_table'
         self.key = 'transaction_id'
         self.endpoint = config.get_config('DYNAMODB_ENDPOINT_URL', None)
         self.region_name = 'eu-west-2'
