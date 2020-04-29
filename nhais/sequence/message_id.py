@@ -10,6 +10,6 @@ class MessageIdGenerator:
         self.table_name = 'transaction_id_counter'
 
     async def generate_message_id(self, sender, recipient) -> int:
-        key = "SMS-" + str(sender) + "-" + str(recipient)
+        key = f"SMS-{sender}-{recipient}"
         message_generator = get_sequence_generator(self.table_name)
         return await message_generator.next(key)
