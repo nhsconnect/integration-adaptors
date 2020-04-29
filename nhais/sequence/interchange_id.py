@@ -9,7 +9,7 @@ class InterchangeIdGenerator:
     def __init__(self):
         self.table_name = 'transaction_id_counter'
 
-    async def generate_outbound_id(self, sender, recipient) -> int:
+    async def generate_interchange_id(self, sender, recipient) -> int:
         key = "SIS-" + str(sender) + "-" + str(recipient)
         interchange_generator = get_sequence_generator(self.table_name)
         return await interchange_generator.next(key)
