@@ -7,7 +7,7 @@ class MessageIdGenerator:
     SMS (Send Message Sequence) - sequence number applied for each message within an interchange"""
 
     def __init__(self):
-        self.table_name = 'transaction_id_counter'
+        self.table_name = 'generated_id_counter'
 
     async def generate_message_id(self, sender, recipient) -> int:
         key = f"SMS-{sender}-{recipient}"

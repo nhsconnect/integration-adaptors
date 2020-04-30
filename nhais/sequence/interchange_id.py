@@ -7,7 +7,7 @@ class InterchangeIdGenerator:
     SIS (Send Interchange Sequence) - sequence number for the entire EDIFACT interchange """
 
     def __init__(self):
-        self.table_name = 'transaction_id_counter'
+        self.table_name = 'generated_id_counter'
 
     async def generate_interchange_id(self, sender, recipient) -> int:
         key = f"SIS-{sender}-{recipient}"
