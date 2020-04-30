@@ -19,8 +19,8 @@ class ComponentTestIds(unittest.TestCase):
         self.endpoint = config.get_config('DYNAMODB_ENDPOINT_URL', None)
         self.region_name = 'eu-west-2'
 
-        '''Create instances of three generators and replace the default table_name
-        of each generator with test table name used in this test'''
+        # Create instances of three generators and replace the default table_name
+        # of each generator with test table name used in this test
         self.transaction_id_generator = TransactionIdGenerator()
         self.transaction_id_generator.table_name = self.table_name
 
