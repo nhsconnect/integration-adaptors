@@ -247,3 +247,9 @@ variable "mhs_forward_reliable_endpoint_url" {
   type = string
   description = "The URL to communicate with Spine for Forward Reliable messaging from the outbound service"
 }
+
+variable "dhcp_options_in_use" {
+  type = string
+  description = "Which set of DHCP options should be used for this VPC, aws or nhs"
+  default = "aws"
+}
