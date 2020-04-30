@@ -1,13 +1,12 @@
 """Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
 import contextlib
 import json
-from typing import Optional
 
 import aioboto3
-import utilities.integration_adaptors_logger as log
-from utilities import config
 
+import utilities.integration_adaptors_logger as log
 from persistence import persistence_adaptor
+from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
