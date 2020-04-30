@@ -1,11 +1,21 @@
 resource "aws_vpc_dhcp_options" "nhs_dhcp_options" {
   domain_name = "nhs.uk"
   domain_name_servers = ["155.231.231.1", "155.231.231.2"]
+
+  tags = {
+    EnvironmentId = "ptl"
+    Name = "ptl-nhs_dhcp_options"
+  }
 }
 
 resource "aws_vpc_dhcp_options" "aws_dhcp_options" { 
   domain_name = "${var.region}-compute.internal"
   domain_name_servers = ["AmazonProvidedDNS"]
+
+  tags = {
+    EnvironmentId = "ptl"
+    Name = "ptl-aws_dhcp_options"
+  }
 }
 
 resource "aws_vpc_dhcp_options_association" "nhs_association" {
