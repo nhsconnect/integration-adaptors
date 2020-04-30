@@ -1,4 +1,4 @@
-FROM python:3.7-slim as base
+FROM python:3.7-alpine as base
 RUN pip install pipenv
 RUN mkdir -p /usr/src/app/nhais
 # TODO: should just be . after NIAD-193
@@ -11,7 +11,7 @@ WORKDIR /usr/src/app/nhais
 
 FROM base as builder
 # build-essential needed to by pipenv to compile dependencies but not needed at runtime
-RUN apt-get update && apt-get install build-essential -y
+RUN apk add --update alpine-sdk libxml2-dev libxslt-dev
 RUN pipenv install --ignore-pipfile
 
 FROM base
