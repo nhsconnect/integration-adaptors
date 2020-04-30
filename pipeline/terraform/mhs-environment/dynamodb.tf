@@ -12,8 +12,9 @@
 resource "aws_dynamodb_table" "mhs_state_table" {
   name = "${var.environment_id}-mhs-state"
   hash_key = "key"
-  read_capacity = var.mhs_state_table_read_capacity
-  write_capacity = var.mhs_state_table_write_capacity
+  billing_mode = PAY_PER_REQUEST
+  #read_capacity = var.mhs_state_table_read_capacity
+  #write_capacity = var.mhs_state_table_write_capacity
 
   attribute {
     name = "key"
