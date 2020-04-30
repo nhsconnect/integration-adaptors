@@ -3,9 +3,7 @@
 import unittest
 
 import aioboto3
-from sequence.interchange_id import InterchangeIdGenerator
-from sequence.message_id import MessageIdGenerator
-from sequence.transaction_id import TransactionIdGenerator
+from sequence.sequence_manager import IdGenerator
 from utilities import test_utilities
 from utilities import config
 
@@ -19,16 +17,10 @@ class ComponentTestIds(unittest.TestCase):
         self.endpoint = config.get_config('DYNAMODB_ENDPOINT_URL', None)
         self.region_name = 'eu-west-2'
 
-        # Create instances of three generators and replace the default table_name
-        # of each generator with test table name used in this test
-        self.transaction_id_generator = TransactionIdGenerator()
-        self.transaction_id_generator.table_name = self.table_name
-
-        self.interchange_id_generator = InterchangeIdGenerator()
-        self.interchange_id_generator.table_name = self.table_name
-
-        self.message_id_generator = MessageIdGenerator()
-        self.message_id_generator.table_name = self.table_name
+        # Create instance id generator and replace the default table_name
+        # with test table name used in this test
+        self.id_generator = IdGenerator()
+        self.id_generator.table_name = self.table_name
 
     @test_utilities.async_test
     async def test_each_id_has_separate_sequence(self):
@@ -38,16 +30,16 @@ class ComponentTestIds(unittest.TestCase):
                 await self.__create_table(dynamo_resource)
 
                 # Generate two transaction ids - to make sure that the value increase each time
-                self.assertEqual(await self.transaction_id_generator.generate_transaction_id(), 1)
-                self.assertEqual(await self.transaction_id_generator.generate_transaction_id(), 2)
+                self.assertEqual(await self.id_generator.generate_transaction_id(), 1)
+                self.assertEqual(await self.id_generator.generate_transaction_id(), 2)
 
                 # Generate interchange id - the sequence should be independent from that of transaction id,
                 # so it should start from 1
-                self.assertEqual(await self.interchange_id_generator.generate_interchange_id(111, 222), 1)
+                self.assertEqual(await self.id_generator.generate_interchange_id(111, 222), 1)
 
                 # Generate message id - the sequence should be independent from those of transaction and
                 # interchange ids, so it should start from 1'''
-                self.assertEqual(await self.message_id_generator.generate_message_id(111, 222), 1)
+                self.assertEqual(await self.id_generator.generate_message_id(111, 222), 1)
 
             except dynamo_resource.meta.client.exceptions.ResourceInUseException:
                 self.fail()
@@ -63,12 +55,12 @@ class ComponentTestIds(unittest.TestCase):
                 await self.__create_table(dynamo_resource)
 
                 # Generate two interchange ids for key SIS-111-222
-                self.assertEqual(await self.interchange_id_generator.generate_interchange_id(111, 222), 1)
-                self.assertEqual(await self.interchange_id_generator.generate_interchange_id(111, 222), 2)
+                self.assertEqual(await self.id_generator.generate_interchange_id(111, 222), 1)
+                self.assertEqual(await self.id_generator.generate_interchange_id(111, 222), 2)
 
                 # Generate interchange id for key SIS-AAA-BBB - the sequence should be independent from
                 # that of interchange ids for key SIS-111-222, so it should start from 1'''
-                self.assertEqual(await self.interchange_id_generator.generate_interchange_id('AAA', 'BBB'), 1)
+                self.assertEqual(await self.id_generator.generate_interchange_id('AAA', 'BBB'), 1)
 
             except dynamo_resource.meta.client.exceptions.ResourceInUseException:
                 self.fail()
@@ -84,12 +76,12 @@ class ComponentTestIds(unittest.TestCase):
                 await self.__create_table(dynamo_resource)
 
                 # Generate two message ids for key SIS-111-222
-                self.assertEqual(await self.message_id_generator.generate_message_id(111, 222), 1)
-                self.assertEqual(await self.message_id_generator.generate_message_id(111, 222), 2)
+                self.assertEqual(await self.id_generator.generate_message_id(111, 222), 1)
+                self.assertEqual(await self.id_generator.generate_message_id(111, 222), 2)
 
                 # Generate interchange id for key SIS-AAA-BBB - the sequence should be independent
                 # from that of interchange ids for key SIS-111-222, so it should start from 1
-                self.assertEqual(await self.message_id_generator.generate_message_id('AAA', 'BBB'), 1)
+                self.assertEqual(await self.id_generator.generate_message_id('AAA', 'BBB'), 1)
 
             except dynamo_resource.meta.client.exceptions.ResourceInUseException:
                 self.fail()

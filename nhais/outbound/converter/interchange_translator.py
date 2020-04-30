@@ -7,18 +7,14 @@ from edifact.outgoing.models.interchange import InterchangeHeader, InterchangeTr
 from edifact.outgoing.models.message import MessageHeader, MessageTrailer, ReferenceTransactionNumber
 from outbound.converter.fhir_helpers import get_ha_identifier, get_gp_identifier
 from outbound.converter.stub_message_translator import StubMessageTranslator
-from sequence.interchange_id import InterchangeIdGenerator
-from sequence.message_id import MessageIdGenerator
-from sequence.transaction_id import TransactionIdGenerator
+from sequence.sequence_manager import IdGenerator
 from utilities.date_utilities import DateUtilities
 
 
 class InterchangeTranslator(object):
 
     def __init__(self):
-        self.transaction_id_generator = TransactionIdGenerator()
-        self.message_id_generator = MessageIdGenerator()
-        self.interchange_id_generator = InterchangeIdGenerator()
+        self.id_generator = IdGenerator()
         self.segments = []
 
     async def convert(self, patient: Patient) -> str:
@@ -49,9 +45,9 @@ class InterchangeTranslator(object):
 
     async def __generate_identifiers(self, sender, recipient):
         interchange_id, message_id, transaction_id = await asyncio.gather(
-            self.interchange_id_generator.generate_interchange_id(sender, recipient),
-            self.message_id_generator.generate_message_id(sender, recipient),
-            self.transaction_id_generator.generate_transaction_id()
+            self.id_generator.generate_interchange_id(sender, recipient),
+            self.id_generator.generate_message_id(sender, recipient),
+            self.id_generator.generate_transaction_id()
         )
         for segment in self.segments:
             if isinstance(segment, (InterchangeHeader, InterchangeTrailer)):
