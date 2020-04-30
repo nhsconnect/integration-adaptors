@@ -1,9 +1,8 @@
 import aioboto3 as aioboto3
-from boto3.dynamodb.conditions import Key
-
-from sequence.sequence import SequenceGenerator
 import utilities.integration_adaptors_logger as log
 from utilities import config
+
+from sequence.sequence import SequenceGenerator
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
