@@ -27,16 +27,16 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
     @mock.patch.object(sequence.message_id.MessageIdGenerator, 'generate_message_id')
     @mock.patch.object(sequence.interchange_id.InterchangeIdGenerator, 'generate_interchange_id')
     @mock.patch.object(sequence.transaction_id.TransactionIdGenerator, 'generate_transaction_id')
-    @mock.patch('utilities.date_utilities.DateUtilities.utcnow')
+    @mock.patch('utilities.date_utilities.DateUtilities.utc_now')
     @async_test
-    async def test_message_translated(self, mock_utcnow, mock_generate_transaction_id, mock_generate_interchange_id,
+    async def test_message_translated(self, mock_utc_now, mock_generate_transaction_id, mock_generate_interchange_id,
                                       mock_generate_message_id):
         expected_date = datetime(year=2020, month=4, day=27, hour=17, minute=37, tzinfo=timezone.utc)
-        mock_utcnow.return_value = expected_date
+        mock_utc_now.return_value = expected_date
         mock_generate_transaction_id.return_value = awaitable(5174)
         mock_generate_interchange_id.return_value = awaitable(45)
         mock_generate_message_id.return_value = awaitable(56)
-        self.assertEqual(expected_date, DateUtilities.utcnow())
+        self.assertEqual(expected_date, DateUtilities.utc_now())
         patient = create_patient()
 
         translator = InterchangeTranslator()

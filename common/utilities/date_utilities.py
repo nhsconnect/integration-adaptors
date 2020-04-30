@@ -18,7 +18,7 @@ class DateUtilities(object):
         return timedelta.total_seconds()
 
     @staticmethod
-    def utcnow() -> datetime:
+    def utc_now() -> datetime:
         """
         :return: the current datetime in utc
         """

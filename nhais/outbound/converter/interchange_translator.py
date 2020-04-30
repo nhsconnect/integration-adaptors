@@ -22,7 +22,7 @@ class InterchangeTranslator(object):
         self.segments = []
 
     async def convert(self, patient: Patient) -> str:
-        translation_timestamp = DateUtilities.utcnow()
+        translation_timestamp = DateUtilities.utc_now()
         sender, recipient = self.__append_interchange_header(patient, translation_timestamp)
         self.__append_message_segments(patient, translation_timestamp)
         self.segments.append(InterchangeTrailer(number_of_messages=1))
