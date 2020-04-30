@@ -95,8 +95,9 @@ pipeline {
                             println("Wait 60 seconds between applies")
                             sleep(60)
                         }
+                        //  terraform plan -no-color -auto-approve \
                         sh label: 'Applying Terraform configuration, part 2', script: """
-                            terraform plan -no-color -auto-approve \
+                            terraform plan -no-color \
                             -var environment_id=${ENVIRONMENT_ID} \
                             -var build_id=${BUILD_TAG} \
                             -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
