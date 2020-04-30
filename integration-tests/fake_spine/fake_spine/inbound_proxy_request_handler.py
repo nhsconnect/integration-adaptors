@@ -11,6 +11,7 @@ logger = log.IntegrationAdaptorsLogger(__name__)
 class InboundProxyRequestHandler(BaseHandler):
 
     def initialize(self, inbound_certs: Certs) -> None:
+        super().initialize()
         self.inbound_certs = inbound_certs
         self.config = fake_spine_configuration.FakeSpineConfiguration()
 
