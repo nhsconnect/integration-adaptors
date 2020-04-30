@@ -92,12 +92,12 @@ pipeline {
                             -var mhs_forward_reliable_endpoint_url="https://msg.int.spine2.ncrs.nhs.uk/reliablemessaging/reliablerequest"
                         """
                         script {
-                            println("Wait 60 seconds between applies")
-                            sleep(60)
+                            println("Wait 2 minutes between applies")
+                            sleep(120)
                         }
                         //  terraform plan -no-color -auto-approve \
                         sh label: 'Applying Terraform configuration, part 2', script: """
-                            terraform plan -no-color \
+                            terraform plan -no-color -auto-approve \
                             -var environment_id=${ENVIRONMENT_ID} \
                             -var build_id=${BUILD_TAG} \
                             -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
