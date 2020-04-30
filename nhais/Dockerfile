@@ -10,7 +10,7 @@ COPY ./common/ /usr/src/app/common
 WORKDIR /usr/src/app/nhais
 
 FROM base as builder
-# build-essential needed to by pipenv to compile dependencies but not needed at runtime
+# dependencies needed to by pipenv install but not required at runtime
 RUN apk add --update alpine-sdk libxml2-dev libxslt-dev
 RUN pipenv install --ignore-pipfile
 
