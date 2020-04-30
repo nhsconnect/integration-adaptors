@@ -1,0 +1,5 @@
+FROM nhais_nhais:latest
+RUN pipenv install -d
+RUN printf "#!/bin/sh\npipenv run unittests && pipenv run componenttests && pipenv run inttests" > test.sh
+RUN chmod +x test.sh
+ENTRYPOINT ["/usr/src/app/nhais/test.sh"]

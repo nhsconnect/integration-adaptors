@@ -31,7 +31,7 @@ class DynamoSequenceGenerator(SequenceGenerator):
         return num
 
     async def _next(self, key: str) -> int:
-        endpoint = config.get_config('DYNAMODB_ENDPOINT_URL', None)
+        endpoint = config.get_config('DYNAMODB_ENDPOINT_URL')
         async with aioboto3.resource('dynamodb', region_name='eu-west-2', endpoint_url=endpoint) as dynamo_resource:
             table = await dynamo_resource.Table(self.table_name)
             response = await table.update_item(

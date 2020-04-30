@@ -8,10 +8,8 @@ requests = "~=2.23"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
-tornado = "*"
+tornado = "~=6.0"
 integration-adaptors-common = {editable = true,path = "./../common"}
-pycurl = {version = "~=7.43",platform_system = "!= 'Windows'"}
-marshmallow = "~=3.2"
 fhir-resources = "~=5.1"
 aioboto3 = "~=8.0"
 
@@ -22,3 +20,4 @@ python_version = "3.7"
 unittests = 'python -m xmlrunner discover -o test-reports -p "test_*" -v'
 inttests = 'python -m xmlrunner discover -o test-reports -p "int_*" -v'
 componenttests = 'python -m xmlrunner discover -o test-reports -p "component_*" -v'
+start = "python main.py"
