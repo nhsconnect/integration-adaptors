@@ -13,6 +13,7 @@ logger = log.IntegrationAdaptorsLogger(__name__)
 class SpineRequestHandler(BaseHandler):
 
     def initialize(self, fake_response_handler: SpineRequestResponseMapper) -> None:
+        super().initialize()
         self.fake_response_handler = fake_response_handler
         self.inbound_client = InboundClient()
         self.config = fake_spine_configuration.FakeSpineConfiguration()
