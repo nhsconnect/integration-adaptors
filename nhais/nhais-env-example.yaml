@@ -11,4 +11,4 @@ NHAIS_OUTBOUND_QUEUE_NAME: 'nhais_outbound'
 #common tests
 AWS_ACCESS_KEY_ID: test
 AWS_SECRET_ACCESS_KEY: test
-MHS_DYNAMODB_ENDPOINT_URL: http://localhost:8000
+NHAIS_DYNAMODB_ENDPOINT_URL: http://localhost:8000

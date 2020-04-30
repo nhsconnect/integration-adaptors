@@ -4,8 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-apispec = "~=3.0"
-apispec-webframeworks = "~=0.5"
+requests = "~=2.23"
+unittest-xml-reporting = "~=2.5"
 
 [packages]
 tornado = "*"
@@ -17,3 +17,8 @@ aioboto3 = "~=8.0"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+unittests = 'python -m xmlrunner discover -o test-reports -p "test_*" -v'
+inttests = 'python -m xmlrunner discover -o test-reports -p "int_*" -v'
+componenttests = 'python -m xmlrunner discover -o test-reports -p "component_*" -v'

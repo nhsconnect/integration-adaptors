@@ -1,6 +1,7 @@
 """
 Date utility class
 """
+from datetime import datetime, tzinfo, timezone
 
 import isodate
 
@@ -15,3 +16,10 @@ class DateUtilities(object):
         """
         timedelta = isodate.parse_duration(xml_date_time)
         return timedelta.total_seconds()
+
+    @staticmethod
+    def utc_now() -> datetime:
+        """
+        :return: the current datetime in utc
+        """
+        return datetime.now(tz=timezone.utc)

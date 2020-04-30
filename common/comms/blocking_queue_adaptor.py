@@ -1,15 +1,10 @@
-"""
-Provides access to AMQ queues
-"""
-import os
-
 from proton import Message, Timeout
 from proton.utils import BlockingConnection
 
 
-class AMQWrapper(object):
+class BlockingQueueAdaptor(object):
     """
-    Allows reading from an AMQ queue
+    Allows blocking reads from an AMQP message queue
     """
 
     def __init__(self, username: str, password: str, queue_url: str, queue_name: str):
@@ -45,9 +40,3 @@ class AMQWrapper(object):
             pass
         finally:
             connection.close()
-
-
-MHS_INBOUND_QUEUE = AMQWrapper(os.environ.get('MHS_SECRET_INBOUND_QUEUE_USERNAME', None),
-                               os.environ.get('MHS_SECRET_INBOUND_QUEUE_PASSWORD', None),
-                               os.environ.get('MHS_INBOUND_QUEUE_BROKERS', 'amqp://localhost:5672'),
-                               os.environ.get('MHS_INBOUND_QUEUE_NAME', 'inbound'))

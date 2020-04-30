@@ -7,12 +7,15 @@ from fhir.resources.fhirelementfactory import FHIRElementFactory
 from fhir.resources.operationoutcome import OperationOutcomeIssue
 from fhir.resources.patient import Patient
 from tornado.web import Application
-from utilities import message_utilities
 
+from edifact.edifact_exception import EdifactValidationException
 from mesh.mesh_outbound import MeshOutboundWrapper
+from outbound.converter.interchange_translator import InterchangeTranslator
 from outbound.request.acceptance_amendment import AcceptanceAmendmentRequestHandler
 from outbound.schema import validate_request
 from outbound.schema.request_validation_exception import RequestValidationException, ValidationError
+from utilities import message_utilities
+from utilities.test_utilities import awaitable, awaitable_exception
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,14 +47,16 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(404, response.code)
         self.assertEqual('Not Found', response.reason)
 
+    @patch.object(InterchangeTranslator, 'convert')
     @patch.object(validate_request, 'validate_patient')
     @patch.object(message_utilities, "get_uuid")
     @patch.object(MeshOutboundWrapper, "send")
     @patch.object(MeshOutboundWrapper, "__init__")
-    def test_happy_path(self, mock_init, mock_send, mock_get_uuid, mock_validate_patient):
+    def test_happy_path(self, mock_init, mock_send, mock_get_uuid, mock_validate_patient, mock_convert):
         mock_init.return_value = None
         mock_get_uuid.return_value = MOCK_UUID
         mock_validate_patient.return_value = self.create_patient()
+        mock_convert.return_value = awaitable('EDIFACT')
         MagicMock.__await__ = lambda x: self.async_magic().__await__()
 
         response = self.fetch(r'/fhir/Patient/9000000009', method="POST", body=self.create_request_body())
@@ -136,3 +141,21 @@ class TestAcceptanceAmendmentRequestHandler(tornado.testing.AsyncHTTPTestCase):
         self.assertEqual(400, response.code)
 
 
+    @patch.object(InterchangeTranslator, 'convert')
+    @patch.object(validate_request, 'validate_patient')
+    @patch.object(MeshOutboundWrapper, "send")
+    @patch.object(MeshOutboundWrapper, "__init__")
+    def test_edifact_translation_error(self, mock_init, mock_send, mock_validate_patient, mock_convert):
+        mock_init.return_value = None
+        mock_validate_patient.return_value = self.create_patient()
+        mock_convert.return_value = awaitable_exception(EdifactValidationException('error message'))
+        MagicMock.__await__ = lambda x: self.async_magic().__await__()
+
+        response = self.fetch('/fhir/Patient/9000000009', method="POST", body=self.create_request_body())
+
+        operation_outcome = FHIRElementFactory.instantiate('OperationOutcome', json.loads(response.body.decode()))
+
+        self.assertEqual('error', operation_outcome.issue[0].severity)
+        self.assertEqual('', operation_outcome.issue[0].expression[0])
+        self.assertEqual('error message', operation_outcome.issue[0].details.text)
+        self.assertEqual(400, response.code)

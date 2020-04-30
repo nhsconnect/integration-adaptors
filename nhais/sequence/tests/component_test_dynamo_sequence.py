@@ -4,16 +4,16 @@ import asyncio
 import unittest
 
 import aioboto3
-from utilities import config
-from utilities import test_utilities
 
 from sequence import dynamo_sequence
+from utilities import config
+from utilities import test_utilities
 
 
 class ComponentTestDynamoSequence(unittest.TestCase):
 
     def setUp(self):
-        config.setup_config("MHS")
+        config.setup_config("NHAIS")
         self.table_name = 'test_dynamo_sequence_table'
         self.key = 'transaction_id'
         self.endpoint = config.get_config('DYNAMODB_ENDPOINT_URL', None)

@@ -4,7 +4,7 @@ Provides tests around the Asynchronous Reliable workflow, including sync-async w
 import json
 from unittest import TestCase
 
-from integration_tests.amq.amq import MHS_INBOUND_QUEUE
+from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
