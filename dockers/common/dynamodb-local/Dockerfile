@@ -9,7 +9,6 @@ USER dynamodblocal
 # Create a table called mhs_state with primary key "key"
 RUN nohup bash -c "java -jar DynamoDBLocal.jar -sharedDb &" && \
         AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test aws dynamodb \
-        AWS_NODEJS_CONNECTION_REUSE_ENABLED=1 \
         --endpoint-url http://localhost:8000 \
         --region eu-west-2 create-table \
         --table-name mhs_state \
