@@ -26,8 +26,11 @@ class RecordRetrievalError(RuntimeError):
     pass
 
 
+
 class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
     """Class responsible for persisting items into a DynamoDB."""
+
+    CLIENT = None
 
     def __init__(self, table_name):
         """
@@ -38,6 +41,8 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :param table_name: Table name to be used in this adaptor.
         """
         self.table_name = table_name
+        if DynamoPersistenceAdaptor.CLIENT is None:
+            DynamoPersistenceAdaptor.CLIENT = aioboto3.client('dynamodb', region_name='eu-west-2', endpoint_url=config.get_config('DYNAMODB_ENDPOINT_URL'))
 
     async def add(self, key, data):
         """Add an item to a specified table, using a provided key.
@@ -48,15 +53,17 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('Adding data for {key}', fparams={'key': key})
         try:
-            async with self.__get_dynamo_table() as table:
-                response = await table.put_item(
-                    Item={'key': key, 'data': json.dumps(data)},
-                    ReturnValues='ALL_OLD'
-                )
+            # table = await self.__get_dynamo_table()
+            response = await DynamoPersistenceAdaptor.CLIENT.put_item(
+                TableName=self.table_name,
+                Item={'key': {'S': key}, 'data': {'S': json.dumps(data)}},
+                ReturnValues='ALL_OLD'
+            )
             if response.get('Attributes', {}).get('data') is None:
                 logger.info('No previous record found: {key}', fparams={'key': key})
                 return None
-            return json.loads(response.get('Attributes', {}).get('data'))
+            return json.loads(response.get('Attributes', {}).get('data').get('S'))
+            # return json.loads(response.get('Attributes', {}).get('data'))
         except Exception as e:
             logger.exception('Error creating record')
             raise RecordCreationError from e
@@ -69,15 +76,17 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('Getting record for {key}', fparams={'key': key})
         try:
-            async with self.__get_dynamo_table() as table:
-                response = await table.get_item(
-                    Key={'key': key}
-                )
+            # table = await self.__get_dynamo_table()
+            response = await DynamoPersistenceAdaptor.CLIENT.get_item(
+                TableName=self.table_name,
+                Key={'key': {'S': key}}
+            )
 
             if 'Item' not in response:
                 logger.info('No item found for record: {key}', fparams={'key': key})
                 return None
-            return json.loads(response.get('Item', {}).get('data'))
+            return json.loads(response.get('Item', {}).get('data').get('S'))
+            # return json.loads(response.get('Item', {}).get('data'))
         except Exception as e:
             logger.exception('Error getting record')
             raise RecordRetrievalError from e
@@ -90,26 +99,30 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('Deleting record for {key}', fparams={'key': key})
         try:
-            async with self.__get_dynamo_table() as table:
-                response = await table.delete_item(
-                    Key={'key': key},
-                    ReturnValues='ALL_OLD'
-                )
+            # table = await self.__get_dynamo_table()
+            response = await DynamoPersistenceAdaptor.CLIENT.delete_item(
+                TableName=self.table_name,
+                Key={'key': {'S': key}},
+                ReturnValues='ALL_OLD'
+            )
             if 'Attributes' not in response:
                 logger.info('No values found for record: {key}', fparams={'key': key})
                 return None
-            return json.loads(response.get('Attributes', {}).get('data'))
+            return json.loads(response.get('Attributes', {}).get('data').get('S'))
+            # return json.loads(response.get('Attributes', {}).get('data'))
         except Exception as e:
             logger.exception('Error deleting record')
             raise RecordDeletionError from e
 
-    @contextlib.asynccontextmanager
-    async def __get_dynamo_table(self):
-        """
-        Creates a connection to the table referenced by this instance.
-        :return: The table to be used by this instance.
-        """
-        async with aioboto3.resource('dynamodb', region_name='eu-west-2',
-                                     endpoint_url=config.get_config('DYNAMODB_ENDPOINT_URL', None)) as dynamo_resource:
-            logger.info('Establishing connection to {table_name}', fparams={'table_name': self.table_name})
-            yield dynamo_resource.Table(self.table_name)
+    # @contextlib.asynccontextmanager
+    # async def __get_dynamo_table(self):
+    #     """
+    #     Creates a connection to the table referenced by this instance.
+    #     :return: The table to be used by this instance.
+    #     """
+    #     if self.table_name in tables:
+    #         return tables[self.table_name]
+    #     resource = await aioboto3.resource('dynamodb', region_name='eu-west-2',
+    #                                  endpoint_url=config.get_config('DYNAMODB_ENDPOINT_URL', None))
+    #     logger.info('Establishing connection to {table_name}', fparams={'table_name': self.table_name})
+    #     return resource.Table(self.table_name)
