@@ -3,9 +3,7 @@ import unittest
 from datetime import datetime, timezone
 from unittest import mock
 
-import sequence.interchange_id
-import sequence.message_id
-import sequence.transaction_id
+import sequence.sequence_manager
 from outbound.converter.interchange_translator import InterchangeTranslator
 from outbound.tests.fhir_test_helpers import create_patient, HA_ID, GP_ID
 from utilities.date_utilities import DateUtilities
@@ -24,9 +22,9 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
     UNT_PATTERN = r"^UNT\+(?P<segment_count>[0-9]+)\+(?P<sms>[0-9]{8})'$"
     UNZ_PATTERN = r"^UNZ\+(?P<message_count>[0-9]+)\+(?P<sis>[0-9]{8})'$"
 
-    @mock.patch.object(sequence.message_id.MessageIdGenerator, 'generate_message_id')
-    @mock.patch.object(sequence.interchange_id.InterchangeIdGenerator, 'generate_interchange_id')
-    @mock.patch.object(sequence.transaction_id.TransactionIdGenerator, 'generate_transaction_id')
+    @mock.patch.object(sequence.sequence_manager.IdGenerator, 'generate_message_id')
+    @mock.patch.object(sequence.sequence_manager.IdGenerator, 'generate_interchange_id')
+    @mock.patch.object(sequence.sequence_manager.IdGenerator, 'generate_transaction_id')
     @mock.patch('utilities.date_utilities.DateUtilities.utc_now')
     @async_test
     async def test_message_translated(self, mock_utc_now, mock_generate_transaction_id, mock_generate_interchange_id,
