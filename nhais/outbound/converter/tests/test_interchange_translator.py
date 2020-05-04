@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from unittest import mock
 
 import sequence.sequence_manager
+from edifact.outgoing.models.message import ReferenceTransactionType
 from outbound.converter.interchange_translator import InterchangeTranslator
 from outbound.tests.fhir_test_helpers import create_patient, HA_ID, GP_ID
 from utilities.date_utilities import DateUtilities
@@ -38,7 +39,7 @@ class TestFhirToEdifactTranslator(unittest.TestCase):
         patient = create_patient()
 
         translator = InterchangeTranslator()
-        edifact = await translator.convert(patient)
+        edifact = await translator.convert(patient, ReferenceTransactionType.TransactionType.ACCEPTANCE)
 
         self.assertIsNotNone(edifact)
         self.assertTrue(len(edifact) > 0)

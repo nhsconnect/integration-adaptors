@@ -1,5 +1,8 @@
 import utilities.integration_adaptors_logger as log
-from utilities import timing
+from edifact.outgoing.models.interchange import InterchangeHeader, InterchangeTrailer
+from edifact.outgoing.models.message import MessageHeader, MessageTrailer, ReferenceTransactionNumber, \
+    ReferenceTransactionType
+from utilities.message_utilities import get_uuid
 
 from persistence import persistence_adaptor as pa
 
@@ -75,23 +78,33 @@ class WorkDescription(object):
 
 
 def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
-                                operation_id: str,
-                                transaction_id: int,
-                                transaction_timestamp: str,
-                                transaction_type: str,
-                                sis_sequence: int,
-                                sms_sequences: list,
-                                sender: str,
-                                recipient: str
+                                segments
                                 ) -> WorkDescription:
     """
     Builds a new local work description instance given the details of the message, these details are held locally
     until a `publish` is executed
     """
+
     if persistence_store is None:
         raise ValueError('Expected persistence store to not be None')
-    if not operation_id:
-        raise ValueError('Expected operation_id to not be None or empty')
+
+    operation_id = get_uuid()
+    sms_sequences = []
+
+    for segment in segments:
+        if isinstance(segment, InterchangeHeader):
+            transaction_timestamp = segment.date_time
+            sender = segment.sender
+            recipient = segment.recipient
+        if isinstance(segment, (InterchangeHeader, InterchangeTrailer)):
+            sis_sequence = segment.sequence_number
+        if isinstance(segment, (MessageHeader, MessageTrailer)):
+            sms_sequences.append(segment.sequence_number)
+        if isinstance(segment, ReferenceTransactionNumber):
+            transaction_id = segment.reference
+        if isinstance(segment, ReferenceTransactionType):
+            transaction_type = segment.reference
+
     if not transaction_id:
         raise ValueError('Expected transaction_id to not be None or empty')
     if not transaction_timestamp:
