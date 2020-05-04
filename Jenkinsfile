@@ -80,9 +80,9 @@ pipeline {
                             -var client_cert_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
                             -var client_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PLT_INT_Endpoint_PrivateKey-Fu1jb6 \
                             -var ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_CA_valid_till_may_2022-XJup7p \
-                            -var route_ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_CA_valid_till_may_2022-XJup7p \
-                            -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
-                            -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
+                            -var route_ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:mhs-route.ptl.nhsredteam.internal.nhs.uk-jwSmag \
+                            -var outbound_alb_certificate_arn=arn:aws:acm:eu-west-2:067756640211:certificate/2bdbc049-282f-4d04-85c6-af9e86f6d53e \
+                            -var route_alb_certificate_arn=arn:aws:acm:eu-west-2:067756640211:certificate/0544f3fd-a5db-44a1-ac4d-cfd5a0e3a508 \
                             -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                             -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                             -var spineroutelookup_service_sds_url="ldaps://ldap.nis1.national.ncrs.nhs.uk" \
@@ -129,9 +129,9 @@ pipeline {
                             -var client_cert_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
                             -var client_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PLT_INT_Endpoint_PrivateKey-Fu1jb6 \
                             -var ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_CA_valid_till_may_2022-XJup7p \
-                            -var route_ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_CA_valid_till_may_2022-XJup7p \
-                            -var outbound_alb_certificate_arn=${OUTBOUND_ALB_CERT_ARN} \
-                            -var route_alb_certificate_arn=${ROUTE_ALB_CERT_ARN} \
+                            -var route_ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:mhs-route.ptl.nhsredteam.internal.nhs.uk-jwSmag \
+                            -var outbound_alb_certificate_arn=arn:aws:acm:eu-west-2:067756640211:certificate/2bdbc049-282f-4d04-85c6-af9e86f6d53e \
+                            -var route_alb_certificate_arn=arn:aws:acm:eu-west-2:067756640211:certificate/0544f3fd-a5db-44a1-ac4d-cfd5a0e3a508 \
                             -var mhs_resynchroniser_max_retries=${MHS_RESYNC_RETRIES} \
                             -var mhs_resynchroniser_interval=${MHS_RESYNC_INTERVAL} \
                             -var spineroutelookup_service_sds_url="ldaps://ldap.nis1.national.ncrs.nhs.uk" \
