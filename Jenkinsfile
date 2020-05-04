@@ -183,11 +183,11 @@ pipeline {
                                             -var opentest_vpc_id=${OPENTEST_VPC_ID} \
                                             -var dlt_vpc_id=${DLT_VPC_ID} \
                                             -var internal_root_domain=${INTERNAL_ROOT_DOMAIN} \
-                                            -var mhs_outbound_service_minimum_instance_count=3 \
+                                            -var mhs_outbound_service_minimum_instance_count=6 \
                                             -var mhs_outbound_service_maximum_instance_count=9 \
-                                            -var mhs_inbound_service_minimum_instance_count=3 \
+                                            -var mhs_inbound_service_minimum_instance_count=6 \
                                             -var mhs_inbound_service_maximum_instance_count=9 \
-                                            -var mhs_route_service_minimum_instance_count=3 \
+                                            -var mhs_route_service_minimum_instance_count=6 \
                                             -var mhs_route_service_maximum_instance_count=9 \
                                             -var task_role_arn=${TASK_ROLE} \
                                             -var execution_role_arn=${TASK_EXECUTION_ROLE} \
