@@ -1,6 +1,6 @@
 resource "aws_vpc_dhcp_options" "nhs_dhcp_options" {
   domain_name = "nhs.uk"
-  domain_name_servers = ["155.231.231.1", "155.231.231.2"]
+  domain_name_servers = ["155.231.231.1", "AmazonProvidedDNS"]
 
   tags = {
     EnvironmentId = "ptl"
