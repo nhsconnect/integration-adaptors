@@ -81,6 +81,8 @@ def main():
     config.setup_config("MHS")
     secrets.setup_secret_config("MHS")
     log.configure_logging('spineroutelookup')
+    from ldap3.utils.log import set_library_log_detail_level
+    set_library_log_detail_level(50)
 
     routing = initialise_routing(search_base=config.get_config("SDS_SEARCH_BASE"))
     start_tornado_server(routing)
