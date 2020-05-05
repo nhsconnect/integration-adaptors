@@ -85,9 +85,6 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     until a `publish` is executed
     """
 
-    if persistence_store is None:
-        raise ValueError('Expected persistence store to not be None')
-
     operation_id = get_uuid()
     sms_sequences = []
 
