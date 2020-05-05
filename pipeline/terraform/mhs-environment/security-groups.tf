@@ -393,3 +393,15 @@ resource "aws_security_group" "alb_route_security_group" {
     EnvironmentId = var.environment_id
   }
 }
+
+# Allow route to connect to LDAP
+
+resource "aws_security_group" "route_to_nhs_ldaps" {
+  type = "egress"
+  from_port = 636 #LDAPS
+  to_port = 636
+  protocol = tcp
+  security_group_id = aws_security_group.mhs_route_security_group.id
+  cidr_blocks = [ "10.196.94.141/32" ] #ldap.nis1.national.ncrs.nhs.uk
+  description = "Allow outbound connection to NHS LDAP server"
+}
