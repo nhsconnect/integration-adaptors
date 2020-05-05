@@ -396,7 +396,7 @@ resource "aws_security_group" "alb_route_security_group" {
 
 # Allow route to connect to LDAP
 
-resource "aws_security_group" "route_to_nhs_ldaps" {
+resource "aws_security_group_rule" "route_to_nhs_ldaps" {
   type = "egress"
   from_port = 636 #LDAPS
   to_port = 636
