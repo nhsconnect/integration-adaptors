@@ -35,7 +35,6 @@ class AcceptanceAmendmentRequestHandler(tornado.web.RequestHandler):
         try:
             request_body = json.loads(self.request.body.decode())
             patient = validate_request.validate_patient(request_body)
-            #  TODO: find out how to extract the transaction type
             transaction_type = ReferenceTransactionType.TransactionType.ACCEPTANCE
             if patient.id == patient_id:
                 edifact = await self.fhir_to_edifact.convert(patient, transaction_type)
