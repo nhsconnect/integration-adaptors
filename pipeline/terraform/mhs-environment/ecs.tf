@@ -308,6 +308,11 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
         }
       ]
       essential = true
+      dnsServers = [
+        "155.231.231.1",
+        "155.231.231.2"
+      ]
+      dnsSearchDomains = ["nhs.uk"]
       logConfiguration = {
         logDriver = "awslogs"
         options = {
