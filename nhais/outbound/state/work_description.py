@@ -36,8 +36,7 @@ class WorkDescription(object):
 
     async def publish(self):
         """
-        Attempts to publish the local state of the work description to the state store, checks versions to avoid
-        collisions
+        Attempts to publish the local state of the work description to the state store
         :return:
         """
         logger.info(f'Attempting to publish work description {self.operation_id}')
