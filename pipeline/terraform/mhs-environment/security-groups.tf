@@ -393,3 +393,57 @@ resource "aws_security_group" "alb_route_security_group" {
     EnvironmentId = var.environment_id
   }
 }
+
+# Allow route to connect to LDAP
+resource "aws_security_group_rule" "route_to_nhs_ldaps" {
+  type = "egress"
+  from_port = 636 #LDAPS
+  to_port = 636
+  protocol = "tcp"
+  security_group_id = aws_security_group.mhs_route_security_group.id
+  cidr_blocks = [ "10.196.94.141/32" ] #ldap.nis1.national.ncrs.nhs.uk
+  description = "Allow outbound connection to NHS LDAP server"
+}
+
+# Allow route and outbound to query NHS DNS
+resource "aws_security_group_rule" "route_nhs_dns" {
+  type = "egress"
+  from_port = 53
+  to_port = 53
+  protocol = "udp"
+  security_group_id = aws_security_group.mhs_route_security_group.id
+  cidr_blocks = ["155.231.231.1/32", "155.231.231.2/32"]
+  description = "Route to NHS DNS"
+}
+
+resource "aws_security_group_rule" "outbound_nhs_dns" {
+  type = "egress"
+  from_port = 53
+  to_port = 53
+  protocol = "udp"
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  cidr_blocks = ["155.231.231.1/32", "155.231.231.2/32"]
+  description = "Outbound to NHS DNS"
+}
+
+# Allow outboud to connect to port 80 and 443
+
+resource "aws_security_group_rule" "outbound_443" {
+  type = "egress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Outbound to Internet on 443"
+}
+
+resource "aws_security_group_rule" "outbound_80" {
+  type = "egress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  security_group_id = aws_security_group.mhs_outbound_security_group.id
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Outbound to Internet on 80"
+}

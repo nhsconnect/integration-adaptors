@@ -52,7 +52,7 @@ resource "aws_subnet" "mhs_subnet" {
   # Generates a CIDR block with a different prefix within the VPC's CIDR block for each subnet being created.
   # E.g if the VPC's CIDR block is 10.0.0.0/16, this generates subnets that have CIDR blocks 10.0.0.0/24, 10.0.1.0/24,
   # etc.
-  cidr_block = cidrsubnet(var.mhs_vpc_cidr_block, 8, count.index)
+  cidr_block = cidrsubnet(var.mhs_vpc_cidr_block, 2, count.index)
 
   map_public_ip_on_launch = false
 
