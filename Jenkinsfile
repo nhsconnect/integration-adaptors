@@ -48,7 +48,7 @@ pipeline {
                             -input=false -no-color
                         """
                     sh label: 'Applying Terraform configuration, part 1', script: """
-                            terraform apply -no-color -auto-approve \
+                            terraform plan -no-color \
                             -var environment_id=${ENVIRONMENT_ID} \
                             -var build_id=${BUILD_TAG} \
                             -var supplier_vpc_id=${SUPPLIER_VPC_ID} \
@@ -138,8 +138,7 @@ pipeline {
                             -var spineroutelookup_service_search_base=${SPINEROUTELOOKUP_SERVICE_SEARCH_BASE} \
                             -var spineroutelookup_service_disable_sds_tls="False" \
                             -var elasticache_node_type="cache.t2.micro" \
-                            -var mhs_forward_reliable_endpoint_url="https://msg.int.spine2.ncrs.nhs.uk/reliablemessaging/reliablerequest" \
-                            -var dhcp_options_in_use="nhs"
+                            -var mhs_forward_reliable_endpoint_url="https://msg.int.spine2.ncrs.nhs.uk/reliablemessaging/reliablerequest"
                         """                   
                     script {
                         env.MHS_ADDRESS = sh (
