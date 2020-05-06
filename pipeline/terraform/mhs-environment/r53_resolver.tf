@@ -21,7 +21,7 @@ resource "aws_route53_resolver_endpoint" "nhs_resolver" {
     subnet_id = aws_subnet.mhs_subnet[2].id
   }
 
-  tags {
+  tags = {
     EnvironmentId = var.environment_id
   }
 }
@@ -40,7 +40,7 @@ resource "aws_route53_resolver_rule" "nhs_dns_resolver_rule" {
     ip = "155.231.231.2"
   }
 
-  tags {
+  tags = {
     EnvironmentId = var.environment_id
   }
 }
