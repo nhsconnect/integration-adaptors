@@ -447,3 +447,15 @@ resource "aws_security_group_rule" "outbound_80" {
   cidr_blocks = ["0.0.0.0/0"]
   description = "Outbound to Internet on 80"
 }
+
+# Allow NHS to connect to Inbound application
+
+resource "aws_security_group_rule" "inbound_nhs_443" {
+  type = "ingress"
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  security_group_id = aws_security_group.mhs_inbound_security_group.id
+  cidr_blocks = ["10.239.14.101/32", "10.196.94.139/32"]
+  description = "Inbound from NHS"
+}
