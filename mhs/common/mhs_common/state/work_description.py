@@ -4,9 +4,8 @@ import enum
 from typing import Optional
 
 import utilities.integration_adaptors_logger as log
-from utilities import timing
-
 from persistence import persistence_adaptor as pa
+from utilities import timing
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -41,8 +40,7 @@ class MessageStatus(str, enum.Enum):
 
 
 KEY = 'key'
-CREATED = 'CREATED'
-UPDATED = 'UPDATED'
+CREATED_TIMESTAMP = 'CREATED'
 INBOUND_STATUS = 'INBOUND_STATUS'
 OUTBOUND_STATUS = 'OUTBOUND_STATUS'
 WORKFLOW = 'WORKFLOW'
@@ -87,14 +85,14 @@ async def get_work_description_from_store(persistence_store: pa.PersistenceAdapt
     return WorkDescription(persistence_store, json_store_data)
 
 
-def _build_store_data(key: str,
-                      created_at: str,
-                      inbound_status: Optional[str],
-                      outbound_status: Optional[str],
-                      workflow: str) -> dict:
+def build_store_data(key: str,
+                     created_at: str,
+                     workflow: str,
+                     inbound_status: Optional[str] = None,
+                     outbound_status: Optional[str] = None) -> dict:
     return {
         KEY: key,
-        CREATED: created_at,
+        CREATED_TIMESTAMP: created_at,
         INBOUND_STATUS: inbound_status,
         OUTBOUND_STATUS: outbound_status,
         WORKFLOW: workflow
@@ -127,7 +125,7 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
 
     return WorkDescription(
         persistence_store,
-        _build_store_data(key, timing.get_time(), inbound_status, outbound_status, workflow))
+        build_store_data(key, timing.get_time(), workflow, inbound_status, outbound_status))
 
 
 class WorkDescription(object):
@@ -174,15 +172,10 @@ class WorkDescription(object):
 
     def _from_store_data(self, store_data):
         self.key = store_data[KEY]
-        self.created_at = store_data[CREATED]
+        self.created_timestamp = store_data[CREATED_TIMESTAMP]
         self.inbound_status = store_data[INBOUND_STATUS]
         self.outbound_status = store_data[OUTBOUND_STATUS]
         self.workflow = store_data[WORKFLOW]
 
     def _to_store_data(self):
-        return _build_store_data(
-            self.key,
-            self.created_at,
-            self.inbound_status,
-            self.outbound_status,
-            self.workflow)
+        return build_store_data(self.key, self.created_timestamp, self.workflow, self.inbound_status, self.outbound_status)

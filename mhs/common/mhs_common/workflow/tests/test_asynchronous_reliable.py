@@ -5,22 +5,20 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import exceptions
-from comms import proton_queue_adaptor
 from tornado import httpclient
-
-from mhs_common.workflow.common import MessageData
-from utilities import test_utilities
-import utilities.file_utilities as file_utilities
-from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_reliable as async_reliable
 import mhs_common.workflow.common_asynchronous as common_async
+import utilities.file_utilities as file_utilities
+from comms import proton_queue_adaptor
 from definitions import ROOT_DIR
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
+from mhs_common.workflow.common import MessageData
+from utilities import test_utilities
+from utilities.test_utilities import async_test
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
@@ -84,7 +82,6 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
                                                                     transmission=self.mock_transmission_adaptor,
                                                                     queue_adaptor=self.mock_queue_adaptor,
                                                                     max_request_size=MAX_REQUEST_SIZE,
-                                                                    persistence_store_max_retries=3,
                                                                     routing=self.mock_routing_reliability)
 
         self.test_message_dir = Path(ROOT_DIR) / TEST_MESSAGE_DIR
@@ -448,7 +445,6 @@ class TestAsynchronousReliableWorkflow(unittest.TestCase):
             transmission=self.mock_transmission_adaptor,
             queue_adaptor=self.mock_queue_adaptor,
             max_request_size=MAX_REQUEST_SIZE,
-            persistence_store_max_retries=3,
             routing=self.mock_routing_reliability
         )
 

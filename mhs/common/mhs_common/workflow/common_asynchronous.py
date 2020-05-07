@@ -1,20 +1,17 @@
 """This module defines the common base for all asynchronous workflows."""
 from typing import Dict, Callable, Tuple, Optional
 
-import utilities.integration_adaptors_logger as log
-from comms import queue_adaptor
-from exceptions import MaxRetriesExceeded
 from tornado import httpclient
 
-from utilities import timing
-
+import utilities.integration_adaptors_logger as log
+from comms import queue_adaptor
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
-from retry import retriable_action
 from mhs_common.routing import routing_reliability
-from persistence import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.common import CommonWorkflow, MessageData
+from persistence import persistence_adaptor
+from utilities import timing
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -47,9 +44,9 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                                                        workflow_name: str):
         if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store,
-                                                 message_id,
-                                                 workflow_name,
-                                                 outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
+                                                       message_id,
+                                                       workflow_name,
+                                                       outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
             await wdo.publish()
         return wdo
 

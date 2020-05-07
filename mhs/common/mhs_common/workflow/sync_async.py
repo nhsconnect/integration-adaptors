@@ -1,16 +1,14 @@
 """This module defines the sync-async workflow."""
 from typing import Tuple, Optional
 
-from mhs_common.workflow.common import MessageData
-from utilities import integration_adaptors_logger as log
-
 from mhs_common import workflow
-from retry import retriable_action
-from persistence import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.workflow import common
 from mhs_common.workflow import common_synchronous
 from mhs_common.workflow import sync_async_resynchroniser
+from mhs_common.workflow.common import MessageData
+from persistence import persistence_adaptor as pa
+from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
