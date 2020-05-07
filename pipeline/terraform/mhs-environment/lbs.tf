@@ -153,8 +153,13 @@ resource "aws_lb_listener" "route_alb_listener" {
 resource "aws_lb" "inbound_nlb" {
   internal = true
   load_balancer_type = "network"
-  subnets = aws_subnet.mhs_subnet.*.id
-  enable_cross_zone_load_balancing = true
+  //subnets = aws_subnet.mhs_subnet.*.id
+  //enable_cross_zone_load_balancing = true
+
+  subnet_mapping {
+    subnet_id = aws_subnet.mhs_subnet[0].id  // we have only one IP assigned and it is in CIDR for Availability Zone 'a'
+    allocation_id = aws_eip.inbound_lb_eip.allocation_id
+  }
 
   access_logs {
     bucket = aws_s3_bucket.mhs_access_logs_bucket.bucket
