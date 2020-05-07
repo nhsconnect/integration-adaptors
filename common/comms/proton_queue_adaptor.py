@@ -61,7 +61,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         :param properties: Optional application properties to send with the message.
         :return: The Message in the correct format with generated uuid.
         """
-        ttl = 10
+        ttl = 300
         message_id = message_utilities.get_uuid()
         logger.info('Constructing message with {id} and {applicationProperties}',
                     fparams={'id': message_id, 'applicationProperties': properties})
