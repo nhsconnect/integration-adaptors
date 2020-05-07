@@ -1,9 +1,8 @@
 """Module for Proton specific queue adaptor functionality. """
 import json
-from typing import Dict, Any, List
-
 import proton.handlers
 import proton.reactor
+from typing import Dict, Any, List
 
 import comms.queue_adaptor
 import utilities.integration_adaptors_logger as log
@@ -27,7 +26,7 @@ class EarlyDisconnectError(RuntimeError):
 class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
     """Proton implementation of a queue adaptor."""
 
-    def __init__(self, urls: List[str], queue: str, username, password, max_retries=0, retry_delay=0) -> None:
+    def __init__(self, urls: List[str], queue: str, username, password, max_retries=0, retry_delay=0, ttl_in_seconds=0) -> None:
         """
         Construct a Proton implementation of a :class:`QueueAdaptor <comms.queue_adaptor.QueueAdaptor>`.
         The kwargs provided should contain the following information:
@@ -43,6 +42,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         self.password = password
         self.max_retries = max_retries
         self.retry_delay = retry_delay
+        self.ttl_in_seconds = ttl_in_seconds
 
         if self.urls is None or not isinstance(urls, List) or len(urls) == 0:
             raise ValueError("Invalid urls %s", urls)
@@ -66,8 +66,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         except MaxRetriesExceeded as e:
             raise MessageSendingError() from e
 
-    @staticmethod
-    def __construct_message(message: dict, properties: Dict[str, Any] = None) -> proton.Message:
+    def __construct_message(self, message: dict, properties: Dict[str, Any] = None) -> proton.Message:
         """
         Build a message with a generated uuid, and specified message body.
         :param message: The message body to be wrapped.
@@ -80,7 +79,8 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         return proton.Message(id=message_id,
                               content_type='application/json',
                               body=json.dumps(message),
-                              properties=properties)
+                              properties=properties,
+                              ttl=self.ttl_in_seconds)
 
     async def __try_sending_to_all_in_sequence(self, message: proton.Message) -> None:
         """
