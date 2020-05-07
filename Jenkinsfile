@@ -154,6 +154,7 @@ pipeline {
                         }
                     }
                     post {
+                    
                         always {
                             sh label: 'Docker status', script: 'docker ps --all'
                             sh label: 'Dump container logs to files', script: '''
