@@ -23,28 +23,9 @@ logger = log.IntegrationAdaptorsLogger(__name__)
 
 ASYNC_TIMEOUT = 30
 
-
-def initialise_workflows() -> Dict[str, workflow.CommonWorkflow]:
-    """Initialise the workflows
-    :return: The workflows that can be used to handle messages.
-    """
-    queue_adaptor = proton_queue_adaptor.ProtonQueueAdaptor(
-        urls=config.get_config('INBOUND_QUEUE_BROKERS').split(','),
-        queue=config.get_config('INBOUND_QUEUE_NAME'),
-        username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME', default=None),
-        password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD', default=None),
-        max_retries=int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3')),
-        retry_delay=int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000)
-    sync_async_store = get_persistence_adaptor(table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
-
-    persistence_store_max_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
-    sync_async_delay = int(config.get_config('SYNC_ASYNC_STORE_RETRY_DELAY', default='100'))
-    work_description_store = get_persistence_adaptor(table_name=config.get_config('STATE_TABLE_NAME'))
-    return workflow.get_workflow_map(inbound_async_queue=queue_adaptor,
-                                     work_description_store=work_description_store,
-                                     sync_async_store=sync_async_store,
-                                     persistence_store_max_retries=persistence_store_max_retries,
-                                     sync_async_store_retry_delay=sync_async_delay)
+config.setup_config("MHS")
+secrets.setup_secret_config("MHS")
+log.configure_logging("inbound")
 
 
 def build_ssl_context(local_certs_file: str, ca_certs_file: str, key_file: str, ):
@@ -111,25 +92,50 @@ def start_inbound_server(local_certs_file: str, ca_certs_file: str, key_file: st
     logger.info('Server shut down, exiting...')
 
 
-def main():
-    config.setup_config("MHS")
-    secrets.setup_secret_config("MHS")
-    log.configure_logging("inbound")
+def create_queue_adaptor():
+    return proton_queue_adaptor.ProtonQueueAdaptor(
+        urls=config.get_config('INBOUND_QUEUE_BROKERS').split(','),
+        queue=config.get_config('INBOUND_QUEUE_NAME'),
+        username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME', default=None),
+        password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD', default=None),
+        max_retries=int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3')),
+        retry_delay=int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000)
 
+
+def create_sync_async_store():
+    return get_persistence_adaptor(
+        table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'),
+        max_retries=int(config.get_config('SYNC_ASYNC_STORE_MAX_RETRIES', default='3')),
+        retry_delay=int(config.get_config('SYNC_ASYNC_STORE_RETRY_DELAY', default='100')) / 1000)
+
+
+def create_work_description_store():
+    return get_persistence_adaptor(
+        table_name=config.get_config('STATE_TABLE_NAME'),
+        max_retries=int(config.get_config('STATE_STORE_MAX_RETRIES', default='3')),
+        retry_delay=int(config.get_config('STATE_STORE_RETRY_DELAY', default='100')) / 1000)
+
+
+def main():
     certificates = certs.Certs.create_certs_files(definitions.ROOT_DIR,
                                                   private_key=secrets.get_secret_config('CLIENT_KEY'),
                                                   local_cert=secrets.get_secret_config('CLIENT_CERT'),
                                                   ca_certs=secrets.get_secret_config('CA_CERTS'))
     party_key = secrets.get_secret_config('PARTY_KEY')
 
-    workflows = initialise_workflows()
-    store = get_persistence_adaptor(table_name=config.get_config('STATE_TABLE_NAME'))
+    queue_adaptor = create_queue_adaptor()
+    work_description_store = create_work_description_store()
+    sync_async_store = create_sync_async_store()
+
+    workflows = workflow.get_workflow_map(inbound_async_queue=queue_adaptor,
+                                          work_description_store=work_description_store,
+                                          sync_async_store=sync_async_store)
 
     interactions_config_file = pathlib.Path(definitions.ROOT_DIR) / 'data' / "interactions" / "interactions.json"
     config_manager = configuration_manager.ConfigurationManager(str(interactions_config_file))
 
     start_inbound_server(certificates.local_cert_path, certificates.ca_certs_path, certificates.private_key_path,
-                         party_key, workflows, store, config_manager)
+                         party_key, workflows, work_description_store, config_manager)
 
 
 if __name__ == "__main__":
