@@ -11,7 +11,7 @@ input_data = {
     wd.KEY: 'aaa-aaa-aaa',
     wd.CREATED_TIMESTAMP: '11:59',
     wd.INBOUND_STATUS: None,
-    wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
+    wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
     wd.WORKFLOW: workflow.SYNC
 }
 
@@ -19,7 +19,7 @@ input_data = {
 old_data = {
     wd.KEY: 'aaa-aaa-aaa',
     wd.CREATED_TIMESTAMP: '11:59',
-    wd.INBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED,
+    wd.INBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
     wd.OUTBOUND_STATUS: None,
     wd.WORKFLOW: workflow.SYNC
 }

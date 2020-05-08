@@ -77,7 +77,6 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         try:
             response = await self.resynchroniser.pause_request(message_id)
             logger.info('Retrieved async response from sync-async store')
-            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED)
             return 200, response[MESSAGE_DATA]
         except sync_async_resynchroniser.SyncAsyncResponseException:
             logger.error('No async response placed on async store within timeout for {messageId}',
@@ -86,7 +85,6 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
 
     async def handle_inbound_message(self, message_id: str, correlation_id: str, wdo: wd.WorkDescription, message_data: MessageData):
         logger.info('Entered sync-async inbound workflow')
-        await wdo.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
 
         try:
             await self.sync_async_store.add({"key": message_id, CORRELATION_ID: correlation_id, MESSAGE_DATA: message_data.payload})

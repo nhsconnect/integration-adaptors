@@ -46,8 +46,6 @@ class TestSyncAsyncWorkflowOutbound(TestCase):
         async_workflow.handle_outbound_message.assert_called_with(None, 'id123', 'cor123', {}, 'payload',
                                                                   wd_mock.return_value)
 
-        wdo.set_outbound_status.assert_called_with(wd.MessageStatus.OUTBOUND_SYNC_ASYNC_MESSAGE_LOADED)
-
         self.assertEqual(code, 200)
         self.assertEqual(body, 'data')
         self.assertEqual(actual_wdo, wdo)

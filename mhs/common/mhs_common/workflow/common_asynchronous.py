@@ -72,8 +72,8 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             return (400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '
                          f'RequestSize={len(message)}'), None, None
 
-        logger.info('Message serialised successfully')
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
+        logger.info('Outbound message prepared')
+
         return None, http_headers, message
 
     async def _make_outbound_request_and_handle_response(
@@ -109,7 +109,6 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                     fparams={'WorkflowName': self.workflow_name})
         logger.audit('{WorkflowName} inbound workflow invoked. Message received from spine',
                      fparams={'WorkflowName': self.workflow_name})
-        await wdo.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_RECEIVED)
 
         await self._publish_message_to_inbound_queue(message_id, correlation_id, wdo, message_data)
 
