@@ -71,7 +71,7 @@ pipeline {
                             -var mhs_state_table_write_capacity=5 \
                             -var mhs_sync_async_table_read_capacity=5 \
                             -var mhs_sync_async_table_write_capacity=5 \
-                            -var mhs_spine_org_code=${SPINE_ORG_CODE} \
+                            -var mhs_spine_org_code="L85016" \
                             -var inbound_queue_brokers="${MHS_INBOUND_QUEUE_BROKERS}" \
                             -var inbound_queue_name="${MHS_INBOUND_QUEUE_NAME}" \
                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
