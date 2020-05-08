@@ -66,7 +66,7 @@ pipeline {
                             -var ecr_address=${DOCKER_REGISTRY} \
                             -var mhs_outbound_validate_certificate=${MHS_OUTBOUND_VALIDATE_CERTIFICATE} \
                             -var mhs_log_level=DEBUG \
-                            -var mhs_outbound_http_proxy=${MHS_OUTBOUND_HTTP_PROXY} \
+                            -var mhs_outbound_http_proxy="" \
                             -var mhs_state_table_read_capacity=5 \
                             -var mhs_state_table_write_capacity=5 \
                             -var mhs_sync_async_table_read_capacity=5 \
