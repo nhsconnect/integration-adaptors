@@ -94,7 +94,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         persistence.get.return_value = test_utilities.awaitable(old_data)
         await wd.get_work_description_from_store(persistence, 'aaa-aaa-aaa')
 
-        persistence.get.assert_called_with('aaa-aaa-aaa')
+        persistence.get.assert_called_with('aaa-aaa-aaa', strongly_consistent_read=True)
         work_mock.assert_called_with(persistence, old_data)
 
     @async_test
