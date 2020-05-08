@@ -6,8 +6,8 @@ from handlers import healthcheck_handler
 from utilities import config, secrets
 from utilities import integration_adaptors_logger as log
 
-from lookup import cache_adaptor, redis_cache, sds_client, mhs_attribute_lookup, \
-    routing_reliability, sds_connection_factory
+from lookup import cache_adaptor, redis_cache, sds_connection_factory, sds_client, mhs_attribute_lookup, \
+    routing_reliability, sds_mock_connection_factory
 from request import routing_handler, reliability_handler, routing_reliability_handler
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -40,7 +40,9 @@ def initialise_routing(search_base: str) -> routing_reliability.RoutingAndReliab
 
     cache = load_cache_implementation()
 
-    sds_connection = sds_connection_factory.create_connection()
+    sds_connection = sds_mock_connection_factory.build_mock_sds_connection()
+        # if config.get_config(sds_mock_connection_factory.LDAP_MOCK_DATA_URL_CONFIG_KEY, default=None) \
+        # else build_real_sds_connection(sds_url, tls)
 
     client = sds_client.SDSClient(sds_connection, search_base)
     attribute_lookup = mhs_attribute_lookup.MHSAttributeLookup(client=client, cache=cache)

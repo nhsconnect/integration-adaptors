@@ -7,6 +7,7 @@ from comms.http_headers import HttpHeaders
 from mhs_common import workflow
 from mhs_common.errors.soap_handler import handle_soap_error
 from mhs_common.messages import soap_envelope
+from mhs_common.routing import routing_reliability
 from persistence import persistence_adaptor as pa
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
