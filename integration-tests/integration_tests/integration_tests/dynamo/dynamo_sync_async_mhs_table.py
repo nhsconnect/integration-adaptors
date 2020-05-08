@@ -30,8 +30,7 @@ class DynamoSyncAsyncMhsTableStateAssertor(object):
         self.assertor.assertTrue(len(items_with_key) == 1, f'Expected exactly one item with key {key} '
                                                            f'but found {num_items}')
 
-        json_string_value = items_with_key[0]['data']['S']
-        xml_message = json.loads(json_string_value)['data']
+        xml_message = items_with_key[0]['data']['S']
 
         return Hl7XmlResponseAssertor(xml_message)
 
