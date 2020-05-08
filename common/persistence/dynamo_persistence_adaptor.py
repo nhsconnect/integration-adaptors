@@ -108,18 +108,19 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
             raise RecordUpdateError from e
 
     @retriable
-    async def get(self, key: str):
+    async def get(self, key: str, strongly_consistent_read: bool = False):
         """
         Retrieves an item from a specified table with a given key.
         :param key: The key which identifies the item to get.
+        :param strongly_consistent_read: https://docs.amazonaws.cn/en_us/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
         :return: The item from the specified table with the given key. (None if no item found)
         """
         logger.info('Getting record for {key}', fparams={'key': key})
         try:
             async with self.__get_dynamo_table() as table:
                 response = await table.get_item(
-                    Key={'key': key}
-                )
+                    Key={'key': key},
+                    ConsistentRead=strongly_consistent_read)
 
             if 'Item' not in response:
                 logger.info('No item found for record: {key}', fparams={'key': key})
