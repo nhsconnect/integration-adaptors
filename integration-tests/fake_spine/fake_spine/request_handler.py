@@ -1,19 +1,19 @@
 import asyncio
-from utilities import integration_adaptors_logger as log
 
-import tornado.web
-
+from fake_spine import fake_spine_configuration
+from fake_spine.base_handler import BaseHandler
 from fake_spine.inbound_client import InboundClient
 from fake_spine.request_matching import SpineRequestResponseMapper
 from fake_spine.spine_responses import InboundRequest
-from fake_spine import fake_spine_configuration
+from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 
-class SpineRequestHandler(tornado.web.RequestHandler):
+class SpineRequestHandler(BaseHandler):
 
     def initialize(self, fake_response_handler: SpineRequestResponseMapper) -> None:
+        super().initialize()
         self.fake_response_handler = fake_response_handler
         self.inbound_client = InboundClient()
         self.config = fake_spine_configuration.FakeSpineConfiguration()

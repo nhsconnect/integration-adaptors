@@ -3,13 +3,12 @@ from typing import Dict, Callable, Tuple, Optional
 
 import utilities.integration_adaptors_logger as log
 from comms import queue_adaptor
-from exceptions import MaxRetriesExceeded
+from comms.http_headers import HttpHeaders
 from tornado import httpclient
 
-from utilities import timing
+from utilities import timing, mdc
 
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
-from retry import retriable_action
 from mhs_common.routing import routing_reliability
 from persistence import persistence_adaptor
 from mhs_common.state import work_description as wd
@@ -78,6 +77,11 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
 
         logger.info('Message serialised successfully')
         await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
+        http_headers[HttpHeaders.CORRELATION_ID] = correlation_id
+        http_headers[HttpHeaders.MESSAGE_ID] = message_id
+        http_headers[HttpHeaders.INTERACTION_ID] = str(mdc.interaction_id.get())
+
+
         return None, http_headers, message
 
     async def _make_outbound_request_and_handle_response(

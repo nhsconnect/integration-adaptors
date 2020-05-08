@@ -19,7 +19,7 @@ services:
       - MHS_STATE_TABLE_NAME=mhs_state
       - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state
       - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
-      - MHS_INBOUND_QUEUE_MESSAGE_TTL_IN_SECONDS=0
+      - MHS_INBOUND_QUEUE_MESSAGE_TTL_IN_SECONDS=300
       # boto3 requires some AWS creds to be provided, even
       # when connecting to local DynamoDB
       - AWS_ACCESS_KEY_ID=test
@@ -55,7 +55,7 @@ services:
     #   context: .
     #   dockerfile: ./dockers/mhs/spineroutelookup/Dockerfile
     ports:
-        - "8080:80"
+      - "8080:80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SDS_URL=ldap://192.168.128.11
@@ -93,5 +93,6 @@ services:
       - FAKE_SPINE_PRIVATE_KEY=${FAKE_SPINE_PRIVATE_KEY}
       - INBOUND_SERVER_BASE_URL=${INBOUND_SERVER_BASE_URL}
       - MHS_SECRET_PARTY_KEY=${MHS_SECRET_PARTY_KEY}
-
-
+      - FAKE_SPINE_PORT=${FAKE_SPINE_PORT}
+      - FAKE_SPINE_OUTBOUND_SSL_ENABLED=${FAKE_SPINE_OUTBOUND_SSL_ENABLED}
+      - MHS_LOG_LEVEL=DEBUG

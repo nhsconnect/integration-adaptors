@@ -29,6 +29,15 @@ data "aws_vpc" "supplier_vpc" {
   id = var.supplier_vpc_id
 }
 
+#################
+#Please remove below DLT (Distributed Load Tester) code if not needed
+#################
+# Get details of the DLT VPC the V&P VPC will have a peering connection with
+data "aws_vpc" "dlt_vpc" {
+  id = var.dlt_vpc_id
+}
+##################
+
 # The MHS VPC that contains the running MHS
 resource "aws_vpc" "mhs_vpc" {
   # Note that this cidr block must not overlap with the cidr blocks of the VPCs

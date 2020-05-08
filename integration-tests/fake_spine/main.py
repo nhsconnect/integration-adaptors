@@ -5,6 +5,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 from tornado.options import parse_command_line
+from tornado import httpclient
 
 import utilities.integration_adaptors_logger as log
 from utilities import config
@@ -44,6 +45,7 @@ def app():
     config.setup_config("MHS")
     log.configure_logging("fake-spine")  # ensure this is first to get proper logging of startup errors
     parse_command_line()
+    httpclient.AsyncHTTPClient.configure(None, max_clients=500)
 
     logger.info("Building fakespine service configuration")
 

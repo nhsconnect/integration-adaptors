@@ -17,7 +17,7 @@ variable "build_id" {
 variable "mhs_vpc_cidr_block" {
   type = string
   description = "The CIDR block to use for the MHS VPC that is created. Should be a /16 block. Note that this cidr block must not overlap with the cidr blocks of the VPCs that the MHS VPC is to be peered with."
-  default = "10.0.0.0/16"
+  default = "10.3.0.0/16"
 }
 
 variable "supplier_vpc_id" {
@@ -28,7 +28,14 @@ variable "opentest_vpc_id" {
   type = string
   description = "VPC id of the VPC that contains the Opentest connection to Spine"
 }
-
+#################
+#Please remove below DLT (Distributed Load Tester) code if not needed
+#################
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC id of the DLT-Distributed Load Testing system that connects to the MHS"
+}
+################
 variable "internal_root_domain" {
   type = string
   description = "Domain name to be used internally to refer to parts of the MHS (subdomains will be created off of this root domain). This domain name should not clash with any domain name on the internet. e.g. internal.somedomainyoucontrol.com"
@@ -197,7 +204,6 @@ variable "ca_certs_arn" {
 variable "route_ca_certs_arn" {
   type = string
   description = "ARN of the secrets manager secret containing the CA certificates to be used to verify the certificate presented by the Spine Route Lookup service. Required if you are using certificates that are not signed by a legitimate CA."
-  default = ""
 }
 
 variable "outbound_alb_certificate_arn" {
@@ -246,4 +252,23 @@ variable "mhs_spine_request_max_size" {
 variable "mhs_forward_reliable_endpoint_url" {
   type = string
   description = "The URL to communicate with Spine for Forward Reliable messaging from the outbound service"
+}
+
+variable "inbound_use_ssl" {
+  type = string
+  description = "Set to 'False' to disable SSL"
+  default = "True"
+}
+variable "inbound_server_port" {
+  type = string
+  description = "The server port that the inbound service listens on"
+  default = "443"
+}
+variable "mhs_ldap_mock_data_url" {
+  type = string
+  description = "Route uses this to connect to the fake ldap"
+}
+variable "mhs_fake_spine_url" {
+  type = string
+  description = "url for the fake spine"
 }

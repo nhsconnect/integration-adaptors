@@ -114,6 +114,7 @@ resource "aws_lb_target_group" "route_alb_target_group" {
   health_check {
     path = "/healthcheck"
     matcher = "200"
+    interval = "60"
   }
 
   tags = {

@@ -7,6 +7,7 @@ from fake_spine.spine_responses import InboundRequest
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
+
 class InboundClient(object):
 
     HEADERS = {
@@ -16,6 +17,7 @@ class InboundClient(object):
 
     def __init__(self):
         self.http_client = httpclient.AsyncHTTPClient()
+        logger.info(f"max_clients for inbound_client: {self.http_client.max_clients}")
         config = fake_spine_configuration.FakeSpineConfiguration()
         self.inbound_url = f'http://localhost:{config.INBOUND_PROXY_PORT}/inbound-proxy'
 

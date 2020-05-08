@@ -58,6 +58,10 @@ class RoutingAndReliability:
 
             logger.info("Requesting endpoint details from Spine route lookup service for {org_code} & {service_id}.",
                         fparams={"org_code": org_code, "service_id": service_id})
+
+            logger.info("Proxy setup: {proxy_host} & {proxy_port}.",
+                        fparams={"proxy_host": self._proxy_host, "proxy_port": self._proxy_port})
+
             http_response = await common_https.CommonHttps.make_request(url=url, method="GET",
                                                                         headers=build_tracking_headers(),
                                                                         body=None,

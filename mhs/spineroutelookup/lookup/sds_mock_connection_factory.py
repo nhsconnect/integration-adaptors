@@ -1,3 +1,4 @@
+import pathlib
 import json
 import os
 import shutil
@@ -14,7 +15,8 @@ logger = log.IntegrationAdaptorsLogger(__name__)
 LDAP_MOCK_DATA_URL_CONFIG_KEY = 'LDAP_MOCK_DATA_URL'
 FAKE_SPINE_URL_CONFIG_KEY = 'FAKE_SPINE_URL'
 
-_MOCK_DATA_BASE_PATH = 'mock_ldap_data'
+# _MOCK_DATA_BASE_PATH = 'mock_ldap_data'
+_MOCK_DATA_BASE_PATH = str(pathlib.Path().absolute()) + '/mock_ldap'
 _SERVER_INFO_FILE = 'server_info.json'
 _SERVER_SCHEMA_FILE = 'server_schema.json'
 _SERVER_ENTRIES_FILE = 'server_entries.json'
@@ -29,11 +31,11 @@ def _file_mock_data_loader(parsed_url: ParseResult) -> None:
 
     file_names = [_SERVER_INFO_FILE, _SERVER_SCHEMA_FILE, _SERVER_ENTRIES_FILE]
 
-    for file_name in file_names:
-        src_file_path = os.path.join(src_file_base_path, file_name)
-        dest_file_path = os.path.join(_MOCK_DATA_BASE_PATH, file_name)
-        logger.info("Copying file from '%s' to '%s'", src_file_path, dest_file_path)
-        shutil.copyfile(src_file_path, dest_file_path)
+    # for file_name in file_names:
+    #     src_file_path = os.path.join(src_file_base_path, file_name)
+    #     dest_file_path = os.path.join(_MOCK_DATA_BASE_PATH, file_name)
+    #     logger.info("Copying file from '%s' to '%s'", src_file_path, dest_file_path)
+    #     shutil.copyfile(src_file_path, dest_file_path)
 
 
 def _s3_mock_data_loader(parsed_url: ParseResult) -> None:
@@ -83,12 +85,15 @@ def _modify_spine_url(fake_spine_url):
 
 
 def build_mock_sds_connection():
-    url = config.get_config(LDAP_MOCK_DATA_URL_CONFIG_KEY)
+    # url = config.get_config(LDAP_MOCK_DATA_URL_CONFIG_KEY)
+    # url = "s3://nhsd-integration-adaptors/mock_ldap_data"
+    url = "file://mock_ldap"
     parsed_url = urlparse(url)
 
     _MOCK_DATA_LOADERS[parsed_url.scheme](parsed_url)
 
-    fake_spine_url = config.get_config(FAKE_SPINE_URL_CONFIG_KEY, default=None)
+    # fake_spine_url = config.get_config(FAKE_SPINE_URL_CONFIG_KEY, default=None)
+    fake_spine_url = "http://172.31.18.145/"
     if fake_spine_url:
         _modify_spine_url(fake_spine_url)
     else:
@@ -107,13 +112,12 @@ def build_mock_sds_connection():
 def main(args):
     config.setup_config('MHS')
     log.configure_logging('spineroutelookup')
-    _read_real_server_data(args.path, args.nhs_id_code)
+    _read_real_server_data(args.path)
 
 
-def _read_real_server_data(output_path, nhs_id_code):
+def _read_real_server_data(output_path):
     ldap_address = config.get_config('SDS_URL')
-    logger.info("Downloading real server data from '%s' for nhs id code '%s' and saving data at '%s'",
-                ldap_address, nhs_id_code, output_path)
+    logger.info("Downloading real server data from '%s'", ldap_address)
     server = Server(ldap_address, get_info=ALL)
     connection = Connection(server, auto_bind=True)
 
@@ -125,7 +129,7 @@ def _read_real_server_data(output_path, nhs_id_code):
     logger.info("Saving real server schema at '%s'", server_schema_path)
     server.schema.to_file(server_schema_path)
 
-    if connection.search('ou=Services,o=nhs', f'(nhsIDCode={nhs_id_code})', attributes=ALL_ATTRIBUTES):
+    if connection.search('ou=Services,o=nhs', '(nhsIDCode=YES)', attributes=ALL_ATTRIBUTES):
         server_entries_path = os.path.join(output_path, _SERVER_ENTRIES_FILE)
         logger.info("Saving server entries at '%s'", server_entries_path)
         connection.response_to_file(server_entries_path, raw=True)
@@ -145,7 +149,6 @@ class ArgParser(argparse.ArgumentParser):
 if __name__ == "__main__":
     parser = ArgParser(description='Downloads real LDAP server config')
     parser.add_argument('path', help="Path where to download files")
-    parser.add_argument('nhs_id_code', help="NHS ID Code do download data for")
     app_args = parser.parse_args()
 
     try:

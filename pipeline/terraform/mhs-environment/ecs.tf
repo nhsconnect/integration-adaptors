@@ -148,8 +148,8 @@ resource "aws_ecs_task_definition" "mhs_outbound_task" {
     }
   ]
   )
-  cpu = "512"
-  memory = "1024"
+  cpu = "2048"
+  memory = "4096"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE"
@@ -190,6 +190,14 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
         {
           name = "MHS_INBOUND_QUEUE_NAME"
           value = var.inbound_queue_name
+        },
+        {
+          name = "MHS_INBOUND_USE_SSL"
+          value = var.inbound_use_ssl
+        },
+        {
+          name = "MHS_INBOUND_SERVER_PORT"
+          value = var.inbound_server_port
         }
       ]
       secrets = [
@@ -245,8 +253,8 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
     }
   ]
   )
-  cpu = "512"
-  memory = "1024"
+  cpu = "2048"
+  memory = "4096"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE"
@@ -327,8 +335,8 @@ resource "aws_ecs_task_definition" "mhs_route_task" {
     }
   ]
   )
-  cpu = "512"
-  memory = "1024"
+  cpu = "2048"
+  memory = "4096"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE"
