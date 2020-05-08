@@ -21,6 +21,7 @@ TEST_QUEUE_USERNAME = "TEST QUEUE USERNAME"
 TEST_QUEUE_PASSWORD = "TEST QUEUE PASSWORD"
 TEST_EXCEPTION = Exception()
 TEST_SIDE_EFFECT = unittest.mock.Mock(side_effect=TEST_EXCEPTION)
+TEST_TTL = 100
 
 
 @unittest.mock.patch('utilities.message_utilities.get_uuid', new=lambda: TEST_UUID)
@@ -33,7 +34,11 @@ class TestProtonQueueAdaptor(unittest.TestCase):
         self.mock_container = patcher.start()
         self.addCleanup(patcher.stop)
         self.service = comms.proton_queue_adaptor.ProtonQueueAdaptor(
-            urls=TEST_QUEUE_SINGLE_URL, queue=TEST_QUEUE_NAME, username=TEST_QUEUE_USERNAME, password=TEST_QUEUE_PASSWORD)
+            urls=TEST_QUEUE_SINGLE_URL,
+            queue=TEST_QUEUE_NAME,
+            username=TEST_QUEUE_USERNAME,
+            password=TEST_QUEUE_PASSWORD,
+            ttl_in_seconds=TEST_TTL)
 
     def test_value_error_is_raised_when_broker_urls_are_invalid(self) -> None:
         test_data = [
@@ -82,6 +87,7 @@ class TestProtonQueueAdaptor(unittest.TestCase):
         self.assertEqual(TEST_QUEUE_PASSWORD, proton_messaging_handler._password)
         self.assertEqual(TEST_MESSAGE_SERIALISED, proton_messaging_handler._message.body)
         self.assertEqual(TEST_UUID, proton_messaging_handler._message.id)
+        self.assertEqual(TEST_TTL, proton_messaging_handler._message.ttl)
         self.assertEqual(properties, proton_messaging_handler._message.properties)
 
 

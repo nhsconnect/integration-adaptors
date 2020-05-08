@@ -10,6 +10,7 @@ MHS_SYNC_ASYNC_STATE_TABLE_NAME: sync_async_state
 MHS_DYNAMODB_ENDPOINT_URL: http://localhost:8000
 AWS_ACCESS_KEY_ID: test
 AWS_SECRET_ACCESS_KEY: test
+MHS_INBOUND_QUEUE_MESSAGE_TTL_IN_SECONDS: "0" # 0 = infinity
 #MHS_INBOUND_USE_SSL is only for testing purpose to facilitate local development debugging
 MHS_INBOUND_USE_SSL: false
 #User-specific env variables

@@ -19,6 +19,7 @@ services:
       - MHS_STATE_TABLE_NAME=mhs_state
       - MHS_SYNC_ASYNC_STATE_TABLE_NAME=sync_async_state
       - MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000
+      - MHS_INBOUND_QUEUE_MESSAGE_TTL_IN_SECONDS=0
       # boto3 requires some AWS creds to be provided, even
       # when connecting to local DynamoDB
       - AWS_ACCESS_KEY_ID=test
