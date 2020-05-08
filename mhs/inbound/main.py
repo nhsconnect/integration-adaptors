@@ -99,7 +99,8 @@ def create_queue_adaptor():
         username=secrets.get_secret_config('INBOUND_QUEUE_USERNAME', default=None),
         password=secrets.get_secret_config('INBOUND_QUEUE_PASSWORD', default=None),
         max_retries=int(config.get_config('INBOUND_QUEUE_MAX_RETRIES', default='3')),
-        retry_delay=int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000)
+        retry_delay=int(config.get_config('INBOUND_QUEUE_RETRY_DELAY', default='100')) / 1000,
+        ttl_in_seconds=int(config.get_config('INBOUND_QUEUE_MESSAGE_TTL_IN_SECONDS', default='0')))
 
 
 def create_sync_async_store():
