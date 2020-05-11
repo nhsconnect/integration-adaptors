@@ -14,11 +14,42 @@ variable "build_id" {
   description = "ID used to identify the current build."
 }
 
+
+# The NHS assigned VPC subnet: 10.239.66.128/25 - .128 - .255 - 126 hosts
 variable "mhs_vpc_cidr_block" {
   type = string
   description = "The CIDR block to use for the MHS VPC that is created. Should be a /16 block. Note that this cidr block must not overlap with the cidr blocks of the VPCs that the MHS VPC is to be peered with."
   default = "10.239.66.128/25"
 }
+
+variable "nhs_registered_ip_for_inbound" {
+  type = string
+  default = "10.239.66.139"
+  description = "IP registered in NHS for incomming traffic"
+}
+
+# variable "lb_cidr_block" {
+#   type = string
+#   default = "10.239.66.128/27" #.128 - .159 - 30 hosts
+#   description = "CIDR for load balancers"
+# }
+
+# variable "inbound_lb_cidr_block" {
+#   type = string
+
+# }
+
+# variable "misc_cidr_block" {
+#   type = string
+#   default = "10.239.66.160/27" #.160 - .190 - 30 hosts
+#   description = "CIDR for all other services"
+# }
+
+# variable "containers_cidr_block" {
+#   type = string
+#   default = "10.239.66.192/26" #.192 - 255 - 62 hosts
+#   description = "CIDR for containers"
+# }
 
 variable "supplier_vpc_id" {
   type = string
