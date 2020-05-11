@@ -114,6 +114,11 @@ variable "mhs_log_level" {
   description = "Log level for the MHS application."
 }
 
+variable "inbound_queue_message_ttl" {
+  type = string
+  description = "TTL of inbound queue messages in seconds"
+}
+
 variable "mhs_resynchroniser_max_retries" {
   type = string
   description = "The number of retry attempts to the sync-async state store that should be made whilst attempting to resynchronise a sync-async message"

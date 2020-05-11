@@ -220,6 +220,7 @@ pipeline {
                                             -var inbound_queue_name="${MHS_INBOUND_QUEUE_NAME}" \
                                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                                             -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
+                                            -var inbound_queue_message_ttl=300 \
                                             -var party_key_arn=${PARTY_KEY_ARN} \
                                             -var client_cert_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:build-fakespine-cert-tAch3o \
                                             -var client_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:build-fakespine-private-key-6qgFQJ \
