@@ -1,20 +1,17 @@
 """This module defines the common base for all asynchronous workflows."""
 from typing import Dict, Callable, Tuple, Optional
 
-import utilities.integration_adaptors_logger as log
-from comms import queue_adaptor
-from exceptions import MaxRetriesExceeded
 from tornado import httpclient
 
-from utilities import timing
-
+import utilities.integration_adaptors_logger as log
+from comms import queue_adaptor
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
-from retry import retriable_action
 from mhs_common.routing import routing_reliability
-from persistence import persistence_adaptor
 from mhs_common.state import work_description as wd
 from mhs_common.transmission import transmission_adaptor
 from mhs_common.workflow.common import CommonWorkflow, MessageData
+from persistence import persistence_adaptor
+from utilities import timing
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
@@ -28,18 +25,18 @@ MHS_ACK_REQUESTED = "nhsMHSAckRequested"
 
 class CommonAsynchronousWorkflow(CommonWorkflow):
     """Common functionality across all asynchronous workflows."""
-    def __init__(self, party_key: str = None, persistence_store: persistence_adaptor.PersistenceAdaptor = None,
+    def __init__(self,
+                 party_key: str = None,
+                 persistence_store: persistence_adaptor.PersistenceAdaptor = None,
                  transmission: transmission_adaptor.TransmissionAdaptor = None,
                  queue_adaptor: queue_adaptor.QueueAdaptor = None,
                  max_request_size: int = None,
-                 persistence_store_max_retries: int = None,
                  routing: routing_reliability.RoutingAndReliability = None):
 
         self.persistence_store = persistence_store
         self.transmission = transmission
         self.party_key = party_key
         self.queue_adaptor = queue_adaptor
-        self.store_retries = persistence_store_max_retries
         self.max_request_size = max_request_size
         super().__init__(routing)
 
@@ -47,10 +44,9 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                                                        workflow_name: str):
         if not wdo:
             wdo = wd.create_new_work_description(self.persistence_store,
-                                                 message_id,
-                                                 workflow_name,
-                                                 outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED
-                                                 )
+                                                       message_id,
+                                                       workflow_name,
+                                                       outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
             await wdo.publish()
         return wdo
 
@@ -76,8 +72,8 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
             return (400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '
                          f'RequestSize={len(message)}'), None, None
 
-        logger.info('Message serialised successfully')
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
+        logger.info('Outbound message prepared')
+
         return None, http_headers, message
 
     async def _make_outbound_request_and_handle_response(
@@ -100,9 +96,7 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
                              'WorkflowName': self.workflow_name
                          })
 
-            await wd.update_status_with_retries(wdo, wdo.set_outbound_status,
-                                                wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
-                                                self.store_retries)
+            await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
             return response.code, '', None
 
         error_response = handle_error_response(response)
@@ -110,23 +104,16 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
         return error_response
 
     @timing.time_function
-    async def handle_inbound_message(self, message_id: str, correlation_id: str, work_description: wd.WorkDescription, message_data: MessageData):
+    async def handle_inbound_message(self, message_id: str, correlation_id: str, wdo: wd.WorkDescription, message_data: MessageData):
         logger.info('Entered {WorkflowName} workflow to handle inbound message',
                     fparams={'WorkflowName': self.workflow_name})
         logger.audit('{WorkflowName} inbound workflow invoked. Message received from spine',
                      fparams={'WorkflowName': self.workflow_name})
-        await wd.update_status_with_retries(work_description,
-                                            work_description.set_inbound_status,
-                                            wd.MessageStatus.INBOUND_RESPONSE_RECEIVED,
-                                            self.store_retries)
 
-        await self._publish_message_to_inbound_queue(message_id, correlation_id, work_description, message_data)
+        await self._publish_message_to_inbound_queue(message_id, correlation_id, wdo, message_data)
 
         logger.info('Placed message onto inbound queue successfully')
-        await wd.update_status_with_retries(work_description,
-                                            work_description.set_inbound_status,
-                                            wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED,
-                                            self.store_retries)
+        await wdo.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)
         logger.audit('{WorkflowName} inbound workflow completed. Message placed on queue, '
                      'returning {Acknowledgement} to spine',
                      fparams={
@@ -137,16 +124,13 @@ class CommonAsynchronousWorkflow(CommonWorkflow):
     async def _publish_message_to_inbound_queue(self,
                                                 message_id: str,
                                                 correlation_id: str,
-                                                work_description: wd.WorkDescription,
+                                                wdo: wd.WorkDescription,
                                                 message_data: MessageData):
 
         try:
             await self._put_message_onto_queue_with(message_id, correlation_id, message_data)
         except Exception as e:
-            await wd.update_status_with_retries(work_description,
-                                                work_description.set_inbound_status,
-                                                wd.MessageStatus.INBOUND_RESPONSE_FAILED,
-                                                self.store_retries)
+            await wdo.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
             raise e
 
     async def _lookup_reliability_details(self, interaction_details: Dict, org_code: str = None) -> Dict:

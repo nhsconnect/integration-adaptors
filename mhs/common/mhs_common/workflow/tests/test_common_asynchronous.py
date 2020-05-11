@@ -2,13 +2,11 @@ import unittest
 from typing import Optional, Tuple
 from unittest import mock
 
+import mhs_common.state.work_description as wd
+from mhs_common.workflow import common_asynchronous
 from mhs_common.workflow.common import MessageData
 from utilities import test_utilities
 from utilities.test_utilities import async_test
-
-import mhs_common.state.work_description as wd
-from mhs_common.workflow import common_asynchronous
-
 
 SERVICE = 'service'
 ACTION = 'action'
@@ -51,7 +49,6 @@ class TestCommonAsynchronousWorkflow(unittest.TestCase):
         transmission = mock.MagicMock()
         queue_adaptor = mock.MagicMock()
         max_request_size = 5000
-        persistence_store_max_retries = 3
         self.mock_routing_reliability = mock.MagicMock()
 
         self.workflow = DummyCommonAsynchronousWorkflow(party_key,
@@ -59,7 +56,6 @@ class TestCommonAsynchronousWorkflow(unittest.TestCase):
                                                         transmission,
                                                         queue_adaptor,
                                                         max_request_size,
-                                                        persistence_store_max_retries,
                                                         self.mock_routing_reliability)
 
     @async_test

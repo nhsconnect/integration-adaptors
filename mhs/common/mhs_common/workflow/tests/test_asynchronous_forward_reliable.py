@@ -5,22 +5,20 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import exceptions
-from comms import proton_queue_adaptor
 from tornado import httpclient
-
-from mhs_common.workflow.common import MessageData
-from utilities import test_utilities
-import utilities.file_utilities as file_utilities
-from utilities.test_utilities import async_test
 
 import mhs_common.workflow.asynchronous_forward_reliable as forward_reliable
 import mhs_common.workflow.common_asynchronous as common_async
+import utilities.file_utilities as file_utilities
+from comms import proton_queue_adaptor
 from definitions import ROOT_DIR
 from mhs_common import workflow
 from mhs_common.messages import ebxml_request_envelope, ebxml_envelope
 from mhs_common.state import work_description
 from mhs_common.state.work_description import MessageStatus
+from mhs_common.workflow.common import MessageData
+from utilities import test_utilities
+from utilities.test_utilities import async_test
 
 FROM_PARTY_KEY = 'from-party-key'
 TO_PARTY_KEY = 'to-party-key'
@@ -92,7 +90,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             transmission=self.mock_transmission_adaptor,
             queue_adaptor=self.mock_queue_adaptor,
             max_request_size=MAX_REQUEST_SIZE,
-            persistence_store_max_retries=3,
             routing=self.mock_routing_reliability
         )
 
@@ -147,7 +144,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         )
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
-            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_ACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         self.mock_routing_reliability.get_end_point.assert_called_once_with(SERVICE_ID, ODS_CODE)
         self.mock_ebxml_request_envelope.assert_called_once_with(expected_interaction_details)
@@ -267,8 +264,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual("Error making outbound request", message)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
-            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED),
-             mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_TRANSMISSION_FAILED)],
             self.mock_work_description.set_outbound_status.call_args_list)
 
     @mock.patch('asyncio.sleep')
@@ -307,7 +303,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
-            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
                                                fparams={'WorkflowName': 'forward-reliable'})
@@ -335,7 +331,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.assertEqual("Didn't get expected response from Spine", message)
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
-            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
                                                fparams={'WorkflowName': 'forward-reliable'})
@@ -389,7 +385,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
 
         self.mock_work_description.publish.assert_called_once()
         self.assertEqual(
-            [mock.call(MessageStatus.OUTBOUND_MESSAGE_PREPARED), mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
+            [mock.call(MessageStatus.OUTBOUND_MESSAGE_NACKD)],
             self.mock_work_description.set_outbound_status.call_args_list)
         audit_log_mock.assert_called_once_with('Outbound {WorkflowName} workflow invoked.',
                                                fparams={'WorkflowName': 'forward-reliable'})
@@ -473,7 +469,6 @@ class TestForwardReliableWorkflow(unittest.TestCase):
             transmission=self.mock_transmission_adaptor,
             queue_adaptor=self.mock_queue_adaptor,
             max_request_size=MAX_REQUEST_SIZE,
-            persistence_store_max_retries=3,
             routing=self.mock_routing_reliability
         )
 
@@ -537,8 +532,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         self.mock_queue_adaptor.send_async.assert_called_once_with(
             {'ebXML': EBXML, 'payload': PAYLOAD, 'attachments': ATTACHMENTS},
             properties={'message-id': MESSAGE_ID, 'correlation-id': CORRELATION_ID})
-        self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
-                          mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
+        self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
         audit_log_mock.assert_called_with('{WorkflowName} inbound workflow completed. Message placed on queue,'
                                           ' returning {Acknowledgement} to spine',
@@ -561,8 +555,7 @@ class TestForwardReliableWorkflow(unittest.TestCase):
         with self.assertRaises(proton_queue_adaptor.MessageSendingError):
             await self.workflow.handle_inbound_message(MESSAGE_ID, CORRELATION_ID, self.mock_work_description, INBOUND_MESSAGE_DATA)
 
-        self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_RECEIVED),
-                          mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
+        self.assertEqual([mock.call(MessageStatus.INBOUND_RESPONSE_FAILED)],
                          self.mock_work_description.set_inbound_status.call_args_list)
         # Should be called when invoked
         audit_log_mock.assert_called_once_with('{WorkflowName} inbound workflow invoked. Message '

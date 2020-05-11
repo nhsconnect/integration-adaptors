@@ -35,7 +35,6 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
                          work_description_store: persistence_adaptor.PersistenceAdaptor,
                          sync_async_store: persistence_adaptor.PersistenceAdaptor,
                          max_request_size: int,
-                         persistence_store_retries: int,
                          routing: routing_reliability.RoutingAndReliability) \
         -> Dict[str, workflow.CommonWorkflow]:
     """Initialise the workflows
@@ -61,7 +60,6 @@ def initialise_workflows(transmission: outbound_transmission.OutboundTransmissio
                                      transmission=transmission,
                                      resynchroniser=resynchroniser,
                                      max_request_size=max_request_size,
-                                     persistence_store_max_retries=persistence_store_retries,
                                      routing=routing
                                      )
 
@@ -152,12 +150,20 @@ def main():
                                                               http_proxy_port)
 
     party_key = secrets.get_secret_config('PARTY_KEY')
-    work_description_store = get_persistence_adaptor(table_name=config.get_config('STATE_TABLE_NAME'))
-    sync_async_store = get_persistence_adaptor(table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'))
-    store_retries = int(config.get_config('STATE_STORE_MAX_RETRIES', default='3'))
+
+    work_description_store = get_persistence_adaptor(
+        table_name=config.get_config('STATE_TABLE_NAME'),
+        max_retries=int(config.get_config('STATE_STORE_MAX_RETRIES', default='3')),
+        retry_delay=int(config.get_config('STATE_STORE_RETRY_DELAY', default='100')) / 1000)
+
+    sync_async_store = get_persistence_adaptor(
+        table_name=config.get_config('SYNC_ASYNC_STATE_TABLE_NAME'),
+        max_retries=int(config.get_config('SYNC_ASYNC_STORE_MAX_RETRIES', default='3')),
+        retry_delay=int(config.get_config('SYNC_ASYNC_STORE_RETRY_DELAY', default='100')) / 1000)
+
     max_request_size = int(config.get_config('SPINE_REQUEST_MAX_SIZE'))
     workflows = initialise_workflows(transmission, party_key, work_description_store, sync_async_store,
-                                     max_request_size, store_retries, routing)
+                                     max_request_size, routing)
     start_tornado_server(data_dir, workflows)
 
 

@@ -9,13 +9,16 @@ class PersistenceAdaptor(abc.ABC):
     """An adaptor that provides a common interface to a specific item type in a database."""
 
     @abc.abstractmethod
-    async def add(self, key: str, data: dict) -> Optional[dict]:
-        """Add an item to a specified table, using a provided key.
+    async def add(self, data: dict) -> None:
+        """Add an item to a specified table, using 'key' from data.
 
-        :param key: The key used to identify the item.
-        :param data: The item to store in persistence.
+        :param data: The item to store in persistence. Must have 'key'
         :return: The previous version of the item which has been replaced. (None if no previous item)
         """
+        pass
+
+    @abc.abstractmethod
+    async def update(self, key: str, data: dict):
         pass
 
     @abc.abstractmethod

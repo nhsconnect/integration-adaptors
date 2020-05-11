@@ -178,7 +178,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
             payload="nice message",
             work_description_object=None)
 
-        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_SYNC_MESSAGE_RESPONSE_RECEIVED)
         self.assertEqual(error, 500)
         self.assertEqual(text, 'Error(s) received from Spine: HTTP 409: Conflict')
 
@@ -203,7 +203,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
             payload="nice message",
             work_description_object=None)
 
-        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_SYNC_MESSAGE_RESPONSE_RECEIVED)
         self.assertEqual(error, 500)
         self.assertEqual(text[:40], 'Error(s) received from Spine: HTTP 451: ')
 
@@ -224,7 +224,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
             payload="nice message",
             work_description_object=None)
 
-        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
+        wdo.set_outbound_status.assert_called_with(work_description.MessageStatus.OUTBOUND_SYNC_MESSAGE_RESPONSE_RECEIVED)
         self.assertEqual(error, 200)
         self.assertEqual(text, 'response body')
 
@@ -249,7 +249,7 @@ class TestSynchronousWorkflow(unittest.TestCase):
 
         log_mock.audit.assert_called_with(
             'Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
-            fparams={'Acknowledgment': 'OUTBOUND_MESSAGE_RESPONSE_RECEIVED'})
+            fparams={'Acknowledgment': 'OUTBOUND_SYNC_MESSAGE_RESPONSE_RECEIVED'})
 
     @mock.patch('mhs_common.workflow.synchronous.logger')
     @mock.patch('mhs_common.state.work_description.create_new_work_description')

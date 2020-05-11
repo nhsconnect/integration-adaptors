@@ -52,6 +52,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
                                              workflow.SYNC,
                                              outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED)
         await wdo.publish()
+
         if not from_asid:
             return 400, '`from_asid` header field required for sync messages', None
 
@@ -81,9 +82,7 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return 400, f'Request to send to Spine is too large. MaxRequestSize={self.max_request_size} '\
                         f'RequestSize={len(message)}', None
 
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_PREPARED)
-
-        logger.info('About to make outbound request')
+        logger.info('Outbound message prepared')
         try:
             response = await self.transmission.make_request(url, headers, message)
         except httpclient.HTTPClientError as e:
@@ -96,15 +95,15 @@ class SynchronousWorkflow(common_synchronous.CommonSynchronousWorkflow):
             return 500, 'Error making outbound request', None
 
         logger.audit('Outbound Synchronous workflow completed. Message sent to Spine and {Acknowledgment} received.',
-                     fparams={'Acknowledgment': wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED})
+                     fparams={'Acknowledgment': wd.MessageStatus.OUTBOUND_SYNC_MESSAGE_RESPONSE_RECEIVED})
 
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_MESSAGE_RESPONSE_RECEIVED)
         return response.code, response.body.decode(), wdo
 
     async def _handle_http_exception(self, exception, wdo):
         logger.exception('Received HTTP errors from Spine. {HTTPStatus}', fparams={'HTTPStatus': exception.code})
 
-        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_RESPONSE_RECEIVED)
+        await wdo.set_outbound_status(wd.MessageStatus.OUTBOUND_SYNC_MESSAGE_RESPONSE_RECEIVED)
 
         if exception.response:
             code, response, _ = handle_soap_error(exception.response.code,
