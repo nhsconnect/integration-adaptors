@@ -45,7 +45,7 @@ def app():
     config.setup_config("MHS")
     log.configure_logging("fake-spine")  # ensure this is first to get proper logging of startup errors
     parse_command_line()
-    httpclient.AsyncHTTPClient.configure(None, max_clients=500)
+    httpclient.AsyncHTTPClient.configure(None, max_clients=750)
 
     logger.info("Building fakespine service configuration")
 
