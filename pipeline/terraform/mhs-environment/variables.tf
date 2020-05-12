@@ -28,29 +28,6 @@ variable "nhs_registered_ip_for_inbound" {
   description = "IP registered in NHS for incomming traffic"
 }
 
-# variable "lb_cidr_block" {
-#   type = string
-#   default = "10.239.66.128/27" #.128 - .159 - 30 hosts
-#   description = "CIDR for load balancers"
-# }
-
-# variable "inbound_lb_cidr_block" {
-#   type = string
-
-# }
-
-# variable "misc_cidr_block" {
-#   type = string
-#   default = "10.239.66.160/27" #.160 - .190 - 30 hosts
-#   description = "CIDR for all other services"
-# }
-
-# variable "containers_cidr_block" {
-#   type = string
-#   default = "10.239.66.192/26" #.192 - 255 - 62 hosts
-#   description = "CIDR for containers"
-# }
-
 variable "supplier_vpc_id" {
   type = string
   description = "VPC id of the supplier system that connects to the MHS"

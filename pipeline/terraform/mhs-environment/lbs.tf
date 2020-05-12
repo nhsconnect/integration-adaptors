@@ -153,7 +153,7 @@ resource "aws_lb_listener" "route_alb_listener" {
 resource "aws_lb" "inbound_nlb" {
   internal = true
   load_balancer_type = "network"
-  subnets = [ aws_subnet.mhs_subnet[1].id, aws_subnet.mhs_subnet[2].id ] # enable only zone b and c, zone a will be enabled manually
+  subnets = aws_subnet.inbound_lb_subnet.*.id
   enable_cross_zone_load_balancing = true
 
   # subnet_mapping {
