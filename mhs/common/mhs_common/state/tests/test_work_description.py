@@ -46,7 +46,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         await work_description.publish()
-        persistence.add.assert_called_with(input_data)
+        persistence.add.assert_called_with(input_data[wd.MESSAGE_ID], input_data)
 
     @async_test
     async def test_set_outbound_status(self):
