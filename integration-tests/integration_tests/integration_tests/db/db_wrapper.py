@@ -12,7 +12,7 @@ _SYNC_ASYNC_TABLE_WRAPPER_FACTORY = {
     'mongodb': MongoWrapper.get_sync_async_table_wrapper
 }
 
-DB_TYPE = os.environ.get('MHS_PERSISTENCE_ADAPTOR')
+DB_TYPE = os.environ.get('MHS_PERSISTENCE_ADAPTOR') or 'dynamodb'
 KEY_NAME = {
     'dynamodb': 'key',
     'mongodb': '_id'
