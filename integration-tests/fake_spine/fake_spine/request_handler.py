@@ -25,7 +25,7 @@ class SpineRequestHandler(BaseHandler):
     async def _do_inbound_request(self, inbound_request: InboundRequest):
         logger.debug(f'Delaying inbound request by {self.config.INBOUND_DELAY_MS}ms')
         await asyncio.sleep(self.config.INBOUND_DELAY_MS / 1000.0)
-        await self.inbound_client.make_request(inbound_request)
+        asyncio.create_task(self.inbound_client.make_request(inbound_request))
 
     async def post(self):
         logger.info(f"request accepted {self.request} with headers: {self.request.headers}, and body: {self.request.body}")
@@ -42,4 +42,4 @@ class SpineRequestHandler(BaseHandler):
         # fire-and-forget the inbound request to allow it to happen some time after the outbound request completes
         inbound_request = responses.get_inbound_request(self.request)
         if inbound_request:
-            asyncio.ensure_future(self._do_inbound_request(inbound_request))
+            asyncio.create_task(self._do_inbound_request(inbound_request))

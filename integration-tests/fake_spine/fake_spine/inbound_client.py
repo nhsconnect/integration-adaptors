@@ -1,3 +1,5 @@
+import asyncio
+
 from utilities import integration_adaptors_logger as log
 
 from tornado import httpclient
@@ -23,9 +25,9 @@ class InboundClient(object):
 
     async def make_request(self, request: InboundRequest):
         logger.info(f'Making inbound request to {self.inbound_url}')
-        response = await self.http_client.fetch(self.inbound_url,
+        asyncio.create_task(self.http_client.fetch(self.inbound_url,
                                                 method='POST',
                                                 body=request.body,
                                                 raise_error=True,
-                                                headers={**self.HEADERS, **request.headers})
-        return response
+                                                headers={**self.HEADERS, **request.headers}))
+
