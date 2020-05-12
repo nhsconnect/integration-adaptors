@@ -1,9 +1,9 @@
 """Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
-import contextlib
 import copy
+import threading
 
-import aioboto3
-from boto3.dynamodb.conditions import Attr
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import ReturnDocument
 
 import utilities.integration_adaptors_logger as log
 from persistence import persistence_adaptor
@@ -13,11 +13,14 @@ from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
-_KEY = "key"
+_DB_NAME = 'integration-adaptors'
+_KEY = "_id"
 
 
-class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
-    """Class responsible for persisting items into a DynamoDB."""
+class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
+    """Class responsible for persisting items into a MongoDB."""
+
+    client = None
 
     def __init__(self, table_name: str, max_retries: int, retry_delay: float):
         """
@@ -32,6 +35,9 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         self.table_name = table_name
         self.retry_delay = retry_delay
         self.max_retries = max_retries
+
+        client = MongoPersistenceAdaptor._initialize_mongo_client()
+        self.collection = client[_DB_NAME][table_name]
 
     @retriable
     async def add(self, key, data):
@@ -48,10 +54,9 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         logger.info('Adding data for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
 
         try:
-            async with self.__get_dynamo_table() as table:
-                await table.put_item(
-                    Item=self._prepare_data_to_add(key, data),
-                    ConditionExpression=Attr(_KEY).not_exists())
+            result = await self.collection.insert_one(self._prepare_data_to_add(key, data))
+            if not result.acknowledged:
+                raise RecordCreationError
         except Exception as e:
             raise RecordCreationError from e
 
@@ -65,26 +70,22 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
 
         if _KEY in data:
-            raise ValueError(f"Updated data must not have field named '{_KEY}' as it's used "
+            raise ValueError(f"Added data must not have field named '{_KEY}' as it's used "
                              f"as primary key and is explicitly set as this function argument")
 
         logger.info('Updating data for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
 
-        attribute_updates = dict([(k, {"Value": v}) for k, v in data.items()])
-
         try:
-            async with self.__get_dynamo_table() as table:
-                response = await table.update_item(
-                    Key={_KEY: key},
-                    AttributeUpdates=attribute_updates,
-                    ReturnValues="ALL_NEW")
-
-            return self._prepare_data_to_return(response.get('Attributes', {}))
+            result = await self.collection.find_one_and_update(
+                {_KEY: key},
+                {'$set': data},
+                return_document=ReturnDocument.AFTER)
+            return self._prepare_data_to_return(result)
         except Exception as e:
             raise RecordUpdateError from e
 
     @retriable
-    async def get(self, key: str, strongly_consistent_read: bool = False):
+    async def get(self, key: str, **kwargs):
         """
         Retrieves an item from a specified table with a given key.
         :param key: The key which identifies the item to get.
@@ -93,16 +94,8 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('Getting record for {key} from table {table}', fparams={'key': key, 'table': self.table_name})
         try:
-            async with self.__get_dynamo_table() as table:
-                response = await table.get_item(
-                    Key={_KEY: key},
-                    ConsistentRead=strongly_consistent_read)
-
-            if 'Item' not in response:
-                logger.info('No item found for record: {key} in table {table}', fparams={'key': key, 'table': self.table_name})
-                return None
-            attributes = response.get('Item', {})
-            return self._prepare_data_to_return(attributes)
+            result = await self.collection.find_one({_KEY: key})
+            return self._prepare_data_to_return(result)
         except Exception as e:
             raise RecordRetrievalError from e
 
@@ -115,29 +108,10 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         logger.info('Deleting record for {key} from table {table}', fparams={'key': key, 'table': self.table_name})
         try:
-            async with self.__get_dynamo_table() as table:
-                response = await table.delete_item(
-                    Key={_KEY: key},
-                    ReturnValues='ALL_OLD'
-                )
-            if 'Attributes' not in response:
-                logger.info('No values found for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
-                return None
-            attributes = response.get('Attributes', {})
-            return self._prepare_data_to_return(attributes)
+            result = await self.collection.find_one_and_delete({_KEY: key})
+            return self._prepare_data_to_return(result)
         except Exception as e:
             raise RecordDeletionError from e
-
-    @contextlib.asynccontextmanager
-    async def __get_dynamo_table(self):
-        """
-        Creates a connection to the table referenced by this instance.
-        :return: The table to be used by this instance.
-        """
-        async with aioboto3.resource('dynamodb', region_name='eu-west-2',
-                                     endpoint_url=config.get_config('DYNAMODB_ENDPOINT_URL', None)) as dynamo_resource:
-            logger.info('Establishing connection to {table_name}', fparams={'table_name': self.table_name})
-            yield dynamo_resource.Table(self.table_name)
 
     @staticmethod
     def _prepare_data_to_add(key, data):
@@ -150,3 +124,10 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         if data is not None:
             del data[_KEY]
         return data
+
+    @staticmethod
+    def _initialize_mongo_client():
+        with threading.Lock():
+            if MongoPersistenceAdaptor.client is None:
+                MongoPersistenceAdaptor.client = AsyncIOMotorClient(config.get_config('MONGODB_ENDPOINT_URL'))
+        return MongoPersistenceAdaptor.client

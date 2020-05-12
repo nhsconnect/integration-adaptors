@@ -1,10 +1,9 @@
 """
 Provides functionality to assert items within the MHS Dynamo table
 """
-import json
 import unittest
 
-from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER
+from integration_tests.db.db_wrapper import MHS_STATE_TABLE_WRAPPER, KEY_NAME
 
 
 class MhsItemAssertor(object):
@@ -27,18 +26,16 @@ class MhsItemAssertor(object):
         """
         for key in expected_values:
             expected_value = expected_values[key]
-            attribute = self.item.get(key)
-            actual_value = attribute['S'] if 'S' in attribute else None
+            actual_value = self.item.get(key)
 
             self.assertor.assertEqual(expected_value, actual_value,
                                       f'Values not equal when comparing dictionary keys: {key}')
 
     def item_contains_value(self, expected_key: str, expected_value) -> bool:
-        value = self.item.get(expected_key)
-        return 'S' in value and expected_value == value['S']
+        return expected_value == self.item.get(expected_key)
 
 
-class DynamoMhsTableStateAssertor(object):
+class MhsTableStateAssertor(object):
     """
     A class that is able to assert records within the MHS table shape
     """
@@ -56,7 +53,7 @@ class DynamoMhsTableStateAssertor(object):
         :param key: the key to search for
         :return: an MhsItemAssertor that can be used to assert properties on the given item
         """
-        items_with_key = [x for x in self.state['Items'] if x['key']['S'] == key]
+        items_with_key = list(filter(lambda d: d[KEY_NAME] == key, self.state))
         num_items = len(items_with_key)
         self.assertor.assertTrue(len(items_with_key) == 1, f'Expected exactly one item with key {key} '
                                                            f'but found {num_items}')
@@ -64,7 +61,7 @@ class DynamoMhsTableStateAssertor(object):
 
     @staticmethod
     def wait_for_inbound_response_processed(message_id: str) -> bool:
-        return DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        return MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .item_contains_value('INBOUND_STATUS', 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED')
 

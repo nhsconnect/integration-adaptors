@@ -67,6 +67,10 @@ services:
     image: nhsdev/nia-dynamodb-local:1.0.3
     ports:
       - "8000:8000"
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
   rabbitmq:
     image: nhsdev/nia-rabbitmq-local:1.0.1
     ports:

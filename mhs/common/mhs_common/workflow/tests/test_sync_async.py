@@ -132,10 +132,10 @@ class TestSyncAsyncWorkflowInbound(TestCase):
 
         await self.workflow.handle_inbound_message('1', 'cor_id', self.work_description, self.message_data)
 
-        self.persistence.add.assert_called_with({
-            'key': '1',
-            'correlation_id': 'cor_id',
-            'data': 'wqe'
+        self.persistence.add.assert_called_with('1', {
+            'MESSAGE_ID': '1',
+            'CORRELATION_ID': 'cor_id',
+            'DATA': 'wqe'
         })
 
         self.work_description.set_inbound_status.assert_called_with(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)

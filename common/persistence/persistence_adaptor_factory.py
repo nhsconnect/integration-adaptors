@@ -1,6 +1,7 @@
 import utilities.config as config
-from persistence.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
 import utilities.integration_adaptors_logger as log
+from persistence.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
+from persistence.mongo_persistence_adaptor import MongoPersistenceAdaptor
 from persistence.persistence_adaptor import PersistenceAdaptor
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -8,6 +9,7 @@ logger = log.IntegrationAdaptorsLogger(__name__)
 _DEFAULT_ADAPTOR = 'dynamodb'
 _PERSISTENCE_ADAPTOR_TYPES = {
     _DEFAULT_ADAPTOR: DynamoPersistenceAdaptor,
+    'mongodb': MongoPersistenceAdaptor,
 }
 
 

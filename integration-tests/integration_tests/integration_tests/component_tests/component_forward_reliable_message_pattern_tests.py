@@ -2,11 +2,11 @@
 
 import unittest
 
-from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
+from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.assertors.json_error_response_assertor import JsonErrorResponseAssertor
-from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
-from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
+from integration_tests.db.db_wrapper import MHS_STATE_TABLE_WRAPPER, MHS_SYNC_ASYNC_TABLE_WRAPPER
+from integration_tests.db.mhs_table import MhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.inbound_proxy_http_request_builder import InboundProxyHttpRequestBuilder
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
@@ -23,8 +23,8 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
     """
 
     def setUp(self):
-        MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
-        MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_STATE_TABLE_WRAPPER.clear_all_records_in_table()
+        MHS_SYNC_ASYNC_TABLE_WRAPPER.clear_all_records_in_table()
         MHS_INBOUND_QUEUE.drain()
 
     def test_should_place_unsolicited_valid_message_onto_queue_for_client_to_receive(self):
@@ -102,7 +102,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_success()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {
@@ -147,7 +147,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {
@@ -193,7 +193,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {
@@ -244,7 +244,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {
@@ -296,7 +296,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {

@@ -3,8 +3,8 @@
 import unittest
 
 from integration_tests.assertors.json_error_response_assertor import JsonErrorResponseAssertor
-from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
-from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
+from integration_tests.db.db_wrapper import MHS_STATE_TABLE_WRAPPER, MHS_SYNC_ASYNC_TABLE_WRAPPER
+from integration_tests.db.mhs_table import MhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 
@@ -19,8 +19,8 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
     """
 
     def setUp(self):
-        MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
-        MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_STATE_TABLE_WRAPPER.clear_all_records_in_table()
+        MHS_SYNC_ASYNC_TABLE_WRAPPER.clear_all_records_in_table()
 
     def test_should_return_information_from_soap_fault_returned_from_spine_in_original_post_request_to_client(self):
         """
@@ -60,7 +60,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {
@@ -106,7 +106,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {
@@ -152,7 +152,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {
@@ -198,7 +198,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
             .execute_post_expecting_error_response()
 
         # Assert
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values(
             {

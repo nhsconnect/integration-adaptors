@@ -1,13 +1,13 @@
 """
 Provides tests around the Forward Reliable workflow, including sync-async wrapping
 """
-from unittest import TestCase, skip
+from unittest import TestCase
 
-from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
+from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
-from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
-from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
+from integration_tests.db.db_wrapper import MHS_STATE_TABLE_WRAPPER, MHS_SYNC_ASYNC_TABLE_WRAPPER
+from integration_tests.db.mhs_table import MhsTableStateAssertor
 from integration_tests.end_to_end_tests.common_assertions import CommonAssertions
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
@@ -33,8 +33,8 @@ class ForwardReliableMessagingPatternTests(TestCase):
     """
 
     def setUp(self):
-        MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
-        MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_STATE_TABLE_WRAPPER.clear_all_records_in_table()
+        MHS_SYNC_ASYNC_TABLE_WRAPPER.clear_all_records_in_table()
         MHS_INBOUND_QUEUE.drain()
         self.assertions = CommonAssertions('forward-reliable')
 
@@ -83,9 +83,9 @@ class ForwardReliableMessagingPatternTests(TestCase):
             .assert_element_attribute('.//acknowledgement//messageRef//id', 'root', message_id)
 
         AssertWithRetries(retry_count=10) \
-            .assert_condition_met(lambda: DynamoMhsTableStateAssertor.wait_for_inbound_response_processed(message_id))
+            .assert_condition_met(lambda: MhsTableStateAssertor.wait_for_inbound_response_processed(message_id))
 
-        DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()) \
+        MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table()) \
             .assert_single_item_exists_with_key(message_id) \
             .assert_item_contains_values({
             'INBOUND_STATUS': 'INBOUND_RESPONSE_SUCCESSFULLY_PROCESSED',

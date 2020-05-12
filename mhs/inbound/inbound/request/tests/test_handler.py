@@ -42,7 +42,7 @@ EXPECTED_UNSOLICITED_ATTACHMENTS = [{ebxml_request_envelope.ATTACHMENT_PAYLOAD: 
 
 state_data = [
     {
-        wd.KEY: REF_TO_MESSAGE_ID,
+        wd.MESSAGE_ID: REF_TO_MESSAGE_ID,
         wd.CREATED_TIMESTAMP: '11:59',
         wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_ACKD,
         wd.INBOUND_STATUS: None,
@@ -57,7 +57,7 @@ async def state_return_values(message_key, strongly_consistent_read):
     :param message_key:
     :return: data associated with that key
     """
-    responses = [data for data in state_data if data[wd.KEY] == message_key]
+    responses = [data for data in state_data if data[wd.MESSAGE_ID] == message_key]
     if not responses:
         return None
     else:
