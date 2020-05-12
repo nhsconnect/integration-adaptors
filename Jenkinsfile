@@ -76,7 +76,7 @@ pipeline {
                             -var inbound_queue_name="${MHS_INBOUND_QUEUE_NAME}" \
                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                             -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
-                            -var party_key_arn="YES-0000806" \
+                            -var party_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_PARTY_KEY-FbOTJn \
                             -var client_cert_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
                             -var client_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PLT_INT_Endpoint_PrivateKey-Fu1jb6 \
                             -var ca_certs_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_CA_valid_till_may_2022-XJup7p \
