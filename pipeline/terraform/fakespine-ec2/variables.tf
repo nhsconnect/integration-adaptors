@@ -134,3 +134,9 @@ variable "instance_count" {
   default = 2
   description = "How many fakespine intances do we need"
 }
+
+variable "mhs_log_level" {
+  type = "string"
+  default = "INFO"
+  description = "Log level for application"
+}

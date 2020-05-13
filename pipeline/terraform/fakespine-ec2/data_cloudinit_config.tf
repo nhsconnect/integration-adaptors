@@ -10,8 +10,9 @@ data "template_file" "fake_spine_app_variables_template" {
     FAKE_SPINE_PRIVATE_KEY_ARN      = var.fake_spine_private_key,
     FAKE_SPINE_CERTIFICATE_ARN      = var.fake_spine_certificate,
     FAKE_SPINE_CA_STORE_ARN         = var.fake_spine_ca_store,
-    MHS_SECRET_PARTY_KEY_ARN        = var.party_key_arn
-    FAKE_SPINE_PROXY_VALIDATE_CERT  = var.fake_spine_proxy_validate_cert
+    MHS_SECRET_PARTY_KEY_ARN        = var.party_key_arn,
+    FAKE_SPINE_PROXY_VALIDATE_CERT  = var.fake_spine_proxy_validate_cert,
+    MHS_LOG_LEVEL                   = var.mhs_log_level
   }
 }
 

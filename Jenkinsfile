@@ -311,6 +311,7 @@ pipeline {
                                                                      "git_branch_name":                "feature/NIAD-23-v-p-fake-spine-lb",
                                                                      "git_repo_url":                   "https://github.com/nhsconnect/integration-adaptors",
                                                                      "fake_spine_proxy_validate_cert": "false"
+                                                                     "mhs_log_level":                  "DEBUG"
                                                                 ]
 
                                                                 sh(label:"Terraform: init", script: initCommand)
