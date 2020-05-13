@@ -128,3 +128,9 @@ variable "fake_spine_proxy_validate_cert" {
   type = string
   description = "Validate certificate for proxy"
 }
+
+variable "instance_count" {
+  type = number
+  default = 2
+  description = "How many fakespine intances do we need"
+}

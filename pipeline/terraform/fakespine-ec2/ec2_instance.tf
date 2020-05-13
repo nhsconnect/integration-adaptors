@@ -1,4 +1,5 @@
 resource "aws_instance" "fake_spine_instance" {
+  count = var.instance_count
   ami = data.aws_ami.base_linux.id
   instance_type = "t2.micro"
   key_name = "kainos-dev"
