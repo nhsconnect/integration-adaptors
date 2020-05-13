@@ -272,7 +272,7 @@ resource "aws_security_group" "cloudwatch_security_group" {
   }
 }
 
-aws_security_group_rule "cloudwatch_sg_ingress_outbound" {
+resource "aws_security_group_rule" "cloudwatch_sg_ingress_outbound" {
   security_group_id = aws_security_group.cloudwatch_security_group.id
   from_port = 443
   to_port = 443
@@ -282,7 +282,7 @@ aws_security_group_rule "cloudwatch_sg_ingress_outbound" {
   description = "Allow MHS Outbound to cloudwatch"
 }
 
-aws_security_group_rule "cloudwatch_sg_ingress_inbound" {
+resource "aws_security_group_rule" "cloudwatch_sg_ingress_inbound" {
   security_group_id = aws_security_group.cloudwatch_security_group.id
   from_port = 443
   to_port = 443
@@ -292,7 +292,7 @@ aws_security_group_rule "cloudwatch_sg_ingress_inbound" {
   description = "Allow MHS inbound to cloudwatch"
 }
 
-aws_security_group_rule "cloudwatch_sg_ingress_route" {
+resource "aws_security_group_rule" "cloudwatch_sg_ingress_route" {
   security_group_id = aws_security_group.cloudwatch_security_group.id
   from_port = 443
   to_port = 443
