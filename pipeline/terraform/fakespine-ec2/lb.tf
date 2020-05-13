@@ -3,7 +3,7 @@ resource "aws_lb" "fake_spine_load_balancer" {
   internal = true
   load_balancer_type = "application"
   security_groups = [aws_security_group.fake_spine_alb_security_group.id]
-  subnets =  [data.terraform_remote_state.mhs.outputs.subnet_ids]
+  subnets =  data.terraform_remote_state.mhs.outputs.subnet_ids
 
   tags = {
     EnvironmentId = var.environment_id
@@ -22,7 +22,7 @@ resource "aws_lb_listener" "fake_spine_listener" {
 }
 
 resource "aws_lb_target_group" "fake_spine_target_group" {
-  name = "${var.environment_id}-fake-spine-target-group"
+  name = "${var.environment_id}-fake-spine-tg"
   port = var.fake_spine_port
   protocol = "HTTP"
   vpc_id = data.terraform_remote_state.mhs.outputs.vpc_id
