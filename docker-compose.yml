@@ -67,7 +67,7 @@ services:
     image: nhsdev/nia-dynamodb-local:1.0.3
     ports:
       - "8000:8000"
-  mongo:
+  mongodb:
     image: mongo
     ports:
       - "27017:27017"

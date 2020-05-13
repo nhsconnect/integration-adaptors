@@ -6,8 +6,8 @@ from persistence.persistence_adaptor import PersistenceAdaptor
 from persistence.persistence_adaptor_factory import get_persistence_adaptor, PERSISTENCE_ADAPTOR_TYPES
 from utilities import test_utilities
 
-MONGODB_ENDPOINT_URL = 'mongodb://localhost:27017'
-DYNAMODB_ENDPOINT_URL = 'http://localhost:8000'
+MONGODB_ENDPOINT_URL = 'mongodb://mongodb:27017'
+DYNAMODB_ENDPOINT_URL = 'http://dynamodb:8000'
 TEST_TABLE_NAME = "mhs_state"
 SAMPLE_DATA = {
     "test-key1": "test-value1",
