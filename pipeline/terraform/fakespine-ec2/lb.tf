@@ -27,6 +27,16 @@ resource "aws_lb_target_group" "fake_spine_target_group" {
   protocol = "HTTP"
   vpc_id = data.terraform_remote_state.mhs.outputs.vpc_id
 
+  health_check {
+    enabled = true
+    interval = 60
+    path = "/healthcheck"
+    protocol = "HTTP"
+    timeout = 20
+    healthy_threshold = 2
+    unhealthy_threshold = 3
+  }
+
   tags = {
     EnvironmentId = var.environment_id
   }
