@@ -41,13 +41,13 @@ class DynamoWrapper:
     @staticmethod
     def get_state_table_wrapper():
         return DynamoWrapper(
-            table_name=os.environ.get('MHS_DYNAMODB_TABLE_NAME', 'mhs_state'),
+            table_name=os.environ.get('MHS_DB_TABLE_NAME', 'mhs_state'),
             region_name='eu-west-2',
-            endpoint_url=os.environ.get('MHS_DYNAMODB_ENDPOINT_URL', None))
+            endpoint_url=os.environ.get('MHS_DB_ENDPOINT_URL', None))
 
     @staticmethod
     def get_sync_async_table_wrapper():
         return DynamoWrapper(
             table_name=os.environ.get('MHS_SYNC_ASYNC_TABLE_NAME', 'sync_async_state'),
             region_name='eu-west-2',
-            endpoint_url=os.environ.get('MHS_DYNAMODB_ENDPOINT_URL', None))
+            endpoint_url=os.environ.get('MHS_DB_ENDPOINT_URL', None))

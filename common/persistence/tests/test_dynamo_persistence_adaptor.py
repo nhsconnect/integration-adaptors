@@ -135,7 +135,7 @@ class TestDynamoPersistenceAdaptor(unittest.TestCase):
 
         self.mock_boto3_resource.assert_called_once_with('dynamodb', region_name='eu-west-2', endpoint_url=None)
 
-    @unittest.mock.patch.dict(utilities.config.config, {'DYNAMODB_ENDPOINT_URL': 'http://localhost:8000'})
+    @unittest.mock.patch.dict(utilities.config.config, {'DB_ENDPOINT_URL': 'http://localhost:8000'})
     @test_utilities.async_test
     async def test_boto3_resource_created_correctly_with_endpoint_url(self):
         self.__setFutureResponse(self.mock_table.get_item, TEST_GET_RESPONSE)

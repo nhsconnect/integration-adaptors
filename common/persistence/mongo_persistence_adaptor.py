@@ -1,4 +1,4 @@
-"""Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
+"""Module containing functionality for a MongoDB implementation of a persistence adaptor."""
 import copy
 import threading
 
@@ -24,10 +24,10 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
 
     def __init__(self, table_name: str, max_retries: int, retry_delay: float):
         """
-        Constructs a DynamoDB version of a
+        Constructs a MongoDB version of a
         :class:`PersistenceAdaptor <mhs.common.state.persistence_adaptor.PersistenceAdaptor>`.
         The kwargs provided should contain the following information:
-          * table_name: The Table Name used to identify the dynamo table containing required items.
+          * table_name: The Table Name used to identify the mongo collection containing required items.
           * max_retries: The number of max retries object should make if there is an error connecting with the DB
           * retry_delay: The delay between retries
         :param table_name: Table name to be used in this adaptor.
@@ -89,7 +89,6 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         """
         Retrieves an item from a specified table with a given key.
         :param key: The key which identifies the item to get.
-        :param strongly_consistent_read: https://docs.amazonaws.cn/en_us/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
         :return: The item from the specified table with the given key. (None if no item found)
         """
         logger.info('Getting record for {key} from table {table}', fparams={'key': key, 'table': self.table_name})
@@ -129,5 +128,5 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
     def _initialize_mongo_client():
         with threading.Lock():
             if MongoPersistenceAdaptor.client is None:
-                MongoPersistenceAdaptor.client = AsyncIOMotorClient(config.get_config('MONGODB_ENDPOINT_URL'))
+                MongoPersistenceAdaptor.client = AsyncIOMotorClient(config.get_config('DB_ENDPOINT_URL'))
         return MongoPersistenceAdaptor.client

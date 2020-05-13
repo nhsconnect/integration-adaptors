@@ -15,7 +15,7 @@ only.
 
 `pipenv run inttests` will run all integration tests.
 
-When running the tests locally, you will need to set the MHS_ADDRESS, ASID, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, MHS_DYNAMODB_ENDPOINT_URL in the 'Environment variables' section of
+When running the tests locally, you will need to set the MHS_ADDRESS, ASID, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, MHS_DB_ENDPOINT_URL in the 'Environment variables' section of
  the Run/Debug Configurations.
 - The INTEGRATION_TEST_ASID is a 12 digit number needed to access Opentest, supplied by NHS Digital
  - eg INTEGRATION_TEST_ASID=123456789012
@@ -23,7 +23,7 @@ When running the tests locally, you will need to set the MHS_ADDRESS, ASID, AWS_
  - eg MHS_ADDRESS=http://localhost
 - The AWS_ACCESS_KEY_ID can be 'test' locally.
 - The AWS_SECRET_ACCESS_KEY can be 'test' locally.
-- MHS_DYNAMODB_ENDPOINT_URL can be http://localhost:8000 locally.
+- MHS_DB_ENDPOINT_URL can be http://localhost:8000 locally.
 
 You will need to complete the setup steps for all the associated services in test prior to running this test suite
 
@@ -38,7 +38,7 @@ export SCR_ADDRESS="http://localhost:9000/"
 export INTEGRATION_TEST_ASID="Your NHS Digital assigned ASID here"
 export AWS_ACCESS_KEY_ID="test"
 export AWS_SECRET_ACCESS_KEY="test"
-export MHS_DYNAMODB_ENDPOINT_URL="http://localhost:8000"
+export MHS_DB_ENDPOINT_URL="http://localhost:8000"
 
 ----
 

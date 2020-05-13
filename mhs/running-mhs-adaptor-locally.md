@@ -17,7 +17,7 @@ are required to run the MHS Adaptor locally.
     - SCR Adaptor (An HTTP endpoint which can be used to simplify Summary Care Record interactions, and call the MHS adaptor for you)
 
 * Run `docker-compose build`. This will build all the additional containers:
-    - DynamoDB local instance (to hold internal state of the MHS Adaptor)
+    - DynamoDB and MongoDB local instance (to hold internal state of the MHS Adaptor) - both are created but only one is used by the app (env cfg)
     - Redis (to cache routing and reliability info)
     - RabbitMQ (to drop asynchronous responses from spine onto a queue)
     

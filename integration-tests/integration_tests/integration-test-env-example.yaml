@@ -5,4 +5,8 @@ MHS_ADDRESS: http://localhost
 SCR_ADDRESS: http://localhost:9000/
 AWS_ACCESS_KEY_ID: test
 AWS_SECRET_ACCESS_KEY: test
-MHS_DYNAMODB_ENDPOINT_URL: http://localhost:8000
+
+#db configuration
+MHS_PERSISTENCE_ADAPTOR: # one of: dynamodb | mongodb
+#then set appropriate db url
+MHS_DB_ENDPOINT_URL: # one of: http://localhost:8000 | mongodb://localhost:27017 for local docker development
