@@ -1,3 +1,3 @@
 variable "namespace" {
-  default = "aks-demo"
+  default = "mhs-azure"
 }
