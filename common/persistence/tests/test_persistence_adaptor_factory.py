@@ -33,18 +33,18 @@ class TestPersistenceAdaptorFactory(TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        factory._PERSISTENCE_ADAPTOR_TYPES['fake'] = FakePersistenceAdaptor
+        factory.PERSISTENCE_ADAPTOR_TYPES['fake'] = FakePersistenceAdaptor
 
     def tearDown(self) -> None:
         super().tearDown()
-        del factory._PERSISTENCE_ADAPTOR_TYPES['fake']
+        del factory.PERSISTENCE_ADAPTOR_TYPES['fake']
 
     def test_all_persistence_types_are_defined(self):
-        self.assertEqual(self._TYPES.keys(), factory._PERSISTENCE_ADAPTOR_TYPES.keys())
+        self.assertEqual(self._TYPES.keys(), factory.PERSISTENCE_ADAPTOR_TYPES.keys())
 
     @patch('mhs_common.state.persistence_adaptor_factory.config')
     def test_get_all_types_of_persistence_adaptors(self, config):
-        for persistence_adaptor_type in factory._PERSISTENCE_ADAPTOR_TYPES:
+        for persistence_adaptor_type in factory.PERSISTENCE_ADAPTOR_TYPES:
             config.get_config.return_value = persistence_adaptor_type
 
             adaptor = factory.get_persistence_adaptor(**{'table_name': 'foobar'})

@@ -7,6 +7,20 @@ from typing import Optional
 from exceptions import MaxRetriesExceeded
 from retry.retriable_action import RetriableAction
 
+DATA_VALIDATION_ERROR_MESSAGE = "Data must not have field named '{}' as it's used " \
+                                 "as primary key and is explicitly set as this function argument"
+
+
+def validate_data(primary_key: str):
+    def decorator(function):
+        async def wrapper(*args, **kwargs):
+            _, _, data = args
+            if primary_key in data:
+                raise ValueError(DATA_VALIDATION_ERROR_MESSAGE.format(primary_key))
+            return await function(*args, **kwargs)
+        return wrapper
+    return decorator
+
 
 def retriable(func):
     async def inner(*args, **kwargs):
@@ -14,7 +28,7 @@ def retriable(func):
         if hasattr(self, 'max_retries') and hasattr(self, 'retry_delay'):
             result = await RetriableAction(func, self.max_retries, self.retry_delay).execute(*args, **kwargs)
             if not result.is_successful:
-                raise MaxRetriesExceeded from result.exception
+                raise MaxRetriesExceeded("Max number of retries exceeded when performing DB call") from result.exception
             return result.result
         else:
             raise RuntimeError("Retriable must be set on method which object has 'max_retries: int' and 'retry_delay: float' attributes")

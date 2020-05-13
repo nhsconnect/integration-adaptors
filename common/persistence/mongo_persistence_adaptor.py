@@ -8,7 +8,7 @@ from pymongo import ReturnDocument
 import utilities.integration_adaptors_logger as log
 from persistence import persistence_adaptor
 from persistence.persistence_adaptor import retriable, RecordCreationError, RecordUpdateError, RecordRetrievalError, \
-    RecordDeletionError
+    RecordDeletionError, validate_data
 from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -39,17 +39,14 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         client = MongoPersistenceAdaptor._initialize_mongo_client()
         self.collection = client[_DB_NAME][table_name]
 
+    @validate_data(primary_key=_KEY)
     @retriable
-    async def add(self, key, data):
+    async def add(self, key: str, data: dict):
         """Add an item to a specified table, using a provided key.
 
         :param key: The key under which to store the data in persistence.
         :param data: The item to store in persistence.
         """
-
-        if _KEY in data:
-            raise ValueError(f"Added data must not have field named '{_KEY}' as it's used "
-                             f"as primary key and is explicitly set as this function argument")
 
         logger.info('Adding data for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
 
@@ -60,6 +57,7 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         except Exception as e:
             raise RecordCreationError from e
 
+    @validate_data(primary_key=_KEY)
     @retriable
     async def update(self, key: str, data: dict):
         """Updates an item in a specified table, using a provided key.
@@ -68,10 +66,6 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :param data: The item to update in persistence.
         :return: The previous version of the item which has been replaced. (None if no previous item)
         """
-
-        if _KEY in data:
-            raise ValueError(f"Added data must not have field named '{_KEY}' as it's used "
-                             f"as primary key and is explicitly set as this function argument")
 
         logger.info('Updating data for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
 

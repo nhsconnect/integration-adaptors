@@ -143,7 +143,7 @@ pipeline {
                                         --env "MHS_ADDRESS=http://outbound" \
                                         --env "AWS_ACCESS_KEY_ID=test" \
                                         --env "AWS_SECRET_ACCESS_KEY=test" \
-                                        --env "MHS_DYNAMODB_ENDPOINT_URL=http://dynamodb:8000" \
+                                        --env "MHS_DB_ENDPOINT_URL=http://dynamodb:8000" \
                                         --env "FAKE_SPINE_ADDRESS=http://fakespine" \
                                         --env "MHS_INBOUND_QUEUE_BROKERS=amqp://rabbitmq:5672" \
                                         --env "MHS_INBOUND_QUEUE_NAME=inbound" \

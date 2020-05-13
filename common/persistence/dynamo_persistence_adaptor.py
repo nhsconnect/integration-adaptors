@@ -8,7 +8,7 @@ from boto3.dynamodb.conditions import Attr
 import utilities.integration_adaptors_logger as log
 from persistence import persistence_adaptor
 from persistence.persistence_adaptor import retriable, RecordCreationError, RecordUpdateError, RecordRetrievalError, \
-    RecordDeletionError
+    RecordDeletionError, validate_data
 from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -33,6 +33,10 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         self.retry_delay = retry_delay
         self.max_retries = max_retries
 
+        self.endpoint_url = config.get_config('DB_ENDPOINT_URL', None)
+        self.region_name = 'eu-west-2'
+
+    @validate_data(primary_key=_KEY)
     @retriable
     async def add(self, key, data):
         """Add an item to a specified table, using a provided key.
@@ -40,10 +44,6 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :param key: The key under which to store the data in persistence.
         :param data: The item to store in persistence.
         """
-
-        if _KEY in data:
-            raise ValueError(f"Added data must not have field named '{_KEY}' as it's used "
-                             f"as primary key and is explicitly set as this function argument")
 
         logger.info('Adding data for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
 
@@ -55,6 +55,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         except Exception as e:
             raise RecordCreationError from e
 
+    @validate_data(primary_key=_KEY)
     @retriable
     async def update(self, key: str, data: dict):
         """Updates an item in a specified table, using a provided key.
@@ -63,10 +64,6 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :param data: The item to update in persistence.
         :return: The previous version of the item which has been replaced. (None if no previous item)
         """
-
-        if _KEY in data:
-            raise ValueError(f"Updated data must not have field named '{_KEY}' as it's used "
-                             f"as primary key and is explicitly set as this function argument")
 
         logger.info('Updating data for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
 
@@ -135,8 +132,8 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         :return: The table to be used by this instance.
         """
         async with aioboto3.resource('dynamodb',
-                                     region_name='eu-west-2',
-                                     endpoint_url=config.get_config('DB_ENDPOINT_URL', None)) as dynamo_resource:
+                                     region_name=self.region_name,
+                                     endpoint_url=self.endpoint_url) as dynamo_resource:
             logger.info('Establishing connection to {table_name}', fparams={'table_name': self.table_name})
             yield dynamo_resource.Table(self.table_name)
 

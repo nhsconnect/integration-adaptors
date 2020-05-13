@@ -7,7 +7,7 @@ from persistence.persistence_adaptor import PersistenceAdaptor
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 _DEFAULT_ADAPTOR = 'dynamodb'
-_PERSISTENCE_ADAPTOR_TYPES = {
+PERSISTENCE_ADAPTOR_TYPES = {
     _DEFAULT_ADAPTOR: DynamoPersistenceAdaptor,
     'mongodb': MongoPersistenceAdaptor,
 }
@@ -24,4 +24,4 @@ def get_persistence_adaptor(*args, **kwargs) -> PersistenceAdaptor:
     """
     persistence_adaptor = config.get_config('PERSISTENCE_ADAPTOR', default=_DEFAULT_ADAPTOR)
     logger.info("Building persistence adaptor using '%s' type", persistence_adaptor)
-    return _PERSISTENCE_ADAPTOR_TYPES[persistence_adaptor.lower()](*args, **kwargs)
+    return PERSISTENCE_ADAPTOR_TYPES[persistence_adaptor.lower()](*args, **kwargs)
