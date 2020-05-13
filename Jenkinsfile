@@ -307,7 +307,8 @@ pipeline {
                                                                      "party_key_arn":                  "${FAKESPINE_PARTY_KEY}",
                                                                      "fake_spine_outbound_ssl":        "${FAKE_SPINE_OUTBOUND_SSL_ENABLED}",
                                                                      "fake_spine_port":                "${FAKE_SPINE_PORT}",
-                                                                     "git_branch_name":                "${GIT_BRANCH}",
+                                                                     //"git_branch_name":                "${GIT_BRANCH}",
+                                                                     "git_branch_name":                "feature/NIAD-23-v-p-fake-spine-lb",
                                                                      "git_repo_url":                   "https://github.com/nhsconnect/integration-adaptors",
                                                                      "fake_spine_proxy_validate_cert": "false"
                                                                 ]

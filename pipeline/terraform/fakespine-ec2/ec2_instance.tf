@@ -14,6 +14,6 @@ resource "aws_instance" "fake_spine_instance" {
 
   tags = {
     EnvironmentId = var.environment_id
-    Name = "${var.environment_id}_fake-spine-instance_${var.build_id}"
+    Name = "${var.environment_id}_fake-spine-instance_${var.build_id}_${count.index}"
   }
 }

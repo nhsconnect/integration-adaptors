@@ -31,6 +31,16 @@ resource "aws_security_group_rule" "fake_spine_security_group_cloudwatch_egress_
   description = "HTTPS connections to Cloudwatch endpoint"
 }
 
+aws_security_group_rule "cloudwatch_sg_ingress_fakespine" {
+  security_group_id = data.terraform_remote_state.mhs.outputs.cloudwatch_vpce_security_group_id
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  type = "ingress"
+  source_security_group_id = aws_security_group.fake_spine_security_group.id
+  description = "Allow MHS route to cloudwatch"
+}
+
 resource "aws_security_group_rule" "fake_spine_security_group_ingress_22" {
   security_group_id = aws_security_group.fake_spine_security_group.id
   type = "ingress"
