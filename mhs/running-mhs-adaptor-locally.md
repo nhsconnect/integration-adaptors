@@ -11,7 +11,7 @@ It may be useful to run these adaptors in a local environment. The following is 
     - git bash (to run .sh files below)
 * Set up Environment variable:
 `export BUILD_TAG='latest'`
-* Run the `./build.sh` script found in the top level directory of this project. This will build the follwoing docker containers which 
+* Run the `./build.sh` script found in the top level directory of this project. This will build the following docker containers which 
 are required to run the MHS Adaptor locally. 
     - Inbound service (An HTTP endpoint which spine communicates request back to you on)
     - Outbound service (An HTTP endpoint which you submit requests for spine on)
