@@ -153,7 +153,7 @@ resource "aws_lb_listener" "route_alb_listener" {
 resource "aws_lb" "inbound_nlb" {
   internal = true
   load_balancer_type = "network"
-  #subnets = aws_subnet.inbound_lb_subnet[1].id # Assign it initially only to zone b, zone a will be assigned later by local provisioner
+  subnets = [aws_subnet.inbound_lb_subnet[1].id] # Assign it initially only to zone b, zone a will be assigned later by local provisioner
   enable_cross_zone_load_balancing = true
 
   # subnet_mapping {
