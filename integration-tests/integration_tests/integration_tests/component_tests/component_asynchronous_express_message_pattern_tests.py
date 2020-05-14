@@ -3,7 +3,7 @@
 import unittest
 
 from integration_tests.assertors.json_error_response_assertor import JsonErrorResponseAssertor
-from integration_tests.db.db_wrapper import MHS_STATE_TABLE_WRAPPER, MHS_SYNC_ASYNC_TABLE_WRAPPER
+from integration_tests.db.db_wrapper_factory import MHS_STATE_TABLE_WRAPPER, MHS_SYNC_ASYNC_TABLE_WRAPPER
 from integration_tests.db.mhs_table import MhsTableStateAssertor
 from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
