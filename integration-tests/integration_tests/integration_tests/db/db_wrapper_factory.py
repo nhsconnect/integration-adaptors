@@ -6,7 +6,7 @@ from integration_tests.db.mongo_wrapper import MongoWrapper
 DYNAMODB_TYPE = "dynamodb"
 MONGODB_TYPE = "mongodb"
 
-DB_TYPE = os.environ.get('MHS_PERSISTENCE_ADAPTOR')
+DB_TYPE = os.environ.get('MHS_PERSISTENCE_ADAPTOR') or DYNAMODB_TYPE
 
 DB_WRAPPER = {
     DYNAMODB_TYPE: DynamoWrapper,
