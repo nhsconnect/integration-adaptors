@@ -9,9 +9,9 @@ unittest-xml-reporting = "~=2.5"
 
 [packages]
 integration-adaptors-common = {editable = true,path = "./../../common"}
-tornado = "*"
+tornado = "~=6.0"
 mhs-common = {editable = true,path = "./../common"}
-isodate = "*"
+isodate = "~=0.6"
 
 [requires]
 python_version = "3.7"

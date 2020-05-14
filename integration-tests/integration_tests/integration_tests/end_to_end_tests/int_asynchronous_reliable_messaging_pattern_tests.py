@@ -4,16 +4,16 @@ Provides tests around the Asynchronous Reliable workflow, including sync-async w
 import json
 from unittest import TestCase
 
-from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
+from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
-from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
-from integration_tests.dynamo.dynamo_mhs_table import DynamoMhsTableStateAssertor
-from integration_tests.dynamo.dynamo_sync_async_mhs_table import DynamoSyncAsyncMhsTableStateAssertor
+from integration_tests.db.db_wrapper_factory import MHS_STATE_TABLE_WRAPPER, MHS_SYNC_ASYNC_TABLE_WRAPPER
+from integration_tests.db.mhs_table import MhsTableStateAssertor
+from integration_tests.db.sync_async_mhs_table import SyncAsyncMhsTableStateAssertor
 from integration_tests.end_to_end_tests.common_assertions import CommonAssertions
+from integration_tests.helpers.build_message import build_message
 from integration_tests.helpers.concurrent_requests import send_messages_concurrently, \
     assert_all_messages_succeeded, has_errors
-from integration_tests.helpers.build_message import build_message
 from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilder
 from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
@@ -37,8 +37,8 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
     """
 
     def setUp(self):
-        MHS_STATE_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
-        MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.clear_all_records_in_table()
+        MHS_STATE_TABLE_WRAPPER.clear_all_records_in_table()
+        MHS_SYNC_ASYNC_TABLE_WRAPPER.clear_all_records_in_table()
         MHS_INBOUND_QUEUE.drain()
         self.assertions = CommonAssertions('async-reliable')
 
@@ -83,9 +83,9 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
         self._assert_gp_summary_upload_success_detail_is_present(hl7_xml_assertor)
 
         AssertWithRetries(retry_count=10) \
-            .assert_condition_met(lambda: DynamoMhsTableStateAssertor.wait_for_inbound_response_processed(message_id))
+            .assert_condition_met(lambda: MhsTableStateAssertor.wait_for_inbound_response_processed(message_id))
 
-        dynamo_assertor = DynamoMhsTableStateAssertor(MHS_STATE_TABLE_DYNAMO_WRAPPER.get_all_records_in_table())
+        dynamo_assertor = MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table())
         self.assertions.message_status_recorded_as_successfully_processed(dynamo_assertor, message_id)
 
     def test_should_return_successful_response_and_record_spline_reply_in_resync_table_if_sync_async_requested(self):
@@ -96,13 +96,13 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
         responses = send_messages_concurrently(messages, interaction_id='REPC_IN150016UK05', sync_async=True)
 
         # Assert
-        all_sync_async_states = MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()
+        all_sync_async_states = MHS_SYNC_ASYNC_TABLE_WRAPPER.get_all_records_in_table()
         if has_errors(responses):
             # TODO: NIAD-72 remove prints and has_errors once sync-async feature is stable
             print('--- mhs-sync-async-state table ---')
             print(json.dumps(all_sync_async_states, indent=2))
         assert_all_messages_succeeded(responses)
-        sync_async_state_assertor = DynamoSyncAsyncMhsTableStateAssertor(all_sync_async_states)
+        sync_async_state_assertor = SyncAsyncMhsTableStateAssertor(all_sync_async_states)
         for message, message_id in messages:
             hl7_xml_assertor = sync_async_state_assertor \
                 .assert_single_item_exists_with_key(message_id)

@@ -32,7 +32,7 @@ terraform init \
     -backend-config="dynamodb_table=<dynamodb_state_lock_table>"
 ```
 Initialises local Terraform settings. See the [pre-requisites section of the pipeline README](../../README.md#pre-requisites) for details of what is required of the
-S3 bucket/DynamoDB table.
+S3 bucket/DB table.
 
 ```
 terraform apply \
