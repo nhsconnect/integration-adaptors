@@ -389,14 +389,14 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.assertEqual(CORRELATION_ID, response.headers["Correlation-Id"])
         self.assertIn("wait-for-response header missing", response.body.decode())
 
-    def test_error_when_wait_for_response_header_not_interactions(self):
+    def test_error_when_sync_async_not_interactions(self):
         self.config_manager.get_interaction_details.return_value = {'workflow': WORKFLOW_NAME}
 
         response = self.call_handler(wait_for_response='true')
 
         self.assertEqual(response.code, 500)
         self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
-        self.assertIn("Failed to find wait-for-response flag for the interaction within the interactions.json",
+        self.assertIn("Failed to find sync-async flag for the interaction within the interactions.json",
                       response.body.decode())
 
     def test_correct_workflow_called(self):
