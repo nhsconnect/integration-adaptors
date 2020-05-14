@@ -5,10 +5,12 @@ import os
 
 from pymongo import MongoClient
 
+from integration_tests.db.db_wrapper import DbWrapper
+
 _DB_NAME = 'integration-adaptors'
 
 
-class MongoWrapper:
+class MongoWrapper(DbWrapper):
     """
     Allows access to a MongoDB instance
     """

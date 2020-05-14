@@ -4,6 +4,9 @@ MHS_LOG_LEVEL: NOTSET
 MHS_INBOUND_QUEUE_BROKERS: amqp://localhost:5672
 MHS_INBOUND_QUEUE_NAME: inbound
 
+#optional region defaults to eu-west-2
+#MHS_CLOUD_REGION: eu-west-2
+
 #db configuration
 MHS_STATE_TABLE_NAME: mhs_state
 MHS_SYNC_ASYNC_STATE_TABLE_NAME: sync_async_state

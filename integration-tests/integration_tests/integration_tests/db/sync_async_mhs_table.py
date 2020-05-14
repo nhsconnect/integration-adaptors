@@ -3,7 +3,7 @@ Provides functionality to assert items within the MHS sync/async Dynamo table
 """
 import unittest
 
-from integration_tests.db.db_wrapper import KEY_NAME
+from integration_tests.db.db_wrapper_factory import KEY_NAME
 from integration_tests.xml.hl7_xml_assertor import Hl7XmlResponseAssertor
 
 

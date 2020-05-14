@@ -34,7 +34,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         self.max_retries = max_retries
 
         self.endpoint_url = config.get_config('DB_ENDPOINT_URL', None)
-        self.region_name = 'eu-west-2'
+        self.region_name = config.get_config('MHS_CLOUD_REGION', 'eu-west-2')
 
     @validate_data(primary_key=_KEY)
     @retriable

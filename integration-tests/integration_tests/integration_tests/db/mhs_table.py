@@ -3,7 +3,7 @@ Provides functionality to assert items within the MHS Dynamo table
 """
 import unittest
 
-from integration_tests.db.db_wrapper import MHS_STATE_TABLE_WRAPPER, KEY_NAME
+from integration_tests.db.db_wrapper_factory import MHS_STATE_TABLE_WRAPPER, KEY_NAME
 
 
 class MhsItemAssertor(object):

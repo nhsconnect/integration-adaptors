@@ -1,23 +1,31 @@
-import os
-
-from integration_tests.db.dynamo_wrapper import DynamoWrapper
-from integration_tests.db.mongo_wrapper import MongoWrapper
-
-_STATE_TABLE_WRAPPER_FACTORY = {
-    'dynamodb': DynamoWrapper.get_state_table_wrapper,
-    'mongodb': MongoWrapper.get_state_table_wrapper
-}
-_SYNC_ASYNC_TABLE_WRAPPER_FACTORY = {
-    'dynamodb': DynamoWrapper.get_sync_async_table_wrapper,
-    'mongodb': MongoWrapper.get_sync_async_table_wrapper
-}
-
-DB_TYPE = os.environ.get('MHS_PERSISTENCE_ADAPTOR') or 'dynamodb'
-KEY_NAME = {
-    'dynamodb': 'key',
-    'mongodb': '_id'
-}[DB_TYPE]
+import abc
+from abc import ABC
 
 
-MHS_STATE_TABLE_WRAPPER = _STATE_TABLE_WRAPPER_FACTORY[DB_TYPE]()
-MHS_SYNC_ASYNC_TABLE_WRAPPER = _SYNC_ASYNC_TABLE_WRAPPER_FACTORY[DB_TYPE]()
+class DbWrapper(ABC):
+
+    @abc.abstractmethod
+    def get_all_records_in_table(self) -> list:
+        """
+        Returns all the records in the DB instance within the given table name
+        :return: the records within the collection
+        """
+        pass
+
+    @abc.abstractmethod
+    def clear_all_records_in_table(self) -> None:
+        """
+        Deletes all records in the DB instance within the given collection
+        :return: None
+        """
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def get_state_table_wrapper():
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def get_sync_async_table_wrapper():
+        pass

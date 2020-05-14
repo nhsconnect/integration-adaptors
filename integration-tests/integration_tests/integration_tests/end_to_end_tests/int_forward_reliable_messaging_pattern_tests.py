@@ -6,7 +6,7 @@ from unittest import TestCase
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
-from integration_tests.db.db_wrapper import MHS_STATE_TABLE_WRAPPER, MHS_SYNC_ASYNC_TABLE_WRAPPER
+from integration_tests.db.db_wrapper_factory import MHS_STATE_TABLE_WRAPPER, MHS_SYNC_ASYNC_TABLE_WRAPPER
 from integration_tests.db.mhs_table import MhsTableStateAssertor
 from integration_tests.end_to_end_tests.common_assertions import CommonAssertions
 from integration_tests.helpers.build_message import build_message
