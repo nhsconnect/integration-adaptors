@@ -185,7 +185,7 @@ class SynchronousHandler(base_handler.BaseHandler):
             logger.error('Failed to parse wait-for-response header from message')
             raise tornado.web.HTTPError(400, 'wait-for-response header missing',
                                         reason='wait-for-response header missing')
-        if wait_for_response_header == 'true':
+        if wait_for_response_header.lower() == 'true':
             return True
         else:
             return False
