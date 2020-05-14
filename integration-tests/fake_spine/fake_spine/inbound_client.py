@@ -29,5 +29,6 @@ class InboundClient(object):
                                                 method='POST',
                                                 body=request.body,
                                                 raise_error=True,
+                                                request_timeout=5,
                                                 headers={**self.HEADERS, **request.headers}))
 
