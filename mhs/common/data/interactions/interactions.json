@@ -449,11 +449,6 @@
     "workflow": "async-reliable",
     "sync_async": false
   },
-  "MCCI_IN010000UK12": {
-    "service":"urn:nhs:names:services:gp2gp",
-    "workflow": "forward-reliable",
-    "sync_async": false
-  },
   "MCCI_IN010000UK13": {
    "service":"urn:nhs:names:services:gp2gp",
    "workflow": "forward-reliable",

@@ -22,10 +22,10 @@ MhsMessage = namedtuple('MhsMessage', 'message message_id')
 
 
 def build_message(template,
-                  patient_nhs_number='9446245796',
+                  patient_nhs_number='9691035456',
                   message_id: str = None,
                   to_party_id='YES-0000806',
-                  to_asid='928942012545'):
+                  to_asid='200000001162'):
     """Build an upload message
 
     :param message_id: message id
