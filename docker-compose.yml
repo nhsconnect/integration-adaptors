@@ -45,7 +45,7 @@ services:
       # Note that this endpoint URL is Opentest-specific
       - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable
       # This is for disabling hostname validation so OpenTest ip address will work
-      - MHS_OUTBOUND_VALIDATE_CERTIFICATE=${MHS_OUTBOUND_VALIDATE_CERTIFICATE:-True}
+      - MHS_OUTBOUND_VALIDATE_CERTIFICATE=${MHS_OUTBOUND_VALIDATE_CERTIFICATE:-False}
       - SERVICE_PORTS=80
   route:
     image: local/mhs-route:${BUILD_TAG}
@@ -72,6 +72,7 @@ services:
     image: redis
     ports:
       - "6379:6379"
+
   inbound-lb:
     image: dockercloud/haproxy
     links:
@@ -84,6 +85,7 @@ services:
     environment:
       - MODE=tcp
       - TIMEOUT=connect 0, client 0, server 0
+
   outbound-lb:
     image: dockercloud/haproxy
     links:
