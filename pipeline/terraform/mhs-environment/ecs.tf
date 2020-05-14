@@ -226,6 +226,13 @@ resource "aws_ecs_task_definition" "mhs_inbound_task" {
           valueFrom = var.ca_certs_arn
         }
       ]
+      ulimits = [
+        {
+          softlimit = 5000,
+          hardlimit = 5000,
+          name = "nofile"
+        }
+      ]
       essential = true
       logConfiguration = {
         logDriver = "awslogs"
