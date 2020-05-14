@@ -153,7 +153,7 @@ resource "aws_lb_listener" "route_alb_listener" {
 resource "aws_lb" "inbound_nlb" {
   internal = true
   load_balancer_type = "network"
-  subnets = [ aws_subnet.mhs_subnet[1].id, aws_subnet.mhs_subnet[2].id ] # enable only zone b and c, zone a will be enabled manually
+  #subnets = aws_subnet.inbound_lb_subnet[1].id # Assign it initially only to zone b, zone a will be assigned later by local provisioner
   enable_cross_zone_load_balancing = true
 
   # subnet_mapping {
@@ -178,6 +178,17 @@ resource "aws_lb" "inbound_nlb" {
     EnvironmentId = var.environment_id
   }
 }
+
+resource "null_resource" "ibound_nlb_subnets" {
+  provisioner "local-exec" {
+    command = "aws elbv2 set-subnets --region ${var.region} --load-balancer-arn ${aws_lb.inbound_nlb.arn} --subnet-mappings SubnetId=${aws_subnet.inbound_lb_subnet[0].id},PrivateIPv4=${var.nhs_registered_ip_for_inbound} SubnetId=${aws_subnet.inbound_lb_subnet[1].id}"
+  }
+  
+  depends_on = [
+    aws_lb.inbound_nlb
+  ]
+}
+# aws elbv2 set-subnets --load-balancer-arn arn:aws:elasticloadbalancing:eu-west-2:067756640211:loadbalancer/net/tf-lb-20200514095611868900000001/a741843b23066350 --subnet-mappings SubnetId=subnet-0536d04f9b97a40c9,PrivateIPv4Address=10.239.66.139 SubnetId=subnet-0d35aca1cd2343390 SubnetId=subnet-05d493bf76d50cc9c --region eu-west-2
 
 # Target group for the network load balancer for MHS inbound
 # The MHS inbound ECS service registers it's tasks here.
