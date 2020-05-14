@@ -36,7 +36,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_success()
 
@@ -53,7 +53,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_success()
 

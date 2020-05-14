@@ -33,7 +33,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -55,7 +55,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
 
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -80,7 +80,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -101,7 +101,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -115,7 +115,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'async-express'
             })
 
-    def test_should_return_information_from_soap_fault_returned_from_spine_in_original_request_to_client_when_sync_async_requested(self):
+    def test_should_return_information_from_soap_fault_returned_from_spine_in_original_request_to_client_when_wait_for_response_requested(self):
         """
         Message ID: AD7D39A8-1B6C-4520-8367-6B7BEBD7B842 configured in fakespine to return a SOAP Fault error.
         Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
@@ -126,7 +126,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -136,7 +136,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
             .assert_code_context('urn:nhs:names:error:tms') \
             .assert_severity('Error')
 
-    def test_should_record_message_status_when_soap_error_response_returned_from_spine_and_sync_async_requested(self):
+    def test_should_record_message_status_when_soap_error_response_returned_from_spine_and_wait_for_response_requested(self):
         """
         Message ID: AD7D39A8-1B6C-4520-8367-6B7BEBD7B842 configured in fakespine to return a SOAP Fault error.
         Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
@@ -147,7 +147,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                                             )
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -161,7 +161,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'sync-async'
             })
 
-    def test_should_return_information_in_ebxml_fault_returned_from_spine_in_original_post_request_to_client_when_sync_async_requested(self):
+    def test_should_return_information_in_ebxml_fault_returned_from_spine_in_original_post_request_to_client_when_wait_for_response_requested(self):
         """
         Message ID: '7AA57E38-8B20-4AE0-9E73-B9B0C0C42BDA' configured in fakespine to return a ebxml Fault error.
         Error found here: fake_spine/fake_spine/configured_responses/ebxml_fault_single_error.xml
@@ -172,7 +172,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -182,7 +182,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
             .assert_severity('Error') \
             .assert_error_type('ebxml_error')
 
-    def test_should_record_message_status_when_ebxml_error_response_returned_from_spine_and_sync_async_requested(self):
+    def test_should_record_message_status_when_ebxml_error_response_returned_from_spine_and_wait_for_response_requested(self):
         """
         Message ID: '7AA57E38-8B20-4AE0-9E73-B9B0C0C42BDA' configured in fakespine to return a ebxml Fault error.
         Error found here: fake_spine/fake_spine/configured_responses/ebxml_fault_single_error.xml
@@ -193,7 +193,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
                                             )
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -213,7 +213,7 @@ class AsynchronousExpressMssagingPatternTests(unittest.TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=False) \
             .with_body({'blah': '123'}) \
             .execute_post_expecting_bad_request_response()
 

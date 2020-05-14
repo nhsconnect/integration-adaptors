@@ -9,17 +9,17 @@ from integration_tests.http.mhs_http_request_builder import MhsHttpRequestBuilde
 OutboundResponse = namedtuple('OutboundResponse', 'message_id error')
 
 
-def send_messages_concurrently(messages: List[MhsMessage], interaction_id, sync_async=True) -> List[OutboundResponse]:
+def send_messages_concurrently(messages: List[MhsMessage], interaction_id, wait_for_response=True) -> List[OutboundResponse]:
     """
     Send all of the provided messages currently (multi-threaded)
     @param messages: the list of message to send
     @param interaction_id: the interaction is to use for all requests
-    @param sync_async: if true the sync_async workflow will be used
+    @param wait_for_response: if true the sync_async workflow will be used
     @return:
     """
     request_threads = []
     for message_body, message_id in messages:
-        request_thread = OutboundRequestThread(message_body, message_id, interaction_id, sync_async=sync_async)
+        request_thread = OutboundRequestThread(message_body, message_id, interaction_id, wait_for_response=wait_for_response)
         request_thread.start()
         request_threads.append(request_thread)
 
@@ -44,13 +44,13 @@ def has_errors(responses: List[OutboundResponse]) -> bool:
 
 class OutboundRequestThread(Thread):
 
-    def __init__(self, message_body, message_id, interaction_id, correlation_id='1', sync_async=True):
+    def __init__(self, message_body, message_id, interaction_id, correlation_id='1', wait_for_response=True):
         Thread.__init__(self)
         self.message_body = message_body
         self.message_id = message_id
         self.interaction_id = interaction_id
         self.correlation_id = correlation_id
-        self.sync_async = sync_async
+        self.wait_for_response = wait_for_response
         self.error = None
 
     def run(self):
@@ -58,7 +58,7 @@ class OutboundRequestThread(Thread):
             MhsHttpRequestBuilder() \
                 .with_headers(interaction_id=self.interaction_id,
                               message_id=self.message_id,
-                              sync_async=self.sync_async,
+                              wait_for_response=self.wait_for_response,
                               correlation_id=self.correlation_id) \
                 .with_body(self.message_body) \
                 .execute_post_expecting_success()

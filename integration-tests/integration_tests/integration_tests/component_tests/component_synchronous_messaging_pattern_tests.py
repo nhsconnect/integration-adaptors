@@ -32,7 +32,7 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -54,7 +54,7 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
 
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -74,7 +74,7 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False, from_asid=None) \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, wait_for_response=False, from_asid=None) \
             .with_body(message) \
             .execute_post_expecting_bad_request_response()
 
@@ -87,7 +87,7 @@ class SynchronousMessagingPatternTests(unittest.TestCase):
 
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False, from_asid=None) \
+            .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, wait_for_response=False, from_asid=None) \
             .with_body(message) \
             .execute_post_expecting_bad_request_response()
 

@@ -16,7 +16,7 @@
                         "description": "ID of the interaction that you want to invoke. e.g. QUPC_IN160101UK05"
                     },
                     {
-                        "name": "sync-async",
+                        "name": "wait-for-response",
                         "in": "header",
                         "required": true,
                         "schema": {

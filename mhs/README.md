@@ -80,7 +80,7 @@ The Asynchronous Express Messaging Pattern is one of the Spine messaging pattern
 In this pattern, a request is made to Spine, but the response is not provided on the same connection. Instead, spine initiates a connection back to your 
 MHS with the response. I.e the response from Spine is delivered like a call back to your MHS. The MHS Adaptor has hidden all this asynchronous callback 
 detail behind a synchronous interface, so your HTTP client just sees a simple HTTP request/response. This is what the MHS Adaptor has termed the "Sync-Async wrapper". 
-When you set the `sync-async` message header to `true` you are requesting the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the 
+When you set the `wait-for-response` message header to `true` you are requesting the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the 
 same HTTP connection.
 
 In this example, the `QUPC_IN160101UK05` Spine message is used. This Spine message is used when requesting the Summary Care Record of a patient.
@@ -92,7 +92,7 @@ In this pattern, a request is made to Spine, but the response is not provided on
 to your MHS with the response. I.e the response from Spine is delivered like a call back to your MHS.
 
 The MHS Adaptor has hidden all this asynchronous callback detail behind a synchronous interface, so your HTTP client just sees a simple HTTP 
-request/response. This is what the MHS Adpator has termed the Sync-Async wrapper. When you set the sync-async  message header you are requesting 
+request/response. This is what the MHS Adpator has termed the Sync-Async wrapper. When you set the wait-for-response  message header you are requesting 
 the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the same hTTP connection.
 
 In this example, the `QUPC_IN160101UK05` Spine message is used again. 

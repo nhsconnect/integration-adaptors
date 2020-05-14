@@ -54,7 +54,7 @@ class MessageSender(object):
         headers = {
             'Content-Type': 'application/json',
             'Interaction-Id': interaction_id,
-            'sync-async': 'true'
+            'wait-for-response': 'true'
         }
         if message_id:
             headers['message-id'] = message_id
