@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from persistence.dynamo_persistence_adaptor import DynamoPersistenceAdaptor
 import persistence.persistence_adaptor_factory as factory
+from persistence.mongo_persistence_adaptor import MongoPersistenceAdaptor
 from persistence.persistence_adaptor import PersistenceAdaptor
 
 
@@ -13,6 +14,9 @@ class FakePersistenceAdaptor(PersistenceAdaptor):
         self.table_name = table_name
 
     async def add(self, key: str, data: dict) -> Optional[dict]:
+        pass
+
+    async def update(self, key: str, data: dict):
         pass
 
     async def get(self, key: str) -> Optional[dict]:
@@ -28,7 +32,7 @@ class TestPersistenceAdaptorFactory(TestCase):
         'fake': FakePersistenceAdaptor,
         # add real adaptors below to match those defined in mhs_common.state.persistence_adaptor_factory
         'dynamodb': DynamoPersistenceAdaptor,
-
+        'mongodb': MongoPersistenceAdaptor,
     }
 
     def setUp(self) -> None:

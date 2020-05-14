@@ -1,5 +1,4 @@
 """Module containing functionality for a MongoDB implementation of a persistence adaptor."""
-import copy
 import threading
 
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,7 +7,7 @@ from pymongo import ReturnDocument
 import utilities.integration_adaptors_logger as log
 from persistence import persistence_adaptor
 from persistence.persistence_adaptor import retriable, RecordCreationError, RecordUpdateError, RecordRetrievalError, \
-    RecordDeletionError, validate_data
+    RecordDeletionError, validate_data_has_no_primary_key_field
 from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -39,7 +38,7 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         client = MongoPersistenceAdaptor._initialize_mongo_client()
         self.collection = client[_DB_NAME][table_name]
 
-    @validate_data(primary_key=_KEY)
+    @validate_data_has_no_primary_key_field(primary_key=_KEY)
     @retriable
     async def add(self, key: str, data: dict):
         """Add an item to a specified table, using a provided key.
@@ -51,13 +50,13 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         logger.info('Adding data for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
 
         try:
-            result = await self.collection.insert_one(self._prepare_data_to_add(key, data))
+            result = await self.collection.insert_one(self.add_primary_key_field(_KEY, key, data))
             if not result.acknowledged:
                 raise RecordCreationError
         except Exception as e:
             raise RecordCreationError from e
 
-    @validate_data(primary_key=_KEY)
+    @validate_data_has_no_primary_key_field(primary_key=_KEY)
     @retriable
     async def update(self, key: str, data: dict):
         """Updates an item in a specified table, using a provided key.
@@ -74,7 +73,7 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 {_KEY: key},
                 {'$set': data},
                 return_document=ReturnDocument.AFTER)
-            return self._prepare_data_to_return(result)
+            return self.remove_primary_key_field(_KEY, result)
         except Exception as e:
             raise RecordUpdateError from e
 
@@ -88,7 +87,7 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         logger.info('Getting record for {key} from table {table}', fparams={'key': key, 'table': self.table_name})
         try:
             result = await self.collection.find_one({_KEY: key})
-            return self._prepare_data_to_return(result)
+            return self.remove_primary_key_field(_KEY, result)
         except Exception as e:
             raise RecordRetrievalError from e
 
@@ -102,21 +101,9 @@ class MongoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         logger.info('Deleting record for {key} from table {table}', fparams={'key': key, 'table': self.table_name})
         try:
             result = await self.collection.find_one_and_delete({_KEY: key})
-            return self._prepare_data_to_return(result)
+            return self.remove_primary_key_field(_KEY, result)
         except Exception as e:
             raise RecordDeletionError from e
-
-    @staticmethod
-    def _prepare_data_to_add(key, data):
-        item = copy.deepcopy(data)
-        item[_KEY] = key
-        return item
-
-    @staticmethod
-    def _prepare_data_to_return(data):
-        if data is not None:
-            del data[_KEY]
-        return data
 
     @staticmethod
     def _initialize_mongo_client():

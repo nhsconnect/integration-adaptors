@@ -3,7 +3,7 @@ This module defines the state adaptor interface, used to allow support for multi
 """
 import abc
 from typing import Optional
-
+import copy
 from exceptions import MaxRetriesExceeded
 from retry.retriable_action import RetriableAction
 
@@ -11,7 +11,7 @@ DATA_VALIDATION_ERROR_MESSAGE = "Data must not have field named '{}' as it's use
                                  "as primary key and is explicitly set as this function argument"
 
 
-def validate_data(primary_key: str):
+def validate_data_has_no_primary_key_field(primary_key: str):
     def decorator(function):
         async def wrapper(*args, **kwargs):
             _, _, data = args
@@ -89,3 +89,15 @@ class PersistenceAdaptor(abc.ABC):
         :return: The instance of the item which has been deleted from persistence. (None if no item found)
         """
         pass
+
+    @staticmethod
+    def add_primary_key_field(primary_key_field, key, data):
+        item = copy.deepcopy(data)
+        item[primary_key_field] = key
+        return item
+
+    @staticmethod
+    def remove_primary_key_field(primary_key_field, data):
+        if data is not None:
+            del data[primary_key_field]
+        return data

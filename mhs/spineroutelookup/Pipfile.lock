@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5a0452e0073579a9e7247d74b9cf1e4752c40f7bd347cfe107c562fe41bd3ce3"
+            "sha256": "4cf3f47d524d10127add69eed35b1af3f4731efa6cf5c96b523f8ee0ce1af9b2"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -128,10 +128,10 @@
         },
         "jmespath": {
             "hashes": [
-                "sha256:695cb76fa78a10663425d5b73ddc5714eb711157e52704d69be03b1a02ba4fec",
-                "sha256:cca55c8d153173e21baa59983015ad0daf603f9cb799904ff057bfb8ff8dc2d9"
+                "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9",
+                "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"
             ],
-            "version": "==0.9.5"
+            "version": "==0.10.0"
         },
         "ldap3": {
             "hashes": [
@@ -288,9 +288,9 @@
         },
         "python-qpid-proton": {
             "hashes": [
-                "sha256:cec7360e5c20adb8fea60ce24f544c3a27c6d5d34280ebbd70f96d3f491db04d"
+                "sha256:0b40aa8e130841820628e71c6f7e0c0210c763435954a682f78aa460681878e9"
             ],
-            "version": "==0.30.0"
+            "version": "==0.31.0"
         },
         "redis": {
             "hashes": [

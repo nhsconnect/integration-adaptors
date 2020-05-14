@@ -10,7 +10,7 @@ MHS_INBOUND_QUEUE_NAME: inbound
 #db configuration
 MHS_STATE_TABLE_NAME: mhs_state
 MHS_SYNC_ASYNC_STATE_TABLE_NAME: sync_async_state
-MHS_PERSISTENCE_ADAPTOR: # one of: dynamodb | mongodb
+MHS_PERSISTENCE_ADAPTOR: # one of: dynamodb(default) | mongodb
 #then set appropriate db url
 MHS_DB_ENDPOINT_URL: # one of: http://localhost:8000 | mongodb://localhost:27017 for local docker development
 

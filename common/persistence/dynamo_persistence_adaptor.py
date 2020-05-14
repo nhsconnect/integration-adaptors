@@ -1,6 +1,5 @@
 """Module containing functionality for a DynamoDB implementation of a persistence adaptor."""
 import contextlib
-import copy
 
 import aioboto3
 from boto3.dynamodb.conditions import Attr
@@ -8,7 +7,7 @@ from boto3.dynamodb.conditions import Attr
 import utilities.integration_adaptors_logger as log
 from persistence import persistence_adaptor
 from persistence.persistence_adaptor import retriable, RecordCreationError, RecordUpdateError, RecordRetrievalError, \
-    RecordDeletionError, validate_data
+    RecordDeletionError, validate_data_has_no_primary_key_field
 from utilities import config
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -36,7 +35,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         self.endpoint_url = config.get_config('DB_ENDPOINT_URL', None)
         self.region_name = config.get_config('MHS_CLOUD_REGION', 'eu-west-2')
 
-    @validate_data(primary_key=_KEY)
+    @validate_data_has_no_primary_key_field(primary_key=_KEY)
     @retriable
     async def add(self, key, data):
         """Add an item to a specified table, using a provided key.
@@ -50,12 +49,12 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
         try:
             async with self.__get_dynamo_table() as table:
                 await table.put_item(
-                    Item=self._prepare_data_to_add(key, data),
+                    Item=self.add_primary_key_field(_KEY, key, data),
                     ConditionExpression=Attr(_KEY).not_exists())
         except Exception as e:
             raise RecordCreationError from e
 
-    @validate_data(primary_key=_KEY)
+    @validate_data_has_no_primary_key_field(primary_key=_KEY)
     @retriable
     async def update(self, key: str, data: dict):
         """Updates an item in a specified table, using a provided key.
@@ -76,7 +75,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                     AttributeUpdates=attribute_updates,
                     ReturnValues="ALL_NEW")
 
-            return self._prepare_data_to_return(response.get('Attributes', {}))
+            return self.remove_primary_key_field(_KEY, response.get('Attributes', {}))
         except Exception as e:
             raise RecordUpdateError from e
 
@@ -99,7 +98,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 logger.info('No item found for record: {key} in table {table}', fparams={'key': key, 'table': self.table_name})
                 return None
             attributes = response.get('Item', {})
-            return self._prepare_data_to_return(attributes)
+            return self.remove_primary_key_field(_KEY, attributes)
         except Exception as e:
             raise RecordRetrievalError from e
 
@@ -121,7 +120,7 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
                 logger.info('No values found for {key} in table {table}', fparams={'key': key, 'table': self.table_name})
                 return None
             attributes = response.get('Attributes', {})
-            return self._prepare_data_to_return(attributes)
+            return self.remove_primary_key_field(_KEY, attributes)
         except Exception as e:
             raise RecordDeletionError from e
 
@@ -137,14 +136,4 @@ class DynamoPersistenceAdaptor(persistence_adaptor.PersistenceAdaptor):
             logger.info('Establishing connection to {table_name}', fparams={'table_name': self.table_name})
             yield dynamo_resource.Table(self.table_name)
 
-    @staticmethod
-    def _prepare_data_to_add(key, data):
-        item = copy.deepcopy(data)
-        item[_KEY] = key
-        return item
 
-    @staticmethod
-    def _prepare_data_to_return(data):
-        if data is not None:
-            del data[_KEY]
-        return data
