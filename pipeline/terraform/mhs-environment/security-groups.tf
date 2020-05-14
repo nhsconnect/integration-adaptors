@@ -266,24 +266,42 @@ resource "aws_security_group" "cloudwatch_security_group" {
   description = "The security group used to control traffic for the Cloudwatch VPC endpoint."
   vpc_id = aws_vpc.mhs_vpc.id
 
-  ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    # Only allow incoming requests from MHS security groups
-    security_groups = [
-      aws_security_group.mhs_outbound_security_group.id,
-      aws_security_group.mhs_route_security_group.id,
-      aws_security_group.mhs_inbound_security_group.id
-    ]
-    description = "Allow inbound HTTPS requests from MHS tasks"
-  }
-
   tags = {
     Name = "${var.environment_id}-cloudwatch-endpoint-sg"
     EnvironmentId = var.environment_id
   }
 }
+
+resource "aws_security_group_rule" "cloudwatch_sg_ingress_outbound" {
+  security_group_id = aws_security_group.cloudwatch_security_group.id
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  type = "ingress"
+  source_security_group_id =  aws_security_group.mhs_outbound_security_group.id
+  description = "Allow MHS Outbound to cloudwatch"
+}
+
+resource "aws_security_group_rule" "cloudwatch_sg_ingress_inbound" {
+  security_group_id = aws_security_group.cloudwatch_security_group.id
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  type = "ingress"
+  source_security_group_id =  aws_security_group.mhs_inbound_security_group.id
+  description = "Allow MHS inbound to cloudwatch"
+}
+
+resource "aws_security_group_rule" "cloudwatch_sg_ingress_route" {
+  security_group_id = aws_security_group.cloudwatch_security_group.id
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  type = "ingress"
+  source_security_group_id =  aws_security_group.mhs_route_security_group.id
+  description = "Allow MHS route to cloudwatch"
+}
+
 
 ###################
 # SDS cache security group

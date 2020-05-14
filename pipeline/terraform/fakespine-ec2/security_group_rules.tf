@@ -31,6 +31,16 @@ resource "aws_security_group_rule" "fake_spine_security_group_cloudwatch_egress_
   description = "HTTPS connections to Cloudwatch endpoint"
 }
 
+resource "aws_security_group_rule" "cloudwatch_sg_ingress_fakespine" {
+  security_group_id = data.terraform_remote_state.mhs.outputs.cloudwatch_vpce_security_group_id
+  from_port = 443
+  to_port = 443
+  protocol = "tcp"
+  type = "ingress"
+  source_security_group_id = aws_security_group.fake_spine_security_group.id
+  description = "Allow MHS route to cloudwatch"
+}
+
 resource "aws_security_group_rule" "fake_spine_security_group_ingress_22" {
   security_group_id = aws_security_group.fake_spine_security_group.id
   type = "ingress"
@@ -118,3 +128,50 @@ resource "aws_security_group_rule" "fake_spine_security_sg_egress_inbound_app_po
 #   source_security_group_id = aws_security_group.fake_spine_security_group.id
 #   description = "Allow ingress ${var.fake_spine_port} inbound requests on MHS inbound"
 # }
+
+
+# For fake spine load balancer
+
+# Allow connection from load balancer to fake spine instances
+
+resource "aws_security_group_rule" "instance_from_fake_spine_alb" {
+  security_group_id = aws_security_group.fake_spine_security_group.id 
+  type = "ingress"
+  from_port = var.fake_spine_port
+  to_port = var.fake_spine_port
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.fake_spine_alb_security_group.id
+  description = "Allow ingress ${var.fake_spine_port} on application from LB"
+}
+
+resource "aws_security_group_rule" "fake_spine_alb_to_instance" {
+  security_group_id = aws_security_group.fake_spine_alb_security_group.id
+  type = "egress"
+  from_port = var.fake_spine_port
+  to_port = var.fake_spine_port
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.fake_spine_security_group.id 
+  description = "Allow ingress ${var.fake_spine_port} on application from LB"
+}
+
+# Allow incoming traffic from outbound to fake spine Load balancer
+
+resource "aws_security_group_rule" "fake_spine_lb_sg_ingress_outbound_app_port" {
+  security_group_id = aws_security_group.fake_spine_alb_security_group.id
+  type = "ingress"
+  from_port = var.fake_spine_port
+  to_port = var.fake_spine_port
+  protocol = "tcp"
+  source_security_group_id = data.terraform_remote_state.mhs.outputs.outbound_sg_id
+  description = "Allow ingress ${var.fake_spine_port} inbound requests from MHS outbound"
+}
+
+resource "aws_security_group_rule" "fake_spine_lb_sg_egress_outbound_app_port" {
+  security_group_id = data.terraform_remote_state.mhs.outputs.outbound_sg_id
+  type = "egress"
+  from_port = var.fake_spine_port
+  to_port = var.fake_spine_port
+  protocol = "tcp"
+  source_security_group_id = aws_security_group.fake_spine_alb_security_group.id
+  description = "Allow egress ${var.fake_spine_port} inbound requests from MHS outbound"
+}

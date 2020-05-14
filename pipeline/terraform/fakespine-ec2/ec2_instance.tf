@@ -1,4 +1,5 @@
 resource "aws_instance" "fake_spine_instance" {
+  count = var.instance_count
   ami = data.aws_ami.base_linux.id
   instance_type = "t2.micro"
   key_name = "kainos-dev"
@@ -13,6 +14,6 @@ resource "aws_instance" "fake_spine_instance" {
 
   tags = {
     EnvironmentId = var.environment_id
-    Name = "${var.environment_id}_fake-spine-instance_${var.build_id}"
+    Name = "${var.environment_id}_fake-spine-instance_${var.build_id}_${count.index}"
   }
 }
