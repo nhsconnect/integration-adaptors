@@ -153,7 +153,7 @@ resource "aws_lb_listener" "route_alb_listener" {
 resource "aws_lb" "inbound_nlb" {
   internal = true
   load_balancer_type = "network"
-  subnets = aws_subnet.inbound_lb_subnet.*.id
+  subnets = aws_subnet.inbound_lb_subnet[1].id # Assign it initially only to zone b, zone a will be assigned later by local provisioner
   enable_cross_zone_load_balancing = true
 
   # subnet_mapping {
@@ -176,6 +176,10 @@ resource "aws_lb" "inbound_nlb" {
   tags = {
     Name = "${var.environment_id}-mhs-inbound-nlb"
     EnvironmentId = var.environment_id
+  }
+
+  provisioner "local-exec" {
+    command = "aws elbv2 set-subnets --load-balancer-arn ${aws_lb.inboud_nlb.arn} --subnet-mappings SubnetId=${aws_subnet.inbound_lb_subnet[0].id},PrivateIPv4=${var.nhs_registered_ip_for_inbound}"
   }
 }
 
