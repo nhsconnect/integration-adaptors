@@ -181,7 +181,7 @@ resource "aws_lb" "inbound_nlb" {
 
 resource "null_resource" "ibound_nlb_subnets" {
   provisioner "local-exec" {
-    command = "aws elbv2 set-subnets --region ${var.region} --load-balancer-arn ${aws_lb.inbound_nlb.arn} --subnet-mappings SubnetId=${aws_subnet.inbound_lb_subnet[0].id},PrivateIPv4=${var.nhs_registered_ip_for_inbound} SubnetId=${aws_subnet.inbound_lb_subnet[1].id}"
+    command = "aws elbv2 set-subnets --region ${var.region} --load-balancer-arn ${aws_lb.inbound_nlb.arn} --subnet-mappings SubnetId=${aws_subnet.inbound_lb_subnet[0].id},PrivateIPv4Address=${var.nhs_registered_ip_for_inbound} SubnetId=${aws_subnet.inbound_lb_subnet[1].id}"
   }
   
   depends_on = [
