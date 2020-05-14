@@ -178,9 +178,17 @@ resource "aws_lb" "inbound_nlb" {
     EnvironmentId = var.environment_id
   }
 
+
+}
+
+resource "null_resource" "ibound_nlb_subnets" {
   provisioner "local-exec" {
     command = "aws elbv2 set-subnets --region ${var.region} --load-balancer-arn ${aws_lb.inboud_nlb.arn} --subnet-mappings SubnetId=${aws_subnet.inbound_lb_subnet[0].id},PrivateIPv4=${var.nhs_registered_ip_for_inbound} SubnetId=${aws_subnet.inbound_lb_subnet[0].id}"
   }
+  
+  depends_on = [
+    aws_lb.inbound_nlb
+  ]
 }
 # aws elbv2 set-subnets --load-balancer-arn arn:aws:elasticloadbalancing:eu-west-2:067756640211:loadbalancer/net/tf-lb-20200514095611868900000001/a741843b23066350 --subnet-mappings SubnetId=subnet-0536d04f9b97a40c9,PrivateIPv4Address=10.239.66.139 SubnetId=subnet-0d35aca1cd2343390 SubnetId=subnet-05d493bf76d50cc9c --region eu-west-2
 
