@@ -41,7 +41,7 @@ class DynamoWrapper:
     @staticmethod
     def get_state_table_wrapper():
         return DynamoWrapper(
-            table_name=os.environ.get('MHS_DB_TABLE_NAME', 'mhs_state'),
+            table_name=os.environ.get('MHS_STATE_TABLE_NAME', 'mhs_state'),
             region_name='eu-west-2',
             endpoint_url=os.environ.get('MHS_DB_ENDPOINT_URL', None))
 
