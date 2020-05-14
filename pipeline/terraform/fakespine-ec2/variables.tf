@@ -131,12 +131,12 @@ variable "fake_spine_proxy_validate_cert" {
 
 variable "instance_count" {
   type = number
-  default = 2
+  default = 4
   description = "How many fakespine intances do we need"
 }
 
 variable "mhs_log_level" {
-  type = "string"
+  type = string
   default = "INFO"
   description = "Log level for application"
 }
