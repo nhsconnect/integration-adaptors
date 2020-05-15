@@ -9,11 +9,11 @@ unittest-xml-reporting = "~=2.5"
 
 [packages]
 integration-adaptors-common = {editable = true,path = "./../../common"}
-tornado = "*"
+tornado = "~=6.0"
 defusedxml = "~=0.6"
-ldap3 = "*"
+ldap3 = "~=2.7"
 mhs-common = {editable = true,path = "./../common"}
-redis = "*"
+redis = "~=3.3"
 
 [requires]
 python_version = "3.7"

@@ -13,8 +13,9 @@ from utilities import integration_adaptors_logger as log
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 ASYNC_RESPONSE_EXPECTED = 'async_response_expected'
-MESSAGE_DATA = 'data'
-CORRELATION_ID = 'correlation_id'
+MESSAGE_ID = 'MESSAGE_ID'
+MESSAGE_DATA = 'DATA'
+CORRELATION_ID = 'CORRELATION_ID'
 
 
 class SyncAsyncStoreFailure(RuntimeError):
@@ -87,7 +88,7 @@ class SyncAsyncWorkflow(common_synchronous.CommonSynchronousWorkflow):
         logger.info('Entered sync-async inbound workflow')
 
         try:
-            await self.sync_async_store.add({"key": message_id, CORRELATION_ID: correlation_id, MESSAGE_DATA: message_data.payload})
+            await self.sync_async_store.add(message_id, {MESSAGE_ID: message_id, CORRELATION_ID: correlation_id, MESSAGE_DATA: message_data.payload})
             logger.info('Placed message in sync-async store successfully')
             await wdo.set_inbound_status(wd.MessageStatus.INBOUND_SYNC_ASYNC_MESSAGE_STORED)
         except Exception as e:

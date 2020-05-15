@@ -8,7 +8,7 @@ from utilities import test_utilities
 from utilities.test_utilities import async_test
 
 input_data = {
-    wd.KEY: 'aaa-aaa-aaa',
+    wd.MESSAGE_ID: 'aaa-aaa-aaa',
     wd.CREATED_TIMESTAMP: '11:59',
     wd.INBOUND_STATUS: None,
     wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
@@ -17,7 +17,7 @@ input_data = {
 
 
 old_data = {
-    wd.KEY: 'aaa-aaa-aaa',
+    wd.MESSAGE_ID: 'aaa-aaa-aaa',
     wd.CREATED_TIMESTAMP: '11:59',
     wd.INBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
     wd.OUTBOUND_STATUS: None,
@@ -31,7 +31,7 @@ class TestWorkDescription(unittest.TestCase):
         persistence = MagicMock()
         work_description = wd.WorkDescription(persistence, input_data)
 
-        self.assertEqual(work_description.key, input_data[wd.KEY])
+        self.assertEqual(work_description.message_id, input_data[wd.MESSAGE_ID])
         self.assertEqual(work_description.workflow, input_data[wd.WORKFLOW])
         self.assertEqual(work_description.inbound_status, input_data[wd.INBOUND_STATUS])
         self.assertEqual(work_description.outbound_status, input_data[wd.OUTBOUND_STATUS])
@@ -46,7 +46,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         await work_description.publish()
-        persistence.add.assert_called_with(input_data)
+        persistence.add.assert_called_with(input_data[wd.MESSAGE_ID], input_data)
 
     @async_test
     async def test_set_outbound_status(self):
@@ -60,7 +60,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         await work_description.set_outbound_status(wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
-        persistence.update.assert_called_with(input_data[wd.KEY], {wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_ACKD})
+        persistence.update.assert_called_with(input_data[wd.MESSAGE_ID], {wd.OUTBOUND_STATUS: wd.MessageStatus.OUTBOUND_MESSAGE_ACKD})
 
         self.assertEqual(work_description.outbound_status, wd.MessageStatus.OUTBOUND_MESSAGE_ACKD)
 
@@ -76,7 +76,7 @@ class TestWorkDescription(unittest.TestCase):
         work_description = wd.WorkDescription(persistence, input_data)
 
         await work_description.set_inbound_status(wd.MessageStatus.INBOUND_RESPONSE_FAILED)
-        persistence.update.assert_called_with(input_data[wd.KEY], {wd.INBOUND_STATUS: wd.MessageStatus.INBOUND_RESPONSE_FAILED})
+        persistence.update.assert_called_with(input_data[wd.MESSAGE_ID], {wd.INBOUND_STATUS: wd.MessageStatus.INBOUND_RESPONSE_FAILED})
 
         self.assertEqual(work_description.inbound_status, wd.MessageStatus.INBOUND_RESPONSE_FAILED)
 
@@ -120,7 +120,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         time_mock.return_value = '12'
         persistence = MagicMock()
         wd.create_new_work_description(persistence,
-                                       key='aaa-aaa',
+                                       message_id='aaa-aaa',
                                        outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                                        workflow=workflow.SYNC
                                        )
@@ -138,7 +138,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     persistence,
-                    key=None,
+                    message_id=None,
                     outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     workflow=workflow.SYNC
                 )
@@ -146,7 +146,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     None,
-                    key='aaa',
+                    message_id='aaa',
                     outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     workflow=workflow.SYNC
                 )
@@ -154,7 +154,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     persistence,
-                    key='aaa',
+                    message_id='aaa',
                     outbound_status=wd.MessageStatus.OUTBOUND_MESSAGE_RECEIVED,
                     workflow=None
                 )
@@ -162,7 +162,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
             with self.assertRaises(ValueError):
                 wd.create_new_work_description(
                     persistence,
-                    key='aaa',
+                    message_id='aaa',
                     outbound_status=None,
                     inbound_status=None,
                     workflow=workflow.SYNC_ASYNC
@@ -171,7 +171,7 @@ class TestWorkDescriptionFactory(unittest.TestCase):
         with self.subTest('Single null status should not raise error'):
             wd.create_new_work_description(
                 persistence,
-                key='aaa',
+                message_id='aaa',
                 outbound_status=wd.MessageStatus.INBOUND_RESPONSE_FAILED,
                 inbound_status=None,
                 workflow=workflow.SYNC_ASYNC

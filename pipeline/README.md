@@ -26,6 +26,10 @@ subsequent builds, reducing the time needed to deploy updated services.
     - It is recommended that default encryption of objects in this bucket is enabled when creating it
 - Two DynamoDB tables to be used to allow Terraform to lock the shared state of the MHS & SCR configurations, preventing issues if concurrent deployments
 of the same environment are performed. These tables must have a primary key named `LockID`.
+
+   Alternatively create MongoDB instance which will be used instead of DynamoDB. 
+   There is no need of creating any MongoDB databases nor collections - they will be created automatically.
+   Type of DB can be choosen by env var `MHS_PERSISTENCE_ADAPTOR: dynamodb(default)|mongodb`
 - Log groups in Cloudwatch under the following names:
     - `/ecs/jenkins-master`
     - `/ecs/jenkins-workers-jenkins-worker`
@@ -99,7 +103,7 @@ containers to be published to ECR and the integration test environment to be sto
     - ElasticLoadBalancingFullAccess
     - AmazonEC2ContainerRegistryPowerUser
     - AmazonECS_FullAccess
-    - AmazonDynamoDBFullAccess
+    - AmazonDynamoDBFullAccess (only if DynamoDB is used)
     - CloudWatchLogsFullAccess
     - AmazonRoute53FullAccess
     - AmazonElastiCacheFullAccess
@@ -198,9 +202,9 @@ Several global environment variables must be set within Jenkins for the scripts 
 [Pre-Requisites](#pre-requisites-for-build-pipeline)).
 - TF_STATE_BUCKET_REGION: The region that the Terraform state S3 bucket (as described in
 [Pre-Requisites](#pre-requisites-for-build-pipeline)) resides in.
-- TF_MHS_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
+- TF_MHS_LOCK_TABLE_NAME: The name of the DB table Terraform should use to enable locking of state (as described in
 [Pre-Requisites](#pre-requisites-for-build-pipeline)).
-- TF_SCR_LOCK_TABLE_NAME: The name of the DynamoDB table Terraform should use to enable locking of state (as described in
+- TF_SCR_LOCK_TABLE_NAME: The name of the DB table Terraform should use to enable locking of state (as described in
 [Pre-Requisites](#pre-requisites-for-build-pipeline)).
 - SUPPLIER_VPC_ID: The ID of the VPC that represents the supplier system that will connect to the MHS
 - OPENTEST_VPC_ID: The ID of the VPC that contains the machine which manages the Opentest connection to Spine
