@@ -54,9 +54,9 @@
       "inline": [
         "pip install pipenv",
         "cd {{user `app_dir`}}/{{user `scr_service_dir`}}",
-        "apt-get install git",
+        "apt-get install -y git",
         "pipenv install --deploy --ignore-pipfile",
-        "apt-get purge git"
+        "apt-get purge -y git"
       ]
     }
   ],
