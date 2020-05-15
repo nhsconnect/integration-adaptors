@@ -1,6 +1,7 @@
 """
 Provides tests around the Asynchronous Express workflow, including sync-async wrapping
 """
+import json
 from unittest import TestCase
 
 from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
@@ -72,6 +73,11 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
         # Assert
         all_sync_async_states = MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()
+        if has_errors(responses):
+            # TODO: NIAD-72 remove prints and has_errors once wait-for-response feature is stable
+            # TODO: 2020-05-14 should it be removed now? please comment while review
+            print('--- mhs-sync-async-state table ---')
+            print(json.dumps(all_sync_async_states, indent=2))
         assert_all_messages_succeeded(responses)
         sync_async_state_assertor = DynamoSyncAsyncMhsTableStateAssertor(all_sync_async_states)
         for message, message_id in messages:
