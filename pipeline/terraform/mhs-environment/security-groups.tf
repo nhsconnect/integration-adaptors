@@ -180,7 +180,8 @@ resource "aws_security_group_rule" "mhs_inbound_security_group_ingress_rule" {
   protocol = "tcp"
   # We're allowing inbound requests from the private subnets as MHS inbound load balancer
   # can't have a security group for us to reference.
-  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  #cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  cidr_blocks = aws_subnet.inbound_lb_subnet.*.cidr_block
   description = "Allow HTTPS inbound requests from MHS inbound load balancer"
 }
 
