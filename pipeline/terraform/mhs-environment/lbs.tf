@@ -46,7 +46,7 @@ resource "aws_lb_target_group" "outbound_alb_target_group" {
     matcher = "200"
     healthy_threshold = 2
     unhealthy_threshold = 2
-    interval = 20
+    interval = 30
   }
 
   deregistration_delay = 45 # the default was 300 seconds!
@@ -121,7 +121,7 @@ resource "aws_lb_target_group" "route_alb_target_group" {
     matcher = "200"
     healthy_threshold = 2
     unhealthy_threshold = 2
-    interval = 20
+    interval = 30
   }
 
   deregistration_delay = 45 # the default was 300 seconds!
@@ -218,7 +218,7 @@ resource "aws_lb_target_group" "inbound_nlb_target_group" {
     path = "/healthcheck"
     healthy_threshold = 2
     unhealthy_threshold = 2
-    interval = 20
+    interval = 30
   }
 
   deregistration_delay = 45 # the default was 300 seconds!
