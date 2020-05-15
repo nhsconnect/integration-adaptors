@@ -1,11 +1,11 @@
-from fake_spine.base_handler import BaseHandler
+import tornado
 
 from utilities import integration_adaptors_logger as log
 
 logger = log.IntegrationAdaptorsLogger(__name__)
 
 
-class HealthcheckHandler(BaseHandler):
+class HealthcheckHandler(tornado.web.RequestHandler):
     """
     A Tornado request handler that returns an empty HTTP 200 response for any GET requests, without
     doing anything else. This handler is intended to be hit by anything that wants to check that the
