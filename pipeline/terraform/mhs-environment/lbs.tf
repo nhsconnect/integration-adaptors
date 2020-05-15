@@ -44,7 +44,12 @@ resource "aws_lb_target_group" "outbound_alb_target_group" {
   health_check {
     path = "/healthcheck"
     matcher = "200"
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    interval = 20
   }
+
+  deregistration_delay = 45 # the default was 300 seconds!
 
   tags = {
     Name = "${var.environment_id}-mhs-outbound-alb-target-group"
@@ -114,7 +119,12 @@ resource "aws_lb_target_group" "route_alb_target_group" {
   health_check {
     path = "/healthcheck"
     matcher = "200"
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    interval = 20
   }
+
+  deregistration_delay = 45 # the default was 300 seconds!
 
   tags = {
     Name = "${var.environment_id}-mhs-route-alb-target-group"
@@ -206,7 +216,12 @@ resource "aws_lb_target_group" "inbound_nlb_target_group" {
     protocol = "HTTP"
     port = 80
     path = "/healthcheck"
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    interval = 20
   }
+
+  deregistration_delay = 45 # the default was 300 seconds!
 
   tags = {
     Name = "${var.environment_id}-mhs-inbound-nlb-target-group"
