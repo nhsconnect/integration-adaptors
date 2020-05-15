@@ -32,6 +32,6 @@ class FakeSpineConfiguration(object):
         self.FAKE_SPINE_PROXY_VALIDATE_CERT = str2bool(os.environ.get('FAKE_SPINE_PROXY_VALIDATE_CERT', default='True'))
         self.INBOUND_SERVER_BASE_URL = environ_or_error('INBOUND_SERVER_BASE_URL')
         self.OUTBOUND_DELAY_MS = int(environ_or_error('FAKE_SPINE_OUTBOUND_DELAY_MS', default='0'))
-        self.INBOUND_DELAY_MS = int(environ_or_error('FAKE_SPINE_INBOUND_DELAY_MS', default='0'))
+        self.INBOUND_DELAY_MS = int(environ_or_error('FAKE_SPINE_INBOUND_DELAY_MS', default='50'))
         self.MHS_SECRET_PARTY_KEY = os.environ.get('MHS_SECRET_PARTY_KEY')
         self.FAKE_SPINE_OUTBOUND_SSL_ENABLED = str2bool(os.environ.get('FAKE_SPINE_OUTBOUND_SSL_ENABLED', default='True'))
