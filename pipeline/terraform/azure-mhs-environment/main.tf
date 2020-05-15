@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "mhs_adaptor" {
 }
 
 ## AKS kubernetes cluster ##
-resource "azurerm_kubernetes_cluster" "mhs_adaptor" { 
+resource "azurerm_kubernetes_cluster" "mhs_adaptor_exemplar" { 
   name                = var.cluster_name
   resource_group_name = azurerm_resource_group.mhs_adaptor.name
   location            = azurerm_resource_group.mhs_adaptor.location
@@ -28,7 +28,7 @@ resource "azurerm_kubernetes_cluster" "mhs_adaptor" {
   agent_pool_profile {
     name            = "default"
     count           = var.agent_count
-    vm_size         = "Standard_D2"
+    vm_size         = "Standard_F2s_v2"
     os_type         = "Linux"
     os_disk_size_gb = 30
   }
@@ -67,27 +67,27 @@ EOF
 
 # Example attributes available for output
 output "id" {
-    value = "${azurerm_kubernetes_cluster.mhs_adaptor.id}"
+    value = "${azurerm_kubernetes_cluster.mhs_adaptor_exemplar.id}"
 }
 
 output "client_key" {
-  value = "${azurerm_kubernetes_cluster.mhs_adaptor.kube_config.0.client_key}"
+  value = "${azurerm_kubernetes_cluster.mhs_adaptor_exemplar.kube_config.0.client_key}"
 }
 
 output "client_certificate" {
-  value = "${azurerm_kubernetes_cluster.mhs_adaptor.kube_config.0.client_certificate}"
+  value = "${azurerm_kubernetes_cluster.mhs_adaptor_exemplar.kube_config.0.client_certificate}"
 }
 
 output "cluster_ca_certificate" {
-  value = "${azurerm_kubernetes_cluster.mhs_adaptor.kube_config.0.cluster_ca_certificate}"
+  value = "${azurerm_kubernetes_cluster.mhs_adaptor_exemplar.kube_config.0.cluster_ca_certificate}"
 }
 
 output "kube_config" {
-  value = azurerm_kubernetes_cluster.mhs_adaptor.kube_config_raw
+  value = azurerm_kubernetes_cluster.mhs_adaptor_exemplar.kube_config_raw
 }
 
 output "host" {
-  value = azurerm_kubernetes_cluster.mhs_adaptor.kube_config.0.host
+  value = azurerm_kubernetes_cluster.mhs_adaptor_exemplar.kube_config.0.host
 }
 
 output "configure" {
