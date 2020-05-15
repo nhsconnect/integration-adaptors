@@ -36,7 +36,7 @@ class MessageStatus(str, enum.Enum):
     SYNC_RESPONSE_FAILED = "SYNC_RESPONSE_FAILED"
 
 
-KEY = 'key'
+MESSAGE_ID = 'MESSAGE_ID'
 CREATED_TIMESTAMP = 'CREATED'
 INBOUND_STATUS = 'INBOUND_STATUS'
 OUTBOUND_STATUS = 'OUTBOUND_STATUS'
@@ -49,7 +49,7 @@ class OutOfDateVersionError(RuntimeError):
 
 
 class EmptyWorkDescriptionError(RuntimeError):
-    """Exception thrown when no work description is found for a given key"""
+    """Exception thrown when no work description is found for a given message_id"""
     pass
 
 
@@ -58,37 +58,37 @@ class WorkDescriptionUpdateFailedError(RuntimeError):
     pass
 
 
-async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, key: str) -> Optional[WorkDescription]:
+async def get_work_description_from_store(persistence_store: pa.PersistenceAdaptor, message_id: str) -> Optional[WorkDescription]:
     """
     Attempts to retrieve and deserialize a work description instance from the given persistence store to create
     a local work description
     :param persistence_store: persistence store to search for work description instance in
-    :param key: key to look for
-    :raise EmptyWorkDescriptionError: when no work description is found for the given key
+    :param message_id: message_id to look for
+    :raise EmptyWorkDescriptionError: when no work description is found for the given message_id
     """
 
     if persistence_store is None:
         logger.error('Failed to get work description from store: persistence store is None')
         raise ValueError('Expected non-null persistence store')
-    if key is None:
-        logger.error('Failed to get work description from store: key is None')
-        raise ValueError('Expected non-null key')
+    if message_id is None:
+        logger.error('Failed to get work description from store: message_id is None')
+        raise ValueError('Expected non-null message_id')
 
-    json_store_data = await persistence_store.get(key, strongly_consistent_read=True)
+    json_store_data = await persistence_store.get(message_id, strongly_consistent_read=True)
     if json_store_data is None:
-        logger.info('Persistence store returned empty value for {key}', fparams={'key': key})
+        logger.info('Persistence store returned empty value for {message_id}', fparams={'message_id': message_id})
         return None
 
     return WorkDescription(persistence_store, json_store_data)
 
 
-def build_store_data(key: str,
+def build_store_data(message_id: str,
                      created_at: str,
                      workflow: str,
                      inbound_status: Optional[str] = None,
                      outbound_status: Optional[str] = None) -> dict:
     return {
-        KEY: key,
+        MESSAGE_ID: message_id,
         CREATED_TIMESTAMP: created_at,
         INBOUND_STATUS: inbound_status,
         OUTBOUND_STATUS: outbound_status,
@@ -97,7 +97,7 @@ def build_store_data(key: str,
 
 
 def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
-                                key: str,
+                                message_id: str,
                                 workflow: str,
                                 inbound_status: Optional[MessageStatus] = None,
                                 outbound_status: Optional[MessageStatus] = None
@@ -109,9 +109,9 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
     if persistence_store is None:
         logger.error('Failed to build new work description, persistence store should not be null')
         raise ValueError('Expected persistence store to not be None')
-    if not key:
-        logger.error('Failed to build new work description, key should not be null or empty')
-        raise ValueError('Expected key to not be None or empty')
+    if not message_id:
+        logger.error('Failed to build new work description, message_id should not be null or empty')
+        raise ValueError('Expected message_id to not be None or empty')
     if workflow is None:
         logger.error('Failed to build new work description, workflow should not be null')
         raise ValueError('Expected workflow to not be None')
@@ -122,7 +122,7 @@ def create_new_work_description(persistence_store: pa.PersistenceAdaptor,
 
     return WorkDescription(
         persistence_store,
-        build_store_data(key, timing.get_time(), workflow, inbound_status, outbound_status))
+        build_store_data(message_id, timing.get_time(), workflow, inbound_status, outbound_status))
 
 
 class WorkDescription(object):
@@ -145,7 +145,7 @@ class WorkDescription(object):
         Attempts to publish the local state of the work description to the state store
         :return:
         """
-        await self._persistence_store.add(self._to_store_data())
+        await self._persistence_store.add(self.message_id, self._to_store_data())
 
     async def set_inbound_status(self, new_status: MessageStatus):
         """
@@ -164,15 +164,15 @@ class WorkDescription(object):
         await self._set_status(OUTBOUND_STATUS, new_status)
 
     async def _set_status(self, field: str, new_status: MessageStatus):
-        store_data = await self._persistence_store.update(self.key, {field: new_status})
+        store_data = await self._persistence_store.update(self.message_id, {field: new_status})
         self._from_store_data(store_data)
 
     def _from_store_data(self, store_data):
-        self.key = store_data[KEY]
+        self.message_id = store_data[MESSAGE_ID]
         self.created_timestamp = store_data[CREATED_TIMESTAMP]
         self.inbound_status = store_data[INBOUND_STATUS]
         self.outbound_status = store_data[OUTBOUND_STATUS]
         self.workflow = store_data[WORKFLOW]
 
     def _to_store_data(self):
-        return build_store_data(self.key, self.created_timestamp, self.workflow, self.inbound_status, self.outbound_status)
+        return build_store_data(self.message_id, self.created_timestamp, self.workflow, self.inbound_status, self.outbound_status)
