@@ -49,7 +49,9 @@
       "inline": [
         "pip install pipenv",
         "cd {{user `app_dir`}}/{{user `outbound_dir`}}",
-        "pipenv install --deploy --ignore-pipfile"
+        "apk add git",
+        "pipenv install --deploy --ignore-pipfile",
+        "apk del git"
       ]
     }
   ],
