@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 coverage = "~=4.5"
 unittest-xml-reporting = "~=2.5"
+integration-adaptors-common = {editable = true,path = "./../../../integration-adaptor-common"}
 
 [packages]
 integration-adaptors-common = {editable = true,git = "https://git@github.com/nhsconnect/integration-adaptor-common.git",tag = '0.1.6'}
