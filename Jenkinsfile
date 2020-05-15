@@ -71,13 +71,13 @@ pipeline {
                                 }
                             }
                         }
-//                         stage('Check documentation') {
-//                             steps {
-//                                 dir('mhs/outbound') {
-//                                     sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
-//                                 }
-//                             }
-//                         }
+                        stage('Check documentation') {
+                            steps {
+                                dir('mhs/outbound') {
+                                    sh label: 'Check API docs can be generated', script: 'pipenv run generate-openapi-docs > /dev/null'
+                                }
+                            }
+                        }
                         stage('Push image') {
                             steps {
                                 script {
