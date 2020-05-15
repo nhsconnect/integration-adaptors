@@ -31,10 +31,10 @@ The MHS adaptor is composed of three main services, coloured in orange,  which a
 
 These services have some dependencies, shown in blue, which are implemented through the adaptor pattern:
 - State database, which is used to handle internal MHS message state. 
-In this repository, DynamoDB is used as an implementation of the State database.
+In this repository, DynamoDB and MongoDB are used as an implementations of the State database.
 - Sync-Async Response Database, a special case of the state database where a synchronous facade is provided by the Outbound Service for interactions
 with Spine which actually involve asynchronous responses. This database is used to correlate request to Spine and responses from Spine in this scenario. 
-Again this is implemented here as a DynamoDB state adaptor.
+Again this is implemented here as a DynamoDB and MongoDB state adaptor.
 - Container orchestration. The container orchestration solution of your choice can be used. In this repository, Docker compose is used when running
 the adaptor locally, and ECS, Fargate and ECR are used by the AWS exemplar architecture.
 - Secret Store - Used to safely inject secrets such as passwords into running containers.
@@ -129,7 +129,7 @@ Key points to note:
  - Balancing of load across instances of the inbound service has been implemented throught the
  use of a Network Load Balancer to enable the inbound service itself to implement TLS mututal
  authentication.
- - DynamoDB is used to implement the state database and sync-re-sync database.
+ - DynamoDB and MongoDB are used to implement the state database and sync-re-sync database.
  - Elasticache for Redis HA is used to implement the routing and reliability cache which is a dependency
  of the routing service.
  - Cloudwatch is used as the logging

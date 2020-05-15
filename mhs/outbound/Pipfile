@@ -10,11 +10,11 @@ apispec = "~=3.0"
 apispec-webframeworks = "~=0.5"
 
 [packages]
-tornado = "*"
+tornado = "~=6.0"
 defusedxml = "~=0.6"
 integration-adaptors-common = {editable = true,path = "./../../common"}
 mhs-common = {editable = true,path = "./../common"}
-isodate = "*"
+isodate = "~=0.6"
 # Temporarily hack the pycurl dependency so that we use a binary package
 # on Windows. This hack should be removed once
 # https://github.com/pycurl/pycurl/issues/569 is fixed.
