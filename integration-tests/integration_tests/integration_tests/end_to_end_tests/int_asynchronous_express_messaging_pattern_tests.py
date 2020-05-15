@@ -72,7 +72,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
         responses = send_messages_concurrently(messages, interaction_id='QUPC_IN160101UK05', wait_for_response=True)
 
         # Assert
-        all_sync_async_states = MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER.get_all_records_in_table()
+        all_sync_async_states = MHS_SYNC_ASYNC_TABLE_WRAPPER.get_all_records_in_table()
         assert_all_messages_succeeded(responses)
         sync_async_state_assertor = SyncAsyncMhsTableStateAssertor(all_sync_async_states)
         for message, message_id in messages:

@@ -187,8 +187,11 @@ class SynchronousHandler(base_handler.BaseHandler):
                                         reason='wait-for-response header missing')
         if wait_for_response_header.lower() == 'true':
             return True
-        else:
+        elif wait_for_response_header.lower() == 'false':
             return False
+        else:
+            raise tornado.web.HTTPError(400, 'wait for response should be set to true or false',
+                                        reason=f'wait-for-response is set to {wait_for_response_header}')
 
     def _extract_from_asid(self):
         return self.request.headers.get(HttpHeaders.FROM_ASID, None)
