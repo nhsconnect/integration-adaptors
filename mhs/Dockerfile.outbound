@@ -1,0 +1,18 @@
+FROM nhsdev/nia-mhs-outbound-base:latest as base
+RUN pip install pipenv
+RUN mkdir -p /usr/src/app/mhs/outbound
+COPY . /usr/src/app/mhs
+WORKDIR /usr/src/app/mhs/outbound
+
+FROM base as builder
+RUN apt-get install git -y
+RUN pipenv install --ignore-pipfile
+RUN ls /root/.local/share/virtualenvs
+
+FROM base
+RUN mkdir -p /root/.local/share/virtualenvs
+COPY --from=builder /root/.local/share/virtualenvs/ /root/.local/share/virtualenvs
+RUN ls /root/.local/share/virtualenvs
+EXPOSE 80
+
+ENTRYPOINT pipenv run start-outbound
