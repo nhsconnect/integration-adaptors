@@ -1,0 +1,32 @@
+{
+  "_description": "This packer file produces an outbound image and has the capability to publish to a given repository",
+  "variables": {
+    "registry": "{{env `DOCKER_REGISTRY`}}",
+    "repository": "/mhs/outbound",
+    "tag": "{{env `BUILD_TAG`}}"
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "local/mhs-outbound:{{user `tag`}}",
+      "commit": true
+    }
+  ],
+  "provisioners": [],
+  "post-processors": [
+    [
+      {
+        "name": "publish",
+        "type": "docker-tag",
+        "repository": "{{user `registry`}}{{user `repository`}}",
+        "tag": "{{user `tag`}}"
+      },
+      {
+        "name": "publish",
+        "type": "docker-push",
+        "ecr_login": true,
+        "login_server": "https://{{user `registry`}}{{user `repository`}}"
+      }
+    ]
+  ]
+}

@@ -46,10 +46,19 @@ pipeline {
                                 }
                             }
                         }
+                        stage('Build docker') {
+                            steps {
+                                script {
+                                    dir('mhs') {
+                                        sh label: 'Building docker image', script "docker build -t local/mhs-inbound:$BUILD_TAG -f Dockerfile.sds ." 
+                                    }
+                                }
+                            }
+                        }
                         stage('Push image') {
                             steps {
                                 script {
-                                    sh label: 'Pushing inbound image', script: "packer build -color=false pipeline/packer/inbound.json"
+                                    sh label: 'Pushing inbound image', script: "packer build -color=false pipeline/packer/inbound-push.json"
                                 }
                             }
                         }
@@ -78,10 +87,19 @@ pipeline {
                                 }
                             }
                         }
+                        stage('Build docker') {
+                            steps {
+                                script {
+                                    dir('mhs') {
+                                        sh label: 'Building docker image', script "docker build -t local/mhs-outbound:$BUILD_TAG -f Dockerfile.outbound ." 
+                                    }
+                                }
+                            }
+                        }
                         stage('Push image') {
                             steps {
                                 script {
-                                    sh label: 'Pushing outbound image', script: "packer build -color=false pipeline/packer/outbound.json"
+                                    sh label: 'Pushing outbound image', script: "packer build -color=false pipeline/packer/outbound-push.json"
                                 }
                             }
                         }
@@ -103,10 +121,19 @@ pipeline {
                                 }
                             }
                         }
+                        stage('Build docker') {
+                            steps {
+                                script {
+                                    dir('mhs') {
+                                        sh label: 'Building docker image', script "docker build -t local/mhs-route:$BUILD_TAG -f Dockerfile.inbound ." 
+                                    }
+                                }
+                            }
+                        }
                         stage('Push image') {
                             steps {
                                 script {
-                                    sh label: 'Pushing spine route lookup image', script: "packer build -color=false pipeline/packer/spineroutelookup.json"
+                                    sh label: 'Pushing spine route lookup image', script: "packer build -color=false pipeline/packer/sds-push.json"
                                 }
                             }
                         }
