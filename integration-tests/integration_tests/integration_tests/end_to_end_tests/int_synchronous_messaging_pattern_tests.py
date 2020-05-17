@@ -34,6 +34,9 @@ class SynchronousMessagingPatternTests(TestCase):
         # Arrange
         message, message_id = build_message('QUPA_IN040000UK32', '9691035456')
 
+        print('-------------------------- msg: ')
+        print(message)
+
         # Act
         response = MhsHttpRequestBuilder() \
             .with_headers(interaction_id='QUPA_IN040000UK32', message_id=message_id, sync_async=False) \
@@ -44,12 +47,15 @@ class SynchronousMessagingPatternTests(TestCase):
         Hl7XmlResponseAssertor(response.text) \
             .assert_element_exists('.//retrievalQueryResponse//QUPA_IN050000UK32//PdsSuccessfulRetrieval') \
             .assert_element_attribute('.//queryAck//queryResponseCode', 'code', 'OK') \
-            .assert_element_attribute('.//patientRole//id', 'extension', '9689174606') \
+            .assert_element_attribute('.//patientRole//id', 'extension', '9691035456') \
             .assert_element_attribute('.//messageRef//id', 'root', message_id)
 
     def test_should_record_synchronous_message_status_as_successful(self):
         # Arrange
         message, message_id = build_message('QUPA_IN040000UK32', '9691035456')
+
+        print('-------------------------- msg: ')
+        print(message)
 
         # Act
         MhsHttpRequestBuilder() \

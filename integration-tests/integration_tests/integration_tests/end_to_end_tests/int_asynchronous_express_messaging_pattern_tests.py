@@ -44,6 +44,9 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
         # Arrange
         message, message_id = build_message('QUPC_IN160101UK05', '9691035456')
 
+        print('-------------------------- msg: ')
+        print(message)
+
         # Act
         MhsHttpRequestBuilder() \
             .with_headers(interaction_id='QUPC_IN160101UK05',
@@ -67,6 +70,12 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
     def test_should_return_successful_response_and_record_spine_reply_in_resync_table_if_sync_async_requested(self):
         # Arrange
         messages = [build_message('QUPC_IN160101UK05', '9691035456') for _ in range(1)]
+
+        print('-------------------------- msgs: ')
+        print(messages[0].message_id)
+        print(messages[0].message)
+        print(messages[1].message_id)
+        print(messages[1].message)
 
         # Act
         responses = send_messages_concurrently(messages, interaction_id='QUPC_IN160101UK05', sync_async=True)
