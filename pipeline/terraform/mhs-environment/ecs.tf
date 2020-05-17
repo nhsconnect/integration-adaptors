@@ -427,7 +427,7 @@ resource "aws_ecs_service" "mhs_inbound_service" {
     security_groups = [
       aws_security_group.mhs_inbound_security_group.id
     ]
-    subnets = aws_subnet.mhs_subnet.*.id
+    subnets = [aws_subnet.mhs_subnet[0].id, aws_subnet.mhs_subnet[1].id]
   }
 
   load_balancer {

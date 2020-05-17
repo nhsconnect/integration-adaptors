@@ -192,7 +192,8 @@ resource "aws_security_group_rule" "mhs_inbound_security_group_healthcheck_ingre
   from_port = 80
   to_port = 80
   protocol = "tcp"
-  cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  #cidr_blocks = aws_subnet.mhs_subnet.*.cidr_block
+  cidr_blocks = aws_subnet.inbound_lb_subnet.*.cidr_block
   description = "Allow an HTTP connection from the inbound NLB to the inbound service. For LB healthchecks."
 }
 
