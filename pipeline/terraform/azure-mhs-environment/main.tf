@@ -1,13 +1,3 @@
-## Azure resource provider ##
-provider "azurerm" {
-  version = "=1.36.1"
-}
-
-## Azure resource group for the kubernetes cluster ##
-resource "azurerm_resource_group" "mhs_adaptor" {
-  name     = var.resource_group_name
-  location = var.location
-}
 
 ## AKS kubernetes cluster ##
 resource "azurerm_kubernetes_cluster" "mhs_adaptor_exemplar" { 
