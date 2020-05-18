@@ -1,5 +1,6 @@
 import pathlib
 import ssl
+import tracemalloc
 from typing import Dict
 
 import definitions
@@ -122,6 +123,9 @@ def main():
                                                   private_key=secrets.get_secret_config('CLIENT_KEY'),
                                                   local_cert=secrets.get_secret_config('CLIENT_CERT'),
                                                   ca_certs=secrets.get_secret_config('CA_CERTS'))
+
+    tornado.ioloop.IOLoop.current().spawn_callback(trace_leak, delay=30, top=10, trace=3)
+
     party_key = secrets.get_secret_config('PARTY_KEY')
 
     queue_adaptor = create_queue_adaptor()
@@ -138,6 +142,51 @@ def main():
     start_inbound_server(certificates.local_cert_path, certificates.ca_certs_path, certificates.private_key_path,
                          party_key, workflows, work_description_store, config_manager)
 
+
+async def trace_leak(delay=60, top=20, trace=1):
+    """
+    Use spawn_callback to invoke:
+    tornado.ioloop.IOLoop.current().spawn_callback(trace_leak, delay=300, top=10, trace=3)
+    :param delay: in seconds (int)
+    :param top: number of top allocations to list (int)
+    :param trace: number of top allocations to trace (int)
+    """
+    logger.info('start_trace {delay}, {top}, {trace}', fparams={'delay': delay, 'top': top, 'trace': trace})
+    tracemalloc.start(25)
+    start = tracemalloc.take_snapshot()
+    prev = start
+    while True:
+        await tornado.gen.sleep(delay)
+        current = tracemalloc.take_snapshot()
+        # compare current snapshot to starting snapshot
+        stats = current.compare_to(start, 'filename')
+        # compare current snapshot to previous snapshot
+        prev_stats = current.compare_to(prev, 'lineno')
+
+        logger.info("Top Diffs since Start")
+        # Print top diffs: current snapshot - start snapshot
+        for i, stat in enumerate(stats[:top], 1):
+            logger.info('top_diffs {i}, {stat}', fparams={'i': i, 'stat': str(stat)})
+
+        logger.info('Top Incremental')
+        # Print top incremental stats: current snapshot - previous snapshot
+        for i, stat in enumerate(prev_stats[:top], 1):
+            logger.info('top_incremental {i}, {stat}', fparams={'i': i, 'stat': str(stat)})
+
+        logger.info('Top Current')
+        # Print top current stats
+        for i, stat in enumerate(current.statistics('filename')[:top], 1):
+            logger.info('top_current {i}, {stat}', fparams={'i': i, 'stat': str(stat)})
+
+        # get tracebacks (stack trace) for the current snapshot
+        traces = current.statistics('traceback')
+        for stat in traces[:trace]:
+            logger.info('traceback {memory_blocks}, {size_kB}', fparams={'memory_blocks': stat.count, 'size_kB': stat.size / 1024})
+            for line in stat.traceback.format():
+                logger.info(line)
+
+        # set previous snapshot to current snapshot
+        prev = current
 
 if __name__ == "__main__":
     try:
