@@ -44,6 +44,8 @@ resource "aws_lb_target_group" "outbound_alb_target_group" {
   health_check {
     path = "/healthcheck"
     matcher = "200"
+    healthy_threshold = var.healthcheck_threshold
+    unhealthy_threshold = var.healthcheck_threshold
   }
 
   deregistration_delay = var.lb_deregistration_delay
@@ -116,6 +118,8 @@ resource "aws_lb_target_group" "route_alb_target_group" {
   health_check {
     path = "/healthcheck"
     matcher = "200"
+    healthy_threshold = var.healthcheck_threshold
+    unhealthy_threshold = var.healthcheck_threshold
   }
 
   deregistration_delay = var.lb_deregistration_delay
@@ -190,6 +194,8 @@ resource "aws_lb_target_group" "inbound_nlb_target_group" {
     protocol = "HTTP"
     port = 80
     path = "/healthcheck"
+    healthy_threshold = var.healthcheck_threshold
+    unhealthy_threshold = var.healthcheck_threshold
   }
 
   deregistration_delay = var.lb_deregistration_delay
