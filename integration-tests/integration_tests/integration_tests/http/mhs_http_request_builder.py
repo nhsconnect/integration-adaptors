@@ -53,6 +53,9 @@ class MhsHttpRequestBuilder(object):
             HttpHeaders.ODS_CODE: ods_code
         }
 
+        print('--------------------------------- headers:')
+        print(self.headers)
+
         return self
 
     def with_body(self, body, attachments=None) -> MhsHttpRequestBuilder:
