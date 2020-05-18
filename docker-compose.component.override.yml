@@ -21,9 +21,6 @@ services:
       - MHS_LOG_LEVEL=INFO
 
   inbound:
-    ports:
-      - "443:443"
-      - "8079:80"
     environment:
       - MHS_SECRET_CLIENT_CERT=${INBOUND_CERTIFICATE}
       - MHS_SECRET_CLIENT_KEY=${INBOUND_PRIVATE_KEY}
@@ -31,8 +28,6 @@ services:
       - MHS_SECRET_PARTY_KEY=test-party-key
 
   outbound:
-    ports:
-      - "80:80"
     environment:
       - MHS_SECRET_CLIENT_CERT=${OUTBOUND_CERTIFICATE}
       - MHS_SECRET_CLIENT_KEY=${OUTBOUND_PRIVATE_KEY}
