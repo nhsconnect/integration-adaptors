@@ -4,7 +4,7 @@ Provides tests around the Asynchronous Express workflow, including sync-async wr
 import json
 from unittest import TestCase
 
-from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
+from integration_tests.amq.amq import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
@@ -42,7 +42,10 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', '9689177923')
+        message, message_id = build_message('QUPC_IN160101UK05', '9691035456')
+
+        print('-------------------------- msg: ')
+        print(message)
 
         # Act
         MhsHttpRequestBuilder() \
@@ -66,7 +69,11 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_and_record_spine_reply_in_resync_table_if_sync_async_requested(self):
         # Arrange
-        messages = [build_message('QUPC_IN160101UK05', '9689177923') for _ in range(1)]
+        messages = [build_message('QUPC_IN160101UK05', '9691035456') for _ in range(1)]
+
+        print('-------------------------- msgs: ')
+        print(messages[0].message_id)
+        print(messages[0].message)
 
         # Act
         responses = send_messages_concurrently(messages, interaction_id='QUPC_IN160101UK05', sync_async=True)
