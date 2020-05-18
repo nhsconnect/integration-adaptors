@@ -50,7 +50,7 @@ pipeline {
                             steps {
                                 script {
                                     dir('mhs') {
-                                        sh label: 'Building docker image', script "docker build -t local/mhs-inbound:$BUILD_TAG -f Dockerfile.inbound ." 
+                                        sh label: 'Building docker image', script 'docker build -t local/mhs-inbound:$BUILD_TAG -f Dockerfile.inbound .' 
                                     }
                                 }
                             }
@@ -58,7 +58,7 @@ pipeline {
                         stage('Push image') {
                             steps {
                                 script {
-                                    sh label: 'Pushing inbound image', script: "packer build -color=false pipeline/packer/inbound-push.json"
+                                    sh label: 'Pushing inbound image', script: 'packer build -color=false pipeline/packer/inbound-push.json'
                                 }
                             }
                         }
