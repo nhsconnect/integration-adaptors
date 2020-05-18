@@ -29,7 +29,7 @@ class MhsHttpRequestBuilder(object):
 
     def with_headers(self, interaction_id: str,
                      message_id: str,
-                     sync_async: bool,
+                     wait_for_response: bool,
                      correlation_id: str = str(uuid.uuid4()).upper(),
                      ods_code: str = "YES",
                      from_asid: Optional[str] = f'{get_asid()}') -> MhsHttpRequestBuilder:
@@ -40,14 +40,14 @@ class MhsHttpRequestBuilder(object):
         :param correlation_id: the correlation id used
         :param interaction_id: id of this interaction used within MHS to track this request lifecycle
         :param message_id: the message id
-        :param sync_async: whether this request should execute synchronously or not
+        :param wait_for_response: whether this request should execute synchronously or not
         :return: self
         """
         self.headers = {
             HttpHeaders.INTERACTION_ID: interaction_id,
             HttpHeaders.MESSAGE_ID: message_id,
             HttpHeaders.CORRELATION_ID: correlation_id,
-            HttpHeaders.SYNC_ASYNC: str(sync_async).lower(),
+            HttpHeaders.WAIT_FOR_RESPONSE: str(wait_for_response).lower(),
             HttpHeaders.FROM_ASID: from_asid,
             HttpHeaders.CONTENT_TYPE: 'application/json',
             HttpHeaders.ODS_CODE: ods_code

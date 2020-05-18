@@ -34,7 +34,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                                             )
         # Act: Response should be 202
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_success()
 
@@ -50,7 +50,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_success()
 
@@ -74,7 +74,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='REPC_IN150016UK05', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -95,7 +95,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
 
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='REPC_IN150016UK05', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -120,7 +120,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -141,7 +141,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -155,7 +155,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'async-reliable'
             })
 
-    def test_should_return_information_from_ebxml_fault_returned_from_spine_in_original_post_request_to_client_when_sync_async_requested(self):
+    def test_should_return_information_from_ebxml_fault_returned_from_spine_in_original_post_request_to_client_when_wait_for_response_requested(self):
         """
         Message ID: 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D' configured in fakespine to return a ebxml fault
         """
@@ -166,7 +166,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -176,7 +176,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
             .assert_severity('Error') \
             .assert_error_type('ebxml_error')
 
-    def test_should_record_message_status_as_nackd_when_ebxml_error_response_returned_from_spine_when_sync_async_requested(self):
+    def test_should_record_message_status_as_nackd_when_ebxml_error_response_returned_from_spine_when_wait_for_response_requested(self):
         """
         Message ID: 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D' configured in fakespine to return a ebxml fault
         """
@@ -187,7 +187,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -201,7 +201,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'sync-async'
             })
 
-    def test_should_return_information_from_soap_fault_from_spine_in_original_post_request_to_client_when_sync_async_requested(self):
+    def test_should_return_information_from_soap_fault_from_spine_in_original_post_request_to_client_when_wait_for_response_requested(self):
         """
         Message ID: '3771F30C-A231-4D64-A46C-E7FB0D52C27C' configured in fakespine to return a soap fault
         """
@@ -212,7 +212,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -233,7 +233,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='REPC_IN150016UK05 ', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -253,7 +253,7 @@ class AsynchronousReliableMessagingPatternTests(unittest.TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='QUPC_IN160101UK05', message_id=message_id, wait_for_response=False) \
             .with_body(None) \
             .execute_post_expecting_bad_request_response()
 

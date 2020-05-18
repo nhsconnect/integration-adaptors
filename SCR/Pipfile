@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-integration-adaptors-common = {editable = true,git = "https://git@github.com/nhsconnect/integration-adaptor-common.git",tag = '0.1.6'}
+integration-adaptors-common = {editable = true,git = "https://git@github.com/nhsconnect/integration-adaptor-common.git",tag = '0.1.7'}
 scr = {editable = true,path = "."}
 
 [requires]

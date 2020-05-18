@@ -34,10 +34,10 @@ class BaseHandlerTest(tornado.testing.AsyncHTTPTestCase):
         mdc.correlation_id.set(None)
 
     def call_handler(self, content_type="application/json", interaction_id=INTERACTION_NAME, body=REQUEST_BODY,
-                     sync_async='false', correlation_id=CORRELATION_ID) -> tornado.httpclient.HTTPResponse:
+                     wait_for_response='false', correlation_id=CORRELATION_ID) -> tornado.httpclient.HTTPResponse:
         return self.fetch("/", method="POST",
                           headers={"Content-Type": content_type, "Interaction-Id": interaction_id,
-                                   'sync-async': sync_async, "Correlation-Id": correlation_id},
+                                   'wait-for-response': wait_for_response, "Correlation-Id": correlation_id},
                           body=body)
 
 
@@ -116,7 +116,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         response = self.fetch("/", method="POST",
                               headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
                                        "Message-Id": message_id,
-                                       'sync-async': 'false'},
+                                       'wait-for-response': 'false'},
                               body=REQUEST_BODY)
 
         self.assertEqual(response.code, 200)
@@ -140,7 +140,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         response = self.fetch("/", method="POST",
                               headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
                                        "Correlation-Id": CORRELATION_ID,
-                                       'sync-async': 'false'},
+                                       'wait-for-response': 'false'},
                               body=REQUEST_BODY)
 
         self.assertEqual(response.code, 200)
@@ -171,7 +171,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.fetch("/", method="POST",
                    headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
                             "Correlation-Id": correlation_id,
-                            'sync-async': 'false'},
+                            'wait-for-response': 'false'},
                    body=REQUEST_BODY)
 
         mock_message_id.set.assert_called_with(MOCK_UUID)
@@ -251,7 +251,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         mock_get_uuid.return_value = MOCK_UUID
         response = self.fetch("/", method="POST",
                               headers={"Content-Type": "application/json", "Interaction-Id": INTERACTION_NAME,
-                                       'sync-async': 'false'},
+                                       'wait-for-response': 'false'},
                               body=REQUEST_BODY)
 
         self.assertEqual(response.code, 500)
@@ -276,7 +276,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         # by default if it is not set to anything. So we use urllib here instead to avoid this behaviour and make a
         # HTTP request with no Content-Type.
         request = urllib.request.Request(url=self.get_url("/"), method="POST",
-                                         headers={"Interaction-Id": INTERACTION_NAME, 'sync-async': 'true'})
+                                         headers={"Interaction-Id": INTERACTION_NAME, 'wait-for-response': 'true'})
 
         def perform_request():
             urllib.request.urlopen(request)
@@ -314,7 +314,7 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
         self.assertIn("Invalid JSON request body", response.body.decode())
 
-    def test_handler_updates_store_for_sync_async(self):
+    def test_handler_updates_store_for_wait_for_response(self):
         expected_response = "Hello world!"
         wdo = unittest.mock.MagicMock()
         wdo.set_outbound_status.return_value = test_utilities.awaitable(True)
@@ -324,12 +324,12 @@ class TestSynchronousHandler(BaseHandlerTest):
         self.sync_async_workflow.set_successful_message_response.return_value = test_utilities.awaitable(None)
         self.config_manager.get_interaction_details.return_value = {'sync_async': True, 'workflow': WORKFLOW_NAME}
 
-        self.call_handler(sync_async='true')
+        self.call_handler(wait_for_response='true')
 
         self.sync_async_workflow.set_successful_message_response.assert_called_once_with(wdo)
 
     @patch('outbound.request.synchronous.handler.SynchronousHandler._write_response')
-    def test_handler_updates_store_for_sync_async_failure_response(self, write_mock):
+    def test_handler_updates_store_for_wait_for_response_failure_response(self, write_mock):
         write_mock.side_effect = Exception('Dam the connection was closed')
         expected_response = "Hello world!"
         wdo = unittest.mock.MagicMock()
@@ -341,7 +341,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.config_manager.get_interaction_details.return_value = {'sync_async': True, 'workflow': WORKFLOW_NAME}
 
-        self.call_handler(sync_async='true')
+        self.call_handler(wait_for_response='true')
 
         self.sync_async_workflow.set_failure_message_response.assert_called_once_with(wdo)
 
@@ -356,7 +356,7 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.config_manager.get_interaction_details.return_value = {'sync_async': True, 'workflow': WORKFLOW_NAME}
 
-        response = self.call_handler(sync_async='true')
+        response = self.call_handler(wait_for_response='true')
 
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_called_once()
         self.assertEqual(expected_response.encode(), response.body)
@@ -373,26 +373,26 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
 
-        response = self.call_handler(sync_async='false')
+        response = self.call_handler(wait_for_response='false')
 
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_called_once()
         self.assertEqual(expected_response.encode(), response.body)
         self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
 
-    def test_error_when_no_sync_async_header_present(self):
+    def test_error_when_no_wait_for_response_header_present(self):
         response = self.fetch("/", method="POST",
                               headers={"Interaction-Id": INTERACTION_NAME, "Correlation-Id": CORRELATION_ID},
                               body=REQUEST_BODY)
 
         self.assertEqual(response.code, 400)
         self.assertEqual(CORRELATION_ID, response.headers["Correlation-Id"])
-        self.assertIn("Sync-Async header missing", response.body.decode())
+        self.assertIn("wait-for-response header missing", response.body.decode())
 
-    def test_error_when_sync_async_header_not_interactions(self):
+    def test_error_when_sync_async_not_interactions(self):
         self.config_manager.get_interaction_details.return_value = {'workflow': WORKFLOW_NAME}
 
-        response = self.call_handler(sync_async='true')
+        response = self.call_handler(wait_for_response='true')
 
         self.assertEqual(response.code, 500)
         self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
@@ -408,42 +408,42 @@ class TestSynchronousHandler(BaseHandlerTest):
 
         self.workflow.handle_outbound_message.assert_called_once()
 
-    def test_sync_async_when_interactions_and_header_are_true(self):
+    def test_sync_async_when_interactions_and_wait_for_response_header_are_true(self):
         self.setup_workflows()
 
         self.config_manager.get_interaction_details.return_value = {'sync_async': True, 'workflow': WORKFLOW_NAME}
 
-        self.call_handler(sync_async='true')
+        self.call_handler(wait_for_response='true')
 
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_called_once()
 
-    def test_error_when_interactions_is_false_and_header_is_true(self):
+    def test_error_when_interactions_is_false_and_wait_for_response_header_is_true(self):
         self.setup_workflows()
         self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
 
-        response = self.call_handler(sync_async='true')
+        response = self.call_handler(wait_for_response='true')
 
         self.assertEqual(response.code, 400)
         self.assertEqual(response.headers["Correlation-Id"], CORRELATION_ID)
-        self.assertIn("Message header requested sync-async wrap for a message pattern that does not support sync-async",
+        self.assertIn("Message header requested wait-for-response wrap for a message pattern that does not support sync-async",
                       response.body.decode())
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_not_called()
 
-    def test_not_sync_async_when_interactions_is_true_and_header_is_false(self):
+    def test_not_sync_async_when_interactions_is_true_and_wait_for_response_header_is_false(self):
         self.setup_workflows()
         self.config_manager.get_interaction_details.return_value = {'sync_async': True, 'workflow': WORKFLOW_NAME}
 
-        self.call_handler(sync_async='false')
+        self.call_handler(wait_for_response='false')
 
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_called_once()
 
-    def test_not_sync_async_when_interactions_is_false_header_is_false(self):
+    def test_not_sync_async_when_interactions_is_false_and_wait_for_response_header_is_false(self):
         self.setup_workflows()
         self.config_manager.get_interaction_details.return_value = {'sync_async': False, 'workflow': WORKFLOW_NAME}
 
-        self.call_handler(sync_async='false')
+        self.call_handler(wait_for_response='false')
 
         self.sync_async_workflow.handle_sync_async_outbound_message.assert_not_called()
         self.workflow.handle_outbound_message.assert_called_once()

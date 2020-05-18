@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "73ee271d14afd6165bcc46ac321e0f4b51cf8dda9f157132a4bbb6ed35b32d51"
+            "sha256": "0e43ea7fedb12b679b2789dd7e9b58b450fa4f2ef1dc6e18b94aa0e45c64b5fa"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -118,7 +118,7 @@
         "integration-adaptors-common": {
             "editable": true,
             "git": "https://git@github.com/nhsconnect/integration-adaptor-common.git",
-            "ref": "de798906642b14f48ea3c72bdd118b41a3fd0e1d"
+            "ref": "974a362eef8184eb712385151c0e9fe992fcfa02"
         },
         "isodate": {
             "hashes": [

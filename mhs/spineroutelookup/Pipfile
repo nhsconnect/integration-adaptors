@@ -8,7 +8,7 @@ coverage = "~=4.5"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
-integration-adaptors-common = {editable = true,git = "https://git@github.com/nhsconnect/integration-adaptor-common.git",tag = '0.1.6'}
+integration-adaptors-common = {editable = true,git = "https://git@github.com/nhsconnect/integration-adaptor-common.git",tag = '0.1.7'}
 tornado = "~=6.0"
 defusedxml = "~=0.6"
 ldap3 = "~=2.7"

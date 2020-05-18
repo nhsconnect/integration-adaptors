@@ -81,7 +81,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                                             )
         # Act/Assert: Response should be 202
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01 ', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='COPC_IN000001UK01 ', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_success()
 
@@ -97,7 +97,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01 ', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='COPC_IN000001UK01 ', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_success()
 
@@ -121,7 +121,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -142,7 +142,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -167,7 +167,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01 ', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='COPC_IN000001UK01 ', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -188,7 +188,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01 ', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='COPC_IN000001UK01 ', message_id=message_id, wait_for_response=False) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -202,20 +202,20 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'forward-reliable'
             })
 
-    def test_should_return_information_from_soap_fault_returned_from_spine_in_original_post_request_when_sync_async_requested(self):
+    def test_should_return_information_from_soap_fault_returned_from_spine_in_original_post_request_when_wait_for_response_requested(self):
         """
         Message ID: 3771F30C-A231-4D64-A46C-E7FB0D52C27C configured in fakespine to return a SOAP Fault error.
         Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
 
         Here we use 'PRSC_IN080000UK07' which is an eRS slot polling call, it is a forward reliable message type that
-        can be wrapped in sync-async
+        can be wrapped in wait_for_response
         """
         # Arrange
         message, message_id = build_message('PRSC_IN080000UK07', '9446245796', message_id='3771F30C-A231-4D64-A46C-E7FB0D52C27C')
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='PRSC_IN080000UK07', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='PRSC_IN080000UK07', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -225,7 +225,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .assert_code_context('urn:nhs:names:error:tms') \
             .assert_severity('Error')
 
-    def test_should_update_status_when_a_soap_fault_is_returned_from_spine_and_sync_async_is_requested(self):
+    def test_should_update_status_when_a_soap_fault_is_returned_from_spine_and_wait_for_response_is_requested(self):
         """
         Message ID: 3771F30C-A231-4D64-A46C-E7FB0D52C27C configured in fakespine to return a SOAP Fault error.
         Error found here: fake_spine/fake_spine/configured_responses/soap_fault_single_error.xml
@@ -239,7 +239,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='PRSC_IN080000UK07', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='PRSC_IN080000UK07', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -253,12 +253,12 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                 'WORKFLOW': 'sync-async'
             })
 
-    def test_should_return_information_from_an_ebxml_fault_returned_from_spine_in_original_post_request_when_sync_async_requested(self):
+    def test_should_return_information_from_an_ebxml_fault_returned_from_spine_in_original_post_request_when_wait_for_response_requested(self):
         """
         Message ID: 'A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D' configured in fakespine to return a ebxml fault
 
         Here we use 'PRSC_IN080000UK07' which is an eRS slot polling call, it is a forward reliable message type that
-        can be wrapped in sync-async
+        can be wrapped in wait_for_response
         """
 
         # Arrange
@@ -267,7 +267,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
                                             )
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='PRSC_IN080000UK07 ', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='PRSC_IN080000UK07 ', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -277,13 +277,13 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
             .assert_severity('Error') \
             .assert_error_type('ebxml_error')
 
-    def test_should_update_status_when_a_ebxml_fault_is_returned_from_spine_and_sync_async_is_requested(self):
+    def test_should_update_status_when_a_ebxml_fault_is_returned_from_spine_and_wait_for_response_is_requested(self):
         """
         Message ID: A7D43B03-38FB-4ED7-8D04-0496DBDEDB7D configured in fakespine to return a ebxml Fault error.
         Error found here: fake_spine/fake_spine/configured_responses/ebxml_fault_single_error.xml
 
         Here we use 'PRSC_IN080000UK07' which is an eRS slot polling call, it is a forward reliable message type that
-        can be wrapped in sync-async
+        can be wrapped in wait_for_response
         """
         # Arrange
         message, message_id = build_message('PRSC_IN080000UK07', '9446245796',
@@ -291,7 +291,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Act
         MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='PRSC_IN080000UK07', message_id=message_id, sync_async=True) \
+            .with_headers(interaction_id='PRSC_IN080000UK07', message_id=message_id, wait_for_response=True) \
             .with_body(message) \
             .execute_post_expecting_error_response()
 
@@ -319,7 +319,7 @@ class ForwardReliablesMessagingPatternTests(unittest.TestCase):
 
         # Act
         response = MhsHttpRequestBuilder() \
-            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, sync_async=False) \
+            .with_headers(interaction_id='COPC_IN000001UK01', message_id=message_id, wait_for_response=False) \
             .with_body(message, attachments=attachments) \
             .execute_post_expecting_bad_request_response()
 

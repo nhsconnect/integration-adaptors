@@ -3,8 +3,8 @@
 POST {{BASE_URL}}:{{OUTBOUND-PORT}} HTTP/1.1
 Content-Type: application/json
 Interaction-Id: COPC_IN000001UK01
-sync-async: false
-# This interaction does not allow sync-async
+wait-for-response: false
+# This interaction does not allow wait-for-response set to true
 ods-code: X26
 
 {

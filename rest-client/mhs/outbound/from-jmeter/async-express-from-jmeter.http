@@ -3,7 +3,7 @@
 POST {{BASE_URL}}:{{OUTBOUND-PORT}} HTTP/1.1
 content-type: application/json
 Interaction-Id: QUPC_IN160101UK05
-sync-async: true
+wait-for-response: true
 from-asid: {{ASID}}
 
 {

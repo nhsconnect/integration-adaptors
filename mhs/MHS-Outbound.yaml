@@ -1,0 +1,190 @@
+openapi: 3.0.2
+info:
+  title: MHS Outbound Service API
+  version: 1.0.0
+  description: |
+    ## Summary
+    The MHS Outbound service is responsible for listening for requests from the wider local system context and transmitting these to Spine.
+
+    The MHS adaptor supports a number of patterns. For more information on these patterns then you may find it beneficial to familarise yourself with Spines EIS and in particular, Part 3 - Message Interaction Map.  
+    The [EIS](https://digital.nhs.uk/developer/api-specifications/spine-external-interface-specification) is a complete set of technical documents with the necessary information to connect to the Spine national services via HL7 V3 APIs.
+    
+    For more information about MHS then please visit the NHS Digital Developer portal.
+
+    ## Sync-Async
+    In this pattern, a request is made to Spine, but the response is not provided on the same connection. Instead, spine initiates a connection back to your MHS with the response. 
+    I.e the response from Spine is delivered like a call back to your MHS. The MHS Adaptor has hidden all this asynchronous callback detail behind a synchronous interface, so your HTTP client just sees a simple HTTP request/response. 
+    This is what the MHS Adaptor has termed the "Wait for Response wrapper". When you set the wait-for-response message header to true you are requesting the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the same HTTP connection.
+
+    ## Environments and testing
+    As the MHS adaptor is implemented client side, there are no sandbox or integration environments to test this API directly against.
+
+  contact: 
+    name: Contact Name for the Outbound Service
+    url: 'https://digital.nhs.uk/developer'
+    email: tbc
+servers:
+- url: https://virtserver.swaggerhub.com/petervdm/outbound/1.0.0
+paths:
+  /:
+    post:
+      summary: Make a request to the MHS
+      description: Make a request to the MHS
+      operationId: postMHS
+      parameters:
+      - name: Interaction-Id
+        in: header
+        description: |- 
+          This is the unique ID of the interaction that you want to invoke. e.g. for the SCR PSIS Document List Data Request, the interaction ID is QUPC_IN160101UK05
+          The full list of interation ID's can be found within the [EIS](https://digital.nhs.uk/developer/api-specifications/spine-external-interface-specification) Part 3 Message Interaction Map.             
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: wait-for-response
+        in: header
+        description: |-
+          ### Where Interactions support wait-for-response:
+          When you set the wait-for-response message header to true you are requesting the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the same HTTP connection.
+          When setting to false for an async interaction, the HTTP response will be an acknowledgement that the request was successfully sent to Spine.  The Spine response will subsquently put onto the inbound queue.
+
+          ### Where interactions dont support wait-for-response:
+          This header must be set to false.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - "true"
+          - "false"
+      - name: from-asid
+        in: header
+        description: The ASID of the sending system. This should be the same as the
+          from-asid value within the HL7 payload. This header is optional and only
+          required/used for interactions that use the sync workflow.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Message-Id
+        in: header
+        description: |-
+          Message ID of the message to send to Spine. If not sent, the MHS generates a random message ID.
+          When performing async requests where the response is put on the inbound queue, the message ID will be put with the response on the queue.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Correlation-Id
+        in: header
+        description: |-
+          Correlation ID that is used when logging. If not passed, a random correlation ID is generated. The idea is that log messages produced by the MHS include this correlation ID which allows correlating logs relating to a single request together. 
+          If the supplier system uses it's own correlation ID when producing it's logs, then that should be passed in here, so that logs for a single request can be tied together across the supplier system and the MHS.
+          When performing async requests where the response is put on the inbound queue, the correlation ID will be put with the response on the queue.
+          Note that this correlation ID gets sent to/from Spine.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: ods-code
+        in: header
+        description: ODS Code receiving system. It defaults to Spines ODS Code if
+          not porvided and is primarily used for indirect messaging, i.e. forward
+          reliable for example, where the destination system is not Spine. The ODS
+          Code is used to lookup the constract properties in SDS.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: The HL7 payload (and optional attachments) to be sent to Spine.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBody'
+        required: true
+      responses:
+        "200":
+          description: Successful response from Spine.
+          content:
+            text/xml: {}
+        "202":
+          description: Acknowledgement that we successfully sent the message to Spine
+            (response will come asynchronously on the inbound queue).
+  /healthcheck:
+    get:
+      summary: Healthcheck endpoint
+      description: This endpoint just returns a HTTP 200 response and does no further
+        processing. This endpoint is intended to be used by load balancers/other infrastructure
+        to check that the server is running.
+      operationId: getHealthcheck
+      responses:
+        "200":
+          description: The only response this endpoint returns.
+components:
+  schemas:
+    Attachment:
+      required:
+      - content_type
+      - description
+      - is_base64
+      - payload
+      type: object
+      properties:
+        is_base64:
+          type: boolean
+          description: Whether the attachment payload is base64-encoded or not. This
+            is only required for binary attachments eg images.
+        content_type:
+          type: string
+          description: Content type of the attachment
+          enum:
+          - text/plain
+          - text/html
+          - application/pdf
+          - text/xml
+          - application/xml
+          - text/rtf
+          - audio/basic
+          - audio/mpeg
+          - image/png
+          - image/gif
+          - image/jpeg
+          - image/tiff
+          - video/mpeg
+          - application/msword
+          - application/octet-stream
+        payload:
+          maxLength: 5000000
+          minLength: 1
+          type: string
+          description: The attachment, possibly base64-encoded as per is_base64.
+        description:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Description of the attachment
+    RequestBody:
+      required:
+      - payload
+      type: object
+      properties:
+        attachments:
+          maxItems: 98
+          type: array
+          description: Optional attachments to send with the payload. Only for use
+            for interactions that support sending attachments.
+          items:
+            $ref: '#/components/schemas/Attachment'
+          default: []
+        payload:
+          maxLength: 5000000
+          minLength: 1
+          type: string
+          description: HL7 Payload to send to Spine

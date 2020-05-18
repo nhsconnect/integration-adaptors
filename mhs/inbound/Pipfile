@@ -8,7 +8,7 @@ coverage = "~=4.5"
 unittest-xml-reporting = "~=2.5"
 
 [packages]
-integration-adaptors-common = {editable = true,git = "https://git@github.com/nhsconnect/integration-adaptor-common.git",tag = '0.1.6'}
+integration-adaptors-common = {editable = true,git = "https://git@github.com/nhsconnect/integration-adaptor-common.git",tag = '0.1.7'}
 tornado = "~=6.0"
 mhs-common = {editable = true,path = "./../common"}
 isodate = "~=0.6"

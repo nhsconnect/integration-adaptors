@@ -46,7 +46,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
         MhsHttpRequestBuilder() \
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
-                          sync_async=False,
+                          wait_for_response=False,
                           correlation_id=message_id,
                           ods_code='X26') \
             .with_body(message) \
@@ -71,7 +71,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
         MhsHttpRequestBuilder() \
             .with_headers(interaction_id='COPC_IN000001UK01',
                           message_id=message_id,
-                          sync_async=False,
+                          wait_for_response=False,
                           correlation_id=message_id,
                           ods_code='X26') \
             .with_body(message) \

@@ -252,7 +252,7 @@ font-style: italic;
       <div class="param">Interaction-Id (required)</div>
 
       <div class="param-desc"><span class="param-type">Header Parameter</span> &mdash; ID of the interaction that you want to invoke. e.g. QUPC_IN160101UK05 default: null </div>
-<div class="param">sync-async (required)</div>
+<div class="param">wait-for-response (required)</div>
 
       <div class="param-desc"><span class="param-type">Header Parameter</span> &mdash; <p>If set to true and the interaction ID is for an async interaction that supports sync-async, then the HTTP response will be the response from Spine, and the response will not be put onto the inbound queue.</p>
 <p>If set to false for an async interaction, then the response from Spine will be put onto the inbound queue and the HTTP response will just acknowledge sending the request successfully to Spine.</p>

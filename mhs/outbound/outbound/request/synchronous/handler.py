@@ -36,7 +36,7 @@ class SynchronousHandler(base_handler.BaseHandler):
             schema:
               type: string
             description: ID of the interaction that you want to invoke. e.g. QUPC_IN160101UK05
-          - name: sync-async
+          - name: wait-for-response
             in: header
             required: true
             schema:
@@ -128,7 +128,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         message_id = self._extract_message_id()
         correlation_id = self._extract_correlation_id()
         interaction_id = self._extract_interaction_id()
-        sync_async_header = self._extract_sync_async_header()
+        wait_for_response_header = self._extract_wait_for_response_header()
         from_asid = self._extract_from_asid()
         ods_code = self._extract_ods_code()
 
@@ -143,7 +143,7 @@ class SynchronousHandler(base_handler.BaseHandler):
         interaction_details['ods-code'] = ods_code
         sync_async_interaction_config = self._extract_sync_async_from_interaction_details(interaction_details)
 
-        if self._should_invoke_sync_async_workflow(sync_async_interaction_config, sync_async_header):
+        if self._should_invoke_sync_async_workflow(sync_async_interaction_config, wait_for_response_header):
             await self._invoke_sync_async(from_asid, message_id, correlation_id, interaction_details, body, wf)
         else:
             await self.invoke_default_workflow(from_asid, message_id, correlation_id, interaction_details, body, wf)
@@ -179,15 +179,19 @@ class SynchronousHandler(base_handler.BaseHandler):
                                         reason=f'Invalid request. Validation errors: {validation_errors}') from e
         return parsed_body.payload
 
-    def _extract_sync_async_header(self):
-        sync_async_header = self.request.headers.get(HttpHeaders.SYNC_ASYNC, None)
-        if not sync_async_header:
-            logger.error('Failed to parse sync-async header from message')
-            raise tornado.web.HTTPError(400, 'Sync-Async header missing', reason='Sync-Async header missing')
-        if sync_async_header == 'true':
+    def _extract_wait_for_response_header(self):
+        wait_for_response_header = self.request.headers.get(HttpHeaders.WAIT_FOR_RESPONSE, None)
+        if not wait_for_response_header:
+            logger.error('Failed to parse wait-for-response header from message')
+            raise tornado.web.HTTPError(400, 'wait-for-response header missing',
+                                        reason='wait-for-response header missing')
+        if wait_for_response_header.lower() == 'true':
             return True
-        else:
+        elif wait_for_response_header.lower() == 'false':
             return False
+        else:
+            raise tornado.web.HTTPError(400, 'wait for response should be set to true or false',
+                                        reason=f'wait-for-response is set to {wait_for_response_header}')
 
     def _extract_from_asid(self):
         return self.request.headers.get(HttpHeaders.FROM_ASID, None)
@@ -245,9 +249,9 @@ class SynchronousHandler(base_handler.BaseHandler):
         if interaction_config and sync_async_header:
             return True
         elif (not interaction_config) and sync_async_header:
-            logger.error('Message header requested sync-async wrap for un-supported sync-async')
-            raise tornado.web.HTTPError(400, f'Message header requested sync-async wrap for un-supported sync-async',
-                                        reason='Message header requested sync-async wrap for a message pattern '
+            logger.error('Message header requested wait-for-response wrap for unsupported sync-async')
+            raise tornado.web.HTTPError(400, f'Message header requested wait-for-response wrap for unsupported sync-async',
+                                        reason='Message header requested wait-for-response wrap for a message pattern '
                                                'that does not support sync-async')
         else:
             return False
