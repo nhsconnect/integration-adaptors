@@ -3,9 +3,9 @@ version: '3'
 services:
   inbound:
     image: local/mhs-inbound:${BUILD_TAG}
-    # build:
-    #   context: .
-    #   dockerfile: ./dockers/mhs/inbound/Dockerfile
+    ports:
+      - "443"
+      - "80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SECRET_PARTY_KEY
@@ -24,11 +24,13 @@ services:
       # when connecting to local DynamoDB
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
+      - MHS_INBOUND_USE_SSL=True
+      - TCP_PORTS=443
+      - SERVICE_PORTS=443,80
   outbound:
     image: local/mhs-outbound:${BUILD_TAG}
-    # build:
-    #   context: .
-    #   dockerfile: ./dockers/mhs/outbound/Dockerfile
+    ports:
+      - "80"
     environment:
       - MHS_LOG_LEVEL=NOTSET
       - MHS_SECRET_PARTY_KEY
@@ -48,12 +50,10 @@ services:
       # Note that this endpoint URL is Opentest-specific
       - MHS_FORWARD_RELIABLE_ENDPOINT_URL=https://192.168.128.11/reliablemessaging/forwardreliable
       # This is for disabling hostname validation so OpenTest ip address will work
-      - MHS_OUTBOUND_VALIDATE_CERTIFICATE=${MHS_OUTBOUND_VALIDATE_CERTIFICATE:-True}
+      - MHS_OUTBOUND_VALIDATE_CERTIFICATE=${MHS_OUTBOUND_VALIDATE_CERTIFICATE:-False}
+      - SERVICE_PORTS=80
   route:
     image: local/mhs-route:${BUILD_TAG}
-    # build:
-    #   context: .
-    #   dockerfile: ./dockers/mhs/spineroutelookup/Dockerfile
     ports:
         - "8080:80"
     environment:
@@ -81,21 +81,30 @@ services:
     image: redis
     ports:
       - "6379:6379"
-  fakespine:
-    image: local/fake-spine:${BUILD_TAG}
-    # build:
-    #   context: .
-    #   dockerfile: ./integration-tests/fake_spine/Dockerfile
+
+  inbound-lb:
+    image: dockercloud/haproxy
+    links:
+      - inbound
     ports:
-      - "8443:443"
-      - "8081:80"
+      - "443:443"
+      - "8079:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - FAKE_SPINE_CA_STORE=${FAKE_SPINE_CA_STORE}
-      - FAKE_SPINE_CERTIFICATE=${FAKE_SPINE_CERTIFICATE}
-      - FAKE_SPINE_INBOUND_DELAY_MS=150
-      - FAKE_SPINE_OUTBOUND_DELAY_MS=150
-      - FAKE_SPINE_PRIVATE_KEY=${FAKE_SPINE_PRIVATE_KEY}
-      - INBOUND_SERVER_BASE_URL=${INBOUND_SERVER_BASE_URL}
-      - MHS_SECRET_PARTY_KEY=${MHS_SECRET_PARTY_KEY}
+      - MODE=tcp
+      - TIMEOUT=connect 0, client 0, server 0
+
+  outbound-lb:
+    image: dockercloud/haproxy
+    links:
+      - outbound
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TIMEOUT=connect 0, client 0, server 0
+
 
 
