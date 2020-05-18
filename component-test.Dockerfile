@@ -3,7 +3,7 @@
 FROM python:3.7-slim
 
 RUN apt-get update
-RUN apt-get install -y build-essential libssl-dev swig pkg-config
+RUN apt-get install -y build-essential libssl-dev swig pkg-config git
 RUN pip install pipenv
 
 WORKDIR /test
