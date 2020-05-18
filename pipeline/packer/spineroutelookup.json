@@ -48,7 +48,9 @@
       "inline": [
         "pip install pipenv",
         "cd {{user `app_dir`}}/{{user `spineroutelookup_dir`}}",
-        "pipenv install --deploy --ignore-pipfile"
+        "apt-get install -y git",
+        "pipenv install --deploy --ignore-pipfile",
+        "apt-get purge -y git"
       ]
     }
   ],
