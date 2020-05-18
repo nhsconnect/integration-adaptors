@@ -124,7 +124,7 @@ def main():
                                                   local_cert=secrets.get_secret_config('CLIENT_CERT'),
                                                   ca_certs=secrets.get_secret_config('CA_CERTS'))
 
-    tornado.ioloop.IOLoop.current().spawn_callback(trace_leak, delay=30, top=10, trace=3)
+    tornado.ioloop.IOLoop.current().spawn_callback(trace_leak, delay=300, top=10, trace=3)
 
     party_key = secrets.get_secret_config('PARTY_KEY')
 
