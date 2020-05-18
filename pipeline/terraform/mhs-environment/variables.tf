@@ -261,3 +261,9 @@ variable "dhcp_options_in_use" {
   description = "Which set of DHCP options should be used for this VPC, aws or nhs"
   default = "aws"
 }
+
+variable "integration_test_asid" {
+  type = string
+  description = "ASID used in integration-tests"
+  default = "200000001162"
+}
