@@ -40,7 +40,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='200000001162')
+        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
 
         print('-------------------------- msg: ')
         print(message)
@@ -68,7 +68,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
         # The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.
         # If failures are seen here, it is probably an issue with opentest SDS not being correctly configured for your
         # account
-        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='200000001162')
+        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
 
         print('-------------------------- msg: ')
         print(message)

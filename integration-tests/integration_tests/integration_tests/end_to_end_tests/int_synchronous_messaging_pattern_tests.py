@@ -32,7 +32,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_in_original_post_request_body(self):
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', '9691035456')
+        message, message_id = build_message('QUPA_IN040000UK32', '9689174606')
 
         print('-------------------------- msg: ')
         print(message)
@@ -52,7 +52,7 @@ class SynchronousMessagingPatternTests(TestCase):
 
     def test_should_record_synchronous_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('QUPA_IN040000UK32', '9691035456')
+        message, message_id = build_message('QUPA_IN040000UK32', '9689174606')
 
         print('-------------------------- msg: ')
         print(message)
