@@ -250,6 +250,6 @@ variable "mhs_forward_reliable_endpoint_url" {
 
 variable "lb_deregistration_delay" {
   type = number
-  default = 45
+  default = 300
   description = "How long the LB should wait before removing deregistered members, AWS default is 300 seconds"
 }
