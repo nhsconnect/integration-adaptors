@@ -4,7 +4,7 @@ Provides tests around the Asynchronous Reliable workflow, including sync-async w
 import json
 from unittest import TestCase
 
-from integration_tests.amq.amq import MHS_INBOUND_QUEUE
+from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
@@ -47,10 +47,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('REPC_IN150016UK05', '9691035456')
-
-        print('-------------------------- msg: ')
-        print(message)
+        message, message_id = build_message('REPC_IN150016UK05', '9446245796')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -69,10 +66,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
 
     def test_should_record_asynchronous_reliable_message_status_as_successful(self):
         # Arrange
-        message, message_id = build_message('REPC_IN150016UK05', '9691035456')
-
-        print('-------------------------- msg: ')
-        print(message)
+        message, message_id = build_message('REPC_IN150016UK05', '9446245796')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -96,11 +90,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_and_record_spline_reply_in_resync_table_if_sync_async_requested(self):
         # Arrange
-        messages = [build_message('REPC_IN150016UK05', '9691035456') for i in range(1)]
-
-        print('-------------------------- msgs: ')
-        print(messages[0].message_id)
-        print(messages[0].message)
+        messages = [build_message('REPC_IN150016UK05', '9446245796') for i in range(1)]
 
         # Act
         responses = send_messages_concurrently(messages, interaction_id='REPC_IN150016UK05', sync_async=True)

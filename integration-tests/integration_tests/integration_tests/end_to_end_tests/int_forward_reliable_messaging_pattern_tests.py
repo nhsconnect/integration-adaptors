@@ -3,7 +3,7 @@ Provides tests around the Forward Reliable workflow, including sync-async wrappi
 """
 from unittest import TestCase, skip
 
-from integration_tests.amq.amq import MHS_INBOUND_QUEUE
+from integration_tests.amq.mhs_inbound_queue import MHS_INBOUND_QUEUE
 from integration_tests.amq.amq_message_assertor import AMQMessageAssertor
 from integration_tests.assertors.assert_with_retries import AssertWithRetries
 from integration_tests.dynamo.dynamo import MHS_STATE_TABLE_DYNAMO_WRAPPER, MHS_SYNC_ASYNC_TABLE_DYNAMO_WRAPPER
@@ -40,10 +40,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='200000001162')
-
-        print('-------------------------- msg: ')
-        print(message)
+        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
 
         # Act
         MhsHttpRequestBuilder() \
@@ -68,10 +65,7 @@ class ForwardReliableMessagingPatternTests(TestCase):
         # The to_party_id, and to_asid are fixed values that the forward reliable responder in opentest will respond to.
         # If failures are seen here, it is probably an issue with opentest SDS not being correctly configured for your
         # account
-        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='200000001162')
-
-        print('-------------------------- msg: ')
-        print(message)
+        message, message_id = build_message('COPC_IN000001UK01', to_party_id='X26-9199246', to_asid='918999199246')
 
         # Act
         MhsHttpRequestBuilder() \
