@@ -101,8 +101,6 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
         print('-------------------------- msgs: ')
         print(messages[0].message_id)
         print(messages[0].message)
-        print(messages[1].message_id)
-        print(messages[1].message)
 
         # Act
         responses = send_messages_concurrently(messages, interaction_id='REPC_IN150016UK05', sync_async=True)

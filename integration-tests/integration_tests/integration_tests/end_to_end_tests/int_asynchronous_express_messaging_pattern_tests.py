@@ -74,8 +74,6 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
         print('-------------------------- msgs: ')
         print(messages[0].message_id)
         print(messages[0].message)
-        print(messages[1].message_id)
-        print(messages[1].message)
 
         # Act
         responses = send_messages_concurrently(messages, interaction_id='QUPC_IN160101UK05', sync_async=True)
