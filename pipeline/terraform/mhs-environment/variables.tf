@@ -256,6 +256,6 @@ variable "lb_deregistration_delay" {
 
 variable "healthcheck_threshold" {
   type = number
-  default = 3
+  default = 2
   description = "Retries for confirming target status - healthy or unhealthy, AWS default is 3"
 }
