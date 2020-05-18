@@ -30,4 +30,4 @@ class CommonAssertions(object):
     def hl7_xml_contains_response_code_and_patient_id(self, hl7_xml_message_assertor: Hl7XmlResponseAssertor):
         hl7_xml_message_assertor \
             .assert_element_attribute('.//queryAck//queryResponseCode', 'code', 'OK') \
-            .assert_element_attribute('.//patient//id', 'extension', '9689177923')
+            .assert_element_attribute('.//patient//id', 'extension', '9691035456')
