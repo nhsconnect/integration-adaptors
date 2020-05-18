@@ -218,7 +218,6 @@ pipeline {
                                             -var inbound_queue_name="${MHS_INBOUND_QUEUE_NAME}" \
                                             -var inbound_queue_username_arn=${INBOUND_QUEUE_USERNAME_ARN} \
                                             -var inbound_queue_password_arn=${INBOUND_QUEUE_PASSWORD_ARN} \
-                                            -var integration_test_asid="200000001162" \
                                             -var party_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_PARTY_KEY-FbOTJn \
                                             -var client_cert_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PTL_INT_Endpoint_Cert-AhPyol \
                                             -var client_key_arn=arn:aws:secretsmanager:eu-west-2:067756640211:secret:MHS_PLT_INT_Endpoint_PrivateKey-Fu1jb6 \
@@ -320,6 +319,9 @@ pipeline {
                         }
 
                         stage('Integration Tests') {
+                            environment {
+                                INTEGRATION_TEST_ASID="200000001162"
+                            }
                             steps {
                                 dir('integration-tests/integration_tests') {
                                     sh label: 'Installing integration test dependencies', script: 'pipenv install --dev --deploy --ignore-pipfile'
