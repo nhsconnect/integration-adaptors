@@ -42,7 +42,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_from_spine_to_message_queue(self):
         # Arrange
-        message, message_id = build_message('QUPC_IN160101UK05', '9691035456')
+        message, message_id = build_message('QUPC_IN160101UK05', '9691813343')
 
         print('-------------------------- msg: ')
         print(message)
@@ -69,7 +69,7 @@ class AsynchronousExpressMessagingPatternTests(TestCase):
 
     def test_should_return_successful_response_and_record_spine_reply_in_resync_table_if_sync_async_requested(self):
         # Arrange
-        messages = [build_message('QUPC_IN160101UK05', '9691035456') for _ in range(1)]
+        messages = [build_message('QUPC_IN160101UK05', '9691813343') for _ in range(1)]
 
         print('-------------------------- msgs: ')
         print(messages[0].message_id)
