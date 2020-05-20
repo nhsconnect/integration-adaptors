@@ -8,6 +8,7 @@ import comms.queue_adaptor
 import utilities.integration_adaptors_logger as log
 import utilities.message_utilities as message_utilities
 from exceptions import MaxRetriesExceeded
+from proton import Message
 from retry.retriable_action import RetriableAction
 
 logger = log.IntegrationAdaptorsLogger(__name__)
@@ -26,7 +27,8 @@ class EarlyDisconnectError(RuntimeError):
 class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
     """Proton implementation of a queue adaptor."""
 
-    def __init__(self, urls: List[str], queue: str, username, password, max_retries=0, retry_delay=0, ttl_in_seconds=0) -> None:
+    def __init__(self, urls: List[str], queue: str, username, password, max_retries=0, retry_delay=0,
+                 ttl_in_seconds=0, get_message_callback: (object, None) = None) -> None:
         """
         Construct a Proton implementation of a :class:`QueueAdaptor <comms.queue_adaptor.QueueAdaptor>`.
         The kwargs provided should contain the following information:
@@ -43,6 +45,7 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         self.max_retries = max_retries
         self.retry_delay = retry_delay
         self.ttl_in_seconds = ttl_in_seconds
+        self.get_message_callback = get_message_callback
 
         if self.urls is None or not isinstance(urls, List) or len(urls) == 0:
             raise ValueError("Invalid urls %s", urls)
@@ -65,6 +68,13 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
             await self.__send_with_retries(payload)
         except MaxRetriesExceeded as e:
             raise MessageSendingError() from e
+
+    def wait_for_messages(self):
+        for url in self.urls:
+            if not self.get_message_callback:
+                raise EarlyDisconnectError('No callback specified for message retrieving')
+            messaging_handler = ProtonMessageReceiver(url, self.get_message_callback)
+            proton.reactor.Container(messaging_handler).run()
 
     def __construct_message(self, message: dict, properties: Dict[str, Any] = None) -> proton.Message:
         """
@@ -111,8 +121,8 @@ class ProtonQueueAdaptor(comms.queue_adaptor.QueueAdaptor):
         result = await RetriableAction(
             lambda: self.__try_sending_to_all_in_sequence(message),
             self.max_retries,
-            self.retry_delay)\
-            .with_retriable_exception_check(lambda ex: isinstance(ex, EarlyDisconnectError))\
+            self.retry_delay) \
+            .with_retriable_exception_check(lambda ex: isinstance(ex, EarlyDisconnectError)) \
             .execute()
 
         if not result.is_successful:
@@ -232,3 +242,23 @@ class ProtonMessagingHandler(proton.handlers.MessagingHandler):
                      fparams={'url': event.connection.connected_address, 'remote_condition': event.context.remote_condition})
         super().on_link_error(event)
         raise EarlyDisconnectError()
+
+
+class ProtonMessageReceiver(proton.handlers.MessagingHandler):
+
+    def __init__(self, url, callback):
+        super(ProtonMessageReceiver, self).__init__()
+        self.url = url
+        self.callback = callback
+
+    def on_start(self, event):
+        event.container.listen(self.url)
+
+    def on_message(self, event) -> Message:
+        message = event.message
+        self.callback(message)
+        print(f'Received message is: {message.body}')
+        # event.receiver.accept()
+        event.receiver.close()
+        event.connection.close()
+        return message

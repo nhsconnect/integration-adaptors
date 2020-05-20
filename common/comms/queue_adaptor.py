@@ -14,3 +14,7 @@ class QueueAdaptor(abc.ABC):
         :param properties: Optional additional properties to send with the message.
         """
         pass
+
+    @abc.abstractmethod
+    async def wait_for_messages(self):
+         pass
