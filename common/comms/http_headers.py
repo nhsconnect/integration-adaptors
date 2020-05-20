@@ -5,5 +5,5 @@ class HttpHeaders:
     INTERACTION_ID = "Interaction-Id"
     INBOUND_MESSAGE_ID = "Inbound-Message-Id"
     FROM_ASID = "from-asid"
-    SYNC_ASYNC = "sync-async"
+    WAIT_FOR_RESPONSE = "wait-for-response"
     ODS_CODE = "ods-code"

@@ -23,7 +23,7 @@
 						"type": "text"
 					},
 					{
-						"key": "sync-async",
+						"key": "wait-for-response",
 						"value": "true",
 						"type": "text"
 					},
@@ -44,7 +44,7 @@
 						"localhost"
 					]
 				},
-				"description": "The Asynchronous Express Messaging Pattern is one of the Spine messaging patterns which is defined in the Spine External Interface Specification. In this pattern, a request is made to Spine, but the response is not provided on the same connection. Instead, spine initiates a connection back to your MHS with the response. I.e the response from Spine is delivered like a call back to your MHS.\nThe MHS Adaptor has hidden all this asynchronous callback detail behind a synchronous interface, so your HTTP client just sees a simple HTTP request/response. This is what the MHS Adpator has termed the Sync-Async wrapper. When you set the sync-async  message header you are requesting the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the same hTTP connection.\n\nIn this example, the QUPC_IN160101UK05 Spine message is used. This Spine message is used when requesting the Summary Care Record of a patient.\n\nBefore sending this request, you will amend the details of the request as follows:\n - Set the `from-asid` message header to the ASID of your spine endpoint, as provided to you by NHS Digital\n - In the Body, replace two instances of the string `FROM_ASID` with the ASID of your spine endpoint as above.\n - Set the URL to the address of the MHS Adaptor API in your environment."
+				"description": "The Asynchronous Express Messaging Pattern is one of the Spine messaging patterns which is defined in the Spine External Interface Specification. In this pattern, a request is made to Spine, but the response is not provided on the same connection. Instead, spine initiates a connection back to your MHS with the response. I.e the response from Spine is delivered like a call back to your MHS.\nThe MHS Adaptor has hidden all this asynchronous callback detail behind a synchronous interface, so your HTTP client just sees a simple HTTP request/response. This is what the MHS Adpator has termed the Sync-Async wrapper. When you set the wait-for-response message header you are requesting the MHS Adaptor to hide this asynchronous response from you, and deliver the response in the same hTTP connection.\n\nIn this example, the QUPC_IN160101UK05 Spine message is used. This Spine message is used when requesting the Summary Care Record of a patient.\n\nBefore sending this request, you will amend the details of the request as follows:\n - Set the `from-asid` message header to the ASID of your spine endpoint, as provided to you by NHS Digital\n - In the Body, replace two instances of the string `FROM_ASID` with the ASID of your spine endpoint as above.\n - Set the URL to the address of the MHS Adaptor API in your environment."
 			},
 			"response": []
 		},
@@ -65,7 +65,7 @@
 						"value": "QUPC_IN160101UK05"
 					},
 					{
-						"key": "sync-async",
+						"key": "wait-for-response",
 						"type": "text",
 						"value": "False"
 					},
@@ -86,7 +86,7 @@
 						"localhost"
 					]
 				},
-				"description": "This illustrates the same Spine message, QUPC_IN160101UK05 Spine message as described with the 'Async Express Pattern Message  - Synchronous Response' API call. \n\nHowever, in this instance, the client has requested that the response from Spine be delivered asynchronously, not in the same HTTP connection. This does not hide the complexity of the asynchronous reposnse from Spine from you, and you will therefore need to implement a message queue where responses are delivered, along with the associated queue worker(s) responsible for reading messages from this queue. These workers would need to correlate the original request with the response.\n\nIn this example therefore, the HTTP header `sync-async` is set to `false`\n\nBefore sending this request, you will amend the details of the request as follows:\n - Set the `from-asid` message header to the ASID of your spine endpoint, as provided to you by NHS Digital\n - In the Body, replace two instances of the string `FROM_ASID` with the ASID of your spine endpoint as above.\n - Set the URL to the address of the MHS Adaptor API in your environment."
+				"description": "This illustrates the same Spine message, QUPC_IN160101UK05 Spine message as described with the 'Async Express Pattern Message  - Synchronous Response' API call. \n\nHowever, in this instance, the client has requested that the response from Spine be delivered asynchronously, not in the same HTTP connection. This does not hide the complexity of the asynchronous reposnse from Spine from you, and you will therefore need to implement a message queue where responses are delivered, along with the associated queue worker(s) responsible for reading messages from this queue. These workers would need to correlate the original request with the response.\n\nIn this example therefore, the HTTP header `wait-for-response` is set to `false`\n\nBefore sending this request, you will amend the details of the request as follows:\n - Set the `from-asid` message header to the ASID of your spine endpoint, as provided to you by NHS Digital\n - In the Body, replace two instances of the string `FROM_ASID` with the ASID of your spine endpoint as above.\n - Set the URL to the address of the MHS Adaptor API in your environment."
 			},
 			"response": []
 		}

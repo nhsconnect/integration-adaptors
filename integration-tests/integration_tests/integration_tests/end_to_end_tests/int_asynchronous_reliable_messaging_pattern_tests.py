@@ -53,7 +53,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
         MhsHttpRequestBuilder() \
             .with_headers(interaction_id='REPC_IN150016UK05',
                           message_id=message_id,
-                          sync_async=False,
+                          wait_for_response=False,
                           correlation_id='1') \
             .with_body(message) \
             .execute_post_expecting_success()
@@ -72,7 +72,7 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
         MhsHttpRequestBuilder() \
             .with_headers(interaction_id='REPC_IN150016UK05',
                           message_id=message_id,
-                          sync_async=False,
+                          wait_for_response=False,
                           correlation_id='1') \
             .with_body(message) \
             .execute_post_expecting_success()
@@ -88,19 +88,15 @@ class AsynchronousReliableMessagingPatternTests(TestCase):
         dynamo_assertor = MhsTableStateAssertor(MHS_STATE_TABLE_WRAPPER.get_all_records_in_table())
         self.assertions.message_status_recorded_as_successfully_processed(dynamo_assertor, message_id)
 
-    def test_should_return_successful_response_and_record_spline_reply_in_resync_table_if_sync_async_requested(self):
+    def test_should_return_successful_response_and_record_spline_reply_in_resync_table_if_wait_for_response_requested(self):
         # Arrange
         messages = [build_message('REPC_IN150016UK05', '9446245796') for i in range(1)]
 
         # Act
-        responses = send_messages_concurrently(messages, interaction_id='REPC_IN150016UK05', sync_async=True)
+        responses = send_messages_concurrently(messages, interaction_id='REPC_IN150016UK05', wait_for_response=True)
 
         # Assert
         all_sync_async_states = MHS_SYNC_ASYNC_TABLE_WRAPPER.get_all_records_in_table()
-        if has_errors(responses):
-            # TODO: NIAD-72 remove prints and has_errors once sync-async feature is stable
-            print('--- mhs-sync-async-state table ---')
-            print(json.dumps(all_sync_async_states, indent=2))
         assert_all_messages_succeeded(responses)
         sync_async_state_assertor = SyncAsyncMhsTableStateAssertor(all_sync_async_states)
         for message, message_id in messages:

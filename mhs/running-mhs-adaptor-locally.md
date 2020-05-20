@@ -9,17 +9,14 @@ It may be useful to run these adaptors in a local environment. The following is 
     - [Python 3](https://www.python.org/downloads/)
     - [Pipenv](https://pipenv.kennethreitz.org/en/latest/install/#pragmatic-installation-of-pipenv)
     - git bash (to run .sh files below)
-* Run the `./build.sh` script found in the top level directory of this project. This will build the follwoing docker containers which 
+* Set up Environment variable:
+`export BUILD_TAG='latest'`
+* Run the `./build.sh` script found in the top level directory of this project. This will build the following docker containers which 
 are required to run the MHS Adaptor locally. 
     - Inbound service (An HTTP endpoint which spine communicates request back to you on)
     - Outbound service (An HTTP endpoint which you submit requests for spine on)
     - Routing service (An HTTP endpoint which the Outbound service uses internally to get routing and reliability information from spine)
     - SCR Adaptor (An HTTP endpoint which can be used to simplify Summary Care Record interactions, and call the MHS adaptor for you)
-
-* Run `docker-compose build`. This will build all the additional containers:
-    - DynamoDB and MongoDB local instance (to hold internal state of the MHS Adaptor) - both are created but only one is used by the app (env cfg)
-    - Redis (to cache routing and reliability info)
-    - RabbitMQ (to drop asynchronous responses from spine onto a queue)
     
  * Set up Environment variables. The environment variables `MHS_SECRET_PARTY_KEY`, `MHS_SECRET_CLIENT_CERT`, `MHS_SECRET_CLIENT_KEY` and `MHS_SECRET_CA_CERTS` need to
   be set when running this command. These variables should be set as described [here](mhs-adaptor-dev-notes.md#environment-variables). 
