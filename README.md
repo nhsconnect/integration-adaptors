@@ -1,3 +1,12 @@
+# THIS REPOSITORY IS NO LONGER MAINTAINED
+Here are the new repositories with service separation:
+
+https://github.com/nhsconnect/integration-adaptor-common
+https://github.com/nhsconnect/integration-adaptor-mhs
+https://github.com/nhsconnect/integration-adaptor-nhais
+
+
+
 # National Integration Adaptors
 
 This repository contains adaptors which accelerate integration with national NHS systems.
