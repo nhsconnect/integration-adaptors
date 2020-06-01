@@ -1,0 +1,16 @@
+[
+  {
+    "name": "${container_name}",
+    "image": "${image}",
+    "essential": "${essential}",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group":  "${aws_log_group}",
+        "awslogs-region": "${aws_log_region}",
+        "awslogs-stream-prefix": "${aws_log_stream_prefix}",
+        "awslogs-datetime-format": "${aws_log_datetime_format}"
+      }
+    }
+  }
+]
