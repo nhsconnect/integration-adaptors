@@ -15,27 +15,29 @@ pipeline {
     choice (name: "Component",   choices: ['base', 'nhais', 'account'],                           description: "Choose component")
     choice (name: "Action",      choices: ['plan', 'apply', 'plan-destroy', 'destroy'],           description: "Choose Terraform action")
     string (name: "Variables",   defaultValue: "",                                                description: "Terrafrom variables, format: variable1=value,variable2=value, no spaces")
-    string (name: "Git_Branch",  defaultValue: "develop",                    description: "Git branch")
-    string (name: "Git_Repo",    defaultValue: "https://github.com/nhsconnect/integration-adaptor-nhais.git", description: "Git Repo to clone")
+    string (name: "Git_Branch",  defaultValue: "feature/NIAD-119-terraform-for-NHAIS",            description: "Git branch from which TF will be taken")
+    string (name: "Git_Repo",    defaultValue: "https://github.com/nhsconnect/integration-adaptors.git", description: "Git Repo with TF Code")
   }
 
   stages {
     stage("Clone the repository") {
       steps {
-        git (branch: params.Git_Branch, url: params.Git_Repo)
-        script {
+        dir ("integration-adaptors") {
+          git (branch: params.Git_Branch, url: params.Git_Repo)
+          script {
           //println(sh(label: "Check the directory contents", script: "ls -laR", returnStdout: true))
           //String buildUser = ""
           // wrap([$class: 'BuildUser']) { buildUser = env.BUILD_USER } //TODO install build user vars plugin
           currentBuild.description = "TF: ${params.Action} | env: ${params.Environment} | cmp: ${params.Component}"
           //println("TODO Clone the branch from Git_Branch")
-        } // script
+          } // script
+        } // dir integration-adaptors
       }  // steps
     } // stage Clone
 
     stage("Terraform Plan") {
       steps {
-        dir("terraform/aws") {
+        dir("integration-adaptors/terraform/aws") {
           script {
             // prepare variables map
             Map<String, String> variablesMap = [:]
@@ -63,9 +65,9 @@ pipeline {
         }
       }
       steps {
-        dir("terraform/aws") {
+        dir("integration-adaptors/terraform/aws") {
           script {
-            if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap) !=0 ) { error("Terraform Plan failed")}
+            if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap) !=0 ) { error("Terraform Apply failed")}
           } // script
         } //dir terraform/aws
       } // steps
@@ -74,7 +76,7 @@ pipeline {
 } // pipeline
 
 int terraformInit(String tfStateBucket, String project, String environment, String component, String region) {
-  println("Terraform Init for Environment: ${environment} Component: ${Component} in region: ${region} using bucket: ${tfStateBucket}")
+  println("Terraform Init for Environment: ${environment} Component: ${component} in region: ${region} using bucket: ${tfStateBucket}")
   String command = "terraform init -backend-config='bucket=${tfStateBucket}' -backend-config='region=${region}' -backend-config='key=${project}-${environment}-${component}.tfstate' -input=false -no-color"
   dir("components/${component}") {
     return( sh( label: "Terraform Init", script: command, returnStatus: true))
