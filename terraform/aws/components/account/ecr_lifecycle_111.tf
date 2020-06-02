@@ -1,4 +1,4 @@
-resource "aws_ecr_lifecycle_policy" ecr_policy_111" {
+resource "aws_ecr_lifecycle_policy" "ecr_policy_111" {
   repository = aws_ecr_repository.ecr_repository_111.name 
   policy = jsonencode(
     {
