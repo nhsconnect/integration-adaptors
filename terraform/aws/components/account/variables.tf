@@ -28,3 +28,8 @@ variable "nhais_ecr_repository_name" {
   type = string
   description = "Name for NHAIS ECR repository"
 }
+
+variable "ecr_repository_name_111" {
+  type = string
+  description = "Name for 111 ECR repository"
+}
