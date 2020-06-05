@@ -36,6 +36,9 @@ pipeline {
     } // stage Clone
 
     stage("Terraform Plan") {
+      options {
+        lock("${params.Project}-${params.Environment}-${params.Component}")
+      }
       steps {
         dir("integration-adaptors/terraform/aws") {
           script {
@@ -63,6 +66,9 @@ pipeline {
         expression {
           params.Action == "apply" || params.Action == "destroy"
         }
+      }
+      options {
+        lock("${params.Project}-${params.Environment}-${params.Component}")
       }
       steps {
         dir("integration-adaptors/terraform/aws") {

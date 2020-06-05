@@ -1,3 +1,8 @@
+variable "account_id" {
+  type = string
+  description = "ID of AWS Account on which the resources are created"
+}
+
 variable "project" {
   type = string
   description = "Name of the project where this code is used"
@@ -11,7 +16,7 @@ variable "environment" {
 variable "component" {
   type = string
   description = "Name of the component"
-  default = "account"
+  default = "111"
 }
 
 variable "region" {
@@ -19,17 +24,16 @@ variable "region" {
   description = "Region where the resources will be created"
 }
 
+variable "base_cidr_block" {
+  type = string
+  description = "CIDR block to use for VPC"
+}
+
 variable "tf_state_bucket" {
   type = string
   description = "Name of S3 bucket with TF state of components"
 }
-
-# variable "nhais_ecr_repository_name" {
-#   type = string
-#   description = "Name for NHAIS ECR repository"
-# }
-
-variable "ecr_repository_name_111" {
+variable "build_id" {
   type = string
-  description = "Name for 111 ECR repository"
+  description = "Number of the current build, used for tagging the logs"
 }
