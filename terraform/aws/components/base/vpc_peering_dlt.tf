@@ -69,3 +69,8 @@ resource "aws_security_group_rule" "mhs_inbound_security_group_amazon_dlt_egress
     data.aws_vpc.dlt_vpc.cidr_block]
   description = "Allow outbound requests to Outbound tasks"
 }
+# Allow DNS resolution of the domain names defined in route53.tf in the DLT VPC
+resource "aws_route53_zone_association" "DLT_hosted_zone_mhs_vpc_association" {
+  zone_id = aws_route53_zone.mhs_hosted_zone.zone_id
+  vpc_id = data.aws_vpc.dlt_vpc.id
+}
