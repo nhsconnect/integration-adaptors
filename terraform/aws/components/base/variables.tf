@@ -45,6 +45,11 @@ variable "dlt_vpc_id" {
   description = "VPC where Distributed Load testing environment is hosted"
 }
 
+variable "second_dlt_route" {
+  type = string
+  description = "As the DLT has two route tables, this is the ID from the second route table which will be stated in Global.tfvars"
+}
+
 variable "enable_internet_access" {
   type = bool
   description = "Enables internet access from private subnets by adding a route table to NAT Gateway"
