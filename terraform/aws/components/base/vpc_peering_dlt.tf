@@ -31,7 +31,7 @@ resource "aws_route" "dlt_to_base_route" {
 
 # Add route to the NHAIS VPC from the second DLT route table
 resource "aws_route" "nhais_to_dlt_route" {
-  route_table_id = data.aws_vpc.dlt_vpc.second_dlt_route
+  route_table_id = data.aws_vpc.dlt_vpc.second_dlt_route_id
   destination_cidr_block = aws_vpc.base_vpc.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.dlt_peering.id
   depends_on = [aws_vpc_peering_connection.dlt_peering]
