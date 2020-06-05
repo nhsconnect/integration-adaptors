@@ -21,7 +21,7 @@ resource "aws_vpc_peering_connection" "dlt_peering" {
   })
 }
 
-# Add a route to the MHS VPC in the supplier VPC route table
+# Add a route to the NHAIS VPC in the DLT VPC route table
 resource "aws_route" "dlt_to_base_route" {
   route_table_id = data.aws_vpc.dlt_vpc.main_route_table_id
   destination_cidr_block = aws_vpc.base_vpc.cidr_block
