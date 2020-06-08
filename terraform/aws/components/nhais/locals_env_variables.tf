@@ -28,13 +28,25 @@ locals {
       name = "NHAIS_MONGO_DATABASE_NAME"
       value = "nhais"
     },
-    {
-      name = "NHAIS_MONGO_URI"
-      value = "mongodb://${var.docdb_master_user}:${var.docdb_master_password}@${aws_docdb_cluster.nhais_db_cluster.endpoint}:${aws_docdb_cluster_instance.nhais_db_instance[0].port}"
-    },
+    # {
+    #   name = "NHAIS_MONGO_URI"
+    #   value = "mongodb://${var.docdb_master_user}:${var.docdb_master_password}@${aws_docdb_cluster.nhais_db_cluster.endpoint}:${aws_docdb_cluster_instance.nhais_db_instance[0].port}"
+    # },
     {
       name  = "NHAIS_LOG_LEVEL"
       value = var.nhais_log_level
+    },
+    {
+      name = "NHAIS_MONGO_HOST"
+      value = "mongodb://${aws_docdb_cluster.nhais_db_cluster.endpoint}"
+    },
+    {
+      name = "NHAIS_MONGO_PORT"
+      value = "${aws_docdb_cluster_instance.nhais_db_instance[0].port}"
+    },
+    {
+      name = "NHAIS_MONGO_OPTIONS"
+      value = var.mongo_options
     },
     {
       name = "NHAIS_MONGO_USERNAME"
