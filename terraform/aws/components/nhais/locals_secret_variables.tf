@@ -10,11 +10,11 @@ locals {
     },
     {
       name = "NHAIS_MONGO_USERNAME"
-      valueFrom = data.aws_secretsmanager_secret.docdb-master-username.arn
+      valueFrom = data.aws_secretsmanager_secret.docdb_master_username.arn
     },
     {
       name = "NHAIS_MONGO_PASSWORD"
-      valueFrom = data.aws_secretsmanager_secret.docdb-master-password.arn
+      valueFrom = data.aws_secretsmanager_secret.docdb_master_password.arn
     }
   ]
 }

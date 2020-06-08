@@ -6,10 +6,10 @@ data "aws_secretsmanager_secret" "mq_password" {
   name = "amazon-mq-inbound-queue-password"
 }
 
-data "aws_secretsmanager_secret" "docdb-master-username" {
-  name = "docdb_master_username"
+data "aws_secretsmanager_secret" "docdb_master_username" {
+  name = "docdb-master-username"
 }
 
-data "aws_secretsmanager_secret" "docdb-master-password" {
-  name = "docdb_master_password"
+data "aws_secretsmanager_secret" "docdb_master_password" {
+  name = "docdb-master-password"
 }
