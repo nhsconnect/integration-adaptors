@@ -37,7 +37,7 @@ resource "aws_route" "nhais_to_dlt_route" {
   depends_on = [aws_vpc_peering_connection.dlt_peering]
 }
 
-# Add a route to the supplier VPC in the MHS VPC route table
+# Add a route to the DLT VPC in the NHAIS VPC route table
 resource "aws_route" "base_to_dlt_route" {
   route_table_id = aws_route_table.private.id
   destination_cidr_block = data.aws_vpc.dlt_vpc.cidr_block
