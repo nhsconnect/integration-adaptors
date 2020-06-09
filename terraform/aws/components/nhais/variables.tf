@@ -154,3 +154,7 @@ variable "nhais_service_target_request_count" {
   description = "The target number of requests per minute that an service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
   default = 1200
 }
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC where Distributed Load testing environment is hosted"
+}
