@@ -37,15 +37,22 @@ resource "aws_route" "base_to_mq_route" {
   depends_on = [aws_vpc_peering_connection.mq_peering]
 }
 
-resource "aws_security_group_rule" "mhs_inbound_security_group_amazon_mq_egress_rule" {
+resource "aws_security_group_rule" "base_core_to_mq" {
   security_group_id = aws_security_group.core_sg.id
   type = "egress"
   from_port = 5671
   to_port = 5671
   protocol = "tcp"
-  # Not making any assumptions here about the internal structure of the supplier VPC.
-  # This can be changed and made more specific to lock this down more.
-  cidr_blocks = [
-    data.aws_vpc.mq_vpc.cidr_block]
-  description = "Allow outbound requests to Amazon MQ inbound queue"
+  source_security_group_id = var.mq_sg_id
+  description = "Allow requests to Amazon MQ inbound queue"
+}
+
+resource "aws_security_group_rule" "mq_from_base_core" {
+  source_security_group_id = aws_security_group.core_sg.id
+  type = "ingress"
+  from_port = 5671
+  to_port = 5671
+  protocol = "tcp"
+  security_group_id = var.mq_sg_id
+  description = "Allow AMQP from ${var.environment} env"
 }
