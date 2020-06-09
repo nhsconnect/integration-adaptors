@@ -84,13 +84,17 @@ variable "environment_variables" {
 variable "docdb_master_user" {
   type = string
   description = "Username for Document DB master user"
-  default = "master_user"
 }
 
 variable "docdb_master_password" {
   type = string
   description = "Password for Document DB master user"
-  default = "ChangeMe"
+}
+
+variable "mongo_options" {
+  type = string
+  description = "Options for Mongo"
+  default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 }
 
 variable "nhais_log_level" {
