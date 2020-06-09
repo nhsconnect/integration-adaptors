@@ -4,7 +4,7 @@ data "aws_vpc" "dlt_vpc" {
   id = var.dlt_vpc_id
 }
 
-# DLT traffic - From the Distributed load tested to the load balancer
+# DLT traffic - From the Distributed load tester to the load balancer
 
 resource "aws_security_group_rule" "dlt_ingress_rule_to_loadbalancer" {
   security_group_id = aws_security_group.service_lb_sg.id
@@ -29,5 +29,5 @@ resource "aws_security_group_rule" "dlt_ingress_rule_to_service" {
   # This can be changed and made more specific to lock this down more.
   cidr_blocks = [
     data.aws_vpc.dlt_vpc.cidr_block]
-  description = "Allow inbound requests from DLT"
+  description = "Allow inbound requests from DLT to service"
 }
