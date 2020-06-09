@@ -47,8 +47,8 @@ resource "aws_route" "base_to_dlt_route" {
 resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_ingress_rule" {
   security_group_id = aws_security_group.core_sg.id
   type = "ingress"
-  from_port = 443
-  to_port = 443
+  from_port = 80
+  to_port = 80
   protocol = "tcp"
   # Not making any assumptions here about the internal structure of the DLT VPC.
   # This can be changed and made more specific to lock this down more.
