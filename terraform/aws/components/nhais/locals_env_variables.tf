@@ -44,13 +44,5 @@ locals {
       name = "NHAIS_MONGO_OPTIONS"
       value = var.mongo_options
     }
-    # {
-    #   name = "NHAIS_MONGO_USERNAME"
-    #   value = var.docdb_master_user
-    # },
-    # {
-    #   name = "NHAIS_MONGO_PASSWORD"
-    #   value = var.docdb_master_password
-    # }
   ])
 }
