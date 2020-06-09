@@ -50,7 +50,7 @@ resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_ingr
   from_port = 443
   to_port = 443
   protocol = "tcp"
-  # Not making any assumptions here about the internal structure of the supplier VPC.
+  # Not making any assumptions here about the internal structure of the DLT VPC.
   # This can be changed and made more specific to lock this down more.
   cidr_blocks = [
     data.aws_vpc.dlt_vpc.cidr_block]
@@ -63,7 +63,7 @@ resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_egre
   from_port = 80
   to_port = 80
   protocol = "tcp"
-  # Not making any assumptions here about the internal structure of the supplier VPC.
+  # Not making any assumptions here about the internal structure of the DLT VPC.
   # This can be changed and made more specific to lock this down more.
   cidr_blocks = [
     data.aws_vpc.dlt_vpc.cidr_block]
