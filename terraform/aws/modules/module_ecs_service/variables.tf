@@ -253,3 +253,7 @@ variable "lb_allowed_cidrs" {
   description = "List of CIDRs that will be allowed to access the Load Balancer"
   default = []
 }
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC where Distributed Load testing environment is hosted"
+}
