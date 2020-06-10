@@ -57,18 +57,18 @@ resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_ingr
   description = "Allow inbound requests to nhais tasks"
 }
 
-# resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_egress_rule" {
-#   security_group_id = aws_security_group.core_sg.id
-#   type = "egress"
-#   from_port = 80
-#   to_port = 80
-#   protocol = "tcp"
-#   # Not making any assumptions here about the internal structure of the DLT VPC.
-#   # This can be changed and made more specific to lock this down more.
-#   cidr_blocks = [
-#     data.aws_vpc.dlt_vpc.cidr_block]
-#   description = "Allow outbound requests to Outbound tasks"
-# }
+resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_egress_rule" {
+  security_group_id = aws_security_group.core_sg.id
+  type = "egress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  # Not making any assumptions here about the internal structure of the DLT VPC.
+  # This can be changed and made more specific to lock this down more.
+  cidr_blocks = [
+    data.aws_vpc.dlt_vpc.cidr_block]
+  description = "Allow outbound requests to Outbound tasks"
+}
 # Allow DNS resolution of the domain names defined in route53.tf in the DLT VPC
 resource "aws_route53_zone_association" "DLT_hosted_zone_nhais_vpc_association" {
   zone_id = aws_route53_zone.base_zone.zone_id
