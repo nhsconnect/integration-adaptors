@@ -9,8 +9,8 @@ data "aws_vpc" "dlt_vpc" {
 resource "aws_security_group_rule" "dlt_ingress_rule_to_loadbalancer" {
   security_group_id = aws_security_group.service_lb_sg.id
   type = "ingress"
-  from_port = var.nhais_service_application_port
-  to_port = var.nhais_service_application_port
+  from_port = var.application_port
+  to_port = var.application_port
   protocol = var.container_protocol
   # Not making any assumptions here about the internal structure of the DLT VPC.
   # This can be changed and made more specific to lock this down more.
@@ -22,8 +22,8 @@ resource "aws_security_group_rule" "dlt_ingress_rule_to_loadbalancer" {
 resource "aws_security_group_rule" "dlt_ingress_rule_to_service" {
   security_group_id = aws_security_group.service_sg.id
   type = "ingress"
-  from_port = var.nhais_service_application_port
-  to_port = var.nhais_service_application_port
+  from_port = var.application_port
+  to_port = var.application_port
   protocol = var.container_protocol
   # Not making any assumptions here about the internal structure of the DLT VPC.
   # This can be changed and made more specific to lock this down more.
