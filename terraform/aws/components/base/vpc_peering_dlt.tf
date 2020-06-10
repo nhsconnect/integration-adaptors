@@ -44,18 +44,18 @@ resource "aws_route" "base_to_dlt_route" {
   vpc_peering_connection_id = aws_vpc_peering_connection.dlt_peering.id
   depends_on = [aws_vpc_peering_connection.dlt_peering]
 }
-# resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_ingress_rule" {
-#   security_group_id = aws_security_group.core_sg.id
-#   type = "ingress"
-#   from_port = 80
-#   to_port = 80
-#   protocol = "tcp"
-#   # Not making any assumptions here about the internal structure of the DLT VPC.
-#   # This can be changed and made more specific to lock this down more.
-#   cidr_blocks = [
-#     data.aws_vpc.dlt_vpc.cidr_block]
-#   description = "Allow inbound requests to nhais tasks"
-# }
+resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_ingress_rule" {
+  security_group_id = aws_security_group.core_sg.id
+  type = "ingress"
+  from_port = 80
+  to_port = 80
+  protocol = "tcp"
+  # Not making any assumptions here about the internal structure of the DLT VPC.
+  # This can be changed and made more specific to lock this down more.
+  cidr_blocks = [
+    data.aws_vpc.dlt_vpc.cidr_block]
+  description = "Allow inbound requests to nhais tasks"
+}
 
 # resource "aws_security_group_rule" "nhais_inbound_security_group_amazon_dlt_egress_rule" {
 #   security_group_id = aws_security_group.core_sg.id
