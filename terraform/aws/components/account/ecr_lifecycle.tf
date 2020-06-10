@@ -1,5 +1,6 @@
-resource "aws_ecr_lifecycle_policy" "ecr_policy_111" {
-  repository = aws_ecr_repository.ecr_repository_111.name 
+resource "aws_ecr_lifecycle_policy" "ecr_policy" {
+  count = length(var.ecr_repositories)
+  repository = aws_ecr_repository.ecr_repository[count.index].name
   policy = jsonencode(
     {
       rules = [
@@ -11,7 +12,7 @@ resource "aws_ecr_lifecycle_policy" "ecr_policy_111" {
             tagPrefixList = ["PR"]
             countType = "sinceImagePushed"
             countUnit = "days"
-            countNumber = 14
+            countNumber = var.ecr_repositories[count.index].expire_PR_after
           }
           action = {
             type = "expire"
@@ -22,15 +23,14 @@ resource "aws_ecr_lifecycle_policy" "ecr_policy_111" {
           description = "Keep last 10 master images"
           selection = {
             tagStatus = "tagged"
-            tagPrefixList = ["master"]
+            tagPrefixList = [var.ecr_repositories[count.index].prefix_to_keep]
             countType = "imageCountMoreThan"
-            countNumber = 10
+            countNumber = var.ecr_repositories[count.index].number_to_keep
           }
           action = {
             type = "expire"
           }
         }
-
       ]
     }
   )

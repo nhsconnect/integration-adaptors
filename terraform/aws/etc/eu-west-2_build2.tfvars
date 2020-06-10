@@ -1,8 +1,8 @@
 
 # Common setting for entire Env - "base" component
-environment = "build1"
-base_cidr_block = "10.11.0.0/16"
-cluster_container_insights = "enabled"
+environment = "build2"
+base_cidr_block = "10.15.0.0/16"
+cluster_container_insights = "disabled"
 docdb_instance_class = "db.r5.large"
 
 # Settings for "nhais" component
