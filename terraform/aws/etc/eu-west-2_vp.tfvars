@@ -9,5 +9,5 @@ nhais_service_container_port = 8080
 nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 cluster_container_insights = "enabled"
-build_id = "develop-24-21b84f9"
+build_id = "develop-26-39cf7af"
 docdb_instance_class = "db.r5.large"
