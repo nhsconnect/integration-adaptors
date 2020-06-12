@@ -7,9 +7,7 @@ data "aws_secretsmanager_secret" "mq_password" {
 }
 
 data "aws_secretsmanager_secret" "docdb_master_username" {
-  name = "docdb-master-username"
 }
 
 data "aws_secretsmanager_secret" "docdb_master_password" {
-  name = "docdb-master-password"
 }
