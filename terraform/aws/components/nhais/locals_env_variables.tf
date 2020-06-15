@@ -34,11 +34,11 @@ locals {
     },
     {
       name = "NHAIS_MONGO_HOST"
-      value = "mongodb://${aws_docdb_cluster.nhais_db_cluster.endpoint}"
+      value = "mongodb://${data.terraform_remote_state.base.outputs.docdb_cluster_endpoint}"
     },
     {
       name = "NHAIS_MONGO_PORT"
-      value = "${aws_docdb_cluster_instance.nhais_db_instance[0].port}"
+      value = "${data.terraform_remote_state.base.outputs.docdb_instance_port}"
     },
     {
       name = "NHAIS_MONGO_OPTIONS"

@@ -35,7 +35,7 @@ module "nhais_ecs_service" {
   
   additional_security_groups = [
     data.terraform_remote_state.base.outputs.core_sg_id,
-    aws_security_group.docdb_access_sg.id
+    data.terraform_remote_state.base.outputs.docdb_access_sg_id
   ]
 
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id

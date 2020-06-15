@@ -37,3 +37,15 @@ output "r53_zone_id" {
 output "r53_zone_name" {
   value = aws_route53_zone.base_zone.name
 }
+
+output "docdb_cluster_endpoint" {
+  value = aws_docdb_cluster.base_db_cluster.endpoint
+}
+
+output "docdb_instance_port" {
+  value = aws_docdb_cluster_instance.base_db_instance[0].port
+}
+
+output "docdb_access_sg_id" {
+  value = aws_security_group.docdb_access_sg.id
+}
