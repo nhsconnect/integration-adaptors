@@ -8,6 +8,8 @@ resource "aws_route53_zone" "base_zone" {
     Name = "${local.resource_prefix}-r53_zone"
   })
 
+  comment = "Zone for ${var.environment} in ${var.root_domain}"
+
   # lifecycle {
   #   # Ignore changes to vpc_id as this is managed by aws_route53_zone_association resources.
   #   ignore_changes = [
