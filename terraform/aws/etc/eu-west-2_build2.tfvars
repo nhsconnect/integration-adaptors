@@ -4,6 +4,8 @@ environment = "build2"
 base_cidr_block = "10.15.0.0/16"
 cluster_container_insights = "disabled"
 docdb_instance_class = "db.r5.large"
+docdb_master_user = "master-user"
+docdb_master_password = "ChangeMe" # Here only for the time of development, destroy the db before merge
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
