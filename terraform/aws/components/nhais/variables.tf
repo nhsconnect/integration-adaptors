@@ -149,8 +149,20 @@ variable "nhais_amqp_retry_delay" {
   description = "Delay on retries to connect to amqp"
   default = 100
 }
+
 variable "nhais_service_target_request_count" {
   type = number
   description = "The target number of requests per minute that an service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
   default = 1200
+}
+
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC where Distributed Load testing environment is hosted"
+  default = ""
+}
+
+variable "enable_dlt" {
+  type = bool
+  description = "Should the containers in the service be attached to dlt"
 }

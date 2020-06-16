@@ -21,7 +21,7 @@ resource "aws_vpc_peering_connection" "mq_peering" {
   })
 }
 
-# Add a route to the MHS VPC in the supplier VPC route table
+# Add a route to the MHS VPC in the MQ VPC route table
 resource "aws_route" "mq_to_base_route" {
   route_table_id = data.aws_vpc.mq_vpc.main_route_table_id
   destination_cidr_block = aws_vpc.base_vpc.cidr_block
@@ -29,7 +29,7 @@ resource "aws_route" "mq_to_base_route" {
   depends_on = [aws_vpc_peering_connection.mq_peering]
 }
 
-# Add a route to the supplier VPC in the MHS VPC route table
+# Add a route to the MQ VPC in the MHS VPC route table
 resource "aws_route" "base_to_mq_route" {
   route_table_id = aws_route_table.private.id
   destination_cidr_block = data.aws_vpc.mq_vpc.cidr_block

@@ -34,7 +34,7 @@ locals {
     },
     {
       name = "NHAIS_MONGO_HOST"
-      value = "mongodb://${aws_docdb_cluster.nhais_db_cluster.endpoint}"
+      value = "${aws_docdb_cluster.nhais_db_cluster.endpoint}"
     },
     {
       name = "NHAIS_MONGO_PORT"
