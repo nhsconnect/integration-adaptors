@@ -183,6 +183,13 @@ variable "enable_load_balancing" {
 variable "enable_dlt" {
   type = bool
   description = "Should the containers in the service be attached to dlt"
+  default = ""
+}
+
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC where Distributed Load testing environment is hosted"
+  default = ""
 }
 
 variable "load_balancer_type" {
@@ -257,8 +264,4 @@ variable "lb_allowed_cidrs" {
   type = list(string)
   description = "List of CIDRs that will be allowed to access the Load Balancer"
   default = []
-}
-variable "dlt_vpc_id" {
-  type = string
-  description = "VPC where Distributed Load testing environment is hosted"
 }

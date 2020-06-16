@@ -43,16 +43,19 @@ variable "mq_vpc_id" {
 variable "dlt_vpc_id" {
   type = string
   description = "VPC where Distributed Load testing environment is hosted"
+  default = ""
 }
 
 variable "second_dlt_route_id" {
   type = string
   description = "As the DLT has two route tables, this is the ID from the second route table which will be stated in Global.tfvars"
+  default = ""
   }
 
 variable "enable_dlt" {
   type = bool
   description = "Should the containers in the service be attached to dlt"
+  default = ""
 }
 
 variable "mq_sg_id" {
