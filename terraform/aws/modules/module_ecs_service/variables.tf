@@ -262,5 +262,4 @@ variable "lb_allowed_cidrs" {
 variable "dlt_vpc_id" {
   type = string
   description = "VPC where Distributed Load testing environment is hosted"
-  default = "vpc-03f843c08b01876d5"
 }
