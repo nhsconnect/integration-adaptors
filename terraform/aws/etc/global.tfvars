@@ -10,4 +10,4 @@ root_domain = "nhsredteam.internal.nhs.uk"
 
 dlt_vpc_id = "vpc-03f843c08b01876d5"
 second_dlt_route_id = "rtb-02eb794dab0362984"
-enable_dlt = "FALSE"
+enable_dlt = false
