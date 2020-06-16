@@ -7,6 +7,7 @@ data "aws_vpc" "dlt_vpc" {
 # DLT traffic - From the Distributed load tester to the load balancer
 
 resource "aws_security_group_rule" "dlt_ingress_rule_to_loadbalancer" {
+  count = var.enable_dlt ? 1 :0
   security_group_id = aws_security_group.service_lb_sg.id
   type = "ingress"
   from_port = var.application_port
@@ -20,6 +21,7 @@ resource "aws_security_group_rule" "dlt_ingress_rule_to_loadbalancer" {
 }
 
 resource "aws_security_group_rule" "dlt_ingress_rule_to_service" {
+  count = var.enable_dlt ? 1 :0
   security_group_id = aws_security_group.service_sg.id
   type = "ingress"
   from_port = var.application_port
