@@ -16,7 +16,7 @@ resource "aws_security_group_rule" "dlt_ingress_rule_to_loadbalancer" {
   # Not making any assumptions here about the internal structure of the DLT VPC.
   # This can be changed and made more specific to lock this down more.
   cidr_blocks = [
-    data.aws_vpc.dlt_vpc.cidr_block]
+    data.aws_vpc.dlt_vpc[0].cidr_block]
   description = "Allow inbound requests from DLT"
 }
 
@@ -30,6 +30,6 @@ resource "aws_security_group_rule" "dlt_ingress_rule_to_service" {
   # Not making any assumptions here about the internal structure of the DLT VPC.
   # This can be changed and made more specific to lock this down more.
   cidr_blocks = [
-    data.aws_vpc.dlt_vpc.cidr_block]
+    data.aws_vpc.dlt_vpc[0].cidr_block]
   description = "Allow inbound requests from DLT to service"
 }
