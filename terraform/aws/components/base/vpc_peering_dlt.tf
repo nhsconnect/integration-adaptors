@@ -1,13 +1,13 @@
 # vpc peering to the network where DLT is hosted
 data "aws_vpc" "dlt_vpc" {
-  count = data.aws_vpc.dlt_vpc[0]
+  count = var.enable_dlt ? 1 :0
   id = var.dlt_vpc_id
 }
 
 resource "aws_vpc_peering_connection" "dlt_peering" {
   count = var.enable_dlt ? 1 :0
   vpc_id = aws_vpc.base_vpc.id
-  peer_vpc_id = data.aws_vpc.dlt_vpc[0]
+  peer_vpc_id = data.aws_vpc.dlt_vpc[0].id
   auto_accept = true
 
   accepter {

@@ -1,7 +1,7 @@
 # vpc peering to the network where DLT is hosted
 
 data "aws_vpc" "dlt_vpc" {
-  count = data.aws_vpc.dlt_vpc[0]
+  count = var.enable_dlt ? 1 :0
   id = var.dlt_vpc_id
 }
 
