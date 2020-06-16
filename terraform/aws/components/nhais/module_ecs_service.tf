@@ -20,7 +20,7 @@ module "nhais_ecs_service" {
   container_port    = var.nhais_service_container_port
   application_port  = var.nhais_service_application_port
   launch_type       = var.nhais_service_launch_type
-  log_stream_prefix = var.build_id
+  log_stream_prefix = var.nhais_build_id
   healthcheck_path  = var.nhais_healthcheck_path
   enable_load_balancing = true
 

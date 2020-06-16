@@ -20,7 +20,7 @@ module "OneOneOne_ecs_service" {
   container_port    = var.OneOneOne_service_container_port
   application_port  = var.OneOneOne_service_application_port
   launch_type       = var.OneOneOne_service_launch_type
-  log_stream_prefix = var.build_id
+  log_stream_prefix = var.OneOneOne_build_id
   healthcheck_path  = var.OneOneOne_healthcheck_path
   enable_load_balancing = true
 

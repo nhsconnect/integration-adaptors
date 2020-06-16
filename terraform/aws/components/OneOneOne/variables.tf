@@ -33,7 +33,7 @@ variable "tf_state_bucket" {
   type = string
   description = "Name of S3 bucket with TF state of components"
 }
-variable "build_id" {
+variable "OneOneOne_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
 }
