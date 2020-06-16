@@ -183,7 +183,7 @@ variable "enable_load_balancing" {
 variable "enable_dlt" {
   type = bool
   description = "Should the containers in the service be attached to dlt"
-  default = false
+  default = true
 }
 
 variable "load_balancer_type" {
