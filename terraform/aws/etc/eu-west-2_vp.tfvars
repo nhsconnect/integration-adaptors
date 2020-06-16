@@ -12,4 +12,4 @@ cluster_container_insights = "enabled"
 build_id = "PR-76-1-89c498b"
 docdb_instance_class = "db.r5.large"
 dlt_vpc_id = "vpc-03f843c08b01876d5"
-enable_dlt = true
+enable_dlt = false
