@@ -1,5 +1,5 @@
 locals {
-  environment_variables = concat(var.environment_variables,[
+  environment_variables = concat(var.nhais_environment_variables,[
     {
       name  = "NHAIS_OUTBOUND_SERVER_PORT"
       value = var.nhais_service_container_port
