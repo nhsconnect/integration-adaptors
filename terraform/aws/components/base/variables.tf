@@ -49,6 +49,13 @@ variable "second_dlt_route_id" {
   type = string
   description = "As the DLT has two route tables, this is the ID from the second route table which will be stated in Global.tfvars"
   }
+
+variable "enable_dlt" {
+  type = bool
+  description = "Should the containers in the service be attached to dlt"
+  default = false
+}
+
 variable "mq_sg_id" {
   type = string
   description = "ID of SG attached to MQ cluster"
