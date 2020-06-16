@@ -5,9 +5,9 @@ data "aws_vpc" "dlt_vpc" {
 }
 
 resource "aws_vpc_peering_connection" "dlt_peering" {
-  count = data.aws_vpc.dlt_vpc[0]
+  count = var.enable_dlt ? 1 :0
   vpc_id = aws_vpc.base_vpc.id
-  peer_vpc_id = data.aws_vpc.dlt_vpc.id
+  peer_vpc_id = data.aws_vpc.dlt_vpc[0]
   auto_accept = true
 
   accepter {
