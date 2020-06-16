@@ -75,6 +75,12 @@ variable "mq_broker_name" {
   description = "Name of the MQ broker shared between all envs"
 }
 
+variable "nhais_mongo_options" {
+  type = string
+  description = "Options for Mongo"
+  default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+}
+
 variable "nhais_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"

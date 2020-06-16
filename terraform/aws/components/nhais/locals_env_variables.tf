@@ -42,7 +42,7 @@ locals {
     },
     {
       name = "NHAIS_MONGO_OPTIONS"
-      value = var.mongo_options
+      value = var.nhais_mongo_options
     }
   ])
 }

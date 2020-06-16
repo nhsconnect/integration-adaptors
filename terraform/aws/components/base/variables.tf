@@ -69,12 +69,6 @@ variable "docdb_master_password" {
   description = "Password for Document DB master user"
 }
 
-variable "mongo_options" {
-  type = string
-  description = "Options for Mongo"
-  default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
-}
-
 variable "docdb_tls" {
   type = string
   default = "disabled"
