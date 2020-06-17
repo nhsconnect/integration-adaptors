@@ -13,8 +13,8 @@ locals {
   image_name = "${data.terraform_remote_state.account.outputs.ecr_repo_url_111}:${var.OneOneOne_build_id}"
 
   subnet_cidrs = [
-    cidrsubnet(data.terraform_remote_state.base.outputs.vpc_cidr,3,5),
-    cidrsubnet(data.terraform_remote_state.base.outputs.vpc_cidr,3,6),
-    cidrsubnet(data.terraform_remote_state.base.outputs.vpc_cidr,3,7)
+    cidrsubnet(data.terraform_remote_state.base.outputs.vpc_cidr,3,8),
+    cidrsubnet(data.terraform_remote_state.base.outputs.vpc_cidr,3,9),
+    cidrsubnet(data.terraform_remote_state.base.outputs.vpc_cidr,3,10)
   ]
 }
