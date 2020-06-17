@@ -49,3 +49,23 @@ output "docdb_instance_port" {
 output "docdb_access_sg_id" {
   value = aws_security_group.docdb_access_sg.id
 }
+
+output "nhais_cidr" {
+  value = local.nhais_cidr
+  description = "CIDR block for NHAIS component"
+}
+
+output "OneOneOne_cidr" {
+  value = local.OneOneOne_cidr
+  description = "CIDR block for OneOneOne component"
+}
+
+output "scr_cidr" {
+  value = local.scr_cidr
+  description = "CIDR block for SCR component"
+}
+
+output "mhs_cidr" {
+  value = local.mhs_cidr
+  description = "CIDR block for MHS component"
+}
