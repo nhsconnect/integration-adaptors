@@ -171,7 +171,7 @@ variable "log_stream_prefix" {
 variable "logs_datetime_format" {
   type = string
   description = "Format for date and time in logs"
-  default = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
+  default = "%Y-%m-%d %H:%M:%S%L"
 }
 
 variable "enable_load_balancing" {
