@@ -22,4 +22,6 @@ resource "aws_lb_target_group" "service_target_group" {
   tags = merge(local.default_tags, {
     Name = "${local.resource_prefix}-lb_tg"
   })
+
+  depends_on = [aws_lb.service_load_balancer]
 }
