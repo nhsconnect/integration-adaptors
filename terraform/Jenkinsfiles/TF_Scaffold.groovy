@@ -117,7 +117,7 @@ void collectTfOutputs(String component) {
   Map<String,String> returnMap = [:]
   dir("components/${component}") {
     List<String> outputsList = sh (label: "Listing TF outputs", script: "terraform output", returnStdout: true).split("\n")
-    outputList.each {
+    outputsList.each {
       returnMap.put(it.split("=")[0].trim(),it.split("=")[1].trim())
     }
     println returnMap
