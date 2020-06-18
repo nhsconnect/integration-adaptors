@@ -113,8 +113,10 @@ int terraform(String action, String tfStateBucket, String project, String enviro
 } // int Terraform
 
 // Map<String,String> collectTfOutputs() {
-void collectTfOutputs() {
+void collectTfOutputs(String component) {
   Map<String,String> returnMap = [:]
-  sh (label: "Listing TF outputs", script: "terraform output")
+  dir("components/${component}") {
+      sh (label: "Listing TF outputs", script: "terraform output")
+  } // dir
   //return returnMap
 }
