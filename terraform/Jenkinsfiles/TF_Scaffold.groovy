@@ -116,7 +116,11 @@ int terraform(String action, String tfStateBucket, String project, String enviro
 void collectTfOutputs(String component) {
   Map<String,String> returnMap = [:]
   dir("components/${component}") {
-      sh (label: "Listing TF outputs", script: "terraform output")
+    List<String> outputsList = sh (label: "Listing TF outputs", script: "terraform output", returnStdout: true).split("\n")
+    outputList.each {
+      returnMap.put(it.split("=")[0].trim(),it.split("=")[1].trim())
+    }
+    println returnMap
   } // dir
   //return returnMap
 }
