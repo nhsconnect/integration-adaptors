@@ -74,6 +74,7 @@ pipeline {
         dir("integration-adaptors/terraform/aws") {
           script {
             if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap) !=0 ) { error("Terraform Apply failed")}
+            collectTfOutputs()
           } // script
         } //dir terraform/aws
       } // steps
@@ -110,3 +111,10 @@ int terraform(String action, String tfStateBucket, String project, String enviro
       return sh(label:"Terraform: "+action, script: command, returnStatus: true)
     } // dir
 } // int Terraform
+
+// Map<String,String> collectTfOutputs() {
+void collectTfOutputs() {
+  Map<String,String> returnMap = [:]
+  sh (label: "Listing TF outputs", script: "terraform output")
+  //return returnMap
+}

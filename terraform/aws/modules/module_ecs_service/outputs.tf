@@ -9,3 +9,13 @@ output "loadbalancer_dns_name" {
 output "loadbalancer_zone_id" {
   value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].zone_id : null
 }
+
+output "loadbalancer_arn" {
+  value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].arn : null
+  description = "ARN of Service loadbalancer"
+}
+
+output "loadbalancer_tg_arn" {
+  value =  var.enable_load_balancing ? aws_lb_target_group.service_target_group[0].arn : null
+  description = "ARN of Service loadbalancers target group"
+}
