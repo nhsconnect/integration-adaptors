@@ -74,7 +74,7 @@ pipeline {
         dir("integration-adaptors/terraform/aws") {
           script {
             if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap) !=0 ) { error("Terraform Apply failed")}
-            if (params.Action == "apply") { collectTfOutputs() }
+            if (params.Action == "apply") { collectTfOutputs(params.Component) }
           } // script
         } //dir terraform/aws
       } // steps
