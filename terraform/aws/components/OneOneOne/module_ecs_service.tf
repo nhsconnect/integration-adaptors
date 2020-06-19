@@ -1,32 +1,30 @@
-module "nhais_ecs_service" {
+module "OneOneOne_ecs_service" {
   source = "../../modules/module_ecs_service"
 
   project         = var.project
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "nhais_ecs"
+  module_instance = "OneOneOne_ecs"
   default_tags    = local.default_tags
   
   availability_zones = local.availability_zones
 
   image_name        = local.image_name
   cluster_id        = data.terraform_remote_state.base.outputs.base_cluster_id
-  minimal_count     = var.nhais_service_minimal_count
-  desired_count     = var.nhais_service_desired_count
-  maximal_count     = var.nhais_service_maximal_count
-  service_target_request_count = var.nhais_service_target_request_count
+  minimal_count     = var.OneOneOne_service_minimal_count
+  desired_count     = var.OneOneOne_service_desired_count
+  maximal_count     = var.OneOneOne_service_maximal_count
+  service_target_request_count = var.OneOneOne_service_target_request_count
 
-  container_port    = var.nhais_service_container_port
-  application_port  = var.nhais_service_application_port
-  launch_type       = var.nhais_service_launch_type
-  log_stream_prefix = var.nhais_build_id
-  healthcheck_path  = var.nhais_healthcheck_path
+  container_port    = var.OneOneOne_service_container_port
+  application_port  = var.OneOneOne_service_application_port
+  launch_type       = var.OneOneOne_service_launch_type
+  log_stream_prefix = var.OneOneOne_build_id
+  healthcheck_path  = var.OneOneOne_healthcheck_path
   enable_load_balancing = true
 
-  container_healthcheck_port = var.nhais_service_container_port
-  enable_dlt                 = var.enable_dlt
-  dlt_vpc_id                 = var.dlt_vpc_id
+  container_healthcheck_port = var.OneOneOne_service_container_port
 
   environment_variables = local.environment_variables
   secret_variables      = local.secret_variables
