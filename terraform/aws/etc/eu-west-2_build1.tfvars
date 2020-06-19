@@ -13,7 +13,7 @@ nhais_service_target_request_count = 1200
 nhais_service_container_port = 8080
 nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
-nhais_build_id = "develop-2-6659f4e"
+nhais_build_id = "develop-28-1d81ddf"
 
 # Settings for "OneOneOne" component
 # Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number
