@@ -81,6 +81,18 @@ variable "mq_broker_name" {
 #   default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 # }
 
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC where Distributed Load testing environment is hosted"
+  default = ""
+}
+
+variable "enable_dlt" {
+  type = bool
+  description = "Should the containers in the service be attached to dlt"
+  default = false
+}
+
 variable "OneOneOne_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
