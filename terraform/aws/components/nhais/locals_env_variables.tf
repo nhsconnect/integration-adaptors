@@ -34,11 +34,13 @@ locals {
     },
     {
       name = "NHAIS_MONGO_HOST"
-      value = "${data.terraform_remote_state.base.outputs.docdb_cluster_endpoint}"
+      //value = "${data.terraform_remote_state.base.outputs.docdb_cluster_endpoint}"
+      value = "nia-build1-nhais-dbcluster.cluster-co553fsbcrew.eu-west-2.docdb.amazonaws.com"
     },
     {
       name = "NHAIS_MONGO_PORT"
-      value = "${data.terraform_remote_state.base.outputs.docdb_instance_port}"
+      //value = "${data.terraform_remote_state.base.outputs.docdb_instance_port}"
+      value = "27017"
     },
     {
       name = "NHAIS_MONGO_OPTIONS"

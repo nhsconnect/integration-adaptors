@@ -14,8 +14,11 @@ locals {
   #image_name = "${data.terraform_remote_state.account.outputs.nhais_ecr_repo_url}:${var.nhais_build_id}"
 
   subnet_cidrs = [
-    cidrsubnet(data.terraform_remote_state.base.outputs.nhais_cidr,2,0),
-    cidrsubnet(data.terraform_remote_state.base.outputs.nhais_cidr,2,1),
-    cidrsubnet(data.terraform_remote_state.base.outputs.nhais_cidr,2,2)
+    # cidrsubnet(data.terraform_remote_state.base.outputs.nhais_cidr,2,0), # uncommnet after apply
+    # cidrsubnet(data.terraform_remote_state.base.outputs.nhais_cidr,2,1),
+    # cidrsubnet(data.terraform_remote_state.base.outputs.nhais_cidr,2,2)
+    cidrsubnet("10.11.1.0/24",2,0),
+    cidrsubnet("10.11.1.0/24",2,1),
+    cidrsubnet("10.11.1.0/24",2,2)
   ]
 }
