@@ -25,6 +25,8 @@ module "nhais_ecs_service" {
   enable_load_balancing = true
 
   container_healthcheck_port = var.nhais_service_container_port
+  enable_dlt                 = var.enable_dlt
+  dlt_vpc_id                 = var.dlt_vpc_id
 
   environment_variables = local.environment_variables
   secret_variables      = local.secret_variables

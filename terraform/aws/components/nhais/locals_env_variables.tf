@@ -34,7 +34,7 @@ locals {
     },
     {
       name = "NHAIS_MONGO_HOST"
-      value = "mongodb://${data.terraform_remote_state.base.outputs.docdb_cluster_endpoint}"
+      value = "${data.terraform_remote_state.base.outputs.docdb_cluster_endpoint}"
     },
     {
       name = "NHAIS_MONGO_PORT"

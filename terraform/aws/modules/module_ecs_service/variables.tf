@@ -171,13 +171,24 @@ variable "log_stream_prefix" {
 variable "logs_datetime_format" {
   type = string
   description = "Format for date and time in logs"
-  default = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
+  default = "%Y-%m-%d %H:%M:%S%L"
 }
 
 variable "enable_load_balancing" {
   type = bool
   description = "Should the containers in the service be attached to loadbalancer"
   default = true
+}
+
+variable "enable_dlt" {
+  type = bool
+  description = "Should the containers in the service be attached to dlt"
+}
+
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC where Distributed Load testing environment is hosted"
+  default = ""
 }
 
 variable "load_balancer_type" {
