@@ -17,11 +17,11 @@ nhais_build_id = "develop-2-6659f4e"
 
 # Settings for "OneOneOne" component
 # Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number
-OneOneOne_service_minimal_count = 1
+OneOneOne_service_minimal_count = 2
 OneOneOne_service_desired_count = 2
 OneOneOne_service_maximal_count = 4
 OneOneOne_service_target_request_count = 1200
 OneOneOne_service_container_port = 8080
 OneOneOne_service_launch_type = "FARGATE"
 OneOneOne_log_level = "DEBUG"
-OneOneOne_build_id = "develop-2-6659f4e"
+OneOneOne_build_id = "master-7-901ea25"
