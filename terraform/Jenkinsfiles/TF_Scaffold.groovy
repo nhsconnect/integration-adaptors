@@ -12,7 +12,7 @@ pipeline {
   parameters {
     choice (name: "Project",     choices: ['nia'],                                                description: "Choose a project")
     choice (name: "Environment", choices: ['build1', 'build2', 'build3', 'vp', 'ptl', 'account'], description: "Choose environment")
-    choice (name: "Component",   choices: ['base', 'nhais', '111', 'mhs', 'account'  ],           description: "Choose component")
+    choice (name: "Component",   choices: ['base', 'nhais', 'OneOneOne', 'mhs', 'account'  ],     description: "Choose component")
     choice (name: "Action",      choices: ['plan', 'apply', 'plan-destroy', 'destroy'],           description: "Choose Terraform action")
     string (name: "Variables",   defaultValue: "",                                                description: "Terrafrom variables, format: variable1=value,variable2=value, no spaces")
     string (name: "Git_Branch",  defaultValue: "develop",                                         description: "Git branch from which TF will be taken")
@@ -74,6 +74,7 @@ pipeline {
         dir("integration-adaptors/terraform/aws") {
           script {
             if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap) !=0 ) { error("Terraform Apply failed")}
+
           } // script
         } //dir terraform/aws
       } // steps
@@ -110,3 +111,14 @@ int terraform(String action, String tfStateBucket, String project, String enviro
       return sh(label:"Terraform: "+action, script: command, returnStatus: true)
     } // dir
 } // int Terraform
+
+Map<String,String> collectTfOutputs(String component) {
+  Map<String,String> returnMap = [:]
+  dir("components/${component}") {
+    List<String> outputsList = sh (label: "Listing TF outputs", script: "terraform output", returnStdout: true).split("\n")
+    outputsList.each {
+      returnMap.put(it.split("=")[0].trim(),it.split("=")[1].trim())
+    }
+  } // dir
+  return returnMap
+}

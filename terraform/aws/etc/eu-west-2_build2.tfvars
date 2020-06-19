@@ -1,11 +1,10 @@
+
 # Common setting for entire Env - "base" component
 environment = "build2"
-base_cidr_block = "10.15.0.0/16"
+base_cidr_block = "10.12.0.0/16"
 enable_internet_access = false
-cluster_container_insights = "enabled"
+cluster_container_insights = "disabled"
 docdb_instance_class = "db.r5.large"
-dlt_vpc_id = "vpc-03f843c08b01876d5"
-enable_dlt = true
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 2
@@ -18,6 +17,7 @@ nhais_log_level = "DEBUG"
 nhais_build_id = "develop-28-1d81ddf"
 
 # Settings for "OneOneOne" component
+# Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number
 OneOneOne_service_minimal_count = 2
 OneOneOne_service_desired_count = 2
 OneOneOne_service_maximal_count = 4

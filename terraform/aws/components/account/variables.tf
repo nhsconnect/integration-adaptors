@@ -29,7 +29,19 @@ variable "tf_state_bucket" {
 #   description = "Name for NHAIS ECR repository"
 # }
 
-variable "ecr_repository_name_111" {
-  type = string
-  description = "Name for 111 ECR repository"
+# variable "ecr_repository_name_111" {
+#   type = string
+#   description = "Name for 111 ECR repository"
+# }
+
+variable "ecr_repositories" {
+  type = list(object({
+    name=string,
+    scan=bool,
+    expire_PR_after=number,
+    prefix_to_keep=string,
+    number_to_keep=number
+  }))
+  description = "List of ECR repositories to create"
+  default = []
 }

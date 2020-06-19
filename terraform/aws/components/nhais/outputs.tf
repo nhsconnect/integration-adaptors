@@ -13,3 +13,13 @@ output "nhais_lb_port" {
   value = var.nhais_service_application_port
   description = "Port on which NHAIS LB is listening"
 }
+
+output "nhais_lb_arn" {
+  value =  module.nhais_ecs_service.loadbalancer_arn
+  description = "ARN of Service loadbalancer"
+}
+
+output "nhais_lb_target_group_arn" {
+  value =  module.nhais_ecs_service.loadbalancer_tg_arn
+  description = "ARN of Service loadbalancers target group"
+}

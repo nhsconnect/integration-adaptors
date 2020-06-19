@@ -1,5 +1,5 @@
 locals {
-  environment_variables = concat(var.environment_variables,[
+  environment_variables = concat(var.nhais_environment_variables,[
     {
       name  = "NHAIS_OUTBOUND_SERVER_PORT"
       value = var.nhais_service_container_port
@@ -34,15 +34,15 @@ locals {
     },
     {
       name = "NHAIS_MONGO_HOST"
-      value = "${aws_docdb_cluster.nhais_db_cluster.endpoint}"
+      value = "${data.terraform_remote_state.base.outputs.docdb_cluster_endpoint}"
     },
     {
       name = "NHAIS_MONGO_PORT"
-      value = "${aws_docdb_cluster_instance.nhais_db_instance[0].port}"
+      value = "${data.terraform_remote_state.base.outputs.docdb_instance_port}"
     },
     {
       name = "NHAIS_MONGO_OPTIONS"
-      value = var.mongo_options
+      value = var.nhais_mongo_options
     }
   ])
 }

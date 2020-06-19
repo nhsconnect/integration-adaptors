@@ -72,3 +72,45 @@ variable "root_domain" {
   type = string
   description = "Name of the domain in which route53 records will be added"
 }
+
+
+# Variables related to DocSB
+
+variable "docdb_master_user" {
+  type = string
+  description = "Username for Document DB master user"
+}
+
+variable "docdb_master_password" {
+  type = string
+  description = "Password for Document DB master user"
+}
+
+variable "docdb_tls" {
+  type = string
+  default = "disabled"
+  description = "Should the Document DB have a TLS enabled for incomming connections"
+}
+
+variable "docdb_audit_logs" {
+  type = string
+  default = "disabled"
+  description = "Should audit logs be enabled for Document DB"
+}
+
+variable "docdb_retention_period" {
+  type = number
+  description = "How many days should the backups be kept, default is 1 day"
+  default = 1
+}
+
+variable "docdb_instance_class" {
+  type = string
+  description = "Instance size to be used to Document DB instances"
+}
+
+variable "docdb_instance_count" {
+  type = number
+  description = "Number of instances in Document DB cluster"
+  default = 1
+}
