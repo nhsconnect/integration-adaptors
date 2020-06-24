@@ -18,11 +18,13 @@ resource "aws_autoscaling_group" "jumpbox" {
 resource "aws_launch_template" "jumpbox_lt" {
   name_prefix = "${local.resource_prefix}-jmp_lt"
   image_id = data.aws_ami.base_linux.id
-  instace_type = "t2.micro"
+  instance_type = "t2.micro"
   key_name = "kainos-dev"
-  iam_instance_profile = "TerraformJumpboxRole"
+  iam_instance_profile {
+    name = "TerraformJumpboxRole"
+  }
   network_interfaces {
-    associate_public_ip_adress = true
+    associate_public_ip_address = true
     delete_on_termination = true
     security_groups = [aws_security_group.jumpbox_sg.id]
     subnet_id = aws_subnet.public_subnet.id
