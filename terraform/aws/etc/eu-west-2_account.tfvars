@@ -1,6 +1,6 @@
 ecr_repositories = [
   {
-    name = "OneOneOne",
+    name = "111",
     scan = false,
     expire_PR_after = 14,
     prefix_to_keep  = "master",
@@ -14,3 +14,5 @@ ecr_repositories = [
   #   number_to_keep = 10
   # },
 ]
+
+account_cidr_block = "10.10.0.0/16"

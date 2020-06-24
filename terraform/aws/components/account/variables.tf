@@ -45,3 +45,14 @@ variable "ecr_repositories" {
   description = "List of ECR repositories to create"
   default = []
 }
+
+variable "account_cidr_block" {
+  type = string
+  description = "CIDR for vpc in account component"
+}
+
+variable "jumpbox_allowed_ssh" {
+  type = list(string)
+  description = "List of CIDR that are allowed to SSH to jumpbox"
+  default = []
+}
