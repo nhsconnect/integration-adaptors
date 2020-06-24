@@ -15,11 +15,11 @@
 # }
 
 output "ecr_repo_urls" {
-  value = aws_ecr_repository.*.repository_url
+  value = aws_ecr_repository.ecr_repository.*.repository_url
 }
 
 output "ecr_repo_names" {
-  value = aws_ecr_repository.*.name
+  value = aws_ecr_repository.ecr_repository.*.name
 }
 
 output "jumpbox_sg_id" {

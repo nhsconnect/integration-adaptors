@@ -3,14 +3,16 @@ resource "aws_autoscaling_group" "jumpbox" {
   max_size = 1
   min_size = 0
   desired_capacity = 1
-  launch_template = aws_launch_template.jumpbox_lt.id
+  launch_template {
+    id = aws_launch_template.jumpbox_lt.id
+    version = "$Latest"
+  }
   //role_arn = "TODO"
   availability_zones = local.availability_zones
 
   tags = merge(local.default_tags, {
     Name = "${local.resource_prefix}-jmp_asg"
   })
-
 }
 
 resource "aws_launch_template" "jumpbox_lt" {
