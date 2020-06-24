@@ -18,5 +18,5 @@ ecr_repositories = [
 account_cidr_block = "10.10.0.0/16"
 
 jumpbox_allowed_ssh = [
-  "91.222.71.98",   # Gdansk VPN
+  "91.222.71.98/32",   # Gdansk VPN
 ]

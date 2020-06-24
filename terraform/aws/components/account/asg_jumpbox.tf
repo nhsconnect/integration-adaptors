@@ -10,9 +10,9 @@ resource "aws_autoscaling_group" "jumpbox" {
   //role_arn = "TODO"
   availability_zones = local.availability_zones
 
-  tags = merge(local.default_tags, {
-    Name = "${local.resource_prefix}-jmp_asg"
-  })
+  # tags = merge(local.default_tags, {
+  #   Name = "${local.resource_prefix}-jmp_asg"
+  # })
 }
 
 resource "aws_launch_template" "jumpbox_lt" {
