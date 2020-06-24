@@ -22,7 +22,7 @@ resource "aws_launch_template" "jumpbox_lt" {
   network_interfaces {
     associate_public_ip_adress = true
     delete_on_termination = true
-    security_groups = []
+    security_groups = [aws_security_group.jumpbox_sg.id]
     subnet_id = aws_subnet.public_subnet.id
   }
   //vpc_security_group_ids = []
