@@ -1,12 +1,11 @@
 resource "aws_instance" "jumpbox" {
-  name = "${local.resource_prefix}-jumpbox"
-  availability_zones = local.availability_zones[0]
+  availability_zone = local.availability_zones[0]
 
-  image_id = data.aws_ami.base_linux.id
+  ami = data.aws_ami.base_linux.id
   instance_type = "t2.micro"
   key_name = "kainos-dev"
   iam_instance_profile = "TerraformJumpboxRole"
-  vpc_security_groups = [aws_security_group.jumpbox_sg.id]
+  vpc_security_group_ids = [aws_security_group.jumpbox_sg.id]
   subnet_id = aws_subnet.public_subnet.id
   user_data = data.template_cloudinit_config.jumpbox_user_data.rendered
   associate_public_ip_address = true
