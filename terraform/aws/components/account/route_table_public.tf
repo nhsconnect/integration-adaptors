@@ -1,5 +1,5 @@
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.base_vpc.id
+  vpc_id = aws_vpc.account_vpc.id
   tags = merge(local.default_tags, {
     Name = "${local.resource_prefix}-public_rt"
   })
