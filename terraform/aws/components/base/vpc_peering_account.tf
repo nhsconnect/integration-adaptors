@@ -1,7 +1,7 @@
 # vpc peering to the account component
 resource "aws_vpc_peering_connection" "account_peering" {
   vpc_id = aws_vpc.base_vpc.id
-  peer_vpc_id = data.terraform_remote_state.base.outputs.account_vpc_id
+  peer_vpc_id = data.terraform_remote_state.account.outputs.account_vpc_id
   auto_accept = true
 
   accepter {
