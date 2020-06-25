@@ -1,5 +1,5 @@
 # Allow account's jumpbox to connect to docdb
-resource "aws_security_group_rule" "allow_jumpbox_to_docdb" {
+resource "aws_security_group_rule" "allow_docdb_from_jumpbox" {
   type = "ingress"
   description = "Allow incoming from jumpbox to documentDB in env ${var.environment}"
   from_port = aws_docdb_cluster_instance.base_db_instance[0].port
