@@ -26,3 +26,8 @@ output "jumpbox_sg_id" {
   description = "ID of jumpbox SG, to be referenced in components that allow access to it"
   value = aws_security_group.jumpbox_sg.id
 }
+
+output "jumpbox_hostname" {
+  description = "Hostname of jumpbox instance"
+  value = aws_instance.jumpbox.public_dns
+}
