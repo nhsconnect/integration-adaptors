@@ -40,6 +40,10 @@ module "OneOneOne_ecs_service" {
     data.terraform_remote_state.base.outputs.docdb_access_sg_id
   ]
 
+  lb_allowed_security_groups = [
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id
+  ]
+
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
   subnet_ids = aws_subnet.service_subnet.*.id
 }
