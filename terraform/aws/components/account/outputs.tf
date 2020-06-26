@@ -1,13 +1,5 @@
-output "ecr_repo_urls" {
-  value = aws_ecr_repository.ecr_repository.*.repository_url
-}
-
-output "ecr_repo_names" {
-  value = aws_ecr_repository.ecr_repository.*.name
-}
-
 output "ecr_repos" {
-  value = zipmap( aws_ecr_repository.ecr_repository.*.name, aws_ecr_repository.ecr_repository.*.repository_url)
+  value = zipmap(aws_ecr_repository.ecr_repository.*.name, aws_ecr_repository.ecr_repository.*.repository_url)
 }
 
 output "account_vpc_id" {
