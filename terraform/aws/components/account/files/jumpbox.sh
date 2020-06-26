@@ -17,5 +17,4 @@ echo "Welcome to NIA Jumpbox" >> /etc/motd
 echo "  " >> /etc/motd
 echo "Useful commands:" >> /etc/motd
 echo "List all DocDB clusters endpoints in the account: aws docdb describe-db-clusters --region eu-west-2 --query 'DBClusters[].Endpoint'" >> /etc/motd
-echo "List all MQ Clusters: TODO"
-echo "List LoadBalancer endpoints for applications: TODO"
+echo "List LoadBalancer endpoints for applications: aws elbv2 describe-load-balancers --region eu-west-2 --query 'LoadBalancers[].DNSName' | grep nia" >> /etc/motd

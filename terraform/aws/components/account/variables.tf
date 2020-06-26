@@ -24,16 +24,6 @@ variable "tf_state_bucket" {
   description = "Name of S3 bucket with TF state of components"
 }
 
-# variable "nhais_ecr_repository_name" {
-#   type = string
-#   description = "Name for NHAIS ECR repository"
-# }
-
-# variable "ecr_repository_name_111" {
-#   type = string
-#   description = "Name for 111 ECR repository"
-# }
-
 variable "ecr_repositories" {
   type = list(object({
     name=string,
