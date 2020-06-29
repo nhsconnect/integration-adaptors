@@ -6,6 +6,7 @@ resource "aws_security_group_rule" "base_core_to_mq" {
   protocol = "tcp"
   source_security_group_id = var.mq_sg_id
   description = "Allow requests to Amazon MQ inbound queue"
+  depends_on = [aws_vpc_peering_connection.mq_peering]
 }
 
 resource "aws_security_group_rule" "mq_from_base_core" {
@@ -16,4 +17,5 @@ resource "aws_security_group_rule" "mq_from_base_core" {
   protocol = "tcp"
   security_group_id = var.mq_sg_id
   description = "Allow AMQP from ${var.environment} env"
+  depends_on = [aws_vpc_peering_connection.mq_peering]
 }

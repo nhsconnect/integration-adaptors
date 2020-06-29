@@ -24,16 +24,6 @@ variable "tf_state_bucket" {
   description = "Name of S3 bucket with TF state of components"
 }
 
-# variable "nhais_ecr_repository_name" {
-#   type = string
-#   description = "Name for NHAIS ECR repository"
-# }
-
-# variable "ecr_repository_name_111" {
-#   type = string
-#   description = "Name for 111 ECR repository"
-# }
-
 variable "ecr_repositories" {
   type = list(object({
     name=string,
@@ -43,5 +33,16 @@ variable "ecr_repositories" {
     number_to_keep=number
   }))
   description = "List of ECR repositories to create"
+  default = []
+}
+
+variable "account_cidr_block" {
+  type = string
+  description = "CIDR for vpc in account component"
+}
+
+variable "jumpbox_allowed_ssh" {
+  type = list(string)
+  description = "List of CIDR that are allowed to SSH to jumpbox"
   default = []
 }
