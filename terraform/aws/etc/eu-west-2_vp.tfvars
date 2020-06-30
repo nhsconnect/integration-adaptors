@@ -15,7 +15,6 @@ nhais_service_target_request_count = 1200
 nhais_service_container_port = 8080
 nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
-nhais_build_id = "develop-28-1d81ddf"
 
 # Settings for "OneOneOne" component
 OneOneOne_service_minimal_count = 2
@@ -25,4 +24,3 @@ OneOneOne_service_target_request_count = 1200
 OneOneOne_service_container_port = 8080
 OneOneOne_service_launch_type = "FARGATE"
 OneOneOne_log_level = "DEBUG"
-OneOneOne_build_id = "master-7-901ea25"
