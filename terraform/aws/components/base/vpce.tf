@@ -1,16 +1,16 @@
 # DynamoDB VPC endpoint
-resource "aws_vpc_endpoint" "dynamodb_endpoint" {
-  vpc_id = aws_vpc.base_vpc.id
-  service_name = "com.amazonaws.${var.region}.dynamodb"
-  route_table_ids = [
-    aws_vpc.base_vpc.main_route_table_id,
-    aws_route_table.private.id
-  ]
+# resource "aws_vpc_endpoint" "dynamodb_endpoint" {
+#   vpc_id = aws_vpc.base_vpc.id
+#   service_name = "com.amazonaws.${var.region}.dynamodb"
+#   route_table_ids = [
+#     aws_vpc.base_vpc.main_route_table_id,
+#     aws_route_table.private.id
+#   ]
 
-  tags = merge(local.default_tags, {
-    Name = "${local.resource_prefix}-dynamodb-vpce"
-  })
-}
+#   tags = merge(local.default_tags, {
+#     Name = "${local.resource_prefix}-dynamodb-vpce"
+#   })
+# }
 
 # ECR DKR VPC endpoint
 resource "aws_vpc_endpoint" "ecr_endpoint" {

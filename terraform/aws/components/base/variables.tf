@@ -114,3 +114,34 @@ variable "docdb_instance_count" {
   description = "Number of instances in Document DB cluster"
   default = 1
 }
+
+# Variables related to PTL connectivity
+
+variable "ptl_connected" {
+  type = bool
+  description = "Should this environment be connected to NHS PTL"
+  default = false
+}
+
+variable "ptl_vpn_gateway_id" {
+  type = string
+  description = "Id of already created and connected gateway, reusing one created by hand"
+  default = ""
+} 
+
+variable "ptl_assigned_cidr" {
+  type = string
+  description = "CIDR assigned to us by NHS, will be used as secondary CIDR in vpc"
+  default = ""
+}
+
+variable "ptl_dns_servers" {
+  type = list(string)
+  description = "DNS servers in the connected PTL environment"
+}
+
+variable "lb_reserved_ips" {
+  type = list(string)
+  description = "List of IPs that should be used for load balancer in components - required for async communication"
+  default = []
+}

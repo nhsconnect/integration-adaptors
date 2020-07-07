@@ -129,9 +129,14 @@ variable "vpc_id" {
   description = "(Required) ID of VPC in which this service will be running"
 }
 
-variable "subnet_ids" {
+variable "lb_subnet_ids" {
   type = list(string)
-  description = "(Requred) List of SubnetIds for subnets which this service will use"
+  description = "(Requred) List of SubnetIds for subnets which this service Load Balancer will use"
+}
+
+variable "container_subnet_ids" {
+  type = list(string)
+  description = "(Requred) List of SubnetIds for subnets which this service Containers will use"
 }
 
 variable "image_name" {
@@ -263,4 +268,16 @@ variable "lb_allowed_cidrs" {
   type = list(string)
   description = "List of CIDRs that will be allowed to access the Load Balancer"
   default = []
+}
+
+variable "create_testbox" {
+  type = bool
+  description = "Should the module contain EC2 instance for connectivity testing"
+  default = false
+}
+
+variable "jumpbox_sg_id" {
+  type = string
+  default = ""
+  description = "SG of Account jumpbox to allow traffic in"
 }

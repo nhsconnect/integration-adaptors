@@ -43,6 +43,22 @@ locals {
     {
       name = "NHAIS_MONGO_OPTIONS"
       value = var.nhais_mongo_options
-    }
+    },
+    {
+      name = "NHAIS_MESH_HOST"
+      value = var.nhais_mesh_host //https://fake-mesh:8829/messageexchange/ / https://msg.intspineservices.nhs.uk/
+    },
+    {
+      name = "NHAIS_SCAN_MAILBOX_DELAY_IN_SECONDS"
+      value = var.nhais_scan_mailbox_delay // 300
+    },
+    {
+      name = "NHAIS_SCAN_MAILBOX_INTERVAL_IN_MILLISECONDS"
+      value = var.nhais_scan_mailbox_interval // 60000
+    },
+    {
+      name = "NHAIS_SCHEDULER_ENABLED"
+      value = var.nhais_scheduler_enabled // true
+    },
   ])
 }

@@ -47,11 +47,11 @@ resource "aws_security_group_rule" "core_sg_to_s3_prefix" {
 }
 
 # DynamoDB
-resource "aws_security_group_rule" "core_sg_to_dynamodb_prefix" { 
-  type      = "egress"
-  from_port = 443
-  to_port   = 443
-  protocol  = "tcp"
-  security_group_id = aws_security_group.core_sg.id
-  prefix_list_ids  = [aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
-}
+# resource "aws_security_group_rule" "core_sg_to_dynamodb_prefix" { 
+#   type      = "egress"
+#   from_port = 443
+#   to_port   = 443
+#   protocol  = "tcp"
+#   security_group_id = aws_security_group.core_sg.id
+#   prefix_list_ids  = [aws_vpc_endpoint.dynamodb_endpoint.prefix_list_id]
+# }

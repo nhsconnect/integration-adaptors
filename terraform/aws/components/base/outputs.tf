@@ -69,3 +69,30 @@ output "mhs_cidr" {
   value = local.mhs_cidr
   description = "CIDR block for MHS component"
 }
+
+# PTL section
+
+output "ptl_connected" {
+  value = var.ptl_connected
+}
+
+output "ptl_assigned_cidr" {
+  value = var.ptl_connected ? var.ptl_assigned_cidr : null
+}
+
+# output "ptl_container_subnet_ids" {
+#   value = var.ptl_connected ? aws_subnet.service_containers_subnet.*.id : null
+# }
+
+# output "ptl_lb_subnet_ids" {
+#   value = var.ptl_connected ? aws_subnet.service_lb_subnet.*.id : null
+# }
+
+
+output "ptl_container_subnet_ids" {
+  value = aws_subnet.service_containers_subnet.*.id
+}
+
+output "ptl_lb_subnet_ids" {
+  value = aws_subnet.service_lb_subnet.*.id
+}
