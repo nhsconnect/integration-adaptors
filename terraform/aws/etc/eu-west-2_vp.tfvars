@@ -4,7 +4,7 @@ base_cidr_block = "10.15.0.0/16"
 enable_internet_access = false
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
-dlt_vpc_id = "vpc-03f843c08b01876d5"
+dlt_vpc_id = "vpc-07f1d7ff1216f6e9d"
 enable_dlt = true
 
 # Settings for "nhais" component
