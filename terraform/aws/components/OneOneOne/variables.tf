@@ -37,6 +37,7 @@ variable "tf_state_bucket" {
 variable "OneOneOne_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
+  default = "master-26-e7d71f9"
 }
 
 variable "OneOneOne_service_desired_count" {
