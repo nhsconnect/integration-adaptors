@@ -50,9 +50,9 @@ pipeline {
             // prepare variables map
             Map<String, String> variablesMap = [:]
             //Get the build_id variable if in application component
-            if (componentImageBranch.containsKey(params.Component)) {
-              variablesMap.put("${params.Component}_build_id", getLatestImageTag(componentImageBranch[params.Component].branch, componentImageBranch[params.Component].ecrRepo, region))
-            }
+            // if (componentImageBranch.containsKey(params.Component)) {
+            //   variablesMap.put("${params.Component}_build_id", getLatestImageTag(componentImageBranch[params.Component].branch, componentImageBranch[params.Component].ecrRepo, region))
+            // }
             List<String> variablesList = params.Variables.split(",")
             variablesList.each {
               def kvp = it.split("=")
