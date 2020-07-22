@@ -150,3 +150,6 @@ export-env-vars-and-run-mhs-docker.sh
 
 # mock ldap data
 /mhs/spineroutelookup/mock_ldap_data/*.json
+
+# PlantUML export diagram folder
+/out

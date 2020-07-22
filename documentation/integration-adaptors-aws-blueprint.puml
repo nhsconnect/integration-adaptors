@@ -1,0 +1,187 @@
+@startuml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/master/dist
+!includeurl AWSPuml/AWSCommon.puml
+
+' Comment out the following line to create technical view
+!includeurl AWSPuml/AWSSimplified.puml
+
+!includeurl AWSPuml/ApplicationIntegration/MQ.puml
+!includeurl AWSPuml/Compute/EC2ContainerRegistry.puml
+!includeurl AWSPuml/Compute/EC2Instance.puml
+!includeurl AWSPuml/Compute/ECSContainer1.puml
+!includeurl AWSPuml/Compute/ECSService.puml
+!includeurl AWSPuml/Compute/Fargate.puml
+!includeurl AWSPuml/Database/DocumentDBwithMongoDBcompatibility.puml
+!includeurl AWSPuml/Database/ElastiCacheForRedis.puml
+!includeurl AWSPuml/GroupIcons/Cloudalt.puml
+!includeurl AWSPuml/GroupIcons/Region.puml
+!includeurl AWSPuml/GroupIcons/VPCSubnetPublic.puml
+!includeurl AWSPuml/GroupIcons/VPCSubnetPrivate.puml
+!includeurl AWSPuml/ManagementAndGovernance/CloudWatch.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/APIGateway2.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/ClientVPN.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCCustomerGateway.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/ELBApplicationLoadBalancer.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/ELBNetworkLoadBalancer.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/ElasticLoadBalancing.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCElasticNetworkInterface.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCEndpoints.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCInternetGateway.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCPeering.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCVPNGateway.puml
+!includeurl AWSPuml/SecurityIdentityAndCompliance/SecretsManager.puml
+!includeurl AWSPuml/Storage/SimpleStorageServiceS3.puml
+
+' left to right direction
+
+rectangle {
+Cloudalt(aws, "AWS Cloud", "") {
+    rectangle {
+    Region(euWest, "eu-west-2 (London) Region", "") {
+        DocumentDBwithMongoDBcompatibility(stateDb, "State Database\n(DocumentDb)", "DocumentDb")
+        DocumentDBwithMongoDBcompatibility(syncDb, "Sync-Async Database\n(DocumentDb)", "DocumentDb")
+        SimpleStorageServiceS3(containerLayerStore, "Container Layer Store", "Technology", "Optional Description")
+        CloudWatch(cw, "CloudWatch", "")
+        SecretsManager(secrets, "Secrets Manager", "")
+        EC2ContainerRegistry(ecr, "Container Registry", "")
+        APIGateway2(gateway, "API Gateway", "")
+        rectangle {
+        VPCSubnetPublic(adaptorVPC, "Adaptor VPC", "") {
+            rectangle {
+            VPCSubnetPrivate(azABC1, "Same three private subnets used for ECS Fargate Cluster", "Private subnet") {
+                VPCEndpoints(ep, "DocumentDb VPC Endpoint", "")
+                rectangle "ECR Security Group" {
+                    VPCElasticNetworkInterface(ecrVPC, "ECR VPC Endpoint", "")
+                }
+                VPCEndpoints(s3ep, "S3 VPC Endpoint", "")
+                rectangle "CloudWatch Security Group" {
+                    VPCElasticNetworkInterface(cwep, "CloudWatch VPC Endpoint", "")
+                }
+            }
+            rectangle {
+            VPCSubnetPrivate(azABC, "Availability Zones A, B & C", "Private subnet") {
+                rectangle {
+                Fargate(fargate, "ECS Fargate Cluster", "") {
+                    rectangle "Outbound MHS Security Group" as osg {
+                        ECSService(oService, "Outbound MHS Fargate Service", "") {
+                            rectangle "Outbound MHS ECS Fargate Task" {
+                                ECSContainer1(oTask, "Outbound MHS Containers", "")
+                            }
+                        }
+                    }
+                    rectangle "Route Security Group" as rsg {
+                        ECSService(rService, "Route Fargate Service", "") {
+                            rectangle "Route ECS Fargate Task" {
+                                ECSContainer1(rTask, "Route Containers", "")
+                            }
+                        }
+                    }
+                    rectangle "Inbound MHS Security Group" as isg {
+                        ECSService(iService, "Inbound MHS Fargate Service", "") {
+                            rectangle "Inbound MHS ECS Fargate Task" {
+                                ECSContainer1(iTask, "Inbound MHS Containers", "")
+                            }
+                        }
+                    }
+                    rectangle "111 PEM Security Group" as 111sg {
+                        ECSService(111Service, "111 PEM Fargate Service", "") {
+                            rectangle "111 PEM ECS Fargate Task" {
+                                ECSContainer1(111Task, "111 PEM Containers", "")
+                            }
+                        }
+                    }
+                }
+                }
+            }
+            }
+            rectangle {
+                VPCSubnetPrivate(azLB, "Same three private subnets used for ECS Fargate Cluster", "Private subnet") {
+                    rectangle "Outbound ALB Security Group" {
+                        ELBApplicationLoadBalancer(outboundLB, "Outbound MHS Application Load Balancer", "")
+                    }
+                    rectangle "Route ALB Security Group" {
+                        ELBApplicationLoadBalancer(routeLB, "Route Application Load Balancer", "")
+                    }
+                    ELBNetworkLoadBalancer(inboundLB, "Inbound MHS Network Load Balancer", "")
+                    ElasticLoadBalancing(111LB, "111 Elastic Load Balancer", "")
+                    ElastiCacheForRedis(redis, "SDS Cache\n(ElastiCache for Redis HA)", "")
+                }
+            }
+        }
+        }
+        VPCPeering(supplierPeering, "VPC Peering", "")
+        rectangle {
+            VPCSubnetPublic(supplierVPC, "Supplier Client System VPC", "") {
+                rectangle "Client System Security Group" {
+                    EC2Instance(supplierSystem, "Supplier Client System", "")
+                }
+                rectangle "Async Response Queue Security Group" {
+                    MQ(inboundQueue, "Async Response Queue\n(Amazon MQ)", "")
+                }
+            }
+        }
+        VPCPeering(openTestPeering, "VPC Peering", "")
+        rectangle {
+            VPCSubnetPublic(openTestVPC, "OpenTest VPN VPC", "") {
+                rectangle "OpenTest Security Group" as otsg {
+                    EC2Instance(openTestEC2, "OpenTest VPN EC2 Instance", "") {
+                        VPCCustomerGateway(fwd, "Squid Forward Proxy", "")
+                        VPCCustomerGateway(rvs, "HAProxy Reverse Proxy", "")
+                        ClientVPN(otVPNClient, "OpenVPN Client", "")
+                    }
+                }
+                VPCInternetGateway(openTestGateway, "Internet Gateway", "")
+            }
+        }
+    }
+    }
+}
+}
+
+rectangle OpenTest {
+    VPCVPNGateway(vpng, "OpenTest VPN", "")
+    EC2Instance(spine, "OpenTest Spine", "")
+}
+
+rectangle "111 Providers" {
+    EC2Instance(111Provider, "111 Provider", "")
+}
+
+fargate --up--> secrets
+fargate --up--> s3ep
+s3ep --up--> containerLayerStore
+fargate --up--> cwep
+cwep --up--> cw
+fargate --up--> ecrVPC
+ecrVPC --up-->ecr
+oTask --up--> ep
+oTask --down-->routeLB
+routeLB --> rTask
+rTask --down--> openTestPeering
+rTask --down--> redis
+ep --up--> stateDb
+ep --up--> syncDb
+oTask --down-- openTestPeering
+iTask --up--> ep
+routeLB --down-- openTestPeering
+openTestPeering --down--> fwd
+openTestPeering --down-- rvs
+fwd <--> otVPNClient
+rvs <--> otVPNClient
+otVPNClient <--> openTestGateway
+iTask --down--> supplierPeering
+111Task --down--> supplierPeering
+111LB --up--> 111Task
+supplierPeering --down--> inboundQueue
+supplierPeering --down--supplierSystem
+supplierSystem --right--> inboundQueue
+supplierPeering --up--> outboundLB
+outboundLB --up--> oTask
+openTestGateway --down--> vpng
+vpng --> spine
+inboundLB --up--> iTask
+openTestPeering --up--> inboundLB
+gateway --up--> 111LB
+111Provider --up--> gateway
+@enduml
