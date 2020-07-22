@@ -5,4 +5,4 @@ account_id = "067756640211"
 mq_broker_name = "nia-broker"
 root_domain = "nhsredteam.internal.nhs.uk"
 
-enable_dlt = true
+enable_dlt = false
