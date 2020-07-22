@@ -127,3 +127,43 @@ variable "enable_dlt" {
   type = bool
   description = "Should the containers in the service be attached to dlt"
 }
+
+variable "create_testbox" {
+  type = bool
+  default = false
+  description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
+}
+
+# Variables related to PTL connectivity
+
+variable "ptl_connected" {
+  type = bool
+  description = "Should this environment be connected to NHS PTL"
+  default = false
+}
+
+# Variables for MESH mailbox
+
+variable "nhais_mesh_host" {
+  type = string
+  description = "URL for MESH host"
+  default = "https://fake-mesh:8829/messageexchange/"
+}
+
+variable "nhais_scan_mailbox_delay" {
+  type = number
+  description = "Delay in seconds on scanning mesh mailbox"
+  default = 300
+}
+
+variable "nhais_scan_mailbox_interval" {
+  type = number
+  description = "Interval in miliseconds between mailbox scans"
+  default = 60000
+}
+
+variable "nhais_scheduler_enabled" {
+  type = bool
+  description = "Enable scheduler"
+  default = true
+}

@@ -127,3 +127,17 @@ variable "OneOneOne_service_target_request_count" {
   description = "The target number of requests per minute that an service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
   default = 1200
 }
+
+variable "create_testbox" {
+  type = bool
+  default = false
+  description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
+}
+
+# Variables related to PTL connectivity
+
+variable "ptl_connected" {
+  type = bool
+  description = "Should this environment be connected to NHS PTL"
+  default = false
+}

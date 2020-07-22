@@ -10,6 +10,14 @@ output "account_vpc_route_table_id" {
   value = aws_vpc.account_vpc.main_route_table_id
 }
 
+output "account_public_route_table_id" {
+  value = aws_route_table.public.id
+}
+
+output "account_private_route_table_id" {
+  value = aws_route_table.private.id
+}
+
 output "account_vpc_cidr" {
    value = aws_vpc.account_vpc.cidr_block
 }

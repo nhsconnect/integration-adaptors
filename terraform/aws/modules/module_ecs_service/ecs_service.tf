@@ -24,7 +24,7 @@ resource "aws_ecs_service" "ecs_service" {
   network_configuration {
     assign_public_ip = var.assign_public_ip
     security_groups  = concat(var.additional_security_groups,[aws_security_group.service_sg.id])
-    subnets          = var.subnet_ids
+    subnets          = var.container_subnet_ids
   }
   # Tags may not yet be supported - TODO
   # tags = merge(local.default_tags, {

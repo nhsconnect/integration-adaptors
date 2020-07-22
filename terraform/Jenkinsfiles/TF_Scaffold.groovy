@@ -49,6 +49,13 @@ pipeline {
           script {
             // prepare variables map
             Map<String, String> variablesMap = [:]
+
+            //Get the build_id variable if in application component
+            if (componentImageBranch.containsKey(params.Component)) {
+              variablesMap.put("${params.Component}_build_id", getLatestImageTag(componentImageBranch[params.Component].branch, componentImageBranch[params.Component].ecrRepo, region))
+            }
+
+            // Get the variables from job parameters
             List<String> variablesList = params.Variables.split(",")
             variablesList.each {
               def kvp = it.split("=")
@@ -56,11 +63,7 @@ pipeline {
                 variablesMap.put(kvp[0],kvp[1])
               }
             }
-            //Get the build_id variable if in application component
-            if (componentImageBranch.containsKey(params.Component)) {
-              variablesMap.put("${params.Component}_build_id", getLatestImageTag(componentImageBranch[params.Component].branch, componentImageBranch[params.Component].ecrRepo, region))
-            }
-               
+
             List<String> tfParams = []
             if (params.Action == "destroy" || params.Action == "plan-destroy") {tfParams.add("-destroy")}
             if (terraformInit(TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region) !=0) { error("Terraform init failed")}
