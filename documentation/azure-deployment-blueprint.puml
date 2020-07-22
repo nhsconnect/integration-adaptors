@@ -1,0 +1,82 @@
+@startuml
+!pragma revision 1
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+!define AzurePuml https://raw.githubusercontent.com/RicardoNiepel/Azure-PlantUML/master/dist
+
+!includeurl AzurePuml/AzureCommon.puml
+' !includeurl AzurePuml/AzureSimplified.puml
+!includeurl AzurePuml/AzureC4Integration.puml
+
+!includeurl AzurePuml/Containers/all.puml
+!includeurl AzurePuml/Databases/AzureCosmosDb.puml
+!includeurl AzurePuml/Databases/AzureRedisCache.puml
+!includeurl AzurePuml/General/Azure.puml
+!includeurl AzurePuml/Integration/AzureServiceBus.puml
+!includeurl AzurePuml/Management/all.puml
+!includeurl AzurePuml/Networking/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Compute/AzureVirtualMachine.puml
+!includeurl AzurePuml/Security/AzureKeyVault.puml
+
+' LAYOUT_LEFT_RIGHT
+LAYOUT_WITH_LEGEND()
+
+System_Ext(gp, "GP Supplier", "GP Supplier Software")
+System_Ext(111, "111 Provider", "1 of many 111 Providers")
+note bottom of gp
+    Supplier software modelled
+    here outside of Azure
+end note
+Azure(azure, "Azure", "Cloud") {
+    AzureSubscription(az, "Subscription", "") {
+        AzureVirtualNetwork(avn, "NIA Adaptors VNET", "Peered with NIA OpenTest VNET") {
+            rectangle "AKS subnet" {
+                AzureKubernetesService(aks, "Adaptors", "k8s cluster") {
+                    AzureContainerInstance(ingress, "Ingress controller", "nginx", "nia/outbound\nnia/inbound\nnia/111")
+                    AzureContainerInstance(outbound, "MHS Outbound", "Python", "GP Facing API")
+                    AzureContainerInstance(sds, "SDS", "Python", "Spine Route Lookup")
+                    AzureContainerInstance(inbound, "MHS Inbound", "Python", "API for Spine callback")
+                    AzureContainerInstance(pem, "111 PEM", "Java", "111 PEM Adaptor")
+                    AzureContainerInstance(redis, "SDS Cache", "Cached SDS route and reliability information")
+                }
+            }
+        }
+        note left of avn
+            Could be deployed into 
+            the same VNET as the
+            GP Supplier systems
+        end note
+        AzureCosmosDb(cosmos, "State Db", "MongoDb")
+        AzureServiceBus(asb, "MHS Inbound Queue", "Consumed by GP System")
+        AzureServiceBus(pemQueue, "111 PEM Queue", "Consumed by GP System")
+        AzureKeyVault(kv, "Key Vault", "Adaptor Secrets needed by AKS when deploying pods")
+        AzureMonitor(monitor, "Logs/Events/Pod Metrics", "view Kubernetes logs, events, and pod metrics in real-time")
+        AzureVirtualNetwork(pvn, "NIA OpenTest VNET", "Peered with NIA Adaptors VNET") {
+            AzureVirtualMachine(vpn, "OpenTest VPN Client", "")
+        }
+    }
+}
+System_Ext(nhs, "NHS Systems", "Spine, SDS, etc")
+AzureContainerRegistry(dockerHub, "Docker Hub", "Adaptor Docker containers")
+gp --down-> ingress
+111 --left-> ingress
+ingress --down-> outbound
+ingress --down-> inbound
+ingress --down-> pem
+outbound --down-> sds
+outbound --left-> cosmos
+outbound --down->vpn
+inbound -> cosmos
+inbound --down-> asb
+pem --> pemQueue
+sds --right-> redis
+sds -> vpn
+aks --up-> dockerHub
+aks --> kv
+vpn --up-> ingress
+asb ..> gp
+pemQueue ..> gp
+aks --> monitor
+vpn <--> nhs
+@enduml
