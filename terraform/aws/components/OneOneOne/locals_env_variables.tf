@@ -7,6 +7,10 @@ locals {
     {
       name = "PEM111_AMQP_QUEUE_NAME"
       value = "pem111_queue"
+    },
+    {
+      name = "LOG_LEVEL"
+      value = var.OneOneOne_log_level
     }
   ])
 }
