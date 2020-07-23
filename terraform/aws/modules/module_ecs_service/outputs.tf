@@ -2,9 +2,9 @@ output "loadbalancer_sg_id" {
   value =  var.enable_load_balancing ? aws_security_group.service_lb_sg.id : null
 }
 
-output "service_sg_id" {
-  value =  aws_security_group.service_sg.id
-}
+//output "service_sg_id" {
+//  value =  aws_security_group.service_sg.id
+//}
 
 output "loadbalancer_dns_name" {
   value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].dns_name : null
