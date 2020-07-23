@@ -270,6 +270,12 @@ variable "lb_allowed_cidrs" {
   default = []
 }
 
+variable "container_allowed_security_groups" {
+  type = list(string)
+  description = "List of SG IDs that will be allowed to access the container(s)"
+  default = []
+}
+
 variable "create_testbox" {
   type = bool
   description = "Should the module contain EC2 instance for connectivity testing"
