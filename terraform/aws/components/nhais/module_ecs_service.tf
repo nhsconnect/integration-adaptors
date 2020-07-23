@@ -75,7 +75,7 @@ module "fake_mesh_ecs_service" {
   launch_type       = var.nhais_service_launch_type
   log_stream_prefix = var.nhais_build_id
   healthcheck_path  = var.nhais_healthcheck_path
-  enable_load_balancing = true
+  enable_load_balancing = false
 
   container_healthcheck_port = 8888 # TODO: fake-mesh does not have a healthcheck
   enable_dlt                 = var.enable_dlt
