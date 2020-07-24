@@ -4,11 +4,11 @@ resource "aws_lb_target_group" "service_target_group" {
   port        = var.container_port
   protocol    = var.protocol
   vpc_id      = var.vpc_id
-  target_type = var.load_balancer_type == "application" ? "ip" : null
+  target_type = var.load_balancer_type == "application" ? "ip" : "instance"
   deregistration_delay = var.deregistration_delay
 
   health_check {
-    enabled  = var.load_balancer_type == "application" ? true : false
+    enabled  = true
     interval = var.load_balancer_type == "application" ? 30   : null
     path     = var.load_balancer_type == "application" ? var.healthcheck_path : null
     port     = var.load_balancer_type == "application" ? local.healthcheck_port : null
