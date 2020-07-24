@@ -4,7 +4,7 @@ resource "aws_lb_target_group" "service_target_group" {
   port        = var.container_port
   protocol    = var.protocol
   vpc_id      = var.vpc_id
-  target_type = var.load_balancer_type == "application" ? "ip" : "instance"
+  target_type = var.load_balancer_type == "application" ? "ip" : null
   deregistration_delay = var.deregistration_delay
 
   health_check {
