@@ -77,6 +77,7 @@ module "fake_mesh_ecs_service" {
   healthcheck_path  = var.nhais_healthcheck_path
   enable_load_balancing = true
   load_balancer_type = "network"
+  protocol = "TCP"
 
   container_healthcheck_port = 8888 # TODO: fake-mesh does not have a healthcheck
   enable_dlt                 = var.enable_dlt
