@@ -9,14 +9,14 @@ resource "aws_lb_target_group" "service_target_group" {
 
   health_check {
     enabled  = var.load_balancer_type == "application" ? true : false
-    interval = 30
-    path     = var.healthcheck_path
-    port     = local.healthcheck_port
-    protocol = var.protocol
-    timeout  = 20
-    matcher = "200-299"
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
+    interval = var.load_balancer_type == "application" ? 30   : null
+    path     = var.load_balancer_type == "application" ? var.healthcheck_path : null
+    port     = var.load_balancer_type == "application" ? local.healthcheck_port : null
+    protocol = var.load_balancer_type == "application" ? var.protocol : null
+    timeout  = var.load_balancer_type == "application" ? 20 : null
+    matcher  = var.load_balancer_type == "application" ? "200-299" : null
+    healthy_threshold   = var.load_balancer_type == "application" ? 3 : null
+    unhealthy_threshold = var.load_balancer_type == "application" ? 3 : null
   }
 
   tags = merge(local.default_tags, {
