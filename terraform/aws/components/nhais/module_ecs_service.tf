@@ -99,7 +99,7 @@ module "fake_mesh_ecs_service" {
   ]
 
   container_allowed_security_groups =  [
-    data.terraform_remote_state.account.outputs.jumpbox_sg_id
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
     module.nhais_ecs_service.service_sg_id
   ]
 
