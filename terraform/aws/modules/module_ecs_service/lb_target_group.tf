@@ -8,7 +8,7 @@ resource "aws_lb_target_group" "service_target_group" {
   deregistration_delay = var.deregistration_delay
 
   health_check {
-    enabled  = true
+    enabled  = var.load_balancer_type == "application" ? true : false
     interval = var.load_balancer_type == "application" ? 30   : null
     path     = var.load_balancer_type == "application" ? var.healthcheck_path : null
     port     = var.load_balancer_type == "application" ? local.healthcheck_port : null
