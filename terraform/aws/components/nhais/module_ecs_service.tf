@@ -38,7 +38,6 @@ module "nhais_ecs_service" {
   additional_security_groups = [
     data.terraform_remote_state.base.outputs.core_sg_id,
     data.terraform_remote_state.base.outputs.docdb_access_sg_id,
-    module.fake_mesh_ecs_service.service_sg_id
   ]
 
   lb_allowed_security_groups = [
@@ -76,7 +75,8 @@ module "fake_mesh_ecs_service" {
   launch_type       = var.nhais_service_launch_type
   log_stream_prefix = var.nhais_build_id
   healthcheck_path  = var.nhais_healthcheck_path
-  enable_load_balancing = false
+  enable_load_balancing = true
+  load_balancer_type = "network"
 
   container_healthcheck_port = 8888 # TODO: fake-mesh does not have a healthcheck
   enable_dlt                 = var.enable_dlt
@@ -92,7 +92,6 @@ module "fake_mesh_ecs_service" {
   additional_security_groups = [
     data.terraform_remote_state.base.outputs.core_sg_id,
     data.terraform_remote_state.base.outputs.docdb_access_sg_id,
-    module.nhais_ecs_service.service_sg_id
   ]
 
   lb_allowed_security_groups = [
@@ -101,6 +100,7 @@ module "fake_mesh_ecs_service" {
 
   container_allowed_security_groups =  [
     data.terraform_remote_state.account.outputs.jumpbox_sg_id
+    module.nhais_ecs_service.service_sg_id
   ]
 
   create_testbox=var.create_testbox
