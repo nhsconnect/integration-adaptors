@@ -9,9 +9,9 @@ resource "aws_lb_target_group" "service_target_group" {
 
   health_check {
     enabled  = true
-    interval = var.load_balancer_type == "application" ? 30   : null
-    path     = var.load_balancer_type == "application" ? var.healthcheck_path : null
-    port     = var.load_balancer_type == "application" ? local.healthcheck_port : null
+    interval = 30
+    path     = var.healthcheck_path
+    port     = local.healthcheck_port
     protocol = var.load_balancer_type == "application" ? var.protocol : null
     timeout  = var.load_balancer_type == "application" ? 20 : null
     matcher  = var.load_balancer_type == "application" ? "200-299" : null
