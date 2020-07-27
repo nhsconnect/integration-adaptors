@@ -39,7 +39,5 @@ locals {
   port_mappings = concat(local.application_mapping,local.healthcheck_mapping)
 
   application_lb = var.load_balancer_type == "application" ? 1 : 0
-  appautoscaling = var.enable_load_balancing * local.application_lb
+  appautoscaling = var.enable_load_balancing ? local.application_lb : 0
 }
-
-
