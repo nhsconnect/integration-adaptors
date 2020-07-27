@@ -276,6 +276,12 @@ variable "container_allowed_security_groups" {
   default = []
 }
 
+variable "container_allowed_cidrs" {
+  type = list(string)
+  description = "List of CIDRs that will be allowed to access the the container(s)"
+  default = []
+}
+
 variable "create_testbox" {
   type = bool
   description = "Should the module contain EC2 instance for connectivity testing"
