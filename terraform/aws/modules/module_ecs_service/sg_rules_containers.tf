@@ -1,4 +1,4 @@
-resource "aws_security_group_rule" "additional_lb_from_incoming_cidr" {
+resource "aws_security_group_rule" "additional_container_from_incoming_cidr" {
   count = length(var.container_allowed_cidrs) > 0 ? 1 : 0
   type = "ingress"
   security_group_id =  aws_security_group.service_sg.id
