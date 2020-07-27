@@ -29,7 +29,7 @@ locals {
       value = "nhais"
     },
     {
-      name  = "NHAIS_LOG_LEVEL"
+      name  = "NHAIS_LOGGING_LEVEL"
       value = var.nhais_log_level
     },
     {
@@ -59,6 +59,6 @@ locals {
     {
       name = "NHAIS_SCHEDULER_ENABLED"
       value = var.nhais_scheduler_enabled // true
-    },
+    }
   ])
 }
