@@ -106,10 +106,10 @@ module "fake_mesh_ecs_service" {
     data.terraform_remote_state.account.outputs.account_vpc_cidr,
   ]
 
-  # container_allowed_security_groups =  [
-  #   data.terraform_remote_state.account.outputs.jumpbox_sg_id,
-  #   module.nhais_ecs_service.service_sg_id
-  # ]
+  container_allowed_security_groups =  [
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+    module.nhais_ecs_service.service_sg_id
+  ]
 
   create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
