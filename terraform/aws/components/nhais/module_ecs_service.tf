@@ -63,7 +63,7 @@ module "fake_mesh_ecs_service" {
 
   availability_zones = local.availability_zones
 
-  image_name        = "067756640211.dkr.ecr.eu-west-2.amazonaws.com/nhais-fake-mesh:0.1.6" # TODO should replace with a var
+  image_name        = "067756640211.dkr.ecr.eu-west-2.amazonaws.com/nhais-fake-mesh:0.2.0" # TODO should replace with a var
   cluster_id        = data.terraform_remote_state.base.outputs.base_cluster_id
   minimal_count     = 1 # fake-mesh does not support multiple instances
   desired_count     = 1
