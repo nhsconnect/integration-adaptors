@@ -38,6 +38,7 @@ module "nhais_ecs_service" {
   additional_security_groups = [
     data.terraform_remote_state.base.outputs.core_sg_id,
     data.terraform_remote_state.base.outputs.docdb_access_sg_id,
+    aws_security_group.nhais_to_fakemesh.id
   ]
 
   lb_allowed_security_groups = [
