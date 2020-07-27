@@ -66,6 +66,6 @@ resource "aws_security_group_rule" "healthcheck_to_service_from_network_load_bal
 }
 
 data "aws_subnet" "lb_subnets" {
-  count = length(var.lb_subnets)
-  id = var.lb_subnets[count.index]
+  count = length(var.lb_subnet_ids)
+  id = var.lb_subnet_ids[count.index]
 }
