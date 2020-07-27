@@ -59,8 +59,8 @@ resource "aws_security_group_rule" "healthcheck_to_service_from_network_load_bal
   security_group_id = aws_security_group.service_sg.id
   #source_security_group_id = aws_security_group.service_lb_sg.id 
   cidr_blocks = [
-    data.aws_subnet.lb_subnets[0].cidr_block
-    data.aws_subnet.lb_subnets[1].cidr_block
+    data.aws_subnet.lb_subnets[0].cidr_block,
+    data.aws_subnet.lb_subnets[1].cidr_block,
     data.aws_subnet.lb_subnets[2].cidr_block
   ]
 }
