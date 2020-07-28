@@ -10,11 +10,11 @@ locals {
     },
     {
       name = "NHAIS_MESH_OUTBOUND_QUEUE_NAME"
-      value = "nhais_mesh_outbound"
+      value = "${var.environment}_nhais_mesh_outbound"
     },
     {
       name = "NHAIS_MESH_INBOUND_QUEUE_NAME"
-      value = "nhais_mesh_inbound"
+      value = "${var.environment}_nhais_mesh_inbound"
     },
     {
       name = "NHAIS_AMQP_MAX_RETRIES"
