@@ -40,5 +40,7 @@ locals {
 
   application_lb = var.load_balancer_type == "application" ? 1 : 0
   network_lb = var.load_balancer_type == "network" ? 1 : 0
-  appautoscaling = var.enable_load_balancing ? local.application_lb : 0 
+  appautoscaling = var.enable_load_balancing ? local.application_lb : 0
+
+  lb_sgs = var.use_application_lb ? [ aws_security_group.service_lb_sg.id ] : []
 }
