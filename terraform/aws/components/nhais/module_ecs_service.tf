@@ -45,6 +45,10 @@ module "nhais_ecs_service" {
     data.terraform_remote_state.account.outputs.jumpbox_sg_id
   ]
 
+  container_allowed_security_groups =  [
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+  ]
+
   create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
