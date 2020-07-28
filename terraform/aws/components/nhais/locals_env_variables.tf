@@ -29,7 +29,7 @@ locals {
       value = "nhais"
     },
     {
-      name  = "NHAIS_LOG_LEVEL"
+      name  = "NHAIS_LOGGING_LEVEL"
       value = var.nhais_log_level
     },
     {
