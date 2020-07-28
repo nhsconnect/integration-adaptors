@@ -202,6 +202,18 @@ variable "load_balancer_type" {
   default = "application"
 }
 
+variable "use_application_lb" {
+  type = bool
+  description = "True if the LB should be application type"
+  default = true
+}
+
+variable "use_network_lb" {
+  type = bool
+  description = "True if the LB should be application type"
+  default = false
+}
+
 variable "protocol" {
   type = string
   description = "Protocol for load balancer, HTTP or HTTPS"
