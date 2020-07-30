@@ -168,3 +168,9 @@ variable "nhais_scheduler_enabled" {
   description = "Enable scheduler"
   default = true
 }
+
+variable "external_access_security_group_id" {
+  type = string
+  description = "Security group id of external access sg"
+  default = ""
+}
