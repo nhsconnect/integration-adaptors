@@ -35,7 +35,7 @@ module "nhais_ecs_service" {
   task_role_arn           = data.aws_iam_role.ecs_service_task_role.arn
   task_scaling_role_arn   = data.aws_iam_role.ecs_autoscale_role.arn
 
-  external_access_security_group_id = aws_security_group.nhais_external_access.id
+//  external_access_security_group_id = aws_security_group.nhais_external_access.id
 
   additional_security_groups = [
     data.terraform_remote_state.base.outputs.core_sg_id,
