@@ -23,6 +23,7 @@ module "fake_mesh_ecs_service" {
   log_stream_prefix = var.fake_mesh_version
   healthcheck_path  = var.fake_mesh_healthcheck_path
   enable_load_balancing = true
+  use_application_lb = false
   load_balancer_type = "network"
   protocol = "TCP"
 
