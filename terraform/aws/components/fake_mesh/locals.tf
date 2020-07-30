@@ -9,7 +9,6 @@ locals {
 
   availability_zones = ["${var.region}a", "${var.region}b", "${var.region}c"]
 
-  // TODO: fake-mesh image name
   image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/nhais-fake-mesh:${var.fake_mesh_version}"
   // 067756640211.dkr.ecr.eu-west-2.amazonaws.com/nhais-fake-mesh:0.2.0"
   # Use below when the ECR repo is created by terraform in account component.
