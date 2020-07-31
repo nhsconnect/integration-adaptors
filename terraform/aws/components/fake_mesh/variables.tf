@@ -42,7 +42,7 @@ variable "fake_mesh_service_launch_type" {
 variable "fake_mesh_version" {
   type = string
   description = "The version of fake-mesh to deploy"
-  default = "0.1.6"
+  default = "0.2.0"
 }
 
 variable "fake_mesh_healthcheck_path" {
