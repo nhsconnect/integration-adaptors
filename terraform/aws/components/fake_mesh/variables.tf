@@ -16,7 +16,7 @@ variable "environment" {
 variable "component" {
   type = string
   description = "Name of the component"
-  default = "nhais"
+  default = "fake_mesh"
 }
 
 variable "region" {
