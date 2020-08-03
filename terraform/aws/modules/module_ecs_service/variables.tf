@@ -210,7 +210,7 @@ variable "use_application_lb" {
 
 variable "use_network_lb" {
   type = bool
-  description = "True if the LB should be application type"
+  description = "True if the LB should be network type"
   default = false
 }
 
