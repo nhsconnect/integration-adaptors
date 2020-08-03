@@ -18,4 +18,5 @@ locals {
     cidrsubnet(data.terraform_remote_state.base.outputs.OneOneOne_cidr,2,1),
     cidrsubnet(data.terraform_remote_state.base.outputs.OneOneOne_cidr,2,2)
   ]
+
 }

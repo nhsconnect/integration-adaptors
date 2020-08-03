@@ -6,6 +6,13 @@ ecr_repositories = [
     prefix_to_keep  = "master",
     number_to_keep  = 10
   },
+  {
+    name = "111-nginx",
+    scan = false,
+    expire_PR_after = 10,
+    prefix_to_keep  = "master",
+    number_to_keep  = 10
+  },
   # {
   #   name = "nhais",
   #   scan = false,
