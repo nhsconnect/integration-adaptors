@@ -46,8 +46,7 @@ locals {
     },
     {
       name = "NHAIS_MESH_HOST"
-      // TODO: hardcoded default for now but it should just be from the var. This will be different for every env
-      value = var.nhais_mesh_host == "" ? "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/" : var.nhais_mesh_host
+      value = var.nhais_mesh_host
     },
     {
       name = "NHAIS_SCAN_MAILBOX_DELAY_IN_SECONDS"

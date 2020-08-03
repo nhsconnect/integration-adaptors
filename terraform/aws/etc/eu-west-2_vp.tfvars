@@ -27,3 +27,4 @@ OneOneOne_log_level = "DEBUG"
 
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
+nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
