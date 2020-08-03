@@ -5,7 +5,6 @@ resource "aws_security_group" "service_sg" {
     Name = "${local.resource_prefix}-sg"
   })
   description = "SG for app: ${var.component} in env: ${var.environment}"
-
 }
 
 resource "aws_security_group" "service_lb_sg" {

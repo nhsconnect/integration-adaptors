@@ -24,3 +24,7 @@ OneOneOne_service_target_request_count = 1200
 OneOneOne_service_container_port = 8080
 OneOneOne_service_launch_type = "FARGATE"
 OneOneOne_log_level = "DEBUG"
+
+# Settings for "fake_mesh" component
+fake_mesh_service_launch_type = "FARGATE"
+nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"

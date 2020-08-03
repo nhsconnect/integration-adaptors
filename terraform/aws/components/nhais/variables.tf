@@ -147,7 +147,8 @@ variable "ptl_connected" {
 variable "nhais_mesh_host" {
   type = string
   description = "URL for MESH host"
-  default = "https://fake-mesh:8829/messageexchange/"
+  #default = "https://fake-mesh:8829/messageexchange/"
+  default = ""
 }
 
 variable "nhais_scan_mailbox_delay" {

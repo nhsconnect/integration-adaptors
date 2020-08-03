@@ -202,6 +202,18 @@ variable "load_balancer_type" {
   default = "application"
 }
 
+variable "use_application_lb" {
+  type = bool
+  description = "True if the LB should be application type"
+  default = true
+}
+
+variable "use_network_lb" {
+  type = bool
+  description = "True if the LB should be network type"
+  default = false
+}
+
 variable "protocol" {
   type = string
   description = "Protocol for load balancer, HTTP or HTTPS"
@@ -267,6 +279,18 @@ variable "lb_allowed_security_groups" {
 variable "lb_allowed_cidrs" {
   type = list(string)
   description = "List of CIDRs that will be allowed to access the Load Balancer"
+  default = []
+}
+
+variable "container_allowed_security_groups" {
+  type = list(string)
+  description = "List of SG IDs that will be allowed to access the container(s)"
+  default = []
+}
+
+variable "container_allowed_cidrs" {
+  type = list(string)
+  description = "List of CIDRs that will be allowed to access the the container(s)"
   default = []
 }
 
