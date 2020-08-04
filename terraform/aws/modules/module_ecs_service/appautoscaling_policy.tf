@@ -2,8 +2,8 @@
 
 # An autoscaling policy for the MHS route ECS service that scales services so that each instance handles the desired
 # number of requests per minute.
-resource "aws_appautoscaling_policy" "mhs_route_autoscaling_policy" {
-  count = var.enable_load_balancing ? 1 : 0
+resource "aws_appautoscaling_policy" "service_autoscaling_policy" {
+  count = local.appautoscaling
   name               = "${local.resource_prefix}-autoscaling_policy"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.service_autoscaling_target[0].resource_id

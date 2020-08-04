@@ -10,11 +10,11 @@ locals {
     },
     {
       name = "NHAIS_MESH_OUTBOUND_QUEUE_NAME"
-      value = "nhais_mesh_outbound"
+      value = "${var.environment}_nhais_mesh_outbound"
     },
     {
       name = "NHAIS_MESH_INBOUND_QUEUE_NAME"
-      value = "nhais_mesh_inbound"
+      value = "${var.environment}_nhais_mesh_inbound"
     },
     {
       name = "NHAIS_AMQP_MAX_RETRIES"
@@ -29,7 +29,7 @@ locals {
       value = "nhais"
     },
     {
-      name  = "NHAIS_LOG_LEVEL"
+      name  = "NHAIS_LOGGING_LEVEL"
       value = var.nhais_log_level
     },
     {
@@ -46,7 +46,7 @@ locals {
     },
     {
       name = "NHAIS_MESH_HOST"
-      value = var.nhais_mesh_host //https://fake-mesh:8829/messageexchange/ / https://msg.intspineservices.nhs.uk/
+      value = var.nhais_mesh_host
     },
     {
       name = "NHAIS_SCAN_MAILBOX_DELAY_IN_SECONDS"
@@ -59,6 +59,6 @@ locals {
     {
       name = "NHAIS_SCHEDULER_ENABLED"
       value = var.nhais_scheduler_enabled // true
-    },
+    }
   ])
 }
