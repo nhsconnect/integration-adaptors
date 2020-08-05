@@ -44,6 +44,8 @@ module "OneOneOne_ecs_service" {
     data.terraform_remote_state.account.outputs.jumpbox_sg_id
   ]
 
+  additional_container_config = local.nginx_container_config
+
   create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
