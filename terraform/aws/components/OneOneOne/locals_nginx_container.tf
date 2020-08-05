@@ -28,7 +28,7 @@ locals {
       image     = local.nginx_image_name
 
       essential = true
-      portMappings = local.application_mapping
+      # portMappings = local.application_mapping
         # logConfiguration = {
         #   logDriver = "awslogs"
         #   options = {
