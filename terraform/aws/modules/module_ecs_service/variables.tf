@@ -314,6 +314,6 @@ variable "multiple_cointainers" {
 
 variable "additional_container_config" {
   type = list(any)
-  default = {}
+  default = []
   description = "Object (later converted to json) with configuration for additional containers"
 }
