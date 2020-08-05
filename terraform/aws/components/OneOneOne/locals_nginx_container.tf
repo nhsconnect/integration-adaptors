@@ -4,6 +4,8 @@ locals {
   nginx_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/111-nginx:${var.OneOneOne_build_id}"
   nginx_container_name = "${local.resource_prefix}-nginx_container"
 
+  local.log_stream_prefix
+
   application_mapping = [
     {
       containerPort = "443"
@@ -27,20 +29,31 @@ locals {
       name      = local.nginx_container_name
       image     = local.nginx_image_name
 
-      essential = true
+      essential = false
       # portMappings = local.application_mapping
-        # logConfiguration = {
-        #   logDriver = "awslogs"
-        #   options = {
-        #     awslogs-group           = aws_cloudwatch_log_group.ecs_service_cw_log_group.name
-        #     awslogs-create-group    = "true"
-        #     awslogs-region          = var.region
-        #     awslogs-stream-prefix   = var.log_stream_prefix
-        #     awslogs-datetime-format = var.logs_datetime_format
-        #   }
-        # }
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group           = aws_cloudwatch_log_group.ecs_service_cw_log_group.name
+          awslogs-create-group    = "true"
+          awslogs-region          = var.region
+          awslogs-stream-prefix   = var.OneOneOne_build_id
+          awslogs-datetime-format = "%Y-%m-%d %H:%M:%S%L"
+        }
+      }
         # environment = var.environment_variables
         # secrets = var.secret_variables
     }
   ]
+}
+
+# CW log  group
+
+resource "aws_cloudwatch_log_group" "ecs_service_cw_log_group" {
+  name = "/ecs/${local.resource_prefix}"
+
+  retention_in_days = var.logs_retention
+  tags = merge(local.default_tags, {
+    Name = "${local.resource_prefix}-cw_log_group"
+  })
 }
