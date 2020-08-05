@@ -3,7 +3,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   
   task_role_arn = var.task_role_arn
   execution_role_arn = var.task_execution_role_arn
-  container_definitions = jsonencode(
+  container_definitions = jsonencode(concat(
     [
       {
         name      = local.container_name
@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
         environment = var.environment_variables
         secrets = var.secret_variables
       }
-    ]
+    ],var.additional_container_config)
   )
 
   cpu = var.cpu_units

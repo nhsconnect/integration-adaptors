@@ -144,8 +144,8 @@ variable "ptl_connected" {
 
 # Additional nginx container in front of OneOneOne
 
-variable "use_nginx_proxy" {
+variable "OneOneOne_use_nginx_proxy" {
   type = bool
   description = "Should an additional container with nginx reverse proxy be deployed"
-  default = true
+  default = false
 }

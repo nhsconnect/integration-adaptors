@@ -17,6 +17,8 @@ nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 
 # Settings for "OneOneOne" component
+# OneOneOne in vp will be configured to use nginx reverse proxy
+OneOneOne_use_nginx_proxy = true
 OneOneOne_service_minimal_count = 2
 OneOneOne_service_desired_count = 2
 OneOneOne_service_maximal_count = 4

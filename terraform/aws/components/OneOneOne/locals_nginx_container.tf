@@ -1,36 +1,36 @@
 # Container configuration for nginx container
 
 locals {
-  nginx_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/111:${var.OneOneOne_build_id}"
+  nginx_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/111-nginx:${var.OneOneOne_build_id}"
   nginx_container_name = "${local.resource_prefix}-nginx_container"
 
   application_mapping = [
     {
-      containerPort = var.container_port
-      hostPort = var.container_port
-      protocol = var.container_protocol
+      containerPort = "443"
+      hostPort = "443"
+      protocol = "TCP"
     }
   ]
 
-  healthcheck_mapping = local.healthcheck_port == var.container_healthcheck_port ? [] : [
-    {
-      containerPort = var.container_healthcheck_port
-      hostPort = var.container_healthcheck_port
-      protocol = var.container_protocol
-    }
-  ]
+  # healthcheck_mapping = local.healthcheck_port == var.container_healthcheck_port ? [] : [
+  #   {
+  #     containerPort = var.container_healthcheck_port
+  #     hostPort = var.container_healthcheck_port
+  #     protocol = var.container_protocol
+  #   }
+  # ]
 
-  port_mappings = concat(local.application_mapping,local.healthcheck_mapping)
+  # port_mappings = concat(local.application_mapping,local.healthcheck_mapping)
 
 
-  nginx_container_config = jsonencode(
+  nginx_container_config = 
     [
       {
         name      = local.nginx_container_name
         image     = local.nginx_image_name
 
         essential = true
-        portMappings = local.port_mappings
+        portMappings = local.application_mapping
         # logConfiguration = {
         #   logDriver = "awslogs"
         #   options = {
@@ -45,6 +45,4 @@ locals {
         # secrets = var.secret_variables
       }
     ]
-  )
-
 }
