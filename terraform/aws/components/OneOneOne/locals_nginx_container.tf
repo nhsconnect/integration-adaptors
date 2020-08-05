@@ -4,8 +4,6 @@ locals {
   nginx_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/111-nginx:${var.OneOneOne_build_id}"
   nginx_container_name = "${local.resource_prefix}-nginx_container"
 
-  local.log_stream_prefix
-
   application_mapping = [
     {
       containerPort = "443"
