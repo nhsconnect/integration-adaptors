@@ -14,7 +14,7 @@ locals {
   image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/111:${var.OneOneOne_build_id}"
 
   lb_type = var.OneOneOne_use_nginx_proxy ? "network" : "application"
-  protocol = var.OneOneOne_use_nginx_proxy ? "TCP" : var.protocol
+  protocol = var.OneOneOne_use_nginx_proxy ? "TCP" : "HTTP"
 
   subnet_cidrs = [
     cidrsubnet(data.terraform_remote_state.base.outputs.OneOneOne_cidr,2,0),
