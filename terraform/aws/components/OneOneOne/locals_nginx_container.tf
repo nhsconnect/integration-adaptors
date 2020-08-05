@@ -22,15 +22,13 @@ locals {
 
   # port_mappings = concat(local.application_mapping,local.healthcheck_mapping)
 
+  nginx_container_config = [
+    {
+      name      = local.nginx_container_name
+      image     = local.nginx_image_name
 
-  nginx_container_config = 
-    [
-      {
-        name      = local.nginx_container_name
-        image     = local.nginx_image_name
-
-        essential = true
-        portMappings = local.application_mapping
+      essential = true
+      portMappings = local.application_mapping
         # logConfiguration = {
         #   logDriver = "awslogs"
         #   options = {
@@ -43,6 +41,6 @@ locals {
         # }
         # environment = var.environment_variables
         # secrets = var.secret_variables
-      }
-    ]
+    }
+  ]
 }
