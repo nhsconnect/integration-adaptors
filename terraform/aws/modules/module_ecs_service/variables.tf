@@ -313,7 +313,7 @@ variable "multiple_cointainers" {
 }
 
 variable "additional_container_config" {
-  type = list(object(any))
+  type = list(any)
   default = {}
   description = "Object (later converted to json) with configuration for additional containers"
 }
