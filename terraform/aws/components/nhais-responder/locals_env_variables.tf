@@ -26,7 +26,7 @@ locals {
     },
     {
       name = "NHAIS_MONGO_DATABASE_NAME"
-      value = "nhais"
+      value = "nhais-responder"
     },
     {
       name  = "NHAIS_LOGGING_LEVEL"

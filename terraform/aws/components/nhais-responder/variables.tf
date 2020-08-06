@@ -16,7 +16,7 @@ variable "environment" {
 variable "component" {
   type = string
   description = "Name of the component"
-  default = "nhais-responder"
+  default = "nhais"
 }
 
 variable "region" {
@@ -34,38 +34,38 @@ variable "tf_state_bucket" {
   description = "Name of S3 bucket with TF state of components"
 }
 
-variable "nhais-responder_service_desired_count" {
+variable "nhais_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
 }
 
-variable "nhais-responder_service_minimal_count" {
+variable "nhais_service_minimal_count" {
   type = number
   description = "Minimal number of containers to run in the service"
 }
 
-variable "nhais-responder_service_maximal_count" {
+variable "nhais_service_maximal_count" {
   type = number
   description = "Maximal number of containers to run in the service"
 }
 
-variable "nhais-responder_service_container_port" {
+variable "nhais_service_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
 }
 
-variable "nhais-responder_service_application_port" {
+variable "nhais_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
   default = 80
 }
 
-variable "nhais-responder_service_launch_type" {
+variable "nhais_service_launch_type" {
   type = string
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
 
-variable "nhais-responder_build_id" {
+variable "nhais_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
 }
@@ -75,43 +75,43 @@ variable "mq_broker_name" {
   description = "Name of the MQ broker shared between all envs"
 }
 
-variable "nhais-responder_mongo_options" {
+variable "nhais_mongo_options" {
   type = string
   description = "Options for Mongo"
   default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 }
 
-variable "nhais-responder_environment_variables" {
+variable "nhais_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
   default = []
 }
 
-variable "nhais-responder_log_level" {
+variable "nhais_log_level" {
   type = string
-  description = "Level of logging for nhais-responder application"
+  description = "Level of logging for NHAIS application"
   default = "INFO"
 }
 
-variable "nhais-responder_healthcheck_path" {
+variable "nhais_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
   default = "/healthcheck"
 }
 
-variable "nhais-responder_amqp_max_retries" {
+variable "nhais_amqp_max_retries" {
   type = number
   description = "Max retries on connection to amqp"
   default = 3
 }
 
-variable "nhais-responder_amqp_retry_delay" {
+variable "nhais_amqp_retry_delay" {
   type = number
   description = "Delay on retries to connect to amqp"
   default = 100
 }
 
-variable "nhais-responder_service_target_request_count" {
+variable "nhais_service_target_request_count" {
   type = number
   description = "The target number of requests per minute that an service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
   default = 1200
@@ -144,26 +144,26 @@ variable "ptl_connected" {
 
 # Variables for MESH mailbox
 
-variable "nhais-responder_mesh_host" {
+variable "nhais_mesh_host" {
   type = string
   description = "URL for MESH host"
   #default = "https://fake-mesh:8829/messageexchange/"
   default = ""
 }
 
-variable "nhais-responder_scan_mailbox_delay" {
+variable "nhais_scan_mailbox_delay" {
   type = number
   description = "Delay in seconds on scanning mesh mailbox"
   default = 300
 }
 
-variable "nhais-responder_scan_mailbox_interval" {
+variable "nhais_scan_mailbox_interval" {
   type = number
   description = "Interval in miliseconds between mailbox scans"
   default = 60000
 }
 
-variable "nhais-responder_scheduler_enabled" {
+variable "nhais_scheduler_enabled" {
   type = bool
   description = "Enable scheduler"
   default = true
