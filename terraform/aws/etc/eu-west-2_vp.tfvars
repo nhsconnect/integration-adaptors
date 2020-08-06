@@ -16,6 +16,15 @@ nhais_service_container_port = 8080
 nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 
+# Settings for "nhais-responder" component
+nhais-responder_service_minimal_count = 1
+nhais-responder_service_desired_count = 1
+nhais-responder_service_maximal_count = 4
+nhais-responder_service_target_request_count = 1200
+nhais-responder_service_container_port = 8080
+nhais-responder_service_launch_type = "FARGATE"
+nhais-responder_log_level = "DEBUG"
+
 # Settings for "OneOneOne" component
 OneOneOne_service_minimal_count = 2
 OneOneOne_service_desired_count = 2

@@ -12,14 +12,14 @@ module "nhais_ecs_service" {
 
   image_name        = local.image_name
   cluster_id        = data.terraform_remote_state.base.outputs.base_cluster_id
-  minimal_count     = var.nhais_service_minimal_count
-  desired_count     = var.nhais_service_desired_count
-  maximal_count     = var.nhais_service_maximal_count
-  service_target_request_count = var.nhais_service_target_request_count
+  minimal_count     = var.nhais-responder_service_minimal_count
+  desired_count     = var.nhais-responder_service_desired_count
+  maximal_count     = var.nhais-responder_service_maximal_count
+  service_target_request_count = var.nhais-responder_service_target_request_count
 
-  container_port    = var.nhais_service_container_port
-  application_port  = var.nhais_service_application_port
-  launch_type       = var.nhais_service_launch_type
+  container_port    = var.nhais-responder_service_container_port
+  application_port  = var.nhais-responder_service_application_port
+  launch_type       = var.nhais-responder_service_launch_type
   log_stream_prefix = var.nhais_build_id
   healthcheck_path  = var.nhais_healthcheck_path
   enable_load_balancing = true

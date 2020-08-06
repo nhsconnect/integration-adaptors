@@ -34,33 +34,33 @@ variable "tf_state_bucket" {
   description = "Name of S3 bucket with TF state of components"
 }
 
-variable "nhais_service_desired_count" {
+variable "nhais-responder_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
 }
 
-variable "nhais_service_minimal_count" {
+variable "nhais-responder_service_minimal_count" {
   type = number
   description = "Minimal number of containers to run in the service"
 }
 
-variable "nhais_service_maximal_count" {
+variable "nhais-responder_service_maximal_count" {
   type = number
   description = "Maximal number of containers to run in the service"
 }
 
-variable "nhais_service_container_port" {
+variable "nhais-responder_service_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
 }
 
-variable "nhais_service_application_port" {
+variable "nhais-responder_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
   default = 80
 }
 
-variable "nhais_service_launch_type" {
+variable "nhais-responder_service_launch_type" {
   type = string
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
