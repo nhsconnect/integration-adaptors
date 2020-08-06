@@ -24,6 +24,7 @@ nhais-responder_service_target_request_count = 1200
 nhais-responder_service_container_port = 8080
 nhais-responder_service_launch_type = "FARGATE"
 nhais-responder_log_level = "DEBUG"
+nhais-responder_build_id = "origin-develop-1-e985255"
 
 # Settings for "OneOneOne" component
 OneOneOne_service_minimal_count = 2

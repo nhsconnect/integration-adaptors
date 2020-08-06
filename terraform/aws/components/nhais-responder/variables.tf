@@ -65,7 +65,7 @@ variable "nhais-responder_service_launch_type" {
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
 
-variable "nhais_build_id" {
+variable "nhais-responder_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
 }
