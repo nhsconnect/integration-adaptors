@@ -52,6 +52,6 @@ module "nhais-responder_ecs_service" {
   create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
-  # lb_subnet_ids = data.terraform_remote_state.base.outputs.ptl_connected ? data.terraform_remote_state.base.outputs.ptl_lb_subnet_ids : aws_subnet.service_subnet.*.id
-  # container_subnet_ids= data.terraform_remote_state.base.outputs.ptl_connected ? data.terraform_remote_state.base.outputs.ptl_container_subnet_ids : aws_subnet.service_subnet.*.id
+  lb_subnet_ids = data.terraform_remote_state.nhais.outputs.nhais_service_subnets
+  container_subnet_ids= data.terraform_remote_state.nhais.outputs.nhais_service_subnets
 }
