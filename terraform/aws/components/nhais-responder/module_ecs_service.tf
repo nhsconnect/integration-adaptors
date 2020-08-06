@@ -1,4 +1,4 @@
-module "nhais_ecs_service" {
+module "nhais-responder_ecs_service" {
   source = "../../modules/module_ecs_service"
 
   project         = var.project

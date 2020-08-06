@@ -1,5 +1,5 @@
 output "nhais-responder_url" {
-  value = aws_route53_record.nhais_lb_record.name
+  value = aws_route53_record.nhais-responder_lb_record.name
   description = "The DNS name of the Route53 record pointing to the NHAIS service's load balancer."
 }
 
@@ -15,7 +15,7 @@ output "nhais_lb_port" {
 }
 
 output "nhais_lb_arn" {
-  value =  module.nhais_ecs_service.loadbalancer_arn
+  value =  module.nhais-responder_ecs_service.loadbalancer_arn
   description = "ARN of Service loadbalancer"
 }
 
