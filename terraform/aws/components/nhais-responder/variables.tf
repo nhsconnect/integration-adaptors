@@ -54,7 +54,7 @@ variable "nhais-responder_service_container_port" {
   description = "Port Number on which service within container will be listening"
 }
 
-variable "nhais-responder_service_application_port" {
+variable "nhais_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
   default = 80
