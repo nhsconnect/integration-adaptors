@@ -4,8 +4,8 @@ resource "aws_route53_record" "nhais-responder_lb_record" {
   type = "A"
 
   alias {
-    name    = module.nhais_ecs_service.loadbalancer_dns_name
-    zone_id = module.nhais_ecs_service.loadbalancer_zone_id
+    name    = module.nhais-responder_ecs_service.loadbalancer_dns_name
+    zone_id = module.nhais-responder_ecs_service.loadbalancer_zone_id
     evaluate_target_health = false
   }
 }
