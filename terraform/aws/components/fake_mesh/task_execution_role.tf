@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs_service_task_execution_role" {
-  name = "${local.resource_prefix}-responder-task_execution_role"
+  name = "${local.resource_prefix}-task_execution_role"
   assume_role_policy = data.aws_iam_policy_document.ecs_service_task_execution_assume_role.json
 }
 
@@ -24,7 +24,7 @@ resource "aws_iam_role_policy_attachment" "ecs_service_task_execution_policies_a
 }
 
 resource "aws_iam_policy" "ecs_service_task_execution_role_policy" {
-  name = "${local.resource_prefix}-responder-iam-task-execution-policy"
+  name = "${local.resource_prefix}-iam-task-execution-policy"
   description = "Policy for ECS tasks running fake-mesh in env: ${var.environment}"
   policy = data.aws_iam_policy_document.ecs_service_task_execution_policies.json
 }
