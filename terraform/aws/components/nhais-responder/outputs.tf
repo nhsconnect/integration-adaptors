@@ -9,8 +9,8 @@ output "nhais_lb_sg_id" {
 }
 # TODO - In case of chicken and egg situation - cross dependency between components - create SG and rules in base components and supply the SG IDs to components and ECS modules
 
-output "nhais_lb_port" {
-  value = var.nhais_service_application_port
+output "nhais-responder_lb_port" {
+  value = var.nhais-responder_service_application_port
   description = "Port on which NHAIS LB is listening"
 }
 

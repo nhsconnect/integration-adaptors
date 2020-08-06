@@ -24,7 +24,7 @@ module "nhais-responder_ecs_service" {
   healthcheck_path  = var.nhais_healthcheck_path
   enable_load_balancing = true
 
-  container_healthcheck_port = var.nhais_service_container_port
+  container_healthcheck_port = var.nhais-responder_service_container_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
 
