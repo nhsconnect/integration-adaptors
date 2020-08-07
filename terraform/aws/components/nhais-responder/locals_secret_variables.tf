@@ -17,27 +17,27 @@ locals {
       valueFrom = data.aws_secretsmanager_secret.docdb_master_password.arn
     },
     {
-      name = "NHAIS_RESPONDER_MESH_MAILBOX_ID"
+      name = "NHAIS_MESH_MAILBOX_ID"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_mailbox_id.arn
     },
     {
-      name = "NHAIS_RESPONDER_MESH_MAILBOX_PASSWORD"
+      name = "NHAIS_MESH_MAILBOX_PASSWORD"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_mailbox_password.arn
     },
     {
-      name = "NHAIS_RESPONDER_MESH_SHARED_KEY"
+      name = "NHAIS_MESH_SHARED_KEY"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_shared_key.arn
     },
     {
-      name = "NHAIS_RESPONDER_MESH_ENDPOINT_CERT"
+      name = "NHAIS_MESH_ENDPOINT_CERT"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_endpoint_cert.arn
     },
     {
-      name = "NHAIS_RESPONDER_MESH_CYPHER_TO_MAILBOX"
+      name = "NHAIS_MESH_CYPHER_TO_MAILBOX"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_recipient_codes.arn
     },
     {
-      name = "NHAIS_RESPONDER_MESH_ENDPOINT_PRIVATE_KEY"
+      name = "NHAIS_MESH_ENDPOINT_PRIVATE_KEY"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_endpoint_private_key.arn
     }
   ]
