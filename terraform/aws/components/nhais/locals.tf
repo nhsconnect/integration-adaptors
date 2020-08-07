@@ -7,7 +7,7 @@ locals {
 
   resource_prefix = "${var.project}-${var.environment}-${var.component}"
 
-  availability_zones = ["${var.region}a", "${var.region}b", "${var.region}c"]
+  availability_zones = var.ptl_connected ? ["${var.region}a", "${var.region}b"] : ["${var.region}a", "${var.region}b", "${var.region}c"]
 
   image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/nhais:${var.nhais_build_id}"
   # Use below when the ECR repo is created by terraform in account component.
