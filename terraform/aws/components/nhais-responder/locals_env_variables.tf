@@ -1,20 +1,20 @@
 locals {
   environment_variables = concat(var.nhais_environment_variables,[
     {
-      name  = "NHAIS-RESPONDER_OUTBOUND_SERVER_PORT"
-      value = var.nhais-responder_service_container_port
+      name  = "nhais_responder_OUTBOUND_SERVER_PORT"
+      value = var.nhais_responder_service_container_port
     },
     {
       name = "NHAIS_AMQP_BROKERS"
       value = replace(data.aws_mq_broker.nhais_mq_broker.instances[0].endpoints[1],"amqp+ssl","amqps") # https://www.terraform.io/docs/providers/aws/r/mq_broker.html#attributes-reference
     },
     {
-      name = "NHAIS-RESPONDER_MESH_OUTBOUND_QUEUE_NAME"
-      value = "${var.environment}_nhais-responder_mesh_outbound"
+      name = "nhais_responder_MESH_OUTBOUND_QUEUE_NAME"
+      value = "${var.environment}_nhais_responder_mesh_outbound"
     },
     {
-      name = "NHAIS-RESPONDER_MESH_INBOUND_QUEUE_NAME"
-      value = "${var.environment}_nhais-responder_mesh_inbound"
+      name = "nhais_responder_MESH_INBOUND_QUEUE_NAME"
+      value = "${var.environment}_nhais_responder_mesh_inbound"
     },
     {
       name = "NHAIS_AMQP_MAX_RETRIES"
@@ -26,11 +26,11 @@ locals {
     },
     {
       name = "NHAIS_MONGO_DATABASE_NAME"
-      value = "nhais-responder"
+      value = "nhais_responder"
     },
     {
-      name  = "NHAIS-RESPONDER_LOGGING_LEVEL"
-      value = var.nhais-responder_log_level
+      name  = "nhais_responder_LOGGING_LEVEL"
+      value = var.nhais_responder_log_level
     },
     {
       name = "NHAIS_MONGO_HOST"

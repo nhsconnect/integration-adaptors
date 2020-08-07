@@ -34,38 +34,38 @@ variable "tf_state_bucket" {
   description = "Name of S3 bucket with TF state of components"
 }
 
-variable "nhais-responder_service_desired_count" {
+variable "nhais_responder_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
 }
 
-variable "nhais-responder_service_minimal_count" {
+variable "nhais_responder_service_minimal_count" {
   type = number
   description = "Minimal number of containers to run in the service"
 }
 
-variable "nhais-responder_service_maximal_count" {
+variable "nhais_responder_service_maximal_count" {
   type = number
   description = "Maximal number of containers to run in the service"
 }
 
-variable "nhais-responder_service_container_port" {
+variable "nhais_responder_service_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
 }
 
-variable "nhais-responder_service_application_port" {
+variable "nhais_responder_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
   default = 80
 }
 
-variable "nhais-responder_service_launch_type" {
+variable "nhais_responder_service_launch_type" {
   type = string
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
 
-variable "nhais-responder_build_id" {
+variable "nhais_responder_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
 }
@@ -87,7 +87,7 @@ variable "nhais_environment_variables" {
   default = []
 }
 
-variable "nhais-responder_log_level" {
+variable "nhais_responder_log_level" {
   type = string
   description = "Level of logging for NHAIS application"
   default = "INFO"
@@ -111,7 +111,7 @@ variable "nhais_amqp_retry_delay" {
   default = 100
 }
 
-variable "nhais-responder_service_target_request_count" {
+variable "nhais_responder_service_target_request_count" {
   type = number
   description = "The target number of requests per minute that an service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
   default = 1200
