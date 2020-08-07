@@ -5,7 +5,7 @@ output "nhais_responder_url" {
 
 output "nhais_lb_sg_id" {
   value = module.nhais_responder_ecs_service.loadbalancer_sg_id
-  description = "Security Group ID for NHAIS-Respomder load balancer, use it create rules to allow other components to connect"
+  description = "Security Group ID for NHAIS_Responder load balancer, use it create rules to allow other components to connect"
 }
 # TODO - In case of chicken and egg situation - cross dependency between components - create SG and rules in base components and supply the SG IDs to components and ECS modules
 
