@@ -15,6 +15,7 @@ nhais_service_target_request_count = 1200
 nhais_service_container_port = 8080
 nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
+nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
 
 # Settings for "nhais-responder" component
 nhais-responder_service_minimal_count = 1
@@ -37,4 +38,3 @@ OneOneOne_log_level = "DEBUG"
 
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
-nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
