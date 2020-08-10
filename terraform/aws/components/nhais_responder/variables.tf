@@ -87,7 +87,7 @@ variable "nhais_environment_variables" {
   default = []
 }
 
-variable "nhais_responder_log_level" {
+variable "nhais_log_level" {
   type = string
   description = "Level of logging for NHAIS application"
   default = "INFO"
