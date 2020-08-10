@@ -26,7 +26,6 @@ nhais_responder_service_container_port = 8090
 nhais_responder_service_launch_type = "FARGATE"
 nhais_responder_log_level = "DEBUG"
 nhais_responder_build_id = "origin-develop-1-e985255"
-nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
 
 # Settings for "OneOneOne" component
 OneOneOne_service_minimal_count = 2
