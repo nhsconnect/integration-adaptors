@@ -14,7 +14,7 @@ resource "aws_security_group_rule" "nhais_responder_to_fakemesh"{
   from_port = 8829
   to_port = 8829
   protocol = "TCP"
-  security_group_id = data.terraform_remote_state.nhais.outputs.nhais_responder_external_access_sg_id
+  security_group_id = data.terraform_remote_state.nhais_responder.outputs.nhais_responder_external_access_sg_id
   cidr_blocks = [
     data.terraform_remote_state.base.outputs.nhais_cidr
   ]
