@@ -29,8 +29,8 @@ locals {
       value = "nhais_responder"
     },
     {
-      name  = "NHAIS_RESPONDER_LOGGING_LEVEL"
-      value = var.nhais_responder_log_level
+      name  = "NHAIS_LOGGING_LEVEL"
+      value = var.nhais_log_level
     },
     {
       name = "NHAIS_MONGO_HOST"
