@@ -20,7 +20,7 @@ nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchan
 # Settings for "nhais_responder" component
 nhais_responder_service_minimal_count = 1
 nhais_responder_service_desired_count = 1
-nhais_responder_service_maximal_count = 4
+nhais_responder_service_maximal_count = 1
 nhais_responder_service_target_request_count = 1200
 nhais_responder_service_container_port = 8090
 nhais_responder_service_launch_type = "FARGATE"
