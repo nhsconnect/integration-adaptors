@@ -3,7 +3,7 @@ String region = "eu-west-2"
 Map <String, Map<String, String>> componentImageBranch = [
   OneOneOne: [ecrRepo: "111",   branch: "master"],
   nhais:     [ecrRepo: "nhais", branch: "develop"],
-  nhais_responder: [ecrRepo: "nhais-fake-responder", branch: "feature/NIAD-448-fake-nhais-responder"]
+  nhais_responder: [ecrRepo: "nhais-fake-responder", branch: "origin-develop"]
 ]
 
 pipeline {
