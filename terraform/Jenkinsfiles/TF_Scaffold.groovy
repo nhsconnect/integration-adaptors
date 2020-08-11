@@ -53,7 +53,7 @@ pipeline {
 
             //Get the build_id variable if in application component
             if (componentImageBranch.containsKey(params.Component)) {
-              variablesMap.put("origin-${params.Component}_build_id", getLatestImageTag(componentImageBranch[params.Component].branch, componentImageBranch[params.Component].ecrRepo, region))
+              variablesMap.put("${params.Component}_build_id", getLatestImageTag(componentImageBranch[params.Component].branch, componentImageBranch[params.Component].ecrRepo, region))
             }
 
             // Get the variables from job parameters
