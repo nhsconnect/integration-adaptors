@@ -10,11 +10,11 @@ locals {
     },
     {
       name = "NHAIS_MESH_OUTBOUND_QUEUE_NAME"
-      value = "${var.environment}_nhais_mesh_outbound"
+      value = "${var.environment}_nhais_responder_mesh_outbound"
     },
     {
       name = "NHAIS_MESH_INBOUND_QUEUE_NAME"
-      value = "${var.environment}_nhais_mesh_inbound"
+      value = "${var.environment}_nhais_responder_mesh_inbound"
     },
     {
       name = "NHAIS_AMQP_MAX_RETRIES"
@@ -30,7 +30,7 @@ locals {
     },
     {
       name  = "NHAIS_LOGGING_LEVEL"
-      value = var.nhais_log_level
+      value = var.nhais_responder_log_level
     },
     {
       name = "NHAIS_MONGO_HOST"
