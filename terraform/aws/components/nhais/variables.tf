@@ -151,6 +151,13 @@ variable "nhais_mesh_host" {
   default = ""
 }
 
+variable "NHAIS_MESH_CERT_VALIDATION" {
+  type = string
+  description = "false will disable certificate validation for SSL connection"
+  #default = "false"
+  default = "false"
+}
+
 variable "nhais_scan_mailbox_delay" {
   type = number
   description = "Delay in seconds on scanning mesh mailbox"
