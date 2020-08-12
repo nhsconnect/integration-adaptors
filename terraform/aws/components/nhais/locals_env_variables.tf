@@ -17,6 +17,10 @@ locals {
       value = "${var.environment}_nhais_mesh_inbound"
     },
     {
+      name = "NHAIS_GP_SYSTEM_INBOUND_QUEUE_NAME"
+      value = "${var.environment}_nhais_gp_system_inbound"
+    },
+    {
       name = "NHAIS_AMQP_MAX_RETRIES"
       value = var.nhais_amqp_max_retries
     },
