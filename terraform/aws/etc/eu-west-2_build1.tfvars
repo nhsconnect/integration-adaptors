@@ -15,7 +15,7 @@ nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 # TODO: Determine correct OpenTest MESH details for build1
 # nhais_mesh_host = "https://localhost:8829/messageexchange/"
-nhais_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
+nhais_mesh_host = "https://192.168.128.11/messageexchange/"
 nhais_mesh_cert_validation = "false"
 
 # Settings for "OneOneOne" component
