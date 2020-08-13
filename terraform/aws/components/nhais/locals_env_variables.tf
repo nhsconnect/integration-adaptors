@@ -53,6 +53,10 @@ locals {
       value = var.nhais_mesh_host
     },
     {
+      name = "NHAIS_MESH_CERT_VALIDATION"
+      value = var.nhais_mesh_cert_validation
+    },
+    {
       name = "NHAIS_SCAN_MAILBOX_DELAY_IN_SECONDS"
       value = var.nhais_scan_mailbox_delay // 300
     },

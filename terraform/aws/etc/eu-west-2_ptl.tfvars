@@ -14,6 +14,7 @@ nhais_service_container_port = 8080
 nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 nhais_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
+nhais_mesh_cert_validation = "true"
 
 # Settings for "OneOneOne" component
 # Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number

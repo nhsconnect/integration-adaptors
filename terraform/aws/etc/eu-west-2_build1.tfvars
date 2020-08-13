@@ -15,6 +15,7 @@ nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 # TODO: Determine correct OpenTest MESH details for build1
 nhais_mesh_host = "https://localhost:8829/messageexchange/"
+nhais_mesh_cert_validation = "true"
 
 # Settings for "OneOneOne" component
 # Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number
