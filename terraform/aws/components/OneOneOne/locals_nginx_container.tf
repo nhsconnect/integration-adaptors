@@ -12,6 +12,39 @@ locals {
     }
   ]
 
+  nginx_secrets = [
+    {
+      name = "NGINX_PUBLIC_CERT"
+      valueFrom = data.aws_secretsmanager_secret.nginx_server_certificate
+    },
+    {
+      name = "NGINX_PRIVATE_CERT"
+      valueFrom = data.aws_secretsmanager_secret.nginx_server_certificate_key
+    },
+    {
+      name = "NGINX_CLIENT_PUBLIC_CERT"
+      valueFrom = data.aws_secretsmanager_secret.nginx_client_certificate
+    },
+    {
+      name = "NGINX_CA_CERT"
+      valueFrom = data.aws_secretsmanager_secret.nginx_ca_certificate
+    }
+  ]
+  nginx_env_variables = [
+    {
+      name = "NGINX_ADAPTER_HOSTNAME"
+      value = "localhost"
+    },
+    {
+      name = "NGINX_ADAPTER_PORT"
+      value = var.OneOneOne_service_container_port
+    },
+    {
+      name = "DEBUG"
+      value = "true"
+    }
+  ]
+
   # healthcheck_mapping = local.healthcheck_port == var.container_healthcheck_port ? [] : [
   #   {
   #     containerPort = var.container_healthcheck_port
@@ -40,7 +73,8 @@ locals {
         }
       }
         # environment = var.environment_variables
-        # secrets = var.secret_variables
+        secrets = local.nginx_secrets
+        variables = local.nginx_env_variables
     }
   ]
 }
