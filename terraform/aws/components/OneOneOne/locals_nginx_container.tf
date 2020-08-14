@@ -37,7 +37,7 @@ locals {
     },
     {
       name = "NGINX_ADAPTER_PORT"
-      value = var.OneOneOne_service_container_port
+      value = tostring(var.OneOneOne_service_container_port)
     },
     {
       name = "DEBUG"
