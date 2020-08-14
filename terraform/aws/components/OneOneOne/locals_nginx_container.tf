@@ -15,19 +15,19 @@ locals {
   nginx_secrets = [
     {
       name = "NGINX_PUBLIC_CERT"
-      valueFrom = data.aws_secretsmanager_secret.nginx_server_certificate
+      valueFrom = data.aws_secretsmanager_secret.nginx_server_certificate.arn
     },
     {
       name = "NGINX_PRIVATE_CERT"
-      valueFrom = data.aws_secretsmanager_secret.nginx_server_certificate_key
+      valueFrom = data.aws_secretsmanager_secret.nginx_server_certificate_key.arn
     },
     {
       name = "NGINX_CLIENT_PUBLIC_CERT"
-      valueFrom = data.aws_secretsmanager_secret.nginx_client_certificate
+      valueFrom = data.aws_secretsmanager_secret.nginx_client_certificate.arn
     },
     {
       name = "NGINX_CA_CERT"
-      valueFrom = data.aws_secretsmanager_secret.nginx_ca_certificate
+      valueFrom = data.aws_secretsmanager_secret.nginx_ca_certificate.arn
     }
   ]
   nginx_env_variables = [
