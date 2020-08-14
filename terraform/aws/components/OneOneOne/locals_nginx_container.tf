@@ -72,9 +72,8 @@ locals {
           awslogs-datetime-format = "%Y-%m-%d %H:%M:%S%L"
         }
       }
-        # environment = var.environment_variables
         secrets = local.nginx_secrets
-        variables = local.nginx_env_variables
+        environment = local.nginx_env_variables
     }
   ]
 }
