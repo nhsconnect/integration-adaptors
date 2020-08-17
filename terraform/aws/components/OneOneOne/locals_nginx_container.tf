@@ -42,7 +42,12 @@ locals {
     {
       name = "DEBUG"
       value = "true"
+    },
+    {
+      name = "SERVICE_HEALTHCHECK"
+      value = var.OneOneOne_healthcheck_path
     }
+
   ]
 
   # healthcheck_mapping = local.healthcheck_port == var.container_healthcheck_port ? [] : [

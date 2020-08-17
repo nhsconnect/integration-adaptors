@@ -65,6 +65,18 @@ variable "OneOneOne_service_application_port" {
   default = 80
 }
 
+variable "OneOneOne_nginx_container_port" {
+  type = number
+  description = "Port Number on which service within container will be listening"
+  default = 443
+}
+
+variable "OneOneOne_nginx_application_port" {
+  type = number
+  description = "Port number on which the service load balancer will listen"
+  default = 443
+}
+
 variable "OneOneOne_service_launch_type" {
   type = string
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
@@ -109,6 +121,18 @@ variable "OneOneOne_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
   default = "/actuator/health"
+}
+
+variable "OneOneOne_nginx_healthcheck_path" {
+  type = string
+  description = "Path for status of nginx container, then routed to 111 container"
+  default = "/healthcheck"
+}
+
+variable "OneOneOne_nginx_healthcheck_port" {
+  type = number
+  description = "Port for nginx healthcheck"
+  default = 80
 }
 
 variable "OneOneOne_amqp_max_retries" {
