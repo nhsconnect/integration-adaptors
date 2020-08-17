@@ -21,13 +21,13 @@ module "OneOneOne_ecs_service" {
   application_port  = var.OneOneOne_use_nginx_proxy ? var.OneOneOne_nginx_application_port : var.OneOneOne_service_application_port
   launch_type       = var.OneOneOne_service_launch_type
   log_stream_prefix = var.OneOneOne_build_id
-  healthcheck_path  = var.OneOneOne_use_nginx_proxy ?  var.OneOneOne_nginx_healthcheck_path : var.OneOneOne_service_healthcheck_path
+  healthcheck_path  = var.OneOneOne_use_nginx_proxy ?  var.OneOneOne_nginx_healthcheck_path : var.OneOneOne_healthcheck_path
   enable_load_balancing = true
   use_application_lb = var.OneOneOne_use_nginx_proxy ? false : true
   load_balancer_type = var.OneOneOne_use_nginx_proxy ? "network" : "application"
   protocol = var.OneOneOne_use_nginx_proxy ? "TCP" : "HTTP"
 
-  container_healthcheck_port = var.OneOneOne_use_nginx_proxy ? var.OneOneOne_nginx_healthcheck_port :  var.OneOneOne_service_healthcheck_port
+  container_healthcheck_port = var.OneOneOne_use_nginx_proxy ? var.OneOneOne_nginx_healthcheck_port :  var.OneOneOne_service_container_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
 
