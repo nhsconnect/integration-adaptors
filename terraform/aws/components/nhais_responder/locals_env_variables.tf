@@ -37,6 +37,10 @@ locals {
       value = "${data.terraform_remote_state.base.outputs.docdb_cluster_endpoint}"
     },
     {
+      name = "NHAIS_MESH_CERT_VALIDATION"
+      value = var.nhais_mesh_cert_validation
+    },
+    {
       name = "NHAIS_MONGO_PORT"
       value = "${data.terraform_remote_state.base.outputs.docdb_instance_port}"
     },

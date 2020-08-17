@@ -154,7 +154,6 @@ variable "nhais_mesh_host" {
 variable "nhais_mesh_cert_validation" {
   type = string
   description = "false will disable certificate validation for SSL connection"
-  #default = "true"
   default = "true"
 }
 
