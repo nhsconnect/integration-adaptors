@@ -39,7 +39,7 @@ Azure(azure, "Azure", "Cloud") {
                     AzureContainerInstance(inbound, "MHS Inbound", "Python", "API for Spine callback")
                     AzureContainerInstance(pem, "111 PEM", "Java", "111 PEM Adaptor")
                     AzureContainerInstance(redis, "SDS Cache", "Cached SDS route and reliability information")
-                    AzureContainerInstance(nhais, "NHAIS", "Java", "FHIR API for outbound transactions\nMESH API")
+                    AzureContainerInstance(nhais, "NHAIS", "Java", "FHIR API for outbound transactions")
                 }
             }
         }
@@ -63,7 +63,7 @@ Azure(azure, "Azure", "Cloud") {
         }
     }
 }
-System_Ext(nhs, "NHS Systems", "Spine, SDS, etc")
+System_Ext(nhs, "NHS Systems", "Spine, SDS, MESH, etc")
 AzureContainerRegistry(dockerHub, "Docker Hub", "Adaptor Docker containers")
 gp --down-> ingress
 111 --left-> ingress
