@@ -34,6 +34,10 @@ data "aws_secretsmanager_secret" "nhais_mesh_endpoint_cert" {
   name = "nhais_${var.environment}_mesh_endpoint_cert"
 }
 
+data "aws_secretsmanager_secret" "nhais_mesh_sub_ca" {
+  name = "nhais_${var.environment}_mesh_sub_ca"
+}
+
 data "aws_secretsmanager_secret" "nhais_mesh_recipient_codes" {
   name = "nhais_${var.environment}_mesh_recipient_codes"
 }

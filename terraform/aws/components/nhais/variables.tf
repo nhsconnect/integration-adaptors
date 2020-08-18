@@ -147,20 +147,31 @@ variable "ptl_connected" {
 variable "nhais_mesh_host" {
   type = string
   description = "URL for MESH host"
-  #default = "https://fake-mesh:8829/messageexchange/"
   default = ""
 }
 
-variable "nhais_scan_mailbox_delay" {
+variable "nhais_mesh_cert_validation" {
+  type = string
+  description = "false will disable certificate validation for SSL connection"
+  default = "true"
+}
+
+variable "nhais_mesh_polling_cycle_minimum_interval_in_seconds" {
   type = number
   description = "Delay in seconds on scanning mesh mailbox"
   default = 300
 }
 
-variable "nhais_scan_mailbox_interval" {
+variable "nhais_mesh_client_wakeup_interval_in_milliseconds" {
   type = number
   description = "Interval in miliseconds between mailbox scans"
   default = 60000
+}
+
+variable "nhais_mesh_polling_cycle_duration_in_seconds" {
+  type = number
+  description = "Duration of mesh polling cycle"
+  default = 285
 }
 
 variable "nhais_scheduler_enabled" {

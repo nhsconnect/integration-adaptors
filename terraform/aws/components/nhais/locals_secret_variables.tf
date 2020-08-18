@@ -39,6 +39,10 @@ locals {
     {
       name = "NHAIS_MESH_ENDPOINT_PRIVATE_KEY"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_endpoint_private_key.arn
+    },
+    {
+      name = "NHAIS_MESH_SUB_CA"
+      valueFrom = data.aws_secretsmanager_secret.nhais_mesh_sub_ca.arn
     }
   ]
 }

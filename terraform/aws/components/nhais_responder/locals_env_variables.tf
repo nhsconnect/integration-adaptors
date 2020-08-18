@@ -49,16 +49,24 @@ locals {
       value = var.nhais_mesh_host
     },
     {
-      name = "NHAIS_SCAN_MAILBOX_DELAY_IN_SECONDS"
-      value = var.nhais_scan_mailbox_delay // 300
+      name = "NHAIS_MESH_CERT_VALIDATION"
+      value = var.nhais_mesh_cert_validation
     },
     {
-      name = "NHAIS_SCAN_MAILBOX_INTERVAL_IN_MILLISECONDS"
-      value = var.nhais_scan_mailbox_interval // 60000
+      name = "NHAIS_MESH_POLLING_CYCLE_MINIMUM_INTERVAL_IN_SECONDS"
+      value = var.nhais_mesh_polling_cycle_minimum_interval_in_seconds
+    },
+    {
+      name = "NHAIS_MESH_CLIENT_WAKEUP_INTERVAL_IN_MILLISECONDS"
+      value = var.nhais_mesh_client_wakeup_interval_in_milliseconds
     },
     {
       name = "NHAIS_SCHEDULER_ENABLED"
-      value = var.nhais_scheduler_enabled // true
+      value = var.nhais_scheduler_enabled
+    },
+    {
+      name = "NHAIS_MESH_POLLING_CYCLE_DURATION_IN_SECONDS",
+      value = var.nhais_mesh_polling_cycle_duration_in_seconds
     }
   ])
 }

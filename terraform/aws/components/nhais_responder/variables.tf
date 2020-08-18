@@ -149,16 +149,28 @@ variable "nhais_mesh_host" {
   description = "URL for MESH host"
 }
 
-variable "nhais_scan_mailbox_delay" {
-  type = number
-  description = "Delay in seconds on scanning mesh mailbox"
-  default = 300
+variable "nhais_mesh_cert_validation" {
+  type = string
+  description = "false will disable certificate validation for SSL connection"
+  default = "true"
 }
 
-variable "nhais_scan_mailbox_interval" {
+variable "nhais_mesh_polling_cycle_minimum_interval_in_seconds" {
   type = number
-  description = "Interval in miliseconds between mailbox scans"
-  default = 60000
+  description = "Minimum interval between MESH polling cycles"
+  default = 30
+}
+
+variable "nhais_mesh_client_wakeup_interval_in_milliseconds" {
+  type = number
+  description = "Interval between each mesh client wakeup"
+  default = 5000
+}
+
+variable "nhais_mesh_polling_cycle_duration_in_seconds" {
+  type = number
+  description = "Duration of mesh polling cycle"
+  default = 25
 }
 
 variable "nhais_scheduler_enabled" {

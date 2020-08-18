@@ -14,9 +14,10 @@ nhais_service_maximal_count = 4
 nhais_service_target_request_count = 1200
 nhais_service_container_port = 8080
 nhais_service_launch_type = "FARGATE"
-nhais_log_level = "DEBUG"
+nhais_log_level = "INFO"
 # nhais_mesh_host is also used by nhais_responder component, they must use the same MESH instance to work correctly
 nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
+nhais_mesh_cert_validation = "false"
 
 # Settings for "nhais_responder" component
 nhais_responder_service_minimal_count = 1
@@ -25,7 +26,7 @@ nhais_responder_service_maximal_count = 1
 nhais_responder_service_target_request_count = 1200
 nhais_responder_service_container_port = 8090
 nhais_responder_service_launch_type = "FARGATE"
-nhais_responder_log_level = "DEBUG"
+nhais_responder_log_level = "INFO"
 
 # Settings for "OneOneOne" component
 OneOneOne_service_minimal_count = 2
