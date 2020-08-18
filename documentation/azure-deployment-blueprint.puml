@@ -39,6 +39,7 @@ Azure(azure, "Azure", "Cloud") {
                     AzureContainerInstance(inbound, "MHS Inbound", "Python", "API for Spine callback")
                     AzureContainerInstance(pem, "111 PEM", "Java", "111 PEM Adaptor")
                     AzureContainerInstance(redis, "SDS Cache", "Cached SDS route and reliability information")
+                    AzureContainerInstance(nhais, "NHAIS", "Java", "FHIR API for outbound transactions\nMESH API")
                 }
             }
         }
@@ -47,8 +48,13 @@ Azure(azure, "Azure", "Cloud") {
             the same VNET as the
             GP Supplier systems
         end note
-        AzureCosmosDb(cosmos, "State Db", "MongoDb")
+        AzureCosmosDb(cosmos, "MHS State Db\nNHAIS Sequence Numbers\nNHAIS Inbound state\nNHAIS Outbound state", "MongoDb")
         AzureServiceBus(asb, "MHS Inbound Queue", "Consumed by GP System")
+        rectangle "NHAIS Queues" {
+            AzureServiceBus(nhaisOutboundQueue, "NHAIS Outbound Queue", "Internal to Adaptor", )
+            AzureServiceBus(nhaisInboundQueue, "NHAIS Outbound Queue", "Internal to Adaptor", )
+            AzureServiceBus(nhaisQueue, "GP System Inbound Queue ", "Consumed by GP System", )
+        }
         AzureServiceBus(pemQueue, "111 PEM Queue", "Consumed by GP System")
         AzureKeyVault(kv, "Key Vault", "Adaptor Secrets needed by AKS when deploying pods")
         AzureMonitor(monitor, "Logs/Events/Pod Metrics", "view Kubernetes logs, events, and pod metrics in real-time")
@@ -64,11 +70,17 @@ gp --down-> ingress
 ingress --down-> outbound
 ingress --down-> inbound
 ingress --down-> pem
+ingress --down-> nhais
 outbound --down-> sds
 outbound --left-> cosmos
 outbound --down->vpn
+nhais --down->vpn
 inbound -> cosmos
 inbound --down-> asb
+nhais --left->cosmos
+nhais --right-> nhaisOutboundQueue
+nhais --right-> nhaisInboundQueue
+nhais --right-> nhaisQueue
 pem --> pemQueue
 sds --right-> redis
 sds -> vpn
@@ -76,6 +88,7 @@ aks --up-> dockerHub
 aks --> kv
 vpn --up-> ingress
 asb ..> gp
+nhaisQueue ..> gp
 pemQueue ..> gp
 aks --> monitor
 vpn <--> nhs
