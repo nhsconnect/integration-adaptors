@@ -115,7 +115,7 @@ Cloudalt(aws, "AWS Cloud", "") {
                         ELBApplicationLoadBalancer(routeLB, "Route Application Load Balancer", "")
                     }
                     rectangle "NHAIS ALB Security Group" {
-                        ELBApplicationLoadBalancer(nhaisLB, "Outbound MHS Application Load Balancer", "")
+                        ELBApplicationLoadBalancer(nhaisLB, "NHAIS Application Load Balancer", "")
                     }
                     ELBNetworkLoadBalancer(inboundLB, "Inbound MHS Network Load Balancer", "")
                     ElasticLoadBalancing(111LB, "111 Elastic Load Balancer", "")
