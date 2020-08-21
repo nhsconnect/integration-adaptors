@@ -39,9 +39,10 @@ rectangle {
 Cloudalt(aws, "AWS Cloud", "") {
     rectangle {
     Region(euWest, "eu-west-2 (London) Region", "") {
-        DocumentDBwithMongoDBcompatibility(stateDb, "State Database\n(DocumentDb)", "DocumentDb")
-        DocumentDBwithMongoDBcompatibility(syncDb, "Sync-Async Database\n(DocumentDb)", "DocumentDb")
-        SimpleStorageServiceS3(containerLayerStore, "Container Layer Store", "Technology", "Optional Description")
+        DocumentDBwithMongoDBcompatibility(stateDb, "DocumentDb\n(State Database)", "")
+        DocumentDBwithMongoDBcompatibility(syncDb, "DocumentDb\n(Sync-Async Database)", "")
+        SimpleStorageServiceS3(containerLayerStore, "Container Layer Store", "Technology", "")
+        MQ(nhaisQueue, "Amazon MQ\n(NHAIS MESH Inbound/Outbound Queues)", "")
         CloudWatch(cw, "CloudWatch", "")
         SecretsManager(secrets, "Secrets Manager", "")
         EC2ContainerRegistry(ecr, "Container Registry", "")
@@ -53,6 +54,9 @@ Cloudalt(aws, "AWS Cloud", "") {
                 VPCEndpoints(ep, "DocumentDb VPC Endpoint", "")
                 rectangle "ECR Security Group" {
                     VPCElasticNetworkInterface(ecrVPC, "ECR VPC Endpoint", "")
+                }
+                rectangle "MQ Security Group" {
+                    VPCElasticNetworkInterface(mqVPC, "MQ VPC Endpoint", "")
                 }
                 VPCEndpoints(s3ep, "S3 VPC Endpoint", "")
                 rectangle "CloudWatch Security Group" {
@@ -91,6 +95,13 @@ Cloudalt(aws, "AWS Cloud", "") {
                             }
                         }
                     }
+                    rectangle "NHAIS Security Group" as nhaissg {
+                        ECSService(nhaisService, "NHAIS Fargate Service", "") {
+                            rectangle "NHAIS ECS Fargate Task" {
+                                ECSContainer1(nhaisTask, "NHAIS Containers", "")
+                            }
+                        }
+                    }
                 }
                 }
             }
@@ -102,6 +113,9 @@ Cloudalt(aws, "AWS Cloud", "") {
                     }
                     rectangle "Route ALB Security Group" {
                         ELBApplicationLoadBalancer(routeLB, "Route Application Load Balancer", "")
+                    }
+                    rectangle "NHAIS ALB Security Group" {
+                        ELBApplicationLoadBalancer(nhaisLB, "NHAIS Application Load Balancer", "")
                     }
                     ELBNetworkLoadBalancer(inboundLB, "Inbound MHS Network Load Balancer", "")
                     ElasticLoadBalancing(111LB, "111 Elastic Load Balancer", "")
@@ -142,6 +156,8 @@ Cloudalt(aws, "AWS Cloud", "") {
 rectangle OpenTest {
     VPCVPNGateway(vpng, "OpenTest VPN", "")
     EC2Instance(spine, "OpenTest Spine", "")
+    EC2Instance(mesh, "MESH", "")
+    EC2Instance(sds, "SDS", "")
 }
 
 rectangle "111 Providers" {
@@ -151,18 +167,22 @@ rectangle "111 Providers" {
 fargate --up--> secrets
 fargate --up--> s3ep
 s3ep --up--> containerLayerStore
+oTask --up--> ep
+oTask --down-->routeLB
+nhaisTask --up-> mqVPC
+mqVPC --up-> nhaisQueue
+nhaisTask --up-> ep
 fargate --up--> cwep
 cwep --up--> cw
 fargate --up--> ecrVPC
 ecrVPC --up-->ecr
-oTask --up--> ep
-oTask --down-->routeLB
 routeLB --> rTask
 rTask --down--> openTestPeering
 rTask --down--> redis
 ep --up--> stateDb
 ep --up--> syncDb
 oTask --down-- openTestPeering
+nhaisTask --down-- openTestPeering
 iTask --up--> ep
 routeLB --down-- openTestPeering
 openTestPeering --down--> fwd
@@ -178,8 +198,12 @@ supplierPeering --down--supplierSystem
 supplierSystem --right--> inboundQueue
 supplierPeering --up--> outboundLB
 outboundLB --up--> oTask
+supplierPeering --up--> nhaisLB
+nhaisLB --up--> nhaisTask
 openTestGateway --down--> vpng
 vpng --> spine
+vpng --> mesh
+vpng --> sds
 inboundLB --up--> iTask
 openTestPeering --up--> inboundLB
 gateway --up--> 111LB
