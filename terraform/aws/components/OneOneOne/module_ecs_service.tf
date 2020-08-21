@@ -17,14 +17,17 @@ module "OneOneOne_ecs_service" {
   maximal_count     = var.OneOneOne_service_maximal_count
   service_target_request_count = var.OneOneOne_service_target_request_count
 
-  container_port    = var.OneOneOne_service_container_port
-  application_port  = var.OneOneOne_service_application_port
+  container_port    = var.OneOneOne_use_nginx_proxy ? var.OneOneOne_nginx_container_port : var.OneOneOne_service_container_port
+  application_port  = var.OneOneOne_use_nginx_proxy ? var.OneOneOne_nginx_application_port : var.OneOneOne_service_application_port
   launch_type       = var.OneOneOne_service_launch_type
   log_stream_prefix = var.OneOneOne_build_id
-  healthcheck_path  = var.OneOneOne_healthcheck_path
+  healthcheck_path  = var.OneOneOne_use_nginx_proxy ?  var.OneOneOne_nginx_healthcheck_path : var.OneOneOne_healthcheck_path
   enable_load_balancing = true
+  use_application_lb = var.OneOneOne_use_nginx_proxy ? false : true
+  load_balancer_type = var.OneOneOne_use_nginx_proxy ? "network" : "application"
+  protocol = var.OneOneOne_use_nginx_proxy ? "TCP" : "HTTP"
 
-  container_healthcheck_port = var.OneOneOne_service_container_port
+  container_healthcheck_port = var.OneOneOne_use_nginx_proxy ? var.OneOneOne_nginx_healthcheck_port :  var.OneOneOne_service_container_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
 
@@ -43,6 +46,8 @@ module "OneOneOne_ecs_service" {
   lb_allowed_security_groups = [
     data.terraform_remote_state.account.outputs.jumpbox_sg_id
   ]
+
+  additional_container_config = var.OneOneOne_use_nginx_proxy ? local.nginx_container_config : []
 
   create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id

@@ -305,3 +305,15 @@ variable "jumpbox_sg_id" {
   default = ""
   description = "SG of Account jumpbox to allow traffic in"
 }
+
+variable "multiple_cointainers" {
+  type = bool
+  default = false
+  description = "Indicates that the service and task will host multiple containers"
+}
+
+variable "additional_container_config" {
+  type = list(any)
+  default = []
+  description = "Object (later converted to json) with configuration for additional containers"
+}
