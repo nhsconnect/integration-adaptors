@@ -81,6 +81,18 @@ variable "nhais_mongo_options" {
   default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 }
 
+variable "nhais_mongo_documentdb_tls_enabled" {
+  type = string
+  description = "Enable TLS on AWS Document DB"
+  default = "true"
+}
+
+variable "nhais_mongo_trust_store_path" {
+  type = string
+  description = "Path to the trust store on the image"
+  default = "/truststore/aws-docdb-truststore.jks"
+}
+
 variable "nhais_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
@@ -90,7 +102,7 @@ variable "nhais_environment_variables" {
 variable "nhais_log_level" {
   type = string
   description = "Level of logging for NHAIS application"
-  default = "INFO"
+  default = "DEBUG"
 }
 
 variable "nhais_healthcheck_path" {
