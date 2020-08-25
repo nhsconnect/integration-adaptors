@@ -79,10 +79,6 @@ locals {
     {
       name = "NHAIS_MONGO_TRUST_STORE_PATH"
       value = var.nhais_mongo_trust_store_path
-    },
-    {
-      name = "NHAIS_MONGO_TRUST_STORE_PASSWORD"
-      value = var.nhais_mongo_trust_store_password
     }
   ])
 }
