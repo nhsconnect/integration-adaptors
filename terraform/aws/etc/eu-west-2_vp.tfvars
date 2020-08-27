@@ -30,7 +30,6 @@ nhais_responder_service_target_request_count = 1200
 nhais_responder_service_container_port = 8090
 nhais_responder_service_launch_type = "FARGATE"
 nhais_responder_log_level = "INFO"
-nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 
 # Settings for "OneOneOne" component
 # OneOneOne in vp will be configured to use nginx reverse proxy
