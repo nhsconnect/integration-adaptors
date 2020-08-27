@@ -84,7 +84,6 @@ variable "nhais_mongo_options" {
 variable "nhais_mongo_documentdb_tls_enabled" {
   type = string
   description = "Enable TLS on AWS Document DB"
-  default = "true"
 }
 
 variable "nhais_mongo_trust_store_path" {

@@ -19,6 +19,7 @@ nhais_log_level = "INFO"
 # nhais_mesh_host is also used by nhais_responder component, they must use the same MESH instance to work correctly
 nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
 nhais_mesh_cert_validation = "false"
+nhais_mongo_documentdb_tls_enabled = "true"
 
 # Settings for "nhais_responder" component
 nhais_responder_service_minimal_count = 1
