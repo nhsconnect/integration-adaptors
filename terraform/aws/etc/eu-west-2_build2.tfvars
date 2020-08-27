@@ -5,6 +5,7 @@ base_cidr_block = "10.12.0.0/16"
 enable_internet_access = false
 cluster_container_insights = "disabled"
 docdb_instance_class = "db.r5.large"
+docdb_tls = "disabled"
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 2

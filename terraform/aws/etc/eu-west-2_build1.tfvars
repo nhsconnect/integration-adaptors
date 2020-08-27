@@ -4,6 +4,7 @@ environment = "build1"
 base_cidr_block = "10.11.0.0/16"
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
+docdb_tls = "enabled"
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
