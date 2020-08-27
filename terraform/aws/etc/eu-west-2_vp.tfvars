@@ -20,6 +20,7 @@ nhais_log_level = "INFO"
 nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
 nhais_mesh_cert_validation = "false"
 nhais_mongo_documentdb_tls_enabled = "true"
+nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 
 # Settings for "nhais_responder" component
 nhais_responder_service_minimal_count = 1
@@ -29,6 +30,7 @@ nhais_responder_service_target_request_count = 1200
 nhais_responder_service_container_port = 8090
 nhais_responder_service_launch_type = "FARGATE"
 nhais_responder_log_level = "INFO"
+nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 
 # Settings for "OneOneOne" component
 # OneOneOne in vp will be configured to use nginx reverse proxy

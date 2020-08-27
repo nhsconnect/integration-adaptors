@@ -78,7 +78,6 @@ variable "mq_broker_name" {
 variable "nhais_mongo_options" {
   type = string
   description = "Options for Mongo"
-  default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 }
 
 variable "nhais_environment_variables" {
