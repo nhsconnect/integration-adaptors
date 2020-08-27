@@ -102,7 +102,7 @@ variable "nhais_environment_variables" {
 variable "nhais_log_level" {
   type = string
   description = "Level of logging for NHAIS application"
-  default = "DEBUG"
+  default = "INFO"
 }
 
 variable "nhais_healthcheck_path" {
