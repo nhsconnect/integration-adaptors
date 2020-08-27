@@ -78,7 +78,17 @@ variable "mq_broker_name" {
 variable "nhais_mongo_options" {
   type = string
   description = "Options for Mongo"
-  default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+}
+
+variable "nhais_mongo_documentdb_tls_enabled" {
+  type = string
+  description = "Enable TLS on AWS Document DB"
+}
+
+variable "nhais_mongo_trust_store_path" {
+  type = string
+  description = "Path to the trust store on the image"
+  default = "/truststore/aws-docdb-truststore.jks"
 }
 
 variable "nhais_environment_variables" {

@@ -88,7 +88,6 @@ variable "docdb_master_password" {
 
 variable "docdb_tls" {
   type = string
-  default = "disabled"
   description = "Should the Document DB have a TLS enabled for incomming connections"
 }
 

@@ -4,6 +4,7 @@ base_cidr_block = "10.16.0.0/16"
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
 ptl_connected = true
+docdb_tls = "disabled"
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
@@ -15,6 +16,8 @@ nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 nhais_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
 nhais_mesh_cert_validation = "true"
+nhais_mongo_documentdb_tls_enabled = "false"
+nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 
 # Settings for "OneOneOne" component
 # Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number

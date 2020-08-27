@@ -43,6 +43,10 @@ locals {
     {
       name = "NHAIS_MESH_SUB_CA"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_sub_ca.arn
+    },
+    {
+      name = "NHAIS_MONGO_TRUST_STORE_PASSWORD"
+      valueFrom = data.aws_secretsmanager_secret.nhais_mongo_trust_store_password.arn
     }
   ]
 }

@@ -6,6 +6,7 @@ cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
 dlt_vpc_id = "vpc-03f843c08b01876d5"
 enable_dlt = true
+docdb_tls = "enabled"
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 2
@@ -18,6 +19,8 @@ nhais_log_level = "INFO"
 # nhais_mesh_host is also used by nhais_responder component, they must use the same MESH instance to work correctly
 nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
 nhais_mesh_cert_validation = "false"
+nhais_mongo_documentdb_tls_enabled = "true"
+nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 
 # Settings for "nhais_responder" component
 nhais_responder_service_minimal_count = 1
