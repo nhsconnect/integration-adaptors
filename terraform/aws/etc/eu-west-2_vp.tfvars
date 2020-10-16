@@ -21,6 +21,7 @@ nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchan
 nhais_mesh_cert_validation = "false"
 nhais_mongo_documentdb_tls_enabled = "true"
 nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
+nhais_mongo_trust_store_path = "s3://nhsd-aws-jks-test/rds-truststore.jks"
 
 # Settings for "nhais_responder" component
 nhais_responder_service_minimal_count = 1
