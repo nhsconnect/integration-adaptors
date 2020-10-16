@@ -16,7 +16,6 @@ nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 nhais_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
 nhais_mesh_cert_validation = "true"
-nhais_mongo_documentdb_tls_enabled = "true"
 nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 nhais_mongo_trust_store_path = "s3://nhsd-aws-jks-test/rds-truststore.jks"
 

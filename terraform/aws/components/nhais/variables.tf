@@ -80,11 +80,6 @@ variable "nhais_mongo_options" {
   description = "Options for Mongo"
 }
 
-variable "nhais_mongo_documentdb_tls_enabled" {
-  type = string
-  description = "Enable TLS on AWS Document DB"
-}
-
 variable "nhais_mongo_trust_store_path" {
   type = string
   description = "S3 path to the custom trust store"
