@@ -19,7 +19,6 @@ nhais_log_level = "INFO"
 # nhais_mesh_host is also used by nhais_responder component, they must use the same MESH instance to work correctly
 nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
 nhais_mesh_cert_validation = "false"
-nhais_mongo_documentdb_tls_enabled = "true"
 nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 nhais_mongo_trust_store_path = "s3://nhsd-aws-jks-test/rds-truststore.jks"
 

@@ -16,7 +16,6 @@ nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 nhais_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
 nhais_mesh_cert_validation = "true"
-nhais_mongo_documentdb_tls_enabled = "false"
 nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 
 # Settings for "OneOneOne" component

@@ -73,10 +73,6 @@ locals {
       value = var.nhais_scheduler_enabled
     },
     {
-      name = "NHAIS_MONGO_DOCUMENTDB_TLS_ENABLED"
-      value = var.nhais_mongo_documentdb_tls_enabled
-    },
-    {
       name = "NHAIS_MONGO_TRUST_STORE_PATH"
       value = var.nhais_mongo_trust_store_path
     }
