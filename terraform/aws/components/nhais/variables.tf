@@ -88,6 +88,7 @@ variable "nhais_mongo_documentdb_tls_enabled" {
 variable "nhais_mongo_trust_store_path" {
   type = string
   description = "S3 path to the custom trust store"
+  default = ""
 }
 
 variable "nhais_environment_variables" {
