@@ -80,7 +80,7 @@ variable "nhais_mongo_options" {
   description = "Options for Mongo"
 }
 
-variable "nhais_mongo_trust_store_path" {
+variable "nhais_ssl_trust_store_url" {
   type = string
   description = "S3 path to the custom trust store"
   default = ""

@@ -42,6 +42,6 @@ data "aws_secretsmanager_secret" "nhais_mesh_recipient_codes" {
   name = "nhais_${var.environment}_mesh_recipient_codes"
 }
 
-data "aws_secretsmanager_secret" "nhais_mongo_trust_store_password" {
-  name = "nhais_${var.environment}_mongo_trust_store_password"
+data "aws_secretsmanager_secret" "nhais_ssl_trust_store_password" {
+  name = "nhais_${var.environment}_ssl_trust_store_password"
 }

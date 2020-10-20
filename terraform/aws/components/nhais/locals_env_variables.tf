@@ -73,8 +73,8 @@ locals {
       value = var.nhais_scheduler_enabled
     },
     {
-      name = "NHAIS_MONGO_TRUST_STORE_PATH"
-      value = var.nhais_mongo_trust_store_path
+      name = "NHAIS_SSL_TRUST_STORE_URL"
+      value = var.nhais_ssl_trust_store_url
     }
   ])
 }
