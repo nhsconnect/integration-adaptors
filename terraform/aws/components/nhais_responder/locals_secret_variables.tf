@@ -33,7 +33,7 @@ locals {
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_endpoint_cert.arn
     },
     {
-      name = "NHAIS_MESH_CYPHER_TO_MAILBOX"
+      name = "NHAIS_MESH_RECIPIENT_MAILBOX_ID_MAPPINGS"
       valueFrom = data.aws_secretsmanager_secret.nhais_mesh_recipient_codes.arn
     },
     {
