@@ -2,7 +2,7 @@ resource "aws_instance" "jumpbox" {
   availability_zone = local.availability_zones[0]
 
   ami = data.aws_ami.base_linux.id
-  instance_type = "t2.micro"
+  instance_type = var.jumpbox_size
   key_name = "kainos-dev"
   iam_instance_profile = "TerraformJumpboxRole"
   vpc_security_group_ids = [aws_security_group.jumpbox_sg.id]
