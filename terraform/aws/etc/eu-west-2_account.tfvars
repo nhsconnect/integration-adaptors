@@ -30,3 +30,5 @@ jumpbox_allowed_ssh = [
   "62.254.63.50/32",   # Belfast VPN #1
   "62.254.63.52/32"    # Belfast VPN #2
 ]
+
+jumpbox_size = "t3a.medium"

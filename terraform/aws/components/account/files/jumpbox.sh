@@ -10,6 +10,7 @@ yum update -y
 
 echo "Install software"
 yum install -y docker git mongodb python3
+amazon-linux-extras install -y java-openjdk11
 pip3 install awscli
 
 export MOTDFILE = /etc/update-motd.d/80-nia

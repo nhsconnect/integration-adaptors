@@ -46,3 +46,8 @@ variable "jumpbox_allowed_ssh" {
   description = "List of CIDR that are allowed to SSH to jumpbox"
   default = []
 }
+
+variable "jumpbox_size" {
+  type = "string"
+  default = "t2.micro"
+}
