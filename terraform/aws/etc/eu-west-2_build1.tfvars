@@ -14,7 +14,7 @@ nhais_service_target_request_count = 1200
 nhais_service_container_port = 8080
 nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
-nhais_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
+nhais_mesh_host = "https://192.168.128.11/messageexchange/"
 nhais_mesh_cert_validation = "true"
 nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 
