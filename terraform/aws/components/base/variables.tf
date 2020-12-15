@@ -114,6 +114,17 @@ variable "docdb_instance_count" {
   default = 1
 }
 
+variable "opentest_connected" {
+  type = bool
+  description = "Should this environment be connected to OpenTest"
+  default = true
+}
+
+variable "opentest_vpc_id" {
+  type = string
+  description = "Id of vpc with opentest instance"
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
@@ -121,6 +132,7 @@ variable "ptl_connected" {
   description = "Should this environment be connected to NHS PTL"
   default = false
 }
+
 
 variable "ptl_vpn_gateway_id" {
   type = string
