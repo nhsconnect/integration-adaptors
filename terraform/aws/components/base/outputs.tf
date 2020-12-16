@@ -70,6 +70,10 @@ output "mhs_cidr" {
   description = "CIDR block for MHS component"
 }
 
+output "opentest_connected" {
+  value = var.opentest_connected
+}
+
 # PTL section
 
 output "ptl_connected" {
