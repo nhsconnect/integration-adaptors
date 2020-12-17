@@ -27,3 +27,10 @@ OneOneOne_service_target_request_count = 1200
 OneOneOne_service_container_port = 8080
 OneOneOne_service_launch_type = "FARGATE"
 OneOneOne_log_level = "DEBUG"
+
+# Settings for "gp2gp" component
+gp2gp_service_desired_count = 1
+gp2gp_service_minimal_count = 1
+gp2gp_service_maximal_count = 1
+gp2gp_service_container_port = 8080
+gp2gp_service_launch_type = "FARGATE"
