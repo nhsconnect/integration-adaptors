@@ -1,9 +1,10 @@
 String region = "eu-west-2"
- 
+
 Map <String, Map<String, String>> componentImageBranch = [
-  OneOneOne: [ecrRepo: "111",   branch: "master"],
-  nhais:     [ecrRepo: "nhais", branch: "develop"],
-  nhais_responder: [ecrRepo: "nhais-fake-responder", branch: "origin-develop"]
+  OneOneOne:       [ecrRepo: "111",                  branch: "master"],
+  nhais:           [ecrRepo: "nhais",                branch: "develop"],
+  nhais_responder: [ecrRepo: "nhais-fake-responder", branch: "origin-develop"],
+  gp2gp:           [ecrRepo: "gp2gp",                branch: "develop"]
 ]
 
 pipeline {
@@ -18,7 +19,7 @@ pipeline {
   parameters {
     choice (name: "Project",     choices: ['nia'],                                                description: "Choose a project")
     choice (name: "Environment", choices: ['build1', 'build2', 'build3', 'vp', 'ptl', 'account'], description: "Choose environment")
-    choice (name: "Component",   choices: ['base', 'nhais', 'OneOneOne', 'mhs', 'account', 'fake_mesh', 'nhais_responder'  ],     description: "Choose component")
+    choice (name: "Component",   choices: ['base', 'nhais', 'OneOneOne', 'mhs', 'account', 'fake_mesh', 'nhais_responder', 'gp2gp'],     description: "Choose component")
     choice (name: "Action",      choices: ['plan', 'apply', 'plan-destroy', 'destroy'],           description: "Choose Terraform action")
     string (name: "Variables",   defaultValue: "",                                                description: "Terrafrom variables, format: variable1=value,variable2=value, no spaces")
     string (name: "Git_Branch",  defaultValue: "develop",                                         description: "Git branch from which TF will be taken")
@@ -117,7 +118,7 @@ int terraform(String action, String tfStateBucket, String project, String enviro
     // Get the secret variables for global
     String secretsFile = "etc/secrets.tfvars"
     writeVariablesToFile(secretsFile,getAllSecretsForEnvironment(environment,"nia",region))
-  
+
     List<String> variableFilesList = [
       "-var-file=../../etc/global.tfvars",
       "-var-file=../../etc/${region}_${environment}.tfvars",
@@ -156,7 +157,7 @@ Map<String,Object> decodeSecretKeyValue(String rawSecret) {
     Object value = it.split(":")[1]
     secretsDecoded.put(key,value)
   }
-  return secretsDecoded 
+  return secretsDecoded
 }
 
 List<String> getSecretsByPrefix(String prefix, String region) {
