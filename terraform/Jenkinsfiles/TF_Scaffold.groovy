@@ -204,11 +204,15 @@ void writeVariablesToFile(String fileName, Map<String,Object> variablesMap) {
 List<String> getAllImageTagsByPrefix(String prefix, String ecrRepo, String region) {
   String awsCommand = "aws ecr list-images --repository-name ${ecrRepo} --region ${region} --query imageIds[].imageTag --output text"
   List<String> allImageTags = sh (script: awsCommand, returnStdout: true).split()
+  println "Images found: "
+  allImageTags.each { println it}
   return allImageTags.findAll{it.startsWith(prefix)}
 }
 
 String getLatestImageTag(String prefix, String ecrRepo, String region) {
   List<String> imageTags = getAllImageTagsByPrefix(prefix, ecrRepo, region)
+  println "Images with prefix: "
+  imageTags.each { println it}
   Map<Integer, String> buildNumberTag = [:]
   Integer maxBuild = 0
   imageTags.each {
