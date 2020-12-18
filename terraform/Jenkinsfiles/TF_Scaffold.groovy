@@ -4,7 +4,7 @@ Map <String, Map<String, String>> componentImageBranch = [
   OneOneOne:       [ecrRepo: "111",                  branch: "master"],
   nhais:           [ecrRepo: "nhais",                branch: "develop"],
   nhais_responder: [ecrRepo: "nhais-fake-responder", branch: "origin-develop"],
-  gp2gp:           [ecrRepo: "gp2gp",                branch: "develop"]
+  gp2gp:           [ecrRepo: "gp2gp",                branch: "main"]
 ]
 
 pipeline {
