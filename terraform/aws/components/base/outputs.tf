@@ -74,6 +74,11 @@ output "opentest_connected" {
   value = var.opentest_connected
 }
 
+output "gp2gp_cidr" {
+  value = local.gp2gp_cidr
+  description = "CIDR block for GP2GP component"
+}
+
 # PTL section
 
 output "ptl_connected" {
