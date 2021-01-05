@@ -4,6 +4,7 @@ base_cidr_block = "10.16.0.0/16"
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
 ptl_connected = true
+opentest_connected = false
 docdb_tls = "enabled"
 
 # Settings for "nhais" component
