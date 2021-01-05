@@ -1,7 +1,7 @@
 locals {
   environment_variables = concat(var.nhais_environment_variables,[
     {
-      name = "NHAIS_OUTBOUND_HTTP_PROXY"
+      name = "NHAIS_MESH_API_HTTP_PROXY"
       value = var.opentest_connected ? data.aws_instance.private_ip_address : ""
     }
     {
