@@ -34,3 +34,11 @@ gp2gp_service_minimal_count = 1
 gp2gp_service_maximal_count = 1
 gp2gp_service_container_port = 8080
 gp2gp_service_launch_type = "FARGATE"
+
+# Settings for "mhs" component
+mhs_service_container_port = 8080
+mhs_service_minimal_count = 1
+mhs_service_desired_count = 1
+mhs_service_maximal_count = 2
+mhs_service_launch_type = "FARGATE"
+mhs_log_level = "FARGATE"
