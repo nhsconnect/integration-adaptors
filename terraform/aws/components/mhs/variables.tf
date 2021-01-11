@@ -16,7 +16,7 @@ variable "environment" {
 variable "component" {
   type = string
   description = "Name of the component"
-  default = "OneOneOne"
+  default = "mhs"
 }
 
 variable "region" {
@@ -34,50 +34,50 @@ variable "tf_state_bucket" {
   description = "Name of S3 bucket with TF state of components"
 }
 
-variable "OneOneOne_build_id" {
+variable "mhs_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
 }
 
-variable "OneOneOne_service_desired_count" {
+variable "mhs_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
 }
 
-variable "OneOneOne_service_minimal_count" {
+variable "mhs_service_minimal_count" {
   type = number
   description = "Minimal number of containers to run in the service"
 }
 
-variable "OneOneOne_service_maximal_count" {
+variable "mhs_service_maximal_count" {
   type = number
   description = "Maximal number of containers to run in the service"
 }
 
-variable "OneOneOne_service_container_port" {
+variable "mhs_service_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
 }
 
-variable "OneOneOne_service_application_port" {
+variable "mhs_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
   default = 80
 }
 
-variable "OneOneOne_nginx_container_port" {
+variable "mhs_nginx_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
   default = 443
 }
 
-variable "OneOneOne_nginx_application_port" {
+variable "mhs_nginx_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
   default = 443
 }
 
-variable "OneOneOne_service_launch_type" {
+variable "mhs_service_launch_type" {
   type = string
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
@@ -87,7 +87,7 @@ variable "mq_broker_name" {
   description = "Name of the MQ broker shared between all envs"
 }
 
-# variable "OneOneOne_mongo_options" {
+# variable "mhs_mongo_options" {
 #   type = string
 #   description = "Options for Mongo"
 #   default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
@@ -105,48 +105,36 @@ variable "enable_dlt" {
   default = false
 }
 
-variable "OneOneOne_environment_variables" {
+variable "mhs_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
   default = []
 }
 
-variable "OneOneOne_log_level" {
+variable "mhs_log_level" {
   type = string
-  description = "Level of logging for OneOneOne application"
+  description = "Level of logging for mhs application"
   default = "INFO"
 }
 
-variable "OneOneOne_healthcheck_path" {
+variable "mhs_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
   default = "/actuator/health"
 }
 
-variable "OneOneOne_nginx_healthcheck_path" {
-  type = string
-  description = "Path for status of nginx container, then routed to 111 container"
-  default = "/healthcheck"
-}
-
-variable "OneOneOne_nginx_healthcheck_port" {
-  type = number
-  description = "Port for nginx healthcheck"
-  default = 80
-}
-
-variable "OneOneOne_amqp_max_retries" {
+variable "mhs_amqp_max_retries" {
   type = number
   description = "Max retries on connection to amqp"
   default = 3
 }
 
-variable "OneOneOne_amqp_retry_delay" {
+variable "mhs_amqp_retry_delay" {
   type = number
   description = "Delay on retries to connect to amqp"
   default = 100
 }
-variable "OneOneOne_service_target_request_count" {
+variable "mhs_service_target_request_count" {
   type = number
   description = "The target number of requests per minute that an service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
   default = 1200
@@ -163,13 +151,5 @@ variable "create_testbox" {
 variable "ptl_connected" {
   type = bool
   description = "Should this environment be connected to NHS PTL"
-  default = false
-}
-
-# Additional nginx container in front of OneOneOne
-
-variable "OneOneOne_use_nginx_proxy" {
-  type = bool
-  description = "Should an additional container with nginx reverse proxy be deployed"
   default = false
 }
