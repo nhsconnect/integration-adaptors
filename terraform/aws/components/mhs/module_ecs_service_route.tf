@@ -31,7 +31,7 @@ module "mhs_route_ecs_service" {
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
 
-  environment_variables = local.environment_variables
+  environment_variables = local.route_variables
   secret_variables      = local.secret_variables
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
@@ -49,7 +49,7 @@ module "mhs_route_ecs_service" {
 
   additional_container_config =  []
 
-  create_testbox=var.create_testbox
+  create_testbox=false //create testbox only along the inbound service
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
   lb_subnet_ids = data.terraform_remote_state.base.outputs.ptl_connected ? data.terraform_remote_state.base.outputs.ptl_lb_subnet_ids : aws_subnet.service_subnet.*.id

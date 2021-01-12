@@ -41,4 +41,4 @@ mhs_service_minimal_count = 1
 mhs_service_desired_count = 1
 mhs_service_maximal_count = 2
 mhs_service_launch_type = "FARGATE"
-mhs_log_level = "FARGATE"
+mhs_log_level = "DEBUG"
