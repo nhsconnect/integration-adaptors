@@ -11,12 +11,11 @@ locals {
     {
       name = "MHS_PERSISTENCE_ADAPTOR"
       value = "mongodb"
-    }
+    },
     {
       name = "MHS_DB_ENDPOINT_URL"
       value = data.terraform_remote_state.base.outputs.docdb_cluster_endpoint
-    }
-
+    },
   ])
 
   outbound_variables = concat(local.environment_variables, [])
