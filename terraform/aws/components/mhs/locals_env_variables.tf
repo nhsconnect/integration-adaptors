@@ -23,9 +23,6 @@ locals {
   route_variables = concat(local.environment_variables, [])
 }
 
-
-
-
 /*
 
     {

@@ -5,7 +5,7 @@ module "mhs_outbound_ecs_service" {
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "mhs_outbound_ecs"
+  module_instance = "mhs_out_ecs"
   default_tags    = local.default_tags
   
   availability_zones = local.availability_zones
