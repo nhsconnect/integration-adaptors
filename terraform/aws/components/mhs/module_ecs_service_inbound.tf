@@ -10,7 +10,7 @@ module "mhs_inbound_ecs_service" {
   
   availability_zones = local.availability_zones
 
-  image_name        = local.image_name
+  image_name        = local.inbound_image_name
   cluster_id        = data.terraform_remote_state.base.outputs.base_cluster_id
   minimal_count     = var.mhs_service_minimal_count
   desired_count     = var.mhs_service_desired_count
