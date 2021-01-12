@@ -13,8 +13,8 @@ locals {
   #image_name = "${data.terraform_remote_state.account.outputs.ecr_repo_url_111}:${var.OneOneOne_build_id}"
   image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/111:${var.mhs_build_id}"
 
-  lb_type = var.mhs_use_nginx_proxy ? "network" : "application"
-  protocol = var.mhs_use_nginx_proxy ? "TCP" : "HTTP"
+  #lb_type = var.mhs_use_nginx_proxy ? "network" : "application"
+  #protocol = var.mhs_use_nginx_proxy ? "TCP" : "HTTP"
 
   subnet_cidrs = [
     cidrsubnet(data.terraform_remote_state.base.outputs.mhs_cidr,2,0),

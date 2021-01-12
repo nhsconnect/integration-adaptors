@@ -6,8 +6,16 @@ locals {
     },
     {
       name = "MHS_STATE_TABLE_NAME"
-      value = aws_dynamodb_table.mhs_state_table.name
+      value = "mhs_state"
     },
+    {
+      name = "MHS_PERSISTENCE_ADAPTOR"
+      value = "mongodb"
+    }
+    {
+      name = "MHS_DB_ENDPOINT_URL"
+      value = data.terraform_remote_state.base.outputs.docdb_cluster_endpoint
+    }
 
   ])
 
@@ -75,6 +83,73 @@ locals {
       name = "MHS_SECRET_CA_CERTS"
       valueFrom = var.ca_certs_arn
     }
+
+
+
+*/
+/*
+     - env:
+        - name: MHS_INBOUND_QUEUE_BROKERS
+          valueFrom:
+            secretKeyRef:
+              name: mhs-queue
+              key: broker
+        - name: MHS_INBOUND_QUEUE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mhs-queue
+              key: queue
+        - name: MHS_SECRET_INBOUND_QUEUE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mhs-queue
+              key: username
+        - name: MHS_SECRET_INBOUND_QUEUE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mhs-queue
+              key: password
+        - name: MHS_LOG_LEVEL
+          value: DEBUG
+        - name: MHS_STATE_TABLE_NAME
+          value: mhs_state
+        - name: MHS_SYNC_ASYNC_STATE_TABLE_NAME
+          value: sync_async_state
+        - name: MHS_SECRET_PARTY_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mhs-partykey
+              key: partyKey
+        - name: MHS_SECRET_CLIENT_CERT
+          valueFrom:
+            secretKeyRef:
+              name: mhs-client-cert
+              key: tls.crt
+        - name: MHS_SECRET_CLIENT_KEY	
+          valueFrom:
+            secretKeyRef:
+              name: mhs-client-cert
+              key: tls.key
+        - name: MHS_SECRET_CA_CERTS
+          valueFrom:
+            secretKeyRef:
+              name: mhs-ca-certs
+              key: ca-certs
+        - name: MHS_DB_ENDPOINT_URL
+          valueFrom:
+            secretKeyRef:
+              name: mhs-database
+              key: connectionString
+        - name: MHS_PERSISTENCE_ADAPTOR
+          value: mongodb
+        - name: MHS_INBOUND_USE_SSL
+          value: "false"
+        - name: MHS_INBOUND_QUEUE_MESSAGE_TTL_IN_SECONDS
+          value: "0"
+        - name: SERVICE_PORTS
+          value: 443,80
+        - name: TCP_PORTS
+          value: "443"
 
 
 

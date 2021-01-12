@@ -1,5 +1,5 @@
 output "mhs_outbound_url" {
-  value = aws_route53_record.mhs_lb_record.name
+  value = aws_route53_record.mhs_outbound_lb_record.name
   description = "The DNS name of the Route53 record pointing to the mhs service's load balancer."
 }
 
