@@ -22,10 +22,10 @@ module "mhs_route_ecs_service" {
   launch_type       = var.mhs_service_launch_type
   log_stream_prefix = var.mhs_build_id
   healthcheck_path  = var.mhs_healthcheck_path
-  enable_load_balancing = false
-  use_application_lb = false
-  #load_balancer_type = "application"
-  #protocol = "HTTP"
+  enable_load_balancing = true
+  use_application_lb = true
+  load_balancer_type = "application"
+  protocol = "HTTP"
 
   container_healthcheck_port =  var.mhs_service_container_port
   enable_dlt                 = var.enable_dlt

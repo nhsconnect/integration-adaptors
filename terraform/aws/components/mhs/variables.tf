@@ -153,3 +153,21 @@ variable "ptl_connected" {
   description = "Should this environment be connected to NHS PTL"
   default = false
 }
+
+# outbound specific
+
+variable "mhs_outbound_validate_certificate" {
+  type = bool
+  default = true
+}
+
+variable "mhs_outbound_spineroutelookup_verify_certificate" {
+  type = bool
+  default = true
+}
+
+
+# route specific
+
+
+# inbound specific

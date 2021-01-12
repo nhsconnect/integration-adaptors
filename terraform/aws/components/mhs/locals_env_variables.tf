@@ -1,4 +1,5 @@
 locals {
+  # variables common for all three adapters
   environment_variables = concat(var.mhs_environment_variables,[
     {
       name = "MHS_LOG_LEVEL"
@@ -7,6 +8,10 @@ locals {
     {
       name = "MHS_STATE_TABLE_NAME"
       value = "mhs_state"
+    },
+    {
+      name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME"
+      value = "mhs_sync_async"
     },
     {
       name = "MHS_PERSISTENCE_ADAPTOR"
@@ -18,7 +23,21 @@ locals {
     },
   ])
 
-  outbound_variables = concat(local.environment_variables, [])
+  outbound_variables = concat(local.environment_variables, [
+    {
+      name = "MHS_SPINE_ROUTE_LOOKUP_URL"
+      value = "https://${aws_route53_record.mhs_route_load_balancer_record.name}"
+    },
+    {
+      name = "MHS_OUTBOUND_VALIDATE_CERTIFICATE"
+      value = var.mhs_outbound_validate_certificate
+    },
+    {
+      name = "MHS_OUTBOUND_SPINE_ROUTE_LOOKUP_VALIDATE_CERT"
+      value = var.mhs_outbound_spineroutelookup_verify_certificate
+    }
+  ])
+
   inbound_variables = concat(local.environment_variables, [])
   route_variables = concat(local.environment_variables, [])
 }
@@ -26,20 +45,12 @@ locals {
 /*
 
     {
-      name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME"
-      value = aws_dynamodb_table.mhs_sync_async_table.name
-    },
-    {
       name = "MHS_RESYNC_RETRIES"
       value = var.mhs_resynchroniser_max_retries
     },
     {
       name = "MHS_RESYNC_INTERVAL"
       value = var.mhs_resynchroniser_interval
-    },
-    {
-      name = "MHS_SPINE_ROUTE_LOOKUP_URL"
-      value = "https://${aws_route53_record.mhs_route_load_balancer_record.name}"
     },
     {
       name = "MHS_SPINE_ORG_CODE"
@@ -53,14 +64,7 @@ locals {
       name = "MHS_FORWARD_RELIABLE_ENDPOINT_URL"
       value = var.mhs_forward_reliable_endpoint_url
     },
-    {
-      name = "MHS_OUTBOUND_VALIDATE_CERTIFICATE"
-      value = var.mhs_outbound_validate_certificate
-    },
-    {
-      name = "MHS_OUTBOUND_SPINE_ROUTE_LOOKUP_VALIDATE_CERT"
-      value = var.mhs_outbound_spineroutelookup_verify_certificate
-    }
+
   ]
   mhs_outbound_base_secrets = [
     {
