@@ -169,5 +169,19 @@ variable "mhs_outbound_spineroutelookup_verify_certificate" {
 
 # route specific
 
+variable "mhs_route_sds_url" {
+  type = string
+  default = ""
+}
+
+variable "mhs_route_disable_sds_tls" {
+  type = bool
+  default = true
+}
+variable "mhs_route_sds_search_base" {
+  type = string
+  default = "ou=services,o=nhs"
+}
+
 
 # inbound specific

@@ -38,8 +38,39 @@ locals {
     }
   ])
 
-  inbound_variables = concat(local.environment_variables, [])
-  route_variables = concat(local.environment_variables, [])
+  inbound_variables = concat(local.environment_variables, [
+    {
+      name = "MHS_INBOUND_QUEUE_BROKERS"
+      value = replace(data.aws_mq_broker.nhais_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
+    },
+    {
+      name = "MHS_INBOUND_QUEUE_NAME"
+      value = "mhs-inbound"
+    }
+  ])
+
+  route_variables = concat(local.environment_variables, [
+    {
+      name = "MHS_SDS_URL"
+      value = var.mhs_route_sds_url
+    },
+    {
+      name = "MHS_DISABLE_SDS_TLS"
+      value = var.mhs_route_disable_sds_tls
+    },
+    {
+      name = "MHS_SDS_SEARCH_BASE"
+      value = var.mhs_route_sds_search_base
+    },
+    {
+      name = "MHS_SDS_REDIS_CACHE_HOST"
+      value = "" //data.terraform_remote_state.base.outputs.redis_host
+    },
+    {
+      name = "MHS_SDS_REDIS_CACHE_PORT"
+      value = "" //data.terraform_remote_state.base.outputs.redis_port
+    }
+  ])
 }
 
 /*
