@@ -21,6 +21,7 @@ module "gp2gp_ecs_service" {
   application_port  = var.gp2gp_service_application_port
   launch_type       = var.gp2gp_service_launch_type
   log_stream_prefix = var.gp2gp_build_id
+  logs_datetime_format = "%Y-%m-%dT%H:%M:%SZ"
   healthcheck_path  = var.gp2gp_healthcheck_path
   enable_load_balancing = false
   use_application_lb = true
