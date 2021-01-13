@@ -123,6 +123,11 @@ variable "mhs_healthcheck_path" {
   default = "/actuator/health"
 }
 
+variable "mq_broker_name" {
+  type = string
+  description = "Name of the MQ broker shared between all envs"
+}
+
 variable "mhs_amqp_max_retries" {
   type = number
   description = "Max retries on connection to amqp"
