@@ -82,11 +82,6 @@ variable "mhs_service_launch_type" {
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
 
-variable "mq_broker_name" {
-  type = string
-  description = "Name of the MQ broker shared between all envs"
-}
-
 # variable "mhs_mongo_options" {
 #   type = string
 #   description = "Options for Mongo"
