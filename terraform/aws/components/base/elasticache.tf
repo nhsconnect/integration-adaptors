@@ -22,10 +22,6 @@ resource "aws_elasticache_subnet_group" "elasticache_subnet_group" {
   name =  "${local.resource_prefix}-ec_subnet_group"
   description = "Subnet group for the ElastiCache cluster used in environment: ${var.environment}"
   subnet_ids = aws_subnet.base_subnet.*.id
-
-  tags = merge(local.default_tags, {
-    Name = "${local.resource_prefix}-elasticache_subnet_group"
-  })
 }
 
 resource "aws_security_group" "elasticache_sg" {
