@@ -146,6 +146,19 @@ variable "create_testbox" {
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
 }
 
+# Opentest
+
+variable "opentest_connected" {
+  type = bool
+  description = "Should this environment be connected to OpenTest"
+  default = true
+}
+
+variable "opentest_instance_id" {
+  type = string
+  description = "Id of vpc with opentest instance"
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
@@ -165,6 +178,22 @@ variable "mhs_outbound_spineroutelookup_verify_certificate" {
   type = bool
   default = true
 }
+
+variable "mhs_outbound_forward_reliable_url" {
+  type = string
+  default = ""
+}
+
+variable "mhs_outbound_validate_certificate" {
+  type = bool
+  default = false
+}
+
+variable "mhs_spine_org_code" {
+  type = string
+  default = "YES"
+}
+
 
 
 # route specific
