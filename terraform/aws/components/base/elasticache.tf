@@ -20,7 +20,7 @@ resource "aws_elasticache_replication_group" "elasticache_replication_group" {
 
 # The MHS ElastiCache subnet group. Defines the subnets that the ElastiCache cluster should place replicas in.
 resource "aws_elasticache_subnet_group" "elasticache_subnet_group" {
-  name =  "${local.resource_prefix}-ec_subnet_group"
+  name =  "${local.resource_prefix}-ec-subnet-group"
   description = "Subnet group for the ElastiCache cluster used in environment: ${var.environment}"
   subnet_ids = aws_subnet.base_subnet.*.id
 }
