@@ -130,6 +130,11 @@ variable "opentest_sg_id" {
   description = "Id of Opentest security group"
 }
 
+variable "elasticache_node_type" {
+  type = string
+  default = "cache.t2.micro"
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
