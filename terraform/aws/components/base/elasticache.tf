@@ -6,6 +6,7 @@ resource "aws_elasticache_replication_group" "elasticache_replication_group" {
   number_cache_clusters = length(local.availability_zones)
   at_rest_encryption_enabled = true
   transit_encryption_enabled = true
+  engine = "redis"
   port = 6379
   subnet_group_name = aws_elasticache_subnet_group.elasticache_subnet_group.name
   security_group_ids = [
