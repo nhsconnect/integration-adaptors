@@ -105,3 +105,11 @@ output "ptl_container_subnet_ids" {
 output "ptl_lb_subnet_ids" {
   value = aws_subnet.service_lb_subnet.*.id
 }
+
+output "redis_host" {
+  value = aws_elasticache_replication_group.elasticache_replication_group.primary_endpoint_address
+}
+
+output redis_port {
+  value = aws_elasticache_replication_group.elasticache_replication_group.port
+}

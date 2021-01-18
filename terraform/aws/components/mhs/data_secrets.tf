@@ -14,7 +14,7 @@ data "aws_secretsmanager_secret" "docdb_master_password" {
   name = "docdb-master-password"
 }
 
-data aws_secretsmanager_secret "mhs_party_key" {
+data "aws_secretsmanager_secret" "mhs_party_key" {
   name = "opentest-party-key"
 }
 
