@@ -90,4 +90,3 @@ data "aws_iam_policy_document" "ecs_service_task_execution_policies" {
 data "aws_iam_role" "mhs_task_execution_role" {
   name = "BuildMHS-ECSTaskExecutionRole"
 }
-

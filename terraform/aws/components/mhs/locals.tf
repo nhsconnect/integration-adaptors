@@ -24,5 +24,4 @@ locals {
     cidrsubnet(data.terraform_remote_state.base.outputs.mhs_cidr,2,1),
     cidrsubnet(data.terraform_remote_state.base.outputs.mhs_cidr,2,2)
   ]
-
 }
