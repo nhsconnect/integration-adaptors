@@ -77,7 +77,7 @@ locals {
     },
     {
       name = "MHS_INBOUND_QUEUE_NAME"
-      value = "${var.evinronment}_mhs_inbound"
+      value = "${var.environment}_mhs_inbound"
     }
   ])
 
