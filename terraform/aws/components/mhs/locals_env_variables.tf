@@ -7,11 +7,11 @@ locals {
     },
     {
       name = "MHS_STATE_TABLE_NAME"
-      value = "${var.evinronment}_mhs_state"
+      value = "${var.environment}_mhs_state"
     },
     {
       name = "MHS_SYNC_ASYNC_STATE_TABLE_NAME"
-      value = "${var.evinronment}_mhs_sync_async"
+      value = "${var.environment}_mhs_sync_async"
     },
     {
       name = "MHS_PERSISTENCE_ADAPTOR"
