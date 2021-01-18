@@ -96,11 +96,11 @@ locals {
     },
     {
       name = "MHS_SDS_REDIS_CACHE_HOST"
-      value = "" //data.terraform_remote_state.base.outputs.redis_host
+      value = data.terraform_remote_state.base.outputs.redis_host
     },
     {
       name = "MHS_SDS_REDIS_CACHE_PORT"
-      value = "" //data.terraform_remote_state.base.outputs.redis_port
+      value = data.terraform_remote_state.base.outputs.redis_port
     }
   ])
 }
