@@ -194,12 +194,6 @@ variable "mhs_outbound_service_container_port" {
   type = number
 }
 
-variable "mhs_outbound_service_healthcheck_port" {
-  type = number
-}
-
-
-
 # route specific
 
 variable "mhs_route_sds_url" {
@@ -219,11 +213,6 @@ variable "mhs_route_sds_search_base" {
 variable "mhs_route_service_container_port" {
   type = number
 }
-
-variable "mhs_route_service_healthcheck_port" {
-  type = number
-}
-
 
 # inbound specific
 
