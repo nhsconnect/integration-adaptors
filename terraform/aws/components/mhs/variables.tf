@@ -57,6 +57,7 @@ variable "mhs_service_maximal_count" {
 variable "mhs_service_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
+  default = 80
 }
 
 variable "mhs_service_application_port" {
@@ -189,6 +190,14 @@ variable "mhs_spine_org_code" {
   default = "YES"
 }
 
+variable "mhs_outbound_service_container_port" {
+  type = number
+}
+
+variable "mhs_outbound_service_healthcheck_port" {
+  type = number
+}
+
 
 
 # route specific
@@ -207,5 +216,21 @@ variable "mhs_route_sds_search_base" {
   default = "ou=services,o=nhs"
 }
 
+variable "mhs_route_service_container_port" {
+  type = number
+}
+
+variable "mhs_route_service_healthcheck_port" {
+  type = number
+}
+
 
 # inbound specific
+
+variable "mhs_inbound_service_container_port" {
+  type = number
+}
+
+variable "mhs_inbound_service_healthcheck_port" {
+  type = number
+}
