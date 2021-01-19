@@ -115,7 +115,7 @@ variable "mhs_log_level" {
 variable "mhs_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
-  default = "/actuator/health"
+  default = "/healthcheck"
 }
 
 variable "mq_broker_name" {

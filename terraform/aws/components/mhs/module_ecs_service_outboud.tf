@@ -17,7 +17,7 @@ module "mhs_outbound_ecs_service" {
   maximal_count     = var.mhs_service_maximal_count
   service_target_request_count = var.mhs_service_target_request_count
 
-  container_port    = var.mhs_service_container_port
+  container_port    = var.mhs_outbound_service_container_port
   application_port  = var.mhs_service_application_port
   launch_type       = var.mhs_service_launch_type
   log_stream_prefix = var.mhs_build_id
@@ -27,7 +27,7 @@ module "mhs_outbound_ecs_service" {
   load_balancer_type = "application"
   protocol =  "HTTP"
 
-  container_healthcheck_port = var.mhs_service_container_port
+  container_healthcheck_port = var.mhs_outbound_service_container_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
 
