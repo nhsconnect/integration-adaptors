@@ -26,7 +26,7 @@ locals {
   outbound_variables = concat(local.environment_variables, [
     {
       name = "MHS_SPINE_ROUTE_LOOKUP_URL"
-      value = "https://${aws_route53_record.mhs_route_lb_record.name}"
+      value = "http://${aws_route53_record.mhs_route_lb_record.name}"
     },
     {
       name = "MHS_OUTBOUND_VALIDATE_CERTIFICATE"
