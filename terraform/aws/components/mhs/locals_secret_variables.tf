@@ -28,13 +28,13 @@ locals {
       name = "MHS_AMQP_PASSWORD"
       valueFrom = data.aws_secretsmanager_secret.mq_password.arn
     },
-    {
-      name = "MHS_MONGO_USERNAME"
-      valueFrom = data.aws_secretsmanager_secret.docdb_master_username.arn
-    },
-    {
-      name = "MHS_MONGO_PASSWORD"
-      valueFrom = data.aws_secretsmanager_secret.docdb_master_password.arn
-    },
+    # {
+    #   name = "MHS_MONGO_USERNAME"
+    #   valueFrom = data.aws_secretsmanager_secret.docdb_master_username.arn
+    # },
+    # {
+    #   name = "MHS_MONGO_PASSWORD"
+    #   valueFrom = data.aws_secretsmanager_secret.docdb_master_password.arn
+    # },
   ]
 }
