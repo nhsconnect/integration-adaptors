@@ -203,7 +203,7 @@ variable "mhs_route_sds_url" {
 
 variable "mhs_route_disable_sds_tls" {
   type = bool
-  default = true
+  default = false
 }
 variable "mhs_route_sds_search_base" {
   type = string
@@ -222,4 +222,9 @@ variable "mhs_inbound_service_container_port" {
 
 variable "mhs_inbound_service_healthcheck_port" {
   type = number
+}
+
+variable "mhs_inboud_use_ssl" {
+  type = bool
+  default = true
 }

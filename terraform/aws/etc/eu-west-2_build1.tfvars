@@ -47,3 +47,4 @@ mhs_service_launch_type = "FARGATE"
 mhs_log_level = "DEBUG"
 
 mhs_outbound_forward_reliable_url = "https://192.168.128.11/reliablemessaging/forwardreliable"
+mhs_route_sds_url = "ldap://192.168.128.11"

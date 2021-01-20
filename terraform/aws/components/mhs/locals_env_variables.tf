@@ -78,13 +78,17 @@ locals {
     {
       name = "MHS_INBOUND_QUEUE_NAME"
       value = "${var.environment}_mhs_inbound"
+    },
+    {
+      name = "MHS_INBOUND_USE_SSL"
+      value = var.mhs_inboud_use_ssl
     }
   ])
 
   route_variables = concat(local.environment_variables, [
     {
       name = "MHS_SDS_URL"
-      value = var.mhs_route_sds_url
+      value = var.opentest_connected ? "ldap://${data.aws_instance.opentest_instance.private_ip}" : var.mhs_route_sds_url
     },
     {
       name = "MHS_DISABLE_SDS_TLS"
