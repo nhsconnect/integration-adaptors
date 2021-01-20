@@ -45,6 +45,7 @@ module "mhs_route_ecs_service" {
 
   lb_allowed_security_groups = [
     data.terraform_remote_state.account.outputs.jumpbox_sg_id
+    module.mhs_out_ecs_service.service_sg_id
   ]
 
   additional_container_config =  []
