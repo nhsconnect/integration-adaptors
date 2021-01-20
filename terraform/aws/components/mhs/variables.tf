@@ -214,6 +214,11 @@ variable "mhs_route_service_container_port" {
   type = number
 }
 
+variable "mhs_route_redis_disable_tls" {
+  type = bool
+  default = true
+}
+
 # inbound specific
 
 variable "mhs_inbound_service_container_port" {

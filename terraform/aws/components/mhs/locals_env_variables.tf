@@ -99,6 +99,10 @@ locals {
       value = var.mhs_route_sds_search_base
     },
     {
+      name = "MHS_SDS_REDIS_DISABLE_TLS"
+      value = var.mhs_route_redis_disable_tls
+    },
+    {
       name = "MHS_SDS_REDIS_CACHE_HOST"
       value = data.terraform_remote_state.base.outputs.redis_host
     },
