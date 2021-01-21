@@ -108,7 +108,7 @@ variable "gp2gp_log_level" {
 variable "gp2gp_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
-  default = "/actuator/health"
+  default = "/healthcheck"
 }
 
 variable "gp2gp_amqp_max_retries" {
