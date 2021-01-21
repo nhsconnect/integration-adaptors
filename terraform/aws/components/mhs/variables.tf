@@ -160,6 +160,11 @@ variable "opentest_instance_id" {
   description = "Id of vpc with opentest instance"
 }
 
+variable "opentest_sg_id" {
+  type = string
+  description = "Id of Opentest security group"
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
