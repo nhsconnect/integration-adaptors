@@ -18,7 +18,7 @@ module "mhs_inbound_ecs_service" {
   service_target_request_count = var.mhs_service_target_request_count
 
   container_port    = var.mhs_inbound_service_container_port
-  application_port  = var.mhs_service_application_port
+  application_port  = var.mhs_inbound_service_container_port
   launch_type       = var.mhs_service_launch_type
   log_stream_prefix = var.mhs_build_id
   healthcheck_path  = var.mhs_healthcheck_path
