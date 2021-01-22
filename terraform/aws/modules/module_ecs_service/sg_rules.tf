@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "to_service_from_load_balancer" {
   description = "Allow application connection from Load Balancer to service"
 }
 
-resource "aws_security_group_rule" "_to_service_from_network_load_balancer" {
+resource "aws_security_group_rule" "to_service_from_network_load_balancer" {
   count = local.network_lb
   type = "ingress"
   from_port = var.container_port
