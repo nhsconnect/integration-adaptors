@@ -28,5 +28,5 @@ resource "aws_security_group_rule" "additional_container_from_incoming_sg" {
   from_port = var.container_port
   to_port = var.container_port
   protocol = var.container_protocol
-  description = "Allow from additional SG: ${var.container_allowed_security_groups[count.index]} to Load Balancer in env: ${var.environment}"
+  description = "Allow from additional SG: ${var.container_allowed_security_groups[count.index]} to Container(s) in env: ${var.environment}"
 }
