@@ -135,6 +135,11 @@ variable "elasticache_node_type" {
   default = "cache.t2.micro"
 }
 
+variable "create_opentest_instance" {
+  type = bool
+  default = false
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
