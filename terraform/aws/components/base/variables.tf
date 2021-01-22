@@ -140,6 +140,12 @@ variable "create_opentest_instance" {
   default = false
 }
 
+variable "jumpbox_allowed_ssh" {
+  type = list(string)
+  description = "List of CIDR that are allowed to SSH to jumpbox"
+  default = []
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
