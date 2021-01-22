@@ -43,7 +43,15 @@ module "mhs_inbound_ecs_service" {
     data.terraform_remote_state.base.outputs.docdb_access_sg_id
   ]
 
-  lb_allowed_security_groups = [
+  # lb_allowed_security_groups = [
+  #   data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+  #   var.opentest_sg_id
+  # ]
+
+  # For network type LBs the LB Security Group does not matter and is transparent
+  # Traffic has to be resricted on the Target Load Balancer
+
+  container_allowed_security_groups = [
     data.terraform_remote_state.account.outputs.jumpbox_sg_id,
     var.opentest_sg_id
   ]
