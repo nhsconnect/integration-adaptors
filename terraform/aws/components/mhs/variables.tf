@@ -175,9 +175,9 @@ variable "ptl_connected" {
 
 # outbound specific
 
-variable "mhs_outbound_spineroutelookup_verify_certificate" {
+variable "mhs_outbound_spineroutelookup_validate_certificate" {
   type = bool
-  default = true
+  default = false
 }
 
 variable "mhs_outbound_forward_reliable_url" {

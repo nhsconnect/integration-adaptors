@@ -45,10 +45,6 @@ locals {
       value = var.opentest_connected ? data.aws_instance.opentest_instance.private_ip : ""
     },
     {
-      name = "MHS_OUTBOUND_VALIDATE_CERTIFICATE"
-      value = var.mhs_outbound_validate_certificate
-    },
-    {
       name = "MHS_RESYNC_INITIAL_DELAY"
       value = "0.15"
     },
