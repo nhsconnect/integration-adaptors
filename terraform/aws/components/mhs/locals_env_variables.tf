@@ -34,7 +34,7 @@ locals {
     },
     {
       name = "MHS_OUTBOUND_SPINE_ROUTE_LOOKUP_VALIDATE_CERT"
-      value = var.mhs_outbound_spineroutelookup_verify_certificate
+      value = var.mhs_outbound_spineroutelookup_validate_certificate
     },
     {
       name = "MHS_FORWARD_RELIABLE_ENDPOINT_URL"
