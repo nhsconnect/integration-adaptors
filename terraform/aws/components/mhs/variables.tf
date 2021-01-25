@@ -238,3 +238,9 @@ variable "mhs_inboud_use_ssl" {
   type = bool
   default = true
 }
+
+variable "logs_datetime_format" {
+  type = string
+  description = "Format for date and time in logs"
+  default = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
+}
