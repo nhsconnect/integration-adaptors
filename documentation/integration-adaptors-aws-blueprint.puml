@@ -39,11 +39,17 @@ rectangle {
 Cloudalt(aws, "AWS Cloud", "") {
     rectangle {
     Region(euWest, "eu-west-2 (London) Region", "") {
-        DocumentDBwithMongoDBcompatibility(stateDb, "DocumentDb\n(State Database)", "")
-        DocumentDBwithMongoDBcompatibility(syncDb, "DocumentDb\n(Sync-Async Database)", "")
+        rectangle DocumentDb {
+            DocumentDBwithMongoDBcompatibility(stateDb, "DocumentDb\n(MHS State Database)", "")
+            DocumentDBwithMongoDBcompatibility(syncDb, "DocumentDb\n(MHS Sync-Async Database)", "")
+            DocumentDBwithMongoDBcompatibility(nhaisDb, "DocumentDb\n(NHAIS State Database)", "")
+            DocumentDBwithMongoDBcompatibility(labResultsDb, "DocumentDb\n(Lab Results State Database)", "")
+        }
         SimpleStorageServiceS3(containerLayerStore, "Container Layer Store", "Technology", "")
-        MQ(nhaisQueue, "Amazon MQ\n(NHAIS MESH Inbound/Outbound Queues)", "")
-        MQ(labResultsQueues, "Amazon MQ\n(Lab Results Inbound/Outbound MESH Queue)", "")
+        rectangle Queues {
+            MQ(nhaisQueue, "Amazon MQ\n(NHAIS MESH Inbound/Outbound Queues)", "")
+            MQ(labResultsQueues, "Amazon MQ\n(Lab Results Inbound/Outbound MESH Queue)", "")
+        }
         CloudWatch(cw, "CloudWatch", "")
         SecretsManager(secrets, "Secrets Manager", "")
         EC2ContainerRegistry(ecr, "Container Registry", "")
@@ -194,10 +200,16 @@ rTask --down--> openTestPeering
 rTask --down--> redis
 ep --up--> stateDb
 ep --up--> syncDb
+ep --up--> labResultsDb
+ep --up--> nhaisDb
 oTask --down-- openTestPeering
 nhaisTask --down-- openTestPeering
+nhaisTask --up--> ep
+
 labResultsTask --down-- openTestPeering
 labResultsTask --down--> supplierPeering
+labResultsTask --up--> ep
+
 
 iTask --up--> ep
 routeLB --down-- openTestPeering
