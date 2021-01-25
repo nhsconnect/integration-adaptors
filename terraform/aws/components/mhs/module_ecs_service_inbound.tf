@@ -26,6 +26,7 @@ module "mhs_inbound_ecs_service" {
   use_application_lb = false 
   load_balancer_type = "network"
   protocol =  "TCP"
+  logs_datetime_format = var.logs_datetime_format
 
   container_healthcheck_port = var.mhs_inbound_service_healthcheck_port
   enable_dlt                 = var.enable_dlt

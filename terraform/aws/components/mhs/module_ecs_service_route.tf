@@ -26,6 +26,7 @@ module "mhs_route_ecs_service" {
   use_application_lb = true
   load_balancer_type = "application"
   protocol = "HTTP"
+  logs_datetime_format = var.logs_datetime_format
 
   container_healthcheck_port =  var.mhs_route_service_container_port
   enable_dlt                 = var.enable_dlt
