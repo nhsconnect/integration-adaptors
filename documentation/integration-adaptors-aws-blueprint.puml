@@ -43,7 +43,7 @@ Cloudalt(aws, "AWS Cloud", "") {
         DocumentDBwithMongoDBcompatibility(syncDb, "DocumentDb\n(Sync-Async Database)", "")
         SimpleStorageServiceS3(containerLayerStore, "Container Layer Store", "Technology", "")
         MQ(nhaisQueue, "Amazon MQ\n(NHAIS MESH Inbound/Outbound Queues)", "")
-        MQ(labResultsQueue, "Amazon MQ\n(Lab Results MESH Inbound Queues)", "")
+        MQ(labResultsQueues, "Amazon MQ\n(Lab Results Inbound/Outbound MESH Queue)", "")
         CloudWatch(cw, "CloudWatch", "")
         SecretsManager(secrets, "Secrets Manager", "")
         EC2ContainerRegistry(ecr, "Container Registry", "")
@@ -142,7 +142,7 @@ Cloudalt(aws, "AWS Cloud", "") {
                     MQ(inboundQueue, "MHS Async Response Queue\n(Amazon MQ)", "")
                 }
                 rectangle "Lab Results Outbound Queue Security Group" {
-                    MQ(labResultsInboundQueue, "Lab Results Outbound Queue\n(Amazon MQ)", "")
+                    MQ(labResultsInboundGPQueue, "Lab Results Outbound GP Queue\n(Amazon MQ)", "")
                 }
             }
         }
@@ -183,7 +183,7 @@ oTask --down-->routeLB
 nhaisTask --up-> mqVPC
 labResultsTask --up-> mqVPC
 mqVPC --up-> nhaisQueue
-mqVPC --up-> labResultsQueue
+mqVPC --up-> labResultsQueues
 nhaisTask --up-> ep
 fargate --up--> cwep
 cwep --up--> cw
@@ -212,10 +212,10 @@ iTask --down--> supplierPeering
 
 supplierPeering --down--> inboundQueue
 supplierPeering --down--supplierSystem
-supplierSystem --right--> inboundQueue
-supplierPeering --up--> outboundLB
-supplierPeering --down--> labResultsInboundQueue
-supplierSystem --right--> labResultsInboundQueue
+supplierSystem --up--> inboundQueue
+supplierPeering --down--> outboundLB
+supplierPeering --down--> labResultsInboundGPQueue
+supplierSystem --up--> labResultsInboundGPQueue
 
 outboundLB --up--> oTask
 supplierPeering --up--> nhaisLB
