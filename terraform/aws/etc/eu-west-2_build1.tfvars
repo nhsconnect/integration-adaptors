@@ -34,3 +34,17 @@ gp2gp_service_minimal_count = 1
 gp2gp_service_maximal_count = 1
 gp2gp_service_container_port = 8080
 gp2gp_service_launch_type = "FARGATE"
+
+# Settings for "mhs" component
+mhs_inbound_service_container_port = 443
+mhs_inbound_service_healthcheck_port = 80
+mhs_outbound_service_container_port = 80
+mhs_route_service_container_port = 80
+mhs_service_minimal_count = 1
+mhs_service_desired_count = 1
+mhs_service_maximal_count = 2
+mhs_service_launch_type = "FARGATE"
+mhs_log_level = "DEBUG"
+
+mhs_outbound_forward_reliable_url = "https://192.168.128.11/reliablemessaging/forwardreliable"
+mhs_route_sds_url = "ldap://192.168.128.11"

@@ -6,7 +6,7 @@ resource "aws_security_group_rule" "additional_container_from_incoming_cidr" {
   from_port = var.container_port
   to_port = var.container_port
   protocol = var.container_protocol
-  description = "Allow additional CIDRs to  Container(s) in env: ${var.environment}"
+  description = "Allow additional CIDRs to ${var.module_instance} Container(s) in env: ${var.environment}"
 }
 
 resource "aws_security_group_rule" "additional_incoming_sg_to_container" {
@@ -17,7 +17,7 @@ resource "aws_security_group_rule" "additional_incoming_sg_to_container" {
   from_port = var.container_port
   to_port = var.container_port
   protocol = var.container_protocol
-  description = "Allow additional SG: ${var.container_allowed_security_groups[count.index]} to Container(s) in env: ${var.environment}"
+  description = "Allow additional SG: ${var.container_allowed_security_groups[count.index]} to ${var.module_instance} Container(s) in env: ${var.environment}"
 }
 
 resource "aws_security_group_rule" "additional_container_from_incoming_sg" {
@@ -28,5 +28,5 @@ resource "aws_security_group_rule" "additional_container_from_incoming_sg" {
   from_port = var.container_port
   to_port = var.container_port
   protocol = var.container_protocol
-  description = "Allow from additional SG: ${var.container_allowed_security_groups[count.index]} to Load Balancer in env: ${var.environment}"
+  description = "Allow from additional SG: ${var.container_allowed_security_groups[count.index]} to ${var.module_instance} Container(s) in env: ${var.environment}"
 }

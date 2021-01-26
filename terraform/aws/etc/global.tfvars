@@ -9,3 +9,10 @@ enable_dlt = false
 opentest_vpc_id = "vpc-05df0513605dcbd32"
 opentest_sg_id = "sg-02dce579551a289dc"
 opentest_instance_id = "i-0c3796a9a8e712b69"
+
+jumpbox_allowed_ssh = [
+  "91.222.71.98/32",   # Gdansk VPN
+  "195.89.171.5/32",   # Belfast Office
+  "62.254.63.50/32",   # Belfast VPN #1
+  "62.254.63.52/32"    # Belfast VPN #2
+]

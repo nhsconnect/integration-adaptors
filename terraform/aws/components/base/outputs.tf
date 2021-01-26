@@ -46,6 +46,11 @@ output "docdb_instance_port" {
   value = aws_docdb_cluster_instance.base_db_instance[0].port
 }
 
+output "docdb_cluster_connection_string" {
+  value = "mongodb://${var.docdb_master_user}:${var.docdb_master_password}@${aws_docdb_cluster.base_db_cluster.endpoint}:${aws_docdb_cluster_instance.base_db_instance[0].port
+}/?retryWrites=false"
+}
+
 output "docdb_access_sg_id" {
   value = aws_security_group.docdb_access_sg.id
 }
@@ -104,4 +109,12 @@ output "ptl_container_subnet_ids" {
 
 output "ptl_lb_subnet_ids" {
   value = aws_subnet.service_lb_subnet.*.id
+}
+
+output "redis_host" {
+  value = aws_elasticache_replication_group.elasticache_replication_group.primary_endpoint_address
+}
+
+output redis_port {
+  value = aws_elasticache_replication_group.elasticache_replication_group.port
 }

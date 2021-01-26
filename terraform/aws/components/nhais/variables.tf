@@ -185,7 +185,7 @@ variable "nhais_scheduler_enabled" {
   default = true
 }
 
-# Opetest
+# Opentest
 
 variable "opentest_connected" {
   type = bool

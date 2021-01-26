@@ -130,6 +130,22 @@ variable "opentest_sg_id" {
   description = "Id of Opentest security group"
 }
 
+variable "elasticache_node_type" {
+  type = string
+  default = "cache.t2.micro"
+}
+
+variable "create_opentest_instance" {
+  type = bool
+  default = false
+}
+
+variable "jumpbox_allowed_ssh" {
+  type = list(string)
+  description = "List of CIDR that are allowed to SSH to jumpbox"
+  default = []
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
