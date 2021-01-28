@@ -1,0 +1,6 @@
+environment = "build1"
+base_cidr = "10.21.0.0/16"
+base_aks_cidr = "10.21.100.0/24"
+base_redis_cidr = "10.21.101.0/24"
+base_firewall_cidr = "10.21.102.0/24"
+base_jumpbox_cidr = "10.21.103.0/24"

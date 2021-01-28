@@ -1,5 +1,10 @@
+variable project {
+  type = string
+  description = "Name of the project"
+}
+
 variable location {
-  description "Azure Location (Region)"
+  description = "Azure Location (Region)"
   type = string
 }
 
@@ -15,5 +20,10 @@ variable state_bucket_storage_account {
 
 variable state_bucket_name {
   description = "Name of bucket (container) with state file"
+  type = string
+}
+
+variable account_resource_group {
+  description = "Resource group for all resources within the account"
   type = string
 }

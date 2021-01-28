@@ -1,13 +1,17 @@
 # MongoDB on CosmosDB
 
 resource "azurerm_cosmosdb_account" "mongodb" {
-  name = "${var.cluster_name}-mongodb"
-  resource_group_name = azurerm_resource_group.mhs_adaptor.name
-  location            = azurerm_resource_group.mhs_adaptor.location
-  offer_type = "Standard"
-  kind = "MongoDB"
+  name = "${local.resource_prefix}-mongodb"
+  resource_group_name = var.account_resource_group
+  location            = var.location
+  offer_type          = "Standard"
+  kind                = "MongoDB"
 
   enable_automatic_failover = false
+
+  capabilities {
+    name = "EnableMongo"
+  }
 
   capabilities {
     name = "MongoDBv3.4"
@@ -20,23 +24,11 @@ resource "azurerm_cosmosdb_account" "mongodb" {
   }
 
   geo_location {
-    location          = azurerm_resource_group.mhs_adaptor.location
+    location          = var.location
     failover_priority = 0
   }
-}
 
-output "mongodb_endpoint" {
-  value = azurerm_cosmosdb_account.mongodb.endpoint
-}
-
-output "mongodb_write_endpoints" {
-  value = azurerm_cosmosdb_account.mongodb.write_endpoints
-}
-
-output "mongodb_read_endpoints" {
-  value = azurerm_cosmosdb_account.mongodb.read_endpoints
-}
-
-output "mongodb_connection_string" {
-  value = azurerm_cosmosdb_account.mongodb.connection_strings
+  tags = merge(local.default_tags,{
+    Name = "${local.resource_prefix}-mongodb"
+  })
 }

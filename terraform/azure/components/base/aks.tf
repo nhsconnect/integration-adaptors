@@ -1,17 +1,18 @@
 ## AKS kubernetes cluster ##
 resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" { 
-  name                = var.cluster_name
-  resource_group_name = azurerm_resource_group.mhs_adaptor.name
-  location            = azurerm_resource_group.mhs_adaptor.location
+  #name                = var.cluster_name
+  name                = "${local.resource_prefix}-aks_cluster"
+  resource_group_name = var.account_resource_group
+  location            = var.location
   dns_prefix          = var.dns_prefix
-  private_cluster_enabled = false
+  private_cluster_enabled = var.private_cluster
 
   linux_profile {
-    admin_username = var.admin_username
+    admin_username = var.aks_admin_user
 
     ## SSH key is generated using "tls_private_key" resource
     ssh_key {
-      key_data = "${trimspace(tls_private_key.key.public_key_openssh)} ${var.admin_username}@azure.com"
+      key_data = "${trimspace(tls_private_key.key.public_key_openssh)} ${var.aks_admin_user}@azure.com"
     }
   }
 
@@ -27,18 +28,18 @@ resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" {
   
   default_node_pool {
     name = "default"
-    node_count = var.agent_count
+    node_count = var.aks_node_count
     vm_size = "Standard_F2s_v2"
     os_disk_size_gb = 30
-    vnet_subnet_id = azurerm_subnet.mhs_aks_subnet.id
+    vnet_subnet_id = azurerm_subnet.base_aks_subnet.id
   }
 
   network_profile {
-    network_plugin = "azure"
-    network_policy = "azure"
-    service_cidr = var.mhs_aks_internal_cidr
-    dns_service_ip = var.mhs_aks_internal_dns
-    docker_bridge_cidr = var.mhs_aks_docker_bridge_cidr
+    network_plugin     = "azure"
+    network_policy     = "azure"
+    service_cidr       = var.base_aks_internal_cidr
+    dns_service_ip     = var.base_aks_internal_dns
+    docker_bridge_cidr = var.base_aks_docker_bridge_cidr
     outbound_type      = "userDefinedRouting"
   }
 
@@ -47,14 +48,16 @@ resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" {
     client_secret = var.client_secret
   }
 
-  tags = {
-    Environment = "Production"
-  }
+  tags = merge(local.default_tags,{
+    Name = "${local.resource_prefix}-aks_cluster"
+  })
 
   depends_on = [
-    azurerm_subnet.mhs_aks_subnet,
-    azurerm_route_table.mhs_aks_route_table,
-    azurerm_subnet_route_table_association.mhs_aks_subnet_association
+    azurerm_subnet.base_aks_subnet,
+    azurerm_route_table.base_route_table,
+    azurerm_subnet_route_table_association.base_aks_subnet_association,
+    azurerm_route.base_default_route,
+    azurerm_firewall.base_firewall,
   ]
 }
 
@@ -68,31 +71,31 @@ resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" {
 ## Outputs ##
 
 # Example attributes available for output
-output "id" {
-    value = "${azurerm_kubernetes_cluster.mhs_adaptor_aks.id}"
+output "base_aks_id" {
+    value = azurerm_kubernetes_cluster.mhs_adaptor_aks.id
 }
 
-output "client_key" {
-  value = "${azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.client_key}"
+output "base_aks_client_key" {
+  value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.client_key
 }
 
-output "client_certificate" {
-  value = "${azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.client_certificate}"
+output "base_aks_client_certificate" {
+  value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.client_certificate
 }
 
-output "cluster_ca_certificate" {
-  value = "${azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.cluster_ca_certificate}"
+output "base_aks_cluster_ca_certificate" {
+  value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.cluster_ca_certificate
 }
 
-output "kube_config" {
+output "base_aks_kube_config" {
   value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config_raw
 }
 
-output "host" {
+output "base_aks_host" {
   value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.host
 }
 
-output "configure" {
+output "base_aks_configure" {
   value = <<CONFIGURE
 
 Run the following commands to configure kubernetes client:
