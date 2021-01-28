@@ -31,22 +31,6 @@ locals {
     {
       name  = "GP2GP_TASK_QUEUE"
       value = join("-", list(var.environment, "gp2gp", "tasks"))
-    },
-    {
-      name = "GP2GP_GPC_GET_URL"
-      value = "https://orange.testlab.nhs.uk/B82617/STU3/1/gpconnect"
-    },
-    {
-      name = "GP2GP_GPC_GET_STRUCTURED_ENDPOINT"
-      value = "/fhir/Patient/$gpc.getstructuredrecord"
-    },
-    {
-      name = "GP2GP_GPC_GET_DOCUMENT_ENDPOINT"
-      value = "/fhir/Binary/"
-    },
-    {
-      name = "GP2GP_GPC_HOST"
-      value = "orange.testlab.nhs.uk"
     }
   ])
 }
