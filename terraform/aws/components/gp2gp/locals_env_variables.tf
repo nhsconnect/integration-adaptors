@@ -32,5 +32,21 @@ locals {
       name  = "GP2GP_TASK_QUEUE"
       value = join("-", list(var.environment, "gp2gp", "tasks"))
     },
+    {
+      name = "GP2GP_GPC_GET_URL"
+      value = var.gp2gp_gpc_get_url
+    },
+    {
+      name = "GP2GP_GPC_GET_STRUCTURED_ENDPOINT"
+      value = var.gp2gp_gpc_get_structured_endpoint
+    },
+    {
+      name = "GP2GP_GPC_GET_DOCUMENT_ENDPOINT"
+      value = var.gp2gp_gpc_get_document_endpoint
+    },
+    {
+      name = "GP2GP_GPC_HOST"
+      value = var.gp2gp_gpc_host
+    }
   ])
 }
