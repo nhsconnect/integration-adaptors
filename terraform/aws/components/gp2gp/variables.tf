@@ -131,7 +131,7 @@ variable "gp2gp_gpc_get_url" {
 
 variable "gp2gp_gpc_get_structured_endpoint" {
   type = string
-  description = Endpoint for GPC access structured request
+  description = "Endpoint for GPC access structured request"
   default = "/fhir/Patient/$gpc.getstructuredrecord"
 }
 
