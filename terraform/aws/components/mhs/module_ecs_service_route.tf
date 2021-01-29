@@ -20,7 +20,7 @@ module "mhs_route_ecs_service" {
   container_port    = var.mhs_route_service_container_port
   application_port  = var.mhs_service_application_port
   launch_type       = var.mhs_service_launch_type
-  log_stream_prefix = var.mhs_build_id
+  log_stream_prefix = local.route_logs_prefix
   healthcheck_path  = var.mhs_healthcheck_path
   enable_load_balancing = true
   use_application_lb = true
