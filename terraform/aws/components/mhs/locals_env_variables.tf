@@ -73,7 +73,7 @@ locals {
     },
     {
       name = "MHS_INBOUND_QUEUE_NAME"
-      value = "${var.environment}_mhs_inbound"
+      value = var.mhs_inbound_queue_name
     },
     {
       name = "MHS_INBOUND_USE_SSL"

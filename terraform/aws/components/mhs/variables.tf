@@ -165,6 +165,11 @@ variable "create_testbox" {
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
 }
 
+variable mhs_inbound_queue_name {
+  type = string
+  description = "Name of queue used by MHS Inbound "
+}
+
 # Opentest
 
 variable "opentest_connected" {
