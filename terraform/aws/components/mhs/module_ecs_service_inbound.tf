@@ -33,7 +33,7 @@ module "mhs_inbound_ecs_service" {
   dlt_vpc_id                 = var.dlt_vpc_id
 
   environment_variables = local.inbound_variables
-  secret_variables      = local.secret_variables
+  secret_variables      = local.inbound_secret_variables
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
   task_role_arn           = data.aws_iam_role.ecs_service_task_role.arn
