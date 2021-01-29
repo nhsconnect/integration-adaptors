@@ -48,9 +48,9 @@ mhs_service_launch_type = "FARGATE"
 mhs_log_level = "DEBUG"
 mhs_inbound_queue_name = "build1_mhs_inbound"
 
-mhs_outbound_alternative_image_tag = "nhsdev/nia-mhs-outbound:1.0.0"
-mhs_inbound_alternative_image_tag =  "nhsdev/nia-mhs-inbound:1.0.0"
-mhs_route_alternative_image_tag =  "nhsdev/nia-mhs-route:1.0.0"
+mhs_outbound_alternative_image_tag = "nhsdev/nia-mhs-outbound:1.0.2"
+mhs_inbound_alternative_image_tag =  "nhsdev/nia-mhs-inbound:1.0.2"
+mhs_route_alternative_image_tag =  "nhsdev/nia-mhs-route:1.0.2"
 
 mhs_outbound_forward_reliable_url = "https://192.168.128.11/reliablemessaging/forwardreliable"
 mhs_route_sds_url = "ldap://192.168.128.11"
