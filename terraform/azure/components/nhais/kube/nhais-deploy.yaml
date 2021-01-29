@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nhais
+  name: nhais
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nhais
+  template:
+    metadata:
+      labels:
+        app: nhais
+    spec:
+      containers:
+      - image: nhsdev/nia-nhais-adaptor:1.4.1
+        name: nhais
+        ports:
+        - containerPort: 8080
+        env:
+        - name: NHAIS_AMQP_BROKERS
+          value: "amqps://nhaisservicebus.servicebus.windows.net:5671/?sasl=plain"
+        - name: NHAIS_AMQP_USERNAME
+          value: nhais
+        - name: NHAIS_AMQP_PASSWORD
+          value: "CHANGE_ME"
+        - name: NHAIS_MESH_OUTBOUND_QUEUE_NAME
+          value: mesh_outbound
+        - name: NHAIS_MESH_INBOUND_QUEUE_NAME
+          value: mesh_inbound
+        - name: NHAIS_GP_SYSTEM_INBOUND_QUEUE_NAME
+          value: gp_inbound
+        - name: NHAIS_MONGO_HOST
+          value: nhais.mongo.cosmos.azure.com
+        - name: NHAIS_MONGO_PORT
+          value: "10255"
+        - name: NHAIS_MONGO_USERNAME
+          value: nhais
+        - name: NHAIS_MONGO_PASSWORD
+          value: "CHANGE_ME"
+        - name: NHAIS_MONGO_OPTIONS
+          value: "ssl=true&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@michalsc@&retrywrites=false"
+        - name: NHAIS_COSMOS_DB_ENABLED
+          value: "true"
+        - name: NHAIS_MESH_MAILBOX_ID
+          value: gp_mailbox
+        - name: NHAIS_MESH_MAILBOX_PASSWORD
+          value: password
+        - name: NHAIS_MESH_SHARED_KEY
+          value: SharedKey
+        - name: NHAIS_MESH_HOST
+          value: https://fake-mesh:8829/messageexchange/
+        - name: NHAIS_MESH_CERT_VALIDATION
+          value: "false"
+        - name: NHAIS_MESH_ENDPOINT_CERT
+          value: |
+           -------CERT----------
+        - name: NHAIS_MESH_ENDPOINT_PRIVATE_KEY
+          value: |
+            -------CERT--------
+        - name: NHAIS_MESH_RECIPIENT_MAILBOX_ID_MAPPINGS
+          value: |
+            XX11=nhais_mailbox
+            TES5=nhais_mailbox
+            YY21=nhais_mailbox
+            KC01=nhais_mailbox
+            WHI5=nhais_mailbox
+            SO01=nhais_mailbox
+            UNY5=nhais_mailbox
+            BAA1=nhais_mailbox
+        - name: NHAIS_MESH_POLLING_CYCLE_MINIMUM_INTERVAL_IN_SECONDS
+          value: "300"
+        - name: NHAIS_MESH_CLIENT_WAKEUP_INTERVAL_IN_MILLISECONDS
+          value: "60000"
+        - name: NHAIS_SCHEDULER_ENABLED
+          value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nhais
+  labels:
+    app: nhais
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: nhais
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fake-mesh
+  name: fake-mesh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fake-mesh
+  template:
+    metadata:
+      labels:
+        app: fake-mesh
+    spec:
+      containers:
+      - image: nhsdev/fake-mesh:0.2.0
+        name: fake-mesh
+        ports:
+        - containerPort: 8829
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fake-mesh
+  labels:
+    app: fake-mesh
+spec:
+  ports:
+  - port: 8829
+    protocol: TCP
+  selector:
+    app: fake-mesh

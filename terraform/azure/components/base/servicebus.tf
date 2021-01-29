@@ -10,6 +10,10 @@ resource "azurerm_servicebus_namespace" "base_servicebus_namespace" {
   })
 }
 
+output "base_servicebus_namespace" {
+  value = azurerm_servicebus_namespace.base_servicebus_namespace.name
+}
+
 # resource "azurerm_servicebus_queue" "mhs_inbound_queue" {
 #   name                = "${var.cluster_name}-servicebus-inbound-queue"
 #   resource_group_name = var.account_resource_group
