@@ -39,6 +39,24 @@ variable "mhs_build_id" {
   description = "Number of the current build, used for tagging the logs"
 }
 
+variable "mhs_outbound_alternative_image_tag" {
+  type = string
+  default = ""
+  description = "Use in case of a need to deploy image from docker hub, will overwrite the mhs_build_id setting"
+}
+
+variable "mhs_inbound_alternative_image_tag" {
+  type = string
+  default = ""
+  description = "Use in case of a need to deploy image from docker hub, will overwrite the mhs_build_id setting"
+}
+
+variable "mhs_route_alternative_image_tag" {
+  type = string
+  default = ""
+  description = "Use in case of a need to deploy image from docker hub, will overwrite the mhs_build_id setting"
+}
+
 variable "mhs_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
@@ -145,6 +163,11 @@ variable "create_testbox" {
   type = bool
   default = false
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
+}
+
+variable mhs_inbound_queue_name {
+  type = string
+  description = "Name of queue used by MHS Inbound "
 }
 
 # Opentest

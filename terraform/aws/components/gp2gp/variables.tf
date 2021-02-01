@@ -153,6 +153,11 @@ variable "gp2gp_service_target_request_count" {
   default = 1200
 }
 
+variable mhs_inbound_queue_name {
+  type = string
+  description = "Name of queue used by MHS Inbound "
+}
+
 variable "create_testbox" {
   type = bool
   default = false

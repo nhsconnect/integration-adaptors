@@ -26,7 +26,7 @@ locals {
     },
     {
       name  = "GP2GP_MHS_INBOUND_QUEUE"
-      value = join("-", list(var.environment, "mhs", "inbound"))
+      value = var.mhs_inbound_queue_name
     },
     {
       name  = "GP2GP_TASK_QUEUE"

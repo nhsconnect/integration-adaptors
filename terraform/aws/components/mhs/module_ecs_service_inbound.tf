@@ -20,7 +20,7 @@ module "mhs_inbound_ecs_service" {
   container_port    = var.mhs_inbound_service_container_port
   application_port  = var.mhs_inbound_service_container_port
   launch_type       = var.mhs_service_launch_type
-  log_stream_prefix = var.mhs_build_id
+  log_stream_prefix = local.inbound_logs_prefix
   healthcheck_path  = var.mhs_healthcheck_path
   enable_load_balancing = true
   use_application_lb = false 
@@ -33,7 +33,7 @@ module "mhs_inbound_ecs_service" {
   dlt_vpc_id                 = var.dlt_vpc_id
 
   environment_variables = local.inbound_variables
-  secret_variables      = local.secret_variables
+  secret_variables      = local.inbound_secret_variables
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
   task_role_arn           = data.aws_iam_role.ecs_service_task_role.arn

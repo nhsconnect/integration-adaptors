@@ -20,14 +20,6 @@ locals {
       name = "MHS_SECRET_CA_CERTS"
       valueFrom = data.aws_secretsmanager_secret.mhs_ca_certs.arn
     },
-    {
-      name = "MHS_AMQP_USERNAME"
-      valueFrom = data.aws_secretsmanager_secret.mq_username.arn
-    },
-    {
-      name = "MHS_AMQP_PASSWORD"
-      valueFrom = data.aws_secretsmanager_secret.mq_password.arn
-    },
     # {
     #   name = "MHS_MONGO_USERNAME"
     #   valueFrom = data.aws_secretsmanager_secret.docdb_master_username.arn
@@ -37,4 +29,15 @@ locals {
     #   valueFrom = data.aws_secretsmanager_secret.docdb_master_password.arn
     # },
   ]
+
+  inbound_secret_variables = concat(local.secret_variables,[
+    {
+      name = "MHS_SECRET_INBOUND_QUEUE_USERNAME"
+      valueFrom = data.aws_secretsmanager_secret.mq_username.arn
+    },
+    {
+      name = "MHS_SECRET_INBOUND_QUEUE_PASSWORD"
+      valueFrom = data.aws_secretsmanager_secret.mq_password.arn
+    },
+  ])
 }
