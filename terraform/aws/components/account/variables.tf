@@ -52,6 +52,11 @@ variable "jumpbox_size" {
   default = "t2.micro"
 }
 
+variable "jumpbox_volume_size" {
+  type = number
+  default = 16
+}
+
 variable "mq_vpc_id" {
   type = string
   description = "VPC where MQ cluster is hosted"
