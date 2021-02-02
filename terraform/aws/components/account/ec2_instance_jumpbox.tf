@@ -10,6 +10,11 @@ resource "aws_instance" "jumpbox" {
   user_data = data.template_cloudinit_config.jumpbox_user_data.rendered
   associate_public_ip_address = true
 
+  root_block_device {
+    delete_on_termination = true
+    volume_size = var.jumpbox_volume_size
+  }
+
   tags = merge(local.default_tags, {
      Name = "${local.resource_prefix}-jumpbox"
   })
