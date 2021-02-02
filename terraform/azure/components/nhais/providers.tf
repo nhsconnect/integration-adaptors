@@ -10,6 +10,13 @@ terraform {
   }
 }
 
+provider "kubernetes" {
+  host                   = data.terraform_remote_state.base.outputs.base_aks_host
+  client_certificate     = base64decode(data.terraform_remote_state.base.outputs.base_aks_client_certificate)
+  client_key             = base64decode(data.terraform_remote_state.base.outputs.base_aks_client_key)
+  cluster_ca_certificate = base64decode(data.terraform_remote_state.base.outputs.base_aks_cluster_ca_certificate)
+}
+
 provider "azurerm" {
   #version = "~>2.5"
   features {

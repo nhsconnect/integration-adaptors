@@ -56,3 +56,9 @@ output "base_jumpbox_connect" {
   description = "Command for connecting to jumpbox"
   value = "ssh ${var.jumpbox_user}@${azurerm_linux_virtual_machine.base_jumpbox.public_ip_address} -i ~/.ssh/azure_mhs_jumpbox"
 }
+
+# keyvault output
+
+output "base_keyvault_id" {
+  value = azurerm_key_vault.base-key-vault.id
+}

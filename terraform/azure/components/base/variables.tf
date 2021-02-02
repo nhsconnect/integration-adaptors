@@ -1,7 +1,7 @@
 ## Azure config variables ##
-#variable "client_id" {}
+variable "client_id" {}
 
-#variable "client_secret" {}
+variable "client_secret" {}
 
 variable "project" {
   type = string
