@@ -94,7 +94,7 @@ variable "lab-results_environment_variables" {
 
 variable "lab-results_log_level" {
   type = string
-  description = "Level of logging for NHAIS application"
+  description = "Level of logging for LAB_RESULTS application"
   default = "INFO"
 }
 
@@ -161,7 +161,7 @@ variable "lab-results_mesh_cert_validation" {
   default = "true"
 }
 
-variable "nhais_mesh_polling_cycle_minimum_interval_in_seconds" {
+variable "lab-results_mesh_polling_cycle_minimum_interval_in_seconds" {
   type = number
   description = "Delay in seconds on scanning mesh mailbox"
   default = 300
