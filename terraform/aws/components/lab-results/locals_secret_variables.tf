@@ -29,20 +29,20 @@ locals {
       valueFrom = data.aws_secretsmanager_secret.lab-results_mesh_shared_key.arn
     },
     {
-      name = "NHAIS_MESH_ENDPOINT_CERT"
-      valueFrom = data.aws_secretsmanager_secret.nhais_mesh_endpoint_cert.arn
+      name = "LAB_RESULTS_MESH_ENDPOINT_CERT"
+      valueFrom = data.aws_secretsmanager_secret.lab-results_mesh_endpoint_cert.arn
     },
     {
-      name = "NHAIS_MESH_RECIPIENT_MAILBOX_ID_MAPPINGS"
-      valueFrom = data.aws_secretsmanager_secret.nhais_mesh_recipient_codes.arn
+      name = "LAB_RESULTS_MESH_RECIPIENT_MAILBOX_ID_MAPPINGS"
+      valueFrom = data.aws_secretsmanager_secret.lab-results_mesh_recipient_codes.arn
     },
     {
-      name = "NHAIS_MESH_ENDPOINT_PRIVATE_KEY"
-      valueFrom = data.aws_secretsmanager_secret.nhais_mesh_endpoint_private_key.arn
+      name = "LAB_RESULTS_MESH_ENDPOINT_PRIVATE_KEY"
+      valueFrom = data.aws_secretsmanager_secret.lab-results_mesh_endpoint_private_key.arn
     },
     {
-      name = "NHAIS_MESH_SUB_CA"
-      valueFrom = data.aws_secretsmanager_secret.nhais_mesh_sub_ca.arn
+      name = "LAB_RESULTS_MESH_SUB_CA"
+      valueFrom = data.aws_secretsmanager_secret.lab-results_mesh_sub_ca.arn
     },
     {
       name = "LAB_RESULTS_SSL_TRUST_STORE_PASSWORD"
