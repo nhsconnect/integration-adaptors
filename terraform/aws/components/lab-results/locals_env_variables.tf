@@ -1,7 +1,7 @@
 locals {
   environment_variables = concat(var.lab-results_environment_variables,[
     {
-      name = "NHAIS_MESH_API_HTTP_PROXY"
+      name = "LAB_RESULTS_MESH_API_HTTP_PROXY"
       value = var.opentest_connected ? data.aws_instance.opentest_instance.private_ip : ""
     },
     {
@@ -13,20 +13,20 @@ locals {
       value = replace(data.aws_mq_broker.lab-results_mq_broker.instances[0].endpoints[1],"amqp+ssl","amqps") # https://www.terraform.io/docs/providers/aws/r/mq_broker.html#attributes-reference
     },
     {
-      name = "LAB_RESULTS_OUTBOUND_QUEUE_NAME"
-      value = "${var.environment}_lab-results_gp_system_outbound"
+      name = "LAB_RESULTS_MESH_OUTBOUND_QUEUE_NAME"
+      value = "${var.environment}_lab-results_mesh_outbound"
     },
     {
-      name = "NHAIS_MESH_INBOUND_QUEUE_NAME"
-      value = "${var.environment}_nhais_mesh_inbound"
+      name = "LAB_RESULTS_MESH_INBOUND_QUEUE_NAME"
+      value = "${var.environment}_lab-results_mesh_inbound"
     },
     {
-      name = "NHAIS_GP_SYSTEM_INBOUND_QUEUE_NAME"
-      value = "${var.environment}_nhais_gp_system_inbound"
+      name = "LAB_RESULTS_GP_OUTBOUND_QUEUE_NAME"
+      value = "${var.environment}_lab-results_gp_outbound"
     },
     {
-      name = "LAB_RESULTS_AMQP_MAX_RETRIES"
-      value = var.lab-results_amqp_max_retries
+      name = "LAB_RESULTS_AMQP_MAX_REDELIVERIES"
+      value = var.lab-results_amqp_max_redeliveries
     },
     {
       name = "LAB_RESULTS_AMQP_RETRY_DELAY"
@@ -34,7 +34,7 @@ locals {
     },
     {
       name = "LAB_RESULTS_MONGO_DATABASE_NAME"
-      value = "lab_results"
+      value = "labresults"
     },
     {
       name  = "LAB_RESULTS_LOGGING_LEVEL"
@@ -53,6 +53,18 @@ locals {
       value = var.lab-results_mongo_options
     },
     {
+      name = "LAB_RESULTS_MONGO_AUTO_INDEX_CREATION"
+      value = true
+    },    
+    {
+      name = "LAB_RESULTS_MONGO_TTL"
+      value = "P30D"
+    },
+    {
+      name = "LAB_RESULTS_COSMOS_DB_ENABLED"
+      value = false
+    },
+    {
       name = "LAB_RESULTS_MESH_HOST"
       value = var.lab-results_mesh_host
     },
@@ -61,20 +73,20 @@ locals {
       value = var.lab-results_mesh_cert_validation
     },
     {
-      name = "NHAIS_MESH_POLLING_CYCLE_MINIMUM_INTERVAL_IN_SECONDS"
-      value = var.nhais_mesh_polling_cycle_minimum_interval_in_seconds
+      name = "LAB_RESULTS_MESH_POLLING_CYCLE_MINIMUM_INTERVAL_IN_SECONDS"
+      value = var.lab-results_mesh_polling_cycle_minimum_interval_in_seconds
     },
     {
-      name = "NHAIS_MESH_CLIENT_WAKEUP_INTERVAL_IN_MILLISECONDS"
-      value = var.nhais_mesh_client_wakeup_interval_in_milliseconds
+      name = "LAB_RESULTS_MESH_CLIENT_WAKEUP_INTERVAL_IN_MILLISECONDS"
+      value = var.lab-results_mesh_client_wakeup_interval_in_milliseconds
     },
     {
-      name = "NHAIS_MESH_POLLING_CYCLE_DURATION_IN_SECONDS",
-      value = var.nhais_mesh_polling_cycle_duration_in_seconds
+      name = "LAB_RESULTS_MESH_POLLING_CYCLE_DURATION_IN_SECONDS",
+      value = var.lab-results_mesh_polling_cycle_duration_in_seconds
     },
     {
-      name = "NHAIS_SCHEDULER_ENABLED"
-      value = var.nhais_scheduler_enabled
+      name = "LAB_RESULTS_SCHEDULER_ENABLED"
+      value = var.lab-results_scheduler_enabled
     },
     {
       name = "LAB_RESULTS_SSL_TRUST_STORE_URL"
