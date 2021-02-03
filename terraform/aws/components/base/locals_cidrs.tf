@@ -6,11 +6,12 @@ locals {
     cidrsubnet(aws_vpc.base_vpc.cidr_block,10,3)
   ]
 
-  nhais_cidr     = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,1)
-  OneOneOne_cidr = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,2)
-  scr_cidr       = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,3)
-  mhs_cidr       = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,4)
-  gp2gp_cidr     = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,5)
+  nhais_cidr         = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,1)
+  OneOneOne_cidr     = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,2)
+  scr_cidr           = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,3)
+  mhs_cidr           = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,4)
+  gp2gp_cidr         = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,5)
+  lab-results_cidr   = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,6)
 }
 
 # Guidance on subnets:
