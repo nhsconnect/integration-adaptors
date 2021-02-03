@@ -75,6 +75,11 @@ output "mhs_cidr" {
   description = "CIDR block for MHS component"
 }
 
+output "lab-results_cidr" {
+  value = local.lab-results_cidr
+  description = "CIDR block for LAB-RESULTS component"
+}
+
 output "opentest_connected" {
   value = var.opentest_connected
 }
