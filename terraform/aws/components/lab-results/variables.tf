@@ -104,7 +104,7 @@ variable "lab-results_healthcheck_path" {
   default = "/healthcheck"
 }
 
-variable "lab-results_amqp_max_retries" {
+variable "lab-results_amqp_max_redeliveries" {
   type = number
   description = "Max retries on connection to amqp"
   default = 3
