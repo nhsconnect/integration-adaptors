@@ -22,66 +22,78 @@ resource "azurerm_servicebus_queue" "nhais_gp_inbound_queue" {
   enable_partitioning = false
 }
 
-resource "azurerm_servicebus_queue_authorization_rule" "nhais_mesh_inbound_queue_ar" {
-  name = "${local.resource_prefix}-mesh_inbound_queue_ar"
+# Namespace authorisation rule for all queues
+
+resource "azurerm_servicebus_namespace_authorization_rule" "nhais_servicebus_ar" {
+  name = "${local.resource_prefix}-servicebus_ar"
   resource_group_name = var.account_resource_group
   namespace_name = data.terraform_remote_state.base.outputs.base_servicebus_namespace
-  queue_name = azurerm_servicebus_queue.nhais_mesh_inbound_queue.name
 
   listen = true
   send = true
   manage = false
 }
 
-resource "azurerm_servicebus_queue_authorization_rule" "nhais_mesh_outbound_queue_ar" {
-  name = "${local.resource_prefix}-mesh_outbound_queue_ar"
-  resource_group_name = var.account_resource_group
-  namespace_name = data.terraform_remote_state.base.outputs.base_servicebus_namespace
-  queue_name = azurerm_servicebus_queue.nhais_mesh_outbound_queue.name
+# resource "azurerm_servicebus_queue_authorization_rule" "nhais_mesh_inbound_queue_ar" {
+#   name = "${local.resource_prefix}-mesh_inbound_queue_ar"
+#   resource_group_name = var.account_resource_group
+#   namespace_name = data.terraform_remote_state.base.outputs.base_servicebus_namespace
+#   queue_name = azurerm_servicebus_queue.nhais_mesh_inbound_queue.name
 
-  listen = true
-  send = true
-  manage = false
-}
+#   listen = true
+#   send = true
+#   manage = false
+# }
 
-resource "azurerm_servicebus_queue_authorization_rule" "nhais_gp_inbound_queue_ar" {
-  name = "${local.resource_prefix}-gp_inbound_queue_ar"
-  resource_group_name = var.account_resource_group
-  namespace_name = data.terraform_remote_state.base.outputs.base_servicebus_namespace
-  queue_name = azurerm_servicebus_queue.nhais_gp_inbound_queue.name
+# resource "azurerm_servicebus_queue_authorization_rule" "nhais_mesh_outbound_queue_ar" {
+#   name = "${local.resource_prefix}-mesh_outbound_queue_ar"
+#   resource_group_name = var.account_resource_group
+#   namespace_name = data.terraform_remote_state.base.outputs.base_servicebus_namespace
+#   queue_name = azurerm_servicebus_queue.nhais_mesh_outbound_queue.name
 
-  listen = true
-  send = true
-  manage = false
-}
+#   listen = true
+#   send = true
+#   manage = false
+# }
+
+# resource "azurerm_servicebus_queue_authorization_rule" "nhais_gp_inbound_queue_ar" {
+#   name = "${local.resource_prefix}-gp_inbound_queue_ar"
+#   resource_group_name = var.account_resource_group
+#   namespace_name = data.terraform_remote_state.base.outputs.base_servicebus_namespace
+#   queue_name = azurerm_servicebus_queue.nhais_gp_inbound_queue.name
+
+#   listen = true
+#   send = true
+#   manage = false
+# }
 
 #
 
-output nhais_mesh_inbound_queue_name {
-  value = azurerm_servicebus_queue.nhais_mesh_inbound_queue.name
-}
+# output nhais_mesh_inbound_queue_name {
+#   value = azurerm_servicebus_queue.nhais_mesh_inbound_queue.name
+# }
 
-output nhais_mesh_outbound_queue_name {
-  value = azurerm_servicebus_queue.nhais_mesh_outbound_queue.name
-}
+# output nhais_mesh_outbound_queue_name {
+#   value = azurerm_servicebus_queue.nhais_mesh_outbound_queue.name
+# }
 
-output nhais_gp_inbound_queue_name {
-  value = azurerm_servicebus_queue.nhais_gp_inbound_queue.name
-}
+# output nhais_gp_inbound_queue_name {
+#   value = azurerm_servicebus_queue.nhais_gp_inbound_queue.name
+# }
 
-#
+# #
 
-output nhais_mesh_inbound_queue_username {
-  value = azurerm_servicebus_queue_authorization_rule.nhais_mesh_inbound_queue_ar.name
-}
+# output nhais_mesh_inbound_queue_username {
+#   value = azurerm_servicebus_queue_authorization_rule.nhais_mesh_inbound_queue_ar.name
+# }
 
-output nhais_mesh_outbound_queue_username {
-  value = azurerm_servicebus_queue_authorization_rule.nhais_mesh_outbound_queue_ar.name
-}
+# output nhais_mesh_outbound_queue_username {
+#   value = azurerm_servicebus_queue_authorization_rule.nhais_mesh_outbound_queue_ar.name
+# }
 
-output nhais_gp_inbound_queue_username {
-  value = azurerm_servicebus_queue_authorization_rule.nhais_gp_inbound_queue_ar.name
-}
+# output nhais_gp_inbound_queue_username {
+#   value = azurerm_servicebus_queue_authorization_rule.nhais_gp_inbound_queue_ar.name
+# }
 
 
 

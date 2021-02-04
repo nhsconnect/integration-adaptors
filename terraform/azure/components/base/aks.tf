@@ -7,6 +7,8 @@ resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" {
   dns_prefix          = var.dns_prefix
   private_cluster_enabled = var.private_cluster
 
+  api_server_authorized_ip_ranges = var.jumpbox_allowed_ips
+
   linux_profile {
     admin_username = var.aks_admin_user
 

@@ -64,3 +64,54 @@ variable nhais_container_port {
   description = "Port exposed on the container"
   default = 8080
 }
+
+variable nhais_mesh_mailbox_id {
+  type = string
+  default = "gp_mailbox"
+}
+
+variable nhais_mesh_mailbox_password {
+  type = string
+}
+
+variable nhais_mesh_shared_key {
+  type = string
+  default = "SharedKey"
+}
+
+variable nhais_mesh_host {
+  type = string
+  default = "https://fake-mesh:8829/messageexchange/"
+}
+
+variable nhais_mesh_cert_validation {
+  type = bool
+  default = false
+}
+
+variable nhais_mesh_endpoint_cert {
+  type = string
+}
+
+variable nhais_mesh_endpoint_private_key {
+  type = string
+}
+
+variable nhais_mesh_recipient_mailbox_id_mappings {
+  type = string
+}
+
+variable nhais_mesh_polling_cycle_minimum_interval_in_seconds {
+  type = number
+  default = 300
+}
+
+variable nhais_mesh_client_wakeup_interval_in_miliseconds {
+  type = number
+  default = 60000
+}
+
+variable nhais_scheduler_enabled {
+  type = bool
+  default = true
+}

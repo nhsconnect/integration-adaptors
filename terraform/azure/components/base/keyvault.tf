@@ -3,7 +3,7 @@ resource "azurerm_key_vault" "base-key-vault" {
   resource_group_name = var.account_resource_group
   location            = var.location
   tenant_id           = data.azurerm_client_config.current.tenant_id
-  soft_delete_enabled         = false
+  soft_delete_enabled         = true
   #soft_delete_retention_days  = 7
   purge_protection_enabled    = false
 
