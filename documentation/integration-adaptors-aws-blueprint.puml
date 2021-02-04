@@ -204,7 +204,6 @@ ep --up--> labResultsDb
 ep --up--> nhaisDb
 oTask --down-- openTestPeering
 nhaisTask --down-- openTestPeering
-nhaisTask --up--> ep
 
 labResultsTask --down-- openTestPeering
 labResultsTask --down--> supplierPeering
