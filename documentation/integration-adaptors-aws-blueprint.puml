@@ -39,10 +39,17 @@ rectangle {
 Cloudalt(aws, "AWS Cloud", "") {
     rectangle {
     Region(euWest, "eu-west-2 (London) Region", "") {
-        DocumentDBwithMongoDBcompatibility(stateDb, "DocumentDb\n(State Database)", "")
-        DocumentDBwithMongoDBcompatibility(syncDb, "DocumentDb\n(Sync-Async Database)", "")
+        rectangle DocumentDb {
+            DocumentDBwithMongoDBcompatibility(stateDb, "DocumentDb\n(MHS State Database)", "")
+            DocumentDBwithMongoDBcompatibility(syncDb, "DocumentDb\n(MHS Sync-Async Database)", "")
+            DocumentDBwithMongoDBcompatibility(nhaisDb, "DocumentDb\n(NHAIS State Database)", "")
+            DocumentDBwithMongoDBcompatibility(labResultsDb, "DocumentDb\n(Lab Results State Database)", "")
+        }
         SimpleStorageServiceS3(containerLayerStore, "Container Layer Store", "Technology", "")
-        MQ(nhaisQueue, "Amazon MQ\n(NHAIS MESH Inbound/Outbound Queues)", "")
+        rectangle Queues {
+            MQ(nhaisQueue, "Amazon MQ\n(NHAIS MESH Inbound/Outbound Queues)", "")
+            MQ(labResultsQueues, "Amazon MQ\n(Lab Results Inbound/Outbound MESH Queue)", "")
+        }
         CloudWatch(cw, "CloudWatch", "")
         SecretsManager(secrets, "Secrets Manager", "")
         EC2ContainerRegistry(ecr, "Container Registry", "")
@@ -64,47 +71,54 @@ Cloudalt(aws, "AWS Cloud", "") {
                 }
             }
             rectangle {
-            VPCSubnetPrivate(azABC, "Availability Zones A, B & C", "Private subnet") {
-                rectangle {
-                Fargate(fargate, "ECS Fargate Cluster", "") {
-                    rectangle "Outbound MHS Security Group" as osg {
-                        ECSService(oService, "Outbound MHS Fargate Service", "") {
-                            rectangle "Outbound MHS ECS Fargate Task" {
-                                ECSContainer1(oTask, "Outbound MHS Containers", "")
+                VPCSubnetPrivate(azABC, "Availability Zones A, B & C", "Private subnet") {
+                    rectangle {
+                        Fargate(fargate, "ECS Fargate Cluster", "") {
+                            rectangle "Outbound MHS Security Group" as osg {
+                                ECSService(oService, "Outbound MHS Fargate Service", "") {
+                                    rectangle "Outbound MHS ECS Fargate Task" {
+                                        ECSContainer1(oTask, "Outbound MHS Containers", "")
+                                    }
+                                }
                             }
-                        }
-                    }
-                    rectangle "Route Security Group" as rsg {
-                        ECSService(rService, "Route Fargate Service", "") {
-                            rectangle "Route ECS Fargate Task" {
-                                ECSContainer1(rTask, "Route Containers", "")
+                            rectangle "Route Security Group" as rsg {
+                                ECSService(rService, "Route Fargate Service", "") {
+                                    rectangle "Route ECS Fargate Task" {
+                                        ECSContainer1(rTask, "Route Containers", "")
+                                    }
+                                }
                             }
-                        }
-                    }
-                    rectangle "Inbound MHS Security Group" as isg {
-                        ECSService(iService, "Inbound MHS Fargate Service", "") {
-                            rectangle "Inbound MHS ECS Fargate Task" {
-                                ECSContainer1(iTask, "Inbound MHS Containers", "")
+                            rectangle "Inbound MHS Security Group" as isg {
+                                ECSService(iService, "Inbound MHS Fargate Service", "") {
+                                    rectangle "Inbound MHS ECS Fargate Task" {
+                                        ECSContainer1(iTask, "Inbound MHS Containers", "")
+                                    }
+                                }
                             }
-                        }
-                    }
-                    rectangle "111 PEM Security Group" as 111sg {
-                        ECSService(111Service, "111 PEM Fargate Service", "") {
-                            rectangle "111 PEM ECS Fargate Task" {
-                                ECSContainer1(111Task, "111 PEM Containers", "")
+                            rectangle "111 PEM Security Group" as 111sg {
+                                ECSService(111Service, "111 PEM Fargate Service", "") {
+                                    rectangle "111 PEM ECS Fargate Task" {
+                                        ECSContainer1(111Task, "111 PEM Containers", "")
+                                    }
+                                }
                             }
-                        }
-                    }
-                    rectangle "NHAIS Security Group" as nhaissg {
-                        ECSService(nhaisService, "NHAIS Fargate Service", "") {
-                            rectangle "NHAIS ECS Fargate Task" {
-                                ECSContainer1(nhaisTask, "NHAIS Containers", "")
+                            rectangle "NHAIS Security Group" as nhaissg {
+                                ECSService(nhaisService, "NHAIS Fargate Service", "") {
+                                    rectangle "NHAIS ECS Fargate Task" {
+                                        ECSContainer1(nhaisTask, "NHAIS Containers", "")
+                                    }
+                                }
+                            }
+                            rectangle "Lab Results Security Group" as labResultssg {
+                                ECSService(labResultsService, "Lab Results Fargate Service", "") {
+                                    rectangle "Lab Results ECS Fargate Task" {
+                                        ECSContainer1(labResultsTask, "Lab Results Containers", "")
+                                    }
+                                }
                             }
                         }
                     }
                 }
-                }
-            }
             }
             rectangle {
                 VPCSubnetPrivate(azLB, "Same three private subnets used for ECS Fargate Cluster", "Private subnet") {
@@ -130,8 +144,11 @@ Cloudalt(aws, "AWS Cloud", "") {
                 rectangle "Client System Security Group" {
                     EC2Instance(supplierSystem, "Supplier Client System", "")
                 }
-                rectangle "Async Response Queue Security Group" {
-                    MQ(inboundQueue, "Async Response Queue\n(Amazon MQ)", "")
+                rectangle "MHS Async Response Queue Security Group" {
+                    MQ(inboundQueue, "MHS Async Response Queue\n(Amazon MQ)", "")
+                }
+                rectangle "Lab Results Outbound Queue Security Group" {
+                    MQ(labResultsInboundGPQueue, "Lab Results Outbound GP Queue\n(Amazon MQ)", "")
                 }
             }
         }
@@ -170,7 +187,9 @@ s3ep --up--> containerLayerStore
 oTask --up--> ep
 oTask --down-->routeLB
 nhaisTask --up-> mqVPC
+labResultsTask --up-> mqVPC
 mqVPC --up-> nhaisQueue
+mqVPC --up-> labResultsQueues
 nhaisTask --up-> ep
 fargate --up--> cwep
 cwep --up--> cw
@@ -181,8 +200,16 @@ rTask --down--> openTestPeering
 rTask --down--> redis
 ep --up--> stateDb
 ep --up--> syncDb
+ep --up--> labResultsDb
+ep --up--> nhaisDb
 oTask --down-- openTestPeering
 nhaisTask --down-- openTestPeering
+
+labResultsTask --down-- openTestPeering
+labResultsTask --down--> supplierPeering
+labResultsTask --up--> ep
+
+
 iTask --up--> ep
 routeLB --down-- openTestPeering
 openTestPeering --down--> fwd
@@ -193,10 +220,14 @@ otVPNClient <--> openTestGateway
 iTask --down--> supplierPeering
 111Task --down--> supplierPeering
 111LB --up--> 111Task
+
 supplierPeering --down--> inboundQueue
 supplierPeering --down--supplierSystem
-supplierSystem --right--> inboundQueue
-supplierPeering --up--> outboundLB
+supplierSystem --up--> inboundQueue
+supplierPeering --down--> outboundLB
+supplierPeering --down--> labResultsInboundGPQueue
+supplierSystem --up--> labResultsInboundGPQueue
+
 outboundLB --up--> oTask
 supplierPeering --up--> nhaisLB
 nhaisLB --up--> nhaisTask
