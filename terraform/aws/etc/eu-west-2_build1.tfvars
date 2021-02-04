@@ -60,7 +60,3 @@ lab-results_log_level = "DEBUG"
 lab-results_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
 lab-results_mesh_cert_validation = "true"
 lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
-
-
-
-
