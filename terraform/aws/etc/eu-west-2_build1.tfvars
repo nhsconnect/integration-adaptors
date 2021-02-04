@@ -54,3 +54,15 @@ mhs_route_alternative_image_tag =  "nhsdev/nia-mhs-route:1.0.2"
 
 mhs_outbound_forward_reliable_url = "https://192.168.128.11/reliablemessaging/forwardreliable"
 mhs_route_sds_url = "ldap://192.168.128.11"
+
+# Settings for "lab-results" component
+lab-results_service_minimal_count = 1
+lab-results_service_desired_count = 1
+lab-results_service_maximal_count = 1
+lab-results_service_target_request_count = 1200
+lab-results_service_container_port = 8080
+lab-results_service_launch_type = "FARGATE"
+lab-results_log_level = "DEBUG"
+lab-results_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
+lab-results_mesh_cert_validation = "true"
+lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
