@@ -16,4 +16,8 @@ resource "azurerm_subnet" "base_aks_subnet" {
 resource "azurerm_subnet_route_table_association" "base_aks_subnet_association" {
   subnet_id      = azurerm_subnet.base_aks_subnet.id
   route_table_id = azurerm_route_table.base_route_table.id
+  depends_on = [
+    azurerm_subnet.base_aks_subnet,
+    azurerm_route_table.base_route_table,
+  ]
 }

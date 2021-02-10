@@ -115,3 +115,33 @@ variable nhais_scheduler_enabled {
   type = bool
   default = true
 }
+
+variable nhais_lb_ip {
+  type = string
+}
+
+# fake_mesh
+
+variable fake_mesh_in_use {
+  default = true
+  type = bool
+}
+
+variable fake_mesh_container_port {
+  type = number
+  default = 8829
+}
+
+variable fake_mesh_application_port {
+  type = number
+  default = 8829
+}
+
+variable fake_mesh_image {
+  type = string
+  default = "nhsdev/fake-mesh:0.2.0"
+}
+
+variable fake_mesh_lb_ip {
+  type = string
+}

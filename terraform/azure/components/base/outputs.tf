@@ -16,6 +16,26 @@ output "mongodb_read_endpoints" {
 
 output "mongodb_connection_string" {
   value = azurerm_cosmosdb_account.mongodb.connection_strings
+  sensitive = true
+}
+
+# Mongo credentials calculated from connection string, some adaptors require this
+
+output mongodb_username {
+  value = split(":",split("@",replace(azurerm_cosmosdb_account.mongodb.connection_strings[0],"mongodb://",""))[0])[0]
+}
+
+output mongodb_password {
+  value = split(":",split("@",replace(azurerm_cosmosdb_account.mongodb.connection_strings[0],"mongodb://",""))[0])[1]
+  sensitive = true
+}
+
+output mongodb_port {
+  value = split(":",split("/",split("@",azurerm_cosmosdb_account.mongodb.connection_strings[0])[1])[0])[1]
+}
+
+output "mongodb_hostname" {
+  value = split(":",split("/",split("@",azurerm_cosmosdb_account.mongodb.connection_strings[0])[1])[0])[0]
 }
 
 # redis outputs
@@ -40,25 +60,33 @@ output "redis_connection_string" {
   value = azurerm_redis_cache.redis-cache.primary_connection_string
 }
 
-# jumpbox outputs
+# testbox outputs
 
-output "base_jumpbox_ip" {
-  description = "Jumpbox VM IP"
-  value       = azurerm_linux_virtual_machine.base_jumpbox.public_ip_address
+output "base_testbox_ip" {
+  description = "testbox VM IP"
+  value       = azurerm_linux_virtual_machine.base_testbox.private_ip_address
 }
 
-output "base_jumpbox_username" {
+output "base_testbox_username" {
   description = "Jumpbox VM username"
   value       = var.jumpbox_user
 }
 
-output "base_jumpbox_connect" {
+output "base_testbox_connect" {
   description = "Command for connecting to jumpbox"
-  value = "ssh ${var.jumpbox_user}@${azurerm_linux_virtual_machine.base_jumpbox.public_ip_address} -i ~/.ssh/azure_mhs_jumpbox"
+  value = "ssh -i ${var.jumpbox_private_key_location} -o \"ProxyCommand ssh -i ${var.jumpbox_private_key_location} -W %h:%p ${var.jumpbox_user}@${data.terraform_remote_state.account.outputs.jumpbox_ip}\" ${var.jumpbox_user}@${azurerm_linux_virtual_machine.base_testbox.private_ip_address}"
 }
 
 # keyvault output
 
-output "base_keyvault_id" {
-  value = azurerm_key_vault.base-key-vault.id
+# output "base_keyvault_id" {
+#   value = azurerm_key_vault.base-key-vault.id
+# }
+
+output "vnet_id" {
+  value = azurerm_virtual_network.base_vnet.id
+}
+
+output "vnet_name" {
+  value = azurerm_virtual_network.base_vnet.name
 }

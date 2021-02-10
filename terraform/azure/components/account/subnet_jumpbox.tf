@@ -1,8 +1,8 @@
-resource "azurerm_subnet" "base_jumpbox_subnet" {
+resource "azurerm_subnet" "account_jumpbox_subnet" {
   name = "${local.resource_prefix}-jumpbox_subnet"
-  resource_group_name  = var.account_resource_group
-  virtual_network_name = azurerm_virtual_network.base_vnet.name
-  address_prefixes    = [ var.base_jumpbox_cidr ]
+  resource_group_name = azurerm_resource_group.account_resource_group.name
+  virtual_network_name = azurerm_virtual_network.account_vnet.name
+  address_prefixes    = [ var.account_jumpbox_cidr ]
 
   service_endpoints = [
     "Microsoft.AzureCosmosDB",

@@ -1,13 +1,18 @@
 ## AKS kubernetes cluster ##
-resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" { 
+resource "azurerm_kubernetes_cluster" "base_aks" { 
   #name                = var.cluster_name
   name                = "${local.resource_prefix}-aks_cluster"
-  resource_group_name = var.account_resource_group
-  location            = var.location
-  dns_prefix          = var.dns_prefix
+  resource_group_name = data.terraform_remote_state.account.outputs.resource_group_name
+  location            = data.terraform_remote_state.account.outputs.resource_group_location
+  dns_prefix          = var.environment
   private_cluster_enabled = var.private_cluster
-
-  api_server_authorized_ip_ranges = var.jumpbox_allowed_ips
+  # Note: be careful with these, the creation time of AKS is very long and times out under terraform
+  # Better to create AKS, and them enable the ranges if needed
+  # api_server_authorized_ip_ranges = concat(
+  #   var.jumpbox_allowed_ips,
+  #   ["${azurerm_linux_virtual_machine.base_jumpbox.public_ip_address}/32"],
+  #   ["${azurerm_linux_virtual_machine.base_jumpbox.private_ip_address}/32"]
+  # )
 
   linux_profile {
     admin_username = var.aks_admin_user
@@ -24,14 +29,14 @@ resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" {
     }
 
     kube_dashboard {
-      enabled = false
+      enabled = true
     }
   }
   
   default_node_pool {
     name = "default"
     node_count = var.aks_node_count
-    vm_size = "Standard_F2s_v2"
+    vm_size    = "Standard_F4s_v2"
     os_disk_size_gb = 30
     vnet_subnet_id = azurerm_subnet.base_aks_subnet.id
   }
@@ -59,7 +64,6 @@ resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" {
     azurerm_route_table.base_route_table,
     azurerm_subnet_route_table_association.base_aks_subnet_association,
     azurerm_route.base_default_route,
-    azurerm_firewall.base_firewall,
   ]
 }
 
@@ -67,34 +71,34 @@ resource "azurerm_kubernetes_cluster" "mhs_adaptor_aks" {
 # resource "azurerm_role_assignment" "vmcontributor" {
 #   role_definition_name = "Virtual Machine Contributor"
 #   scope                = azurerm_resource_group.mhs_adaptor.name
-#   principal_id         = azurerm_kubernetes_cluster.mhs_adaptor_aks.identity[0].principal_id
+#   principal_id         = azurerm_kubernetes_cluster.base_aks.identity[0].principal_id
 # }
 
 ## Outputs ##
 
 # Example attributes available for output
 output "base_aks_id" {
-    value = azurerm_kubernetes_cluster.mhs_adaptor_aks.id
+    value = azurerm_kubernetes_cluster.base_aks.id
 }
 
 output "base_aks_client_key" {
-  value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.client_key
+  value = azurerm_kubernetes_cluster.base_aks.kube_config.0.client_key
 }
 
 output "base_aks_client_certificate" {
-  value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.client_certificate
+  value = azurerm_kubernetes_cluster.base_aks.kube_config.0.client_certificate
 }
 
 output "base_aks_cluster_ca_certificate" {
-  value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.cluster_ca_certificate
+  value = azurerm_kubernetes_cluster.base_aks.kube_config.0.cluster_ca_certificate
 }
 
 output "base_aks_kube_config" {
-  value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config_raw
+  value = azurerm_kubernetes_cluster.base_aks.kube_config_raw
 }
 
 output "base_aks_host" {
-  value = azurerm_kubernetes_cluster.mhs_adaptor_aks.kube_config.0.host
+  value = azurerm_kubernetes_cluster.base_aks.kube_config.0.host
 }
 
 output "base_aks_configure" {

@@ -1,7 +1,7 @@
-resource "azurerm_firewall_application_rule_collection" "base_aks_rules" {
+resource "azurerm_firewall_application_rule_collection" "account_aks_rules" {
   name = "${local.resource_prefix}-aks_firewall_rules"
-  azure_firewall_name = azurerm_firewall.base_firewall.name
-  resource_group_name = var.account_resource_group
+  azure_firewall_name = azurerm_firewall.account_firewall.name
+  resource_group_name = azurerm_resource_group.account_resource_group.name
   priority = "101"
   action = "Allow"
 
@@ -23,6 +23,8 @@ resource "azurerm_firewall_application_rule_collection" "base_aks_rules" {
       "*.monitoring.azure.com",
       "*.azmk8s.io",
       "*.blob.core.windows.net",
+      "*.internal.cloudapp.net",
+      "*.cosmos.azure.com"
     ]
 
     protocol {
@@ -39,8 +41,8 @@ resource "azurerm_firewall_application_rule_collection" "base_aks_rules" {
 
 resource "azurerm_firewall_network_rule_collection" "ntp" {
   name                = "time"
-  azure_firewall_name = azurerm_firewall.base_firewall.name
-  resource_group_name = var.account_resource_group
+  azure_firewall_name = azurerm_firewall.account_firewall.name
+  resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 101
   action              = "Allow"
 
@@ -56,8 +58,8 @@ resource "azurerm_firewall_network_rule_collection" "ntp" {
 
 resource "azurerm_firewall_network_rule_collection" "dns" {
   name                = "dns"
-  azure_firewall_name = azurerm_firewall.base_firewall.name
-  resource_group_name = var.account_resource_group
+  azure_firewall_name = azurerm_firewall.account_firewall.name
+  resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 102
   action              = "Allow"
 
@@ -73,8 +75,8 @@ resource "azurerm_firewall_network_rule_collection" "dns" {
 
 resource "azurerm_firewall_network_rule_collection" "servicetags" {
   name                = "servicetags"
-  azure_firewall_name = azurerm_firewall.base_firewall.name
-  resource_group_name = var.account_resource_group
+  azure_firewall_name = azurerm_firewall.account_firewall.name
+  resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 110
   action              = "Allow"
 
@@ -95,8 +97,8 @@ resource "azurerm_firewall_network_rule_collection" "servicetags" {
 
 resource "azurerm_firewall_application_rule_collection" "osupdates" {
   name                = "osupdates"
-  azure_firewall_name = azurerm_firewall.base_firewall.name
-  resource_group_name = var.account_resource_group
+  azure_firewall_name = azurerm_firewall.account_firewall.name
+  resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 102
   action              = "Allow"
 
@@ -107,12 +109,15 @@ resource "azurerm_firewall_application_rule_collection" "osupdates" {
     target_fqdns = [
       "download.opensuse.org",
       "security.ubuntu.com",
+      "archive.ubuntu.com",
       "ntp.ubuntu.com",
       "packages.microsoft.com",
       "snapcraft.io",
       "azure.archive.ubuntu.com",
       "deb.debian.org",
-      "security.debian.org"
+      "security.debian.org",
+      "apt.kubernetes.io",
+      "packages.cloud.google.com",
     ]
 
     protocol {
@@ -129,8 +134,8 @@ resource "azurerm_firewall_application_rule_collection" "osupdates" {
 
 resource "azurerm_firewall_application_rule_collection" "publicimages" {
   name                = "publicimages"
-  azure_firewall_name = azurerm_firewall.base_firewall.name
-  resource_group_name = var.account_resource_group
+  azure_firewall_name = azurerm_firewall.account_firewall.name
+  resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 103
   action              = "Allow"
 

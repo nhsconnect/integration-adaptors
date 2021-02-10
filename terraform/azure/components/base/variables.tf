@@ -46,7 +46,7 @@ variable account_resource_group {
 
 variable private_cluster {
   description = "Should the AKS cluster be private"
-  default = false
+  default = true
   type = bool
 }
 
@@ -60,10 +60,10 @@ variable "base_cidr" {
   description = "CIDR for vnet in base component"
 }
 
-variable base_firewall_cidr {
-  type = string
-  description = "CIDR used by base firewall"
-}
+# variable base_firewall_cidr {
+#   type = string
+#   description = "CIDR used by base firewall"
+# }
 
 variable base_redis_cidr {
   type = string
@@ -86,7 +86,7 @@ variable "base_aks_internal_dns" {
 }
 
 variable "base_aks_docker_bridge_cidr" {
-  default = "10.31.0.1/16"
+  default = "10.31.0.5/16"
 }
 
 variable "ptl_connected" {
@@ -107,17 +107,21 @@ variable jumpbox_user {
   default = "azure_user"
 }
 
+variable jumpbox_private_key_location {
+  default = "~/.ssh/azure_mhs_jumpbox"
+}
+
 variable aks_admin_user {
   default = "aks_admin"
 }
 
 variable aks_node_count {
-  default = 2
+  default = 1
   type = number
 }
 
 
-variable "base_jumpbox_cidr" {
+variable "base_testbox_cidr" {
   type = string
   description = "CIDR for jumpbox subnet"
 }
