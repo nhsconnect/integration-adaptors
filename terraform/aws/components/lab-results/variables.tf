@@ -34,6 +34,12 @@ variable "tf_state_bucket" {
   description = "Name of S3 bucket with TF state of components"
 }
 
+variable "lab-results_logs_datetime_format" {
+  type = string
+  description = "Format for date and time in logs"
+  default = "%Y-%m-%d %H:%M:%S%L"
+}
+
 variable "lab-results_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"

@@ -45,6 +45,8 @@ module "lab-results_ecs_service" {
     data.terraform_remote_state.account.outputs.jumpbox_sg_id
   ]
 
+  logs_datetime_format = var.lab-results_logs_datetime_format
+  
 #  container_allowed_security_groups =  [
 #    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
 #  ]
