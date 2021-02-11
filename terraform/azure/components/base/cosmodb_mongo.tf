@@ -1,5 +1,3 @@
-# MongoDB on CosmosDB
-
 resource "azurerm_cosmosdb_account" "mongodb" {
   name = "${local.resource_prefix}-mongodb"
   resource_group_name = var.account_resource_group

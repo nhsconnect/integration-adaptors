@@ -60,11 +60,6 @@ variable "base_cidr" {
   description = "CIDR for vnet in base component"
 }
 
-# variable base_firewall_cidr {
-#   type = string
-#   description = "CIDR used by base firewall"
-# }
-
 variable base_redis_cidr {
   type = string
   description = "CIDR used by base redis"
@@ -119,7 +114,6 @@ variable aks_node_count {
   default = 1
   type = number
 }
-
 
 variable "base_testbox_cidr" {
   type = string

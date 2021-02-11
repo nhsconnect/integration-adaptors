@@ -12,11 +12,14 @@ resource "kubernetes_service" "nhais" {
 
     annotations = {
       "service.beta.kubernetes.io/azure-load-balancer-internal" = true
+      "service.beta.kubernetes.io/azure-load-balancer-resource-group" = data.terraform_remote_state.account.outputs.resource_group_name
+      "service.beta.kubernetes.io/azure-dns-label-name" = local.resource_prefix
     }
   }
 
   spec {
     port {
+      name = var.nhais_application_port
       port = var.nhais_application_port
       target_port = var.nhais_container_port
     }
@@ -30,8 +33,4 @@ resource "kubernetes_service" "nhais" {
     }
 
   }
-}
-
-output nhais_ingress {
-  value = kubernetes_service.nhais.status[0].load_balancer[0].ingress
 }

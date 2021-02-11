@@ -1,6 +1,3 @@
-## General outputs
-
-
 ## Mongo outputs
 output "mongodb_endpoint" {
   value = azurerm_cosmosdb_account.mongodb.endpoint
@@ -77,11 +74,7 @@ output "base_testbox_connect" {
   value = "ssh -i ${var.jumpbox_private_key_location} -o \"ProxyCommand ssh -i ${var.jumpbox_private_key_location} -W %h:%p ${var.jumpbox_user}@${data.terraform_remote_state.account.outputs.jumpbox_ip}\" ${var.jumpbox_user}@${azurerm_linux_virtual_machine.base_testbox.private_ip_address}"
 }
 
-# keyvault output
-
-# output "base_keyvault_id" {
-#   value = azurerm_key_vault.base-key-vault.id
-# }
+# VNET
 
 output "vnet_id" {
   value = azurerm_virtual_network.base_vnet.id
@@ -89,4 +82,50 @@ output "vnet_id" {
 
 output "vnet_name" {
   value = azurerm_virtual_network.base_vnet.name
+}
+
+# Servicebus
+
+output "base_servicebus_namespace" {
+  value = azurerm_servicebus_namespace.base_servicebus_namespace.name
+}
+
+# AKS
+
+output "base_aks_id" {
+    value = azurerm_kubernetes_cluster.base_aks.id
+}
+
+output "base_aks_client_key" {
+  value = azurerm_kubernetes_cluster.base_aks.kube_config.0.client_key
+}
+
+output "base_aks_client_certificate" {
+  value = azurerm_kubernetes_cluster.base_aks.kube_config.0.client_certificate
+}
+
+output "base_aks_cluster_ca_certificate" {
+  value = azurerm_kubernetes_cluster.base_aks.kube_config.0.cluster_ca_certificate
+}
+
+output "base_aks_kube_config" {
+  value = azurerm_kubernetes_cluster.base_aks.kube_config_raw
+}
+
+output "base_aks_host" {
+  value = azurerm_kubernetes_cluster.base_aks.kube_config.0.host
+}
+
+output "base_aks_configure" {
+  value = <<CONFIGURE
+
+Run the following commands to configure kubernetes client:
+
+$ terraform output kube_config > ~/.kube/aksconfig
+$ export KUBECONFIG=~/.kube/aksconfig
+
+Test configuration using kubectl
+
+$ kubectl get nodes
+CONFIGURE
 }
