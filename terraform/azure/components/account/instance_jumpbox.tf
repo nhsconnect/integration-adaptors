@@ -29,7 +29,7 @@ resource "azurerm_linux_virtual_machine" "account_jumpbox" {
   os_disk {
     name                 = "${local.resource_prefix}-jumpbox_disk"
     caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = var.account_jumpbox_storage_type
   }
 
   source_image_reference {

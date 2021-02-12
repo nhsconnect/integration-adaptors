@@ -102,6 +102,12 @@ variable jumpbox_user {
   default = "azure_user"
 }
 
+variable "base_testbox_storage_type" {
+  type = string
+  description = "Disk type for jumpbox, options are Standard_LRS, StandardSSD_LRS, and Premium_LRS"
+  default = "Standard_LRS"
+}
+
 variable jumpbox_private_key_location {
   default = "~/.ssh/azure_mhs_jumpbox"
 }
@@ -123,4 +129,16 @@ variable "base_testbox_cidr" {
 variable "jumpbox_allowed_ips" {
   description = "List of IPs that should be allowed to jumpbox, this value is not stored in Azure Keyvault and should always be loaded from tfvars"
   default = []
+}
+
+variable servicebus_sku {
+  description = "Service level for Servicebus, available are Basic, Standard and Premium"
+  type = string
+  default = "Standard" # Standard is needed to support AMQP protocol
+}
+
+variable servicebus_capacity {
+  description = "Servicebus capacity"
+  type = number
+  default = 0 # has to be 0 for Basic and Standard SKU, Premium SKU allows for more
 }

@@ -28,7 +28,7 @@ resource "azurerm_linux_virtual_machine" "base_testbox" {
   os_disk {
     name                 = "${local.resource_prefix}-testbox_disk"
     caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = var.base_testbox_storage_type
   }
 
   source_image_reference {

@@ -54,6 +54,12 @@ variable "account_jumpbox_cidr" {
   description = "CIDR for jumpbox subnet"
 }
 
+variable "account_jumpbox_storage_type" {
+  type = string
+  description = "Disk type for jumpbox, options are Standard_LRS, StandardSSD_LRS, and Premium_LRS"
+  default = "Standard_LRS"
+}
+
 variable "jumpbox_allowed_ips" {
   description = "List of IPs that should be allowed to jumpbox, this value is not stored in Azure Keyvault and should always be loaded from tfvars"
   default = []

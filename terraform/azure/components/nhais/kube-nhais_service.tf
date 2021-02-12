@@ -25,12 +25,11 @@ resource "kubernetes_service" "nhais" {
     }
 
     type = "LoadBalancer"
-    load_balancer_ip = var.nhais_lb_ip
+    load_balancer_ip = var.nhais_lb_ip == "" ? null : var.nhais_lb_ip
 
     selector = {
       Component = "nhais"
       Environment = var.environment
     }
-
   }
 }

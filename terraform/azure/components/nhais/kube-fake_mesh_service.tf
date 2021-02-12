@@ -1,4 +1,5 @@
 resource "kubernetes_service" "fake_mesh" {
+  count = var.fake_mesh_in_use ? 1 : 0
   metadata {
     name = "${local.resource_prefix}-fake-mesh"
     namespace = kubernetes_namespace.nhais.metadata.0.name

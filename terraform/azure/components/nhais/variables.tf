@@ -118,6 +118,7 @@ variable nhais_scheduler_enabled {
 
 variable nhais_lb_ip {
   type = string
+  default = ""
 }
 
 # fake_mesh
@@ -140,8 +141,4 @@ variable fake_mesh_application_port {
 variable fake_mesh_image {
   type = string
   default = "nhsdev/fake-mesh:0.2.0"
-}
-
-variable fake_mesh_lb_ip {
-  type = string
 }
