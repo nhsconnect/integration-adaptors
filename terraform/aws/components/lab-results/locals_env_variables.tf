@@ -91,6 +91,10 @@ locals {
     {
       name = "LAB_RESULTS_SSL_TRUST_STORE_URL"
       value = var.lab-results_ssl_trust_store_url
+    },
+    {
+      name = "LAB_RESULTS_LOGGING_APPENDER"
+      value = "TEXT"
     }
   ])
 }
