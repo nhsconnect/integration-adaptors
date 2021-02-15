@@ -5,6 +5,7 @@ cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
 ptl_connected = true
 opentest_connected = false
+create_opentest_instance = false
 docdb_tls = "enabled"
 
 # Settings for "nhais" component

@@ -6,6 +6,7 @@ cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
 docdb_tls = "disabled"
 enable_internet_access = "true"
+create_opentest_instance = true
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
