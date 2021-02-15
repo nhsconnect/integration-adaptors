@@ -30,6 +30,19 @@ OneOneOne_service_container_port = 8080
 OneOneOne_service_launch_type = "FARGATE"
 OneOneOne_log_level = "DEBUG"
 
-
-# setting for mhs component
+# Settings for "mhs" component
+mhs_inbound_service_container_port = 443
+mhs_inbound_service_healthcheck_port = 80
+mhs_outbound_service_container_port = 80
+mhs_route_service_container_port = 80
+mhs_service_minimal_count = 1
+mhs_service_desired_count = 1
+mhs_service_maximal_count = 2
+mhs_service_launch_type = "FARGATE"
+mhs_log_level = "DEBUG"
+mhs_inbound_queue_name = "ptl_mhs_inbound"
+mhs_outbound_alternative_image_tag = "nhsdev/nia-mhs-outbound:1.0.2"
+mhs_inbound_alternative_image_tag =  "nhsdev/nia-mhs-inbound:1.0.2"
+mhs_route_alternative_image_tag =  "nhsdev/nia-mhs-route:1.0.2"
 mhs_outbound_forward_reliable_url =  "https://msg.int.spine2.ncrs.nhs.uk/reliablemessaging/reliablerequest"
+mhs_route_sds_url = "ldaps://ldap.nis1.national.ncrs.nhs.uk"
