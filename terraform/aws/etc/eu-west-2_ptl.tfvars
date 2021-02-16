@@ -7,6 +7,7 @@ ptl_connected = true
 opentest_connected = false
 create_opentest_instance = false
 docdb_tls = "enabled"
+enable_internet_access = true
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
