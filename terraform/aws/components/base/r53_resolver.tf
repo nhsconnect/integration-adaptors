@@ -8,7 +8,14 @@ resource "aws_route53_resolver_endpoint" "nhs_resolver" {
   ]
 
   dynamic "ip_address" {
-    for_each = concat(aws_subnet.service_containers_subnet.*.id, aws_subnet.service_lb_subnet.*.id)
+    for_each = aws_subnet.service_containers_subnet.*.id
+    content {
+      subnet_id = ip_address.value
+    }
+  }
+
+  dynamic "ip_address" {
+    for_each = aws_subnet.service_lb_subnet.*.id
     content {
       subnet_id = ip_address.value
     }
