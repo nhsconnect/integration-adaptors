@@ -46,7 +46,7 @@ locals {
 
   # Fill the list of private IPs with "auto" settings, then trim it to the size of subnet list
   # This way we get always get the lists with the same size
-  private_ips_filled = slice(concat(var.private_ips_for_lb, ["auto", "auto", "auto"]),0,length(var.lb_subnet_ids)+1)
+  private_ips_filled = slice(concat(var.private_ips_for_lb, ["auto", "auto", "auto"]),0,length(var.lb_subnet_ids))
 
   lb_subnets_to_private_ips = zipmap(var.lb_subnet_ids, local.private_ips_filled)
 }
