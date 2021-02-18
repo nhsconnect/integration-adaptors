@@ -317,3 +317,9 @@ variable "additional_container_config" {
   default = []
   description = "Object (later converted to json) with configuration for additional containers"
 }
+
+variable private_ips_for_lb {
+  type = list(string)
+  description = "List of Private IPs to assign to LB Fronenteds, should match the subnets, if there is more subnets than entries here, the remaining subnets will get random IP"
+  default = []
+}

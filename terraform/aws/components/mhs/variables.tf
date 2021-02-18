@@ -262,6 +262,12 @@ variable "mhs_inboud_use_ssl" {
   default = true
 }
 
+variable mhs_inbound_lb_ip {
+  type = string
+  default = ""
+  description = "Static IP for Inbound Load Balancer"
+}
+
 variable "logs_datetime_format" {
   type = string
   description = "Format for date and time in logs"
