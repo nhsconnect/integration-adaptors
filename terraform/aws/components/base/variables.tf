@@ -86,9 +86,10 @@ variable "docdb_master_password" {
   description = "Password for Document DB master user"
 }
 
-variable "docdb_tls" {
-  type = string
+variable "mongo_ssl_enabled" {
+  type = bool
   description = "Should the Document DB have a TLS enabled for incomming connections"
+  default = true
 }
 
 variable "docdb_audit_logs" {

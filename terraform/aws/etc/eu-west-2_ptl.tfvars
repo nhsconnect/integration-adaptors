@@ -6,7 +6,7 @@ docdb_instance_class = "db.r5.large"
 ptl_connected = true
 opentest_connected = false
 create_opentest_instance = false
-docdb_tls = "enabled"
+mongo_ssl_enabled = false
 # enable_internet_access = true
 
 # Settings for "nhais" component

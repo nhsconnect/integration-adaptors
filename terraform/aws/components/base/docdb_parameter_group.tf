@@ -5,7 +5,7 @@ resource "aws_docdb_cluster_parameter_group" "base_db_parameters" {
 
   parameter {
     name = "tls"
-    value = var.docdb_tls
+    value = var.mongo_ssl_enabled ? "enabled" : "disabled"
   }
 
   # parameter {
