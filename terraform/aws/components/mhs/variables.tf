@@ -279,3 +279,32 @@ variable "logs_datetime_format" {
   description = "Format for date and time in logs"
   default = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
 }
+
+# secret names
+# Define the names of secrets in secret manager for secret variables used by mhs
+# These are different depending on the way MHS is connected to NHS systems
+
+variable secret_name_mhs_party_key {
+  type = string
+  default = "opentest-party-key"
+}
+
+variable secret_name_mhs_client_cert {
+  type = string
+  default = "opentest-client-certificate"
+}
+
+variable secret_name_mhs_client_key {
+  type = string
+  default = "opentest-client-key"
+}
+
+variable secret_name_mhs_ca_certs {
+  type = string
+  default = "opentest-ca-certs"
+}
+
+variable secret_name_mhs_spine_route_lookup_ca_certs {
+  type = string
+  default = "build-outbound-route-connection-cacerts"
+}
