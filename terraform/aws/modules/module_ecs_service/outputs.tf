@@ -30,5 +30,5 @@ output "cloudwatch_log_group" {
 }
 
 output "testbox_hostname" {
-    value = var.crate_testbox ? aws_instance.testbox[0].private_dns : null
+    value = var.create_testbox ? aws_instance.testbox[0].private_dns : null
 }

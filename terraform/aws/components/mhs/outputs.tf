@@ -25,5 +25,5 @@ output "mhs_outbound_lb_target_group_arn" {
 }
 
 output "testbox_hostname" {
-  value = var.create_testbox ? module.mhs_outbound.testbox_hostname : null
+  value = var.create_testbox ? module.mhs_outbound_ecs_service.testbox_hostname : null
 }
