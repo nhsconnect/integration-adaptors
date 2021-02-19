@@ -50,7 +50,7 @@ locals {
     },
     {
       name = "NHAIS_MONGO_OPTIONS"
-      value = join("&",[var.nhais_mongo_options,"ssl=${var.mongo_ssl_enabled}")
+      value = join("&",[var.nhais_mongo_options,"ssl=${var.mongo_ssl_enabled}"])
     },
     {
       name = "NHAIS_MESH_HOST"
