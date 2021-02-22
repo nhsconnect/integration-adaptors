@@ -153,6 +153,17 @@ variable "gp2gp_service_target_request_count" {
   default = 1200
 }
 
+variable "gp2gp_extract_cache_bucket" {
+  type = string
+  description = "Bucket to store extracts from app to use as cache"
+}
+
+variable "gp2gp_extract_cache_bucket_retention_period" {
+  type = number
+  description = "Number of days objects will be retained in gp2gp_extract_cache_bucket"
+  default = 7
+}
+
 variable mhs_inbound_queue_name {
   type = string
   description = "Name of queue used by MHS Inbound "
