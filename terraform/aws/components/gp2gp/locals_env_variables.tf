@@ -45,6 +45,10 @@ locals {
       value = var.gp2gp_gpc_get_document_endpoint
     },
     {
+      name = "GP2GP_EXTRACT_CACHE_BUCKET"
+      value = var.gp2gp_extract_cache_bucket
+    },
+    {
       name = "GP2GP_GPC_HOST"
       value = var.gp2gp_gpc_host
     }
