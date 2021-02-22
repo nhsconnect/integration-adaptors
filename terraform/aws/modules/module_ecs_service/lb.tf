@@ -13,17 +13,6 @@ resource "aws_lb" "service_load_balancer" {
     }
   }
 
-  # subnet_mapping {
-  #   subnet_id = var.lb_subnet_ids[0]
-  #   private_ipv4_address = var.private_ips_for_lb[0]
-  # }
-
-  # subnet_mapping {
-  #   subnet_id = var.lb_subnet_ids[1]
-  #   //private_ipv4_address = var.private_ips_for_lb[1]
-  # }
-
-
   tags = merge(local.default_tags, {
     Name = "${local.resource_prefix}-lb"
   })

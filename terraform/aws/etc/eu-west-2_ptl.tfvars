@@ -19,7 +19,7 @@ nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 nhais_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
 nhais_mesh_cert_validation = "true"
-nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
+nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 nhais_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
 # Settings for "OneOneOne" component
@@ -43,12 +43,8 @@ mhs_service_maximal_count = 2
 mhs_service_launch_type = "FARGATE"
 mhs_log_level = "DEBUG"
 mhs_inbound_queue_name = "ptl_mhs_inbound"
-# mhs_outbound_alternative_image_tag = "nhsdev/nia-mhs-outbound:1.0.2"
-# mhs_inbound_alternative_image_tag =  "nhsdev/nia-mhs-inbound:1.0.2"
-# mhs_route_alternative_image_tag =  "nhsdev/nia-mhs-route:1.0.2"
 mhs_outbound_forward_reliable_url =  "https://msg.int.spine2.ncrs.nhs.uk/reliablemessaging/reliablerequest"
 mhs_route_sds_url = "ldaps://ldap.nis1.national.ncrs.nhs.uk"
-mhs_inbound_lb_ip = "10.239.66.139"
 
 # secret names from secrets manager for PTL specific keys and certs:
 secret_name_mhs_party_key = "MHS_PTL_INT_PARTY_KEY"
