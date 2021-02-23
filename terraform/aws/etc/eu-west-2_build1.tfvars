@@ -36,6 +36,7 @@ gp2gp_service_maximal_count = 1
 gp2gp_service_container_port = 8080
 gp2gp_service_launch_type = "FARGATE"
 gp2gp_extract_cache_bucket_retention_period = 7
+gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 
 # Settings for "mhs" component
 mhs_inbound_service_container_port = 443

@@ -159,6 +159,12 @@ variable "gp2gp_extract_cache_bucket_retention_period" {
   default = 7
 }
 
+variable "gp2gp_logs_datetime_format" {
+  type = string
+  description = "Format for date and time in AWS cloudwatch logs"
+  default = "%Y-%m-%d %H:%M:%S%L"
+}
+
 variable mhs_inbound_queue_name {
   type = string
   description = "Name of queue used by MHS Inbound "
