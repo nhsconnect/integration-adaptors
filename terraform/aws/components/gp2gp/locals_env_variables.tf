@@ -50,7 +50,7 @@ locals {
     },
    {
       name = "GP2GP_STORAGE_CONTAINER_NAME"
-      value = aws_s3_bucket.gp2gp_extract_cache_bucket.name
+      value = aws_s3_bucket.gp2gp_extract_cache_bucket.id
     },
     {
       name = "GP2GP_GPC_HOST"
