@@ -46,7 +46,7 @@ locals {
     },
     {
       name = "GP2GP_EXTRACT_CACHE_BUCKET"
-      value = var.gp2gp_extract_cache_bucket
+      value = aws_s3_bucket.gp2gp_extract_cache_bucket.name
     },
     {
       name = "GP2GP_GPC_HOST"
