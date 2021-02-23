@@ -49,6 +49,8 @@ module "gp2gp_ecs_service" {
 
   additional_container_config = []
 
+  logs_datetime_format = var.gp2gp_logs_datetime_format
+  
   create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
