@@ -46,9 +46,11 @@ module "mhs_inbound_ecs_service" {
 
   lb_allowed_security_groups = var.opentest_connected ? [
     data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+    var.ptl_allowed_incoming_cidrs,
     var.opentest_sg_id
   ] : [
     data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+    var.ptl_allowed_incoming_cidrs,
   ]
 
   # For network type LBs the LB Security Group does not matter and is transparent

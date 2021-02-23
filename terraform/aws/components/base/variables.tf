@@ -174,6 +174,12 @@ variable "ptl_dns_servers" {
   default = []
 }
 
+variable "ptl_allowed_incoming_cidrs" {
+  description = "List of exernal CIDR that will be allowed to service LBs (where needed)"
+  type = list(string)
+  default = []
+}
+
 variable "lb_reserved_ips" {
   type = list(string)
   description = "List of IPs that should be used for load balancer in components - required for async communication"

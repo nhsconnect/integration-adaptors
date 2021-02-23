@@ -202,6 +202,12 @@ variable "ptl_connected" {
   default = false
 }
 
+variable "ptl_allowed_incoming_cidrs" {
+  description = "List of exernal CIDR that will be allowed to service LBs (where needed)"
+  type = list(string)
+  default = []
+}
+
 # outbound specific
 
 variable "mhs_outbound_spineroutelookup_validate_certificate" {
