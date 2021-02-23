@@ -52,4 +52,4 @@ secret_name_mhs_client_cert = "MHS_PTL_INT_Endpoint_Cert"
 secret_name_mhs_client_key = "MHS_PLT_INT_Endpoint_PrivateKey"
 secret_name_mhs_ca_certs = "MHS_PTL_INT_Endpoint_CA_SHA2"
 
-# ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
+ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
