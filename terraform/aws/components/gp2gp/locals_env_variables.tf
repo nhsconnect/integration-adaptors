@@ -45,6 +45,14 @@ locals {
       value = var.gp2gp_gpc_get_document_endpoint
     },
     {
+      name = "GP2GP_STORAGE_TYPE"
+      value = "S3"
+    },
+   {
+      name = "GP2GP_STORAGE_CONTAINER_NAME"
+      value = aws_s3_bucket.gp2gp_extract_cache_bucket.id
+    },
+    {
       name = "GP2GP_GPC_HOST"
       value = var.gp2gp_gpc_host
     }
