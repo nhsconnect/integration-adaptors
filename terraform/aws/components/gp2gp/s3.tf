@@ -1,11 +1,10 @@
 
 # S3 bucket for storing extracts as cache
 resource "aws_s3_bucket" "gp2gp_extract_cache_bucket" {
-  bucket = "${var.environment_id}-gp2gp-extract-cache-bucket"
-  tags = {
-    Name = "${var.environment_id}-gp2gp-extract-cache-bucket"
-    EnvironmentId = var.environment_id
-  }
+  bucket = "${local.resource_prefix}-extract-cache-bucket"
+  tags = merge(local.default_tags, {
+    Name = "${local.resource_prefix}-extract-cache-bucket"
+  })
   lifecycle_rule {
     id      = "cache_retention_period"
     enabled = true
