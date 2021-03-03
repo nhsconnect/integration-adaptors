@@ -134,11 +134,11 @@ variable "jumpbox_allowed_ips" {
 variable servicebus_sku {
   description = "Service level for Servicebus, available are Basic, Standard and Premium"
   type = string
-  default = "Standard" # Standard is needed to support AMQP protocol
+  default = "Premium" # Standard is needed to support AMQP protocol, Premium to allow connection with Service Endpoint
 }
 
 variable servicebus_capacity {
   description = "Servicebus capacity"
   type = number
-  default = 0 # has to be 0 for Basic and Standard SKU, Premium SKU allows for more
+  default = 1 # has to be 0 for Basic and Standard SKU, Premium SKU allows for more
 }

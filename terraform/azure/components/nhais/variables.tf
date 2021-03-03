@@ -56,7 +56,7 @@ variable nhais_image {
 variable nhais_application_port {
   type = number
   description = "Port of which the the service should be visible, also the port used by LB if set"
-  default = 8080
+  default = 80
 }
 
 variable nhais_container_port {
