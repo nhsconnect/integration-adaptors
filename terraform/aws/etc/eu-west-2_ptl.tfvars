@@ -50,6 +50,14 @@ mhs_route_sds_url = "ldaps://ldap.nis1.national.ncrs.nhs.uk"
 secret_name_mhs_party_key = "MHS_PTL_INT_PARTY_KEY"
 secret_name_mhs_client_cert = "MHS_PTL_INT_Endpoint_Cert"
 secret_name_mhs_client_key = "MHS_PLT_INT_Endpoint_PrivateKey"
-secret_name_mhs_ca_certs = "MHS_PTL_INT_Endpoint_CA_SHA2"
+secret_name_mhs_ca_certs = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
 
 ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
+# Settings for "gp2gp" component
+gp2gp_service_desired_count = 1
+gp2gp_service_minimal_count = 1
+gp2gp_service_maximal_count = 1
+gp2gp_service_container_port = 8080
+gp2gp_service_launch_type = "FARGATE"
+gp2gp_extract_cache_bucket_retention_period = 7
+gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"

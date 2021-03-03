@@ -153,6 +153,18 @@ variable "gp2gp_service_target_request_count" {
   default = 1200
 }
 
+variable "gp2gp_extract_cache_bucket_retention_period" {
+  type = number
+  description = "Number of days objects will be retained in gp2gp_extract_cache_bucket"
+  default = 7
+}
+
+variable "gp2gp_logs_datetime_format" {
+  type = string
+  description = "Format for date and time in AWS cloudwatch logs"
+  default = "%Y-%m-%d %H:%M:%S%L"
+}
+
 variable mhs_inbound_queue_name {
   type = string
   description = "Name of queue used by MHS Inbound "
