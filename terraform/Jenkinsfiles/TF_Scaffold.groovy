@@ -97,7 +97,6 @@ pipeline {
       steps {
         dir("integration-adaptors/terraform/aws") {
           script {
-  
             Map<String, String> variablesMap = [:]
 
             //Get the build_id variable if in application component
@@ -123,7 +122,6 @@ pipeline {
             }
 
             if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap, tfTargets) !=0 ) { error("Terraform Apply failed")}
-
           } // script
         } //dir terraform/aws
       } // steps
