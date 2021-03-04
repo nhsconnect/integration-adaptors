@@ -72,7 +72,9 @@ pipeline {
             List<String> targetsList = params.Targets.split(",")
             List<String> tfTargets = []
             targetsList.each {
-              tfTargets.add("-target=${it}")
+              if (it != "") {
+                tfTargets.add("-target=${it}")
+              }
             }
 
             if (params.Action == "destroy" || params.Action == "plan-destroy") {tfParams.add("-destroy")}
