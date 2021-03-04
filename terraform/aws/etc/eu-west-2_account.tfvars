@@ -1,5 +1,6 @@
 ecr_repositories = [
   {
+    number = 1,       // for odering and prevent recreation if alphabetic order is used
     name = "111",
     scan = false,
     expire_PR_after = 10,
@@ -7,20 +8,15 @@ ecr_repositories = [
     number_to_keep  = 10
   },
   {
+    number = 2,
     name = "111-nginx",
     scan = false,
     expire_PR_after = 10,
     prefix_to_keep  = "master",
     number_to_keep  = 10
   },
-  # {
-  #   name = "nhais",
-  #   scan = false,
-  #   expire_PR_after = 10,
-  #   prefix_to_keep = "develop"
-  #   number_to_keep = 10
-  # },
   {
+    number = 3,
     name = "gp2gp",
     scan = false,
     expire_PR_after = 10,
@@ -28,12 +24,29 @@ ecr_repositories = [
     number_to_keep  = 10
   },
   {
+    number = 4,
+    name = "lab-results",
+    scan = false,
+    expire_PR_after = 10,
+    prefix_to_keep  = "main",
+    number_to_keep  = 10
+  },
+  {
+    number = 5,
     name = "gp2gp-wiremock",
     scan = false,
     expire_PR_after = 10,
     prefix_to_keep  = "main",
     number_to_keep  = 10
   },
+  # {
+  #   number = 6,
+  #   name = "nhais",
+  #   scan = false,
+  #   expire_PR_after = 10,
+  #   prefix_to_keep = "develop"
+  #   number_to_keep = 10
+  # },  
 ]
 
 account_cidr_block = "10.10.0.0/16"
