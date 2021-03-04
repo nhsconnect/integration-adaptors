@@ -97,6 +97,31 @@ pipeline {
       steps {
         dir("integration-adaptors/terraform/aws") {
           script {
+  
+            Map<String, String> variablesMap = [:]
+
+            //Get the build_id variable if in application component
+            if (componentImageBranch.containsKey(params.Component)) {
+              variablesMap.put("${params.Component}_build_id", getLatestImageTag(componentImageBranch[params.Component].branch, componentImageBranch[params.Component].ecrRepo, region))
+            }
+
+            // Get the variables from job parameters
+            List<String> variablesList = params.Variables.split(",")
+            variablesList.each {
+              def kvp = it.split("=")
+              if (kvp.length > 1) {
+                variablesMap.put(kvp[0],kvp[1])
+              }
+            }
+            List<String> tfParams = []
+            List<String> targetsList = params.Targets.split(",")
+            List<String> tfTargets = []
+            targetsList.each {
+              if (it != "") {
+                tfTargets.add("-target=${it}")
+              }
+            }
+
             if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap, tfTargets) !=0 ) { error("Terraform Apply failed")}
 
           } // script
