@@ -8,6 +8,7 @@ opentest_connected = false
 create_opentest_instance = false
 mongo_ssl_enabled = false
 # enable_internet_access = true
+ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
@@ -48,11 +49,10 @@ mhs_route_sds_url = "ldaps://ldap.nis1.national.ncrs.nhs.uk"
 
 # secret names from secrets manager for PTL specific keys and certs:
 secret_name_mhs_party_key = "MHS_PTL_INT_PARTY_KEY"
-secret_name_mhs_client_cert = "MHS_PTL_INT_Endpoint_Cert"
-secret_name_mhs_client_key = "MHS_PLT_INT_Endpoint_PrivateKey"
+secret_name_mhs_client_cert = "MHS_PTL_INT_Endpoint_Cert_v2"
+secret_name_mhs_client_key = "MHS_PTL_INT_Endpoint_PrivateKey_v2"
 secret_name_mhs_ca_certs = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
 
-ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
 # Settings for "gp2gp" component
 gp2gp_service_desired_count = 1
 gp2gp_service_minimal_count = 1
