@@ -24,7 +24,7 @@ pipeline {
     choice (name: "Component",   choices: ['base', 'nhais', 'OneOneOne', 'mhs', 'account', 'fake_mesh', 'nhais_responder', 'gp2gp', 'lab-results'],     description: "Choose component")
     choice (name: "Action",      choices: ['plan', 'apply', 'plan-destroy', 'destroy'],           description: "Choose Terraform action")
     string (name: "Variables",   defaultValue: "",                                                description: "Terrafrom variables, format: variable1=value,variable2=value, no spaces")
-    string (name: "Targets",     defaultValue: "",                                                description: "Resources to be targeted by plan/apply/destroy, format: [resource type1].[resource_name1],[resource type2],[resource name2], no spaces")
+    string (name: "Targets",     defaultValue: "",                                                description: "Resources to be targeted by plan/apply/destroy, format: [resource type1].[resource_name1],[resource type2].[resource name2], no spaces")
     string (name: "Git_Branch",  defaultValue: "develop",                                         description: "Git branch from which TF will be taken")
     string (name: "Git_Repo",    defaultValue: "https://github.com/nhsconnect/integration-adaptors.git", description: "Git Repo with TF Code")
   }
