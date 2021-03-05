@@ -62,4 +62,5 @@ resource "aws_flow_log" "inbound_lb_flow_log" {
   subnet_id = data.terraform_remote_state.base.outputs.ptl_lb_subnet_ids[0]
   log_destination = aws_cloudwatch_log_group.inbound_lb_flow_logs.arn
   iam_role_arn = aws_iam_role.inbound_lb_flow_logs_iam_role.arn
+  max_aggregation_interval = 60
 }
