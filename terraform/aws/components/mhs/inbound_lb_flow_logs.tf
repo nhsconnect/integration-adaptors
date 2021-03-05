@@ -60,4 +60,5 @@ resource "aws_flow_log" "inbound_lb_flow_log" {
   traffic_type = "ALL"
   eni_id = data.aws_network_interface.inbound_lb_ni.id
   log_destination = aws_cloudwatch_log_group.inbound_lb_flow_logs.arn
+  iam_role_arn = aws_iam_role.inbound_lb_flow_logs_iam_role.arn
 }
