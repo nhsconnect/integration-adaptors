@@ -1,14 +1,14 @@
-data "aws_network_interface" "inbound_lb_ni" {
-  filter {
-    name = "vpc-id"
-    values = [data.terraform_remote_state.base.outputs.vpc_id]
-  }
+# data "aws_network_interface" "inbound_lb_ni" {
+#   filter {
+#     name = "vpc-id"
+#     values = [data.terraform_remote_state.base.outputs.vpc_id]
+#   }
 
-  filter {
-    name = "private-ip-address"
-    values = [var.mhs_inbound_lb_ip]
-  }
-}
+#   filter {
+#     name = "private-ip-address"
+#     values = [var.mhs_inbound_lb_ip]
+#   }
+# }
 
 resource "aws_cloudwatch_log_group" "inbound_lb_flow_logs" {
   name = "${local.resource_prefix}-inbound_lb_flow_logs"
@@ -58,7 +58,8 @@ resource "aws_iam_role_policy" "inbound_flow_logs_iam_policy" {
 
 resource "aws_flow_log" "inbound_lb_flow_log" {
   traffic_type = "ALL"
-  eni_id = data.aws_network_interface.inbound_lb_ni.id
+  #eni_id = data.aws_network_interface.inbound_lb_ni.id
+  subnet_id = data.terraform_remote_state.base.outputs.ptl_lb_subnet_ids[0]
   log_destination = aws_cloudwatch_log_group.inbound_lb_flow_logs.arn
   iam_role_arn = aws_iam_role.inbound_lb_flow_logs_iam_role.arn
 }
