@@ -8,7 +8,7 @@ opentest_connected = false
 create_opentest_instance = false
 mongo_ssl_enabled = false
 # enable_internet_access = true
-ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
+ptl_allowed_incoming_cidrs = ["10.239.0.0/16", "0.0.0.0/0"]
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1

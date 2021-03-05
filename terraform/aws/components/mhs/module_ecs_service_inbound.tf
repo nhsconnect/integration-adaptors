@@ -51,7 +51,8 @@ module "mhs_inbound_ecs_service" {
     data.terraform_remote_state.account.outputs.jumpbox_sg_id,
   ]
 
-  lb_allowed_cidrs = var.ptl_allowed_incoming_cidrs
+  lb_allowed_cidrs = var.ptl_connected ? var.ptl_allowed_incoming_cidrs : []
+  container_allowed_cidrs = var.ptl_connected ? var.ptl_allowed_incoming_cidrs : []
 
   # For network type LBs the LB Security Group does not matter and is transparent
   # Traffic has to be resricted on the Target Load Balancer
