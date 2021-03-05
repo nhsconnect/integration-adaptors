@@ -51,5 +51,8 @@ gp2gp_service_launch_type = "FARGATE"
 gp2gp_extract_cache_bucket_retention_period = 7
 gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 
+# setting for mhs component
+mhs_inbound_queue_name = "vp_inbound_queue"
+
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
