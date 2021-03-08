@@ -66,7 +66,7 @@ module "mhs_inbound_ecs_service" {
 
   additional_container_config =  []
 
-  private_ips_for_lb = var.ptl_connected ? [var.mhs_inbound_lb_ip] : []
+  //private_ips_for_lb = var.ptl_connected ? [var.mhs_inbound_lb_ip] : []
 
   create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
