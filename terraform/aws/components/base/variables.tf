@@ -170,6 +170,7 @@ variable "ptl_assigned_cidr" {
 variable "ptl_dns_servers" {
   type = list(string)
   description = "DNS servers in the connected PTL environment"
+  default = []
 }
 
 variable "lb_reserved_ips" {
