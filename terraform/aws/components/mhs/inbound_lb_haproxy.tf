@@ -63,3 +63,13 @@ data "template_cloudinit_config" "haproxy_user_data" {
     content = data.template_file.haproxy_cloudinit_template.rendered
   }
 }
+
+resource "aws_security_group_rule" "haproxy_22_from_jumpbox" {
+  description = "Allow SSH connection from listed CIDRS"
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  security_group_id = module.mhs_inbound_ecs_service.loadbalancer_sg_id
+  source_security_group_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
+}
