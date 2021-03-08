@@ -39,7 +39,7 @@ resource "aws_instance" "haproxy" {
   instance_type = "t2.micro"
   key_name = "kainos-dev"
   iam_instance_profile        = "TerraformJumpboxRole"
-  vpc_security_group_ids      = [ module.mhs_inbound_ecs_service.loadbalancer_sg_id ]
+  vpc_security_group_ids      = [ module.mhs_inbound_ecs_service.loadbalancer_sg_id, data.terraform_remote_state.base.outputs.core_sg_id ]
   subnet_id                   = data.terraform_remote_state.base.outputs.ptl_lb_subnet_ids[0]
   user_data                   = data.template_cloudinit_config.haproxy_user_data.rendered
   associate_public_ip_address = false
