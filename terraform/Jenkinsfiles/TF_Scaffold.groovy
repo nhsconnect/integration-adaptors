@@ -1,6 +1,4 @@
 String region = "eu-west-2"
-String tfEnvRepo = "https://github.com/tfutils/tfenv.git"
-String terraformBinPath = "terraform" //by default use the one from PATH
 
 Map <String, Map<String, String>> componentImageBranch = [
   OneOneOne:       [ecrRepo: "111",                  branch: "master"],
@@ -130,12 +128,15 @@ pipeline {
     } // stage Terraform Apply
   } // stages
 } // pipeline
+String tfEnv(String tfEnvRepo="https://github.com/tfutils/tfenv.git", String tfEnvPath="~/.tfenv") {
+  sh(label: "Get tfenv", command: "git clone ${tfEnvRepo} ${tfEnvPath}")
+  sh(label: "Set TF version", command: "${tfEnvPath}/bin/tfenv install")
+  return "${tfEnvPath}/bin/terraform"
+}
+
 
 int terraformInit(String tfStateBucket, String project, String environment, String component, String region) {
-  // tfenv - get the required TF version
-  sh(label: "Get tfenv", command: "git clone ${tfEnvRepo} ~/.tfenv")
-  sh(label: "Set TF version", command: "~/.tfenv/bin/tfenv install")
-  terraformBinPath = "~/.tfenv/bin/terraform"
+  String terraformBinPath = tfEnv()
   println("Terraform Init for Environment: ${environment} Component: ${component} in region: ${region} using bucket: ${tfStateBucket}")
   String command = "${terraformBinPath} init -backend-config='bucket=${tfStateBucket}' -backend-config='region=${region}' -backend-config='key=${project}-${environment}-${component}.tfstate' -input=false -no-color"
   dir("components/${component}") {
@@ -157,6 +158,7 @@ int terraform(String action, String tfStateBucket, String project, String enviro
     // Get the secret variables for global
     String secretsFile = "etc/secrets.tfvars"
     writeVariablesToFile(secretsFile,getAllSecretsForEnvironment(environment,"nia",region))
+    String terraformBinPath = tfEnv()
 
     List<String> variableFilesList = [
       "-var-file=../../etc/global.tfvars",
@@ -174,6 +176,7 @@ int terraform(String action, String tfStateBucket, String project, String enviro
 Map<String,String> collectTfOutputs(String component) {
   Map<String,String> returnMap = [:]
   dir("components/${component}") {
+    String terraformBinPath = tfEnv()
     List<String> outputsList = sh (label: "Listing TF outputs", script: "${terraformBinPath} output", returnStdout: true).split("\n")
     outputsList.each {
       returnMap.put(it.split("=")[0].trim(),it.split("=")[1].trim())
