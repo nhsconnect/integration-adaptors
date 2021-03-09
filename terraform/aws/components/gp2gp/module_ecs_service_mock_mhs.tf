@@ -1,4 +1,4 @@
-module "gp2gp_ecs_service" {
+module "mock_mhs_ecs_service" {
   source = "../../modules/module_ecs_service"
   # count         = var.gp2gp_create_mhs_mock ? 1 : 0 # uncomment after Terraform is upgraded to 0.13+
   project         = var.project
@@ -44,7 +44,7 @@ module "gp2gp_ecs_service" {
   ]
 
   lb_allowed_security_groups = [
-    data.terraform_remote_state.account.outputs.jumpbox_sg_id
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
     module.gp2gp_ecs_service.service_sg_id
   ]
 
