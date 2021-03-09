@@ -44,3 +44,6 @@ OneOneOne_log_level = "DEBUG"
 
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
+
+# Settings for gp2gp
+gp2gp_create_mhs_mock = true

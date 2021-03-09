@@ -48,7 +48,7 @@ locals {
       name = "GP2GP_STORAGE_TYPE"
       value = "S3"
     },
-   {
+    {
       name = "GP2GP_STORAGE_CONTAINER_NAME"
       value = aws_s3_bucket.gp2gp_extract_cache_bucket.id
     },
@@ -57,4 +57,27 @@ locals {
       value = var.gp2gp_gpc_host
     }
   ])
+
+  mock_mhs_environment_variables = [
+    {
+      name = "MOCK_MHS_SERVER_PORT"
+      value = var.gp2gp_mock_mhs_port
+    },
+    {
+      name = "MOCK_MHS_LOGGING_LEVEL"
+      value = var.gp2gp_log_level
+    },
+    {
+      name = "GP2GP_MHS_INBOUND_QUEUE"
+      value = var.mhs_inbound_queue_name
+    },
+    {
+      name = "GP2GP_AMQP_BROKERS"
+      value = replace(data.aws_mq_broker.nhais_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
+    },
+    {
+      name = "GP2GP_AMQP_MAX_REDELIVERIES"
+      value = var.gp2gp_mock_mhs_amqp_max_redeleveries
+    }
+  ]
 }
