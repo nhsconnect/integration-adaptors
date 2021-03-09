@@ -1,4 +1,6 @@
 String region = "eu-west-2"
+String tfEnvRepo = "https://github.com/tfutils/tfenv.git"
+String terraformBinPath = "terraform" //by default use the one from PATH
 
 Map <String, Map<String, String>> componentImageBranch = [
   OneOneOne:       [ecrRepo: "111",                  branch: "master"],
@@ -130,8 +132,12 @@ pipeline {
 } // pipeline
 
 int terraformInit(String tfStateBucket, String project, String environment, String component, String region) {
+  // tfenv - get the required TF version
+  sh(label: "Get tfenv", command: "git clone ${tfEnvRepo} ~/.tfenv")
+  sh(label: "Set TF version", command: "~/.tfenv/bin/tfenv install")
+  terraformBinPath = "~/.tfenv/bin/terraform"
   println("Terraform Init for Environment: ${environment} Component: ${component} in region: ${region} using bucket: ${tfStateBucket}")
-  String command = "terraform init -backend-config='bucket=${tfStateBucket}' -backend-config='region=${region}' -backend-config='key=${project}-${environment}-${component}.tfstate' -input=false -no-color"
+  String command = "${terraformBinPath} init -backend-config='bucket=${tfStateBucket}' -backend-config='region=${region}' -backend-config='key=${project}-${environment}-${component}.tfstate' -input=false -no-color"
   dir("components/${component}") {
     return( sh( label: "Terraform Init", script: command, returnStatus: true))
   } // dir
@@ -159,7 +165,7 @@ int terraform(String action, String tfStateBucket, String project, String enviro
     ]
     if (action == "apply"|| action == "destroy") {parametersList.add("-auto-approve")}
     List<String> variablesList=variablesMap.collect { key, value -> "-var ${key}=${value}" }
-    String command = "terraform ${action} ${variableFilesList.join(" ")} ${parametersList.join(" ")} ${variablesList.join(" ")} "
+    String command = "${terraformBinPath} ${action} ${variableFilesList.join(" ")} ${parametersList.join(" ")} ${variablesList.join(" ")} "
     dir("components/${component}") {
       return sh(label:"Terraform: "+action, script: command, returnStatus: true)
     } // dir
@@ -168,7 +174,7 @@ int terraform(String action, String tfStateBucket, String project, String enviro
 Map<String,String> collectTfOutputs(String component) {
   Map<String,String> returnMap = [:]
   dir("components/${component}") {
-    List<String> outputsList = sh (label: "Listing TF outputs", script: "terraform output", returnStdout: true).split("\n")
+    List<String> outputsList = sh (label: "Listing TF outputs", script: "${terraformBinPath} output", returnStdout: true).split("\n")
     outputsList.each {
       returnMap.put(it.split("=")[0].trim(),it.split("=")[1].trim())
     }
