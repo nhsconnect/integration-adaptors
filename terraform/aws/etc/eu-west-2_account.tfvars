@@ -39,8 +39,16 @@ ecr_repositories = [
     prefix_to_keep  = "main",
     number_to_keep  = 10
   },
+  {
+    number = 6,
+    name = "gp2gp-mock-mhs",
+    scan = false,
+    expire_PR_after = 10,
+    prefix_to_keep  = "main",
+    number_to_keep  = 10
+  },
   # {
-  #   number = 6,
+  #   number = 7,
   #   name = "nhais",
   #   scan = false,
   #   expire_PR_after = 10,
