@@ -129,7 +129,8 @@ pipeline {
   } // stages
 } // pipeline
 String tfEnv(String tfEnvRepo="https://github.com/tfutils/tfenv.git", String tfEnvPath="~/.tfenv") {
-  sh(label: "Get tfenv", script: "git clone ${tfEnvRepo} ${tfEnvPath}", returnStatus: true)
+  sh(label: "Get tfenv" ,  script: "git clone ${tfEnvRepo} ${tfEnvPath}", returnStatus: true)
+  sh(label: "Install TF",  script: "${tfEnvPath}/bin/tfenv install"     , returnStatus: true)
   return "${tfEnvPath}/bin/terraform"
 }
 

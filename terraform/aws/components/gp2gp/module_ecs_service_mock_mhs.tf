@@ -1,6 +1,6 @@
 module "mock_mhs_ecs_service" {
   source = "../../modules/module_ecs_service"
-  # count         = var.gp2gp_create_mhs_mock ? 1 : 0 # uncomment after Terraform is upgraded to 0.13+
+  count           = var.gp2gp_create_mhs_mock ? 1 : 0
   project         = var.project
   component       = var.component
   environment     = var.environment
