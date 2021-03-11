@@ -24,6 +24,7 @@ pipeline {
     choice (name: "Component",   choices: ['base', 'nhais', 'OneOneOne', 'mhs', 'account', 'fake_mesh', 'nhais_responder', 'gp2gp', 'lab-results'],     description: "Choose component")
     choice (name: "Action",      choices: ['plan', 'apply', 'plan-destroy', 'destroy'],           description: "Choose Terraform action")
     string (name: "Variables",   defaultValue: "",                                                description: "Terrafrom variables, format: variable1=value,variable2=value, no spaces")
+    string (name: "Targets",     defaultValue: "",                                                description: "Resources to be targeted by plan/apply/destroy, format: [resource type1].[resource_name1],[resource type2].[resource name2], no spaces")
     string (name: "Git_Branch",  defaultValue: "develop",                                         description: "Git branch from which TF will be taken")
     string (name: "Git_Repo",    defaultValue: "https://github.com/nhsconnect/integration-adaptors.git", description: "Git Repo with TF Code")
   }
@@ -67,11 +68,18 @@ pipeline {
                 variablesMap.put(kvp[0],kvp[1])
               }
             }
-
             List<String> tfParams = []
+            List<String> targetsList = params.Targets.split(",")
+            List<String> tfTargets = []
+            targetsList.each {
+              if (it != "") {
+                tfTargets.add("-target=${it}")
+              }
+            }
+
             if (params.Action == "destroy" || params.Action == "plan-destroy") {tfParams.add("-destroy")}
             if (terraformInit(TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region) !=0) { error("Terraform init failed")}
-            if (terraform('plan', TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap, tfParams) !=0 ) { error("Terraform Plan failed")}
+            if (terraform('plan', TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap, tfParams.plus(tfTargets)) !=0 ) { error("Terraform Plan failed")}
           } // script
         } //dir terraform/aws
       } // steps
@@ -89,18 +97,47 @@ pipeline {
       steps {
         dir("integration-adaptors/terraform/aws") {
           script {
-            if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap) !=0 ) { error("Terraform Apply failed")}
+            Map<String, String> variablesMap = [:]
 
+            //Get the build_id variable if in application component
+            if (componentImageBranch.containsKey(params.Component)) {
+              variablesMap.put("${params.Component}_build_id", getLatestImageTag(componentImageBranch[params.Component].branch, componentImageBranch[params.Component].ecrRepo, region))
+            }
+
+            // Get the variables from job parameters
+            List<String> variablesList = params.Variables.split(",")
+            variablesList.each {
+              def kvp = it.split("=")
+              if (kvp.length > 1) {
+                variablesMap.put(kvp[0],kvp[1])
+              }
+            }
+            List<String> tfParams = []
+            List<String> targetsList = params.Targets.split(",")
+            List<String> tfTargets = []
+            targetsList.each {
+              if (it != "") {
+                tfTargets.add("-target=${it}")
+              }
+            }
+
+            if (terraform(params.Action, TF_STATE_BUCKET, params.Project, params.Environment, params.Component, region, variablesMap, tfTargets) !=0 ) { error("Terraform Apply failed")}
           } // script
         } //dir terraform/aws
       } // steps
     } // stage Terraform Apply
   } // stages
 } // pipeline
+String tfEnv(String tfEnvRepo="https://github.com/tfutils/tfenv.git", String tfEnvPath="~/.tfenv") {
+  sh(label: "Get tfenv" ,  script: "git clone ${tfEnvRepo} ${tfEnvPath}", returnStatus: true)
+  sh(label: "Install TF",  script: "${tfEnvPath}/bin/tfenv install"     , returnStatus: true)
+  return "${tfEnvPath}/bin/terraform"
+}
 
 int terraformInit(String tfStateBucket, String project, String environment, String component, String region) {
+  String terraformBinPath = tfEnv()
   println("Terraform Init for Environment: ${environment} Component: ${component} in region: ${region} using bucket: ${tfStateBucket}")
-  String command = "terraform init -backend-config='bucket=${tfStateBucket}' -backend-config='region=${region}' -backend-config='key=${project}-${environment}-${component}.tfstate' -input=false -no-color"
+  String command = "${terraformBinPath} init -backend-config='bucket=${tfStateBucket}' -backend-config='region=${region}' -backend-config='key=${project}-${environment}-${component}.tfstate' -input=false -no-color"
   dir("components/${component}") {
     return( sh( label: "Terraform Init", script: command, returnStatus: true))
   } // dir
@@ -120,6 +157,7 @@ int terraform(String action, String tfStateBucket, String project, String enviro
     // Get the secret variables for global
     String secretsFile = "etc/secrets.tfvars"
     writeVariablesToFile(secretsFile,getAllSecretsForEnvironment(environment,"nia",region))
+    String terraformBinPath = tfEnv()
 
     List<String> variableFilesList = [
       "-var-file=../../etc/global.tfvars",
@@ -128,7 +166,7 @@ int terraform(String action, String tfStateBucket, String project, String enviro
     ]
     if (action == "apply"|| action == "destroy") {parametersList.add("-auto-approve")}
     List<String> variablesList=variablesMap.collect { key, value -> "-var ${key}=${value}" }
-    String command = "terraform ${action} ${variableFilesList.join(" ")} ${parametersList.join(" ")} ${variablesList.join(" ")} "
+    String command = "${terraformBinPath} ${action} ${variableFilesList.join(" ")} ${parametersList.join(" ")} ${variablesList.join(" ")} "
     dir("components/${component}") {
       return sh(label:"Terraform: "+action, script: command, returnStatus: true)
     } // dir
@@ -137,7 +175,8 @@ int terraform(String action, String tfStateBucket, String project, String enviro
 Map<String,String> collectTfOutputs(String component) {
   Map<String,String> returnMap = [:]
   dir("components/${component}") {
-    List<String> outputsList = sh (label: "Listing TF outputs", script: "terraform output", returnStdout: true).split("\n")
+    String terraformBinPath = tfEnv()
+    List<String> outputsList = sh (label: "Listing TF outputs", script: "${terraformBinPath} output", returnStdout: true).split("\n")
     outputsList.each {
       returnMap.put(it.split("=")[0].trim(),it.split("=")[1].trim())
     }
