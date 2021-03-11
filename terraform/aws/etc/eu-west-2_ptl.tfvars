@@ -49,8 +49,8 @@ mhs_route_sds_url = "ldaps://ldap.nis1.national.ncrs.nhs.uk"
 
 # secret names from secrets manager for PTL specific keys and certs:
 secret_name_mhs_party_key = "MHS_PTL_INT_PARTY_KEY"
-secret_name_mhs_client_cert = "MHS_PTL_INT_Endpoint_Cert_v2"
-secret_name_mhs_client_key = "MHS_PTL_INT_Endpoint_PrivateKey_v2"
+secret_name_mhs_client_cert = "MHS_PTL_INT_Endpoint_Cert_v3"
+secret_name_mhs_client_key = "MHS_PTL_INT_Endpoint_PrivateKey_v3"
 secret_name_mhs_ca_certs = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
 
 # Settings for "gp2gp" component
