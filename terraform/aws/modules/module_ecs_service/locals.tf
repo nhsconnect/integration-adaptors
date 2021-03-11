@@ -16,8 +16,6 @@ locals {
     }
   ] : []
 
-  //load_balancer_settings = var.enable_load_balancing ? local.load_balancer_default_settings : []
-
   healthcheck_port = var.container_healthcheck_port == 0 ? var.container_port : var.container_healthcheck_port
 
   application_mapping = [
