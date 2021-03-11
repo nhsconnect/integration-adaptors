@@ -10,7 +10,7 @@ module "mock_mhs_ecs_service" {
 
   availability_zones = local.availability_zones
 
-  image_name        = local.image_name
+  image_name        = local.mhs_mock_image_name
   cluster_id        = data.terraform_remote_state.base.outputs.base_cluster_id
   minimal_count     = var.gp2gp_service_minimal_count
   desired_count     = var.gp2gp_service_desired_count
