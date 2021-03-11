@@ -55,6 +55,10 @@ locals {
     {
       name = "GP2GP_GPC_HOST"
       value = var.gp2gp_gpc_host
+    },
+      {
+      name = "GP2GP_GPC_GET_URL"
+      value = "${module.gp2gp_wiremock_ecs_service.loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}/GP0001/STU3/1/gpconnect"
     }
   ])
 }

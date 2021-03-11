@@ -1,6 +1,7 @@
-module "gp2gp_wirmock_ecs_service" {
+module "gp2gp_wiremock_ecs_service" {
   source = "../../modules/module_ecs_service"
-
+  
+  count           = var.gp2gp_create_wiremock ? 1 : 0
   project         = var.project
   component       = var.component
   environment     = var.environment
