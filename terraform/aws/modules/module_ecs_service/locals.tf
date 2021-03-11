@@ -8,15 +8,13 @@ locals {
 
   container_name = "${local.resource_prefix}-container"
 
-  load_balancer_default_settings = [
+  load_balancer_settings = var.enable_load_balancing ? [
     {
       target_group_arn = aws_lb_target_group.service_target_group[0].arn
       container_name = local.container_name
       container_port = var.container_port
     }
-  ]
-
-  load_balancer_settings = var.enable_load_balancing ? local.load_balancer_default_settings : []
+  ] : []
 
   healthcheck_port = var.container_healthcheck_port == 0 ? var.container_port : var.container_healthcheck_port
 
