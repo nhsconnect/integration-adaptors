@@ -1,5 +1,5 @@
 # Common setting for entire Env - "base" component
-environment = "build2"
+environment = "vp"
 base_cidr_block = "10.15.0.0/16"
 enable_internet_access = false
 cluster_container_insights = "enabled"
@@ -53,23 +53,10 @@ gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gp2gp_wiremock_container_port = 8080
 gp2gp_wiremock_application_port = 8080
 gp2gp_create_wiremock = true
+gp2gp_create_mhs_mock = true
 
 # setting for mhs component
 mhs_inbound_queue_name = "vp_inbound_queue"
 
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
-
-# Settings for gp2gp
-# Settings for "gp2gp" component
-gp2gp_service_desired_count = 1
-gp2gp_service_minimal_count = 1
-gp2gp_service_maximal_count = 1
-gp2gp_service_container_port = 8080
-gp2gp_service_launch_type = "FARGATE"
-gp2gp_extract_cache_bucket_retention_period = 7
-gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
-gp2gp_create_mhs_mock = true
-
-# setting for mhs component
-mhs_inbound_queue_name = "vp_mhs_inbound"
