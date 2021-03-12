@@ -27,7 +27,7 @@ module "mock_mhs_ecs_service" {
   load_balancer_type = "application"
   protocol = "HTTP"
 
-  container_healthcheck_port = var.gp2gp_service_container_port
+  container_healthcheck_port = var.gp2gp_mock_mhs_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
 
