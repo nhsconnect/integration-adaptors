@@ -58,7 +58,7 @@ locals {
     },
     {
       name = "GP2GP_MHS_OUTBOUND_URL"
-      value = "${module.mock_mhs_ecs_service.loadbalancer_dns_name}:${var.gp2gp_mock_mhs_port}/mock-mhs-endpoint"
+      value = "${module.mock_mhs_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_mhs_port}/mock-mhs-endpoint"
     }
   ])
 
