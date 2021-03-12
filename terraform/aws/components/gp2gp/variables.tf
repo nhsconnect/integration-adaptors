@@ -187,7 +187,7 @@ variable "gp2gp_mock_mhs_port" {
   default = 8081
 }
 
-variable gp2gp_mock_mhs_amqp_max_redeleveries {
+variable gp2gp_mock_mhs_amqp_max_redeliveries {
   type = number
   default = 15
 }

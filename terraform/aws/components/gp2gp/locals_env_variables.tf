@@ -81,7 +81,7 @@ locals {
     },
     {
       name = "GP2GP_AMQP_MAX_REDELIVERIES"
-      value = var.gp2gp_mock_mhs_amqp_max_redeleveries
+      value = var.gp2gp_mock_mhs_amqp_max_redeliveries
     }
   ]
 }
