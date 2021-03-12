@@ -33,10 +33,6 @@ locals {
       value = join("-", list(var.environment, "gp2gp", "tasks"))
     },
     {
-      name = "GP2GP_GPC_GET_URL"
-      value = var.gp2gp_gpc_get_url
-    },
-    {
       name = "GP2GP_GPC_GET_STRUCTURED_ENDPOINT"
       value = var.gp2gp_gpc_get_structured_endpoint
     },
@@ -59,6 +55,10 @@ locals {
     {
       name = "GP2GP_MHS_OUTBOUND_URL"
       value = var.gp2gp_create_mhs_mock ? "http://${module.mock_mhs_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_mhs_port}/mock-mhs-endpoint" : "http://mhs-outbound.${data.terraform_remote_state.base.outputs.r53_zone_name}/"
+    },
+    {
+      name = "GP2GP_GPC_GET_URL"
+      value = var.gp2gp_create_wiremock ? "http://${module.gp2gp_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}/GP0001/STU3/1/gpconnect" : var.gp2gp_gpc_get_url
     }
   ])
 

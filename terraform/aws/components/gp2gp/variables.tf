@@ -192,6 +192,22 @@ variable gp2gp_mock_mhs_amqp_max_redeleveries {
   default = 15
 }
 
+variable "gp2gp_create_wiremock" {
+  type = bool
+  default = false
+  description = "Should an wiremock mock be created and used by GP2GP"
+}
+
+variable "gp2gp_wiremock_container_port" {
+  type = number
+  default = 8080
+}
+
+variable "gp2gp_wiremock_application_port" {
+  type = number
+  default = 8080
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
