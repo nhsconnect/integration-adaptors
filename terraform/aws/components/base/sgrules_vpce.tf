@@ -36,6 +36,25 @@ resource "aws_security_group_rule" "ecr_sg_from_core_sg" {
   source_security_group_id = aws_security_group.core_sg.id
 }
 
+#Secrets
+resource "aws_security_group_rule" "core_sg_to_secrets_sg" {
+  type      = "egress"
+  from_port = 443
+  to_port   = 443
+  protocol  = "tcp"
+  security_group_id        = aws_security_group.core_sg.id
+  source_security_group_id = aws_security_group.secrets_sg.id
+}
+
+resource "aws_security_group_rule" "secrets_sg_from_core_sg" { 
+  type      = "ingress"
+  from_port = 443
+  to_port   = 443
+  protocol  = "tcp"
+  security_group_id        = aws_security_group.secrets_sg.id
+  source_security_group_id = aws_security_group.core_sg.id
+}
+
 # S3
 resource "aws_security_group_rule" "core_sg_to_s3_prefix" { 
   type      = "egress"

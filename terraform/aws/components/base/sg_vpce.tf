@@ -17,3 +17,13 @@ resource "aws_security_group" "ecr_sg" {
     Name = "${local.resource_prefix}-ecr_sg"
   })
 }
+
+resource "aws_security_group" "secrets_sg" {
+  name = "${local.resource_prefix}-secrets_sg"
+  description = "Security group controlling access to Secrets Manager VPC Endpoint in env: ${var.environment}"
+  vpc_id = aws_vpc.base_vpc.id
+
+  tags = merge(local.default_tags, {
+    Name = "${local.resource_prefix}-secrets_sg"
+  })
+}
