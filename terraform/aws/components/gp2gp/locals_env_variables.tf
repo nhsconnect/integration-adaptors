@@ -33,10 +33,6 @@ locals {
       value = join("-", list(var.environment, "gp2gp", "tasks"))
     },
     {
-      name = "GP2GP_GPC_GET_URL"
-      value = var.gp2gp_gpc_get_url
-    },
-    {
       name = "GP2GP_GPC_GET_STRUCTURED_ENDPOINT"
       value = var.gp2gp_gpc_get_structured_endpoint
     },
@@ -55,6 +51,10 @@ locals {
     {
       name = "GP2GP_GPC_HOST"
       value = var.gp2gp_gpc_host
+    },
+    {
+      name = "GP2GP_GPC_GET_URL"
+      value = var.gp2gp_create_wiremock ? "${module.gp2gp_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}/GP0001/STU3/1/gpconnect" : var.gp2gp_gpc_get_url
     }
   ])
 }

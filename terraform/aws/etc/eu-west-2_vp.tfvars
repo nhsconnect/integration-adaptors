@@ -42,5 +42,20 @@ OneOneOne_service_container_port = 8080
 OneOneOne_service_launch_type = "FARGATE"
 OneOneOne_log_level = "DEBUG"
 
+# Settings for "gp2gp" component
+gp2gp_service_desired_count = 1
+gp2gp_service_minimal_count = 1
+gp2gp_service_maximal_count = 1
+gp2gp_service_container_port = 8080
+gp2gp_service_launch_type = "FARGATE"
+gp2gp_extract_cache_bucket_retention_period = 7
+gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+gp2gp_wiremock_container_port = 8080
+gp2gp_wiremock_application_port = 8080
+gp2gp_create_wiremock = true
+
+# setting for mhs component
+mhs_inbound_queue_name = "vp_inbound_queue"
+
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
