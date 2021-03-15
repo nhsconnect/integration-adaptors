@@ -18,7 +18,7 @@ locals {
     },
     {
       name      = "GP2GP_SSL_TRUST_STORE_PASSWORD"
-      valueFrom = data.aws_secretsmanager_secret.nhais_ssl_trust_store_password.arn
+      valueFrom = data.aws_secretsmanager_secret.gp2gp_ssl_trust_store_password.arn
     }
   ]
 }
