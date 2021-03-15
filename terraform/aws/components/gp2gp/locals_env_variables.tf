@@ -13,6 +13,14 @@ locals {
       value = data.terraform_remote_state.base.outputs.docdb_instance_port
     },
     {
+      name = "GP2GP_MONGO_OPTIONS"
+      value = var.gp2gp_mongo_options
+    },
+    {
+      name = "GP2GP_SSL_TRUST_STORE_URL"
+      value = var.gp2gp_ssl_trust_store_url
+    },
+    {
       name  = "GP2GP_MONGO_DATABASE_NAME"
       value = "gp2gp"
     },

@@ -165,6 +165,17 @@ variable "gp2gp_logs_datetime_format" {
   default = "%Y-%m-%d %H:%M:%S%L"
 }
 
+variable gp2gp_mongo_options {
+  type = string
+  description = "Options for mongo db connection"
+}
+
+variable gp2gp_ssl_trust_store_url {
+  type = string
+  description = "URL to bucket with trusted CAs"
+  default = ""
+}
+
 variable mhs_inbound_queue_name {
   type = string
   description = "Name of queue used by MHS Inbound "

@@ -54,6 +54,8 @@ gp2gp_wiremock_container_port = 8080
 gp2gp_wiremock_application_port = 8080
 gp2gp_create_wiremock = true
 gp2gp_create_mhs_mock = true
+gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
+gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
 # setting for mhs component
 mhs_inbound_queue_name = "vp_inbound_queue"
