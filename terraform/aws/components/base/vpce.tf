@@ -68,3 +68,18 @@ resource "aws_vpc_endpoint" "cloudwatch_endpoint" {
     Name = "${local.resource_prefix}-cloudwatch-vpce"
   })
 }
+
+# Secrets Manager VPC Endpoint
+resource "aws_vpc_endpoint" "secrets_endpoint" {
+  vpc_endpoint_type = "Interface"
+  private_dns_enabled = true
+  vpc_id = aws_vpc.base_vpc.id
+  service_name = "com.amazonaws.${var.region}.secretsmanager"
+  subnet_ids = aws_subnet.base_subnet.*.id
+  security_group_ids = [
+    aws_security_group.secrets_sg.id
+  ]
+  tags = merge(local.default_tags, {
+    Name = "${local.resource_prefix}-secrets-vpce"
+  })
+}
