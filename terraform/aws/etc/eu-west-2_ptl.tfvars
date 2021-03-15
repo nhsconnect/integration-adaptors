@@ -8,7 +8,7 @@ opentest_connected = false
 create_opentest_instance = false
 mongo_ssl_enabled = false
 # enable_internet_access = true
-ptl_allowed_incoming_cidrs = ["10.239.0.0/16", "0.0.0.0/0"]
+ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
@@ -61,5 +61,5 @@ gp2gp_service_container_port = 8080
 gp2gp_service_launch_type = "FARGATE"
 gp2gp_extract_cache_bucket_retention_period = 7
 gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
-gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
+gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
