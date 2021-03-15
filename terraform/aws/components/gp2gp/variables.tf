@@ -165,6 +165,17 @@ variable "gp2gp_logs_datetime_format" {
   default = "%Y-%m-%d %H:%M:%S%L"
 }
 
+variable gp2gp_mongo_options {
+  type = string
+  description = "Options for mongo db connection"
+}
+
+variable gp2gp_ssl_trust_store_url {
+  type = string
+  description = "URL to bucket with trusted CAs"
+  default = ""
+}
+
 variable mhs_inbound_queue_name {
   type = string
   description = "Name of queue used by MHS Inbound "
@@ -174,6 +185,38 @@ variable "create_testbox" {
   type = bool
   default = false
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
+}
+
+variable "gp2gp_create_mhs_mock" {
+  type = bool
+  default = false
+  description = "Should an MHS mock be created and used by GP2GP"
+}
+
+variable "gp2gp_mock_mhs_port" {
+  type = number
+  default = 8081
+}
+
+variable gp2gp_mock_mhs_amqp_max_redeliveries {
+  type = number
+  default = 15
+}
+
+variable "gp2gp_create_wiremock" {
+  type = bool
+  default = false
+  description = "Should an wiremock mock be created and used by GP2GP"
+}
+
+variable "gp2gp_wiremock_container_port" {
+  type = number
+  default = 8080
+}
+
+variable "gp2gp_wiremock_application_port" {
+  type = number
+  default = 8080
 }
 
 # Variables related to PTL connectivity
