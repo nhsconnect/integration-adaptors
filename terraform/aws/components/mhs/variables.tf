@@ -196,6 +196,12 @@ variable "ptl_connected" {
   default = false
 }
 
+variable "ptl_allowed_incoming_cidrs" {
+  description = "List of exernal CIDR that will be allowed to service LBs (where needed)"
+  type = list(string)
+  default = []
+}
+
 # outbound specific
 
 variable "mhs_outbound_spineroutelookup_validate_certificate" {
@@ -262,8 +268,43 @@ variable "mhs_inboud_use_ssl" {
   default = true
 }
 
+variable mhs_inbound_lb_ip {
+  type = string
+  default = ""
+  description = "Static IP for Inbound Load Balancer"
+}
+
 variable "logs_datetime_format" {
   type = string
   description = "Format for date and time in logs"
   default = "\\[%Y-%m-%dT%H:%M:%S\\.%fZ\\]"
+}
+
+# secret names
+# Define the names of secrets in secret manager for secret variables used by mhs
+# These are different depending on the way MHS is connected to NHS systems
+
+variable secret_name_mhs_party_key {
+  type = string
+  default = "opentest-party-key"
+}
+
+variable secret_name_mhs_client_cert {
+  type = string
+  default = "opentest-client-certificate"
+}
+
+variable secret_name_mhs_client_key {
+  type = string
+  default = "opentest-client-key"
+}
+
+variable secret_name_mhs_ca_certs {
+  type = string
+  default = "opentest-ca-certs"
+}
+
+variable secret_name_mhs_spine_route_lookup_ca_certs {
+  type = string
+  default = "build-outbound-route-connection-cacerts"
 }

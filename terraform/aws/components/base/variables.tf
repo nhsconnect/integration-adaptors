@@ -86,9 +86,10 @@ variable "docdb_master_password" {
   description = "Password for Document DB master user"
 }
 
-variable "docdb_tls" {
-  type = string
+variable "mongo_ssl_enabled" {
+  type = bool
   description = "Should the Document DB have a TLS enabled for incomming connections"
+  default = true
 }
 
 variable "docdb_audit_logs" {
@@ -170,6 +171,12 @@ variable "ptl_assigned_cidr" {
 variable "ptl_dns_servers" {
   type = list(string)
   description = "DNS servers in the connected PTL environment"
+  default = []
+}
+
+variable "ptl_allowed_incoming_cidrs" {
+  description = "List of exernal CIDR that will be allowed to service LBs (where needed)"
+  type = list(string)
   default = []
 }
 

@@ -19,18 +19,16 @@ resource "aws_security_group_rule" "to_service_from_load_balancer" {
 }
 
 resource "aws_security_group_rule" "to_service_from_network_load_balancer" {
-  count = local.network_lb
+  count = local.network_lb * length(var.lb_subnet_ids)
   type = "ingress"
   from_port = var.container_port
   to_port = var.container_port
   protocol = var.container_protocol
   security_group_id = aws_security_group.service_sg.id
   cidr_blocks = [
-    data.aws_subnet.lb_subnets[0].cidr_block,
-    data.aws_subnet.lb_subnets[1].cidr_block,
-    data.aws_subnet.lb_subnets[2].cidr_block
+    data.aws_subnet.lb_subnets[count.index].cidr_block,
   ]
-  description = "Allow application from LB subnets"
+  description = "Allow application from LB subnet ${data.aws_subnet.lb_subnets[count.index].cidr_block}"
 }
 
 # Healtheck rules - apply only if healthcheck port is different than main port
@@ -58,18 +56,16 @@ resource "aws_security_group_rule" "healthcheck_to_service_from_load_balancer" {
 }
 
 resource "aws_security_group_rule" "healthcheck_to_service_from_network_load_balancer" {
-  count = var.container_port == local.healthcheck_port ? 0 : local.network_lb
+  count = var.container_port == local.healthcheck_port ? 0 : local.network_lb * length(var.lb_subnet_ids)
   type = "ingress"
   from_port = local.healthcheck_port
   to_port = local.healthcheck_port
   protocol = var.container_protocol
   security_group_id = aws_security_group.service_sg.id
   cidr_blocks = [
-    data.aws_subnet.lb_subnets[0].cidr_block,
-    data.aws_subnet.lb_subnets[1].cidr_block,
-    data.aws_subnet.lb_subnets[2].cidr_block
+    data.aws_subnet.lb_subnets[count.index].cidr_block,
   ]
-  description = "Allow healthchecks from LB subnets"
+  description = "Allow healthchecks from LB subnet: ${data.aws_subnet.lb_subnets[count.index].cidr_block}"
 }
 
 data "aws_subnet" "lb_subnets" {

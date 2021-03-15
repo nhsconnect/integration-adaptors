@@ -23,3 +23,7 @@ output "mhs_outbound_lb_target_group_arn" {
   value =  module.mhs_outbound_ecs_service.loadbalancer_tg_arn
   description = "ARN of Service loadbalancers target group"
 }
+
+output "testbox_hostname" {
+  value = var.create_testbox ? module.mhs_inbound_ecs_service.testbox_hostname : null
+}

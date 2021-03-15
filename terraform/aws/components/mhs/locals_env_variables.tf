@@ -19,7 +19,7 @@ locals {
     },
     {
       name = "MHS_DB_ENDPOINT_URL"
-      value = data.terraform_remote_state.base.outputs.docdb_cluster_connection_string
+      value = join("&",[data.terraform_remote_state.base.outputs.docdb_cluster_connection_string,"ssl=${data.terraform_remote_state.base.outputs.docdb_tls_enabled}"])
     },
   ])
 

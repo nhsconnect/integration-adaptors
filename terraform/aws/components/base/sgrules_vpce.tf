@@ -56,10 +56,19 @@ resource "aws_security_group_rule" "secrets_sg_from_core_sg" {
 }
 
 # S3
-resource "aws_security_group_rule" "core_sg_to_s3_prefix" { 
+resource "aws_security_group_rule" "core_sg_to_s3_prefix_443" { 
   type      = "egress"
   from_port = 443
   to_port   = 443
+  protocol  = "tcp"
+  security_group_id = aws_security_group.core_sg.id
+  prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id]
+}
+
+resource "aws_security_group_rule" "core_sg_to_s3_prefix_80" { 
+  type      = "egress"
+  from_port = 80
+  to_port   = 80
   protocol  = "tcp"
   security_group_id = aws_security_group.core_sg.id
   prefix_list_ids = [aws_vpc_endpoint.s3_endpoint.prefix_list_id]

@@ -4,7 +4,14 @@ resource "aws_lb" "service_load_balancer" {
   internal = true
   load_balancer_type = var.load_balancer_type
   security_groups = local.lb_sgs
-  subnets = var.lb_subnet_ids
+
+  dynamic "subnet_mapping" {
+    for_each = local.lb_subnets_to_private_ips
+    content {
+      subnet_id = subnet_mapping.key
+      private_ipv4_address = subnet_mapping.value != "auto" ?  subnet_mapping.value : null
+    }
+  }
 
   tags = merge(local.default_tags, {
     Name = "${local.resource_prefix}-lb"
