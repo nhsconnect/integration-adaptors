@@ -14,7 +14,7 @@ locals {
     },
     {
       name = "GP2GP_MONGO_OPTIONS"
-      value = join("&",[var.gp2gp_mongo_options,"ssl=${var.mongo_ssl_enabled}"])
+      value = join("&",[var.gp2gp_mongo_options,"ssl=${data.terraform_remote_state.base.outputs.docdb_tls_enabled}"])
     },
     {
       name = "GP2GP_SSL_TRUST_STORE_URL"

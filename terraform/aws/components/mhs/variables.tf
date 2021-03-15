@@ -107,12 +107,6 @@ variable "mhs_service_launch_type" {
 #   default = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 # }
 
-variable "mongo_ssl_enabled" {
-  type = bool
-  default = true
-  description = "Should SSL be used when connecting to mongo cluster"
-}
-
 variable "dlt_vpc_id" {
   type = string
   description = "VPC where Distributed Load testing environment is hosted"

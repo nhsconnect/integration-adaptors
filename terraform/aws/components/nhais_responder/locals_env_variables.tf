@@ -42,7 +42,7 @@ locals {
     },
     {
       name = "NHAIS_MONGO_OPTIONS"
-      value = var.nhais_mongo_options
+      value = join("&",[var.nhais_mongo_options,"ssl=${data.terraform_remote_state.base.outputs.docdb_tls_enabled}"])
     },
     {
       name = "NHAIS_MESH_HOST"

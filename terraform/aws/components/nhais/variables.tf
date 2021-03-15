@@ -86,12 +86,6 @@ variable "nhais_ssl_trust_store_url" {
   default = ""
 }
 
-variable "mongo_ssl_enabled" {
-  type = bool
-  default = true
-  description = "Should SSL be used when connecting to mongo cluster"
-}
-
 variable "nhais_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
