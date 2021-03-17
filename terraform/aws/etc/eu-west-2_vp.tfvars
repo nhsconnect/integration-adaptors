@@ -19,7 +19,7 @@ nhais_log_level = "INFO"
 # nhais_mesh_host is also used by nhais_responder component, they must use the same MESH instance to work correctly
 nhais_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
 nhais_mesh_cert_validation = "false"
-nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
+nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 nhais_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
 # Settings for "nhais_responder" component
@@ -54,7 +54,7 @@ gp2gp_wiremock_container_port = 8080
 gp2gp_wiremock_application_port = 8080
 gp2gp_create_wiremock = true
 gp2gp_create_mhs_mock = true
-gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
+gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
 # setting for mhs component
