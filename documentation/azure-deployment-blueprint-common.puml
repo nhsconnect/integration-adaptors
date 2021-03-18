@@ -1,0 +1,54 @@
+@startuml
+!pragma revision 1
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+!define AzurePuml https://raw.githubusercontent.com/RicardoNiepel/Azure-PlantUML/master/dist
+
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/AzureC4Integration.puml
+
+!includeurl AzurePuml/Containers/all.puml
+!includeurl AzurePuml/Databases/AzureCosmosDb.puml
+!includeurl AzurePuml/Databases/AzureRedisCache.puml
+!includeurl AzurePuml/General/Azure.puml
+!includeurl AzurePuml/Integration/AzureServiceBus.puml
+!includeurl AzurePuml/Management/all.puml
+!includeurl AzurePuml/Networking/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Compute/AzureVirtualMachine.puml
+!includeurl AzurePuml/Security/AzureKeyVault.puml
+
+title "Azure Architecture - Common Infrastructure"
+
+LAYOUT_WITH_LEGEND()
+
+Azure(azure, "Azure", "Cloud") {
+    AzureSubscription(azPTL, "PTL Subscription", "") {
+        AzureVirtualNetwork(ptlvn, "PTL VNET", "") {
+        }
+    }
+    AzureSubscription(azGP, "GP Supplier Subscription", "") {
+        AzureVirtualNetwork(gpvn, "GP VNET", "") {
+            System_Ext(gp, "GP Supplier", "GP Supplier Software")
+        }
+    }
+    AzureSubscription(az, "Adaptors Subscription", "") {
+        AzureVirtualNetwork(avn, "NIA Adaptors VNET", "Peered with PTL VNET") {
+            rectangle "AKS subnet" {
+                AzureKubernetesService(aks, "Adaptors Kubernetes Cluster", "k8s cluster") {
+                }
+            }
+        }
+        AzureKeyVault(kv, "Key Vault", "Adaptor Secrets needed by AKS when deploying pods")
+        AzureMonitor(monitor, "Logs/Events/Pod Metrics", "view Kubernetes logs, events, and pod metrics in real-time")
+    }
+}
+System_Ext(nhs, "NHS Systems", "Spine, SDS, MESH, etc")
+AzureContainerRegistry(dockerHub, "Docker Hub", "Adaptor Docker containers")
+aks --up--> dockerHub
+aks --> kv
+aks --> monitor
+ptlvn <--> nhs
+ptlvn <--> gpvn : VNET Peering
+avn <--> ptlvn : VNET Peering
+@enduml
