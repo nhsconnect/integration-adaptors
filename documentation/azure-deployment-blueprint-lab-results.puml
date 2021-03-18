@@ -1,0 +1,67 @@
+@startuml
+!pragma revision 1
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+!define AzurePuml https://raw.githubusercontent.com/RicardoNiepel/Azure-PlantUML/master/dist
+
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/AzureC4Integration.puml
+
+!includeurl AzurePuml/Containers/all.puml
+!includeurl AzurePuml/Databases/AzureCosmosDb.puml
+!includeurl AzurePuml/Databases/AzureRedisCache.puml
+!includeurl AzurePuml/General/Azure.puml
+!includeurl AzurePuml/Integration/AzureServiceBus.puml
+!includeurl AzurePuml/Management/all.puml
+!includeurl AzurePuml/Networking/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Compute/AzureVirtualMachine.puml
+!includeurl AzurePuml/Security/AzureKeyVault.puml
+
+title "Azure Architecture - Laboratory Results Adaptor (Pathology, Screening)"
+
+LAYOUT_LEFT_RIGHT
+LAYOUT_WITH_LEGEND()
+
+System_Ext(labs, "Laboratories", "1 of many Laboratories")
+
+Azure(azure, "Azure", "Cloud") {
+    AzureSubscription(azPTL, "PTL Subscription", "") {
+        AzureVirtualNetwork(ptlvn, "PTL VNET", "") {
+        }
+    }
+    AzureSubscription(azGP, "GP Supplier Subscription", "") {
+        AzureVirtualNetwork(gpvn, "GP VNET", "") {
+            System_Ext(gp, "GP Supplier", "GP Supplier Software")
+        }
+    }
+    AzureSubscription(az, "Adaptors Subscription", "") {
+        AzureVirtualNetwork(avn, "NIA Adaptors VNET", "") {
+            rectangle "AKS subnet" {
+                AzureKubernetesService(aks, "Adaptors Kubernetes Cluster", "k8s cluster") {
+                    agent "Lab Results Pod" as labResults #fff
+                }
+            }
+        }
+        AzureCosmosDb(cosmos, "State Db", "MongoDb")
+        rectangle "Lab Results Queues" {
+            AzureServiceBus(lrInboundMesh, "Inbound MESH Queue", "Internal task queue")
+            AzureServiceBus(lrOutboundMesh, "Outbound MESH Queue", "Internal task queue")
+            AzureServiceBus(lrInboundGp, "Inbound GP Queue", "Provided by GP System")
+            AzureServiceBus(lrOutboundGp, "Outbound GP Queue", "Consumed by GP System")
+        }
+    }
+}
+System_Ext(nhs, "NHS Systems", "Spine, SDS, MESH, etc")
+
+labResults --left-> cosmos : EDIFACT + FHIR
+labResults <--> lrOutboundMesh : Enqueue/Dequeue NHSACK
+labResults <--> lrInboundMesh : Enqueue/Dequeue EDIFACT
+labResults --> lrOutboundGp : Enqueue FHIR messages
+labResults --> lrInboundGp : Enqueue FHIR messages\n(OperationOutcome)
+ptlvn --down-> labResults : Receive EDIFACT messages\nfrom MESH
+gp --> lrInboundGp : Enqueue FHIR messages \n(OperationOutcome)
+lrInboundGp ..> labResults : Consume FHIR message \n(OperationOutcome)
+lrOutboundGp ..> gp : Consume FHIR messages
+nhs <--> ptlvn
+labs --> nhs : Send EDIFACT messages
+@enduml

@@ -1,0 +1,49 @@
+@startuml
+!pragma revision 1
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+!define AzurePuml https://raw.githubusercontent.com/RicardoNiepel/Azure-PlantUML/master/dist
+
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/AzureC4Integration.puml
+
+!includeurl AzurePuml/Containers/all.puml
+!includeurl AzurePuml/Databases/AzureCosmosDb.puml
+!includeurl AzurePuml/Databases/AzureRedisCache.puml
+!includeurl AzurePuml/General/Azure.puml
+!includeurl AzurePuml/Integration/AzureServiceBus.puml
+!includeurl AzurePuml/Management/all.puml
+!includeurl AzurePuml/Networking/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Compute/AzureVirtualMachine.puml
+!includeurl AzurePuml/Security/AzureKeyVault.puml
+
+title "Azure Architecture - 111"
+
+LAYOUT_LEFT_RIGHT
+LAYOUT_WITH_LEGEND()
+
+System_Ext(111, "111 Provider", "1 of many 111 Providers")
+
+Azure(azure, "Azure", "Cloud") {
+    AzureSubscription(azGP, "GP Supplier Subscription", "") {
+        AzureVirtualNetwork(gpvn, "GP VNET", "") {
+            System_Ext(gp, "GP Supplier", "GP Supplier Software")
+        }
+    }
+    AzureSubscription(az, "Adaptors Subscription", "") {
+        AzureVirtualNetwork(avn, "NIA Adaptors VNET", "Peered with PTL VNET") {
+            rectangle "AKS subnet" {
+                AzureKubernetesService(aks, "Adaptors Kubernetes Cluster", "k8s cluster") {
+                    agent "111 PEM Pod" as pem #fff
+                }
+            }
+        }
+        AzureServiceBus(pemQueue, "111 PEM Queue", "Consumed by GP System")
+    }
+}
+
+111 --down-> pem
+pem --> pemQueue
+pemQueue ..> gp
+@enduml

@@ -1,0 +1,63 @@
+@startuml
+!pragma revision 1
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+!define AzurePuml https://raw.githubusercontent.com/RicardoNiepel/Azure-PlantUML/master/dist
+
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/AzureC4Integration.puml
+
+!includeurl AzurePuml/Containers/all.puml
+!includeurl AzurePuml/Databases/AzureCosmosDb.puml
+!includeurl AzurePuml/Databases/AzureRedisCache.puml
+!includeurl AzurePuml/General/Azure.puml
+!includeurl AzurePuml/Integration/AzureServiceBus.puml
+!includeurl AzurePuml/Management/all.puml
+!includeurl AzurePuml/Networking/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Compute/AzureVirtualMachine.puml
+!includeurl AzurePuml/Security/AzureKeyVault.puml
+
+title "Azure Architecture - Message Handling System (MHS)"
+
+LAYOUT_LEFT_RIGHT
+LAYOUT_WITH_LEGEND()
+
+Azure(azure, "Azure", "Cloud") {
+    AzureSubscription(azPTL, "PTL Subscription", "") {
+        AzureVirtualNetwork(ptlvn, "PTL VNET", "") {
+        }
+    }
+    AzureSubscription(azGP, "GP Supplier Subscription", "") {
+        AzureVirtualNetwork(gpvn, "GP VNET", "") {
+            System_Ext(gp, "GP Supplier", "GP Supplier Software")
+        }
+    }
+    AzureSubscription(az, "Adaptors Subscription", "") {
+        AzureVirtualNetwork(avn, "NIA Adaptors VNET", "Peered with PTL VNET") {
+            rectangle "AKS subnet" {
+                AzureKubernetesService(aks, "Adaptors Kubernetes Cluster", "k8s cluster") {
+                    agent "Outbound Pod" as outbound #fff
+                    agent "Inbound Pod" as inbound #fff
+                    agent "SDS Pod" as sds #fff
+                    database "Redis Pod" as redis #fff
+                }
+            }
+        }
+        AzureCosmosDb(cosmos, "MHS State Db", "MongoDb")
+        AzureServiceBus(asb, "MHS Inbound Queue", "Consumed by GP System")
+    }
+}
+System_Ext(nhs, "NHS Systems", "Spine, SDS, MESH, etc")
+gp --down-> outbound
+outbound --> sds
+outbound --> cosmos
+inbound --> cosmos
+outbound --down--> ptlvn
+inbound --> asb
+sds --> redis
+sds -> ptlvn
+asb ..> gp
+ptlvn <--> nhs
+ptlvn --up--> inbound
+@enduml

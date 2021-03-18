@@ -1,0 +1,64 @@
+@startuml
+!pragma revision 1
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+!define AzurePuml https://raw.githubusercontent.com/RicardoNiepel/Azure-PlantUML/master/dist
+
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/AzureC4Integration.puml
+
+!includeurl AzurePuml/Containers/all.puml
+!includeurl AzurePuml/Databases/AzureCosmosDb.puml
+!includeurl AzurePuml/Databases/AzureRedisCache.puml
+!includeurl AzurePuml/General/Azure.puml
+!includeurl AzurePuml/Integration/AzureServiceBus.puml
+!includeurl AzurePuml/Management/all.puml
+!includeurl AzurePuml/Networking/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Compute/AzureVirtualMachine.puml
+!includeurl AzurePuml/Security/AzureKeyVault.puml
+
+title "Azure Architecture - NHAIS"
+
+LAYOUT_LEFT_RIGHT
+LAYOUT_WITH_LEGEND()
+
+Azure(azure, "Azure", "Cloud") {
+    AzureSubscription(azPTL, "PTL Subscription", "") {
+        AzureVirtualNetwork(ptlvn, "PTL VNET", "") {
+        }
+        
+    }
+    AzureSubscription(azGP, "GP Supplier Subscription", "") {
+        AzureVirtualNetwork(gpvn, "GP VNET", "") {
+            System_Ext(gp, "GP Supplier", "GP Supplier Software")
+        }
+    }
+    AzureSubscription(az, "Adaptors Subscription", "") {
+        AzureVirtualNetwork(avn, "NIA Adaptors VNET", "Peered with PTL VNET") {
+            rectangle "AKS subnet" {
+                AzureKubernetesService(aks, "Adaptors Kubernetes Cluster", "k8s cluster") {
+                    agent "NHAIS Pod" as nhais #fff
+                }
+            }
+        }
+        AzureCosmosDb(cosmos, "NHAIS Sequence Numbers\nNHAIS Inbound state\nNHAIS Outbound state", "MongoDb")
+        rectangle "NHAIS Queues" {
+            AzureServiceBus(nhaisOutboundQueue, "NHAIS Outbound Queue", "Internal to Adaptor", )
+            AzureServiceBus(nhaisInboundQueue, "NHAIS Outbound Queue", "Internal to Adaptor", )
+            AzureServiceBus(nhaisQueue, "GP System Inbound Queue ", "Consumed by GP System", )
+        }
+    }
+}
+System_Ext(nhs, "NHS Systems", "Spine, SDS, MESH, etc")
+
+gp --down-> nhais
+nhais --down->ptlvn
+nhais --left->cosmos
+nhais --up--> nhaisOutboundQueue
+nhais --up--> nhaisInboundQueue
+nhais --up--> nhaisQueue
+ptlvn --up-> nhais
+nhaisQueue ..> gp
+ptlvn <--> nhs
+@enduml

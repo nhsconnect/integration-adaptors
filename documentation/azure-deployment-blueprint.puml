@@ -22,14 +22,25 @@
 ' LAYOUT_LEFT_RIGHT
 LAYOUT_WITH_LEGEND()
 
-System_Ext(gp, "GP Supplier", "GP Supplier Software")
 System_Ext(111, "111 Provider", "1 of many 111 Providers")
-note bottom of gp
-    Supplier software modelled
-    here outside of Azure
-end note
+System_Ext(labs, "Laboratories", "1 of many Laboratories")
+
 Azure(azure, "Azure", "Cloud") {
-    AzureSubscription(az, "Subscription", "") {
+    AzureSubscription(azPTL, "PTL Subscription", "") {
+        AzureVirtualNetwork(ptlvn, "PTL VNET", "") {
+        }
+        
+    }
+    AzureSubscription(azGP, "GP Supplier Subscription", "") {
+        AzureVirtualNetwork(gpvn, "GP VNET", "") {
+            System_Ext(gp, "GP Supplier", "GP Supplier Software")
+            note bottom of gp
+                Supplier software modelled
+                here outside of Azure
+        end note
+        }
+    }
+    AzureSubscription(az, "Adaptors Subscription", "") {
         AzureVirtualNetwork(avn, "NIA Adaptors VNET", "Peered with NIA OpenTest VNET") {
             rectangle "AKS subnet" {
                 AzureKubernetesService(aks, "Adaptors", "k8s cluster") {
@@ -40,6 +51,7 @@ Azure(azure, "Azure", "Cloud") {
                     AzureContainerInstance(pem, "111 PEM", "Java", "111 PEM Adaptor")
                     AzureContainerInstance(redis, "SDS Cache", "Cached SDS route and reliability information")
                     AzureContainerInstance(nhais, "NHAIS", "Java", "FHIR API for outbound transactions")
+                    AzureContainerInstance(labResults, "Lab Results", "Java", "Pathology/Screening results adaptor")
                 }
             }
         }
@@ -55,26 +67,30 @@ Azure(azure, "Azure", "Cloud") {
             AzureServiceBus(nhaisInboundQueue, "NHAIS Outbound Queue", "Internal to Adaptor", )
             AzureServiceBus(nhaisQueue, "GP System Inbound Queue ", "Consumed by GP System", )
         }
+        rectangle "Lab Results Queues" {
+            AzureServiceBus(lrInboundMesh, "Inbound MESH Queue", "Consumed by GP System")
+            AzureServiceBus(lrOutboundMesh, "Outbound MESH Queue", "Consumed by Lab Results Adaptor")
+            AzureServiceBus(lrInboundGp, "Inbound GP Queue", "Consumed by GP System")
+            AzureServiceBus(lrOutboundGp, "Outbound GP Queue", "Provided by GP System")
+        }
         AzureServiceBus(pemQueue, "111 PEM Queue", "Consumed by GP System")
         AzureKeyVault(kv, "Key Vault", "Adaptor Secrets needed by AKS when deploying pods")
         AzureMonitor(monitor, "Logs/Events/Pod Metrics", "view Kubernetes logs, events, and pod metrics in real-time")
-        AzureVirtualNetwork(pvn, "NIA OpenTest VNET", "Peered with NIA Adaptors VNET") {
-            AzureVirtualMachine(vpn, "OpenTest VPN Client", "")
-        }
     }
 }
 System_Ext(nhs, "NHS Systems", "Spine, SDS, MESH, etc")
 AzureContainerRegistry(dockerHub, "Docker Hub", "Adaptor Docker containers")
 gp --down-> ingress
-111 --left-> ingress
+111 --down-> ingress
 ingress --down-> outbound
 ingress --down-> inbound
 ingress --down-> pem
+ingress --down-> labResults
 ingress --down-> nhais
 outbound --down-> sds
 outbound --left-> cosmos
-outbound --down->vpn
-nhais --down->vpn
+outbound --down->ptlvn
+nhais --down->ptlvn
 inbound -> cosmos
 inbound --down-> asb
 nhais --left->cosmos
@@ -82,14 +98,22 @@ nhais --right-> nhaisOutboundQueue
 nhais --right-> nhaisInboundQueue
 nhais --right-> nhaisQueue
 pem --> pemQueue
+labResults --> lrOutboundMesh
+labResults --> lrOutboundGp
+labResults --> ptlvn
+lrOutboundMesh --> ptlvn
 sds --right-> redis
-sds -> vpn
+sds -> ptlvn
 aks --up-> dockerHub
 aks --> kv
-vpn --up-> ingress
+ptlvn --up-> ingress
 asb ..> gp
 nhaisQueue ..> gp
 pemQueue ..> gp
+gp --> lrInboundGp
+lrInboundGp ..> labResults
+gp --> lrOutboundGp
 aks --> monitor
-vpn <--> nhs
+ptlvn <--> nhs
+labs --up--> nhs
 @enduml
