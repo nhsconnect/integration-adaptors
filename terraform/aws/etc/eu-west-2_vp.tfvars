@@ -65,7 +65,7 @@ lab-results_service_target_request_count = 1200
 lab-results_service_container_port = 8080
 lab-results_service_launch_type = "FARGATE"
 lab-results_log_level = "INFO"
-lab-results_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
+lab-results_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
 lab-results_mesh_cert_validation = "true"
 lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
