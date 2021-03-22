@@ -64,7 +64,7 @@ lab-results_service_maximal_count = 1
 lab-results_service_target_request_count = 1200
 lab-results_service_container_port = 8080
 lab-results_service_launch_type = "FARGATE"
-lab-results_log_level = "DEBUG"
+lab-results_log_level = "INFO"
 lab-results_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
 lab-results_mesh_cert_validation = "true"
 lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
