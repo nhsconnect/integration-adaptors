@@ -45,7 +45,11 @@ resource "aws_vpc_endpoint" "ecr_api_endpoint" {
 resource "aws_vpc_endpoint" "s3_endpoint" {
   vpc_id = aws_vpc.base_vpc.id
   service_name = "com.amazonaws.${var.region}.s3"
-  route_table_ids = [
+  route_table_ids = var.ptl_connected ? [
+    aws_vpc.base_vpc.main_route_table_id,
+    aws_route_table.private.id,
+    aws_route_table.nhs_ptl[0].id
+  ] : [
     aws_vpc.base_vpc.main_route_table_id,
     aws_route_table.private.id
   ]
@@ -66,5 +70,20 @@ resource "aws_vpc_endpoint" "cloudwatch_endpoint" {
   subnet_ids = aws_subnet.base_subnet.*.id
   tags = merge(local.default_tags, {
     Name = "${local.resource_prefix}-cloudwatch-vpce"
+  })
+}
+
+# Secrets Manager VPC Endpoint
+resource "aws_vpc_endpoint" "secrets_endpoint" {
+  vpc_endpoint_type = "Interface"
+  private_dns_enabled = true
+  vpc_id = aws_vpc.base_vpc.id
+  service_name = "com.amazonaws.${var.region}.secretsmanager"
+  subnet_ids = aws_subnet.base_subnet.*.id
+  security_group_ids = [
+    aws_security_group.secrets_sg.id
+  ]
+  tags = merge(local.default_tags, {
+    Name = "${local.resource_prefix}-secrets-vpce"
   })
 }

@@ -50,7 +50,7 @@ locals {
     },
     {
       name = "LAB_RESULTS_MONGO_OPTIONS"
-      value = var.lab-results_mongo_options
+      value = join("&",[var.lab-results_mongo_options,"ssl=${data.terraform_remote_state.base.outputs.docdb_tls_enabled}"])
     },
     {
       name = "LAB_RESULTS_MONGO_AUTO_INDEX_CREATION"

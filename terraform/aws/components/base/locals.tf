@@ -20,14 +20,14 @@ locals {
 # cidrsubnet("10.x.x.128/25",2,2) # 10.x.x.192/27 # zone b
 # cidrsubnet("10.x.x.128/25",2,3) # 10.x.x.224/27 # zone c
 
-  ptl_lb_subnet_cidrs = [
+  ptl_lb_subnet_cidrs = var.ptl_connected ? [
     cidrsubnet(var.ptl_assigned_cidr,3,0),
     cidrsubnet(var.ptl_assigned_cidr,3,1)
-  ]
+  ] : []
 
-  ptl_containers_subnet_cidrs = [
+  ptl_containers_subnet_cidrs = var.ptl_connected ? [
     cidrsubnet(var.ptl_assigned_cidr,2,1),
     cidrsubnet(var.ptl_assigned_cidr,2,2),
     cidrsubnet(var.ptl_assigned_cidr,2,3)
-  ]
+  ] : []
 }

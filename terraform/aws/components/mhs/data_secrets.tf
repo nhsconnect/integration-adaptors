@@ -14,22 +14,24 @@ data "aws_secretsmanager_secret" "docdb_master_password" {
   name = "docdb-master-password"
 }
 
+# These are env specific, OpenTest certs and keys are different than HSCN ones.
+
 data "aws_secretsmanager_secret" "mhs_party_key" {
-  name = "opentest-party-key"
+  name = var.secret_name_mhs_party_key
 }
 
 data "aws_secretsmanager_secret" "mhs_client_cert" {
-  name = "opentest-client-certificate"
+  name = var.secret_name_mhs_client_cert
 }
 
 data "aws_secretsmanager_secret" "mhs_client_key" {
-  name = "opentest-client-key"
+  name = var.secret_name_mhs_client_key
 }
 
 data "aws_secretsmanager_secret" "mhs_ca_certs" {
-  name = "opentest-ca-certs"
+  name = var.secret_name_mhs_ca_certs
 }
 
 data "aws_secretsmanager_secret" "spine_routelookup_ca_certs" {
-  name = "build-outbound-route-connection-cacerts"
+  name = var.secret_name_mhs_spine_route_lookup_ca_certs
 }

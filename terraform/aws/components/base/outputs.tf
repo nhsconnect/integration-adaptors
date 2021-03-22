@@ -46,6 +46,10 @@ output "docdb_instance_port" {
   value = aws_docdb_cluster_instance.base_db_instance[0].port
 }
 
+output "docdb_tls_enabled" {
+  value = var.mongo_ssl_enabled
+}
+
 output "docdb_cluster_connection_string" {
   value = "mongodb://${var.docdb_master_user}:${var.docdb_master_password}@${aws_docdb_cluster.base_db_cluster.endpoint}:${aws_docdb_cluster_instance.base_db_instance[0].port
 }/?retryWrites=false"

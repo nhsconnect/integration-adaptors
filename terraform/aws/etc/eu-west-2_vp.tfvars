@@ -1,12 +1,12 @@
 # Common setting for entire Env - "base" component
-environment = "build2"
+environment = "vp"
 base_cidr_block = "10.15.0.0/16"
 enable_internet_access = false
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
 dlt_vpc_id = "vpc-03f843c08b01876d5"
 enable_dlt = true
-docdb_tls = "enabled"
+mongo_ssl_enabled = true
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 2
@@ -41,6 +41,38 @@ OneOneOne_service_target_request_count = 1200
 OneOneOne_service_container_port = 8080
 OneOneOne_service_launch_type = "FARGATE"
 OneOneOne_log_level = "DEBUG"
+
+# Settings for "gp2gp" component
+gp2gp_service_desired_count = 1
+gp2gp_service_minimal_count = 1
+gp2gp_service_maximal_count = 1
+gp2gp_service_container_port = 8080
+gp2gp_service_launch_type = "FARGATE"
+gp2gp_extract_cache_bucket_retention_period = 7
+gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+gp2gp_wiremock_container_port = 8080
+gp2gp_wiremock_application_port = 8080
+gp2gp_create_wiremock = true
+gp2gp_create_mhs_mock = true
+gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
+gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+
+# Settings for "lab-results" component
+lab-results_service_minimal_count = 1
+lab-results_service_desired_count = 1
+lab-results_service_maximal_count = 1
+lab-results_service_target_request_count = 1200
+lab-results_service_container_port = 8080
+lab-results_service_launch_type = "FARGATE"
+lab-results_log_level = "INFO"
+lab-results_mesh_host = "https://mesh.vp.nhsredteam.internal.nhs.uk:8829/messageexchange/"
+lab-results_mesh_cert_validation = "true"
+lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+
+# setting for mhs component
+mhs_inbound_queue_name = "vp_inbound_queue"
 
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"

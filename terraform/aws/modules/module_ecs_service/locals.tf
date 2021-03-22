@@ -8,15 +8,13 @@ locals {
 
   container_name = "${local.resource_prefix}-container"
 
-  load_balancer_default_settings = [
+  load_balancer_settings = var.enable_load_balancing ? [
     {
       target_group_arn = aws_lb_target_group.service_target_group[0].arn
       container_name = local.container_name
       container_port = var.container_port
     }
-  ]
-
-  load_balancer_settings = var.enable_load_balancing ? local.load_balancer_default_settings : []
+  ] : []
 
   healthcheck_port = var.container_healthcheck_port == 0 ? var.container_port : var.container_healthcheck_port
 
@@ -43,4 +41,10 @@ locals {
   appautoscaling = var.enable_load_balancing ? local.application_lb : 0
 
   lb_sgs = var.use_application_lb ? [ aws_security_group.service_lb_sg.id ] : []
+
+  # Fill the list of private IPs with "auto" settings, then trim it to the size of subnet list
+  # This way we get always get the lists with the same size
+  private_ips_filled = slice(concat(var.private_ips_for_lb, ["auto", "auto", "auto"]),0,length(var.lb_subnet_ids))
+
+  lb_subnets_to_private_ips = zipmap(var.lb_subnet_ids, local.private_ips_filled)
 }

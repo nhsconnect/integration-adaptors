@@ -28,3 +28,7 @@ output "cloudwatch_log_group" {
   value = aws_cloudwatch_log_group.ecs_service_cw_log_group.name
   description = "Cloudwatch log group for logs from the service"
 }
+
+output "testbox_hostname" {
+    value = var.create_testbox ? aws_instance.testbox[0].private_dns : null
+}
