@@ -93,6 +93,11 @@ output "gp2gp_cidr" {
   description = "CIDR block for GP2GP component"
 }
 
+output "gpc-consumer_cidr" {
+  value = local.gpc-consumer_cidr
+  description = "CIDR block for GP2GP component"
+}
+
 # PTL section
 
 output "ptl_connected" {
