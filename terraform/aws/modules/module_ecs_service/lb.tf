@@ -4,6 +4,8 @@ resource "aws_lb" "service_load_balancer" {
   internal = true
   load_balancer_type = var.load_balancer_type
   security_groups = local.lb_sgs
+  # Needed for LB in AZ A to route to service in AZ B
+  enable_cross_zone_load_balancing = true
 
   dynamic "subnet_mapping" {
     for_each = local.lb_subnets_to_private_ips
