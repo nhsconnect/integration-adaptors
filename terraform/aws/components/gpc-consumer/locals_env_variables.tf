@@ -9,7 +9,7 @@ locals {
       value = var.gpc-consumer_root_log_level
     },
     {
-      name  = "GPC_CONSUMER_ROOT_LOGGING_LEVEL"
+      name  = "GPC_CONSUMER_LOGGING_LEVEL"
       value = var.gpc-consumer_log_level
     },
     {
@@ -18,7 +18,7 @@ locals {
     },
     {
       name  = "GPC_CONSUMER_URL"
-      value = "http://${module.gpc-consumer_ecs_service[0].loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}"
+      value = "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}"
     },
     {
       name  = "GPC_CONSUMER_GPC_GET_URL"
