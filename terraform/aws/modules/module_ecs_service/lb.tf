@@ -5,6 +5,10 @@ resource "aws_lb" "service_load_balancer" {
   load_balancer_type = var.load_balancer_type
   security_groups = local.lb_sgs
 
+  # Only used if type is network. Required for Spine which only routes to a
+  # single IP in a single zone but services run in multiple AZ
+  enable_cross_zone_load_balancing = true
+
   dynamic "subnet_mapping" {
     for_each = local.lb_subnets_to_private_ips
     content {
