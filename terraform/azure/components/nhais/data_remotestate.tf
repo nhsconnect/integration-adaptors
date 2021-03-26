@@ -4,7 +4,7 @@ data "terraform_remote_state" "base" {
   config = {
     storage_account_name = var.state_bucket_storage_account
     container_name = var.state_bucket_name
-    key = "base.tfstate"
+    key = "${var.project}-${var.environment}-base"
   }
 }
 

@@ -96,6 +96,18 @@ variable "ptl_cidr" {
   description = "CIDR assigned to us by NHS, used for PTL peering / VPN"
 }
 
+variable base_ptl_prefixes {
+  type = list(string)
+  default = []
+  description = "Prefixes in form of CIDR which should be routed via PTL connection"
+}
+
+variable base_ptl_next_hop {
+  type = string
+  default = ""
+  description = "IP of next hop router in PTL connection"
+}
+
 ## Resource group variables ##
 
 variable jumpbox_user {
