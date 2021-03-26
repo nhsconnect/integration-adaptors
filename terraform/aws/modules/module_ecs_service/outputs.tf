@@ -6,18 +6,18 @@ output "service_sg_id" {
   value =  aws_security_group.service_sg.id
 }
 
-output "loadbalancer_dns_name" {
-  value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].dns_name : null
-}
+#output "loadbalancer_dns_name" {
+#  value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].dns_name : null
+#}
 
-output "loadbalancer_zone_id" {
-  value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].zone_id : null
-}
+#output "loadbalancer_zone_id" {
+#  value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].zone_id : null
+#}
 
-output "loadbalancer_arn" {
-  value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].arn : null
-  description = "ARN of Service loadbalancer"
-}
+#output "loadbalancer_arn" {
+#  value =  var.enable_load_balancing ? aws_lb.service_load_balancer[0].arn : null
+#  description = "ARN of Service loadbalancer"
+#}
 
 output "loadbalancer_tg_arn" {
   value =  var.enable_load_balancing ? aws_lb_target_group.service_target_group[0].arn : null
