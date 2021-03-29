@@ -19,7 +19,7 @@ locals {
 # cidrsubnet("10.x.x.128/25",2,1) # 10.x.x.160/27 # zone b
 # For everything else
 # cidrsubnet("10.x.x.128/25",2,2) # 10.x.x.192/27 # zone a
-# cidrsubnet("10.x.x.128/25",2,2) # 10.x.x.224/27 # zone b
+# cidrsubnet("10.x.x.128/25",2,3) # 10.x.x.224/27 # zone b
 
   ptl_lb_subnet_cidrs = var.ptl_connected ? [
     cidrsubnet(var.ptl_assigned_cidr,2,0),
