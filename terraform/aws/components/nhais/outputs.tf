@@ -1,7 +1,7 @@
-# output "nhais_url" {
-#   value = aws_route53_record.nhais_lb_record.name
-#   description = "The DNS name of the Route53 record pointing to the NHAIS service's load balancer."
-# }
+output "nhais_url" {
+  value = aws_route53_record.nhais_lb_record.name
+  description = "The DNS name of the Route53 record pointing to the NHAIS service's load balancer."
+}
 
 output "nhais_lb_sg_id" {
   value = module.nhais_ecs_service.loadbalancer_sg_id
@@ -14,15 +14,15 @@ output "nhais_lb_port" {
   description = "Port on which NHAIS LB is listening"
 }
 
-# output "nhais_lb_arn" {
-#   value =  module.nhais_ecs_service.loadbalancer_arn
-#   description = "ARN of Service loadbalancer"
-# }
+output "nhais_lb_arn" {
+  value =  module.nhais_ecs_service.loadbalancer_arn
+  description = "ARN of Service loadbalancer"
+}
 
-# output "nhais_lb_target_group_arn" {
-#   value =  module.nhais_ecs_service.loadbalancer_tg_arn
-#   description = "ARN of Service loadbalancers target group"
-# }
+output "nhais_lb_target_group_arn" {
+  value =  module.nhais_ecs_service.loadbalancer_tg_arn
+  description = "ARN of Service loadbalancers target group"
+}
 
 output "nhais_external_access_sg_id" {
   value = aws_security_group.nhais_external_access.id
