@@ -36,6 +36,7 @@ lab-results_mesh_cert_validation = "true"
 lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+create_testbox = true
 
 # Settings for "OneOneOne" component
 # Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number
