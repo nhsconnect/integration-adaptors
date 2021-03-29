@@ -7,7 +7,7 @@ resource "aws_route_table" "nhs_ptl" {
 }
 
 resource "aws_route_table_association" "ptl_container_route_ptl_subnet" {
-  count = var.ptl_connected ? length(local.availability_zones) : 0
+  count = var.ptl_connected ? length(local.ptl_lb_availability_zones) : 0
   subnet_id = aws_subnet.service_containers_subnet[count.index].id
   route_table_id = aws_route_table.nhs_ptl[0].id 
 }
