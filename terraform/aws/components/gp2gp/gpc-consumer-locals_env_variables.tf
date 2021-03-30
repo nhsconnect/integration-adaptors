@@ -22,11 +22,11 @@ locals {
     },
     {
       name  = "GPC_CONSUMER_GPC_GET_URL"
-      value = var.gpc-consumer_create_wiremock ? "http://${module.gpc-consumer_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gpc-consumer_wiremock_container_port}" : ""
+      value = var.gp2gp_create_wiremock ? "http://${module.gp2gp_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}" : ""
     },
     {
       name  = "GPC_CONSUMER_SDS_URL"
-      value = var.gpc-consumer_create_wiremock ? "http://${module.gpc-consumer_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gpc-consumer_wiremock_container_port}" : var.gpc-consumer_sds_url
+      value = var.gp2gp_create_wiremock ? "http://${module.gp2gp_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}" : var.gpc-consumer_sds_url
     },
     {
       name  = "GPC_CONSUMER_GPC_STRUCTURED_PATH"
