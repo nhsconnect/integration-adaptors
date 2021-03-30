@@ -2,7 +2,7 @@ locals {
   gpc-consumer_default_tags = {
     Project = var.project
     Environment = var.environment
-    Component = "gpc-consumer" #var.component
+    Component = var.component
   }
 
   #resource_prefix = "${var.project}-${var.environment}-${var.component}"
