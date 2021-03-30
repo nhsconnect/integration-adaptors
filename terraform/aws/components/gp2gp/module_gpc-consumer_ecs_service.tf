@@ -5,7 +5,7 @@ module "gpc-consumer_ecs_service" {
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "gpc-consumer_ecs"
+  module_instance = "gpcc_ecs"
   default_tags    = local.gpc-consumer_default_tags
 
   availability_zones = local.availability_zones
