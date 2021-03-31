@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  nhs.server: |
+    nhs.uk:53 {
+      errors
+      cache 30
+      log
+      forward . 155.231.231.1 155.231.231.2
+    }
+
+# To apply this: kubectl apply -f dns.yaml && kubectl -n kube-system rollout restart deployment coredns
