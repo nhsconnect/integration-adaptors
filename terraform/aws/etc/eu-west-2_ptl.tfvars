@@ -10,6 +10,9 @@ enable_internet_access = true
 mongo_ssl_enabled = false
 # enable_internet_access = true
 ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
+ptl_allowed_outbound = ["10.239.0.0/16", "155.231.231.0/29"]
+ptl_hscn_prefixes = ["10.239.0.0/16", "155.231.231.0/29"]
+ptl_internet_prefixes = ["0.0.0.0/0"]
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
