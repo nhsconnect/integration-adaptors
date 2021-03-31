@@ -21,6 +21,10 @@ locals {
       value = "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}"
     },
     {
+      name  = "GPC_CONSUMER_GPC_GET_URL"
+      value = var.gp2gp_create_wiremock ? "http://${module.gp2gp_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}" : "https://orange.testlab.nhs.uk"
+    },
+    {
       name  = "GPC_CONSUMER_SDS_URL"
       value = var.gp2gp_create_wiremock ? "http://${module.gp2gp_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}" : var.gpc-consumer_sds_url
     },
