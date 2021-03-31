@@ -23,6 +23,21 @@ nhais_mesh_cert_validation = "true"
 nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 nhais_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
+# Settings for "lab-results" component
+lab-results_service_minimal_count = 1
+lab-results_service_desired_count = 1
+lab-results_service_maximal_count = 1
+lab-results_service_target_request_count = 1200
+lab-results_service_container_port = 8080
+lab-results_service_launch_type = "FARGATE"
+lab-results_log_level = "INFO"
+lab-results_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
+lab-results_mesh_cert_validation = "true"
+lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+create_testbox = true
+
 # Settings for "OneOneOne" component
 # Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number
 OneOneOne_service_minimal_count = 2
