@@ -56,9 +56,6 @@ gpc-consumer_mesh_cert_validation = "true"
 gpc-consumer_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 gpc-consumer_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
-gpc-consumer_create_wiremock = false
-gpc-consumer_wiremock_container_port = 8080
-gpc-consumer_wiremock_application_port = 8080
 gpc-consumer_sds_url = "https://sandbox.api.service.nhs.uk/spine-directory/"
 
 ###### FOR GPC-CONSUMER DEPLOYED IN PTL ENVIRONMENT
