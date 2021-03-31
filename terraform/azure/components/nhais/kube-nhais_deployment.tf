@@ -127,6 +127,11 @@ resource "kubernetes_deployment" "nhais" {
           }
 
           env {
+              name = "NHAIS_MESH_SUB_CA"
+              value = var.nhais_mesh_sub_ca
+          }
+
+          env {
               name = "NHAIS_MESH_ENDPOINT_CERT"
               value = var.nhais_mesh_endpoint_cert
           }
