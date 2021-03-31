@@ -30,23 +30,27 @@ locals {
     },
     {
       name  = "GPC_CONSUMER_GPC_STRUCTURED_PATH"
-      value = "/GP0001/STU3/1/gpconnect/fhir/Patient/$gpc.getstructuredrecord"
+      value = "/*/STU3/1/gpconnect/fhir/Patient/$gpc.getstructuredrecord"
     },
     {
       name  = "GPC_CONSUMER_GPC_GET_DOCUMENT_PATH"
-      value = "/GP0001/STU3/1/gpconnect/fhir/Binary/{documentId}"
+      value = "/*/STU3/1/gpconnect/fhir/Binary/{documentId}"
     },
     {
       name  = "GPC_CONSUMER_GPC_GET_PATIENT_PATH"
-      value = "/GP0001/STU3/1/gpconnect/fhir/Patient"
+      value = "/*/STU3/1/gpconnect/fhir/Patient"
     },
     {
       name  = "GPC_CONSUMER_SEARCH_DOCUMENTS_PATH"
-      value = "/GP0001/STU3/1/gpconnect/fhir/Patient/**"
+      value = "/*/STU3/1/gpconnect/fhir/Patient/**"
     },
     {
       name  = "GPC_CONSUMER_SDS_URL"
       value = var.gpc-consumer_sds_url
+    },
+    {
+      name  = "GPC_CONSUMER_SSP_FQDN"
+      value = var.gpc-consumer_ssp_fqdn
     },
     {
       name = "GPC_CONSUMER_MONGO_DATABASE_NAME"
