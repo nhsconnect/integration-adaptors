@@ -6,6 +6,7 @@ docdb_instance_class = "db.r5.large"
 ptl_connected = true
 opentest_connected = false
 create_opentest_instance = false
+enable_internet_access = true
 mongo_ssl_enabled = false
 # enable_internet_access = true
 ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
