@@ -1,11 +1,11 @@
-resource "aws_route" "route_all_to_ptl" {
+resource "aws_route" "ptl_route_via_hscn" {
   count = var.ptl_connected ? length(var.ptl_hscn_prefixes) : 0
   route_table_id = aws_route_table.nhs_ptl[0].id
   destination_cidr_block = var.ptl_hscn_prefixes[count.index]
   gateway_id = data.aws_vpn_gateway.ptl_gateway[0].id
 }
 
-resource "aws_route" "ptl_internet_route" {
+resource "aws_route" "ptl_route_via_internet" {
   count = var.ptl_connected && var.enable_internet_access ? length(var.ptl_internet_prefixes) : 0
   route_table_id = aws_route_table.nhs_ptl[0].id
   destination_cidr_block = var.ptl_internet_prefixes[count.index]
