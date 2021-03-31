@@ -57,6 +57,7 @@ gpc-consumer_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&r
 gpc-consumer_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gpc-consumer_sds_url = "https://sandbox.api.service.nhs.uk/spine-directory/"
+gpc-consumer_ssp_fqdn = ""
 
 ###### FOR GPC-CONSUMER DEPLOYED IN PTL ENVIRONMENT
 #secret_name_spine_client_cert = "MHS_PTL_INT_Endpoint_Cert_v3"
