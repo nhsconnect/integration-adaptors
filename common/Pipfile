@@ -11,7 +11,7 @@ unittest-xml-reporting = "~=2.5"
 tornado = "~=6.0"
 python-qpid-proton = "~=0.28"
 pystache = "~=0.5"
-lxml = "~=4.4"
+lxml = "~=4.6"
 isodate = "~=0.6"
 motor = "~=2.1"
 
