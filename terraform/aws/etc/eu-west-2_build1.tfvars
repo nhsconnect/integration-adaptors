@@ -41,6 +41,33 @@ gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
+# Settings for "gpc-consumer" component
+gpc-consumer_service_minimal_count = 1
+gpc-consumer_service_desired_count = 1
+gpc-consumer_service_maximal_count = 1
+gpc-consumer_service_target_request_count = 1200
+gpc-consumer_service_container_port = 8080
+gpc-consumer_service_launch_type = "FARGATE"
+gpc-consumer_root_log_level = "WARN"
+gpc-consumer_log_level = "INFO"
+gpc-consumer_logging_format = "(*)"
+gpc-consumer_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
+gpc-consumer_mesh_cert_validation = "true"
+gpc-consumer_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+gpc-consumer_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+gpc-consumer_create_wiremock = false
+gpc-consumer_wiremock_container_port = 8080
+gpc-consumer_wiremock_application_port = 8080
+gpc-consumer_sds_url = "https://sandbox.api.service.nhs.uk/spine-directory/"
+
+###### FOR GPC-CONSUMER DEPLOYED IN PTL ENVIRONMENT
+#secret_name_spine_client_cert = "MHS_PTL_INT_Endpoint_Cert_v3"
+#secret_name_spine_client_key = "MHS_PTL_INT_Endpoint_PrivateKey_v3"
+#secret_name_spine_root_ca_cert = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
+#secret_name_spine_sub_ca_cert = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
+#secret_name_sds_apikey = ""
+
 # Settings for "mhs" component
 mhs_inbound_service_container_port = 443
 mhs_inbound_service_healthcheck_port = 80

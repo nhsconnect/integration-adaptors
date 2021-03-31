@@ -47,6 +47,14 @@ ecr_repositories = [
     prefix_to_keep  = "main",
     number_to_keep  = 10
   },
+    {
+    number = 7,
+    name = "gpc-consumer",
+    scan = false,
+    expire_PR_after = 10,
+    prefix_to_keep  = "main",
+    number_to_keep  = 10
+  },
   # {
   #   number = 7,
   #   name = "nhais",
