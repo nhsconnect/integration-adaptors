@@ -12,8 +12,6 @@ resource "kubernetes_service" "nhais" {
 
     annotations = {
       "service.beta.kubernetes.io/azure-load-balancer-internal" = true
-      #"service.beta.kubernetes.io/azure-load-balancer-resource-group" = data.terraform_remote_state.account.outputs.resource_group_name
-      #"service.beta.kubernetes.io/azure-dns-label-name" = local.resource_prefix
     }
   }
 

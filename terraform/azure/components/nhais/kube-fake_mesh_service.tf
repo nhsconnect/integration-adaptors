@@ -10,12 +10,6 @@ resource "kubernetes_service" "fake_mesh" {
       component = var.component
       name = "nhais-fake-mesh"
     }
-
-    # annotations = {
-    #   #"service.beta.kubernetes.io/azure-load-balancer-internal" = true
-    #   #"service.beta.kubernetes.io/azure-load-balancer-resource-group" =  data.terraform_remote_state.account.outputs.resource_group_name
-    #   #"service.beta.kubernetes.io/azure-dns-label-name" = "${local.resource_prefix}-fake-mesh"
-    # }
   }
 
   spec {
@@ -24,8 +18,6 @@ resource "kubernetes_service" "fake_mesh" {
       port = var.fake_mesh_application_port
       target_port = var.fake_mesh_container_port
     }
-
-    #type = "LoadBalancer"
 
     selector = {
       name = "nhais-fake-mesh"

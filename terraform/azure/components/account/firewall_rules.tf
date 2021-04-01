@@ -39,27 +39,6 @@ resource "azurerm_firewall_application_rule_collection" "general" {
   }
 }
 
-# resource "azurerm_firewall_application_rule_collection" "servicebus" {
-#   name                = "${local.resource_prefix}-firewall_rules_servicebus"
-#   azure_firewall_name = azurerm_firewall.account_firewall.name
-#   resource_group_name = azurerm_resource_group.account_resource_group.name
-#   priority            = "101"
-#   action              = "Allow"
-
-#   rule {
-#     name = "allow network"
-#     source_addresses = ["*"]
-#     target_fqdns = [
-#       "*.servicebus.windows.net" 
-#     ]
-
-#     protocol {
-#       port = "5671"
-#       type = "Tcp"
-#     }
-#   }
-# }
-
 resource "azurerm_firewall_network_rule_collection" "ntp" {
   name                = "${local.resource_prefix}-firewall_rules_ntp"
   azure_firewall_name = azurerm_firewall.account_firewall.name
