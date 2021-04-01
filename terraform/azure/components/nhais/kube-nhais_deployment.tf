@@ -1,13 +1,13 @@
 resource "kubernetes_deployment" "nhais" {
   metadata {
-    name = local.resource_prefix
+    name = "nhais"
     namespace = kubernetes_namespace.nhais.metadata.0.name
 
     labels = {
-      Project = var.project
-      Environment = var.environment
-      Component = var.component
-      Name = local.resource_prefix
+      project = var.project
+      environment = var.environment
+      component = var.component
+      name = "nhais"
     }
   }
 
@@ -16,25 +16,24 @@ resource "kubernetes_deployment" "nhais" {
 
     selector {
       match_labels = {
-        Component = "nhais"
-        Environment = var.environment
+        name = "nhais"
       }
     } // selector
 
     template {
       metadata {
         labels = {
-          Project = var.project
-          Environment = var.environment
-          Component = var.component
-          Name = local.resource_prefix
+          project = var.project
+          environment = var.environment
+          component = var.component
+          name = "nhais"
         }
       } //metadata
 
       spec {
         container {
           image = var.nhais_image
-          name = local.resource_prefix
+          name = "nhais"
 
           port {
             name = "container-port"
@@ -119,12 +118,17 @@ resource "kubernetes_deployment" "nhais" {
 
           env {
               name = "NHAIS_MESH_HOST"
-              value = var.fake_mesh_in_use ? "https://${local.resource_prefix}-fake-mesh:${var.fake_mesh_application_port}/messageexchange/" : var.nhais_mesh_host
+              value = var.fake_mesh_in_use ? "https://${kubernetes_service.fake_mesh[0].metadata.0.name}:${var.fake_mesh_application_port}/messageexchange/" : var.nhais_mesh_host
           }
 
           env {
               name = "NHAIS_MESH_CERT_VALIDATION"
               value = var.nhais_mesh_cert_validation
+          }
+
+          env {
+              name = "NHAIS_MESH_SUB_CA"
+              value = var.nhais_mesh_sub_ca
           }
 
           env {

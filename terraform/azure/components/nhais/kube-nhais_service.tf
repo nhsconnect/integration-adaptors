@@ -1,19 +1,17 @@
 resource "kubernetes_service" "nhais" {
   metadata {
-    name = local.resource_prefix
+    name = "nhais"
     namespace = kubernetes_namespace.nhais.metadata.0.name
 
     labels = {
-      Project = var.project
-      Environment = var.environment
-      Component = var.component
-      Name = local.resource_prefix
+      project = var.project
+      environment = var.environment
+      component = var.component
+      name = "nhais"
     }
 
     annotations = {
       "service.beta.kubernetes.io/azure-load-balancer-internal" = true
-      "service.beta.kubernetes.io/azure-load-balancer-resource-group" = data.terraform_remote_state.account.outputs.resource_group_name
-      "service.beta.kubernetes.io/azure-dns-label-name" = local.resource_prefix
     }
   }
 
@@ -28,8 +26,7 @@ resource "kubernetes_service" "nhais" {
     load_balancer_ip = var.nhais_lb_ip == "" ? null : var.nhais_lb_ip
 
     selector = {
-      Component = "nhais"
-      Environment = var.environment
+      name = "nhais"
     }
   }
 }

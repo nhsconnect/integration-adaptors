@@ -96,6 +96,18 @@ variable "ptl_cidr" {
   description = "CIDR assigned to us by NHS, used for PTL peering / VPN"
 }
 
+variable base_ptl_prefixes {
+  type = list(string)
+  default = []
+  description = "Prefixes in form of CIDR which should be routed via PTL connection"
+}
+
+variable base_ptl_next_hop {
+  type = string
+  default = ""
+  description = "IP of next hop router in PTL connection"
+}
+
 ## Resource group variables ##
 
 variable jumpbox_user {
@@ -134,11 +146,11 @@ variable "jumpbox_allowed_ips" {
 variable servicebus_sku {
   description = "Service level for Servicebus, available are Basic, Standard and Premium"
   type = string
-  default = "Standard" # Standard is needed to support AMQP protocol
+  default = "Premium" # Standard is needed to support AMQP protocol, Premium to allow connection with Service Endpoint
 }
 
 variable servicebus_capacity {
   description = "Servicebus capacity"
   type = number
-  default = 0 # has to be 0 for Basic and Standard SKU, Premium SKU allows for more
+  default = 1 # has to be 0 for Basic and Standard SKU, Premium SKU allows for more
 }

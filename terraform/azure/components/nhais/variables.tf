@@ -56,7 +56,7 @@ variable nhais_image {
 variable nhais_application_port {
   type = number
   description = "Port of which the the service should be visible, also the port used by LB if set"
-  default = 8080
+  default = 80
 }
 
 variable nhais_container_port {
@@ -97,6 +97,10 @@ variable nhais_mesh_endpoint_private_key {
   type = string
 }
 
+variable nhais_mesh_sub_ca {
+  type = string
+}
+
 variable nhais_mesh_recipient_mailbox_id_mappings {
   type = string
 }
@@ -119,6 +123,12 @@ variable nhais_scheduler_enabled {
 variable nhais_lb_ip {
   type = string
   default = ""
+}
+
+variable base_ptl_dns_servers {
+  type = list(string)
+  default = []
+  description = "IP of DNS Servers to use in PTL"
 }
 
 # fake_mesh

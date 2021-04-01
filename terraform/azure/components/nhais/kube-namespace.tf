@@ -1,12 +1,12 @@
 resource "kubernetes_namespace" "nhais" {
   metadata {
-    name = local.resource_prefix
+    name = var.environment
 
     labels = {
-      Project = var.project
-      Environment = var.environment
-      Component = var.component
-      Name = local.resource_prefix
+      project = var.project
+      environment = var.environment
+      component = var.component
+      name = local.resource_prefix
     }
   }
 }

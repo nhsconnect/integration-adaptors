@@ -1,5 +1,5 @@
-resource "azurerm_firewall_application_rule_collection" "account_aks_rules" {
-  name = "${local.resource_prefix}-aks_firewall_rules"
+resource "azurerm_firewall_application_rule_collection" "general" {
+  name = "${local.resource_prefix}-firewall_rules_general"
   azure_firewall_name = azurerm_firewall.account_firewall.name
   resource_group_name = azurerm_resource_group.account_resource_group.name
   priority = "101"
@@ -24,8 +24,8 @@ resource "azurerm_firewall_application_rule_collection" "account_aks_rules" {
       "*.azmk8s.io",
       "*.blob.core.windows.net",
       "*.internal.cloudapp.net",
-      "*.cosmos.azure.com"
-    ]
+      "*.cosmos.azure.com",     
+     ]
 
     protocol {
       port = "80"
@@ -40,7 +40,7 @@ resource "azurerm_firewall_application_rule_collection" "account_aks_rules" {
 }
 
 resource "azurerm_firewall_network_rule_collection" "ntp" {
-  name                = "time"
+  name                = "${local.resource_prefix}-firewall_rules_ntp"
   azure_firewall_name = azurerm_firewall.account_firewall.name
   resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 101
@@ -57,7 +57,7 @@ resource "azurerm_firewall_network_rule_collection" "ntp" {
 }
 
 resource "azurerm_firewall_network_rule_collection" "dns" {
-  name                = "dns"
+  name                = "${local.resource_prefix}-firewall_rules_dns"
   azure_firewall_name = azurerm_firewall.account_firewall.name
   resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 102
@@ -74,7 +74,7 @@ resource "azurerm_firewall_network_rule_collection" "dns" {
 }
 
 resource "azurerm_firewall_network_rule_collection" "servicetags" {
-  name                = "servicetags"
+  name                = "${local.resource_prefix}-firewall_rules_servicetags"
   azure_firewall_name = azurerm_firewall.account_firewall.name
   resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 110
@@ -96,7 +96,7 @@ resource "azurerm_firewall_network_rule_collection" "servicetags" {
 }
 
 resource "azurerm_firewall_application_rule_collection" "osupdates" {
-  name                = "osupdates"
+  name                = "${local.resource_prefix}-firewall_rules_osupdates"
   azure_firewall_name = azurerm_firewall.account_firewall.name
   resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 102
@@ -133,7 +133,7 @@ resource "azurerm_firewall_application_rule_collection" "osupdates" {
 }
 
 resource "azurerm_firewall_application_rule_collection" "publicimages" {
-  name                = "publicimages"
+  name                = "${local.resource_prefix}-firewall_rules_publicimages"
   azure_firewall_name = azurerm_firewall.account_firewall.name
   resource_group_name = azurerm_resource_group.account_resource_group.name
   priority            = 103

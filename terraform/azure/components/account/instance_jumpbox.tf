@@ -20,7 +20,7 @@ resource "azurerm_linux_virtual_machine" "account_jumpbox" {
   computer_name                   = "${local.resource_prefix}-jumpbox"
   admin_username                  = var.jumpbox_user
   disable_password_authentication = true
-
+  
   admin_ssh_key {
     username = var.jumpbox_user
     public_key = file("files/azure_account_jumpbox.pub")
@@ -34,8 +34,8 @@ resource "azurerm_linux_virtual_machine" "account_jumpbox" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
     version   = "latest"
   }
 

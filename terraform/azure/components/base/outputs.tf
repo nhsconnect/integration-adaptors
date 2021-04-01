@@ -84,6 +84,10 @@ output "vnet_name" {
   value = azurerm_virtual_network.base_vnet.name
 }
 
+output "ptl_connected" {
+  value = var.ptl_connected
+}
+
 # Servicebus
 
 output "base_servicebus_namespace" {

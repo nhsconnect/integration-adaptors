@@ -1,14 +1,14 @@
 resource "kubernetes_deployment" "fake_mesh" {
   count = var.fake_mesh_in_use ? 1 : 0
   metadata {
-    name = "${local.resource_prefix}-fake-mesh"
+    name = "nhais-fake-mesh"
     namespace = kubernetes_namespace.nhais.metadata.0.name
 
     labels = {
-      Project = var.project
-      Environment = var.environment
-      Component = var.component
-      Name = "${local.resource_prefix}-fake-mesh"
+      project = var.project
+      environment = var.environment
+      component = var.component
+      name = "nhais-fake-mesh"
     }
   }
 
@@ -17,25 +17,24 @@ resource "kubernetes_deployment" "fake_mesh" {
 
     selector {
       match_labels = {
-        Component = "nhais"
-        Environment = var.environment
+        name = "nhais-fake-mesh"
       }
     } // selector
 
     template {
       metadata {
         labels = {
-          Project = var.project
-          Environment = var.environment
-          Component = var.component
-          Name = "${local.resource_prefix}-fake-mesh"
+          project = var.project
+          environment = var.environment
+          component = var.component
+          name = "nhais-fake-mesh"
         }
       } //metadata
 
       spec {
         container {
           image = var.fake_mesh_image
-          name = "${local.resource_prefix}-fake-mesh"
+          name = "nhais-fake-mesh"
 
           port {
             name = "container-port"

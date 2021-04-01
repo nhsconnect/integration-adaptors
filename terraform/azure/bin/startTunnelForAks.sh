@@ -1,0 +1,1 @@
+ssh -L 8443:ptl-c634dd53.9e629df2-9827-46e8-bbab-32259af23906.privatelink.ukwest.azmk8s.io:443 azure-ptl-testbox
