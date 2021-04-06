@@ -22,4 +22,4 @@
 
 ## Deploying
 
-## HSCN VNet Config
+## HSCN VPC Config
