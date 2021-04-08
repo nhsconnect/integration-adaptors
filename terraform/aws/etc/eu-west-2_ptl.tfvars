@@ -24,9 +24,9 @@ nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWri
 nhais_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
 # Settings for "lab-results" component
-lab-results_service_minimal_count = 1
-lab-results_service_desired_count = 1
-lab-results_service_maximal_count = 1
+lab-results_service_minimal_count = 3
+lab-results_service_desired_count = 3
+lab-results_service_maximal_count = 3
 lab-results_service_target_request_count = 1200
 lab-results_service_container_port = 8080
 lab-results_service_launch_type = "FARGATE"
