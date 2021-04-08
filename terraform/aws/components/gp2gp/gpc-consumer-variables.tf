@@ -195,3 +195,9 @@ variable secret_name_sds_apikey {
   type = string
   default = "opentest-client-key"
 }
+
+variable "gpc-consumer_empty_string" {
+  type = string
+  description = "Empty String"
+  default = ""
+}
