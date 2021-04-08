@@ -36,6 +36,9 @@ lab-results_mesh_cert_validation = "true"
 lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+lab-results_mesh_polling_cycle_minimum_interval_in_seconds = 30
+lab-results_mesh_client_wakeup_interval_in_milliseconds = 10000
+lab-results_mesh_polling_cycle_duration_in_seconds = 25
 create_testbox = true
 
 # Settings for "OneOneOne" component
