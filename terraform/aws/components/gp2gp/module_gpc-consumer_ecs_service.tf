@@ -42,7 +42,8 @@ module "gpc-consumer_ecs_service" {
   ]
 
   lb_allowed_security_groups = [
-    data.terraform_remote_state.account.outputs.jumpbox_sg_id
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+    module.gp2gp_ecs_service.service_sg_id
   ]
 
   additional_container_config = []
