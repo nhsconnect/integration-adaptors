@@ -13,10 +13,6 @@ locals {
       value = var.gpc-consumer_log_level
     },
     {
-      name  = "GPC_CONSUMER_LOGGING_FORMAT"
-      value = var.gpc-consumer_logging_format
-    },
-    {
       name  = "GPC_CONSUMER_URL"
       value = "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}"
     },
