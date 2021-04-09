@@ -64,13 +64,6 @@ variable "gpc-consumer_log_level" {
   default = "INFO"
 }
 
-variable "gpc-consumer_logging_format" {
-  type = string
-  description = "Defines how to format log events on stdout"
-  default = "(*)"
-}
-
-
 variable "gpc-consumer_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
@@ -201,10 +194,4 @@ variable secret_name_spine_sub_ca_cert {
 variable secret_name_sds_apikey {
   type = string
   default = "opentest-client-key"
-}
-
-variable "gpc-consumer_empty_string" {
-  type = string
-  description = "Empty String"
-  default = ""
 }

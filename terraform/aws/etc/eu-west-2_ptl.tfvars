@@ -88,7 +88,6 @@ gpc-consumer_service_container_port = 8080
 gpc-consumer_service_launch_type = "FARGATE"
 gpc-consumer_root_log_level = "WARN"
 gpc-consumer_log_level = "INFO"
-gpc-consumer_logging_format = ""
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory"
 gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
