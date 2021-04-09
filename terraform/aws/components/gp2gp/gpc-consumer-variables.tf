@@ -129,6 +129,13 @@ variable "gpc-consumer_ssp_fqdn" {
   default = ""
 }
 
+variable "gpc-consumer_include_certs" {
+  type = bool
+  description = "If TRUE, GPCC Spine Certs & Key Secrets will be included in envrionment variables"
+  default = false
+}
+
+
 # Variables for MESH mailbox
 
 variable "gpc-consumer_mesh_host" {

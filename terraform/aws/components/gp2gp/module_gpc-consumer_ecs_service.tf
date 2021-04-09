@@ -29,7 +29,8 @@ module "gpc-consumer_ecs_service" {
   dlt_vpc_id                 = var.dlt_vpc_id
 
   environment_variables = local.gpcc_environment_variables
-  secret_variables      = local.gpcc_secret_variables
+  secret_variables      = var.gpc-consumer_include_certs ? concat(local.gpcc_secret_variables,local.gpcc_spine_secrets) : local.gpcc_secret_variables
+
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
   task_role_arn           = data.aws_iam_role.ecs_service_task_role.arn
