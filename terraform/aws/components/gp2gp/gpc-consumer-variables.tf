@@ -181,12 +181,7 @@ variable secret_name_spine_client_key {
   default = "opentest-client-key"
 }
 
-variable secret_name_spine_root_ca_cert {
-  type = string
-  default = "opentest-ca-certs"
-}
-
-variable secret_name_spine_sub_ca_cert {
+variable secret_name_spine_sub_and_root_ca_cert {
   type = string
   default = "opentest-ca-certs"
 }

@@ -55,11 +55,11 @@ gpc-consumer_sds_url = "https://sandbox.api.service.nhs.uk/spine-directory/"
 gpc-consumer_ssp_fqdn = ""
 
 ###### FOR GPC-CONSUMER TO BE DEPLOYED IN PTL ENVIRONMENT
+###### FOR GPC-CONSUMER TO BE DEPLOYED IN PTL ENVIRONMENT
 #gpc-consumer_include_certs = true
 #secret_name_spine_client_cert = "MHS_PTL_INT_Endpoint_Cert_v3"
 #secret_name_spine_client_key = "MHS_PTL_INT_Endpoint_PrivateKey_v3"
-#secret_name_spine_root_ca_cert = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
-#secret_name_spine_sub_ca_cert = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
+#secret_name_spine_sub_and_root_ca_cert = "opentest-ca-certs"
 #secret_name_sds_apikey = ""
 
 # Settings for "mhs" component

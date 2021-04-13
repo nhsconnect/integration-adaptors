@@ -74,8 +74,7 @@ gpc-consumer_ssp_fqdn = ""
 #gpc-consumer_include_certs = true
 #secret_name_spine_client_cert = "MHS_PTL_INT_Endpoint_Cert_v3"
 #secret_name_spine_client_key = "MHS_PTL_INT_Endpoint_PrivateKey_v3"
-#secret_name_spine_root_ca_cert = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
-#secret_name_spine_sub_ca_cert = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
+#secret_name_spine_sub_and_root_ca_cert = "opentest-ca-certs"
 #secret_name_sds_apikey = ""
 
 # Settings for "lab-results" component

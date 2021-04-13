@@ -14,12 +14,8 @@ locals {
       valueFrom = data.aws_secretsmanager_secret.gpc-consumer_spine_client_key.arn
     },
     {
-      name = "GPC_CONSUMER_SPINE_ROOT_CA_CERT"
-      valueFrom = data.aws_secretsmanager_secret.gpc-consumer_spine_root_ca_cert.arn
-    },
-    {
-      name = "GPC_CONSUMER_SPINE_SUB_CA_CERT"
-      valueFrom = data.aws_secretsmanager_secret.gpc-consumer_spine_sub_ca_cert.arn
+      name = "GPC_CONSUMER_SPINE_SUB_AND_ROOT_CA_CERT"
+      valueFrom = data.aws_secretsmanager_secret.gpc-consumer_spine_sub_and_root_ca_cert.arn
     },
     {
       name = "GPC_CONSUMER_SDS_APIKEY"
