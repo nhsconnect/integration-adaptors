@@ -94,8 +94,8 @@ gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
 
 ###### FOR GPC-CONSUMER TO BE DEPLOYED IN PTL ENVIRONMENT
 gpc-consumer_include_certs = true
-secret_name_spine_client_cert = "MHS_PTL_INT_Endpoint_Cert_v3"
-secret_name_spine_client_key = "MHS_PTL_INT_Endpoint_PrivateKey_v3"
-secret_name_spine_root_ca_cert = "opentest-ca-root-cert"
-secret_name_spine_sub_ca_cert = "opentest-ca-sub-cert"
+secret_name_spine_client_cert = "gpc_consumer_spine_client_cert"
+secret_name_spine_client_key = "gpc_consumer_spine_client_key"
+secret_name_spine_root_ca_cert = "gpc_consumer_spine_root_ca_cert"
+secret_name_spine_sub_ca_cert = "gpc_consumer_spine_sub_ca_cert"
 secret_name_sds_apikey = "gpc-consumer_SDS-API_Key"
