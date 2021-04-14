@@ -64,13 +64,6 @@ variable "gpc-consumer_log_level" {
   default = "INFO"
 }
 
-variable "gpc-consumer_logging_format" {
-  type = string
-  description = "Defines how to format log events on stdout"
-  default = "(*)"
-}
-
-
 variable "gpc-consumer_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
@@ -121,6 +114,18 @@ variable "gpc-consumer_sds_url" {
   type = string
   description = "URL to the SDS API"
   default = 8080 
+}
+
+variable "gpc-consumer_ssp_fqdn" {
+  type = string
+  description = "FQDN for the SDS API"
+  default = ""
+}
+
+variable "gpc-consumer_include_certs" {
+  type = bool
+  description = "If TRUE, GPCC Spine Certs & Key Secrets will be included in envrionment variables"
+  default = false
 }
 
 
