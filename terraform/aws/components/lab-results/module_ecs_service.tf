@@ -23,7 +23,8 @@ module "lab-results_ecs_service" {
   log_stream_prefix = var.lab-results_build_id
   healthcheck_path  = var.lab-results_healthcheck_path
   enable_load_balancing = true
-
+  load_balancer_type = "application"
+  
   container_healthcheck_port = var.lab-results_service_container_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id

@@ -79,9 +79,9 @@ gpc-consumer_ssp_fqdn = ""
 #secret_name_sds_apikey = ""
 
 # Settings for "lab-results" component
-lab-results_service_minimal_count = 1
-lab-results_service_desired_count = 1
-lab-results_service_maximal_count = 1
+lab-results_service_minimal_count = 3
+lab-results_service_desired_count = 3
+lab-results_service_maximal_count = 3
 lab-results_service_target_request_count = 1200
 lab-results_service_container_port = 8080
 lab-results_service_launch_type = "FARGATE"
@@ -91,7 +91,9 @@ lab-results_mesh_cert_validation = "false"
 lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
-
+lab-results_mesh_polling_cycle_minimum_interval_in_seconds = 30
+lab-results_mesh_client_wakeup_interval_in_milliseconds = 10000
+lab-results_mesh_polling_cycle_duration_in_seconds = 25
 
 # setting for mhs component
 mhs_inbound_queue_name = "vp_inbound_queue"
