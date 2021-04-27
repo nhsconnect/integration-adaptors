@@ -89,16 +89,16 @@ gpc-consumer_service_maximal_count = 1
 gpc-consumer_service_target_request_count = 1200
 gpc-consumer_service_container_port = 8080
 gpc-consumer_service_launch_type = "FARGATE"
-gpc-consumer_root_log_level = "WARN"
-gpc-consumer_log_level = "INFO"
+gpc-consumer_root_log_level = "DEBUG"
+gpc-consumer_log_level = "DEBUG"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory"
 gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
 
 ###### FOR GPC-CONSUMER TO BE DEPLOYED IN PTL ENVIRONMENT
 gpc-consumer_include_certs = true
-secret_name_spine_client_cert = "MHS_PTL_INT_Endpoint_Cert_v3"
-secret_name_spine_client_key = "MHS_PTL_INT_Endpoint_PrivateKey_v3"
-secret_name_spine_root_ca_cert = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
-secret_name_spine_sub_ca_cert = "MHS_PTL_INT_Endpoint_CA_SHA1_SHA2"
+secret_name_spine_client_cert = "gpc_consumer_spine_client_cert"
+secret_name_spine_client_key = "gpc_consumer_spine_client_key"
+secret_name_spine_root_ca_cert = "gpc_consumer_spine_root_ca_cert"
+secret_name_spine_sub_ca_cert = "gpc_consumer_spine_sub_ca_cert"
 secret_name_sds_apikey = "gpc-consumer_SDS-API_Key"
