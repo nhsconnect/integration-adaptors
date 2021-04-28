@@ -18,7 +18,7 @@ locals {
     },
     {
       name  = "GPC_CONSUMER_GPC_GET_URL"
-      value = var.gp2gp_create_wiremock ? "http://${module.gp2gp_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}" : "https://orange.testlab.nhs.uk"
+      value = var.gp2gp_create_wiremock ? "http://${module.gp2gp_wiremock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_wiremock_container_port}" : "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
     },
     {
       name  = "GPC_CONSUMER_SDS_URL"
