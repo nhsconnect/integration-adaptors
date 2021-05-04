@@ -84,10 +84,6 @@ locals {
       value = var.mhs_inbound_queue_name
     },
     {
-      name = "GP2GP_AMQP_BROKERS"
-      value = replace(data.aws_mq_broker.nhais_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
-    },
-    {
       name = "GP2GP_AMQP_MAX_REDELIVERIES"
       value = var.gp2gp_mock_mhs_amqp_max_redeliveries
     }
