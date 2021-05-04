@@ -30,7 +30,7 @@ locals {
     },
     {
       name  = "GP2GP_AMQP_BROKERS"
-      value = replace(data.aws_mq_broker.nhais_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps") # https://www.terraform.io/docs/providers/aws/r/mq_broker.html#attributes-reference
+      value = replace(data.aws_mq_broker.gp2gp_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps") # https://www.terraform.io/docs/providers/aws/r/mq_broker.html#attributes-reference
     },
     {
       name  = "GP2GP_MHS_INBOUND_QUEUE"
