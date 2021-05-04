@@ -16,7 +16,9 @@ module "lab-results_ecs_service" {
   desired_count     = var.lab-results_service_desired_count
   maximal_count     = var.lab-results_service_maximal_count
   service_target_request_count = var.lab-results_service_target_request_count
-
+  memory_units      = 4096
+#  cpu_units         = 2048
+  
   container_port    = var.lab-results_service_container_port
   application_port  = var.lab-results_service_application_port
   launch_type       = var.lab-results_service_launch_type
