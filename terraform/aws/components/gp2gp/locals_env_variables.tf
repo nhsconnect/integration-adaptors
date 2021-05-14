@@ -67,6 +67,10 @@ locals {
     {
       name = "GP2GP_GPC_GET_URL"
       value = "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}/B82617/STU3/1/gpconnect"
+    },
+    {
+      name = "GP2GP_GPC_OVERRIDE_NHS_NUMBER"
+      value = var.gp2gp_gpc_override_nhs_number
     }
   ])
 
