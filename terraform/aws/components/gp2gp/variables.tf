@@ -219,6 +219,12 @@ variable "gp2gp_wiremock_application_port" {
   default = 8080
 }
 
+variable gp2gp_gpc_override_nhs_number {
+  type = string
+  description = "NHS Number override for patient transfer requests"
+  default = ""
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
