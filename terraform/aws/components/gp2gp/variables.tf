@@ -226,9 +226,9 @@ variable gp2gp_gpc_override_nhs_number {
 }
 
 variable gp2gp_gpc_enable_sds {
-  type = boolean
+  type = string
   description = "Enable SDS for GPC requests"
-  default = true
+  default = "true"
 }
 
 # Variables related to PTL connectivity
