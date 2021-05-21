@@ -30,7 +30,7 @@ locals {
     },
     {
       name  = "GPC_ENABLE_SDS"
-      value = var.gp2gp_gpc_enable_sds
+      value = var.gpc_enable_sds
     }
   ])
 }

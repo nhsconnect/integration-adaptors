@@ -128,6 +128,12 @@ variable "gpc-consumer_include_certs" {
   default = false
 }
 
+variable "gpc_enable_sds" {
+  type = string
+  description = "Enable SDS for GPC requests"
+  default = "true"
+}
+
 
 # Variables for MESH mailbox
 
