@@ -225,6 +225,12 @@ variable gp2gp_gpc_override_nhs_number {
   default = ""
 }
 
+variable gp2gp_gpc_override_from_asid {
+  type = string
+  description = "Override value to override from aside in GPC requests"
+  default = ""
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
