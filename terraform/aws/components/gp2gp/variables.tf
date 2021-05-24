@@ -227,6 +227,12 @@ variable gp2gp_gpc_override_nhs_number {
 
 variable gp2gp_gpc_override_to_asid {
   type = string
+  description = "Override value to override to aside in GPC requests"
+  default = ""
+}
+
+variable gp2gp_gpc_override_from_asid {
+  type = string
   description = "Override value to override from aside in GPC requests"
   default = ""
 }
