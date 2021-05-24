@@ -74,8 +74,8 @@ locals {
     }
     ,
         {
-          name = "GP2GP_GPC_OVERRIDE_FROM_ASID"
-          value = var.gp2gp_gpc_override_from_asid
+          name = "GP2GP_GPC_OVERRIDE_TO_ASID"
+          value = var.gp2gp_gpc_override_to_asid
         }
   ])
 
