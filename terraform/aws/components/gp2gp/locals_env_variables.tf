@@ -62,8 +62,7 @@ locals {
     },
     {
       name = "GP2GP_MHS_OUTBOUND_URL"
-      value = var.gp2gp_create_mhs_mock ? "http://${module.mock_mhs_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_mhs_port}/mock-mhs-endpoint" : join("", ["http://mhs-outbound.", trimsuffix(${data.terraform_remote_state.base.outputs.r53_zone_name}, "."), "/"])
-    },
+      value = var.gp2gp_create_mhs_mock ? "http://${module.mock_mhs_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_mhs_port}/mock-mhs-endpoint" : "http://mhs-outbound.${trimsuffix(data.terraform_remote_state.base.outputs.r53_zone_name,".")}/"    },
     {
       name = "GP2GP_GPC_GET_URL"
       value = "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}/B82617/STU3/1/gpconnect"
