@@ -83,7 +83,6 @@ gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWri
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 gp2gp_gpc_override_nhs_number = "9690938622"
 gp2gp_gpc_override_to_asid = "200000001329"
-gp2gp_gpc_override_from_asid = "200000001467"
 
 # Settings for "gpc-consumer" component
 gpc-consumer_service_minimal_count = 1
