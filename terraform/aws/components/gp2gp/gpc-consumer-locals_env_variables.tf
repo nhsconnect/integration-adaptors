@@ -27,6 +27,10 @@ locals {
     {
       name  = "GPC_CONSUMER_SSP_FQDN"
       value = var.gpc-consumer_ssp_fqdn
+    },
+    {
+      name  = "GPC_ENABLE_SDS"
+      value = var.gpc_enable_sds
     }
   ])
 }

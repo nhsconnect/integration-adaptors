@@ -81,6 +81,9 @@ gp2gp_extract_cache_bucket_retention_period = 7
 gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+gp2gp_gpc_override_nhs_number = "9690938622"
+gp2gp_gpc_override_to_asid = "200000001329"
+gp2gp_gpc_override_from_asid = "200000001467"
 
 # Settings for "gpc-consumer" component
 gpc-consumer_service_minimal_count = 1
@@ -93,6 +96,7 @@ gpc-consumer_root_log_level = "DEBUG"
 gpc-consumer_log_level = "DEBUG"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory"
+gpc_enable_sds = "true"
 gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
 
 ###### FOR GPC-CONSUMER TO BE DEPLOYED IN PTL ENVIRONMENT
