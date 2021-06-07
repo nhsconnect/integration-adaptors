@@ -45,7 +45,8 @@ module "mhs_outbound_ecs_service" {
   ]
 
   lb_allowed_security_groups = [
-    data.terraform_remote_state.account.outputs.jumpbox_sg_id
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+    data.terraform_remote_state.gp2gp.outputs.gp2gp_service_sg_id
   ]
 
   additional_container_config =  []
