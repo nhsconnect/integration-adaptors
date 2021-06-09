@@ -81,7 +81,7 @@ gpc-consumer_ssp_fqdn = ""
 # Settings for "lab-results" component
 lab-results_service_minimal_count = 1
 lab-results_service_desired_count = 2
-lab-results_service_maximal_count = 5
+lab-results_service_maximal_count = 6
 lab-results_service_target_request_count = 1200
 lab-results_service_container_port = 8080
 lab-results_service_launch_type = "FARGATE"

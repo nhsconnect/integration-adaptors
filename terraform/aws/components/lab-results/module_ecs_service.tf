@@ -20,8 +20,8 @@ module "lab-results_ecs_service" {
   memory_units      = 4096
 #  cpu_units         = 2048
   
-  deployment_minimum_healthy_percent = 40
-  deployment_maximum_percent = 60
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent = 150
 
 # To Set AppAutoScaling Policy
   predefined_metric_type = "ASGAverageCPUUtilization"    // ALBRequestCountPerTarget OR ASGAverageCPUUtilization
