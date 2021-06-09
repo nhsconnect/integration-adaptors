@@ -112,6 +112,12 @@ variable "deployment_minimum_healthy_percent" {
   default = 100
 }
 
+variable "predefined_metric_type" {
+  type = string
+  description = "(Optional) Metric type to be used in ECS ASG's Target Tracking Scaling Policy."
+  default = "ALBRequestCountPerTarget"
+}
+
 variable "assign_public_ip" {
   type = bool
   description = "(Optional) Should the container isntance have a public IP adress"
