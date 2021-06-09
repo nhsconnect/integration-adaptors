@@ -14,7 +14,7 @@ resource "aws_appautoscaling_policy" "service_autoscaling_policy" {
     target_value = var.service_target_request_count
     predefined_metric_specification {
       predefined_metric_type = var.predefined_metric_type
-      resource_label = "${aws_lb.service_load_balancer[0].arn_suffix}/${aws_lb_target_group.service_target_group[0].arn_suffix}"
+ #     resource_label = "${aws_lb.service_load_balancer[0].arn_suffix}/${aws_lb_target_group.service_target_group[0].arn_suffix}"
     }
   }
 }
