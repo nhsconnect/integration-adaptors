@@ -24,7 +24,7 @@ module "lab-results_ecs_service" {
   deployment_maximum_percent = 150
 
 # To Set AppAutoScaling Policy
-  predefined_metric_type = "ASGAverageCPUUtilization"    // ALBRequestCountPerTarget OR ASGAverageCPUUtilization
+  predefined_metric_type = "ECSServiceAverageCPUUtilization"    // ALBRequestCountPerTarget OR ASGAverageCPUUtilization
   service_target_request_count = 50.0 //var.lab-results_service_target_request_count
 
   container_port    = var.lab-results_service_container_port
