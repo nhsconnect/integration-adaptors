@@ -15,10 +15,18 @@ module "lab-results_ecs_service" {
   minimal_count     = var.lab-results_service_minimal_count
   desired_count     = var.lab-results_service_desired_count
   maximal_count     = var.lab-results_service_maximal_count
-  service_target_request_count = var.lab-results_service_target_request_count
+
+# To Set Memory / CPU Units
   memory_units      = 4096
 #  cpu_units         = 2048
   
+  deployment_minimum_healthy_percent = 40
+  deployment_maximum_percent = 60
+
+# To Set AppAutoScaling Policy
+  predefined_metric_type = "ASGAverageCPUUtilization"    // ALBRequestCountPerTarget OR ASGAverageCPUUtilization
+  service_target_request_count = 50.0 //var.lab-results_service_target_request_count
+
   container_port    = var.lab-results_service_container_port
   application_port  = var.lab-results_service_application_port
   launch_type       = var.lab-results_service_launch_type
