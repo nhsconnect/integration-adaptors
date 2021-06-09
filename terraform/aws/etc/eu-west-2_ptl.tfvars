@@ -81,7 +81,7 @@ gp2gp_extract_cache_bucket_retention_period = 7
 gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
-gp2gp_gpc_override_nhs_number = "9658218873"
+gp2gp_gpc_override_nhs_number = "9690937286"
 gp2gp_gpc_override_to_asid = "200000001329"
 gp2gp_gpc_override_from_asid = "200000001467"
 
