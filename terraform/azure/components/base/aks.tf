@@ -4,6 +4,7 @@ resource "azurerm_kubernetes_cluster" "base_aks" {
   name                = "${local.resource_prefix}-aks_cluster"
   resource_group_name = data.terraform_remote_state.account.outputs.resource_group_name
   location            = data.terraform_remote_state.account.outputs.resource_group_location
+  kubernetes_version = "1.18.17" //
   dns_prefix          = var.environment
   private_cluster_enabled = var.private_cluster
   # Note: be careful with these, the creation time of AKS is very long and times out under terraform
