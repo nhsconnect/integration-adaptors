@@ -155,6 +155,29 @@ variable "ptl_connected" {
   default = false
 }
 
+# variable route_all_to_ptl {
+#   type = bool
+#   default = true
+#   description = "If env is connected to PTL route all traffic via PTL connection, if not the enable_internet_access variable needs to be set to true"
+# }
+
+variable ptl_hscn_prefixes {
+  type = list(string)
+  default = ["0.0.0.0/0"]
+  description = "List of IP CIDR that will be routed via PTL connection"
+}
+
+variable ptl_internet_prefixes {
+  type = list(string)
+  default = ["0.0.0.0/0"]
+  description = "List of IP CIDR that will be routed via Internet, if PTL is internet enabled"
+}
+
+variable ptl_allowed_outbound {
+  type = list(string)
+  default = []
+  description = "List of CIDRs that are PTL connected env is allowd to access, applies to both HSCN and internet"
+}
 
 variable "ptl_vpn_gateway_id" {
   type = string
