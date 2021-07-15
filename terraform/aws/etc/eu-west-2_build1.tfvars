@@ -4,7 +4,7 @@ environment = "build1"
 base_cidr_block = "10.11.0.0/16"
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
-mongo_ssl_enabled = false
+mongo_ssl_enabled = true
 enable_internet_access = "true"
 create_opentest_instance = true
 
