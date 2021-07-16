@@ -1,6 +1,6 @@
 resource "aws_docdb_cluster_parameter_group" "base_db_parameters" {
   name = "${replace(local.resource_prefix,"_","-")}-db-parameters-36"
-  family = "docdb3.6"
+  family = "docdb4.0"
   description = "Parameter group for MongoDB in env: ${var.environment}"
 
   parameter {
