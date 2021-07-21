@@ -12,3 +12,15 @@ base_testbox_cidr    = "172.28.65.0/26"
 
 nhais_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
 nhais_mesh_cert_validation = true
+
+#LAB-RESULTS CONFIGURATION
+lab-results_fake_mesh_in_use     = false
+lab-results_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
+lab-results_mesh_cert_validation = "true"
+lab-results_image = "nhsdev/nia-lab-results-adaptor:0.0.4"
+lab-results_application_port = 80
+lab-results_container_port = 8080
+lab-results_log_level = "INFO"
+lab-results_scheduler_enabled = true
+
+
