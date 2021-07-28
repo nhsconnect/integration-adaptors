@@ -18,7 +18,7 @@ locals {
     },
     {
       name = "LAB_RESULTS_MESH_MAILBOX_ID"
-      value = "aninvalid123"
+      valueFrom = data.aws_secretsmanager_secret.lab-results_mesh_mailbox_id.arn
     },
     {
       name = "LAB_RESULTS_MESH_MAILBOX_PASSWORD"
