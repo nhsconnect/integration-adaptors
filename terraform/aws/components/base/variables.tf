@@ -86,6 +86,16 @@ variable "docdb_master_password" {
   description = "Password for Document DB master user"
 }
 
+variable "docdb_storage_encrypted" {
+  type = string
+  description = "Document DB Encryption-at-rest enablement"
+  default = true
+}
+variable "docdb_kms_key_id" {
+  type = string
+  description = "ARN for AWS KMS Key to encrypt Document DB"
+}
+
 variable "mongo_ssl_enabled" {
   type = bool
   description = "Should the Document DB have a TLS enabled for incomming connections"

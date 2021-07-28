@@ -4,7 +4,7 @@ environment = "build1"
 base_cidr_block = "10.11.0.0/16"
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
-mongo_ssl_enabled = false
+mongo_ssl_enabled = true
 enable_internet_access = "true"
 create_opentest_instance = true
 
@@ -18,7 +18,7 @@ nhais_service_launch_type = "FARGATE"
 nhais_log_level = "DEBUG"
 nhais_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
 nhais_mesh_cert_validation = "true"
-nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+nhais_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 
 # Settings for "OneOneOne" component
 # Name changed to "OneOneOne" from "111" because of problems with some Terraform names starting with number
@@ -38,7 +38,7 @@ gp2gp_service_container_port = 8080
 gp2gp_service_launch_type = "FARGATE"
 gp2gp_extract_cache_bucket_retention_period = 7
 gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
-gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
 # Settings for "gpc-consumer" component
@@ -91,6 +91,6 @@ lab-results_service_launch_type = "FARGATE"
 lab-results_log_level = "DEBUG"
 lab-results_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
 lab-results_mesh_cert_validation = "true"
-lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
