@@ -64,6 +64,18 @@ locals {
       name = "MHS_SPINE_REQUEST_MAX_SIZE"
       value = "4999600"
     },
+    {
+      name = "MHS_OUTBOUND_ROUTING_LOOKUP_METHOD"
+      value = var.mhs_outbound_routing_lookup_method
+    },
+    {
+      name = "MHS_OUTBOUND_ROUTING_LOOKUP_METHOD"
+      value = var.mhs_outbound_routing_lookup_method
+    },
+    {
+      name = "MHS_SDS_API_URL"
+      value = var.mhs_sds_api_url
+    }
   ])
 
   inbound_variables = concat(local.environment_variables, [

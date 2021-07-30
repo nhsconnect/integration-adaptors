@@ -28,6 +28,10 @@ locals {
     #   name = "MHS_MONGO_PASSWORD"
     #   valueFrom = data.aws_secretsmanager_secret.docdb_master_password.arn
     # },
+    {
+      name = "MHS_SDS_API_KEY"
+      valueFrom = data.aws_secretsmanager_secret.mhs_sds_api_key.arn
+    }
   ]
 
   inbound_secret_variables = concat(local.secret_variables,[

@@ -211,6 +211,9 @@ Several global environment variables must be set within Jenkins for the scripts 
 - INTERNAL_ROOT_DOMAIN: The domain name to be used internally to refer to parts of the MHS (subdomains will be created
 from this root domain). This domain name should not clash with any domain name on the internet. e.g.
 internal.somedomainyoucontrol.com"
+- MHS_OUTBOUND_ROUTING_LOOKUP_METHOD: Should MHS use SpineRouteLookup or SDS API. Must be one of {`SPINE_ROUTE_LOOKUP`, `SDS_API`}
+- MHS_SDS_API_URL: If `MHS_OUTBOUND_ROUTING_LOOKUP_METHOD` is set to `SDS_API`, this value defines SDS API url
+- MHS_SDS_API_KEY: If `MHS_OUTBOUND_ROUTING_LOOKUP_METHOD` is set to `SDS_API`, this value defines SDS API api key to authenticate requests with
 - MHS_OUTBOUND_HTTP_PROXY: The hostname of the HTTP proxy being used to route connections to Spine. E.g. an Opentest
 proxy machine.
 - MHS_OUTBOUND_VALIDATE_CERTIFICATE: Verification of the server certificate received when making a connection to the spine MHS.

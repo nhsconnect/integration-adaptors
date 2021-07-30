@@ -228,6 +228,14 @@ variable "mhs_outbound_service_container_port" {
   type = number
 }
 
+variable "mhs_outbound_routing_lookup_method" {
+  type = string
+}
+
+variable "mhs_sds_api_url" {
+  type = string
+}
+
 # route specific
 
 variable "mhs_route_sds_url" {
@@ -307,4 +315,8 @@ variable secret_name_mhs_ca_certs {
 variable secret_name_mhs_spine_route_lookup_ca_certs {
   type = string
   default = "build-outbound-route-connection-cacerts"
+}
+
+variable "secret_name_mhs_sds_api_key" {
+  type = string
 }

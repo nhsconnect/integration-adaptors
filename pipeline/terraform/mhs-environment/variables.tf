@@ -247,3 +247,15 @@ variable "mhs_forward_reliable_endpoint_url" {
   type = string
   description = "The URL to communicate with Spine for Forward Reliable messaging from the outbound service"
 }
+
+variable "mhs_outbound_routing_lookup_method" {
+  type = string
+}
+
+variable "mhs_sds_api_url" {
+  type = string
+}
+
+variable "mhs_sds_api_key_arn" {
+  type = string
+}
