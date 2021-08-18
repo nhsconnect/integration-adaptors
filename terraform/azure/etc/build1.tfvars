@@ -17,3 +17,16 @@ lab-results_container_port = 8080
 lab-results_log_level = "INFO"
 lab-results_scheduler_enabled = true
 #lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+
+# MHS CONFIGURATION
+mhs_service_application_port = 80
+mhs_inbound_service_container_port = 443
+mhs_outbound_service_container_port = 80
+mhs_route_service_container_port = 80
+mhs-inbound_image =  "nhsdev/nia-mhs-inbound:1.0.2"
+mhs-outbound_image = "nhsdev/nia-mhs-outbound:1.0.2"
+mhs-route_image =  "nhsdev/nia-mhs-route:1.0.2"
+mhs_inbound_queue_name = "build1_mhs_inbound"
+mhs_log_level = "DEBUG"
+mhs_outbound_forward_reliable_url = "https://192.168.128.11/reliablemessaging/forwardreliable"
+mhs_route_sds_url = "ldap://192.168.128.11"
