@@ -39,6 +39,11 @@ variable account_resource_group {
   type = string
 }
 
+variable account_bucket_storage_account {
+  description = "Name of storage account for buckets being used by Adapters"
+  type = string
+}
+
 variable "account_cidr" {
   type = string
   description = "CIDR for vnet in account component"
