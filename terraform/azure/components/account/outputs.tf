@@ -6,6 +6,18 @@ output "resource_group_location" {
   value = azurerm_resource_group.account_resource_group.location
 }
 
+output "storage_account_name" {
+  value = azurerm_storage_account.account_bucket_sa.name
+}
+
+output "storage_account_key" {
+  value = azurerm_storage_account.account_bucket_sa.primary_access_key
+}
+
+output "storage_account_connection_string" {
+  value = azurerm_storage_account.account_bucket_sa.primary_connection_string
+}
+
 output "jumpbox_ip" {
   description = "Jumpbox VM IP"
   value       = azurerm_linux_virtual_machine.account_jumpbox.public_ip_address

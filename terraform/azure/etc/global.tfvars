@@ -6,6 +6,7 @@ state_bucket_storage_account = "niastate"
 state_bucket_name = "nia-state-container"
 
 account_resource_group = "nia-rg"
+account_bucket_storage_account = "niaaccount"
 
 jumpbox_allowed_ips = [
   "91.222.71.98/32",   # Gdansk VPN
