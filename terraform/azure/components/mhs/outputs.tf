@@ -9,3 +9,10 @@ output mhs-outbound_url {
 output mhs-route_url {
   value = "http://${kubernetes_service.mhs-route.metadata.0.name}:${var.mhs_service_application_port}/"
 }
+
+output mhs-outbound_ingress {
+  value = kubernetes_service.mhs-outbound.status[0].load_balancer[0].ingress
+}
+output mhs-route_ingress {
+  value = kubernetes_service.mhs-route.status[0].load_balancer[0].ingress
+}
