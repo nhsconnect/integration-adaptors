@@ -83,7 +83,7 @@ resource "kubernetes_deployment" "gpc-consumer" {
           
           env {
             name  = "GPC_CONSUMER_URL"
-            value = "https://${kubernetes_service.gpc-consumer.metadata.0.name}:${var.gpc-consumer_container_port}"
+            value = "http://${kubernetes_service.gpc-consumer.metadata.0.name}:${var.gpc-consumer_application_port}"
           }
 
           env {

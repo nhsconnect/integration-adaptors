@@ -163,12 +163,12 @@ resource "kubernetes_deployment" "gp2gp" {
 
           env {
             name = "GP2GP_GPC_GET_URL"
-            value = "https://${kubernetes_service.gpc-consumer.metadata.0.name}:${var.gpc-consumer_application_port}/B82617/STU3/1/gpconnect"
+            value = "http://${kubernetes_service.gpc-consumer.metadata.0.name}:${var.gpc-consumer_application_port}/B82617/STU3/1/gpconnect"
           }
 
           env {
             name  = "GP2GP_GPC_CONSUMER_URL"
-            value = "https://${kubernetes_service.gpc-consumer.metadata.0.name}:${var.gpc-consumer_container_port}"
+            value = "http://${kubernetes_service.gpc-consumer.metadata.0.name}:${var.gpc-consumer_application_port}"
           }
 
 # MHS Adapter Settings
@@ -179,7 +179,7 @@ resource "kubernetes_deployment" "gp2gp" {
 
           env {
             name = "GP2GP_MHS_OUTBOUND_URL"
-            value = data.terraform_remote_state.mhs.outputs.mhs-outbound_url            
+            value = "http://${data.terraform_remote_state.mhs.outputs.mhs-outbound_ingress[0].ip}"           
           }
 
         } // container
