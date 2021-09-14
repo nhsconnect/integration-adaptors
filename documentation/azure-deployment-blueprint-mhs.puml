@@ -50,7 +50,7 @@ Azure(azure, "Azure", "Cloud") {
 }
 System_Ext(nhs, "NHS Systems", "Spine, SDS, MESH, etc")
 gp --down-> outbound
-outbound --> sds
+outbound --> sds: "Optional - can be replaced with direct connection to SDS API instead of SDS Pod"
 outbound --> cosmos
 inbound --> cosmos
 outbound --down--> ptlvn
