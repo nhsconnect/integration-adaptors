@@ -46,10 +46,10 @@ Azure(azure, "Azure", "Cloud") {
                 AzureKubernetesService(aks, "Adaptors", "k8s cluster") {
                     AzureContainerInstance(ingress, "Ingress controller", "nginx", "nia/outbound\nnia/inbound\nnia/111")
                     AzureContainerInstance(outbound, "MHS Outbound", "Python", "GP Facing API")
-                    AzureContainerInstance(sds, "SDS", "Python", "Spine Route Lookup")
+                    AzureContainerInstance(sds, "MHS Spine Route Lookup", "Python")
                     AzureContainerInstance(inbound, "MHS Inbound", "Python", "API for Spine callback")
                     AzureContainerInstance(pem, "111 PEM", "Java", "111 PEM Adaptor")
-                    AzureContainerInstance(redis, "SDS Cache", "Cached SDS route and reliability information")
+                    AzureContainerInstance(redis, "MHS Spine Route Lookup Cache", "Cached Spine Route Lookup route and reliability information")
                     AzureContainerInstance(nhais, "NHAIS", "Java", "FHIR API for outbound transactions")
                     AzureContainerInstance(labResults, "Lab Results", "Java", "Pathology/Screening results adaptor")
                 }
@@ -59,6 +59,10 @@ Azure(azure, "Azure", "Cloud") {
             Could be deployed into 
             the same VNET as the
             GP Supplier systems
+        end note
+       note bottom of outbound
+            Outbound can use Spine Route Lookup that does a direct LDAP call
+            or use SDS API
         end note
         AzureCosmosDb(cosmos, "MHS State Db\nNHAIS Sequence Numbers\nNHAIS Inbound state\nNHAIS Outbound state", "MongoDb")
         AzureServiceBus(asb, "MHS Inbound Queue", "Consumed by GP System")
@@ -87,7 +91,7 @@ ingress --down-> inbound
 ingress --down-> pem
 ingress --down-> labResults
 ingress --down-> nhais
-outbound --down-> sds
+outbound ..down-> sds
 outbound --left-> cosmos
 outbound --down->ptlvn
 nhais --down->ptlvn
