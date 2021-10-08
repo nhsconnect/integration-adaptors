@@ -11,6 +11,10 @@ locals {
     {
       name = "LOG_LEVEL"
       value = var.OneOneOne_log_level
+    },
+    {
+      name = "PEM111_ITK_ODS_CODE_LIST"
+      value = "EM396"
     }
   ])
 }
