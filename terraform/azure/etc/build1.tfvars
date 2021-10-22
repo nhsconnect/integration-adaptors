@@ -3,6 +3,7 @@ base_cidr = "10.21.0.0/16"
 base_aks_cidr = "10.21.98.0/23"
 base_redis_cidr = "10.21.101.0/24"
 base_testbox_cidr = "10.21.103.0/24"
+base_private_dns = "build1.nhsredteam.internal.nhs.uk"
 
 # nhais_lb_ip = "10.21.98.210"
 
