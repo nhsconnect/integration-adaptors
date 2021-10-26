@@ -51,6 +51,7 @@ gp2gp_service_launch_type = "FARGATE"
 gp2gp_extract_cache_bucket_retention_period = 7
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+gp2gp_log_level = "DEBUG"
 gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gp2gp_create_wiremock = false
 gp2gp_wiremock_container_port = 8080
