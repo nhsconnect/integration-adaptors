@@ -102,7 +102,7 @@ lab-results_mesh_client_wakeup_interval_in_milliseconds = 10000
 lab-results_mesh_polling_cycle_duration_in_seconds = 25
 
 # setting for mhs component
-mhs_inbound_queue_name = "vp_inbound_queue"
+mhs_inbound_queue_name = "vp_gp2gp_inbound_queue"
 
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
