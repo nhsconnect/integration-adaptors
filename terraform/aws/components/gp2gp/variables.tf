@@ -42,7 +42,13 @@ variable "gp2gp_build_id" {
 variable "gp2gp_gpcc_mock_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
-  default = "main-338-7bf424a"
+  default = "main-340-4d6ff67"
+}
+
+variable "gp2gp_mhs_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-341-b4b28a1"
 }
 
 variable "gp2gp_service_desired_count" {

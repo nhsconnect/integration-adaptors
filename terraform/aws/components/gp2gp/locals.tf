@@ -12,7 +12,7 @@ locals {
   # Use below when the ECR repo is created by terraform in account component.
   #image_name = "${data.terraform_remote_state.account.outputs.ecr_repo_url_gp2gp}:${var.gp2gp_build_id}"
   image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/gp2gp:${var.gp2gp_build_id}"
-  mhs_mock_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/gp2gp-mock-mhs:${var.gp2gp_build_id}"
+  mhs_mock_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/gp2gp-mock-mhs:${var.gp2gp_mhs_mock_build_id}"
   gpcc_mock_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/gp2gp-gpcc-mock:${var.gp2gp_gpcc_mock_build_id}"
   wiremock_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/gp2gp-wiremock:${var.gp2gp_build_id}"
   

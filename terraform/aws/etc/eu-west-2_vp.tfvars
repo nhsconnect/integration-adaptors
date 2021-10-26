@@ -57,9 +57,10 @@ gp2gp_create_wiremock = false
 gp2gp_wiremock_container_port = 8080
 gp2gp_wiremock_application_port = 8080
 gp2gp_create_mhs_mock = true
-gp2gp_mock_mhs_port = 8081
+gp2gp_mhs_mock_build_id = "main-341-b4b28a1"
+gp2gp_mock_mhs_port = 8080
 gp2gp_create_gpcc_mock = true
-gp2gp_gpcc_mock_build_id = "main-338-7bf424a"
+gp2gp_gpcc_mock_build_id = "main-340-4d6ff67"
 gp2gp_mock_port = 8080
 
 # Settings for "gpc-consumer" component
