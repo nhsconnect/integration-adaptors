@@ -52,12 +52,14 @@ gp2gp_extract_cache_bucket_retention_period = 7
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+gp2gp_create_wiremock = false
 gp2gp_wiremock_container_port = 8080
 gp2gp_wiremock_application_port = 8080
-gp2gp_create_wiremock = true
 gp2gp_create_mhs_mock = true
+gp2gp_mock_mhs_port = 8081
 gp2gp_create_gpcc_mock = true
 gp2gp_gpcc_mock_build_id = "main-338-7bf424a"
+gp2gp_mock_port = 8080
 
 # Settings for "gpc-consumer" component
 gpc-consumer_service_minimal_count = 1

@@ -17,8 +17,8 @@ module "gpcc_mock_ecs_service" {
   maximal_count     = var.gp2gp_service_minimal_count
   service_target_request_count = var.gp2gp_service_target_request_count
 
-  container_port    = var.gp2gp_mock_mhs_port
-  application_port  = var.gp2gp_mock_mhs_port
+  container_port    = var.gp2gp_mock_port
+  application_port  = var.gp2gp_mock_port
   launch_type       = var.gp2gp_service_launch_type
   log_stream_prefix = var.gp2gp_gpcc_mock_build_id
   healthcheck_path  = var.gpc-consumer_healthcheck_path

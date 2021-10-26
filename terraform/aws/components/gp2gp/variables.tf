@@ -231,6 +231,12 @@ variable "gp2gp_wiremock_application_port" {
   default = 8080
 }
 
+variable "gp2gp_mock_port" {
+  type = number
+  default = 8080
+  description = "Application/Container port number for GPCC_MOCK, GPC-API_MOCK, SDS_API_MOCK"
+}
+
 variable gp2gp_gpc_override_nhs_number {
   type = string
   description = "NHS Number override for patient transfer requests"
