@@ -1,4 +1,4 @@
-module "gpc-consumer_ecs_service" {
+module "gpcc_mock_ecs_service" {
   source = "../../modules/module_ecs_service"
   count           = var.gp2gp_create_gpcc_mock ? 1 : 0
   project         = var.project
