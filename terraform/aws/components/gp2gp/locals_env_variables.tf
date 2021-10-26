@@ -100,4 +100,7 @@ locals {
       value = var.gp2gp_mock_mhs_amqp_max_redeliveries
     }
   ]
+
+  gpcc_mock_environment_variables = [
+  ]
 }

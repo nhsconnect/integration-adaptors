@@ -39,6 +39,12 @@ variable "gp2gp_build_id" {
   description = "Number of the current build, used for tagging the logs"
 }
 
+variable "gp2gp_gpcc_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-338-7bf424a"
+}
+
 variable "gp2gp_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
@@ -191,6 +197,12 @@ variable "gp2gp_create_mhs_mock" {
   type = bool
   default = false
   description = "Should an MHS mock be created and used by GP2GP"
+}
+
+variable "gp2gp_create_gpcc_mock" {
+  type = bool
+  default = false
+  description = "Should GPCC mock be created and used by GP2GP"
 }
 
 variable "gp2gp_mock_mhs_port" {
