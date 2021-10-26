@@ -114,12 +114,7 @@ locals {
     {
       name = "MHS_MOCK_LOGGING_LEVEL"
       value = "WARN"
-    },
-    {
-      name = "MHS_MOCK_LOGGING_FORMAT"
-      value = var.gp2gp_logs_datetime_format
     }
-
   ]
 
   gpcc_mock_environment_variables = [
