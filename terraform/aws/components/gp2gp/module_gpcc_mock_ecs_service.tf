@@ -24,7 +24,7 @@ module "gpcc_mock_ecs_service" {
   healthcheck_path  = var.gpc-consumer_healthcheck_path
   enable_load_balancing = true
 
-  container_healthcheck_port = var.gp2gp_mock_mhs_port
+  container_healthcheck_port = var.gp2gp_mock_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
 
