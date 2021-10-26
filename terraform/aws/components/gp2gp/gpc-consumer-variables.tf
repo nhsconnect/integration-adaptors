@@ -35,11 +35,6 @@ variable "gpc-consumer_build_id" {
   default = "main-21-188a231"
 }
 
-variable "gpc-consumer_mongo_options" {
-  type = string
-  description = "Options for Mongo"
-}
-
 variable "gpc-consumer_ssl_trust_store_url" {
   type = string
   description = "S3 path to the custom trust store"
