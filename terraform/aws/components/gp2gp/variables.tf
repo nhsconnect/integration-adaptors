@@ -51,6 +51,17 @@ variable "gp2gp_mhs_mock_build_id" {
   default = "main-341-b4b28a1"
 }
 
+variable "gp2gp_gpcapi_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-340-4d6ff67"
+}
+variable "gp2gp_sdsapi_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-340-4d6ff67"
+}
+
 variable "gp2gp_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
@@ -209,6 +220,18 @@ variable "gp2gp_create_gpcc_mock" {
   type = bool
   default = false
   description = "Should GPCC mock be created and used by GP2GP"
+}
+
+variable "gp2gp_create_sdsapi_mock" {
+  type = bool
+  default = false
+  description = "Should SDS API GPCC mock be created and used by GP2GP"
+}
+
+variable "gp2gp_create_gpcapi_mock" {
+  type = bool
+  default = false
+  description = "Should GPConnect API mock be created and used by GP2GP"
 }
 
 variable "gp2gp_mock_mhs_port" {

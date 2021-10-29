@@ -59,9 +59,13 @@ gp2gp_wiremock_application_port = 8080
 gp2gp_create_mhs_mock = true
 gp2gp_mhs_mock_build_id = "main-341-b4b28a1"
 gp2gp_mock_mhs_port = 8080
+gp2gp_mock_port = 8080
 gp2gp_create_gpcc_mock = true
 gp2gp_gpcc_mock_build_id = "main-340-4d6ff67"
-gp2gp_mock_port = 8080
+gp2gp_create_gpcapi_mock = true
+gp2gp_gpcapi_mock_build_id = "main-340-4d6ff67"
+gp2gp_create_sdsapi_mock = true
+gp2gp_sdsapi_mock_build_id ="main-340-4d6ff67"
 
 # Settings for "gpc-consumer" component
 gpc-consumer_service_minimal_count = 1
