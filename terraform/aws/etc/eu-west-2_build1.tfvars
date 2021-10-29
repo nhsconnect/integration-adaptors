@@ -51,6 +51,7 @@ gpc-consumer_service_launch_type = "FARGATE"
 gpc-consumer_root_log_level = "WARN"
 gpc-consumer_log_level = "INFO"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+gpc-consumer_override_gpc_provider_url = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
 gpc-consumer_sds_url = "https://sandbox.api.service.nhs.uk/spine-directory/"
 gpc-consumer_ssp_fqdn = ""
 

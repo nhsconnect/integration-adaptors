@@ -119,4 +119,11 @@ locals {
 
   gpcc_mock_environment_variables = [
   ]
+
+  gpcapi_mock_environment_variables = [
+  ]
+
+  sdsapi_mock_environment_variables = [
+  ]
+
 }
