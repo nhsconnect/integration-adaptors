@@ -53,7 +53,7 @@ module "gp2gp_wiremock_ecs_service" {
 
   logs_datetime_format = var.gp2gp_logs_datetime_format
   
-  create_testbox=var.create_testbox
+  #create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
   lb_subnet_ids = data.terraform_remote_state.base.outputs.ptl_connected ? data.terraform_remote_state.base.outputs.ptl_lb_subnet_ids : aws_subnet.service_subnet.*.id

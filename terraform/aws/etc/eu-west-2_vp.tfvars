@@ -7,6 +7,7 @@ docdb_instance_class = "db.r5.large"
 dlt_vpc_id = "vpc-03f843c08b01876d5"
 enable_dlt = true
 mongo_ssl_enabled = true
+create_testbox = true
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 2
