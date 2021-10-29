@@ -29,7 +29,7 @@ module "sdsapi_mock_ecs_service" {
   dlt_vpc_id                 = var.dlt_vpc_id
 
   environment_variables = local.sdsapi_mock_environment_variables
-  secret_variables      = var.gpcc_secret_variables
+  secret_variables      = local.gpcc_secret_variables
 
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
