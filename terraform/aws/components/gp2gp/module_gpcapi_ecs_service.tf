@@ -5,7 +5,7 @@ module "gpcapi_mock_ecs_service" {
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "gp2gp_gpcapi_mock_ecs"
+  module_instance = "gp2gp_gpcapi_mck_ecs"
   default_tags    = local.default_tags
 
   availability_zones = local.availability_zones
