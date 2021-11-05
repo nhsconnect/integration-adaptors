@@ -1,6 +1,10 @@
 locals {
     secret_variables = [
     {
+      name = "MHS_DB_CA_CERTS"
+      valueFrom = data.aws_secretsmanager_secret.aws_rds_combined_ca_bundle.arn
+    },
+    {
       name = "MHS_SECRET_SPINE_ROUTE_LOOKUP_CA_CERTS"
       valueFrom = data.aws_secretsmanager_secret.spine_routelookup_ca_certs.arn
     },
