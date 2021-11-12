@@ -33,7 +33,7 @@ mhs_outbound_forward_reliable_url = "https://192.168.128.11/reliablemessaging/fo
 mhs_route_sds_url = "ldap://192.168.128.11"
 
 #GP2GP CONFIGURATION
-gp2gp_image = "nhsdev/nia-gp2gp-adaptor:1.2.0"          # 1.1.2 / 1.2.0
+gp2gp_image = "nhsdev/nia-gp2gp-adaptor:1.3.2"          # 1.1.2 / 1.2.0 / 1.3.2
 gp2gp_application_port = 80
 gp2gp_container_port = 8080
 gp2gp_log_level = "INFO"
@@ -43,7 +43,7 @@ gp2gp_log_level = "INFO"
 
 
 #GPC-CONSUMER CONFIGURATION
-gpc-consumer_image = "nhsdev/nia-gpc-consumer-adaptor:0.2.5"    # 0.1.5 / 0.2.5
+gpc-consumer_image = "nhsdev/nia-gpc-consumer-adaptor:0.2.8"    # 0.1.5 / 0.2.5 / 0.2.8
 gpc-consumer_include_certs = false
 gpc-consumer_application_port = 80
 gpc-consumer_container_port = 8080
