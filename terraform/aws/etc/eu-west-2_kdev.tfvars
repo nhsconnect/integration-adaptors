@@ -1,5 +1,5 @@
 # Common setting for entire Env - "base" component
-environment = "kainos-dev"
+environment = "kdev"
 base_cidr_block = "10.17.0.0/16"
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
