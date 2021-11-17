@@ -5,4 +5,4 @@ cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
 mongo_ssl_enabled = true
 enable_internet_access = "true"
-create_opentest_instance = true
+create_opentest_instance = false
