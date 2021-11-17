@@ -108,6 +108,10 @@ variable base_ptl_next_hop {
   description = "IP of next hop router in PTL connection"
 }
 
+variable base_private_dns {
+  type = string
+}
+
 ## Resource group variables ##
 
 variable jumpbox_user {

@@ -94,6 +94,12 @@ output "base_servicebus_namespace" {
   value = azurerm_servicebus_namespace.base_servicebus_namespace.name
 }
 
+# private dns zone
+
+output "base_private_dns_zone" {
+  value = azurerm_private_dns_zone.private-dns.name
+}
+
 # AKS
 
 output "base_aks_id" {

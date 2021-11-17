@@ -9,6 +9,7 @@ base_ptl_prefixes    = [ "172.17.0.0/16", "155.231.231.0/29", "10.239.0.0/16" ]
 base_ptl_dns_servers = [ "155.231.231.1", "155.231.231.2" ]
 base_redis_cidr      = "10.22.101.0/24"
 base_testbox_cidr    = "172.28.65.0/26"
+base_private_dns     = "ptl.nhsredteam.internal.nhs.uk"
 
 nhais_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
 nhais_mesh_cert_validation = true
@@ -37,7 +38,7 @@ mhs_outbound_forward_reliable_url =  "https://msg.int.spine2.ncrs.nhs.uk/reliabl
 mhs_route_sds_url = "ldaps://ldap.nis1.national.ncrs.nhs.uk"
 
 #GP2GP CONFIGURATION
-gp2gp_image = "nhsdev/nia-gp2gp-adaptor:1.2.0"          # 1.1.2 / 1.2.0
+gp2gp_image = "nhsdev/nia-gp2gp-adaptor:1.3.2"          # 1.1.2 / 1.2.0 / 1.3.2
 gp2gp_application_port = 80
 gp2gp_container_port = 8080
 gp2gp_log_level = "INFO"
@@ -46,12 +47,12 @@ gp2gp_gpc_override_to_asid = "200000001329"
 gp2gp_gpc_override_from_asid = "200000001467"
 
 #GPC-CONSUMER CONFIGURATION
-gpc-consumer_image = "nhsdev/nia-gpc-consumer-adaptor:0.2.5"    # 0.1.5 / 0.2.5
+gpc-consumer_image = "nhsdev/nia-gpc-consumer-adaptor:0.2.8"    # 0.1.5 / 0.2.5 / 0.2.8
 gpc-consumer_include_certs = true
 gpc-consumer_application_port = 80
 gpc-consumer_container_port = 8080
 gpc-consumer_root_log_level = "INFO"
 gpc-consumer_log_level = "INFO"
-gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory"
+gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory/FHIR/R4"
 gpc_enable_sds = "true"
 gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
