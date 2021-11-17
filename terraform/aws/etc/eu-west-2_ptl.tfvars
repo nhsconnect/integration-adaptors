@@ -96,7 +96,7 @@ gpc-consumer_root_log_level = "DEBUG"
 gpc-consumer_log_level = "DEBUG"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gpc-consumer_override_gpc_provider_url = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
-gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory"
+gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory/FHIR/R4"
 gpc_enable_sds = "true"
 gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
 
