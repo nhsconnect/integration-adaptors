@@ -19,6 +19,7 @@
 !includeurl AWSPuml/GroupIcons/Region.puml
 !includeurl AWSPuml/GroupIcons/VPCSubnetPublic.puml
 !includeurl AWSPuml/GroupIcons/VPCSubnetPrivate.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/Route53HostedZone.puml
 !includeurl AWSPuml/ManagementAndGovernance/CloudWatch.puml
 !includeurl AWSPuml/NetworkingAndContentDelivery/APIGateway2.puml
 !includeurl AWSPuml/NetworkingAndContentDelivery/ClientVPN.puml
@@ -52,6 +53,7 @@ Cloudalt(aws, "AWS Cloud Architecture for Kainos-Dev Environment (kdev)", "") {
         }
         CloudWatch(cw, "CloudWatch", "")
         SecretsManager(secrets, "Secrets Manager", "")
+        Route53HostedZone(r53hz,"nhsredteam.internal.nhs.uk", "")
         EC2ContainerRegistry(ecr, "Container Registry", "")
 
         rectangle {
@@ -131,6 +133,10 @@ Cloudalt(aws, "AWS Cloud Architecture for Kainos-Dev Environment (kdev)", "") {
 }
 }
 
+
+
+
+azABC1 --up--> r53hz
 fargate --up--> s3ep
 fargate --up--> smep
 s3ep --up--> containerLayerStore
