@@ -97,15 +97,12 @@ lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
 # Settings for "pss" component
-lab-results_service_minimal_count = 1
-lab-results_service_desired_count = 1
-lab-results_service_maximal_count = 1
-lab-results_service_target_request_count = 1200
-lab-results_service_container_port = 8080
-lab-results_service_launch_type = "FARGATE"
-lab-results_log_level = "DEBUG"
-lab-results_mesh_host = "https://msg.opentest.hscic.gov.uk/messageexchange/"
-lab-results_mesh_cert_validation = "true"
-lab-results_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
-lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
-lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+pss_service_minimal_count = 1
+pss_service_desired_count = 1
+pss_service_maximal_count = 1
+pss_service_target_request_count = 1200
+pss_service_container_port = 8080
+pss_service_launch_type = "FARGATE"
+pss_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
+pss_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+pss_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"

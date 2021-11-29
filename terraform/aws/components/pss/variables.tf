@@ -81,10 +81,10 @@ variable "mq_broker_name" {
   description = "Name of the MQ broker shared between all envs"
 }
 
-variable "pss_mongo_options" {
+/*variable "pss_mongo_options" {
   type = string
   description = "Options for Mongo"
-}
+}*/
 
 variable "pss_ssl_trust_store_url" {
   type = string
@@ -151,55 +151,4 @@ variable "ptl_connected" {
   type = bool
   description = "Should this environment be connected to NHS PTL"
   default = false
-}
-
-# Variables for MESH mailbox
-
-variable "pss_mesh_host" {
-  type = string
-  description = "URL for MESH host"
-  default = ""
-}
-
-variable "pss_mesh_cert_validation" {
-  type = string
-  description = "false will disable certificate validation for SSL connection"
-  default = "true"
-}
-
-variable "pss_mesh_polling_cycle_minimum_interval_in_seconds" {
-  type = number
-  description = "Delay in seconds on scanning mesh mailbox"
-  default = 300
-}
-
-variable "pss_mesh_client_wakeup_interval_in_milliseconds" {
-  type = number
-  description = "Interval in miliseconds between mailbox scans"
-  default = 60000
-}
-
-variable "pss_mesh_polling_cycle_duration_in_seconds" {
-  type = number
-  description = "Duration of mesh polling cycle"
-  default = 285
-}
-
-variable "pss_scheduler_enabled" {
-  type = bool
-  description = "Enable scheduler"
-  default = true
-}
-
-# Opentest
-
-variable "opentest_connected" {
-  type = bool
-  description = "Should this environment be connected to OpenTest"
-  default = true
-}
-
-variable "opentest_instance_id" {
-  type = string
-  description = "Id of vpc with opentest instance"
 }
