@@ -81,11 +81,6 @@ variable "mq_broker_name" {
   description = "Name of the MQ broker shared between all envs"
 }
 
-/*variable "pss_mongo_options" {
-  type = string
-  description = "Options for Mongo"
-}*/
-
 variable "pss_ssl_trust_store_url" {
   type = string
   description = "S3 path to the custom trust store"
@@ -143,6 +138,34 @@ variable "create_testbox" {
   type = bool
   default = false
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
+}
+
+# MHS mock specific variables 
+variable "pss_mhs_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-341-b4b28a1"
+}
+
+variable "pss_mock_mhs_port" {
+  type = number
+  default = 8081
+}
+
+variable pss_mock_mhs_amqp_max_redeliveries {
+  type = number
+  default = 15
+}
+
+variable "pss_mongo_options" {
+  type = string
+  description = "Options for Mongo"
+}
+
+variable "pss_create_mhs_mock" {
+  type = bool
+  default = false
+  description = "Should an MHS mock be created and used by pss"
 }
 
 # Variables related to PTL connectivity
