@@ -57,7 +57,23 @@ ecr_repositories = [
   },
     {
     number = 8,
-    name = "pss",
+    name = "pss_gp2gp-translator",
+    scan = false,
+    expire_PR_after = 10,
+    prefix_to_keep  = "main",
+    number_to_keep  = 10
+  },
+    {
+    number = 9,
+    name = "pss_gpc_facade",
+    scan = false,
+    expire_PR_after = 10,
+    prefix_to_keep  = "main",
+    number_to_keep  = 10
+  },
+    {
+    number = 10,
+    name = "pss-mock-mhs",
     scan = false,
     expire_PR_after = 10,
     prefix_to_keep  = "main",
