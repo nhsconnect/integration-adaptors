@@ -1,35 +1,35 @@
-module "pss_ecs_service" {
+module "ecs_service_gpc_api_facade" {
   source = "../../modules/module_ecs_service"
 
   project         = var.project
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "pss_ecs"
+  module_instance = "gpc_facade_ecs"
   default_tags    = local.default_tags
 
   availability_zones = local.availability_zones
 
-  image_name        = local.image_name
+  image_name        = local.gpc_api_facade_image_name
   cluster_id        = data.terraform_remote_state.base.outputs.base_cluster_id
   minimal_count     = var.pss_service_minimal_count
   desired_count     = var.pss_service_desired_count
   maximal_count     = var.pss_service_maximal_count
   service_target_request_count = var.pss_service_target_request_count
 
-  container_port    = var.pss_service_container_port
+  container_port    = var.gpc_api_facade_container_port
   application_port  = var.pss_service_application_port
   launch_type       = var.pss_service_launch_type
-  log_stream_prefix = var.pss_build_id
+  log_stream_prefix = var.gpc_api_facade_build_id
   healthcheck_path  = var.pss_healthcheck_path
   enable_load_balancing = true
   load_balancer_type = "application"
   
-  container_healthcheck_port = var.pss_service_container_port
+  container_healthcheck_port = var.gpc_api_facade_container_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
 
-  environment_variables = local.environment_variables
+  environment_variables = local.gpc_api_facade_environment_variables
   secret_variables      = local.secret_variables
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn

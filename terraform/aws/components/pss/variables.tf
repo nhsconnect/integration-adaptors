@@ -55,11 +55,6 @@ variable "pss_service_maximal_count" {
   description = "Maximal number of containers to run in the service"
 }
 
-variable "pss_service_container_port" {
-  type = number
-  description = "Port Number on which service within container will be listening"
-}
-
 variable "pss_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
@@ -71,7 +66,7 @@ variable "pss_service_launch_type" {
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
 
-variable "pss_build_id" {
+variable "gp2gp_translator_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
 }
@@ -140,6 +135,19 @@ variable "create_testbox" {
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
 }
 
+variable "pss_mongo_options" {
+  type = string
+  description = "Options for Mongo"
+}
+
+# Variables related to PTL connectivity
+
+variable "ptl_connected" {
+  type = bool
+  description = "Should this environment be connected to NHS PTL"
+  default = false
+}
+
 # MHS mock specific variables 
 variable "pss_mhs_mock_build_id" {
   type = string
@@ -150,6 +158,13 @@ variable "pss_mhs_mock_build_id" {
 variable "pss_mock_mhs_port" {
   type = number
   default = 8081
+  description = "Port Number on which service within container will be listening"
+}
+
+variable "pss_create_mhs_mock" {
+  type = bool
+  default = true
+  description = "Should an MHS mock be created and used by pss"
 }
 
 variable pss_mock_mhs_amqp_max_redeliveries {
@@ -157,21 +172,32 @@ variable pss_mock_mhs_amqp_max_redeliveries {
   default = 15
 }
 
-variable "pss_mongo_options" {
+variable mhs_inbound_queue_name {
   type = string
-  description = "Options for Mongo"
+  description = "Name of queue used by MHS Inbound "
 }
 
-variable "pss_create_mhs_mock" {
-  type = bool
-  default = false
-  description = "Should an MHS mock be created and used by pss"
+# GPC API Facade specific variables 
+variable "gpc_api_facade_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-341-b4b28a1"
 }
 
-# Variables related to PTL connectivity
+variable "gpc_api_facade_container_port" {
+  type = number
+  description = "Port Number on which service within container will be listening"
+}
 
-variable "ptl_connected" {
-  type = bool
-  description = "Should this environment be connected to NHS PTL"
-  default = false
+# GP2GP Translator specific variables 
+variable "gp2gp_translator_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-341-b4b28a1"
+}
+
+variable "gp2gp_translator_container_port" {
+  type = number
+  default = 8085
+  description = "Port Number on which service within container will be listening"
 }

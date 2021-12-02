@@ -7,7 +7,7 @@ data "aws_secretsmanager_secret" "mq_password" {
 }
 
 data "aws_secretsmanager_secret" "postgres_master_username" {
-  name = "amazon-mq-nia-broker-username"
+  name = "postgres-master-username"
 }
 
 data "aws_secretsmanager_secret" "postgres_master_password" {
