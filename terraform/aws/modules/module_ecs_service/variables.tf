@@ -227,7 +227,7 @@ variable "health_check_grace_period_seconds" {
 }
 
 variable "environment_variables" {
-  type = list(string)
+  type = list(object({name=string, valueFrom=string}))
   description = "List of objects for Environment variables"
   default = [
     {
