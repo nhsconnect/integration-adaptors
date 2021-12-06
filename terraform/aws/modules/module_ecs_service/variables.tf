@@ -237,7 +237,7 @@ variable "environment_variables" {
 }
 
 variable "command" {
-  type = list(object({name=string, valueFrom=string}))
+  type = list(string)
   description = "list of objects for commands to pass to container"
   default = [                
     "-global-response-templating",
