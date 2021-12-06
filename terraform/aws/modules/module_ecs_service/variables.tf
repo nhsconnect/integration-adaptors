@@ -229,7 +229,19 @@ variable "health_check_grace_period_seconds" {
 variable "environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
-  default = []
+  default = [
+    {
+      "name": "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL",
+      "value": "http://internal-nia-vp-gp2gp-gpcapi-mk-ecs-lb-1632486310.eu-west-2.elb.amazonaws.com:8080"
+    }]
+}
+
+variable "command" {
+  type = list(object({name=string, valueFrom=string}))
+  description = "list of objects for commands to pass to container"
+  default = [                
+    "-global-response-templating",
+    "-permitted-system-keys=.*"]
 }
 
 variable "secret_variables" {
