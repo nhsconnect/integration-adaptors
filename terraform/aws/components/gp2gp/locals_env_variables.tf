@@ -124,6 +124,10 @@ locals {
   ]
 
   sdsapi_mock_environment_variables = [
+    {
+          "name": "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL",
+          "value": "http://internal-nia-vp-gp2gp-gpcapi-mk-ecs-lb-1632486310.eu-west-2.elb.amazonaws.com:8080"
+    }
   ]
 
 }
