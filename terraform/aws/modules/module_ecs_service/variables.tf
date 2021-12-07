@@ -232,12 +232,10 @@ variable "environment_variables" {
   default = []
 }
 
-variable "command" {
+variable "command_variables" {
   type = list(string)
   description = "list of objects for commands to pass to container"
-  default = [                
-    "-global-response-templating",
-    "-permitted-system-keys=.*"]
+  default = []
 }
 
 variable "secret_variables" {
