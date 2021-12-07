@@ -226,7 +226,7 @@ variable "health_check_grace_period_seconds" {
   default = 20
 }
 
-/*variable "environment_variables" {
+variable "environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
   default = [
@@ -234,7 +234,7 @@ variable "health_check_grace_period_seconds" {
       "name": "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL",
       "value": "http://internal-nia-vp-gp2gp-gpcapi-mk-ecs-lb-1632486310.eu-west-2.elb.amazonaws.com:8080"
     }]
-}*/
+}
 
 variable "command" {
   type = list(string)
