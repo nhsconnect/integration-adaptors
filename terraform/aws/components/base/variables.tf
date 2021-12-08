@@ -159,6 +159,12 @@ variable "jumpbox_allowed_ssh" {
 
 # Variables related to Postgres DB
 
+variable "create_postgres_db" {
+  type = bool
+  description = "If PostgreSQL DB needs to be created"
+  default = false
+}
+
 variable "postgres_master_user" {
   type = string
   description = "Username for Postgres DB master user"
