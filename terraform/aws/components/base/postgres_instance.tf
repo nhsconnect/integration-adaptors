@@ -1,5 +1,5 @@
 resource "aws_db_instance" "base_postgres_db" {
-  count                           = var.postgres_instance_count
+  count                           = var.create_postgres_db ? 1 : 0
   allocated_storage               = "20"
   identifier                      = "${replace(local.resource_prefix,"_","-")}-postgres-server"
   engine                          = "postgres"
