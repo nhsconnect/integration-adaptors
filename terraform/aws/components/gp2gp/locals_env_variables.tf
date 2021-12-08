@@ -125,8 +125,8 @@ locals {
 
   sdsapi_mock_environment_variables = [
     {
-      "name": "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL",
-      "value": "http://internal-nia-vp-gp2gp-gpcapi-mk-ecs-lb-1632486310.eu-west-2.elb.amazonaws.com:8080"
+      name  = "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL"
+      value = var.gp2gp_create_gpcapi_mock ? "http://${module.gpcapi_mock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_port}" : var.gpc-consumer_override_gpc_provider_url
     }
   ]
   gpcc_mock_command_variables = [
