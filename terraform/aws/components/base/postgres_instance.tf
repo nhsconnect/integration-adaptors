@@ -1,7 +1,7 @@
 resource "aws_db_instance" "base_postgres_db" {
   count                           = var.create_postgres_db ? 1 : 0
   allocated_storage               = "20"
-  identifier                      = "${replace(local.resource_prefix,"_","-")}-postgres-server"
+  identifier                      = "${replace(local.resource_prefix,"_","-")}-psdb-instance"
   engine                          = "postgres"
   instance_class                  = var.postgres_instance_class
   username                        = var.postgres_master_user
@@ -19,6 +19,6 @@ resource "aws_db_instance" "base_postgres_db" {
   apply_immediately               = true
 
   tags = merge(local.default_tags,{
-    Name = "${local.resource_prefix}-postgresserver"
+    Name = "${local.resource_prefix}-psdb-instance"
   })
 }
