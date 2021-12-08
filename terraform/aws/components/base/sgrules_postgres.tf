@@ -22,7 +22,7 @@ resource "aws_security_group_rule" "allow_egress_to_postgres" {
 resource "aws_security_group_rule" "allow_postgres_from_jumpbox" {
   type = "ingress"
   description = "Allow incoming from jumpbox to postgresDB in env ${var.environment}"
-  from_port = aws_db_instance.base_postgres_db.base_db_instance[0].port
+  from_port = aws_db_instance.base_postgres_db[0].port
   to_port = aws_db_instance.base_postgres_db[0].port
   protocol = "tcp"
   security_group_id = aws_security_group.postgres_sg.id
