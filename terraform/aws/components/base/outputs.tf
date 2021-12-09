@@ -58,6 +58,10 @@ output "docdb_cluster_connection_string" {
 output "docdb_access_sg_id" {
   value = aws_security_group.docdb_access_sg.id
 }
+  
+output "postgres_access_sg_id" {
+ value = aws_security_group.postgres_access_sg.id
+}
 
 output "nhais_cidr" {
   value = local.nhais_cidr
