@@ -58,9 +58,25 @@ output "docdb_cluster_connection_string" {
 output "docdb_access_sg_id" {
   value = aws_security_group.docdb_access_sg.id
 }
+
+output "postgres_instance_endpoint" {
+  value = aws_db_instance.base_postgres_db.endpoint
+}  
+  
+output "postgres_instance_address" {
+  value = aws_db_instance.base_postgres_db.address
+}  
+
+output "postgres_instance_port" {
+  value = aws_db_instance.base_postgres_db[0].port
+}
   
 output "postgres_access_sg_id" {
- value = aws_security_group.postgres_access_sg.id
+  value = aws_security_group.postgres_access_sg.id
+}
+  
+output "postgres_instance_connection_string" {
+  value = "postgresql://[var.postgres_master_user[:var.postgres_master_password@][aws_db_instance.base_postgres_db.address][:aws_db_instance.base_postgres_db[0].port]"
 }
 
 output "nhais_cidr" {
