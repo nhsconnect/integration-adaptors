@@ -60,7 +60,7 @@ output "docdb_access_sg_id" {
 }
 
 output "postgres_instance_endpoint" {
-  value = aws_db_instance.base_postgres_db[0].endpoint
+  value = aws_db_instance.base_postgres_db.endpoint
 }  
   
 output "postgres_instance_address" {
