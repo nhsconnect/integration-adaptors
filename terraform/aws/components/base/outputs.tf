@@ -76,7 +76,7 @@ output "postgres_access_sg_id" {
 }
   
 output "postgres_instance_connection_string" {
-  value = "postgresql://[aws_db_instance.base_postgres_db[0].username[:aws_db_instance.base_postgres_db[0].password@][aws_db_instance.base_postgres_db[0].address][:aws_db_instance.base_postgres_db[0].port]"
+  value = "postgresql://[aws_db_instance.base_postgres_db[0].username[:aws_db_instance.base_postgres_db[0].password]@][aws_db_instance.base_postgres_db[0].address][:aws_db_instance.base_postgres_db[0].port]"
 }
 
 output "nhais_cidr" {
