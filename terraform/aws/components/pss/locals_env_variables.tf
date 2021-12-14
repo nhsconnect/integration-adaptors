@@ -10,20 +10,12 @@ locals {
         value = var.mq_broker_name
       },
       {
-        name = "PSS_AMQP_USERNAME"
-        value = local.PSS_AMQP_USERNAME
-      },
-      {
         name = "PS_DB_URL"
         value = "jdbc:${data.terraform_remote_state.base.outputs.postgres_instance_connection_string}/patient_switching"
       },
       {
         name = "PSS_AMQP_MAX_REDELIVERIES"
         value = var.pss_amqp_max_redeliveries
-      },
-      {
-        name = "PSS_AMQP_PASSWORD"
-        value = local.PSS_AMQP_PASSWORD
       }
     ]
 
@@ -54,14 +46,6 @@ locals {
       {
         name = "MHS_QUEUE_NAME"
         value = var.mq_broker_name
-      },
-      {
-        name = "MHS_AMQP_USERNAME"
-        value = local.PSS_AMQP_PASSWORD
-      },
-      {
-        name = "MHS_AMQP_PASSWORD"
-        value = local.PSS_AMQP_PASSWORD
       },
       {
         name = "MHS_AMQP_MAX_REDELIVERIES"
