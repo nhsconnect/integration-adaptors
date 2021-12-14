@@ -1,7 +1,4 @@
 locals {
-    mock_mhs_environment_variables = [
-    ]
-
     pss_gpc_api_facade_environment_variables = [
       {
         name = "GPC_SERVER_PORT"
@@ -91,3 +88,6 @@ locals {
       } 
   ]
 }
+
+ mock_mhs_environment_variables = [
+    ]
