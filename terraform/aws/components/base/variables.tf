@@ -157,6 +157,64 @@ variable "jumpbox_allowed_ssh" {
   default = []
 }
 
+# Variables related to Postgres DB
+
+variable "create_postgres_db" {
+  type = bool
+  description = "If PostgreSQL DB needs to be created"
+  default = false
+}
+
+variable "postgres_master_user" {
+  type = string
+  description = "Username for Postgres DB master user"
+}
+
+variable "postgres_master_password" {
+  type = string
+  description = "Password for Postgres DB master user"
+}
+
+variable "postgres_instance_class" {
+  type = string
+  description = "Instance size to be used to Document DB instances"
+}
+
+variable "postgres_instance_count" {
+  type = number
+  description = "Number of instances in postgres DB cluster"
+  default = 1
+}
+
+variable "ssl_postgres_protocol" {
+  type = string
+  description = "minimum ssl protocol version"
+  default = "TLSv1.2"
+}
+
+variable "postgres_storage_encrypted" {
+  type = string
+  description = "Postgres DB Encryption-at-rest enablement"
+  default = true
+}
+
+variable "postgres_port" {
+  type = string
+  description = "Postgres DB inbound port"
+  default = "5432"
+}
+
+variable "postgres_retention_period" {
+  type = number
+  description = "How many days should the backups be kept, default is 1 day"
+  default = 7
+}
+
+variable "postgres_kms_key_id" {
+  type = string
+  description = "ARN for AWS KMS Key to encrypt Postgres DB"
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {

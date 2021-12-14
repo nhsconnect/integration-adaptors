@@ -7,6 +7,8 @@ docdb_instance_class = "db.r5.large"
 mongo_ssl_enabled = true
 enable_internet_access = "true"
 create_opentest_instance = true
+postgres_instance_class = "db.t4g.micro"
+create_postgres_db = true
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
