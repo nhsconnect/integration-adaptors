@@ -101,12 +101,6 @@ variable "pss_amqp_max_redeliveries" {
   default = 3
 }
 
-variable "pss_amqp_retry_delay" {
-  type = number
-  description = "Delay on retries to connect to amqp"
-  default = 100
-}
-
 variable "pss_service_target_request_count" {
   type = number
   description = "The target number of requests per minute that an service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
@@ -119,18 +113,18 @@ variable "create_testbox" {
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
 }
 
+variable "pss_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "PR-17-1-826a928"
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
   type = bool
   description = "Should this environment be connected to NHS PTL"
   default = false
-}
-
-variable "pss_build_id" {
-  type = string
-  description = "Number of the current build, used for tagging the logs"
-  default = "PR-17-1-826a928"
 }
 
 # MHS mock specific variables 
