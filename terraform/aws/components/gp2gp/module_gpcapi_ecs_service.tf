@@ -30,6 +30,7 @@ module "gpcapi_mock_ecs_service" {
 
   environment_variables = local.gpcapi_mock_environment_variables
   secret_variables      = local.gpcc_secret_variables
+  command_variables     = local.gpcapi_mock_command_variables
 
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn

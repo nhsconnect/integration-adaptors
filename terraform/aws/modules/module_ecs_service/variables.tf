@@ -232,6 +232,12 @@ variable "environment_variables" {
   default = []
 }
 
+variable "command_variables" {
+  type = list(string)
+  description = "list of objects for commands to pass to container"
+  default = []
+}
+
 variable "secret_variables" {
   type = list(object({name=string, valueFrom=string}))
   description = "list of objects for secret variables to pass to container"

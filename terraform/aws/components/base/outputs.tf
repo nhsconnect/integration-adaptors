@@ -59,6 +59,26 @@ output "docdb_access_sg_id" {
   value = aws_security_group.docdb_access_sg.id
 }
 
+output "postgres_instance_endpoint" {
+  value = aws_db_instance.base_postgres_db[0].endpoint
+}  
+  
+output "postgres_instance_address" {
+  value = aws_db_instance.base_postgres_db[0].address
+}  
+
+output "postgres_instance_port" {
+  value = aws_db_instance.base_postgres_db[0].port
+}
+  
+output "postgres_access_sg_id" {
+  value = aws_security_group.postgres_access_sg.id
+}
+  
+output "postgres_instance_connection_string" {
+  value = "postgresql://${var.postgres_master_user}:${var.postgres_master_password}@${aws_db_instance.base_postgres_db[0].address}:${aws_db_instance.base_postgres_db[0].port}"
+}
+
 output "nhais_cidr" {
   value = local.nhais_cidr
   description = "CIDR block for NHAIS component"
