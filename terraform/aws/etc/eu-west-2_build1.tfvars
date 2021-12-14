@@ -106,3 +106,5 @@ pss_service_target_request_count = 1200
 gpc_api_facade_container_port = 8080
 pss_service_launch_type = "FARGATE"
 pss_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+pss_gp2gp_translator_testbox = false
+pss_gpc_facade_testbox = false

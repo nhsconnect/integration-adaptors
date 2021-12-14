@@ -101,9 +101,13 @@ variable "pss_service_target_request_count" {
   default = 1200
 }
 
-variable "create_testbox" {
+variable "pss_gp2gp_translator_testbox" {
   type = bool
-  default = false
+  description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
+}
+
+variable "pss_gpc_facade_testbox" {
+  type = bool
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
 }
 
@@ -111,6 +115,11 @@ variable "pss_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
   default = "PR-17-1-826a928"
+}
+
+variable "postgres_master_password" {
+  type = string
+  description = "master password for postgres server"
 }
 
 # Variables related to PTL connectivity
@@ -135,13 +144,13 @@ variable "pss_create_mhs_mock" {
 }
 
 # GPC API Facade specific variables 
-variable "gpc_api_facade_container_port" {
+variable "pss_gpc_api_facade_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
 }
 
 # GP2GP Translator specific variables 
-variable "gp2gp_translator_container_port" {
+variable "pss_gp2gp_translator_container_port" {
   type = number
   default = 8085
   description = "Port Number on which service within container will be listening"

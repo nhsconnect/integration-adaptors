@@ -10,7 +10,7 @@ module "ecs_service_mock_mhs" {
 
   availability_zones = local.availability_zones
 
-  image_name        = local.mhs_mock_image_name
+  image_name        = local.pss_mhs_mock_image_name
   cluster_id        = data.terraform_remote_state.base.outputs.base_cluster_id
   minimal_count     = var.pss_service_minimal_count
   desired_count     = var.pss_service_desired_count
@@ -43,7 +43,6 @@ module "ecs_service_mock_mhs" {
 
   lb_allowed_security_groups = [
     data.terraform_remote_state.account.outputs.jumpbox_sg_id,
-    module.gp2gp_ecs_service.service_sg_id
   ]
 
   additional_container_config = []

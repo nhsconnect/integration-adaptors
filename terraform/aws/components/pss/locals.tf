@@ -9,9 +9,9 @@ locals {
 
   availability_zones = ["${var.region}a", "${var.region}b", "${var.region}c"]
 
-  gp2gp_translator_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/pss_gp2gp-translator:${var.pss_build_id}"
-  mhs_mock_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/pss-mock-mhs:${var.pss_build_id}"
-  gpc_api_facade_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/pss_gpc_facade:${var.pss_build_id}"
+  pss_gp2gp_translator_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/pss_gp2gp-translator:${var.pss_build_id}"
+  pss_mhs_mock_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/pss-mock-mhs:${var.pss_build_id}"
+  pss_gpc_api_facade_image_name = "${var.account_id}.dkr.ecr.${var.region}.amazonaws.com/pss_gpc_facade:${var.pss_build_id}"
 
 
   subnet_cidrs = [
