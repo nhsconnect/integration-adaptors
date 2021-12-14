@@ -26,10 +26,9 @@ module "ecs_service_gpc_api_facade" {
   load_balancer_type = "application"
   
   container_healthcheck_port = var.gpc_api_facade_container_port
-  enable_dlt                 = var.enable_dlt
-  dlt_vpc_id                 = var.dlt_vpc_id
+  
 
-  environment_variables = local.gpc_api_facade_environment_variables
+  environment_variables = local.pss_gpc_api_facade_environment_variables
   secret_variables      = local.secret_variables
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
@@ -47,10 +46,6 @@ module "ecs_service_gpc_api_facade" {
   ]
 
   logs_datetime_format = var.pss_logs_datetime_format
-  
-#  container_allowed_security_groups =  [
-#    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
-#  ]
 
   create_testbox=var.create_testbox
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id

@@ -66,11 +66,6 @@ variable "pss_service_launch_type" {
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
 
-variable "gp2gp_translator_build_id" {
-  type = string
-  description = "Number of the current build, used for tagging the logs"
-}
-
 variable "mq_broker_name" {
   type = string
   description = "Name of the MQ broker shared between all envs"
@@ -118,26 +113,10 @@ variable "pss_service_target_request_count" {
   default = 1200
 }
 
-variable "dlt_vpc_id" {
-  type = string
-  description = "VPC where Distributed Load testing environment is hosted"
-  default = ""
-}
-
-variable "enable_dlt" {
-  type = bool
-  description = "Should the containers in the service be attached to dlt"
-}
-
 variable "create_testbox" {
   type = bool
   default = false
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
-}
-
-variable "pss_mongo_options" {
-  type = string
-  description = "Options for Mongo"
 }
 
 # Variables related to PTL connectivity
@@ -148,13 +127,13 @@ variable "ptl_connected" {
   default = false
 }
 
-# MHS mock specific variables 
-variable "pss_mhs_mock_build_id" {
+variable "pss_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
-  default = "main-341-b4b28a1"
+  default = "PR-17-1-826a928"
 }
 
+# MHS mock specific variables 
 variable "pss_mock_mhs_port" {
   type = number
   default = 8081
@@ -178,24 +157,12 @@ variable mhs_inbound_queue_name {
 }
 
 # GPC API Facade specific variables 
-variable "gpc_api_facade_build_id" {
-  type = string
-  description = "Number of the current build, used for tagging the logs"
-  default = "main-341-b4b28a1"
-}
-
 variable "gpc_api_facade_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
 }
 
 # GP2GP Translator specific variables 
-variable "gp2gp_translator_build_id" {
-  type = string
-  description = "Number of the current build, used for tagging the logs"
-  default = "main-341-b4b28a1"
-}
-
 variable "gp2gp_translator_container_port" {
   type = number
   default = 8085

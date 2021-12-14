@@ -103,6 +103,5 @@ pss_service_maximal_count = 1
 pss_service_target_request_count = 1200
 gpc_api_facade_container_port = 8080
 pss_service_launch_type = "FARGATE"
-pss_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 pss_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 pss_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"

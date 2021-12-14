@@ -28,8 +28,6 @@ module "ecs_service_mock_mhs" {
   protocol = "HTTP"
 
   container_healthcheck_port = var.pss_mock_mhs_port
-  enable_dlt                 = var.enable_dlt
-  dlt_vpc_id                 = var.dlt_vpc_id
 
   environment_variables = local.mock_mhs_environment_variables
   secret_variables      = local.secret_variables
