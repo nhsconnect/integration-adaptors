@@ -71,12 +71,6 @@ variable "mq_broker_name" {
   description = "Name of the MQ broker shared between all envs"
 }
 
-variable "pss_ssl_trust_store_url" {
-  type = string
-  description = "S3 path to the custom trust store"
-  default = ""
-}
-
 variable "pss_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
@@ -138,16 +132,6 @@ variable "pss_create_mhs_mock" {
   type = bool
   default = true
   description = "Should an MHS mock be created and used by pss"
-}
-
-variable pss_mock_mhs_amqp_max_redeliveries {
-  type = number
-  default = 15
-}
-
-variable mhs_inbound_queue_name {
-  type = string
-  description = "Name of queue used by MHS Inbound "
 }
 
 # GPC API Facade specific variables 
