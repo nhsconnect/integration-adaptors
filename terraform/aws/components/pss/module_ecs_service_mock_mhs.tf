@@ -20,7 +20,7 @@ module "ecs_service_mock_mhs" {
   container_port    = var.pss_mock_mhs_port
   application_port  = var.pss_mock_mhs_port
   launch_type       = var.pss_service_launch_type
-  log_stream_prefix = var.pss_mhs_mock_build_id
+  log_stream_prefix = var.pss_build_id
   healthcheck_path  = var.pss_healthcheck_path
   enable_load_balancing = true
   use_application_lb = true
@@ -48,7 +48,7 @@ module "ecs_service_mock_mhs" {
 
   additional_container_config = []
 
-  logs_datetime_format = var.gp2gp_logs_datetime_format
+  logs_datetime_format = var.pss_logs_datetime_format
 
   create_testbox = false
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id

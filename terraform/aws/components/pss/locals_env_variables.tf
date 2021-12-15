@@ -33,7 +33,7 @@ locals {
       },
       {
         name = "MHS_AMQP_BROKER"
-        value = replace(data.aws_mq_broker.mhs_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
+        value = replace(data.aws_mq_broker.pss_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
       },
       {
         name = "MHS_QUEUE_NAME"
