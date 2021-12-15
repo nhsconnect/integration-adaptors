@@ -207,7 +207,7 @@ variable "postgres_port" {
 variable "postgres_retention_period" {
   type = number
   description = "How many days should the backups be kept, default is 1 day"
-  default = 6
+  default = 7
 }
 
 variable "postgres_kms_key_id" {
