@@ -65,6 +65,11 @@ variable "pss_service_launch_type" {
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
 }
 
+variable "pss_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+}
+
 variable "mq_broker_name" {
   type = string
   description = "Name of the MQ broker shared between all envs"
@@ -108,11 +113,6 @@ variable "pss_gp2gp_translator_testbox" {
 variable "pss_gpc_facade_testbox" {
   type = bool
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
-}
-
-variable "pss_build_id" {
-  type = string
-  description = "Number of the current build, used for tagging the logs"
 }
 
 variable "pss_queue_name" {
