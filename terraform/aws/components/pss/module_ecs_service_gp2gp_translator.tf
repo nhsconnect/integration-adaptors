@@ -28,7 +28,7 @@ module "ecs_service_gp2gp_translator" {
   container_healthcheck_port = var.pss_gp2gp_translator_container_port
 
   environment_variables = concat(local.pss_gp2gp_translator_environment_variables,local.environment_variables)
-  secret_variables      = concat(local.secret_variables,local.secret_variables_pss_gp2gp_translator)
+  secret_variables      = concat(local.secret_variables,pss_gp2gp_translator_secret_variables)
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
   task_role_arn           = data.aws_iam_role.ecs_service_task_role.arn

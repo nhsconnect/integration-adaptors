@@ -25,7 +25,7 @@ locals {
       valueFrom = data.aws_secretsmanager_secret.postgres_master_password.arn
     }
   ]
-  secret_variables_pss_gp2gp_translator = [
+  pss_gp2gp_translator_secret_variables = [
     {
       name = "MHS_AMQP_USERNAME"
       valueFrom  = data.aws_secretsmanager_secret.mq_username.arn
@@ -39,7 +39,7 @@ locals {
       valueFrom = data.aws_secretsmanager_secret.postgres_master_password.arn
     }
   ]
-  secret_variables_pss_gpc_api_facade = [
+  pss_gpc_api_facade_secret_variables = [
     {
       name = "GPC_USER_DB_PASSWORD"
       valueFrom = data.aws_secretsmanager_secret.postgres_master_password.arn

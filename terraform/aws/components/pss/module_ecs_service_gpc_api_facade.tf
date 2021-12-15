@@ -29,7 +29,7 @@ module "ecs_service_gpc_api_facade" {
   
 
   environment_variables = concat(local.pss_gpc_api_facade_environment_variables,local.environment_variables)
-  secret_variables      = concat(local.secret_variables,local.secret_variables_pss_gpc_api_facade)
+  secret_variables      = concat(local.secret_variables,local.pss_gpc_api_facade_secret_variables)
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
   task_role_arn           = data.aws_iam_role.ecs_service_task_role.arn

@@ -22,14 +22,14 @@ locals {
     pss_gpc_api_facade_environment_variables = [
       {
         name = "GPC_SERVER_PORT"
-        value = var.pss_gpc_api_facade_container_port
+        value = var.pss_service_application_port
       }
     ]
 
     pss_gp2gp_translator_environment_variables = [
       {  
         name = "GP2GP_SERVER_PORT"
-        value = var.pss_gp2gp_translator_container_port
+        value = var.pss_service_application_port
       },
       {
         name = "MHS_AMQP_BROKER"
