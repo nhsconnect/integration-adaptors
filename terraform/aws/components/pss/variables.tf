@@ -58,7 +58,6 @@ variable "pss_service_maximal_count" {
 variable "pss_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
-  default = 80
 }
 
 variable "pss_service_launch_type" {
@@ -137,7 +136,6 @@ variable "ptl_connected" {
 # MHS mock specific variables 
 variable "pss_mock_mhs_port" {
   type = number
-  default = 8080
   description = "Port Number on which service within container will be listening"
 }
 
@@ -150,13 +148,11 @@ variable "pss_create_mhs_mock" {
 # GPC API Facade specific variables 
 variable "pss_gpc_api_facade_container_port" {
   type = number
-  default = 8080
   description = "Port Number on which service within container will be listening"
 }
 
 # GP2GP Translator specific variables 
 variable "pss_gp2gp_translator_container_port" {
   type = number
-  default = 8080
   description = "Port Number on which service within container will be listening"
 }

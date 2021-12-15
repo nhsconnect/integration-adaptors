@@ -109,3 +109,7 @@ pss_gp2gp_translator_testbox = false
 pss_gpc_facade_testbox = false
 pss_queue_name = "build1-ps-queue"
 mhs_queue_name = "build1-ps-mhs-queue"
+pss_gpc_api_facade_container_port = 8080
+pss_gp2gp_translator_container_port = 8080
+pss_mock_mhs_port = 8080
+pss_service_application_port = 80
