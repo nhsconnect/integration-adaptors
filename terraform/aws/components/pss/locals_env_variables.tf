@@ -44,7 +44,8 @@ locals {
         value = var.pss_amqp_max_redeliveries
       } 
   ]
-}
 
- mock_mhs_environment_variables = [
+
+    mock_mhs_environment_variables = [
     ]
+}
