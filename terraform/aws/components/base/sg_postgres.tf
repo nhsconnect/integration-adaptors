@@ -8,7 +8,7 @@ resource "aws_security_group" "postgres_sg" {
   })
 }
 
-/*resource "aws_security_group" "postgres_access_sg" {
+resource "aws_security_group" "postgres_access_sg" {
   name = "${local.resource_prefix}-postgres_access_sg"
   description = "Security Group that allow access to postgres DB in env: ${var.environment}"
   vpc_id = aws_vpc.base_vpc.id
@@ -16,4 +16,4 @@ resource "aws_security_group" "postgres_sg" {
   tags = merge(local.default_tags,{
     Name = "${local.resource_prefix}-postgres_access_sg"
   })
-}*/
+}
