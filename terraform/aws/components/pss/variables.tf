@@ -114,7 +114,6 @@ variable "pss_gpc_facade_testbox" {
 variable "pss_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
-  default = "PR-17-1-826a928"
 }
 
 variable "postgres_master_password" {
