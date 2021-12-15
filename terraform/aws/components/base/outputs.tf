@@ -72,7 +72,7 @@ output "postgres_instance_port" {
 }
   
 output "postgres_access_sg_id" {
-  value = aws_security_group.postgres_access_sg.id
+  value = aws_security_group.postgres_access_sg[0].id
 }
   
 output "postgres_instance_connection_string" {
