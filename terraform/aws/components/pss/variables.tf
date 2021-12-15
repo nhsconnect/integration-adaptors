@@ -75,6 +75,22 @@ variable "mq_broker_name" {
   description = "Name of the MQ broker shared between all envs"
 }
 
+variable "pss_queue_name" {
+  type = string
+  description = "Name of PSS Queue"
+}
+
+variable "mhs_queue_name" {
+  type = string
+  description = "Name of PSS MHS Queue"
+}
+
+variable "enable_dlt" {
+  type = bool
+  description = "Should the containers in the service be attached to dlt"
+  default = false
+}
+
 variable "pss_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
@@ -113,16 +129,6 @@ variable "pss_gp2gp_translator_testbox" {
 variable "pss_gpc_facade_testbox" {
   type = bool
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
-}
-
-variable "pss_queue_name" {
-  type = string
-  description = "Name of PSS Queue"
-}
-
-variable "mhs_queue_name" {
-  type = string
-  description = "Name of PSS MHS Queue"
 }
 
 # Variables related to PTL connectivity
