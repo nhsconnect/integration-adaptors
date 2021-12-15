@@ -1,4 +1,4 @@
-resource "aws_security_group_rule" "allow_ingress_in_postgres" {
+/*resource "aws_security_group_rule" "allow_ingress_in_postgres" {
   type = "ingress"
   from_port = aws_db_instance.base_postgres_db[0].port
   to_port = aws_db_instance.base_postgres_db[0].port
@@ -8,7 +8,7 @@ resource "aws_security_group_rule" "allow_ingress_in_postgres" {
   description = "Allow incoming from application to document DB in env: ${var.environment}"
 }
 
-/*resource "aws_security_group_rule" "allow_egress_to_postgres" {
+resource "aws_security_group_rule" "allow_egress_to_postgres" {
   type = "egress"
   from_port = aws_db_instance.base_postgres_db[0].port
   to_port = aws_db_instance.base_postgres_db[0].port
