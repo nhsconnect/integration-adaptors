@@ -26,6 +26,7 @@ module "ecs_service_gpc_api_facade" {
   load_balancer_type = "application"
   
   container_healthcheck_port = var.pss_gpc_api_facade_container_port
+  enable_dlt                 = var.enable_dlt
   
 
   environment_variables = concat(local.pss_gpc_api_facade_environment_variables,local.environment_variables)
