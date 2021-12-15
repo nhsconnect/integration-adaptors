@@ -2,19 +2,19 @@ locals {
 
     environment_variables = [
       {
-        name = "PSS_AMQP_BROKER"
+        name = "PS_AMQP_BROKER"
         value = replace(data.aws_mq_broker.pss_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
       },
       {
-        name = "PSS_QUEUE_NAME"
+        name = "PS_QUEUE_NAME"
         value = var.pss_queue_name
       },
       {
-        name = "PSS_DB_URL"
+        name = "PS_DB_URL"
         value = "jdbc:${data.terraform_remote_state.base.outputs.postgres_instance_connection_string}/patient_switching"
       },
       {
-        name = "PSS_AMQP_MAX_REDELIVERIES"
+        name = "PS_AMQP_MAX_REDELIVERIES"
         value = var.pss_amqp_max_redeliveries
       }
     ]
