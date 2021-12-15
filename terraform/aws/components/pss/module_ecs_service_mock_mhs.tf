@@ -5,7 +5,7 @@ module "ecs_service_mock_mhs" {
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "pss_mhs_mock_ecs"
+  module_instance = "pss_mhs_ecs"
   default_tags    = local.default_tags
 
   availability_zones = local.availability_zones
@@ -48,7 +48,8 @@ module "ecs_service_mock_mhs" {
   additional_container_config = []
 
   logs_datetime_format = var.gp2gp_logs_datetime_format
-  
+
+  create_testbox = false
   jumpbox_sg_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
   lb_subnet_ids = data.terraform_remote_state.base.outputs.ptl_connected ? data.terraform_remote_state.base.outputs.ptl_lb_subnet_ids : aws_subnet.service_subnet.*.id
