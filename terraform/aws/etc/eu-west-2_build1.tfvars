@@ -107,3 +107,5 @@ pss_service_launch_type = "FARGATE"
 pss_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 pss_gp2gp_translator_testbox = false
 pss_gpc_facade_testbox = false
+pss_queue_name = "build1-pss-queue"
+mhs_queue_name = "build1-pss-mhs-queue"

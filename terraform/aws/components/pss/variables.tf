@@ -116,9 +116,14 @@ variable "pss_build_id" {
   description = "Number of the current build, used for tagging the logs"
 }
 
-variable "postgres_master_password" {
+variable "pss_queue_name" {
   type = string
-  description = "master password for postgres server"
+  description = "Name of PSS Queue"
+}
+
+variable "mhs_queue_name" {
+  type = string
+  description = "Name of PSS MHS Queue"
 }
 
 # Variables related to PTL connectivity
