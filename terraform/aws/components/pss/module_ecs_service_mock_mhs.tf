@@ -5,7 +5,7 @@ module "ecs_service_mock_mhs" {
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "pss_mhs_mock_ecs"
+  module_instance = "ps_mhs_mock_ecs"
   default_tags    = local.default_tags
 
   availability_zones = local.availability_zones

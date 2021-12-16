@@ -5,7 +5,7 @@ module "ecs_service_gpc_api_facade" {
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "pss_gpc_facade_ecs"
+  module_instance = "ps_gpc_fcde_ecs"
   default_tags    = local.default_tags
 
   availability_zones = local.availability_zones

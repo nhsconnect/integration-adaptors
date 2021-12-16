@@ -5,7 +5,7 @@ module "ecs_service_gp2gp_translator" {
   component       = var.component
   environment     = var.environment
   region          = var.region
-  module_instance = "pss_gp2gp_tl_ecs"
+  module_instance = "ps_gp2gp_tl_ecs"
   default_tags    = local.default_tags
 
   availability_zones = local.availability_zones
