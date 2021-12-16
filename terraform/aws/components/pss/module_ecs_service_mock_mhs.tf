@@ -43,7 +43,7 @@ module "ecs_service_mock_mhs" {
   ]
 
   lb_allowed_security_groups = [
-    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id
   ]
 
   additional_container_config = []
