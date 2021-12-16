@@ -40,11 +40,6 @@ variable "pss_logs_datetime_format" {
   default = "%Y-%m-%d %H:%M:%S%L"
 }
 
-variable "pss_log_level" {
-  type = string
-  description = "Level of logging for pss application"
-}
-
 variable "pss_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
@@ -104,8 +99,7 @@ variable "pss_environment_variables" {
 
 variable "pss_log_level" {
   type = string
-  description = "Level of logging for PSS application"
-  default = "INFO"
+  description = "Level of logging for pss application"
 }
 
 variable "pss_healthcheck_path" {
