@@ -113,3 +113,4 @@ pss_gpc_api_facade_container_port = 8081
 pss_gp2gp_translator_container_port = 8085
 pss_mock_mhs_port = 8080
 pss_service_application_port = 80
+pss_log_level = "DEBUG"

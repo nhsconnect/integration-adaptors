@@ -9,9 +9,14 @@ locals {
         name = "PS_QUEUE_NAME"
         value = var.pss_queue_name
       },
+
+      {
+        name  = "PSS_LOGGING_LEVEL"
+        value = var.pss_log_level
+      },
       {
         name = "PS_DB_URL"
-        value = "jdbc:${data.terraform_remote_state.base.outputs.postgres_instance_connection_string}/patient_switching"
+        value = "jdbc:postgresql://${data.terraform_remote_state.base.outputs.postgres_instance_endpoint}/patient_switching"
       },
       {
         name = "PS_AMQP_MAX_REDELIVERIES"
