@@ -5,7 +5,7 @@ resource "aws_security_group_rule" "allow_ingress_in_postgres" {
   protocol = "tcp"
   security_group_id = aws_security_group.postgres_sg.id
   source_security_group_id = aws_security_group.postgres_access_sg.id
-  description = "Allow incoming from application to document DB in env: ${var.environment}"
+  description = "Allow incoming from application to postgres DB in env: ${var.environment}"
 }
 
 resource "aws_security_group_rule" "allow_egress_to_postgres" {
@@ -15,7 +15,7 @@ resource "aws_security_group_rule" "allow_egress_to_postgres" {
   protocol = "tcp"
   security_group_id = aws_security_group.postgres_access_sg.id
   source_security_group_id = aws_security_group.postgres_sg.id
-  description = "Allow outgoing from application to document DB in env: ${var.environment}"
+  description = "Allow outgoing from application to postgres DB in env: ${var.environment}"
 }
 
 # Allow account's jumpbox to connect to docdb
