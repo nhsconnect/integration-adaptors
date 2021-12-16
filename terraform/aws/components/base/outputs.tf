@@ -112,6 +112,10 @@ output "gp2gp_cidr" {
   value = local.gp2gp_cidr
   description = "CIDR block for GP2GP component"
 }
+  output "pss_cidr" {
+  value = local.pss_cidr
+  description = "CIDR block for PSS component"
+}
 
 # PTL section
 
