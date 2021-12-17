@@ -5,7 +5,7 @@ resource "aws_security_group_rule" "additional_incoming_jumpbox_to_testbox" {
   from_port = var.pss_service_application_port
   to_port = var.pss_service_application_port
   protocol = var.protocol
-  description = "Allow additional SG: ${var.lb_allowed_security_groups} to testbox: ${var.environment}"
+  description = "Allow additional SG: Jumpbox to testbox: ${var.environment}"
 }
 
 resource "aws_security_group_rule" "additional_outgoing_from_testbox_to_jumpbox" {
@@ -15,7 +15,7 @@ resource "aws_security_group_rule" "additional_outgoing_from_testbox_to_jumpbox"
   from_port = var.pss_service_application_port
   to_port = var.pss_service_application_port
   protocol = var.protocol
-  description = "Allow from additional SG: From testbox to ${var.lb_allowed_security_groups} in env: ${var.environment}"
+  description = "Allow from additional SG: From testbox to Jumpbox in env: ${var.environment}"
 }
 
 /*resource "aws_security_group_rule" "pss_testbox_80_internet" {
