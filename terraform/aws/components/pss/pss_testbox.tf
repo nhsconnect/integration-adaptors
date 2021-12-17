@@ -1,4 +1,4 @@
-/*resource "aws_instance" "pss_testbox" {
+resource "aws_instance" "pss_testbox" {
   availability_zone = local.availability_zones[0]
 
   ami           = data.aws_ami.base_linux.id
@@ -10,4 +10,4 @@
   tags = merge(local.default_tags, {
      Name = "${local.resource_prefix}-pss_testbox"
   })
-}*/
+}
