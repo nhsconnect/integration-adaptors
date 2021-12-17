@@ -39,7 +39,7 @@ module "ecs_service_gpc_api_facade" {
   additional_security_groups = [
     data.terraform_remote_state.base.outputs.core_sg_id,
     data.terraform_remote_state.base.outputs.postgres_access_sg_id,
-    aws_security_group.pss_external_access
+    aws_security_group.pss_external_access.id
   ]
 
   lb_allowed_security_groups = [
