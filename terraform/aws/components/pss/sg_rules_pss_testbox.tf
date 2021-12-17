@@ -3,7 +3,7 @@ resource "aws_security_group_rule" "connect_to_testbox" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = [data.terraform_remote_state.base.outputs.pss_cidr]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.pss_testbox_sg.id
 }
 
