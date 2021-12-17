@@ -33,16 +33,8 @@ locals {
     {
       name = "MHS_AMQP_PASSWORD"
       valueFrom  = data.aws_secretsmanager_secret.mq_password.arn
-    },
-    {
-      name = "GP2GP_USER_DB_PASSWORD"
-      valueFrom = data.aws_secretsmanager_secret.postgres_master_password.arn
     }
   ]
   pss_gpc_api_facade_secret_variables = [
-    {
-      name = "GPC_USER_DB_PASSWORD"
-      valueFrom = data.aws_secretsmanager_secret.postgres_master_password.arn
-    }
   ]
 }
