@@ -60,6 +60,12 @@ variable "pss_service_application_port" {
   description = "Port number on which the service load balancer will listen"
 }
 
+variable "protocol" {
+  type = string
+  description = "Protocol used by container"
+  default = "tcp"
+}
+
 variable "pss_service_launch_type" {
   type = string
   description = "Type of cluster on which this service will be run, FARGATE or EC2"
