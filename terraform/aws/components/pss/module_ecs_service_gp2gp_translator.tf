@@ -41,7 +41,8 @@ module "ecs_service_gp2gp_translator" {
   ]
 
   lb_allowed_security_groups = [
-    data.terraform_remote_state.account.outputs.jumpbox_sg_id
+    data.terraform_remote_state.account.outputs.jumpbox_sg_id,
+    aws_security_group.pss_testbox_sg.id
   ]
 
   logs_datetime_format = var.pss_logs_datetime_format
