@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "connect_to_mhs_mock" {
 }
 
 resource "aws_security_group_rule" "connect_to_gp2gp_tl" {
-  description = "Allow testbox to connect to internet on 443"
+  description = "Allow testbox to connect to internet on 8085"
   type = "egress"
   from_port = 8085
   to_port = 8085
