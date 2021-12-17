@@ -1,4 +1,4 @@
-resource "aws_security_group_rule" "connect_to_jumpbox" {
+resource "aws_security_group_rule" "connect_to_testbox" {
   type              = "ingress"
   from_port         = 22
   to_port           = 22
