@@ -28,6 +28,8 @@ module "gp2gp_wiremock_ecs_service" {
   load_balancer_type = "application"
   protocol = "HTTP"
 
+  memory = 4096
+
   container_healthcheck_port = var.gp2gp_wiremock_container_port
   enable_dlt                 = var.enable_dlt
   dlt_vpc_id                 = var.dlt_vpc_id
