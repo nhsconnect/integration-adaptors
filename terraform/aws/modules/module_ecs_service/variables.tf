@@ -147,13 +147,13 @@ variable "image_name" {
 variable "cpu_units" {
   type = number
   description = "Number of CPU units to assign to containers"
-  default = 2048
+  default = 4096
 }
 
 variable "memory_units" {
   type = number
   description = "Number of Memory units to assign to containers"
-  default = 4096
+  default = 8192
 }
 
 variable "network_mode" {
