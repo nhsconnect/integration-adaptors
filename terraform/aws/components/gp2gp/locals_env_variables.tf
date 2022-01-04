@@ -125,21 +125,24 @@ locals {
 
   sdsapi_mock_environment_variables = [
     {
-      name  = "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL"
+      name  = "SDS_MOCK_GPC_URL"
       value = var.gp2gp_create_gpcapi_mock ? "http://${module.gpcapi_mock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_port}" : var.gpc-consumer_override_gpc_provider_url
     }
   ]
   gpcc_mock_command_variables = [
-    "-global-response-templating"
+    "-global-response-templating",
+    "--no-request-journal"
   ]
 
   gpcapi_mock_command_variables = [
-    "-global-response-templating"
+    "-global-response-templating",
+    "--no-request-journal"
   ]
 
   sdsapi_mock_command_variables = [
     "-global-response-templating",
-    "-permitted-system-keys=.*"
+    "-permitted-system-keys=.*",
+    "--no-request-journal"
   ]
 
 }
