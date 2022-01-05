@@ -19,7 +19,7 @@ resource "aws_security_group_rule" "allow_testbox_to_postgres" {
   protocol = "tcp"
   from_port = data.terraform_remote_state.base.outputs.postgres_instance_port
   to_port = data.terraform_remote_state.base.outputs.postgres_instance_port
-  source_security_group_id = data.terraform_remote_state.outputs.base.postgres_access_sg_id
+  source_security_group_id = data.terraform_remote_state.base.outputs.postgres_access_sg_id
   description = "Allow outgoing from pss testbox to PostgreSQL DB in env: ${var.environment}"
 }
 
