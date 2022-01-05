@@ -1,12 +1,24 @@
 resource "aws_security_group_rule" "additional_incoming_jumpbox_to_testbox" {
+  type = "ingress"
+  security_group_id = aws_security_group.pss_testbox_sg.id
+  source_security_group_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
+  from_port = 22
+  to_port = 22
+  protocol = var.protocol
+  description = "Allow from Jumpbox to PSS Testbox in env: ${var.environment}"
+}
+
+/*
+resource "aws_security_group_rule" "additional_incoming_jumpbox_to_testbox" {
   type = "egress"
-  source_security_group_id =  aws_security_group.pss_testbox_sg.id
   security_group_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
+  source_security_group_id =  aws_security_group.pss_testbox_sg.id
   from_port = var.pss_service_application_port
   to_port = var.pss_service_application_port
   protocol = var.protocol
   description = "Allow additional SG: Jumpbox to testbox: ${var.environment}"
 }
+
 
 resource "aws_security_group_rule" "additional_outgoing_from_testbox_to_jumpbox" {
   type = "ingress"
@@ -17,6 +29,7 @@ resource "aws_security_group_rule" "additional_outgoing_from_testbox_to_jumpbox"
   protocol = var.protocol
   description = "Allow from additional SG: From testbox to Jumpbox in env: ${var.environment}"
 }
+*/
 
 /*resource "aws_security_group_rule" "pss_testbox_80_internet" {
   description = "Allow testbox to connect to internet on 80"

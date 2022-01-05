@@ -8,6 +8,6 @@ resource "aws_instance" "pss_testbox" {
   subnet_id = aws_subnet.service_subnet[0].id
 
   tags = merge(local.default_tags, {
-     Name = "${local.resource_prefix}-pss_testbox"
+     Name = "${local.resource_prefix}-testbox"
   })
 }
