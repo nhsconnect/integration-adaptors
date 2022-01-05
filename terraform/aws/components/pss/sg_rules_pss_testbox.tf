@@ -30,7 +30,7 @@ resource "aws_security_group_rule" "allow_postgres_from_testbox" {
   from_port = data.terraform_remote_state.base.outputs.postgres_instance_port
   to_port = data.terraform_remote_state.base.outputs.postgres_instance_port
   source_security_group_id = aws_security_group.pss_testbox_sg.id
-  description = "Allow incoming from pss testbox to PostgreSQL DB in env ${var.environment}"
+  description = "Allow incoming from pss testbox to PostgreSQL DB in env: ${var.environment}"
 }
 
 
@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "pss_testbox_80_internet" {
   from_port = 80
   to_port = 80
   cidr_blocks = ["0.0.0.0/0"]
-  description = "Allow pss testbox to connect to internet on 80 in env ${var.environment}"
+  description = "Allow pss testbox to connect to internet on 80 in env: ${var.environment}"
 }
 
 resource "aws_security_group_rule" "pss_testbox_443_internet" {
@@ -55,7 +55,7 @@ resource "aws_security_group_rule" "pss_testbox_443_internet" {
   from_port = 443
   to_port = 443
   cidr_blocks = ["0.0.0.0/0"]
-  description = "Allow pss testbox to connect to internet on 443 in env ${var.environment}"
+  description = "Allow pss testbox to connect to internet on 443 in env: ${var.environment}"
 }
 
 /*
