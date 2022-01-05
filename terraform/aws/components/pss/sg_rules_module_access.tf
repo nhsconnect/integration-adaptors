@@ -1,3 +1,4 @@
+/*
 resource "aws_security_group_rule" "additional_outgoing_mhs_mock_to_jumpbox" {
   type = "egress"
   source_security_group_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
@@ -27,3 +28,4 @@ resource "aws_security_group_rule" "additional_outgoing_from_gp2gp_translator_to
   protocol = var.protocol
   description = "Allow from additional SG: From testbox to Jumpbox in env: ${var.environment}"
 }
+*/
