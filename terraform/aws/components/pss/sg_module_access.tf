@@ -4,6 +4,6 @@ resource "aws_security_group" "pss_external_access" {
   vpc_id = data.terraform_remote_state.base.outputs.vpc_id
 
   tags = merge(local.default_tags, {
-    Name = "${local.resource_prefix}-pss_testbox_sg"
+    Name = "${local.resource_prefix}-pss_external_access_sg"
   })
 }

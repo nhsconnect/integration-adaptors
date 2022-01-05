@@ -129,11 +129,13 @@ variable "pss_service_target_request_count" {
 variable "pss_gp2gp_translator_testbox" {
   type = bool
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
+  default = false
 }
 
 variable "pss_gpc_facade_testbox" {
   type = bool
   description = "Should en EC2 instance be created along the containers (with the same same subnet and security group) Useful for testing connectivity"
+  default = false
 }
 
 # Variables related to PTL connectivity
@@ -148,6 +150,7 @@ variable "ptl_connected" {
 variable "pss_mock_mhs_port" {
   type = number
   description = "Port Number on which service within container will be listening"
+  default = 8080
 }
 
 variable "pss_create_mhs_mock" {
@@ -160,10 +163,12 @@ variable "pss_create_mhs_mock" {
 variable "pss_gpc_api_facade_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
+  default = 8081
 }
 
 # GP2GP Translator specific variables 
 variable "pss_gp2gp_translator_container_port" {
   type = number
   description = "Port Number on which service within container will be listening"
+  default = 8085
 }
