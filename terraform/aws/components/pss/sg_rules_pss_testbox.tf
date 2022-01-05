@@ -1,11 +1,61 @@
 resource "aws_security_group_rule" "additional_incoming_jumpbox_to_testbox" {
-  type = "ingress"
   security_group_id = aws_security_group.pss_testbox_sg.id
-  source_security_group_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
+  type = "ingress"
+  protocol = var.protocol
   from_port = 22
   to_port = 22
-  protocol = var.protocol
+  source_security_group_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   description = "Allow from Jumpbox to PSS Testbox in env: ${var.environment}"
+}
+
+
+#####################################
+# PSS Testbox Access To PostgreSQL DB
+#####################################
+
+resource "aws_security_group_rule" "allow_testbox_to_postgres" {
+  security_group_id = aws_security_group.pss_testbox_sg.id
+  type = "egress"
+  protocol = "tcp"
+  from_port = data.terraform_remote_state.base_postgres_db[0].port
+  to_port = data.terraform_remote_state.base_postgres_db[0].port
+  source_security_group_id = data.terraform_remote_state.base.postgres_access_sg.id
+  description = "Allow outgoing from pss testbox to PostgreSQL DB in env: ${var.environment}"
+}
+
+resource "aws_security_group_rule" "allow_postgres_from_testbox" {
+  security_group_id = data.terraform_remote_state.base.postgres_access_sg.id
+  type = "ingress"
+  protocol = "tcp"
+  from_port = data.terraform_remote_state.base_postgres_db[0].port
+  to_port = data.terraform_remote_state.base_postgres_db[0].port
+  source_security_group_id = aws_security_group.pss_testbox_sg.id
+  description = "Allow incoming from pss testbox to PostgreSQL DB in env ${var.environment}"
+}
+
+
+#################################
+# PSS Testbox Access To Internet
+#################################
+
+resource "aws_security_group_rule" "pss_testbox_80_internet" {
+  security_group_id = aws_security_group.pss_testbox_sg.id
+  type = "egress"
+  protocol = "tcp"
+  from_port = 80
+  to_port = 80
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Allow pss testbox to connect to internet on 80 in env ${var.environment}"
+}
+
+resource "aws_security_group_rule" "pss_testbox_443_internet" {
+  security_group_id = aws_security_group.pss_testbox_sg.id
+  type = "egress"
+  protocol = "tcp"
+  from_port = 443
+  to_port = 443
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Allow pss testbox to connect to internet on 443 in env ${var.environment}"
 }
 
 /*
@@ -30,23 +80,3 @@ resource "aws_security_group_rule" "additional_outgoing_from_testbox_to_jumpbox"
   description = "Allow from additional SG: From testbox to Jumpbox in env: ${var.environment}"
 }
 */
-
-/*resource "aws_security_group_rule" "pss_testbox_80_internet" {
-  description = "Allow testbox to connect to internet on 80"
-  type = "egress"
-  from_port = 80
-  to_port = 80
-  protocol = "tcp"
-  security_group_id = aws_security_group.pss_testbox_sg.id
-  cidr_blocks = [data.terraform_remote_state.base.outputs.pss_cidr]
-}
-
-resource "aws_security_group_rule" "pss_testbox_443_internet" {
-  description = "Allow testbox to connect to internet on 443"
-  type = "egress"
-  from_port = 443
-  to_port = 443
-  protocol = "tcp"
-  security_group_id = aws_security_group.pss_testbox_sg.id
-  cidr_blocks = [data.terraform_remote_state.base.outputs.pss_cidr]
-}*/
