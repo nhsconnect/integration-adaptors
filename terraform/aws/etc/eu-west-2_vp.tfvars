@@ -69,9 +69,9 @@ gp2gp_create_sdsapi_mock = true
 gp2gp_sdsapi_mock_build_id ="main-376-81e0a27"
 
 # Settings for "gpc-consumer" component
-gpc-consumer_service_minimal_count = 2
-gpc-consumer_service_desired_count =2
-gpc-consumer_service_maximal_count = 2
+gpc-consumer_service_minimal_count = 1
+gpc-consumer_service_desired_count =1
+gpc-consumer_service_maximal_count = 1
 gpc-consumer_service_target_request_count = 1200
 gpc-consumer_service_container_port = 8080
 gpc-consumer_service_launch_type = "FARGATE"
