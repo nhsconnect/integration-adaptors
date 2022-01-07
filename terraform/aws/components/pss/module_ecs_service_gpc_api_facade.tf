@@ -47,6 +47,10 @@ module "ecs_service_gpc_api_facade" {
     module.ecs_service_gp2gp_translator.service_sg_id
   ]
 
+  container_allowed_security_groups =  [
+    aws_security_group.pss_container_access_sg.id
+  ]
+
   logs_datetime_format = var.pss_logs_datetime_format
 
   create_testbox = var.pss_gpc_facade_testbox

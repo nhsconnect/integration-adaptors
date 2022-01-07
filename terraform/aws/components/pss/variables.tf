@@ -81,16 +81,6 @@ variable "mq_broker_name" {
   description = "Name of the MQ broker shared between all envs"
 }
 
-variable "pss_queue_name" {
-  type = string
-  description = "Name of PSS Queue"
-}
-
-variable "mhs_queue_name" {
-  type = string
-  description = "Name of PSS MHS Queue"
-}
-
 variable "enable_dlt" {
   type = bool
   description = "Should the containers in the service be attached to dlt"

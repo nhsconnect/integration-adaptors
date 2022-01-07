@@ -4,7 +4,11 @@ resource "aws_instance" "pss_testbox" {
   ami           = data.aws_ami.base_linux.id
   instance_type = "t2.micro"
   key_name = "kainos-dev"
-  vpc_security_group_ids = [aws_security_group.pss_testbox_sg.id,data.terraform_remote_state.base.outputs.postgres_access_sg_id]
+  vpc_security_group_ids = [
+    aws_security_group.pss_testbox_sg.id,
+    aws_security_group.pss_ecs_access,
+    data.terraform_remote_state.base.outputs.postgres_access_sg_id
+  ]
   subnet_id = aws_subnet.service_subnet[0].id
 
   tags = merge(local.default_tags, {

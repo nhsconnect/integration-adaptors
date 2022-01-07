@@ -7,11 +7,10 @@ locals {
       },
       {
         name = "PS_QUEUE_NAME"
-        value = var.pss_queue_name
+        value = "${var.environment}-pss-queue"
       },
-
       {
-        name  = "PSS_LOGGING_LEVEL"
+        name  = "LOG_LEVEL"
         value = var.pss_log_level
       },
       {
@@ -26,15 +25,19 @@ locals {
 
     pss_gpc_api_facade_environment_variables = [
       {
-        name = "GPC_SERVER_PORT"
-        value = var.pss_service_application_port
+        name = "GPC_FACADE_SERVER_PORT"
+        value = var.pss_gpc_api_facade_container_port
       }
     ]
 
     pss_gp2gp_translator_environment_variables = [
       {  
-        name = "GP2GP_SERVER_PORT"
-        value = var.pss_service_application_port
+        name = "GP2GP_TRANSLATOR_SERVER_PORT"
+        value = var.pss_gp2gp_translator_container_port
+      },
+      {
+        name = "MHS_QUEUE_NAME"
+        value = "${var.environment}-pss-mhs-queue"
       },
       {
         name = "MHS_AMQP_BROKER"
