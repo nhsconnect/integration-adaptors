@@ -44,10 +44,6 @@ locals {
         value = replace(data.aws_mq_broker.pss_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
       },
       {
-        name = "MHS_QUEUE_NAME"
-        value = var.mhs_queue_name
-      },
-      {
         name = "MHS_AMQP_MAX_REDELIVERIES"
         value = var.pss_amqp_max_redeliveries
       } 

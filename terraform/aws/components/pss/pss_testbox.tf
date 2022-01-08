@@ -6,7 +6,7 @@ resource "aws_instance" "pss_testbox" {
   key_name = "kainos-dev"
   vpc_security_group_ids = [
     aws_security_group.pss_testbox_sg.id,
-    aws_security_group.pss_ecs_access,
+    aws_security_group.pss_container_access_sg.id,
     data.terraform_remote_state.base.outputs.postgres_access_sg_id
   ]
   subnet_id = aws_subnet.service_subnet[0].id
