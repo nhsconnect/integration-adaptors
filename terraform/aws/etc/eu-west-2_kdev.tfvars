@@ -2,7 +2,7 @@
 environment = "kdev"
 base_cidr_block = "10.17.0.0/16"
 cluster_container_insights = "enabled"
-docdb_instance_class = "db.r5.large"
+docdb_instance_class = "db.t3.medium"
 mongo_ssl_enabled = true
 enable_internet_access = "true"
 create_opentest_instance = false
