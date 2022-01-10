@@ -12,6 +12,7 @@ locals {
   mhs_cidr           = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,4)
   gp2gp_cidr         = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,5)
   lab-results_cidr   = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,6)
+  pss_cidr           = cidrsubnet(aws_vpc.base_vpc.cidr_block,8,7)
 }
 
 # Guidance on subnets:

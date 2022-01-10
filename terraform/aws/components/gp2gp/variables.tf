@@ -39,6 +39,29 @@ variable "gp2gp_build_id" {
   description = "Number of the current build, used for tagging the logs"
 }
 
+variable "gp2gp_gpcc_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-340-4d6ff67"
+}
+
+variable "gp2gp_mhs_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-341-b4b28a1"
+}
+
+variable "gp2gp_gpcapi_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-340-4d6ff67"
+}
+variable "gp2gp_sdsapi_mock_build_id" {
+  type = string
+  description = "Number of the current build, used for tagging the logs"
+  default = "main-340-4d6ff67"
+}
+
 variable "gp2gp_service_desired_count" {
   type = number
   description = "Number of containers to run in the service"
@@ -193,6 +216,24 @@ variable "gp2gp_create_mhs_mock" {
   description = "Should an MHS mock be created and used by GP2GP"
 }
 
+variable "gp2gp_create_gpcc_mock" {
+  type = bool
+  default = false
+  description = "Should GPCC mock be created and used by GP2GP"
+}
+
+variable "gp2gp_create_sdsapi_mock" {
+  type = bool
+  default = false
+  description = "Should SDS API GPCC mock be created and used by GP2GP"
+}
+
+variable "gp2gp_create_gpcapi_mock" {
+  type = bool
+  default = false
+  description = "Should GPConnect API mock be created and used by GP2GP"
+}
+
 variable "gp2gp_mock_mhs_port" {
   type = number
   default = 8081
@@ -217,6 +258,12 @@ variable "gp2gp_wiremock_container_port" {
 variable "gp2gp_wiremock_application_port" {
   type = number
   default = 8080
+}
+
+variable "gp2gp_mock_port" {
+  type = number
+  default = 8080
+  description = "Application/Container port number for GPCC_MOCK, GPC-API_MOCK, SDS_API_MOCK"
 }
 
 variable gp2gp_gpc_override_nhs_number {

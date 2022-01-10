@@ -35,11 +35,6 @@ variable "gpc-consumer_build_id" {
   default = "main-21-188a231"
 }
 
-variable "gpc-consumer_mongo_options" {
-  type = string
-  description = "Options for Mongo"
-}
-
 variable "gpc-consumer_ssl_trust_store_url" {
   type = string
   description = "S3 path to the custom trust store"
@@ -114,6 +109,12 @@ variable "gpc-consumer_sds_url" {
   type = string
   description = "URL to the SDS API"
   default = 8080 
+}
+
+variable "gpc-consumer_override_gpc_provider_url" {
+  type = string
+  description = "URL to the GP Connect Provider API"
+  default = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
 }
 
 variable "gpc-consumer_ssp_fqdn" {

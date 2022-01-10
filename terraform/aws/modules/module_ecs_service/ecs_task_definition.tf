@@ -21,6 +21,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
             awslogs-datetime-format = var.logs_datetime_format
           }
         }
+        command =  var.command_variables
         environment = var.environment_variables
         secrets = var.secret_variables
       }

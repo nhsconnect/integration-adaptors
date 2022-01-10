@@ -66,7 +66,7 @@ locals {
     },
     {
       name = "GP2GP_GPC_GET_URL"
-      value = "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}/B82617/STU3/1/gpconnect"
+      value = var.gp2gp_create_gpcc_mock ? "http://${module.gpcc_mock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_port}/GP0001/STU3/1/gpconnect" : "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}/B82617/STU3/1/gpconnect"
     },
     {
       name = "GP2GP_GPC_OVERRIDE_NHS_NUMBER"
@@ -96,8 +96,50 @@ locals {
       value = var.mhs_inbound_queue_name
     },
     {
+      name  = "GP2GP_AMQP_BROKERS"
+      value = replace(data.aws_mq_broker.nhais_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
+    },
+    {
       name = "GP2GP_AMQP_MAX_REDELIVERIES"
       value = var.gp2gp_mock_mhs_amqp_max_redeliveries
+    },
+    {
+      name = "MHS_MOCK_REQUEST_JOURNAL_ENABLED"
+      value = false
+    },
+    {
+      name = "MHS_MOCK_ROOT_LOGGING_LEVEL"
+      value = "WARN"
+    },
+    {
+      name = "MHS_MOCK_LOGGING_LEVEL"
+      value = "WARN"
     }
   ]
+
+  gpcc_mock_environment_variables = [
+  ]
+
+  gpcapi_mock_environment_variables = [
+  ]
+
+  sdsapi_mock_environment_variables = [
+    {
+      name  = "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL"
+      value = var.gp2gp_create_gpcapi_mock ? "http://${module.gpcapi_mock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_port}" : var.gpc-consumer_override_gpc_provider_url
+    }
+  ]
+  gpcc_mock_command_variables = [
+    "-global-response-templating"
+  ]
+
+  gpcapi_mock_command_variables = [
+    "-global-response-templating"
+  ]
+
+  sdsapi_mock_command_variables = [
+    "-global-response-templating",
+    "-permitted-system-keys=.*"
+  ]
+
 }

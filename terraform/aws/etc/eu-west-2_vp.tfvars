@@ -7,6 +7,7 @@ docdb_instance_class = "db.r5.large"
 dlt_vpc_id = "vpc-03f843c08b01876d5"
 enable_dlt = true
 mongo_ssl_enabled = true
+create_testbox = true
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 2
@@ -49,13 +50,23 @@ gp2gp_service_maximal_count = 1
 gp2gp_service_container_port = 8080
 gp2gp_service_launch_type = "FARGATE"
 gp2gp_extract_cache_bucket_retention_period = 7
-gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
-gp2gp_wiremock_container_port = 8080
-gp2gp_wiremock_application_port = 8080
-gp2gp_create_wiremock = true
-gp2gp_create_mhs_mock = true
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
+gp2gp_log_level = "INFO"
+gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+gp2gp_create_wiremock = false
+gp2gp_wiremock_container_port = 8080
+gp2gp_wiremock_application_port = 8080
+gp2gp_create_mhs_mock = true
+gp2gp_mhs_mock_build_id = "main-341-b4b28a1"
+gp2gp_mock_mhs_port = 8080
+gp2gp_mock_port = 8080
+gp2gp_create_gpcc_mock = true
+gp2gp_gpcc_mock_build_id = "main-340-4d6ff67"
+gp2gp_create_gpcapi_mock = true
+gp2gp_gpcapi_mock_build_id = "main-340-4d6ff67"
+gp2gp_create_sdsapi_mock = true
+gp2gp_sdsapi_mock_build_id ="main-340-4d6ff67"
 
 # Settings for "gpc-consumer" component
 gpc-consumer_service_minimal_count = 1
@@ -67,6 +78,7 @@ gpc-consumer_service_launch_type = "FARGATE"
 gpc-consumer_root_log_level = "WARN"
 gpc-consumer_log_level = "INFO"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+gpc-consumer_override_gpc_provider_url = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
 gpc-consumer_sds_url = "https://sandbox.api.service.nhs.uk/spine-directory/"
 gpc-consumer_ssp_fqdn = ""
 
@@ -96,7 +108,7 @@ lab-results_mesh_client_wakeup_interval_in_milliseconds = 10000
 lab-results_mesh_polling_cycle_duration_in_seconds = 25
 
 # setting for mhs component
-mhs_inbound_queue_name = "vp_inbound_queue"
+mhs_inbound_queue_name = "vp_gp2gp_inbound_queue"
 
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
