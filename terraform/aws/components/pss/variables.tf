@@ -128,6 +128,11 @@ variable "pss_gpc_facade_testbox" {
   default = false
 }
 
+variable "create_pss_testbox" {
+  type = bool
+  default = false
+}
+
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
