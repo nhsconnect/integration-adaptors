@@ -99,12 +99,13 @@ lab-results_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 lab-results_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 
 # Settings for "pss" component
-pss_service_minimal_count = 1
-pss_service_desired_count = 1
-pss_service_maximal_count = 1
+pss_service_minimal_count = 0
+pss_service_desired_count = 0
+pss_service_maximal_count = 0
 pss_service_target_request_count = 1200
 pss_service_launch_type = "FARGATE"
 pss_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+create_pss_testbox = false
 pss_gp2gp_translator_testbox = false
 pss_gpc_facade_testbox = false
 pss_gpc_api_facade_container_port = 8081

@@ -1,6 +1,6 @@
 resource "aws_instance" "pss_testbox" {
+  count = var.create_pss_testbox ? 1 : 0
   availability_zone = local.availability_zones[0]
-
   ami           = data.aws_ami.base_linux.id
   instance_type = "t2.micro"
   key_name = "kainos-dev"
