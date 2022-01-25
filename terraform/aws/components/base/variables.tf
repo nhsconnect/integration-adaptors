@@ -175,6 +175,7 @@ variable "postgresdb_scheduler_stop_pattern" {
   type = bool
   description = "Schedule what time to stop the postgres instance "
   default = ""
+}
 
 variable "postgresdb_scheduler_start_pattern" {
   type = bool
