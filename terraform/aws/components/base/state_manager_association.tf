@@ -2,8 +2,9 @@ resource "aws_ssm_association" "stop_rds_association" {
   name = aws_ssm_document.stop_rds_document.name
   association_name = "Stop_RDS"
   schedule_expression = "cron(0 00 18 ? * * *)"
+  
 
-  parameters { 
+  parameters = { 
     InstanceId = aws_db_instance.base_postgres_db.id
     AutomationAssumeRole = aws_iam_role.rds_stop_start_role.name
   }
