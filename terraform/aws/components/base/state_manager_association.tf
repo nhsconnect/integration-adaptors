@@ -1,4 +1,4 @@
-/*resource "aws_ssm_association" "stop_rds_association" {
+resource "aws_ssm_association" "stop_rds_association" {
   name = aws_ssm_document.stop_rds_document.name
   association_name = "Stop_RDS"
   schedule_expression = "cron(0 00 18 ? * * *)"
@@ -60,4 +60,3 @@ mainSteps:
   }
 DOC
 }
-*/
