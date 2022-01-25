@@ -32,7 +32,7 @@ resource "aws_iam_policy" "rds_stop_start_Policy" {
                 "rds:Stop*",
                 "rds:Reboot*"
             ],
-            "Resource": "*"
+            "Resource": "nia-build1-base-psdb-instance"
         }
     ]
 })
