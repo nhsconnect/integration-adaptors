@@ -31,8 +31,3 @@ output "jumpbox_hostname" {
   description = "Hostname of jumpbox instance"
   value = aws_instance.jumpbox.public_dns
 }
-
-output "rds_iam_role" {
-  description = "Iam role arn use to start and stop rds instance"
-  value = aws_iam_role.rds_stop_start_role.arn
-}
