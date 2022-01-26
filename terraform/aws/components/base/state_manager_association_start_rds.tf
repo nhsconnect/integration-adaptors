@@ -17,7 +17,7 @@ resource "aws_ssm_document" "start_rds_document" {
   document_type = "Automation"
 
   content = <<DOC
-ddescription: Start RDS instance
+description: Start RDS instance
 schemaVersion: '0.3'
 assumeRole: '{{ AutomationAssumeRole }}'
 parameters:
