@@ -7,7 +7,7 @@ resource "aws_ssm_association" "start_rds_association" {
 
   parameters = { 
     InstanceId = aws_db_instance.base_postgres_db[0].id
-    AutomationAssumeRole = data.terraform_remote_state.account.outputs.rds_iam_role
+    AutomationAssumeRole = aws_iam_role.rds_stop_start_role.arn
   }
 }
 
