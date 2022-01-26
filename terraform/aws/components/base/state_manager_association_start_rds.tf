@@ -3,11 +3,12 @@ resource "aws_ssm_association" "start_rds_association" {
   name = aws_ssm_document.start_rds_document.name
   association_name = "${replace(local.resource_prefix,"_","-")}-Start_RDS"
   schedule_expression = var.postgresdb_scheduler_start_pattern
+  test = data.terraform_remote_state.account.outputs.rds_iam_role
   
 
   parameters = { 
     InstanceId = aws_db_instance.base_postgres_db[0].id
-    AutomationAssumeRole = data.terraform_remote_state.account.outputs.rds_iam_role
+    AutomationAssumeRole = var.rds_iam_role_arn
   }
 }
 
