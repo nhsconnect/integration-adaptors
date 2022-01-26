@@ -33,6 +33,6 @@ output "jumpbox_hostname" {
 }
 
 output "rds_iam_role" {
-  description = "Iam role use to start and stop rds instance"
+  description = "Iam role arn use to start and stop rds instance"
   value = aws_iam_role.rds_stop_start_role.arn
 }
