@@ -11,6 +11,7 @@ postgres_instance_class = "db.t4g.micro"
 create_postgres_db = true
 postgresdb_scheduler_enabled = true
 postgresdb_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
+ostgresdb_scheduler_start_pattern = "cron(0 00 06 ? * * *)"
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
