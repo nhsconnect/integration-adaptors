@@ -1,4 +1,4 @@
-resource "aws_ssm_association" "stop_rds_association" {
+/*resource "aws_ssm_association" "stop_rds_association" {
   count = var.postgresdb_scheduler_enabled ? 1 : 0
   name = aws_ssm_document.stop_rds_document.name
   association_name = "Stop_RDS"
@@ -63,4 +63,4 @@ mainSteps:
       DesiredValues:
         - stopped
 DOC
-}
+}*/

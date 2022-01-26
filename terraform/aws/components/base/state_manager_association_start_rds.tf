@@ -1,4 +1,4 @@
-resource "aws_ssm_association" "start_rds_association" {
+/*resource "aws_ssm_association" "start_rds_association" {
   count = var.postgresdb_scheduler_enabled ? 1 : 0
   name = aws_ssm_document.start_rds_document.name
   association_name = "Start_RDS"
@@ -64,4 +64,4 @@ mainSteps:
         - available
     isEnd: true
 DOC
-}
+}*/
