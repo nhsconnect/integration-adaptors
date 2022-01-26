@@ -3,7 +3,6 @@ resource "aws_ssm_association" "start_rds_association" {
   name = aws_ssm_document.start_rds_document.name
   association_name = "Start_RDS"
   schedule_expression = var.postgresdb_scheduler_start_pattern
-  apply_only_at_cron_interval = "false"
   
 
   parameters = { 
