@@ -12,7 +12,7 @@ resource "aws_ssm_association" "stop_rds_association" {
 }
 
 resource "aws_ssm_document" "stop_rds_document" {
-  name          = "AWS-StopRdsInstance"
+  name          = "StopRdsInstance"
   document_format = "YAML"
   document_type = "Automation"
 
