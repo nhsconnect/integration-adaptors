@@ -183,12 +183,6 @@ variable "postgresdb_scheduler_start_pattern" {
   default = ""
 }
 
-variable "rds_iam_role_arn" {
-  type = string
-  description = "Iam role arn use to start and stop rds instance "
-  default = data.terraform_remote_state.account.outputs.rds_iam_role
-}
-
 variable "postgres_master_user" {
   type = string
   description = "Username for Postgres DB master user"
