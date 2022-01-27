@@ -47,6 +47,6 @@ resource "aws_iam_policy" "rds_stop_start_Policy" {
 
 resource "aws_iam_role_policy_attachment" "rds_policy_attach" {
   count = var.create_rds_stopstart_role ? 1 : 0
-  role       = aws_iam_role.rds_stop_start_role.name
-  policy_arn = aws_iam_policy.rds_stop_start_Policy.arn
+  role       = aws_iam_role.rds_stop_start_role[0].name
+  policy_arn = aws_iam_policy.rds_stop_start_Policy[0].arn
 }

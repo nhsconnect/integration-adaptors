@@ -7,7 +7,7 @@ resource "aws_ssm_association" "start_rds_association" {
 
   parameters = { 
     InstanceId = aws_db_instance.base_postgres_db[0].id
-    AutomationAssumeRole = aws_iam_role.rds_stop_start_role.arn
+    AutomationAssumeRole = aws_iam_role.rds_stop_start_role[0].arn
   }
 }
 
