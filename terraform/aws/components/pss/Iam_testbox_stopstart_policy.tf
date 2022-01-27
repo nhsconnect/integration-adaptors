@@ -1,6 +1,6 @@
 resource "aws_iam_role" "pss_testbox_stop_start_role" {
   count = var.create_testbox_stopstart_role ? 1 : 0
-  name = "${replace(local.resource_prefix,"_","-")}-StartStop_Pss_Testbox_Role"
+  name = "${replace(local.resource_prefix,"_","-")}-StartStop-Pss-Testbox-Role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -19,7 +19,7 @@ resource "aws_iam_role" "pss_testbox_stop_start_role" {
 
 resource "aws_iam_policy" "pss_testbox_stop_start_Policy" {
   count = var.create_testbox_stopstart_role ? 1 : 0
-  name        = "${replace(local.resource_prefix,"_","-")}-StartStop_PSS_Testbox_Policy"
+  name        = "${replace(local.resource_prefix,"_","-")}-StartStop-PSS-Testbox-Policy"
   description = "My test policy"
 
  
