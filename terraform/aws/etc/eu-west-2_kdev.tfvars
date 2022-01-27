@@ -9,6 +9,7 @@ create_opentest_instance = false
 postgres_instance_class = "db.t4g.micro"
 create_postgres_db = true
 postgresdb_scheduler_enabled = true
+create_rds_stopstart_role = true
 postgresdb_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
 postgresdb_scheduler_start_pattern = "cron(0 00 06 ? * * *)"
 

@@ -1,4 +1,5 @@
 resource "aws_iam_role" "rds_stop_start_role" {
+  count = var.create_rds_stopstart_role ? 1 : 0
   name = "rds_scheduler"
 
   assume_role_policy = jsonencode({
@@ -17,6 +18,7 @@ resource "aws_iam_role" "rds_stop_start_role" {
 
 
 resource "aws_iam_policy" "rds_stop_start_Policy" {
+  count = var.create_rds_stopstart_role ? 1 : 0
   name        = "RDS_AutoStopStart"
   description = "My test policy"
 
@@ -44,6 +46,7 @@ resource "aws_iam_policy" "rds_stop_start_Policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_policy_attach" {
+  count = var.create_rds_stopstart_role ? 1 : 0
   role       = aws_iam_role.rds_stop_start_role.name
   policy_arn = aws_iam_policy.rds_stop_start_Policy.arn
 }

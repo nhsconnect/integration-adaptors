@@ -171,6 +171,12 @@ variable "postgresdb_scheduler_enabled" {
   default = false
 }
 
+variable "create_rds_stopstart_role" {
+  type = bool
+  description = "If IAm role/policy to be created for rds start stop scheduler"
+  default = false
+}
+
 variable "postgresdb_scheduler_stop_pattern" {
   type = string
   description = "Schedule what time to stop the postgres instance "

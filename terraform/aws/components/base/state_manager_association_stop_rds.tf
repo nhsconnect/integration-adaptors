@@ -12,6 +12,7 @@ resource "aws_ssm_association" "stop_rds_association" {
 }
 
 resource "aws_ssm_document" "stop_rds_document" {
+  count = var.postgresdb_scheduler_enabled ? 1 : 0
   name          = "StopRdsInstance"
   document_format = "YAML"
   document_type = "Automation"
