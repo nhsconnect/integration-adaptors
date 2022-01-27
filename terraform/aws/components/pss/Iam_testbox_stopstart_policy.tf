@@ -3,17 +3,17 @@ resource "aws_iam_role" "pss_testbox_stop_start_role" {
   name = "${replace(local.resource_prefix,"_","-")}-StartStop-Pss-Testbox-Role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ssm.amazonaws.com"
-        }
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
       },
-    ]
-  })
+      "Action": "sts:AssumeRole"
+    }
+  ]
+})
 }
 
 
@@ -30,6 +30,8 @@ resource "aws_iam_policy" "pss_testbox_stop_start_Policy" {
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
+                "ec2:StartInstances",
+                "ec2:StopInstances",
                 "ec2:StartInstances",
                 "ec2:StopInstances"
             ],
