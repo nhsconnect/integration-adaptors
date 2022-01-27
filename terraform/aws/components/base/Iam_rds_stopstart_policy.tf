@@ -1,6 +1,6 @@
 resource "aws_iam_role" "rds_stop_start_role" {
   count = var.create_rds_stopstart_role ? 1 : 0
-  name = "${replace(local.resource_prefix,"_","-")}rds_scheduler"
+  name = "${replace(local.resource_prefix,"_","-")}-rds-scheduler"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -19,7 +19,7 @@ resource "aws_iam_role" "rds_stop_start_role" {
 
 resource "aws_iam_policy" "rds_stop_start_Policy" {
   count = var.create_rds_stopstart_role ? 1 : 0
-  name        = "${replace(local.resource_prefix,"_","-")}RDS_AutoStopStart"
+  name        = "${replace(local.resource_prefix,"_","-")}-rds-auto-stopstart"
   description = "My test policy"
 
  
