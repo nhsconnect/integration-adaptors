@@ -13,5 +13,6 @@ resource "aws_instance" "pss_testbox" {
 
   tags = merge(local.default_tags, {
      Name = "${local.resource_prefix}-testbox"
+     Stop-Start-Testbox = var.enable_start_stop_testbox
   })
 }
