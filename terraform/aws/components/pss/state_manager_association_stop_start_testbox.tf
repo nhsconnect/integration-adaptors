@@ -13,7 +13,7 @@ resource "aws_ssm_association" "stop_pss_testbox_association" {
 
 resource "aws_ssm_document" "stop_pss_testbox_document" {
   count = var.pss_testbox_scheduler_enabled ? 1 : 0
-  name          = "Stop_PSS_Testbox"
+  name          = "Stop-PSS-Testbox-${replace(local.resource_prefix,"_","-")}"
   document_type = "Automation"
 
   content = <<DOC
@@ -72,7 +72,7 @@ DOC
 
 resource "aws_ssm_document" "start_pss_testbox_document" {
   count = var.pss_testbox_scheduler_enabled ? 1 : 0
-  name          = "Start_PSS_Testbox"
+  name          = "Start-PSS-Testbox-${replace(local.resource_prefix,"_","-")}"
   document_type = "Automation"
 
   content = <<DOC
