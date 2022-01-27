@@ -1,4 +1,4 @@
-/*resource "aws_ssm_association" "stop_pss_testbox_association" {
+resource "aws_ssm_association" "stop_pss_testbox_association" {
   count = var.pss_testbox_scheduler_enabled ? 1 : 0
   name = aws_ssm_document.stop_pss_testbox_document.name
   association_name = "${replace(local.resource_prefix,"_","-")}-Stop_pss_testbox"
@@ -7,7 +7,7 @@
 
   parameters = { 
     InstanceId = aws_instance.pss_testbox[0].id
-    AutomationAssumeRole = aws_iam_role.testbox_stop_start_role[0].arn
+    AutomationAssumeRole = aws_iam_role.pss_testbox_stop_start_role[0].arn
   }
 }
 
@@ -57,7 +57,7 @@ resource "aws_ssm_document" "stop_pss_testbox_document" {
 DOC
 }
 
-resource "aws_ssm_association" "start_pss_testbox_association" {
+/*resource "aws_ssm_association" "start_pss_testbox_association" {
   count = var.pss_testbox_scheduler_enabled ? 1 : 0
   name = aws_ssm_document.start_pss_testbox_document.name
   association_name = "${replace(local.resource_prefix,"_","-")}-Start_pss_testbox"
@@ -66,7 +66,7 @@ resource "aws_ssm_association" "start_pss_testbox_association" {
 
   parameters = { 
     InstanceId = aws_instance.pss_testbox[0].id
-    AutomationAssumeRole = aws_iam_role.testbox_stop_start_role[0].arn
+    AutomationAssumeRole = aws_iam_role.pss_testbox_stop_start_role[0].arn
   }
 }
 
