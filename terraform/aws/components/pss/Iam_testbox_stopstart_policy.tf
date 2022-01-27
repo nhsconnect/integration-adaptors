@@ -8,7 +8,8 @@ resource "aws_iam_role" "pss_testbox_stop_start_role" {
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": "ec2.amazonaws.com"
+        "Service": "ec2.amazonaws.com",
+        "Service": "ssm.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }
@@ -32,8 +33,9 @@ resource "aws_iam_policy" "pss_testbox_stop_start_Policy" {
             "Action": [
                 "ec2:StartInstances",
                 "ec2:StopInstances",
-                "ec2:StartInstances",
-                "ec2:StopInstances"
+                "ec2:DescribeInstances",
+                "ec2:RebootInstances",
+                "ec2:DescribeInstanceStatus"
             ],
             "Resource": "*",
             "Condition": {
