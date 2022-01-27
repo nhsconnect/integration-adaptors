@@ -1,7 +1,7 @@
 resource "aws_ssm_association" "stop_pss_testbox_association" {
   count = var.pss_testbox_scheduler_enabled ? 1 : 0
   name = aws_ssm_document.stop_pss_testbox_document.name
-  association_name = "${replace(local.resource_prefix,"_","-")}-Stop_pss_testbox"
+  association_name = "${replace(local.resource_prefix,"_","-")}-Stop_pss-testbox"
   schedule_expression = var.pss_testbox_scheduler_stop_pattern
   
 
@@ -60,7 +60,7 @@ DOC
 /*resource "aws_ssm_association" "start_pss_testbox_association" {
   count = var.pss_testbox_scheduler_enabled ? 1 : 0
   name = aws_ssm_document.start_pss_testbox_document.name
-  association_name = "${replace(local.resource_prefix,"_","-")}-Start_pss_testbox"
+  association_name = "${replace(local.resource_prefix,"_","-")}-Start_pss-testbox"
   schedule_expression = var.pss_testbox_scheduler_start_pattern
   
 
