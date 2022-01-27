@@ -1,4 +1,4 @@
-resource "aws_iam_role" "testbox_stop_start_role" {
+resource "aws_iam_role" "pss_testbox_stop_start_role" {
   count = var.create_testbox_stopstart_role ? 1 : 0
   name = "SSM_StartStop_Pss_testbox_Role"
 
@@ -17,7 +17,7 @@ resource "aws_iam_role" "testbox_stop_start_role" {
 }
 
 
-resource "aws_iam_policy" "testbox_stop_start_Policy" {
+resource "aws_iam_policy" "pss_testbox_stop_start_Policy" {
   count = var.create_testbox_stopstart_role ? 1 : 0
   name        = "SSM_StartStop_PSS_testbox_Policy"
   description = "My test policy"
@@ -44,7 +44,7 @@ resource "aws_iam_policy" "testbox_stop_start_Policy" {
 })
 }
 
-resource "aws_iam_role_policy_attachment" "testbox_policy_attach" {
+resource "aws_iam_role_policy_attachment" "pss_testbox_policy_attach" {
   count = var.create_testbox_stopstart_role ? 1 : 0
   role       = aws_iam_role.testbox_stop_start_role[0].name
   policy_arn = aws_iam_policy.testbox_stop_start_Policy[0].arn
