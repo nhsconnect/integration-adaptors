@@ -13,7 +13,7 @@ resource "aws_ssm_association" "stop_rds_association" {
 
 resource "aws_ssm_document" "stop_rds_document" {
   count = var.postgresdb_scheduler_enabled ? 1 : 0
-  name          = "StopRdsInstance"
+  name          = "StopRdsInstance-${replace(local.resource_prefix,"_","-")}"
   document_format = "YAML"
   document_type = "Automation"
 
@@ -81,7 +81,7 @@ resource "aws_ssm_association" "start_rds_association" {
 
 resource "aws_ssm_document" "start_rds_document" {
   count = var.postgresdb_scheduler_enabled ? 1 : 0
-  name          = "StartRdsInstance"
+  name          = "StartRdsInstance-${replace(local.resource_prefix,"_","-")}"
   document_format = "YAML"
   document_type = "Automation"
 
