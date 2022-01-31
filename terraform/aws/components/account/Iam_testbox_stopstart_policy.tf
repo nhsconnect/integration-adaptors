@@ -1,5 +1,5 @@
 resource "aws_iam_role" "pss_testbox_stop_start_role" {
-  count = var.create_testbox_stopstart_role ? 1 : 0
+  //count = var.create_testbox_stopstart_role ? 1 : 0
   name = "${replace(local.resource_prefix,"_","-")}-StartStop-Pss-Testbox-Role"
 
   assume_role_policy = jsonencode({
@@ -19,9 +19,9 @@ resource "aws_iam_role" "pss_testbox_stop_start_role" {
 
 
 resource "aws_iam_policy" "pss_testbox_stop_start_Policy" {
-  count = var.create_testbox_stopstart_role ? 1 : 0
+  //count = var.create_testbox_stopstart_role ? 1 : 0
   name        = "${replace(local.resource_prefix,"_","-")}-StartStop-PSS-Testbox-Policy"
-  description = "My test policy"
+  description = "Enable Stop Start Scheduler"
 
  
   policy = jsonencode({
@@ -49,7 +49,7 @@ resource "aws_iam_policy" "pss_testbox_stop_start_Policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "pss_testbox_policy_attach" {
-  count = var.create_testbox_stopstart_role ? 1 : 0
+  //count = var.create_testbox_stopstart_role ? 1 : 0
   role       = aws_iam_role.pss_testbox_stop_start_role[0].name
   policy_arn = aws_iam_policy.pss_testbox_stop_start_Policy[0].arn
 }

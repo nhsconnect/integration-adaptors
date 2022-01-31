@@ -12,6 +12,9 @@ postgresdb_scheduler_enabled = true
 create_rds_stopstart_role = true
 postgresdb_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
 postgresdb_scheduler_start_pattern = "cron(0 00 06 ? * * *)"
+pss_testbox_scheduler_enabled = true
+pss_testbox_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
+pss_testbox_scheduler_start_pattern = "cron(0 00 06 ? * * *)"
 
 # Settings for "pss" component
 pss_service_minimal_count = 1
@@ -30,6 +33,3 @@ pss_service_application_port = 8080
 pss_log_level = "DEBUG"
 enable_start_stop_testbox = true
 create_testbox_stopstart_role = true
-pss_testbox_scheduler_enabled = true
-pss_testbox_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
-pss_testbox_scheduler_start_pattern = "cron(0 00 06 ? * * *)"
