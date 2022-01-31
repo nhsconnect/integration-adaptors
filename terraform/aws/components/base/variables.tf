@@ -157,24 +157,6 @@ variable "jumpbox_allowed_ssh" {
   default = []
 }
 
-variable "pss_testbox_scheduler_enabled" {
-  description = "enable scheduler to start and stop pss testbox"
-  type = bool
-  default = false
-}
-
-variable "pss_testbox_scheduler_stop_pattern" {
-  description = "schedule time to stop the testbox"
-  type = string
-  default = ""
-}
-
-variable "pss_testbox_scheduler_start_pattern" {
-  description = "schedule time to start the test box"
-  type = string
-  default = ""
-}
-
 # Variables related to Postgres DB
 
 variable "create_postgres_db" {

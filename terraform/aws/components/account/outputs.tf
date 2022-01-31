@@ -31,3 +31,8 @@ output "jumpbox_hostname" {
   description = "Hostname of jumpbox instance"
   value = aws_instance.jumpbox.public_dns
 }
+
+  output "scheduler_role_arn" {
+  value = "enable-stop-start-scheduler_role.arn"
+  description = "Arn for Start Stop scheduler role"
+}
