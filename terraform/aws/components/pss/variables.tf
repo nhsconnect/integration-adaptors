@@ -133,34 +133,10 @@ variable "create_pss_testbox" {
   default = false
 }
 
-variable "enable_start_stop_testbox" {
+variable "enable_start_stop_scheduler" {
   description = "creates a tag which allows the scheduler to be able to run on the resource"
   type = bool
   default = false
-}
-
-variable "create_testbox_stopstart_role" {
-  description = "create role and policy to allow aws to start and stop pss testbox"
-  type = bool
-  default = false
-}
-
-variable "pss_testbox_scheduler_enabled" {
-  description = "enable scheduler to start and stop pss testbox"
-  type = bool
-  default = false
-}
-
-variable "start_stop_scheduler_stop_pattern" {
-  description = "schedule time to stop the testbox"
-  type = string
-  default = ""
-}
-
-variable "start_stop_scheduler_start_pattern" {
-  description = "schedule time to start the test box"
-  type = string
-  default = ""
 }
 
 # Variables related to PTL connectivity

@@ -11,7 +11,7 @@ create_postgres_db = true
 enable_start_stop_scheduler = true
 scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
 scheduler_start_pattern = "cron(0 00 06 ? * * *)"
-pss_testbox_scheduler_enabled = true
+enable_scheduler = true
 
 # Settings for "pss" component
 pss_service_minimal_count = 1
