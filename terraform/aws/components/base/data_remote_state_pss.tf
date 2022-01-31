@@ -1,4 +1,4 @@
-data "terraform_remote_state" "base" {
+data "terraform_remote_state" "pss" {
   backend = "s3"
   
   config = {
