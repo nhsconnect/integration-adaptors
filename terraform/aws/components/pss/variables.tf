@@ -152,14 +152,14 @@ variable "pss_testbox_scheduler_stop_pattern" {
 
 variable "pss_testbox_scheduler_start_pattern" {
   description = "Schedule what time to start instance"
-  type = bool
+  type = string
   default = false
 }
 
 # Variables related to PTL connectivity
 
 variable "ptl_connected" {
-  type = bool
+  type = string
   description = "Should this environment be connected to NHS PTL"
   default = false
 }
