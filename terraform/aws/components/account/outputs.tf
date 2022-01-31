@@ -34,5 +34,5 @@ output "jumpbox_hostname" {
 
 output "scheduler_role_arn" {
   description = "Arn for start stop scheduler role"
-  value = aws_iam_role.enable-stop-start-scheduler_role.arn
+  value = aws_iam_role.enable_stop_start_scheduler_role.arn
 }
