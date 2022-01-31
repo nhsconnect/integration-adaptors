@@ -6,7 +6,7 @@ resource "aws_ssm_association" "stop_pss_testbox_association" {
   
 
   parameters = { 
-    InstanceId = aws_instance.pss_testbox.id
+    InstanceId = aws_instance.pss_testbox[0].id
     AutomationAssumeRole = data.terraform_remote_state.account.outputs.scheduler_role_arn
   }
 }
@@ -65,7 +65,7 @@ resource "aws_ssm_association" "start_pss_testbox_association" {
   
 
   parameters = { 
-    InstanceId = aws_instance.pss_testbox.id
+    InstanceId = aws_instance.pss_testbox[0].id
     AutomationAssumeRole = data.terraform_remote_state.account.outputs.scheduler_role_arn
   }
 }
