@@ -133,7 +133,7 @@ variable "create_pss_testbox" {
   default = false
 }
 
-variable "enable_start_stop_scheduler" {
+variable "testbox_enable_scheduler" {
   description = "creates a tag which allows the scheduler to be able to run on the resource"
   type = bool
   default = false

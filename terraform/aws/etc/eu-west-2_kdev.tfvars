@@ -28,4 +28,4 @@ pss_gp2gp_translator_container_port = 8085
 pss_mock_mhs_port = 8080
 pss_service_application_port = 8080
 pss_log_level = "DEBUG"
-enable_scheduler = true
+testbox_enable_scheduler = true
