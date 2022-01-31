@@ -48,7 +48,7 @@ resource "aws_iam_policy" "enable_stop_start_scheduler_policy" {
 })
 }
 
-resource "aws_iam_role_policy_attachment" "enable-stop-start-scheduler_policy_attach" {
+resource "aws_iam_role_policy_attachment" "enable_stop_start_scheduler_policy_attach" {
   //count = var.create_testbox_stopstart_role ? 1 : 0
   role       = enable_stop_start_scheduler_role.name
   policy_arn = enable_stop_start_scheduler_policy.arn
