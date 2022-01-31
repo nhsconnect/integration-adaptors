@@ -1,8 +1,8 @@
 resource "aws_ssm_association" "stop_rds_association" {
-  count = var.postgresdb_scheduler_enabled ? 1 : 0
+  count = var.enable_start_stop_scheduler ? 1 : 0
   name = aws_ssm_document.stop_rds_document[0].name
   association_name = "${replace(local.resource_prefix,"_","-")}-Stop-RDS"
-  schedule_expression = var.postgresdb_scheduler_stop_pattern
+  schedule_expression = var.scheduler_stop_pattern
   
 
   parameters = { 
@@ -12,7 +12,7 @@ resource "aws_ssm_association" "stop_rds_association" {
 }
 
 resource "aws_ssm_document" "stop_rds_document" {
-  count = var.postgresdb_scheduler_enabled ? 1 : 0
+  count = var.enable_start_stop_scheduler ? 1 : 0
   name          = "StopRdsInstance-${replace(local.resource_prefix,"_","-")}"
   document_format = "YAML"
   document_type = "Automation"
@@ -67,10 +67,10 @@ DOC
 }
 
 resource "aws_ssm_association" "start_rds_association" {
-  count = var.postgresdb_scheduler_enabled ? 1 : 0
+  count = var.enable_start_stop_scheduler ? 1 : 0
   name = aws_ssm_document.start_rds_document[0].name
   association_name = "${replace(local.resource_prefix,"_","-")}-Start-RDS"
-  schedule_expression = var.postgresdb_scheduler_start_pattern
+  schedule_expression = var.scheduler_start_pattern
   
 
   parameters = { 
@@ -80,7 +80,7 @@ resource "aws_ssm_association" "start_rds_association" {
 }
 
 resource "aws_ssm_document" "start_rds_document" {
-  count = var.postgresdb_scheduler_enabled ? 1 : 0
+  count = var.enable_start_stop_scheduler ? 1 : 0
   name          = "StartRdsInstance-${replace(local.resource_prefix,"_","-")}"
   document_format = "YAML"
   document_type = "Automation"

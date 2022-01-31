@@ -20,6 +20,6 @@ resource "aws_db_instance" "base_postgres_db" {
 
   tags = merge(local.default_tags,{
     Name = "${local.resource_prefix}-psdb-instance"
-    AutoStopStart = "StopStartRDS"
+    EnableScheduler = var.enable_scheduler
   })
 }

@@ -151,13 +151,13 @@ variable "pss_testbox_scheduler_enabled" {
   default = false
 }
 
-variable "pss_testbox_scheduler_stop_pattern" {
+variable "start_stop_scheduler_stop_pattern" {
   description = "schedule time to stop the testbox"
   type = string
   default = ""
 }
 
-variable "pss_testbox_scheduler_start_pattern" {
+variable "start_stop_scheduler_start_pattern" {
   description = "schedule time to start the test box"
   type = string
   default = ""

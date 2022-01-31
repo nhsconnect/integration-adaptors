@@ -35,12 +35,16 @@ resource "aws_iam_policy" "enable_stop_start_scheduler_policy" {
                 "ec2:StopInstances",
                 "ec2:DescribeInstances",
                 "ec2:RebootInstances",
-                "ec2:DescribeInstanceStatus"
+                "ec2:DescribeInstanceStatus",
+                "rds:Describe*",
+                "rds:Start*",
+                "rds:Stop*",
+                "rds:Reboot*"
             ],
             "Resource": "*",
             "Condition": {
                 "ForAllValues:StringEquals": {
-                    "aws:TagKeys": "Stop-Start-Testbox"
+                    "aws:TagKeys": "EnableScheduler"
                 }
             }
         }

@@ -165,27 +165,27 @@ variable "create_postgres_db" {
   default = false
 }
 
-variable "postgresdb_scheduler_enabled" {
+variable "enable_start_stop_scheduler" {
   type = bool
-  description = "If PostgreSQL DB needs stop and start schedule"
+  description = "If stop and start schedule will enabled for the env"
   default = false
 }
 
-variable "create_rds_stopstart_role" {
+variable "enable_scheduler" {
   type = bool
-  description = "If IAm role/policy to be created for rds start stop scheduler"
+  description = "Adds a tag to the to instance to allow start and stop scheduler to work on it"
   default = false
 }
 
-variable "postgresdb_scheduler_stop_pattern" {
+variable "scheduler_stop_pattern" {
   type = string
-  description = "Schedule what time to stop the postgres instance "
+  description = "Schedule what time to stop instance"
   default = ""
 }
 
-variable "postgresdb_scheduler_start_pattern" {
+variable "scheduler_start_pattern" {
   type = string
-  description = "Schedule what time to start the postgres instance "
+  description = "Schedule what time to start instance"
   default = ""
 }
 
