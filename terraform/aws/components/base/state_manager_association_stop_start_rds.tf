@@ -2,7 +2,7 @@ resource "aws_ssm_association" "stop_rds_association" {
   count = var.enable_start_stop_scheduler ? 1 : 0
   name = aws_ssm_document.stop_rds_document[0].name
   association_name = "${replace(local.resource_prefix,"_","-")}-Stop-RDS"
-  schedule_expression = var.scheduler_stop_pattern
+  schedule_expression = var.postgres_scheduler_stop_pattern
   
 
   parameters = { 
@@ -70,7 +70,7 @@ resource "aws_ssm_association" "start_rds_association" {
   count = var.enable_start_stop_scheduler ? 1 : 0
   name = aws_ssm_document.start_rds_document[0].name
   association_name = "${replace(local.resource_prefix,"_","-")}-Start-RDS"
-  schedule_expression = var.scheduler_start_pattern
+  schedule_expression = var.postgres_scheduler_start_pattern
   
 
   parameters = { 
