@@ -167,7 +167,7 @@ variable "create_postgres_db" {
 
 variable "enable_start_stop_scheduler" {
   type = bool
-  description = "If stop and start schedule will enabled for the env"
+  description = "If stop and start schedule will enabled postgres instance for this env"
   default = false
 }
 

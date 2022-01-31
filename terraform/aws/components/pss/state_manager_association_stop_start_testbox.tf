@@ -1,18 +1,18 @@
 resource "aws_ssm_association" "stop_pss_testbox_association" {
-  count = var.enable_start_stop_scheduler ? 1 : 0
+  count = var.enable_pss_testbox_scheduler ? 1 : 0
   name = aws_ssm_document.stop_pss_testbox_document[0].name
   association_name = "${replace(local.resource_prefix,"_","-")}-Stop_pss-testbox"
-  schedule_expression = var.scheduler_stop_pattern
+  schedule_expression = var.pss_testbox_scheduler_stop_pattern
   
 
   parameters = { 
-    InstanceId = data.terraform_remote_state.pss.outputs.pss_testbox_id
+    InstanceId = aws_instance.pss_testbox.id
     AutomationAssumeRole = data.terraform_remote_state.account.outputs.scheduler_role_arn
   }
 }
 
 resource "aws_ssm_document" "stop_pss_testbox_document" {
-  count = var.enable_start_stop_scheduler ? 1 : 0
+  count = var.enable_pss_testbox_scheduler ? 1 : 0
   name          = "Stop-PSS-Testbox-${replace(local.resource_prefix,"_","-")}"
   document_type = "Automation"
 
@@ -58,20 +58,20 @@ DOC
 }
 
 resource "aws_ssm_association" "start_pss_testbox_association" {
-  count = var.enable_start_stop_scheduler ? 1 : 0
+  count = var.enable_pss_testbox_scheduler ? 1 : 0
   name = aws_ssm_document.start_pss_testbox_document[0].name
   association_name = "${replace(local.resource_prefix,"_","-")}-Start_pss-testbox"
-  schedule_expression = var.scheduler_start_pattern
+  schedule_expression = var.pss_testbox_scheduler_start_pattern
   
 
   parameters = { 
-    InstanceId = data.terraform_remote_state.pss.outputs.pss_testbox_id
+    InstanceId = aws_instance.pss_testbox.id
     AutomationAssumeRole = data.terraform_remote_state.account.outputs.scheduler_role_arn
   }
 }
 
 resource "aws_ssm_document" "start_pss_testbox_document" {
-  count = var.enable_start_stop_scheduler ? 1 : 0
+  count = var.enable_pss_testbox_scheduler ? 1 : 0
   name          = "Start-PSS-Testbox-${replace(local.resource_prefix,"_","-")}"
   document_type = "Automation"
 
