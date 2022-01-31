@@ -171,19 +171,19 @@ variable "enable_start_stop_scheduler" {
   default = false
 }
 
-variable "enable_scheduler" {
+variable "enable_postgres_scheduler" {
   type = bool
   description = "Adds a tag to the to instance to allow start and stop scheduler to work on it"
   default = false
 }
 
-variable "scheduler_stop_pattern" {
+variable "postgres_scheduler_stop_pattern" {
   type = string
   description = "Schedule what time to stop instance"
   default = ""
 }
 
-variable "scheduler_start_pattern" {
+variable "postgres_scheduler_start_pattern" {
   type = string
   description = "Schedule what time to start instance"
   default = ""

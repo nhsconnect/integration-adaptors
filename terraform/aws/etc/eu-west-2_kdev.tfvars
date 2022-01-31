@@ -9,9 +9,9 @@ create_opentest_instance = false
 postgres_instance_class = "db.t4g.micro"
 create_postgres_db = true
 enable_start_stop_scheduler = true
-scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
-scheduler_start_pattern = "cron(0 00 06 ? * * *)"
-enable_scheduler = true
+postgres_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
+postgres_scheduler_start_pattern = "cron(0 00 06 ? * * *)"
+enable_postgres_scheduler = true
 
 # Settings for "pss" component
 pss_service_minimal_count = 1
