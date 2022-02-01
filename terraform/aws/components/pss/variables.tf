@@ -34,6 +34,16 @@ variable "tf_state_bucket" {
   description = "Name of S3 bucket with TF state of components"
 }
 
+variable "tf_state_bucket_resource_group" {
+  description = "Resource group which contains bucket with TF state file"
+  type = string
+}
+
+variable "tf_state_bucket_storage_account" {
+  description = "Name of storage account with TF state bucket"
+  type = string
+}
+
 variable "pss_logs_datetime_format" {
   type = string
   description = "Format for date and time in logs"

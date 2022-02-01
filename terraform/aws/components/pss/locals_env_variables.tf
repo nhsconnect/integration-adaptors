@@ -46,8 +46,12 @@ locals {
       {
         name = "MHS_AMQP_MAX_REDELIVERIES"
         value = var.pss_amqp_max_redeliveries
-      } 
-  ]
+      },
+      {
+        name = "MHS_BASE_URL"
+        value = "http://${data.terraform_remote_state.mhs.outputs.mhs-outbound_url}"
+      }
+    ]
 
 
     mock_mhs_environment_variables = [
