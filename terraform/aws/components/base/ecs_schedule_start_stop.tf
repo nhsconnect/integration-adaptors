@@ -6,7 +6,7 @@ resource "null_resource" "schedule_ecs_stop" {
         --scalable-dimension ecs:service:DesiredCount \
         --resource-id service/nia-kdev-base-ecs_cluster/nia-kdev-ps_gpc_fcde_ecs-service \
         --scheduled-action-name cron-scaleout-action \
-        --schedule "cron(00 18 * * ? *)" \
+        --schedule "cron(27 18 * * ? *)" \
         --scalable-target-action MinCapacity=0,MaxCapacity=0 \
         --region eu-west-2
 COMMAND
