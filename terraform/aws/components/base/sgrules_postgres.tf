@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "allow_egress_to_postgres" {
   description = "Allow outgoing from application to postgres DB in env: ${var.environment}"
 }
 
-# Allow account's jumpbox to connect to docdb
+# Allow account's jumpbox to connect to PostgreSQL DB
 resource "aws_security_group_rule" "allow_postgres_from_jumpbox" {
   type = "ingress"
   description = "Allow incoming from jumpbox to postgresDB in env ${var.environment}"
@@ -39,4 +39,27 @@ resource "aws_security_group_rule" "allow_jumpbox_to_postgres" {
   security_group_id = data.terraform_remote_state.account.outputs.jumpbox_sg_id
   source_security_group_id = aws_security_group.postgres_sg.id
   depends_on = [aws_vpc_peering_connection.account_peering]
+}
+
+# Allow Jenikins-Worker instances to connect to PostgreSQL DB
+resource "aws_security_group_rule" "allow_postgres_from_jenkins" {
+  type = "ingress"
+  description = "Allow incoming from jenkins-workers to postgresDB in env ${var.environment}"
+  from_port = aws_db_instance.base_postgres_db[0].port
+  to_port = aws_db_instance.base_postgres_db[0].port
+  protocol = "tcp"
+  security_group_id = aws_security_group.postgres_sg.id
+  source_security_group_id = var.jenkins_worker_sg_id
+  depends_on = [aws_vpc_peering_connection.mq_peering]
+}
+
+resource "aws_security_group_rule" "allow_jenkins_to_postgres" {
+  type = "egress"
+  description = "Allow outgoing from jenkins-workers to postgresDB in env ${var.environment}"
+  from_port = aws_db_instance.base_postgres_db[0].port
+  to_port = aws_db_instance.base_postgres_db[0].port
+  protocol = "tcp"
+  security_group_id = var.jenkins_worker_sg_id
+  source_security_group_id = aws_security_group.postgres_sg.id
+  depends_on = [aws_vpc_peering_connection.mq_peering]
 }
