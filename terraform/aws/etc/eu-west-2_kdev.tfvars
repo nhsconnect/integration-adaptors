@@ -8,6 +8,10 @@ enable_internet_access = "true"
 create_opentest_instance = false
 postgres_instance_class = "db.t4g.micro"
 create_postgres_db = true
+enable_start_stop_scheduler = true
+postgres_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
+postgres_scheduler_start_pattern = "cron(0 00 06 ? * * *)"
+enable_postgres_scheduler = true
 
 # Settings for "pss" component
 pss_service_minimal_count = 1
@@ -24,3 +28,7 @@ pss_gp2gp_translator_container_port = 8085
 pss_mock_mhs_port = 8080
 pss_service_application_port = 8080
 pss_log_level = "DEBUG"
+enable_pss_testbox_scheduler = true
+tag_testbox_enable_scheduler = true
+pss_testbox_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
+pss_testbox_scheduler_start_pattern = "cron(0 00 06 ? * * *)"

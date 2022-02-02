@@ -165,6 +165,30 @@ variable "create_postgres_db" {
   default = false
 }
 
+variable "enable_start_stop_scheduler" {
+  type = bool
+  description = "If stop and start schedule will enabled postgres instance for this env"
+  default = false
+}
+
+variable "enable_postgres_scheduler" {
+  type = bool
+  description = "Adds a tag to the to instance to allow start and stop scheduler to work on it"
+  default = false
+}
+
+variable "postgres_scheduler_stop_pattern" {
+  type = string
+  description = "Schedule what time to stop instance"
+  default = ""
+}
+
+variable "postgres_scheduler_start_pattern" {
+  type = string
+  description = "Schedule what time to start instance"
+  default = ""
+}
+
 variable "postgres_master_user" {
   type = string
   description = "Username for Postgres DB master user"

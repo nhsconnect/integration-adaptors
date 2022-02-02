@@ -20,5 +20,6 @@ resource "aws_db_instance" "base_postgres_db" {
 
   tags = merge(local.default_tags,{
     Name = "${local.resource_prefix}-psdb-instance"
+    EnableScheduler = var.enable_postgres_scheduler
   })
 }
