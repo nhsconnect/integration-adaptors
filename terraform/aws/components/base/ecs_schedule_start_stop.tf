@@ -6,7 +6,7 @@ resource "null_resource" "register_scalable_target" {
         --service-namespace ecs \
         --scalable-dimension ecs:service:DesiredCount \
         --resource-id service/nia-build1-base-ecs_cluster/nia-build1-ps_gpc_fcde_ecs-service \
-        --min-capacity 0 --max-capacity 1 \
+        --min-capacity 0 --max-capacity 2 \
         --region eu-west-2
 
 
