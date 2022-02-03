@@ -1,3 +1,19 @@
+resource "null_resource" "register_scalable_target" {
+
+  provisioner "local-exec" {
+    command = <<COMMAND
+        aws application-autoscaling register-scalable-target \
+        --service-namespace ecs \
+        --scalable-dimension ecs:service:DesiredCount \
+        --resource-id service/nia-build1-base-ecs_cluster/nia-build1-ps_gpc_fcde_ecs-service \
+        --min-capacity 0 --max-capacity 1 \
+        --region eu-west-2
+
+
+COMMAND
+  }
+}
+
 resource "null_resource" "schedule_ecs_stop" {
 
   provisioner "local-exec" {
