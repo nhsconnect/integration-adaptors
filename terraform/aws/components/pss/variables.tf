@@ -68,6 +68,7 @@ variable "ecs_scheduler_start_pattern" {
 variable "enable_ecs_scheduler" {
   type = bool
   description = "Enable stop and start scheduler for ecs"
+  default = false
 }
 
 variable "pss_service_application_port" {

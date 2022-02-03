@@ -42,6 +42,7 @@ variable "availability_zones" {
 variable "enable_ecs_schedule" {
   type = bool
   description = "enable stop and start scheduler for ecs"
+  default = false
 }
 
 variable "ecs_scheduler_stop_time" {
