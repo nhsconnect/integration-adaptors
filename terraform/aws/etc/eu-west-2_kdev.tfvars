@@ -32,3 +32,6 @@ enable_pss_testbox_scheduler = true
 tag_testbox_enable_scheduler = true
 pss_testbox_scheduler_stop_pattern = "cron(0 00 18 ? * * *)"
 pss_testbox_scheduler_start_pattern = "cron(0 00 06 ? * * *)"
+enable_ecs_scheduler = true
+ecs_scheduler_stop_pattern = "cron(00 18 * * ? *)"
+ecs_scheduler_start_pattern = "cron(00 06 * * ? *)"

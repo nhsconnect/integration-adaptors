@@ -16,6 +16,9 @@ module "ecs_service_gpc_api_facade" {
   desired_count     = var.pss_service_desired_count
   maximal_count     = var.pss_service_maximal_count
   service_target_request_count = var.pss_service_target_request_count
+  ecs_scheduler_stop_time = var.ecs_scheduler_stop_pattern
+  ecs_scheduler_start_time = var.ecs_scheduler_start_pattern
+  enable_ecs_schedule = var.enable_ecs_scheduler
 
   container_port    = var.pss_gpc_api_facade_container_port
   application_port  = var.pss_service_application_port
