@@ -7,6 +7,6 @@ resource "aws_appautoscaling_scheduled_action" "ecs_schedule_stop" {
 
   scalable_target_action {
     min_capacity = 0
-    max_capacity = 1
+    max_capacity = 0
   }
 }
