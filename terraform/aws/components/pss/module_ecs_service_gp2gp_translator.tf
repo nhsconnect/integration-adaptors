@@ -19,7 +19,8 @@ module "ecs_service_gp2gp_translator" {
   ecs_scheduler_stop_time = var.ecs_scheduler_stop_pattern
   ecs_scheduler_start_time = var.ecs_scheduler_start_pattern
   enable_ecs_schedule = var.enable_ecs_scheduler
-
+  ecs_schedule_stop_capacity = var.ecs_scheduler_stop_capacity
+  ecs_schedule_start_capacity = var.ecs_scheduler_start_capacity
 
   container_port    = var.pss_gp2gp_translator_container_port
   application_port  = var.pss_service_application_port

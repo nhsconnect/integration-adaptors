@@ -55,6 +55,16 @@ variable "ecs_scheduler_start_time" {
   description = "what time to start ecs tasks"
 }
 
+variable "ecs_schedule_stop_capacity" {
+  type = number
+  description = "stop task running at schedule time"
+}
+
+variable "ecs_schedule_start_capacity" {
+  type = number
+  description = "set how many tasks to run at schedule time"
+}
+
 variable "cluster_id" {
   type = string
   description = "(Required) ID of the cluster to run the service on"

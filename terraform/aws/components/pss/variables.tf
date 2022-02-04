@@ -65,6 +65,16 @@ variable "ecs_scheduler_start_pattern" {
   description = "If ecs scheduler is enabled what time to start ecs tasks"
 }
 
+variable "ecs_scheduler_stop_capacity" {
+  type = number
+  description = "stop task running at schedule time"
+}
+
+variable "ecs_scheduler_start_capacity" {
+  type = number
+  description = "set how many tasks to run at schedule time"
+}
+
 variable "enable_ecs_scheduler" {
   type = bool
   description = "Enable stop and start scheduler for ecs"

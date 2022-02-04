@@ -7,8 +7,8 @@ resource "aws_appautoscaling_scheduled_action" "ecs_schedule_stop" {
   schedule           = var.ecs_scheduler_stop_time
 
   scalable_target_action {
-    min_capacity = 0
-    max_capacity = 0
+    min_capacity = var.ecs_schedule_stop_capacity
+    max_capacity = var.ecs_schedule_stop_capacity
   }
 }
 
@@ -21,7 +21,7 @@ resource "aws_appautoscaling_scheduled_action" "ecs_schedule_start" {
   schedule           = var.ecs_scheduler_start_time
 
   scalable_target_action {
-    min_capacity = 1
-    max_capacity = 1
+    min_capacity = var.ecs_schedule_start_capacity
+    max_capacity = var.ecs_schedule_start_capacity
   }
 }
