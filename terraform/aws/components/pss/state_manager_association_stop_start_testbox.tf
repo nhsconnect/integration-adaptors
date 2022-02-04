@@ -1,4 +1,4 @@
-/*resource "aws_ssm_association" "stop_pss_testbox_association" {
+resource "aws_ssm_association" "stop_pss_testbox_association" {
   count = var.enable_pss_testbox_scheduler ? 1 : 0
   name = aws_ssm_document.stop_pss_testbox_document[0].name
   association_name = "${replace(local.resource_prefix,"_","-")}-Stop_pss-testbox"
@@ -9,7 +9,7 @@
     InstanceId = aws_instance.pss_testbox[0].id
     AutomationAssumeRole = data.terraform_remote_state.account.outputs.scheduler_role_arn
   }
-}*/
+}
 
 resource "aws_ssm_document" "stop_pss_testbox_document" {
   count = var.enable_pss_testbox_scheduler ? 1 : 0
@@ -57,7 +57,7 @@ resource "aws_ssm_document" "stop_pss_testbox_document" {
 DOC
 }
 
-/*resource "aws_ssm_association" "start_pss_testbox_association" {
+resource "aws_ssm_association" "start_pss_testbox_association" {
   count = var.enable_pss_testbox_scheduler ? 1 : 0
   name = aws_ssm_document.start_pss_testbox_document[0].name
   association_name = "${replace(local.resource_prefix,"_","-")}-Start_pss-testbox"
@@ -68,7 +68,7 @@ DOC
     InstanceId = aws_instance.pss_testbox[0].id
     AutomationAssumeRole = data.terraform_remote_state.account.outputs.scheduler_role_arn
   }
-}*/
+}
 
 resource "aws_ssm_document" "start_pss_testbox_document" {
   count = var.enable_pss_testbox_scheduler ? 1 : 0
