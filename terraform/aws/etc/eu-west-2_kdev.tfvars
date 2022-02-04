@@ -35,4 +35,4 @@ pss_testbox_scheduler_start_pattern = "cron(0 00 06 ? * MON-FRI *)"
 enable_ecs_scheduler = true
 ecs_scheduler_stop_pattern = "cron(0 00 18 * * ? *)"
 ecs_scheduler_start_pattern = "cron(0 00 06 ? * MON-FRI *)"
-ecs_schedule_stop_capacity = 0
+ecs_scheduler_stop_capacity = 0
