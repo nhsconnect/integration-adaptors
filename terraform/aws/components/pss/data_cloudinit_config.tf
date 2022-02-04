@@ -1,5 +1,5 @@
 data "template_file" "testbox_cloudinit_template" {
-  template = file("${path.module}/files/jumpbox.sh")
+  template = file("${path.module}/files/pss_testbox.sh")
   vars = {}
 }
 
