@@ -6,5 +6,5 @@ output "PS_DB_URL" {
 }
 
 output "PS_DBOWNER_USERNAME" {
-  value = jsondecode(data.aws_secretsmanager_secret_version.postgres_psdbowner_username.secret_string)
+  value = data.aws_secretsmanager_secret_version.postgres_psdbowner_username.secret_string
 }
