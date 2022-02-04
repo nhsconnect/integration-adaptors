@@ -29,3 +29,7 @@ data "aws_secretsmanager_secret" "postgres_gp2gp_translator_password" {
 data "aws_secretsmanager_secret" "postgres_gpc_facade_password" {
   name = "postgres_psdb_gpc_facade_user_password"
 }
+
+data "aws_secretsmanager_secret_version" "postgres_psdbowner_username" {
+  secret_id = data.aws_secretsmanager_secret.postgres_psdbowner_username.id
+}
