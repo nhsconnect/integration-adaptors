@@ -141,6 +141,11 @@ variable "opentest_sg_id" {
   description = "Id of Opentest security group"
 }
 
+variable "jenkins_worker_sg_id" {
+  type = string
+  description = "Id of Jenkins-Worker security group"
+}
+
 variable "elasticache_node_type" {
   type = string
   default = "cache.t2.micro"
