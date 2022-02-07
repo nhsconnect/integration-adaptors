@@ -76,3 +76,8 @@ variable "opentest_sg_id" {
   type = string
   description = "Id of Opentest security group"
 }
+
+variable "jenkins_worker_sg_id" {
+  type = string
+  description = "Id of Jenkins-Worker security group"
+}

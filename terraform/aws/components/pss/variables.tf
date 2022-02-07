@@ -55,6 +55,27 @@ variable "pss_service_maximal_count" {
   description = "Maximal number of containers to run in the service"
 }
 
+variable "ecs_scheduler_stop_pattern" {
+  type = string
+  description = "If ecs scheduler is enabled what time to stop ecs tasks"
+}
+
+variable "ecs_scheduler_start_pattern" {
+  type = string
+  description = "If ecs scheduler is enabled what time to start ecs tasks"
+}
+
+variable "ecs_scheduler_stop_capacity" {
+  type = number
+  description = "stop task running at schedule time"
+}
+
+variable "enable_ecs_scheduler" {
+  type = bool
+  description = "Enable stop and start scheduler for ecs"
+  default = false
+}
+
 variable "pss_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
