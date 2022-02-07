@@ -10,6 +10,7 @@ resource "aws_instance" "pss_testbox" {
     data.terraform_remote_state.base.outputs.postgres_access_sg_id
   ]
   subnet_id = aws_subnet.service_subnet[0].id
+  user_data = data.template_cloudinit_config.testbox_user_data.rendered
 
   tags = merge(local.default_tags, {
      Name = "${local.resource_prefix}-testbox"
