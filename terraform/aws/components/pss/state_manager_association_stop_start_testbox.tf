@@ -5,9 +5,9 @@ resource "aws_ssm_association" "stop_pss_testbox_association" {
   schedule_expression = var.pss_testbox_scheduler_stop_pattern
   automation_target_parameter_name = aws_instance.pss_testbox[0].id
 
-  targets = {
+  Targets = {
     key = "tag:EnableScheduler"
-    value = "true"
+    values = ["true"]
   }
   
 
