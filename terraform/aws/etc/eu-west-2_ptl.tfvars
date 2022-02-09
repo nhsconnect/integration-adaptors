@@ -9,6 +9,8 @@ create_opentest_instance = false
 mongo_ssl_enabled = true
 # enable_internet_access = true
 ptl_allowed_incoming_cidrs = ["10.239.0.0/16"]
+postgres_instance_class = "db.t4g.micro"
+create_postgres_db = true
 
 # Settings for "nhais" component
 nhais_service_minimal_count = 1
