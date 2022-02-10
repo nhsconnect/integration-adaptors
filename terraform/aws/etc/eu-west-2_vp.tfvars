@@ -1,7 +1,7 @@
 # Common setting for entire Env - "base" component
 environment = "vp"
 base_cidr_block = "10.15.0.0/16"
-enable_internet_access = true
+enable_internet_access = false
 cluster_container_insights = "enabled"
 docdb_instance_class = "db.r5.large"
 dlt_vpc_id = "vpc-03f843c08b01876d5"
