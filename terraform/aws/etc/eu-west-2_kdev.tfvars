@@ -36,3 +36,4 @@ enable_ecs_scheduler = true
 ecs_scheduler_stop_pattern = "cron(0 00 18 * * ? *)"
 ecs_scheduler_start_pattern = "cron(0 00 06 ? * MON-FRI *)"
 ecs_scheduler_stop_capacity = 0
+pss_create_mhs_mock = true
