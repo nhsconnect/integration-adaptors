@@ -114,3 +114,19 @@ mhs_inbound_queue_name = "vp_gp2gp_inbound_queue"
 
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
+
+pss_service_minimal_count = 0
+pss_service_desired_count = 0
+pss_service_maximal_count = 0
+pss_service_target_request_count = 1200
+pss_service_launch_type = "FARGATE"
+pss_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+create_pss_testbox = false
+pss_gp2gp_translator_testbox = false
+pss_gpc_facade_testbox = false
+pss_gpc_api_facade_container_port = 8081
+pss_gp2gp_translator_container_port = 8085
+pss_mock_mhs_port = 8080
+pss_service_application_port = 8080
+pss_log_level = "DEBUG"
+ecs_scheduler_stop_capacity = 0

@@ -108,6 +108,11 @@ variable "enable_dlt" {
   default = false
 }
 
+variable "dlt_vpc_id" {
+  type = string
+  description = "VPC where Distributed Load testing environment is hosted"
+  default = ""
+}
 variable "pss_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"

@@ -1,5 +1,6 @@
 module "ecs_service_mock_mhs" {
   source = "../../modules/module_ecs_service"
+
   count           = var.pss_create_mhs_mock ? 1 : 0
   project         = var.project
   component       = var.component
@@ -34,6 +35,7 @@ module "ecs_service_mock_mhs" {
 
   container_healthcheck_port = var.pss_mock_mhs_port
   enable_dlt                 = var.enable_dlt
+  dlt_vpc_id                 = var.dlt_vpc_id
 
   environment_variables = local.mock_mhs_environment_variables
   secret_variables      = local.secret_variables

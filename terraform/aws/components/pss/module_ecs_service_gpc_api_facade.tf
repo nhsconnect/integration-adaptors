@@ -32,6 +32,7 @@ module "ecs_service_gpc_api_facade" {
   
   container_healthcheck_port = var.pss_gpc_api_facade_container_port
   enable_dlt                 = var.enable_dlt
+  dlt_vpc_id                 = var.dlt_vpc_id
   
 
   environment_variables = concat(local.pss_gpc_api_facade_environment_variables,local.environment_variables)
