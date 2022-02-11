@@ -32,6 +32,7 @@ module "ecs_service_gp2gp_translator" {
   
   container_healthcheck_port = var.pss_gp2gp_translator_container_port
   enable_dlt                 = var.enable_dlt
+  dlt_vpc_id                 = var.dlt_vpc_id
 
   environment_variables = concat(local.pss_gp2gp_translator_environment_variables,local.environment_variables)
   secret_variables      = concat(local.secret_variables,local.pss_gp2gp_translator_secret_variables)
