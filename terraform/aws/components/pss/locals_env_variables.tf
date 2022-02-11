@@ -46,6 +46,11 @@ locals {
       {
         name = "MHS_AMQP_MAX_REDELIVERIES"
         value = var.pss_amqp_max_redeliveries
+      },
+
+      {
+        name = "MHS_BASE_URL"
+        value = "http://${module.ecs_service_mock_mhs[0].loadbalancer_dns_name}:${var.pss_service_application_port}/"
       } 
   ]
 
