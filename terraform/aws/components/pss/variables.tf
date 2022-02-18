@@ -199,7 +199,7 @@ variable "pss_mock_mhs_port" {
 
 variable "pss_create_mhs_mock" {
   type = bool
-  default = false
+  default = true
   description = "Should an MHS mock be created and used by pss"
 }
 

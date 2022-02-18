@@ -1,10 +1,3 @@
-resource "aws_route" "route_all_to_ptl" {
-  count = var.ptl_connected ? 1 : 0
-  route_table_id = aws_route_table.nhs_ptl[0].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id = data.aws_vpn_gateway.ptl_gateway[0].id
-}
-
 resource "aws_vpc_endpoint_route_table_association" "s3_vpce_on_ptl_rt" {
   count = var.ptl_connected ? 1 : 0
   route_table_id = aws_route_table.nhs_ptl[0].id
@@ -31,4 +24,25 @@ resource "aws_route" "ptl_to_mq_route" {
   destination_cidr_block = data.aws_vpc.mq_vpc.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.mq_peering.id
   depends_on = [aws_vpc_peering_connection.mq_peering]
+}
+
+resource "aws_route" "ptl_route_via_hscn" {
+  count = var.ptl_connected ? 1 : 0
+  route_table_id = aws_route_table.nhs_ptl[0].id
+  destination_cidr_block = "10.239.0.0/16"
+  gateway_id = data.aws_vpn_gateway.ptl_gateway[0].id
+}
+
+resource "aws_route" "second_ptl_route_via_hscn" {
+  count = var.ptl_connected ? 1 : 0
+  route_table_id = aws_route_table.nhs_ptl[0].id
+  destination_cidr_block = "155.231.231.0/29"
+  gateway_id = data.aws_vpn_gateway.ptl_gateway[0].id
+}
+
+resource "aws_route" "ptl_route_via_internet" {
+  count = var.ptl_connected ? 1 : 0
+  route_table_id = aws_route_table.nhs_ptl[0].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id = aws_nat_gateway.nat_gw[0].id
 }
