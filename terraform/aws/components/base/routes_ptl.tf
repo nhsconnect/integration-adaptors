@@ -1,10 +1,3 @@
-# resource "aws_route" "route_all_to_ptl" {
-#  count = var.ptl_connected ? 1 : 0
-#  route_table_id = aws_route_table.nhs_ptl[0].id
-#  destination_cidr_block = "0.0.0.0/0"
-#  gateway_id = data.aws_vpn_gateway.ptl_gateway[0].id
-# }
-
 resource "aws_vpc_endpoint_route_table_association" "s3_vpce_on_ptl_rt" {
   count = var.ptl_connected ? 1 : 0
   route_table_id = aws_route_table.nhs_ptl[0].id
