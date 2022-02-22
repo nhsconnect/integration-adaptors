@@ -50,7 +50,7 @@ output "postgres_hostname" {
 }
 
 output "postgres_instance_connection_string" {
-  value = "postgresql://${azurerm_private_dns_a_record.postgres.fqdn}:${var.postgres_port}:${var.postgres_master_user}:${var.postgres_master_password}"
+  value = "postgresql://${var.postgres_port}:${var.postgres_master_user}@${azurerm_private_dns_a_record.postgres.fqdn}:${var.postgres_master_password}"
   sensitive = true
 }
 
