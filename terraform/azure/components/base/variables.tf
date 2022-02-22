@@ -121,25 +121,29 @@ variable postgres_sku_name {
 variable postgres_master_user {
   type = string
   description = "Username for Postgres DB master user"
-  sensitive = true
 }
 
 variable postgres_master_password {
   type = string
   description = "Password for Postgres DB master user"
-  sensitive = true
 }
 
 variable "ssl_postgres_protocol" {
   type = string
   description = "minimum ssl protocol version"
-  default = "TLSv1.2"
+  default = "TLS1_2"
 }
 
 variable "backup_retention_period" {
   type = number
   description = "How many days should the backups be kept, default is 1 day"
   default = 7
+}
+
+variable "postgres_port" {
+  type = number
+  description = "postgres port number"
+  default = 5432
 }
 
 ## Resource group variables ##

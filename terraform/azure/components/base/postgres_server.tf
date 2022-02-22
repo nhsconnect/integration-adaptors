@@ -8,17 +8,25 @@ resource "azurerm_postgresql_server" "postgres_server" {
 
   sku_name   = var.postgres_sku_name
   version    = "11"
-  storage_mb = 20000
+  storage_mb = 20480
 
   backup_retention_days        = var.backup_retention_period
-  geo_redundant_backup_enabled = false
+  geo_redundant_backup_enabled = true
   auto_grow_enabled            = false
 
   public_network_access_enabled    = false
-  ssl_enforcement_enabled          = true
+  ssl_enforcement_enabled          = false
   ssl_minimal_tls_version_enforced = var.ssl_postgres_protocol
 
 tags = merge(local.default_tags,{
 Name = "${local.resource_prefix}-postgres-server"
   })
+}
+
+resource "azurerm_postgresql_database" "postgres_database" {
+  name                = "postgresql"
+  resource_group_name = var.account_resource_group
+  server_name         = azurerm_postgresql_server.postgres_server.name
+  charset             = "UTF8"
+  collation           = "English_United States.1252"
 }

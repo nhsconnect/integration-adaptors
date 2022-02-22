@@ -3,12 +3,14 @@ resource "azurerm_subnet" "base_testbox_subnet" {
   resource_group_name  = data.terraform_remote_state.account.outputs.resource_group_name
   virtual_network_name = azurerm_virtual_network.base_vnet.name
   address_prefixes     = [ var.base_testbox_cidr ]
+  enforce_private_link_endpoint_network_policies = true
 
   service_endpoints = [
     "Microsoft.AzureCosmosDB",
     "Microsoft.ContainerRegistry",
     "Microsoft.ServiceBus",
-    "Microsoft.Storage"
+    "Microsoft.Storage",
+    "Microsoft.Sql"
   ]
 }
 

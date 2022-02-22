@@ -4,7 +4,7 @@ base_aks_cidr = "10.21.98.0/23"
 base_redis_cidr = "10.21.101.0/24"
 base_testbox_cidr = "10.21.103.0/24"
 base_private_dns = "build1.nhsredteam.internal.nhs.uk"
-postgres_sku_name = "B_Gen5_2"
+postgres_sku_name = "GP_Gen5_2"
 
 # nhais_lb_ip = "10.21.98.210"
 

@@ -9,7 +9,8 @@ resource "azurerm_subnet" "base_aks_subnet" {
     "Microsoft.AzureCosmosDB",
     "Microsoft.ContainerRegistry",
     "Microsoft.ServiceBus",
-    "Microsoft.Storage"
+    "Microsoft.Storage",
+    "Microsoft.Sql"
   ]
 }
 
