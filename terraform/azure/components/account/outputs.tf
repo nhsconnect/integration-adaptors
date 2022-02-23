@@ -44,3 +44,7 @@ output "vnet_name" {
 output "fw_private_ip_address" {
   value = azurerm_firewall.account_firewall.ip_configuration[0].private_ip_address
 }
+
+output "jumpbox_subnet_id" {
+  value = azurerm_subnet.account_jumpbox_subnet.id
+}

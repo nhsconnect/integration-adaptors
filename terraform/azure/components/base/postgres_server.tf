@@ -15,7 +15,7 @@ resource "azurerm_postgresql_server" "postgres_server" {
   auto_grow_enabled            = false
 
   public_network_access_enabled    = false
-  ssl_enforcement_enabled          = false
+  ssl_enforcement_enabled          = true
   ssl_minimal_tls_version_enforced = var.ssl_postgres_protocol
 
 tags = merge(local.default_tags,{
@@ -28,5 +28,5 @@ resource "azurerm_postgresql_database" "postgres_database" {
   resource_group_name = var.account_resource_group
   server_name         = azurerm_postgresql_server.postgres_server.name
   charset             = "UTF8"
-  collation           = "English_United States.1252"
+  collation           = "English_United Kingdom.1252"
 }

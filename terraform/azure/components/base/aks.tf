@@ -32,10 +32,6 @@ resource "azurerm_kubernetes_cluster" "base_aks" {
     kube_dashboard {
       enabled = true
     }
-
-    azure_policy {
-      enabled = true
-    }
   }
   
   default_node_pool {
