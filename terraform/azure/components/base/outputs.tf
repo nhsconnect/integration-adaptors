@@ -35,6 +35,26 @@ output "mongodb_hostname" {
   value = split(":",split("/",split("@",azurerm_cosmosdb_account.mongodb.connection_strings[0])[1])[0])[0]
 }
 
+# postgres outputs
+output "postgres_username" {
+  value = azurerm_postgresql_server.postgres_server.administrator_login
+}
+
+output "postgres_password" {
+  value = azurerm_postgresql_server.postgres_server.administrator_login_password
+  sensitive = true
+}
+
+output "postgres_hostname" {
+  value = azurerm_private_dns_a_record.postgres.fqdn
+}
+
+output "postgres_instance_connection_string" {
+  value = "postgresql://${var.postgres_port}:${var.postgres_master_user}@${azurerm_private_dns_a_record.postgres.fqdn}:${var.postgres_master_password}"
+  sensitive = true
+}
+
+
 # redis outputs
 
 output "redis_hostname" {
