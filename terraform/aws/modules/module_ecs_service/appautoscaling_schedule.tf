@@ -1,4 +1,4 @@
-resource "aws_appautoscaling_scheduled_action" "ecs_schedule_stop" {
+/*resource "aws_appautoscaling_scheduled_action" "ecs_schedule_stop" {
   count              = var.enable_ecs_schedule ? 1 : 0
   name               = "${local.resource_prefix}_schedule_stop"
   service_namespace  = "ecs"
@@ -24,4 +24,4 @@ resource "aws_appautoscaling_scheduled_action" "ecs_schedule_start" {
     min_capacity = var.ecs_schedule_start_capacity
     max_capacity = var.ecs_schedule_start_capacity
   }
-}
+}*/
