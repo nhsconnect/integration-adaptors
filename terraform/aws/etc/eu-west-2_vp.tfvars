@@ -115,6 +115,7 @@ mhs_inbound_queue_name = "vp_gp2gp_inbound_queue"
 # Settings for "fake_mesh" component
 fake_mesh_service_launch_type = "FARGATE"
 
+# Settings for pss component
 pss_service_minimal_count = 0
 pss_service_desired_count = 0
 pss_service_maximal_count = 0
