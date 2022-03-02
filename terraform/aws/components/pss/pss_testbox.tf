@@ -14,6 +14,5 @@ resource "aws_instance" "pss_testbox" {
 
   tags = merge(local.default_tags, {
      Name = "${local.resource_prefix}-testbox"
-     EnableScheduler = var.tag_testbox_enable_scheduler
   })
 }
