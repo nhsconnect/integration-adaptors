@@ -17,11 +17,6 @@ module "ecs_service_mock_mhs" {
   desired_count     = var.pss_service_desired_count
   maximal_count     = var.pss_service_maximal_count
   service_target_request_count = var.pss_service_target_request_count
-  ecs_scheduler_stop_time = var.ecs_scheduler_stop_pattern
-  ecs_scheduler_start_time = var.ecs_scheduler_start_pattern
-  enable_ecs_schedule = var.enable_ecs_scheduler
-  ecs_schedule_stop_capacity = var.ecs_scheduler_stop_capacity
-  ecs_schedule_start_capacity = var.pss_service_maximal_count
 
   container_port    = var.pss_mock_mhs_port
   application_port  = var.pss_mock_mhs_port

@@ -55,27 +55,6 @@ variable "pss_service_maximal_count" {
   description = "Maximal number of containers to run in the service"
 }
 
-variable "ecs_scheduler_stop_pattern" {
-  type = string
-  description = "If ecs scheduler is enabled what time to stop ecs tasks"
-}
-
-variable "ecs_scheduler_start_pattern" {
-  type = string
-  description = "If ecs scheduler is enabled what time to start ecs tasks"
-}
-
-variable "ecs_scheduler_stop_capacity" {
-  type = number
-  description = "stop task running at schedule time"
-}
-
-variable "enable_ecs_scheduler" {
-  type = bool
-  description = "Enable stop and start scheduler for ecs"
-  default = false
-}
-
 variable "pss_service_application_port" {
   type = number
   description = "Port number on which the service load balancer will listen"
@@ -156,29 +135,6 @@ variable "pss_gpc_facade_testbox" {
 
 variable "create_pss_testbox" {
   type = bool
-  default = false
-}
-
-variable "tag_testbox_enable_scheduler" {
-  description = "creates a tag which allows the scheduler to be able to run on the resource"
-  type = bool
-  default = false
-}
-
-variable "enable_pss_testbox_scheduler" {
-  description = "If stop and start schedule will enabled pss testbox instance for this env"
-  type = bool
-  default = false
-}
-
-variable "pss_testbox_scheduler_stop_pattern" {
-  description = "Schedule what time to stop instance"
-  default = false
-}
-
-variable "pss_testbox_scheduler_start_pattern" {
-  description = "Schedule what time to start instance"
-  type = string
   default = false
 }
 

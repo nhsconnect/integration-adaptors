@@ -39,32 +39,6 @@ variable "availability_zones" {
   description = "List of availabilty zones to be used by this module"
 }
 
-variable "enable_ecs_schedule" {
-  type = bool
-  description = "enable stop and start scheduler for ecs"
-  default = false
-}
-
-variable "ecs_scheduler_stop_time" {
-  type = string
-  description = "what time to stop ecs tasks"
-}
-
-variable "ecs_scheduler_start_time" {
-  type = string
-  description = "what time to start ecs tasks"
-}
-
-variable "ecs_schedule_stop_capacity" {
-  type = number
-  description = "stop task running at schedule time"
-}
-
-variable "ecs_schedule_start_capacity" {
-  type = number
-  description = "set how many tasks to run at schedule time"
-}
-
 variable "cluster_id" {
   type = string
   description = "(Required) ID of the cluster to run the service on"
