@@ -32,8 +32,12 @@ resource "azurerm_kubernetes_cluster" "base_aks" {
     kube_dashboard {
       enabled = true
     }
-  }
   
+
+      azure_policy {
+      enabled = false
+    }
+}
   default_node_pool {
     name = "default"
     node_count = var.aks_node_count
