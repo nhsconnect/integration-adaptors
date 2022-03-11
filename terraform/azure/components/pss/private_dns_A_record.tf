@@ -1,4 +1,4 @@
-/*resource "azurerm_private_dns_a_record" "pss_gp2gp_translator" {
+resource "azurerm_private_dns_a_record" "pss_gp2gp_translator" {
   name                = "pss_gp2gp_translator"
   zone_name           = data.terraform_remote_state.base.outputs.base_private_dns_zone
   resource_group_name = var.account_resource_group
@@ -19,5 +19,5 @@ resource "azurerm_private_dns_a_record" "pss_mhs_mock" {
   zone_name           = data.terraform_remote_state.base.outputs.base_private_dns_zone
   resource_group_name = var.account_resource_group
   ttl                 = 30
-  records             = [kubernetes_service.pss_mhs_mock.status[0].load_balancer[0].ingress[0].ip]
-}*/
+  records             = [kubernetes_service.pss_mock_mhs.status[0].load_balancer[0].ingress[0].ip]
+}
