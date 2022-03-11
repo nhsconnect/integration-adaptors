@@ -38,7 +38,6 @@ resource "azurerm_kubernetes_cluster" "base_aks" {
       enabled = false
     }
 }
-  
   default_node_pool {
     name = "default"
     node_count = var.aks_node_count
