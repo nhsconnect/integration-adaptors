@@ -10,6 +10,7 @@ base_ptl_dns_servers = [ "155.231.231.1", "155.231.231.2" ]
 base_redis_cidr      = "10.22.101.0/24"
 base_testbox_cidr    = "172.28.65.0/26"
 base_private_dns     = "ptl.nhsredteam.internal.nhs.uk"
+postgres_sku_name    = "GP_Gen5_2"
 
 nhais_mesh_host = "https://msg.int.spine2.ncrs.nhs.uk/messageexchange/"
 nhais_mesh_cert_validation = true
