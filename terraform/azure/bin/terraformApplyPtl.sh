@@ -1,1 +1,1 @@
-terraform apply -target=azurerm_postgresql_database.postgres_database --var-file=../../etc/global.tfvars --var-file=../../etc/ptl.tfvars --var-file=../../etc/secrets_ptl.tfvars
+terraform apply --var-file=../../etc/global.tfvars --var-file=../../etc/ptl.tfvars --var-file=../../etc/secrets_ptl.tfvars
