@@ -1,0 +1,68 @@
+@startuml
+!pragma revision 1
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+!define AzurePuml https://raw.githubusercontent.com/RicardoNiepel/Azure-PlantUML/master/dist
+
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/AzureC4Integration.puml
+
+!includeurl AzurePuml/Containers/all.puml
+!includeurl AzurePuml/Databases/AzureCosmosDb.puml
+!includeurl AzurePuml/Databases/AzureRedisCache.puml
+!includeurl AzurePuml/General/Azure.puml
+!includeurl AzurePuml/Integration/AzureServiceBus.puml
+!includeurl AzurePuml/Management/all.puml
+!includeurl AzurePuml/Networking/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Compute/AzureVirtualMachine.puml
+!includeurl AzurePuml/Security/AzureKeyVault.puml
+
+title "Azure Architecture - GP2GP Adaptor"
+
+LAYOUT_LEFT_RIGHT
+LAYOUT_WITH_LEGEND()
+
+
+Azure(azure, "Azure", "Cloud") {
+    AzureSubscription(azPTL, "PTL Subscription", "") {
+        AzureVirtualNetwork(ptlvn, "PTL VNET", "") {
+        }
+    }
+    AzureSubscription(az, "Adaptors Subscription", "") {
+        AzureVirtualNetwork(avn, "NIA Adaptors VNET", "") {
+            rectangle "AKS subnet" {
+                AzureKubernetesService(aks, "Adaptors Kubernetes Cluster", "k8s cluster") {
+                    'agent "Lab Results Pod" as labResults #fff
+                    agent "GP2GP Pod" as gp2gp #fff
+                    agent "GPCC Pod" as gpcc #B88
+                    agent "MHS-Inbound" as mhsin #ddd
+                    agent "MHS-Outbound" as mhsout #ddd
+                    agent "MHS-Route" as mhsroute #ddd
+                }
+            }
+        }
+        AzureCosmosDb(cosmos, "State Db", "MongoDb")
+        rectangle "MHS Queues" {
+            AzureServiceBus(mhsinq, "MHS Inbound Queue", "Internal task queue")
+
+        }
+    }
+}
+System_Ext(nhs, "NHS Systems", "Spine, SDS, GPC Connect, etc")
+
+mhsin --left--> mhsinq : Message Received via HTTP
+mhsroute <-down--> nhs : Retrieve Endpoint from SPINE to Forward Message
+mhsout <--left--> mhsroute : Enqueue FHIR message
+mhsinq --> gp2gp : Message Recevied from MHS-Inbound
+gp2gp <--left--> gpcc : Get GPC Structure
+gpcc <-> nhs : Migrate Structure Record
+gp2gp <--left--> mhsout : Consume FHIR Message
+
+gp2gp <--> cosmos
+gpcc <--> cosmos
+mhsout <--> cosmos
+mhsin <--> cosmos
+
+nhs <--> ptlvn
+
+@enduml
