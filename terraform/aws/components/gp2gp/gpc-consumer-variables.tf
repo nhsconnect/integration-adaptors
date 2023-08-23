@@ -117,7 +117,7 @@ variable "gpc-consumer_override_gpc_provider_url" {
   default = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
 }
 
-variable "gpc-consumer_ssp_fqdn" {
+variable "gpc-consumer_ssp_url" {
   type = string
   description = "FQDN for the SDS API"
   default = ""

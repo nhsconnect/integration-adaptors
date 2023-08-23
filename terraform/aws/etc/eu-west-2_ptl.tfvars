@@ -84,9 +84,10 @@ gp2gp_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 gp2gp_log_level = "INFO"
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
-gp2gp_gpc_override_nhs_number = "9690938622"
-gp2gp_gpc_override_to_asid = "200000001329"
-gp2gp_gpc_override_from_asid = "200000001467"
+#gp2gp_gpc_override_nhs_number = "9690938622"
+#gp2gp_gpc_override_to_asid = "200000001329"
+#gp2gp_gpc_override_from_asid = "200000001467"
+gp2gp_create_wiremock = true
 
 # Settings for "gpc-consumer" component
 gpc-consumer_service_minimal_count = 1
@@ -98,10 +99,10 @@ gpc-consumer_service_launch_type = "FARGATE"
 gpc-consumer_root_log_level = "WARN"
 gpc-consumer_log_level = "INFO"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
-gpc-consumer_override_gpc_provider_url = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
-gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory/FHIR/R4"
-gpc_enable_sds = "true"
-gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
+#gpc-consumer_override_gpc_provider_url = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
+#gpc-consumer_sds_url = "https://int.api.service.nhs.uk/spine-directory/FHIR/R4" # using wiremock instead
+#gpc_enable_sds = "true" # maybe not needed anymore
+#gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
 
 ###### FOR GPC-CONSUMER TO BE DEPLOYED IN PTL ENVIRONMENT
 gpc-consumer_include_certs = true
