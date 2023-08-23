@@ -67,7 +67,7 @@ locals {
     {
       name = "GP2GP_GPC_GET_URL"
       # value = var.gp2gp_create_gpcc_mock ? "http://${module.gpcc_mock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_port}/GP0001/STU3/1/gpconnect" : "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}/B82617/STU3/1/gpconnect"
-      value = var.gp2gp_create_wiremock ? "http://${module.gpc-consumer_ecs_service[0].loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}/@ODS_CODE@/STU3/1/gpconnect" : var.gp2gp_gpc_get_url
+      value = var.gp2gp_create_wiremock ? "http://${module.gpc-consumer_ecs_service.loadbalancer_dns_name}:${var.gpc-consumer_service_container_port}/@ODS_CODE@/STU3/1/gpconnect" : var.gp2gp_gpc_get_url
     },
     {
       name = "GP2GP_GPC_OVERRIDE_NHS_NUMBER"
