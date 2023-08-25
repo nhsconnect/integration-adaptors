@@ -56,10 +56,10 @@ locals {
       name = "GP2GP_STORAGE_CONTAINER_NAME"
       value = aws_s3_bucket.gp2gp_extract_cache_bucket.id
     },
-    {
-      name = "GP2GP_GPC_HOST"
-      value = var.gp2gp_gpc_host
-    },
+#    {
+#      name = "GP2GP_GPC_HOST"
+#      value = var.gp2gp_gpc_host
+#    },
     {
       name = "GP2GP_MHS_OUTBOUND_URL"
       value = var.gp2gp_create_mhs_mock ? "http://${module.mock_mhs_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_mhs_port}/mock-mhs-endpoint" : "http://mhs-outbound.${trimsuffix(data.terraform_remote_state.base.outputs.r53_zone_name,".")}/"
@@ -125,10 +125,10 @@ locals {
   ]
 
   sdsapi_mock_environment_variables = [
-    {
-      name  = "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL"
-      value = var.gp2gp_create_gpcapi_mock ? "http://${module.gpcapi_mock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_port}" : var.gpc-consumer_override_gpc_provider_url
-    }
+#    {
+#      name  = "GPC_CONSUMER_OVERRIDE_GPC_PROVIDER_URL"
+#      value = var.gp2gp_create_gpcapi_mock ? "http://${module.gpcapi_mock_ecs_service[0].loadbalancer_dns_name}:${var.gp2gp_mock_port}" : var.gpc-consumer_override_gpc_provider_url
+#    }
   ]
   gpcc_mock_command_variables = [
     "-global-response-templating"

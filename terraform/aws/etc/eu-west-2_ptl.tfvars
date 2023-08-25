@@ -105,7 +105,7 @@ gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
 #gpc-consumer_ssp_fqdn = "https://proxy.int.spine2.ncrs.nhs.uk/"
 
 ###### FOR GPC-CONSUMER TO BE DEPLOYED IN PTL ENVIRONMENT
-gpc-consumer_include_certs = true
+gpc-consumer_include_certs = false
 secret_name_spine_client_cert = "gpc_consumer_spine_client_cert"
 secret_name_spine_client_key = "gpc_consumer_spine_client_key"
 secret_name_spine_root_ca_cert = "gpc_consumer_spine_root_ca_cert"

@@ -164,11 +164,11 @@ variable "gp2gp_gpc_get_document_endpoint" {
   default =  "/fhir/Binary/"
 }
 
-variable "gp2gp_gpc_host" {
-  type = string
-  description = "Host used for GPC requests"
-  default = "orange.testlab.nhs.uk"
-}
+#variable "gp2gp_gpc_host" {
+#  type = string
+#  description = "Host used for GPC requests"
+#  default = "orange.testlab.nhs.uk"
+#}
 
 variable "gp2gp_service_target_request_count" {
   type = number
