@@ -27,6 +27,7 @@ module "gp2gp_wiremock_ecs_service" {
   use_application_lb = true
   load_balancer_type = "application"
   protocol = "HTTP"
+  internal = false
 
   container_healthcheck_port = var.gp2gp_wiremock_container_port
   enable_dlt                 = var.enable_dlt
