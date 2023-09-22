@@ -10,12 +10,12 @@ locals {
         value = "${var.environment}-pss-queue"
       },
       {
-        name  = "LOG_LEVEL"
+        name  = "PS_LOGGING_LEVEL"
         value = var.pss_log_level
       },
       {
         name = "PS_DB_URL"
-        value = "jdbc:postgresql://${data.terraform_remote_state.base.outputs.postgres_instance_endpoint}"
+        value = "jdbc:postgresql://${data.terraform_remote_state.base.outputs.postgres_instance_endpoint}/patient_switching"
       },
       {
         name = "PS_AMQP_MAX_REDELIVERIES"
@@ -37,7 +37,7 @@ locals {
       },
       {
         name = "MHS_QUEUE_NAME"
-        value = "${var.environment}-pss-mhs-queue"
+        value = "${var.environment}_mhs_inbound"
       },
       {
         name = "MHS_AMQP_BROKER"
@@ -47,11 +47,27 @@ locals {
         name = "MHS_AMQP_MAX_REDELIVERIES"
         value = var.pss_amqp_max_redeliveries
       },
+      {
+        name = "GP2GP_MHS_INBOUND_QUEUE",
+        value = "${var.environment}_gp2gp_queue"
+      },
+      {
+        name = "GP2GP_AMQP_BROKERS",
+        value = replace(data.aws_mq_broker.pss_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
+      },
+      {
+        name = "PS_DAISY_CHAINING_ACTIVE",
+        value = var.daisy_chaining_active
+      },
 
       {
         name = "MHS_BASE_URL"
         value = "http://${module.ecs_service_mock_mhs[0].loadbalancer_dns_name}:${var.pss_service_application_port}/"
-      } 
+      },
+      {
+        name = "SUPPORTED_FILE_TYPES"
+        value = var.supported_file_types
+      }
   ]
 
 

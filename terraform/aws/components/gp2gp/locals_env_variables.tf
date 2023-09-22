@@ -89,7 +89,7 @@ locals {
     },
     {
       name = "GP2GP_MHS_INBOUND_QUEUE"
-      value = var.mhs_inbound_queue_name
+      value = var.daisy_chaining_active ? var.daisy_chaining_queue : var.mhs_inbound_queue_name
     },
     {
       name  = "GP2GP_AMQP_BROKERS"

@@ -85,6 +85,7 @@ gp2gp_log_level = "INFO"
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 gp2gp_create_wiremock = true
+daisy_chaining_active = true
 
 # Settings for "gpc-consumer" component
 gpc-consumer_service_minimal_count = 1
@@ -105,9 +106,9 @@ secret_name_spine_root_ca_cert = "gpc_consumer_spine_root_ca_cert"
 secret_name_spine_sub_ca_cert = "gpc_consumer_spine_sub_ca_cert"
 secret_name_sds_apikey = "gpc-consumer_SDS-API_Key"
 
-pss_service_minimal_count = 0
-pss_service_desired_count = 0
-pss_service_maximal_count = 0
+pss_service_minimal_count = 1
+pss_service_desired_count = 1
+pss_service_maximal_count = 1
 pss_service_target_request_count = 1200
 pss_service_launch_type = "FARGATE"
 pss_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
@@ -120,3 +121,4 @@ pss_mock_mhs_port = 8080
 pss_service_application_port = 8080
 pss_log_level = "DEBUG"
 ecs_scheduler_stop_capacity = 0
+pss_gp2gp_inbound_queue_name = ""

@@ -198,6 +198,18 @@ variable mhs_inbound_queue_name {
   description = "Name of queue used by MHS Inbound "
 }
 
+variable "daisy_chaining_active" {
+  type = bool
+  description = "Enable daisy chaining"
+  default = false
+}
+
+variable "daisy_chaining_queue" {
+  type = string
+  description = "Inbound queue when daisy chaining is active"
+  default = "ptl_gp2gp_queue"
+}
+
 variable "create_testbox" {
   type = bool
   default = false

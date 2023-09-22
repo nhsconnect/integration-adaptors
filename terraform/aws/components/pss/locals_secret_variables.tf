@@ -37,6 +37,18 @@ locals {
     {
       name = "MHS_AMQP_PASSWORD"
       valueFrom  = data.aws_secretsmanager_secret.mq_password.arn
+    },
+    {
+      name = "GP2GP_AMQP_USERNAME"
+      valueFrom = data.aws_secretsmanager_secret.mq_username.arn
+    },
+    {
+      name = "GP2GP_AMQP_PASSWORD"
+      valueFrom = data.aws_secretsmanager_secret.mq_password.arn
+    },
+    {
+      name = "SDS_API_KEY"
+      valueFrom = data.aws_secretsmanager_secret.gpc-consumer_sds_apikey.arn
     }
   ]
   pss_gpc_api_facade_secret_variables = [
