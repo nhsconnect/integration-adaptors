@@ -111,9 +111,9 @@ secret_name_spine_root_ca_cert = "gpc_consumer_spine_root_ca_cert"
 secret_name_spine_sub_ca_cert = "gpc_consumer_spine_sub_ca_cert"
 secret_name_sds_apikey = "gpc-consumer_SDS-API_Key"
 
-pss_service_minimal_count = 0
-pss_service_desired_count = 0
-pss_service_maximal_count = 0
+pss_service_minimal_count = 1
+pss_service_desired_count = 1
+pss_service_maximal_count = 1
 pss_service_target_request_count = 1200
 pss_service_launch_type = "FARGATE"
 pss_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
