@@ -49,12 +49,12 @@ variable "jumpbox_allowed_ssh" {
 
 variable "jumpbox_size" {
   type = "string"
-  default = "t2.micro"
+  default = "t3a.medium"
 }
 
 variable "jumpbox_volume_size" {
   type = number
-  default = 16
+  default = 32
 }
 
 variable "mq_vpc_id" {
