@@ -62,7 +62,7 @@ locals {
 
       {
         name = "MHS_BASE_URL"
-        value = "http://${module.ecs_service_mock_mhs[0].loadbalancer_dns_name}:${var.pss_service_application_port}/"
+        value = var.pss_create_mhs_mock ? "http://${module.ecs_service_mock_mhs[0].loadbalancer_dns_name}:${var.pss_service_application_port}/": "http://mhs-outbound.${trimsuffix(data.terraform_remote_state.base.outputs.r53_zone_name,".")}/"
       },
       {
         name = "SUPPORTED_FILE_TYPES"
