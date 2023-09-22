@@ -15,7 +15,7 @@ locals {
       },
       {
         name = "PS_DB_URL"
-        value = "jdbc:postgresql://${data.terraform_remote_state.base.outputs.postgres_instance_endpoint}/patient_switching"
+        value = "jdbc:postgresql://${data.terraform_remote_state.base.outputs.postgres_instance_endpoint}"
       },
       {
         name = "PS_AMQP_MAX_REDELIVERIES"
