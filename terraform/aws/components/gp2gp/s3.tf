@@ -5,9 +5,13 @@ resource "aws_s3_bucket" "gp2gp_extract_cache_bucket" {
   tags = merge(local.default_tags, {
     Name = "${local.resource_prefix}-extract-cache-bucket"
   })
-  lifecycle_rule {
-    id      = "cache_retention_period"
-    enabled = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "gp2gp_extract_cache_bucket_lifecycle_config" {
+  bucket = aws_s3_bucket.gp2gp_extract_cache_bucket.id
+  rule {
+    id     = "cache_retention_period"
+    status = "Enabled"
     expiration {
       days = var.gp2gp_extract_cache_bucket_retention_period
     }
