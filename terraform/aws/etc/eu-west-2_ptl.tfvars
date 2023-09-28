@@ -121,4 +121,4 @@ pss_mock_mhs_port = 8080
 pss_service_application_port = 8080
 pss_log_level = "DEBUG"
 ecs_scheduler_stop_capacity = 0
-pss_gp2gp_inbound_queue_name = ""
+pss_storage_type="S3"

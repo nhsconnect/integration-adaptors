@@ -59,7 +59,6 @@ locals {
         name = "PS_DAISY_CHAINING_ACTIVE",
         value = var.daisy_chaining_active
       },
-
       {
         name = "MHS_BASE_URL"
         value = var.pss_create_mhs_mock ? "http://${module.ecs_service_mock_mhs[0].loadbalancer_dns_name}:${var.pss_service_application_port}/": "http://mhs-outbound.${trimsuffix(data.terraform_remote_state.base.outputs.r53_zone_name,".")}/"
@@ -67,6 +66,14 @@ locals {
       {
         name = "SUPPORTED_FILE_TYPES"
         value = var.supported_file_types
+      },
+      {
+        name = "STORAGE_TYPE"
+        value = var.pss_storage_type
+      },
+      {
+        name = "STORAGE_CONTAINER_NAME"
+        value = aws_s3_bucket.pss_attachment_bucket.id
       }
   ]
 
