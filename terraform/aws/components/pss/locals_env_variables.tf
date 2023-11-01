@@ -69,7 +69,7 @@ locals {
       },
       {
         name = "STORAGE_TYPE"
-        value = var.pss_storage_type
+        value = "S3"
       },
       {
         name = "STORAGE_CONTAINER_NAME"

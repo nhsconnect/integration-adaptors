@@ -193,18 +193,7 @@ variable gp2gp_ssl_trust_store_url {
   default = ""
 }
 
-variable mhs_inbound_queue_name {
-  type = string
-  description = "Name of queue used by MHS Inbound "
-}
-
-variable "daisy_chaining_active" {
-  type = bool
-  description = "Enable daisy chaining"
-  default = false
-}
-
-variable "daisy_chaining_queue" {
+variable "gp2gp_inbound_queue_name" {
   type = string
   description = "Inbound queue when daisy chaining is active"
   default = "ptl_gp2gp_queue"
