@@ -195,9 +195,3 @@ variable "pss_attachment_bucket_retention_period" {
   description = "Number of days objects will be retained in pss_attachment_storage_bucket"
   default = 7
 }
-
-variable "pss_storage_type" {
-  type = string
-  description = "The storage type used for attachments"
-  default = "LocalMock"
-}
