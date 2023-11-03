@@ -33,3 +33,7 @@ data "aws_secretsmanager_secret" "postgres_gpc_facade_password" {
 data "aws_secretsmanager_secret_version" "postgres_psdbowner_username" {
   secret_id = data.aws_secretsmanager_secret.postgres_psdbowner_username.id
 }
+
+data "aws_secretsmanager_secret" "gpc-consumer_sds_apikey" {
+  name = var.secret_name_sds_apikey
+}

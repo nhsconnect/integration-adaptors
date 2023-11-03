@@ -10,7 +10,7 @@ locals {
         value = "${var.environment}-pss-queue"
       },
       {
-        name  = "LOG_LEVEL"
+        name  = "PS_LOGGING_LEVEL"
         value = var.pss_log_level
       },
       {
@@ -47,11 +47,34 @@ locals {
         name = "MHS_AMQP_MAX_REDELIVERIES"
         value = var.pss_amqp_max_redeliveries
       },
-
+      {
+        name = "GP2GP_MHS_INBOUND_QUEUE",
+        value = "${var.environment}_gp2gp_queue"
+      },
+      {
+        name = "GP2GP_AMQP_BROKERS",
+        value = replace(data.aws_mq_broker.pss_mq_broker.instances[0].endpoints[1], "amqp+ssl", "amqps")
+      },
+      {
+        name = "PS_DAISY_CHAINING_ACTIVE",
+        value = var.daisy_chaining_active
+      },
       {
         name = "MHS_BASE_URL"
         value = var.pss_create_mhs_mock ? "http://${module.ecs_service_mock_mhs[0].loadbalancer_dns_name}:${var.pss_service_application_port}/": "http://mhs-outbound.${trimsuffix(data.terraform_remote_state.base.outputs.r53_zone_name,".")}/"
-      } 
+      },
+      {
+        name = "SUPPORTED_FILE_TYPES"
+        value = var.supported_file_types
+      },
+      {
+        name = "STORAGE_TYPE"
+        value = "S3"
+      },
+      {
+        name = "STORAGE_CONTAINER_NAME"
+        value = aws_s3_bucket.pss_attachment_bucket.id
+      }
   ]
 
 

@@ -164,12 +164,6 @@ variable "gp2gp_gpc_get_document_endpoint" {
   default =  "/fhir/Binary/"
 }
 
-variable "gp2gp_gpc_host" {
-  type = string
-  description = "Host used for GPC requests"
-  default = "orange.testlab.nhs.uk"
-}
-
 variable "gp2gp_service_target_request_count" {
   type = number
   description = "The target number of requests per minute that an service should handle. The number of services will be autoscaled so each instance handles this number of requests. This value should be tuned based on the results of performance testing."
@@ -199,9 +193,10 @@ variable gp2gp_ssl_trust_store_url {
   default = ""
 }
 
-variable mhs_inbound_queue_name {
+variable "gp2gp_inbound_queue_name" {
   type = string
-  description = "Name of queue used by MHS Inbound "
+  description = "Inbound queue when daisy chaining is active"
+  default = "ptl_gp2gp_queue"
 }
 
 variable "create_testbox" {

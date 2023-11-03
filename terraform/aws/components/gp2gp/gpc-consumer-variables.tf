@@ -32,7 +32,7 @@ variable "gpc-consumer_service_launch_type" {
 variable "gpc-consumer_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
-  default = "main-21-188a231"
+  default = "main-51-5768b7f"
 }
 
 variable "gpc-consumer_ssl_trust_store_url" {
@@ -117,7 +117,7 @@ variable "gpc-consumer_override_gpc_provider_url" {
   default = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
 }
 
-variable "gpc-consumer_ssp_fqdn" {
+variable "gpc-consumer_ssp_url" {
   type = string
   description = "FQDN for the SDS API"
   default = ""
