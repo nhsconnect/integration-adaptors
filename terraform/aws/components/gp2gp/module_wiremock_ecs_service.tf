@@ -18,8 +18,8 @@ module "gp2gp_wiremock_ecs_service" {
   maximal_count     = var.gp2gp_service_maximal_count
   service_target_request_count = var.gp2gp_service_target_request_count
 
-  container_port    = var.gp2gp_wiremock_container_port #var.gp2gp_service_container_port
-  application_port  = var.gp2gp_wiremock_application_port #var.gp2gp_service_application_port
+  container_port    = var.gp2gp_wiremock_container_port
+  application_port  = var.gp2gp_wiremock_application_port
   launch_type       = var.gp2gp_service_launch_type
   log_stream_prefix = var.gp2gp_build_id
   healthcheck_path  = var.gp2gp_healthcheck_path
