@@ -35,12 +35,6 @@ variable "gpc-consumer_build_id" {
   default = "main-51-5768b7f"
 }
 
-variable "gpc-consumer_ssl_trust_store_url" {
-  type = string
-  description = "S3 path to the custom trust store"
-  default = ""
-}
-
 variable "gpc-consumer_environment_variables" {
   type = list(object({name=string, value=string}))
   description = "List of objects for Environment variables"
@@ -63,18 +57,6 @@ variable "gpc-consumer_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
   default = "/healthcheck"
-}
-
-variable "gpc-consumer_amqp_max_retries" {
-  type = number
-  description = "Max retries on connection to amqp"
-  default = 3
-}
-
-variable "gpc-consumer_amqp_retry_delay" {
-  type = number
-  description = "Delay on retries to connect to amqp"
-  default = 100
 }
 
 variable "gpc-consumer_service_target_request_count" {
@@ -111,15 +93,9 @@ variable "gpc-consumer_sds_url" {
   default = 8080 
 }
 
-variable "gpc-consumer_override_gpc_provider_url" {
-  type = string
-  description = "URL to the GP Connect Provider API"
-  default = "https://GPConnect-Win1.itblab.nic.cfh.nhs.uk"
-}
-
 variable "gpc-consumer_ssp_url" {
   type = string
-  description = "FQDN for the SDS API"
+  description = "FQDN for the spine secure proxy"
   default = ""
 }
 
@@ -127,51 +103,6 @@ variable "gpc-consumer_include_certs" {
   type = bool
   description = "If TRUE, GPCC Spine Certs & Key Secrets will be included in envrionment variables"
   default = false
-}
-
-variable "gpc_enable_sds" {
-  type = string
-  description = "Enable SDS for GPC requests"
-  default = "true"
-}
-
-
-# Variables for MESH mailbox
-
-variable "gpc-consumer_mesh_host" {
-  type = string
-  description = "URL for MESH host"
-  default = ""
-}
-
-variable "gpc-consumer_mesh_cert_validation" {
-  type = string
-  description = "false will disable certificate validation for SSL connection"
-  default = "true"
-}
-
-variable "gpc-consumer_mesh_polling_cycle_minimum_interval_in_seconds" {
-  type = number
-  description = "Delay in seconds on scanning mesh mailbox"
-  default = 300
-}
-
-variable "gpc-consumer_mesh_client_wakeup_interval_in_milliseconds" {
-  type = number
-  description = "Interval in miliseconds between mailbox scans"
-  default = 60000
-}
-
-variable "gpc-consumer_mesh_polling_cycle_duration_in_seconds" {
-  type = number
-  description = "Duration of mesh polling cycle"
-  default = 285
-}
-
-variable "gpc-consumer_scheduler_enabled" {
-  type = bool
-  description = "Enable scheduler"
-  default = true
 }
 
 # secret names
