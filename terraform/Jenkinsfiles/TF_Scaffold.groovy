@@ -21,7 +21,7 @@ pipeline {
 
   parameters {
     choice (name: "Project",     choices: ['nia'],                                                description: "Choose a project")
-    choice (name: "Environment", choices: ['build1', 'build2', 'build3', 'vp', 'ptl', 'account', 'kdev'], description: "Choose environment")
+    choice (name: "Environment", choices: ['ptl', 'account'],                                     description: "Choose environment")
     choice (name: "Component",   choices: ['base', 'nhais', 'OneOneOne', 'mhs', 'account', 'fake_mesh', 'nhais_responder', 'gp2gp', 'lab-results', 'pss'],     description: "Choose component")
     choice (name: "Action",      choices: ['plan', 'apply', 'plan-destroy', 'destroy'],           description: "Choose Terraform action")
     string (name: "Variables",   defaultValue: "",                                                description: "Terrafrom variables, format: variable1=value,variable2=value, no spaces")
