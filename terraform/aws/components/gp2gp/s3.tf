@@ -15,6 +15,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "gp2gp_extract_cache_bucket" {
     expiration {
       days = var.gp2gp_extract_cache_bucket_retention_period
     }
+
+    filter { } # Expire all objects
   }
 }
 
