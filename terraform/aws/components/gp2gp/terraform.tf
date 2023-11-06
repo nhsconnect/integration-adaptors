@@ -3,11 +3,16 @@ terraform {
   backend "s3" {
     # Intentionally blank - all parameters provided in command line
   }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.2.0"
+    }
+  }
 }
 
 # Setup AWS provider
 provider "aws" {
   profile = "default"
-  version = "~> 3.37.0"
   region = var.region
 }
