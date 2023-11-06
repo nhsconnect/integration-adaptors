@@ -38,7 +38,7 @@ locals {
     },
     {
       name  = "GP2GP_TASK_QUEUE"
-      value = join("-", list(var.environment, "gp2gp", "tasks"))
+      value = join("-", tolist([var.environment, "gp2gp", "tasks"]))
     },
     {
       name = "GP2GP_GPC_GET_STRUCTURED_ENDPOINT"
