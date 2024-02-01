@@ -21,6 +21,14 @@ locals {
       name = "MHS_DB_ENDPOINT_URL"
       value = join("&",[data.terraform_remote_state.base.outputs.docdb_cluster_connection_string,"ssl=${data.terraform_remote_state.base.outputs.docdb_tls_enabled}"])
     },
+    {
+      name  = "MHS_OUTBOUND_ROUTING_LOOKUP_METHOD"
+      value = "SDS_API"
+    },
+    {
+      name  = "MHS_SDS_API_URL"
+      value = var.gpc-consumer_sds_url
+    }
   ])
 
   outbound_variables = concat(local.environment_variables, [

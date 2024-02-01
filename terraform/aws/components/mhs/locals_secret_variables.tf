@@ -24,6 +24,10 @@ locals {
       name = "MHS_SECRET_CA_CERTS"
       valueFrom = data.aws_secretsmanager_secret.mhs_ca_certs.arn
     },
+    {
+      name = "MHS_SDS_API_KEY"
+      valueFrom = data.aws_secretsmanager_secret.sds_apikey.arn
+    }
     # {
     #   name = "MHS_MONGO_USERNAME"
     #   valueFrom = data.aws_secretsmanager_secret.docdb_master_username.arn

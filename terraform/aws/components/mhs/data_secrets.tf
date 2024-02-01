@@ -39,3 +39,7 @@ data "aws_secretsmanager_secret" "mhs_ca_certs" {
 data "aws_secretsmanager_secret" "spine_routelookup_ca_certs" {
   name = var.secret_name_mhs_spine_route_lookup_ca_certs
 }
+
+data "aws_secretsmanager_secret" "sds_apikey" {
+  name = var.secret_name_sds_apikey
+}
