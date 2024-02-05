@@ -308,3 +308,12 @@ variable secret_name_mhs_spine_route_lookup_ca_certs {
   type = string
   default = "build-outbound-route-connection-cacerts"
 }
+
+variable "gpc-consumer_sds_url" {
+  type = string
+  description = "URL to the SDS API"
+}
+
+variable secret_name_sds_apikey {
+  type = string
+}
