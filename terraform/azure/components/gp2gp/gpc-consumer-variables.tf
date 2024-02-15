@@ -41,6 +41,12 @@ variable "gpc-consumer_sds_url" {
   default = 8080 
 }
 
+variable "gpc-consumer_supplier_ods_code" {
+  type = string
+  description = "GPC Supplier ODS code"
+  default = ""
+}
+
 variable "gpc-consumer_ssp_fqdn" {
   type = string
   description = "FQDN for the SDS API"
