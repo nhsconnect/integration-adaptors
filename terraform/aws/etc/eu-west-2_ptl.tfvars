@@ -96,6 +96,7 @@ gpc-consumer_service_launch_type = "FARGATE"
 gpc-consumer_root_log_level = "WARN"
 gpc-consumer_log_level = "INFO"
 gpc-consumer_logs_datetime_format = "%Y-%m-%d %H:%M:%S%L"
+gpc-consumer_supplier_ods_code = "YGMYW"
 
 ###### FOR GPC-CONSUMER TO BE DEPLOYED IN PTL ENVIRONMENT
 gpc-consumer_include_certs = false

@@ -97,6 +97,11 @@ resource "kubernetes_deployment" "gpc-consumer" {
           }
 
           env {
+            name  = "GPC_SUPPLIER_ODS_CODE"
+            value = var.gpc-consumer_supplier_ods_code
+          }
+
+          env {
             name  = "GPC_CONSUMER_SSP_FQDN"
             value = var.gpc-consumer_ssp_fqdn
           }

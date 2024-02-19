@@ -53,6 +53,12 @@ variable "gpc-consumer_log_level" {
   default = "INFO"
 }
 
+variable "gpc-consumer_supplier_ods_code" {
+  type = string
+  description = "GPC Supplier ODS code"
+  default = ""
+}
+
 variable "gpc-consumer_healthcheck_path" {
   type = string
   description = "Path on which the container provides info about its status"
