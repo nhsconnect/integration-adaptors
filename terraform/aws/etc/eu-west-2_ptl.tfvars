@@ -85,6 +85,7 @@ gp2gp_log_level = "INFO"
 gp2gp_mongo_options = "replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false&tls=true"
 gp2gp_ssl_trust_store_url = "s3://nhsd-aws-truststore/rds-truststore.jks"
 gp2gp_create_wiremock = true
+gp2gp_environment_variables = [{name="GP2GP_LARGE_EHR_EXTRACT_THRESHOLD",value="31216"}]
 
 # Settings for "gpc-consumer" component
 gpc-consumer_service_minimal_count = 1
