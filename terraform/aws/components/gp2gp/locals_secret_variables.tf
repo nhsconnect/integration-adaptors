@@ -21,4 +21,19 @@ locals {
       valueFrom = data.aws_secretsmanager_secret.gp2gp_ssl_trust_store_password.arn
     }
   ]
+
+  wiremock_secret_variables = [
+    {
+      name      = "PDS_KEY_ID"
+      valueFrom = data.aws_secretsmanager_secret.pds_key_id.arn
+    },
+    {
+      name      = "PDS_API_KEY"
+      valueFrom = data.aws_secretsmanager_secret.pds_api_key.arn
+    },
+    {
+      name      = "PDS_PRIVATE_KEY"
+      valueFrom = data.aws_secretsmanager_secret.pds_private_key.arn
+    }
+  ]
 }
