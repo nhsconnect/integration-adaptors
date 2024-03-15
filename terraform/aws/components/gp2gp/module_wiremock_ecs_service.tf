@@ -33,7 +33,7 @@ module "gp2gp_wiremock_ecs_service" {
   dlt_vpc_id                 = var.dlt_vpc_id
 
   #environment_variables = local.environment_variables
-  #secret_variables      = local.secret_variables
+  secret_variables      = local.wiremock_secret_variables
 
   task_execution_role_arn = aws_iam_role.ecs_service_task_execution_role.arn
   task_role_arn           = data.aws_iam_role.ecs_service_task_role.arn
