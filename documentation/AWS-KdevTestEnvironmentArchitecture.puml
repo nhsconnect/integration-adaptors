@@ -1,0 +1,168 @@
+@startuml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/master/dist
+!includeurl AWSPuml/AWSCommon.puml
+
+' Comment out the following line to create technical view
+!includeurl AWSPuml/AWSSimplified.puml
+
+!includeurl AWSPuml/ApplicationIntegration/MQ.puml
+!includeurl AWSPuml/Compute/EC2ContainerRegistry.puml
+!includeurl AWSPuml/Compute/EC2Instance.puml
+!includeurl AWSPuml/Compute/ECSContainer1.puml
+!includeurl AWSPuml/Compute/ECSService.puml
+!includeurl AWSPuml/Compute/Fargate.puml
+!includeurl AWSPuml/Database/DocumentDBwithMongoDBcompatibility.puml
+!includeurl AWSPuml/Database/RDSPostgreSQLinstance.puml
+!includeurl AWSPuml/Database/ElastiCacheForRedis.puml
+!includeurl AWSPuml/GroupIcons/Cloudalt.puml
+!includeurl AWSPuml/GroupIcons/Region.puml
+!includeurl AWSPuml/GroupIcons/VPCSubnetPublic.puml
+!includeurl AWSPuml/GroupIcons/VPCSubnetPrivate.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/Route53HostedZone.puml
+!includeurl AWSPuml/ManagementAndGovernance/CloudWatch.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/APIGateway2.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/ClientVPN.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCCustomerGateway.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/ELBApplicationLoadBalancer.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/ELBNetworkLoadBalancer.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/ElasticLoadBalancing.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCElasticNetworkInterface.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCEndpoints.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCInternetGateway.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCPeering.puml
+!includeurl AWSPuml/NetworkingAndContentDelivery/VPCVPNGateway.puml
+!includeurl AWSPuml/SecurityIdentityAndCompliance/SecretsManager.puml
+!includeurl AWSPuml/Storage/SimpleStorageServiceS3.puml
+
+' left to right direction
+
+rectangle {
+Cloudalt(aws, "AWS Cloud Architecture for Kainos-Dev Environment (kdev)", "") {
+    rectangle {
+    Region(euWest, "eu-west-2 (London) Region", "") {
+        rectangle "RDS PostgreSQL Database" {
+            RDSPostgreSQLinstance(pssDb, "PSS DB\n(PSS State Database)", "")
+            RDSPostgreSQLinstance(stateDb, "Mock_MHS State DB\n(MHS State Database)", "")
+            RDSPostgreSQLinstance(syncDb, "Mock_MHS Sync-Async DB\n(MHS Sync-Async Database)", "")
+        }
+        SimpleStorageServiceS3(containerLayerStore, "S3 Bucket", "Technology", "")
+        rectangle "Amazon MQ Queues" {
+            MQ(pssQueues, "PSS Queues\n(PSS  Inbound/Outbound Queues)", "")
+            MQ(mhsQueues, "MockMHS Queues\n(Mock_MHS Inbound/Outbound Queues)", "")
+        }
+        CloudWatch(cw, "CloudWatch", "")
+        SecretsManager(secrets, "Secrets Manager", "")
+        Route53HostedZone(r53hz,"nhsredteam.internal.nhs.uk", "")
+        EC2ContainerRegistry(ecr, "Container Registry", "")
+
+        rectangle {
+        VPCSubnetPublic(adaptorVPC, "Adaptor VPC", "") {
+            rectangle {
+            VPCSubnetPrivate(azABC1, "Same three private subnets used for ECS Fargate Cluster", "Private subnet") {
+                VPCEndpoints(ep, "RDS PostgreSQL VPC Endpoint", "")
+                rectangle "ECR Security Group" {
+                    VPCElasticNetworkInterface(ecrVPC, "ECR VPC Endpoint", "")
+                }
+                rectangle "MQ Security Group" {
+                    VPCElasticNetworkInterface(mqVPC, "MQ VPC Endpoint", "")
+                }
+                VPCEndpoints(s3ep, "S3 VPC Endpoint", "")
+                rectangle "CloudWatch Security Group" {
+                    VPCElasticNetworkInterface(cwep, "CloudWatch VPC Endpoint", "")
+                }
+                rectangle "Secret Manager Security Group" {
+                    VPCElasticNetworkInterface(smep, "Secret Manager VPC Endpoint", "")
+                }
+            }
+            rectangle {
+                VPCSubnetPrivate(azABC, "Availability Zones A, B & C", "Private subnet") {
+                    rectangle {
+                        Fargate(fargate, "ECS Fargate Cluster", "") {
+                            rectangle "Outbound Mock_MHS Security Group" as osg {
+                                ECSService(oService, "Outbound Mock_MHS Fargate Service", "") {
+                                    rectangle "Outbound Mock_MHS ECS Fargate Task" {
+                                        ECSContainer1(oTask, "Outbound Mock_MHS Containers", "")
+                                    }
+                                }
+                            }
+                           rectangle "Route Security Group" as rsg {
+                                ECSService(rService, "Route Fargate Service", "") {
+                                    rectangle "Route ECS Fargate Task" {
+                                        ECSContainer1(rTask, "Route Containers", "")
+                                    }
+                                }
+                            }
+                            rectangle "Inbound Mock_MHS Security Group" as isg {
+                                ECSService(iService, "Inbound Mock_MHS Fargate Service", "") {
+                                    rectangle "Inbound Mock_MHS ECS Fargate Task" {
+                                        ECSContainer1(iTask, "Inbound Mock_MHS Containers", "")
+                                    }
+                                }
+                            }
+                            rectangle "PSS Security Group" as psssg {
+                                ECSService(pssService, "PSS ECS Fargate Service", "") {
+                                    rectangle "PSS ECS Fargate Task" {
+                                        ECSContainer1(pssTask, "PSS Containers", "")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            rectangle {
+                VPCSubnetPrivate(azLB, "Same three private subnets used for ECS Fargate Cluster", "Private subnet") {
+                    rectangle "Outbound ALB Security Group" {
+                        ELBApplicationLoadBalancer(outboundLB, "Outbound Mock_MHS Application Load Balancer", "")
+                    }
+                    rectangle "Route ALB Security Group" {
+                        ELBApplicationLoadBalancer(routeLB, "Route Application Load Balancer", "")
+                    }
+                    rectangle "PSS ALB Security Group" {
+                        ELBApplicationLoadBalancer(pssLB, "PSS Application Load Balancer", "")
+                    }
+                    ELBNetworkLoadBalancer(inboundLB, "Inbound Mock_MHS Network Load Balancer", "")
+                    ElastiCacheForRedis(redis, "SDS Cache\n(ElastiCache for Redis HA)", "")
+                }
+            }
+        }
+        }
+    }
+    }
+}
+}
+
+
+
+
+azABC1 --up--> r53hz
+fargate --up--> s3ep
+fargate --up--> smep
+s3ep --up--> containerLayerStore
+smep --up--> secrets
+oTask --up--> ep
+oTask --down-->routeLB
+pssTask --up-> mqVPC
+iTask --up-> mqVPC
+oTask --up-> mqVPC
+
+mqVPC --up-> pssQueues
+mqVPC --up-> mhsQueues
+pssTask --up-> ep
+fargate --up--> cwep
+cwep --up--> cw
+fargate --up--> ecrVPC
+ecrVPC --up-->ecr
+routeLB --> rTask
+
+rTask --down--> redis
+ep --up--> pssDb
+ep --up--> stateDb
+ep --up--> syncDb
+
+iTask --up--> ep
+outboundLB --up--> oTask
+pssLB --up--> pssTask
+inboundLB --up--> iTask
+@enduml
