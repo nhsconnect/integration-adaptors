@@ -32,7 +32,7 @@ variable "gpc-consumer_service_launch_type" {
 variable "gpc-consumer_build_id" {
   type = string
   description = "Number of the current build, used for tagging the logs"
-  default = "main-56-bcb8a2f"
+  default = "main-71-299f617"
 }
 
 variable "gpc-consumer_environment_variables" {
