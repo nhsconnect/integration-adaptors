@@ -10,7 +10,7 @@ resource "aws_ecs_service" "ecs_service" {
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
   health_check_grace_period_seconds  = var.enable_load_balancing ? var.health_check_grace_period_seconds : null
-
+  wait_for_steady_state              = true
 
   dynamic "load_balancer" {
     for_each = local.load_balancer_settings
