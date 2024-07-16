@@ -75,6 +75,10 @@ locals {
     {
       name = "GP2GP_GPC_OVERRIDE_FROM_ASID"
       value = var.gp2gp_gpc_override_from_asid
+    },
+    {
+      name = "GP2GP_REDACTIONS_ENABLED"
+      value = var.gp2gp_redactions_enabled
     }
   ])
 
