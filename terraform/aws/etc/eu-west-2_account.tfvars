@@ -79,9 +79,17 @@ ecr_repositories = [
     prefix_to_keep  = "main",
     number_to_keep  = 10
   },
-      {
+    {
     number = 11,
-    name = "pss",
+    name = "pss_snomed_schema",
+    scan = false,
+    expire_PR_after = 10,
+    prefix_to_keep  = "main",
+    number_to_keep  = 10
+  },
+    {
+    number = 12,
+    name = "pss_db_migration",
     scan = false,
     expire_PR_after = 10,
     prefix_to_keep  = "main",
