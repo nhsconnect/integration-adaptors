@@ -1,15 +1,13 @@
 # THIS REPOSITORY IS NO LONGER MAINTAINED
-Here are the new repositories with service separation:
 
-https://github.com/nhsconnect/integration-adaptor-common
+> [!CAUTION]
+> Here are the new repositories with service separation:
 
-https://github.com/nhsconnect/integration-adaptor-mhs
-
-https://github.com/nhsconnect/integration-adaptor-nhais
-
-
-
-
+- https://github.com/NHSDigital/integration-adaptor-111
+- https://github.com/NHSDigital/summary-care-record-api
+- https://github.com/NHSDigital/integration-adaptor-mhs
+- https://github.com/NHSDigital/integration-adaptor-nhais
+- https://github.com/NHSDigital/integration-adaptors-deployment
 
 # National Integration Adaptors
 
